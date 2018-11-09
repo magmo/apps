@@ -36,17 +36,26 @@ contract TicTacToehelpers {
     //
 
     function hasWon(uint16 _marks) private pure returns (bool) {
-        return ((_marks & 448) == 448 );
+        return (
+            ((_marks & 448) == 448) ||
+            ((_marks & 56 ) == 56 ) ||
+            ((_marks & 7  ) == 7  ) ||
+            ((_marks & 292) == 292) ||
+            ((_marks & 146) == 146) ||
+            ((_marks & 73 ) == 73 ) ||
+            ((_marks & 273) == 273) ||
+            ((_marks & 84 ) == 84 ) 
+            );
     }
 
     function madeStrictlyOneMark(uint16 _new_marks, uint16 _old_marks) private pure returns (bool){
         uint16 i;
         bool already_marked = false;
         for (i = 0; i < 9; i++){
-            if ((_new_marks/2**i)%2 == 0 && (_old_marks/2**i)%2 == 1){
+            if ((_new_marks >> i)%2 == 0 && (_old_marks >> i)%2 == 1){
                 return false; // erased a mark
             } 
-            else if ((_new_marks/2**i)%2 == 1 && (_old_marks/2**i)%2 == 0){
+            else if ((_new_marks >> i)%2 == 1 && (_old_marks >> i)%2 == 0){
                 if (already_marked == true){
                     return false; // made two or more marks
                 }
