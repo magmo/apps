@@ -11,7 +11,7 @@ contract TicTacToehelpers {
     //   +-----------------+
     //      6  |  7  |  8  
     // 
-    // The binary representation is 2**(8-index).
+    // The binary representation for a single mark is 2**(8-index).
     //
     // e.g. noughts = 000000001
     //      crosses = 010000000
@@ -24,23 +24,19 @@ contract TicTacToehelpers {
     //   +-----------------+
     //         |      |  0  
     // 
+    //
+    // 0b111000000 = 448 /* mask for win @ row 1 */
+    // 0b000111000 =  56 /* mask for win @ row 2 */
+    // 0b000000111 =   7 /* mask for win @ row 3 */
+    // 0b100100100 = 292 /* mask for win @ col 1 */
+    // 0b010010010 = 146 /* mask for win @ col 2 */
+    // 0b001001001 =  73 /* mask for win @ col 3 */
+    // 0b100010001 = 273 /* mask for win @ downhill diag */
+    // 0b001010100 =  84 /* mask for win @ uphill diag */
+    //
 
     function hasWon(uint16 _marks) private pure returns (bool) {
-        if(
-            ((_marks && 0b111000000) == 0b111000000) // match to 111********* :  win @ row 1 
-         || ((_marks && 0b000111000) == 0b000111000) // win @ row 2
-         || ((_marks && 0b000000111) == 0b000000111) // win @ row 3
-            //
-         || ((_marks && 0b100100100) == 0b100100100) // win @ col 1
-         || ((_marks && 0b010010010) == 0b010010010) // win @ col 2
-         || ((_marks && 0b001001001) == 0b001001001) // win @ col 3
-            //           
-         || ((_marks && 0b100010001) == 0b100010001) // win @ downhill diag
-         || ((_marks && 0b001010100) == 0b001010100) // win @ uphill diag
-            )
-        {
-            return true;
-        }
+        return ((_marks & 448) == 448 );
     }
 
     function madeStrictlyOneMark(uint16 _new_marks, uint16 _old_marks) private pure returns (bool){
@@ -61,7 +57,7 @@ contract TicTacToehelpers {
     }
 
     function areDisjoint(uint16 _noughts, uint16 _crosses) private pure returns (bool) {
-        if((_noughts && _crosses) == 0b000000000){
+        if((_noughts & _crosses) == 0){
             return true;
         }
     }
