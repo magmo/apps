@@ -34,8 +34,9 @@ contract TicTacToehelpers {
     // 0b100010001 = 273 /* mask for win @ downhill diag */
     // 0b001010100 =  84 /* mask for win @ uphill diag */
     //
+    // 0b111111111 = 511 /* full board */
 
-    function hasWon(uint16 _marks) private pure returns (bool) {
+    function hasWon(uint16 _marks) public pure returns (bool) {
         return (
             ((_marks & 448) == 448) ||
             ((_marks & 56 ) == 56 ) ||
@@ -48,7 +49,13 @@ contract TicTacToehelpers {
             );
     }
 
-    function madeStrictlyOneMark(uint16 _new_marks, uint16 _old_marks) private pure returns (bool){
+    function isDraw(uint16 _noughts, uint16 _crosses) public pure returns (bool) {
+        if((_noughts ^ _crosses) == 511) { 
+            return true; // using XOR. Note that a draw could include a winning position that is unnoticed / unclaimed
+        }
+    }
+
+    function madeStrictlyOneMark(uint16 _new_marks, uint16 _old_marks) public pure returns (bool){
         uint16 i;
         bool already_marked = false;
         for (i = 0; i < 9; i++){
@@ -65,7 +72,7 @@ contract TicTacToehelpers {
         return true;
     }
 
-    function areDisjoint(uint16 _noughts, uint16 _crosses) private pure returns (bool) {
+    function areDisjoint(uint16 _noughts, uint16 _crosses) public pure returns (bool) {
         if((_noughts & _crosses) == 0){
             return true;
         }
