@@ -1,0 +1,19 @@
+{
+  "name": "ttt",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "module": "src/index.js",
+  "dependencies": {
+    "fmg-core": "0.1.6",
+    "fmg-simple-adjudicator": "0.1.6"
+  },
+  "config": {
+    "deploymentNetwork": "ropsten"
+  },
+  "scripts": {
+
+  },
+  "devDependencies": {
+  }
+}
