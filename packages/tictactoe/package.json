@@ -11,9 +11,6 @@
   "config": {
     "deploymentNetwork": "ropsten"
   },
-  "scripts": {
-
-  },
-  "devDependencies": {
-  }
+  "scripts": {},
+  "devDependencies": {}
 }

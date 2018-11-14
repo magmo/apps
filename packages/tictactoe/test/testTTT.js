@@ -1,8 +1,6 @@
-var TTT = artifacts.require("TicTacToehelpers");
+var TTT = artifacts.require("TicTacToeGame");
 
-contract('TicTacToehelpers', (accounts) => {
-
-  let stateContract;
+contract('TicTacToeGame', (accounts) => {
 
   before(async () => {
     TTT = await TTT.deployed();
