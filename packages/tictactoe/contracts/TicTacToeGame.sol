@@ -246,32 +246,32 @@ contract TicTacToeGame {
     //         |      |  0  
     // 
     //
-    // 0b111000000 = 448 /* mask for win @ row 1 */
-    // 0b000111000 =  56 /* mask for win @ row 2 */
-    // 0b000000111 =   7 /* mask for win @ row 3 */
-    // 0b100100100 = 292 /* mask for win @ col 1 */
-    // 0b010010010 = 146 /* mask for win @ col 2 */
-    // 0b001001001 =  73 /* mask for win @ col 3 */
-    // 0b100010001 = 273 /* mask for win @ downhill diag */
-    // 0b001010100 =  84 /* mask for win @ uphill diag */
+    uint16 constant topRow = 448; /*  0b111000000 = 448 mask for win @ row 1 */
+    uint16 constant midRow =  56; /*  0b000111000 =  56 mask for win @ row 2 */
+    uint16 constant botRow =   7; /*  0b000000111 =   7 mask for win @ row 3 */
+    uint16 constant lefCol = 292; /*  0b100100100 = 292 mask for win @ col 1 */
+    uint16 constant midCol = 146; /*  0b010010010 = 146 mask for win @ col 2 */
+    uint16 constant rigCol =  73; /*  0b001001001 =  73 mask for win @ col 3 */
+    uint16 constant dhDiag = 273; /*  0b100010001 = 273 mask for win @ downhill diag */
+    uint16 constant uhDiag =  84; /*  0b001010100 =  84 mask for win @ uphill diag */
     //
-    // 0b111111111 = 511 /* full board */
+    uint16 constant fullBd = 511; /* 0b111111111 = 511 full board */
 
     function hasWon(uint16 _marks) public pure returns (bool) {
         return (
-            ((_marks & 448) == 448) ||
-            ((_marks & 56 ) == 56 ) ||
-            ((_marks & 7  ) == 7  ) ||
-            ((_marks & 292) == 292) ||
-            ((_marks & 146) == 146) ||
-            ((_marks & 73 ) == 73 ) ||
-            ((_marks & 273) == 273) ||
-            ((_marks & 84 ) == 84 ) 
+            ((_marks & topRow) == topRow) ||
+            ((_marks & midRow) == midRow) ||
+            ((_marks & botRow) == botRow) ||
+            ((_marks & lefCol) == lefCol) ||
+            ((_marks & midCol) == midCol) ||
+            ((_marks & rigCol) == rigCol) ||
+            ((_marks & dhDiag) == dhDiag) ||
+            ((_marks & uhDiag) == uhDiag) 
             );
     }
 
     function isDraw(uint16 _noughts, uint16 _crosses) public pure returns (bool) {
-        if((_noughts ^ _crosses) == 511) { 
+        if((_noughts ^ _crosses) == fullBd) { 
             return true; // using XOR. Note that a draw could include a winning position that is unnoticed / unclaimed
         }
     }
