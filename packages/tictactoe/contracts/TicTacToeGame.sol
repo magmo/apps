@@ -300,7 +300,7 @@ contract TicTacToeGame {
         }
     }
 
-    function popCount(uint256 _marks) public pure returns (uint8) {
+    function popCount(uint16 _marks) public pure returns (uint8) {
         uint16 i;
         uint8  count;
         for (i = 0; i < 9; i++){

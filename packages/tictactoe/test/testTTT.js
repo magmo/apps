@@ -53,4 +53,12 @@ contract('TicTacToeGame', (accounts) => {
   it("Rejects a non-draw", async () => {
     assert.isFalse(await TTT.isDraw.call(0b001101110,0b110010000));
   });
+
+  it("can count the ones in a binary number", async () => {
+    assert.notEqual(await TTT.popCount.call(0b111000000), 5);
+  });
+
+  it("can count the ones in a binary number", async () => {
+    assert.equal(await TTT.popCount.call(0b111000010), 4);
+  });
 });
