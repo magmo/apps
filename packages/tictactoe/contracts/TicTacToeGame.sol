@@ -111,26 +111,14 @@ contract TicTacToeGame {
         revert();
     }
 
-    // function winnings(TicTacToeState.Play firstPlay, TicTacToeState.Play secondPlay, uint256 stake)
-    // private pure returns (uint256, uint256) {
-    //     if (firstPlay == secondPlay) { // no-one won
-    //         return (stake, stake);
-    //     } else if ((firstPlay == TicTacToeState.Play.Rock && secondPlay == TicTacToeState.Play.Scissors) ||
-    //               (firstPlay > secondPlay)) { // first player won
-    //         return (2 * stake, 0);
-    //     } else { // second player won
-    //         return (0, 2 * stake);
-    //     }
-    // }
-
     // transition validations
+
     function validateRestToPropose(bytes _old, bytes _new) private pure {
         // require(_new.stake() == _old.stake()); // not if we want to let proposer choose the stake
-        require(_old.aResolution() >= _new.stake()); // avoid integer overflow attacks
-        require(_old.bResolution() >= _new.stake()); // avoid integer overflow attacks
+        require(_old.aResolution() >= _new.stake()); // cannot stake more than you have to lose
+        require(_old.bResolution() >= _new.stake()); 
         require(_new.aResolution() == _old.aResolution()); // resolution unchanged
         require(_new.bResolution() == _old.bResolution()); // resolution unchanged
-        // we should maybe require that aPreCommit isn't empty, but then it will only hurt a later if it is
     }
 
     function validateProposeToAccept(bytes _old, bytes _new) private pure {
@@ -302,6 +290,7 @@ contract TicTacToeGame {
                 already_marked = true; // made at least one mark
             }
         }
+        if (_new_marks == _old_marks) {return false;} // do not allow a non-move
         return true;
     }
 
