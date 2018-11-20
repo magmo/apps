@@ -6,11 +6,53 @@
   "module": "src/index.js",
   "dependencies": {
     "fmg-core": "0.1.6",
-    "fmg-simple-adjudicator": "0.1.6"
+    "fmg-simple-adjudicator": "0.1.6",
+    "truffle": "4.1.14"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/src/**/?(*.)(spec|test).(j|t)s?(x)"
+    ],
+    "testEnvironment": "node",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|ts|tsx)$"
+    ],
+    "moduleFileExtensions": [
+      "web.ts",
+      "ts",
+      "web.tsx",
+      "tsx",
+      "web.js",
+      "js",
+      "web.jsx",
+      "jsx",
+      "json",
+      "node",
+      "mjs"
+    ]
   },
   "config": {
     "deploymentNetwork": "ropsten"
   },
-  "scripts": {},
-  "devDependencies": {}
+  "scripts": {
+    "test": "run-s test:truffle 'test:app --all'",
+    "test:app": "node scripts/test.js --env=jsdom",
+    "test:truffle": "node scripts/test_truffle.js",
+    "test:ci": "run-s test:truffle 'test:app --all --ci'"
+  },
+  "devDependencies": {
+    "@types/jest": "23.3.9",
+    "babel-jest": "23.6.0",
+    "dotenv": "6.1.0",
+    "ganache-cli": "6.2.1",
+    "jest": "23.6.0",
+    "npm-run-all": "4.1.3",
+    "ts-jest": "23.10.4",
+    "typescript": "3.1.6"
+  }
 }
