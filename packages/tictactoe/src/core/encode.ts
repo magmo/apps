@@ -4,7 +4,7 @@
 import { Channel, State, toHex32, padBytes32 } from 'fmg-core';
 import * as positions from './positions';
 // import { Move } from './moves';
-import hexToBN from './hexToBN';
+import hexToBN from '../utils/hexToBN';
 
 export default function encode(position: positions.Position) {
   const { libraryAddress, channelNonce, participants, turnNum, balances } = position;
@@ -74,7 +74,7 @@ export function packProposeAttributes(position: positions.Propose) {
   return (
     toHex32(GamePositionType.Propose).substr(2) +
     padBytes32(roundBuyIn).substr(2)
-  );``
+  );
 }
 
 export function packAcceptAttributes(position: positions.Accept) {
