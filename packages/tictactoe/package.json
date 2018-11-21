@@ -5,6 +5,7 @@
   "main": "index.js",
   "module": "src/index.js",
   "dependencies": {
+    "bn.js": "4.11.8",
     "fmg-core": "0.1.6",
     "fmg-simple-adjudicator": "0.1.6",
     "truffle": "4.1.14"
