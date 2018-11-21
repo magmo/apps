@@ -23,7 +23,7 @@ const rigCol: number =  73; /*  0b001001001 =  73 mask for win @ col 3 */
 const dhDiag: number = 273; /*  0b100010001 = 273 mask for win @ downhill diag */
 const uhDiag: number =  84; /*  0b001010100 =  84 mask for win @ uphill diag */
 //
-const fullBd: number = 511; /* 0b111111111 = 511 full board */
+// const fullBd: number = 511; /* 0b111111111 = 511 full board */
 
 export function isWinningMarks(marks: number){
   return  (

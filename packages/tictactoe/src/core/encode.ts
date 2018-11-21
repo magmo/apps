@@ -87,6 +87,9 @@ export function packAcceptAttributes(position: positions.Accept) {
 
 export function packPlayingAttributes(position: positions.Playing) {
   const { roundBuyIn, noughts, crosses } = position;
+  // console.log(noughts);
+  // console.log(toHex32(noughts));
+  // console.log(toHex32(noughts).substr(2));
   return (
     toHex32(GamePositionType.Playing).substr(2) +
     padBytes32(roundBuyIn).substr(2) +

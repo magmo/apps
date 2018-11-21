@@ -1,7 +1,7 @@
 // import { Move } from './moves';
-import { soliditySha3 } from 'web3-utils';
-import { padBytes32 } from 'fmg-core';
-import { positions } from '.';
+// import { soliditySha3 } from 'web3-utils';
+// import { padBytes32 } from 'fmg-core';
+// import { positions } from '.';
 
 // Position names
 // ==============
@@ -15,6 +15,7 @@ export const PLAYING = 'PLAYING';
 export const RESTING = 'RESTING';
 export const VICTORY = 'VICTORY';
 export const DRAW = 'DRAW';
+export const CONCLUDE = 'CONCLUDE';
 
 // Positions
 // =========
@@ -55,7 +56,6 @@ interface BaseWithBuyIn extends Base {
   
   export interface Propose extends BaseWithBuyIn {
     name: typeof PROPOSE;
-    preCommit: string;
   }
   
   export interface Accept extends BaseWithBuyIn {
@@ -91,6 +91,7 @@ interface BaseWithBuyIn extends Base {
     | Resting
     | Victory
     | Draw
+    // | Conclude
   );
 
 
@@ -105,6 +106,11 @@ interface BaseParams extends Base {
 
 interface BaseWithBuyInParams extends BaseParams {
   roundBuyIn: string;
+}
+
+interface PlayingParams extends BaseWithBuyInParams {
+  noughts: number;
+  crosses: number;
 }
 
 function base(obj: BaseParams): Base {
@@ -136,9 +142,13 @@ export function postFundSetupB(obj: BaseWithBuyInParams): PostFundSetupB {
 //   preCommit: string;
 // }
 
-// export function propose(obj: ProposeParams): Propose {
-//   return { ...baseWithBuyIn(obj), name: PROPOSE, preCommit: obj.preCommit };
-// }
+export function propose(obj: BaseWithBuyInParams): Propose {
+  return { ...baseWithBuyIn(obj), name: PROPOSE };
+}
+
+export function playing(obj: PlayingParams): Playing {
+  return { ...baseWithBuyIn(obj), name: PLAYING, ...obj };
+}
 
 // export function hashCommitment(play: Move, salt: string) {
 //   return soliditySha3(
