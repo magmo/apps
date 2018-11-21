@@ -47,7 +47,7 @@ function encodeGameAttributes(position: positions.Position) {
     case positions.ACCEPT:
       return packAcceptAttributes(position);
     case positions.PLAYING:
-      return packRevealAttributes(position);
+      return packPlayingAttributes(position);
     case positions.VICTORY:
       return '';
     case positions.DRAW:
@@ -85,7 +85,7 @@ export function packAcceptAttributes(position: positions.Accept) {
   );
 }
 
-export function packRevealAttributes(position: positions.Playing) {
+export function packPlayingAttributes(position: positions.Playing) {
   const { roundBuyIn, noughts, crosses } = position;
   return (
     toHex32(GamePositionType.Playing).substr(2) +
