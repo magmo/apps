@@ -2,7 +2,7 @@ import { State } from 'fmg-core';
 import decodeState from '../wallet/domain/decode';
 
 import * as positions from './positions';
-import { Move } from './moves';
+// import { Move } from './moves';
 import { GamePositionType } from './encode';
 import bnToHex from '../utils/bnToHex';
 
@@ -22,16 +22,13 @@ function extractBytes(hexString: string, byteOffset: number = 0, numBytes: numbe
   return '0x' + hexString.substr(charOffset, numBytes * CHARS_PER_BYTE);
 }
 
-// RockPaperScissors State Fields
-// (relative to gamestate offset)
-// ==============================
-// [  0 -  31] enum positionType
-// [ 32 -  63] uint256 stake
-// [ 64 -  95] bytes32 preCommit
-// [ 96 - 127] enum bPlay
-// [128 - 159] enum aPlay
-// [160 - 191] bytes32 salt
-// [192 - 223] uint256 roundNum
+ // TicTacToe State Fields
+    // (relative to gamestate offset) <- GK / this is because the gamestate is appended to the full state of the channel, which has things like turnNum in it
+    // ==============================
+    // [  0 -  31] enum positionType
+    // [ 32 -  63] uint256 stake
+    // [ 64 -  65] uint16 noughts
+    // [ 66 -  67] uint16 crosses 
 
 function extractGamePositionType(hexString: string) {
   return extractInt(hexString, GAME_ATTRIBUTE_OFFSET) as GamePositionType;
@@ -41,21 +38,21 @@ function extractStake(hexString: string) {
   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 32);
 }
 
-function extractPreCommit(hexString: string) {
-  return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 64);
+// function extractPreCommit(hexString: string) {
+//   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 64);
+// }
+
+function extractNoughts(hexString: string) {
+  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 64);
 }
 
-function extractBPlay(hexString: string) {
-  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 3 * 32) as Move;
+function extractCrosses(hexString: string) {
+  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 66);
 }
 
-function extractAPlay(hexString: string) {
-  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 4 * 32) as Move;
-}
-
-function extractSalt(hexString: string) {
-  return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 5 * 32);
-}
+// function extractSalt(hexString: string) {
+//   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 5 * 32);
+// }
 
 export default function decode(hexString: string) {
   const state = decodeState(hexString);
@@ -105,17 +102,17 @@ export function decodeGameState(state: State, roundBuyIn: string, hexString: str
     case GamePositionType.Resting:
       return positions.resting(base);
     case GamePositionType.Propose:
-      const preCommit0 = extractPreCommit(hexString);
-      return positions.propose({...base, preCommit: preCommit0 });
+      return positions.propose({...base});
     case GamePositionType.Accept:
-      const preCommit1 = extractPreCommit(hexString);
-      const bsMove1 = extractBPlay(hexString);
-      return positions.accept({...base, preCommit: preCommit1, bsMove: bsMove1 });
-    case GamePositionType.Reveal:
-      const bsMove2 = extractBPlay(hexString);
-      const asMove2 = extractAPlay(hexString);
-      const salt = extractSalt(hexString);
-      return positions.reveal({...base, asMove: asMove2, bsMove: bsMove2, salt });
+      return positions.accept({...base});
+    case GamePositionType.Playing:
+      const noughts1 = extractNoughts(hexString);
+      const crosses1 = extractCrosses(hexString);
+      return positions.playing({...base, noughts: noughts1, crosses: crosses1});
+    case GamePositionType.Victory:
+      return positions.victory({...base});
+    case GamePositionType.Draw:
+      return positions.draw({...base});;
   }
 }
 

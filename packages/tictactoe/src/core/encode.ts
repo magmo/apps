@@ -31,9 +31,17 @@ function stateType(position: positions.Position) {
     case positions.POST_FUND_SETUP_A:
     case positions.POST_FUND_SETUP_B:
       return State.StateType.PostFundSetup;
+    case positions.PROPOSE:
+      return State.StateType.Game; //unecessary since caught by default
+    case positions.ACCEPT:
+      return State.StateType.Game;
+    case positions.PLAYING:
+      return State.StateType.Game;
     case positions.VICTORY:
-      return State.StateType.Conclude;
+      return State.StateType.Game;
     case positions.DRAW:
+      return State.StateType.Game;
+    case positions.CONCLUDE:
       return State.StateType.Conclude;
     default:
       return State.StateType.Game;
@@ -49,8 +57,10 @@ function encodeGameAttributes(position: positions.Position) {
     case positions.PLAYING:
       return packPlayingAttributes(position);
     case positions.VICTORY:
-      return '';
+      return packVictoryAttributes(position);
     case positions.DRAW:
+      return packDrawAttributes(position);
+    case positions.CONCLUDE:
       return '';
     default:
       // unreachable
@@ -68,7 +78,7 @@ export enum GamePositionType {
 }
 
 export function packRestingAttributes(stake: string) {
-  return toHex32(GamePositionType.Resting).substr(2) + stake.substr(2); // possible issues here in future when there are more than four GamePositionTypes? substr(2) may need to become substr(>2)
+  return toHex32(GamePositionType.Resting).substr(2) + stake.substr(2); 
 }
 
 export function packProposeAttributes(position: positions.Propose) {
@@ -97,6 +107,22 @@ export function packPlayingAttributes(position: positions.Playing) {
     padBytes32(roundBuyIn).substr(2) +
     toHex32(noughts).substr(2) +
     toHex32(crosses).substr(2) 
+  );
+}
+
+export function packVictoryAttributes(position: positions.Victory) {
+  const { roundBuyIn } = position;
+  return (
+    toHex32(GamePositionType.Victory).substr(2) +
+    padBytes32(roundBuyIn).substr(2) 
+  );
+}
+
+export function packDrawAttributes(position: positions.Draw) {
+  const { roundBuyIn } = position;
+  return (
+    toHex32(GamePositionType.Draw).substr(2) +
+    padBytes32(roundBuyIn).substr(2) 
   );
 }
 

@@ -19,9 +19,9 @@ describe('decode', () => {
   testEncodeDecode(scenarios.standard.postFundSetupA);
   testEncodeDecode(scenarios.standard.postFundSetupB);
   testEncodeDecode(scenarios.standard.propose);
-  testEncodeDecode(scenarios.standard.accept);
-  testEncodeDecode(scenarios.standard.reveal);
-  testEncodeDecode(scenarios.aResignsAfterOneRound.resting);
-  testEncodeDecode(scenarios.aResignsAfterOneRound.conclude);
-  testEncodeDecode(scenarios.aResignsAfterOneRound.conclude2);
+  // testEncodeDecode(scenarios.standard.accept);
+  // testEncodeDecode(scenarios.standard.reveal);
+  // testEncodeDecode(scenarios.aResignsAfterOneRound.resting);
+  // testEncodeDecode(scenarios.aResignsAfterOneRound.conclude);
+  // testEncodeDecode(scenarios.aResignsAfterOneRound.conclude2);
 });

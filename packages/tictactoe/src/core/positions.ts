@@ -72,12 +72,16 @@ interface BaseWithBuyIn extends Base {
     crosses: number;
   }
   
-  export interface Victory extends Base {
+  export interface Victory extends BaseWithBuyIn {
     name: typeof VICTORY;
   }
 
-  export interface Draw extends Base {
+  export interface Draw extends BaseWithBuyIn {
     name: typeof DRAW;
+  }
+
+  export interface Conclude extends Base {
+    name: typeof CONCLUDE;
   }
   
   export type Position = (
@@ -91,7 +95,7 @@ interface BaseWithBuyIn extends Base {
     | Resting
     | Victory
     | Draw
-    // | Conclude
+    | Conclude
   );
 
 
@@ -142,12 +146,32 @@ export function postFundSetupB(obj: BaseWithBuyInParams): PostFundSetupB {
 //   preCommit: string;
 // }
 
+export function resting(obj: BaseWithBuyInParams): Resting {
+  return { ...baseWithBuyIn(obj), name: RESTING };
+}
+
 export function propose(obj: BaseWithBuyInParams): Propose {
   return { ...baseWithBuyIn(obj), name: PROPOSE };
 }
 
+export function accept(obj: BaseWithBuyInParams): Accept {
+  return { ...baseWithBuyIn(obj), name: ACCEPT};
+}
+
 export function playing(obj: PlayingParams): Playing {
   return { ...baseWithBuyIn(obj), name: PLAYING, ...obj };
+}
+
+export function victory(obj: BaseWithBuyInParams): Victory {
+  return { ...baseWithBuyIn(obj), name: VICTORY };
+}
+
+export function draw(obj: BaseWithBuyInParams): Draw {
+  return { ...baseWithBuyIn(obj), name: DRAW };
+}
+
+export function conclude(obj: BaseParams): Conclude {
+  return { ...base(obj), name: CONCLUDE };
 }
 
 // export function hashCommitment(play: Move, salt: string) {
@@ -172,10 +196,7 @@ export function playing(obj: PlayingParams): Playing {
 //   bsMove: Move;
 // }
 
-// export function accept(obj: AcceptParams): Accept {
-//   const { preCommit, bsMove } = obj;
-//   return { ...baseWithBuyIn(obj), name: ACCEPT, preCommit, bsMove };
-// }
+
 
 // interface RevealParams extends BaseWithBuyInParams {
 //   bsMove: Move;
@@ -188,11 +209,7 @@ export function playing(obj: PlayingParams): Playing {
 //   return { ...baseWithBuyIn(obj), name: REVEAL, asMove, bsMove, salt };
 // }
 
-// export function resting(obj: BaseWithBuyInParams): Resting {
-//   return { ...baseWithBuyIn(obj), name: RESTING };
-// }
 
-// export function conclude(obj: BaseParams): Conclude {
-//   return { ...base(obj), name: CONCLUDE };
-// }
+
+
 
