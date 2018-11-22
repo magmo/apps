@@ -9,6 +9,7 @@ contract TicTacToeGame {
     // The following transitions are allowed:
     //
     // Rest    -> Propose
+    // Rest    -> Conclude
     //
     // Propose -> Rest // reject game
     // Propose -> Propose // counter proposal
@@ -23,7 +24,8 @@ contract TicTacToeGame {
     //
     // Draw    -> Rest
     // Draw    -> Propose
-    // 
+    //
+    //  
     //
     function validTransition(bytes _old, bytes _new) public pure returns (bool) {
 
@@ -36,6 +38,12 @@ contract TicTacToeGame {
                 return true;
 
             } 
+            else if (_new.positionType() == TicTacToeState.PositionType.Concluded) {
+
+                validateRestToConcluded(_old,_new);
+
+                return true;
+            }
         } else if (_old.positionType() == TicTacToeState.PositionType.Propose) {
 
             if (_new.positionType() == TicTacToeState.PositionType.Rest) { // game rejected
@@ -119,6 +127,12 @@ contract TicTacToeGame {
         require(_old.bResolution() >= _new.stake()); 
         require(_new.aResolution() == _old.aResolution()); // resolution unchanged
         require(_new.bResolution() == _old.bResolution()); // resolution unchanged
+    }
+
+    function validateRestToConcluded(bytes _old, bytes _new) private pure {
+        require(_new.stake() == _old.stake());
+        require(_new.aResolution() == _old.aResolution());
+        require(_new.bResolution() == _old.bResolution());
     }
 
     function validateProposeToAccept(bytes _old, bytes _new) private pure {

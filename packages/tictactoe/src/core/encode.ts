@@ -62,7 +62,9 @@ export enum GamePositionType {
   Resting = 0,
   Propose = 1,
   Accept  = 2,
-  Playing = 3 // I didn't include either of the concluding states (Victory and Draw)
+  Playing = 3,
+  Victory = 4,
+  Draw    = 5
 }
 
 export function packRestingAttributes(stake: string) {
