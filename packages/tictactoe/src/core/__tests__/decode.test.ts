@@ -19,7 +19,12 @@ describe('decode', () => {
   testEncodeDecode(scenarios.standard.postFundSetupA);
   testEncodeDecode(scenarios.standard.postFundSetupB);
   testEncodeDecode(scenarios.standard.propose);
-  // testEncodeDecode(scenarios.standard.accept);
+  testEncodeDecode(scenarios.standard.accept);
+  testEncodeDecode(scenarios.standard.playing1);
+  testEncodeDecode(scenarios.standard.draw);
+  testEncodeDecode(scenarios.standard.resting1);
+  testEncodeDecode(scenarios.standard.conclude);
+
   // testEncodeDecode(scenarios.standard.reveal);
   // testEncodeDecode(scenarios.aResignsAfterOneRound.resting);
   // testEncodeDecode(scenarios.aResignsAfterOneRound.conclude);

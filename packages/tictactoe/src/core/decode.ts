@@ -47,7 +47,7 @@ function extractNoughts(hexString: string) {
 }
 
 function extractCrosses(hexString: string) {
-  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 66);
+  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 96);
 }
 
 // function extractSalt(hexString: string) {
