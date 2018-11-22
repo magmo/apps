@@ -10,8 +10,8 @@ library TicTacToeState {
     // ==============================
     // [  0 -  31] enum positionType
     // [ 32 -  63] uint256 stake
-    // [ 64 -  65] uint16 noughts
-    // [ 66 -  67] uint16 crosses <- GK / shame we can't use uint9. Possible to use one uint8 and one Bool (say for the centre of the grid)? Probably not worth it.
+    // [ 64 -  95] uint16 noughts
+    // [ 96 - 127] uint16 crosses
 
     function positionType(bytes _state) public pure returns (PositionType _positionType) {
         uint offset = State.gameStateOffset(_state);
@@ -35,7 +35,7 @@ library TicTacToeState {
     }
 
     function crosses(bytes _state) public pure returns (uint16 _crosses) {
-        uint offset = State.gameStateOffset(_state) + 66;
+        uint offset = State.gameStateOffset(_state) + 96;
         assembly {
             _crosses := mload(add(_state, offset))
         }
