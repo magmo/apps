@@ -31,10 +31,17 @@ describe('decode', () => {
     expect(encode(scenarios.standard.playing8)).toEqual(scenarios.standard.playing8Hex);
     expect(encode(scenarios.standard.playing9)).toEqual(scenarios.standard.playing9Hex);
   });
-  // it('encodes Resting', () => {
-  //   expect(encode(scenarios.aResignsAfterOneRound.resting)).toEqual(scenarios.aResignsAfterOneRound.restingHex);
+  it('encodes Resting', () => {
+    expect(encode(scenarios.standard.resting1)).toEqual(scenarios.standard.resting1Hex);
+    expect(encode(scenarios.standard.resting2)).toEqual(scenarios.standard.resting2Hex);
+  });
+  // it('encodes Victory', () => {
+  //   expect(encode(scenarios.standard.victory)).toEqual(scenarios.standard.victoryHex);
   // });
-  // it('encodes Conclude', () => {
-  //   expect(encode(scenarios.aResignsAfterOneRound.conclude)).toEqual(scenarios.aResignsAfterOneRound.concludeHex);
-  // });
+  it('encodes Draw', () => {
+    expect(encode(scenarios.standard.draw)).toEqual(scenarios.standard.drawHex);
+  });
+  it('encodes Conclude', () => {
+    expect(encode(scenarios.standard.conclude)).toEqual(scenarios.standard.concludeHex);
+  });
 });
