@@ -23,9 +23,9 @@ const rigCol: number =  73; /*  0b001001001 =  73 mask for win @ col 3 */
 const dhDiag: number = 273; /*  0b100010001 = 273 mask for win @ downhill diag */
 const uhDiag: number =  84; /*  0b001010100 =  84 mask for win @ uphill diag */
 //
-// const fullBd: number = 511; /* 0b111111111 = 511 full board */
+const fullBd: number = 511; /* 0b111111111 = 511 full board */
 
-export function isWinningMarks(marks: number){
+export function isWinningMarks(marks: number): boolean{
   return  (
     ((marks & topRow) == topRow) ||
     ((marks & midRow) == midRow) ||
@@ -35,19 +35,30 @@ export function isWinningMarks(marks: number){
     ((marks & rigCol) == rigCol) ||
     ((marks & dhDiag) == dhDiag) ||
     ((marks & uhDiag) == uhDiag) 
-  )
+  );
 }
 
+export function isDraw(noughts: number, crosses: number): boolean{
+  if((noughts ^ crosses) == fullBd) { 
+      return true; // using XOR. Note that a draw could include a winning position that is unnoticed / unclaimed
+  }
+  else return false;
+}
+
+
 export function calculateResult(yourMarks: number, theirMarks: number, yourVictoryClaim: boolean, theirVictoryClaim: boolean): Result {
-  if (yourVictoryClaim && !theirVictoryClaim && isWinningMarks(yourMarks)) {
-    return Result.YouWin;
+  if (yourVictoryClaim && !theirVictoryClaim) {
+    if (isWinningMarks(yourMarks)) {
+      return Result.YouWin;
+    }
+    else {
+      return Result.YouLose;
+    }
   }
-  else if (!yourVictoryClaim && theirVictoryClaim && isWinningMarks(theirMarks)) { 
-    return Result.YouLose;
-  }
-  else {
+  else if (yourVictoryClaim && theirVictoryClaim && isDraw(yourMarks,theirMarks)) {
     return Result.Tie;
-  }
+    }
+  else return Result.YouLose;
 }
 
 export function calculateAbsoluteResult(asMarks: number, bsMarks: number, asVictoryClaim: boolean, bsVictoryClaim: boolean): AbsoluteResult {

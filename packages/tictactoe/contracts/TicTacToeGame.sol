@@ -288,6 +288,7 @@ contract TicTacToeGame {
         if((_noughts ^ _crosses) == fullBd) { 
             return true; // using XOR. Note that a draw could include a winning position that is unnoticed / unclaimed
         }
+        else return false;
     }
 
     function madeStrictlyOneMark(uint16 _new_marks, uint16 _old_marks) public pure returns (bool){
@@ -312,6 +313,7 @@ contract TicTacToeGame {
         if((_noughts & _crosses) == 0){
             return true;
         }
+        else return false;
     }
 
     function popCount(uint16 _marks) public pure returns (uint8) {
