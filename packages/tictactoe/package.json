@@ -5,10 +5,14 @@
   "main": "index.js",
   "module": "src/index.js",
   "dependencies": {
+    "babel-core": "6",
+    "babel-preset-react-app": "^3.1.1",
+    "babel-runtime": "^6.23.0",
     "bn.js": "4.11.8",
     "fmg-core": "0.1.6",
     "fmg-simple-adjudicator": "0.1.6",
-    "truffle": "4.1.14"
+    "truffle": "4.1.14",
+    "ts-node": "^7.0.1"
   },
   "jest": {
     "testMatch": [
@@ -17,7 +21,6 @@
     "testEnvironment": "node",
     "testURL": "http://localhost",
     "transform": {
-      "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
       "^.+\\.tsx?$": "ts-jest"
     },
     "transformIgnorePatterns": [
@@ -37,6 +40,11 @@
       "mjs"
     ]
   },
+  "babel": {
+    "presets": [
+      "react-app"
+    ]
+  },
   "config": {
     "deploymentNetwork": "ropsten"
   },
@@ -47,8 +55,12 @@
     "test:ci": "run-s test:truffle 'test:app --all --ci'"
   },
   "devDependencies": {
-    "@types/jest": "23.3.9",
-    "babel-jest": "23.6.0",
+    "@babel/runtime": "^7.0.0-beta.53",
+    "@types/jest": "^23.3.1",
+    "babel-jest": "^23.4.2",
+    "babel-loader": "^7.1.5",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
     "dotenv": "6.1.0",
     "ganache-cli": "6.2.1",
     "jest": "23.6.0",
