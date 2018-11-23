@@ -1,6 +1,6 @@
 // import { Marks } from './marks';
 import { Player } from './players';
-import BN from 'bn.js'; // TODO troubleshoot this. Need to add @types to project? yarn add @types/node ?
+import BN from 'bn.js'; 
 
 export enum Result {
   Tie,
@@ -70,7 +70,7 @@ export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) 
     case Result.Tie:
       return AbsoluteResult.Tie;
     case Result.YouWin:
-      return youArePlayerA ? AbsoluteResult.AWins : AbsoluteResult.BWins;
+      return youArePlayerA ? AbsoluteResult.AWins : AbsoluteResult.BWins; //conditional type
     case Result.YouLose:
       return youArePlayerA ? AbsoluteResult.BWins : AbsoluteResult.AWins;
   }
