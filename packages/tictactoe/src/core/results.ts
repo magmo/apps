@@ -1,6 +1,8 @@
 // import { Marks } from './marks';
-import { Player } from './players';
+// import { Player } from './players';
 import BN from 'bn.js'; 
+
+// note that we are only interested in the results once we are in the draw (full board) or victory states. 
 
 export enum Result {
   Tie,
@@ -10,9 +12,14 @@ export enum Result {
 
 export enum AbsoluteResult {
   Tie,
-  AWins,
-  BWins,
+  NoughtsWins,
+  CrossesWins,
 }
+
+// export enum MarksType {
+//   Noughts,
+//   Crosses,
+// }
 
 const topRow: number = 448; /*  0b111000000 = 448 mask for win @ row 1 */
 const midRow: number =  56; /*  0b000111000 =  56 mask for win @ row 2 */
@@ -46,68 +53,62 @@ export function isDraw(noughts: number, crosses: number): boolean{
 }
 
 
-export function calculateResult(yourMarks: number, theirMarks: number, yourVictoryClaim: boolean, theirVictoryClaim: boolean): Result {
-  if (yourVictoryClaim && !theirVictoryClaim) {
-    if (isWinningMarks(yourMarks)) {
-      return Result.YouWin;
-    }
-    else {
-      return Result.YouLose;
-    }
+export function calculateResult(noughts: number, crosses: number, you: string): Result {
+  if (isWinningMarks(crosses)) {  // crosses takes precedence, since they always move first. 
+    if (you == "crosses") return Result.YouWin;
+    else return Result.YouLose;
   }
-  else if (yourVictoryClaim && theirVictoryClaim && isDraw(yourMarks,theirMarks)) {
-    return Result.Tie;
-    }
-  else return Result.YouLose;
+  else if (isWinningMarks(noughts)) {
+    if (you == "noughts") return Result.YouWin;
+    else return Result.YouLose;
+  }
+  else return Result.Tie;
 }
 
-export function calculateAbsoluteResult(asMarks: number, bsMarks: number, asVictoryClaim: boolean, bsVictoryClaim: boolean): AbsoluteResult {
-  if (asVictoryClaim && !bsVictoryClaim && isWinningMarks(asMarks)) {
-    return AbsoluteResult.AWins;
+export function calculateAbsoluteResult(noughts: number, crosses: number): AbsoluteResult {
+  if (isWinningMarks(crosses)) { 
+    return AbsoluteResult.CrossesWins;
   }
-  else if (!asVictoryClaim && bsVictoryClaim && isWinningMarks(bsMarks)) { 
-    return AbsoluteResult.BWins;
+  else if (isWinningMarks(noughts)) {
+    return AbsoluteResult.NoughtsWins;
   }
-  else {
-    return AbsoluteResult.Tie;
-  }
+  else return AbsoluteResult.Tie;
 }
 
 
-export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) {
-  const youArePlayerA = youAre === Player.PlayerA;
-
+export function convertToAbsoluteResult(relativeResult: Result, you: string): AbsoluteResult {
   switch(relativeResult) {
     case Result.Tie:
       return AbsoluteResult.Tie;
     case Result.YouWin:
-      return youArePlayerA ? AbsoluteResult.AWins : AbsoluteResult.BWins; //conditional type
+      return you == "crosses" ? AbsoluteResult.CrossesWins : AbsoluteResult.NoughtsWins; //conditional type
     case Result.YouLose:
-      return youArePlayerA ? AbsoluteResult.BWins : AbsoluteResult.AWins;
+      return you == "crosses" ? AbsoluteResult.NoughtsWins : AbsoluteResult.CrossesWins;
   }
 }
 
-export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
-  const youArePlayerA = youAre === Player.PlayerA;
-
+export function convertToRelativeResult(absoluteResult: AbsoluteResult, you: string): Result {
   switch(absoluteResult) {
     case AbsoluteResult.Tie:
       return Result.Tie;
-    case AbsoluteResult.AWins:
-      return youArePlayerA ? Result.YouWin : Result.YouLose;
-    case AbsoluteResult.BWins:
-      return youArePlayerA ? Result.YouLose : Result.YouWin;
+    case AbsoluteResult.NoughtsWins:
+      return you == "crosses" ? Result.YouLose : Result.YouWin;
+    case AbsoluteResult.CrossesWins:
+      return you == "crosses" ? Result.YouWin : Result.YouLose;
   }
-
 }
 
-export function balancesAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
+export function balancesAfterResult(absoluteResult: AbsoluteResult, you: string, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
   switch(absoluteResult) {
-    case AbsoluteResult.AWins:
-      return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
-    case AbsoluteResult.BWins:
+    case AbsoluteResult.NoughtsWins:
+      if (you == "noughts") return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
+    case AbsoluteResult.CrossesWins:
       return balances;
     case AbsoluteResult.Tie:
-      return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
+      if (you == "crosses") return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
   }
 }
+
+// TODO no default case here?
