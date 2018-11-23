@@ -1,4 +1,3 @@
-// import { Move } from './moves';
 // import { soliditySha3 } from 'web3-utils';
 // import { padBytes32 } from 'fmg-core';
 // import { positions } from '.';
@@ -174,40 +173,6 @@ export function conclude(obj: BaseParams): Conclude {
   return { ...base(obj), name: CONCLUDE };
 }
 
-// export function hashCommitment(play: Move, salt: string) {
-//   return soliditySha3(
-//     { type: 'uint256', value: play },
-//     { type: 'bytes32', value: padBytes32(salt) },
-//   );
-// }
-
-// interface ProposeWithMoveAndSaltParams extends BaseWithBuyInParams {
-//   salt: string;
-//   asMove: Move;
-// }
-// export function proposeFromSalt(obj: ProposeWithMoveAndSaltParams): Propose {
-//   const { salt, asMove } = obj;
-//   const preCommit = hashCommitment(asMove, salt);
-//   return { ...baseWithBuyIn(obj), name: PROPOSE, preCommit };
-// }
-
-// interface AcceptParams extends BaseWithBuyInParams {
-//   preCommit: string;
-//   bsMove: Move;
-// }
-
-
-
-// interface RevealParams extends BaseWithBuyInParams {
-//   bsMove: Move;
-//   asMove: Move;
-//   salt: string;
-// }
-
-// export function reveal(obj: RevealParams): Reveal {
-//   const { asMove, bsMove, salt } = obj;
-//   return { ...baseWithBuyIn(obj), name: REVEAL, asMove, bsMove, salt };
-// }
 
 
 

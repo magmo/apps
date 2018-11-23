@@ -1,5 +1,4 @@
-// import { Marks } from './marks';
-// import { Player } from './players';
+
 import BN from 'bn.js'; 
 
 // note that we are only interested in the results once we are in the draw (full board) or victory states. 
@@ -15,11 +14,6 @@ export enum AbsoluteResult {
   NoughtsWins,
   CrossesWins,
 }
-
-// export enum MarksType {
-//   Noughts,
-//   Crosses,
-// }
 
 const topRow: number = 448; /*  0b111000000 = 448 mask for win @ row 1 */
 const midRow: number =  56; /*  0b000111000 =  56 mask for win @ row 2 */

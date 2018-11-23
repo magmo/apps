@@ -1,9 +1,5 @@
-// TODO change for Tic Tac Toe instead of Rock Paper Scissors
-// to do this, one needs to understand the attributes that each position should have. 
-
 import { Channel, State, toHex32, padBytes32 } from 'fmg-core';
 import * as positions from './positions';
-// import { Move } from './moves';
 import hexToBN from '../utils/hexToBN';
 
 export default function encode(position: positions.Position) {
@@ -125,11 +121,3 @@ export function packDrawAttributes(position: positions.Draw) {
     padBytes32(roundBuyIn).substr(2) 
   );
 }
-
-// export function hashCommitment(move: Move, salt: string) {
-//   return soliditySha3(
-//     { type: 'uint256', value: move },
-//     { type: 'bytes32', value: padBytes32(salt) },
-//   );
-// }
-

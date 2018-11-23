@@ -2,7 +2,6 @@ import { State } from 'fmg-core';
 import decodeState from '../wallet/domain/decode';
 
 import * as positions from './positions';
-// import { Move } from './moves';
 import { GamePositionType } from './encode';
 import bnToHex from '../utils/bnToHex';
 
@@ -38,9 +37,6 @@ function extractStake(hexString: string) {
   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 32);
 }
 
-// function extractPreCommit(hexString: string) {
-//   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 64);
-// }
 
 function extractNoughts(hexString: string) {
   return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 64);
@@ -49,10 +45,6 @@ function extractNoughts(hexString: string) {
 function extractCrosses(hexString: string) {
   return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 96);
 }
-
-// function extractSalt(hexString: string) {
-//   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 5 * 32);
-// }
 
 export default function decode(hexString: string) {
   const state = decodeState(hexString);

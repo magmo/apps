@@ -1,4 +1,3 @@
-// export { Move } from './moves';
 export * from './results';
 export { Player } from './players';
 export { Position } from './positions';
