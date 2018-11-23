@@ -5,7 +5,7 @@ The [ForceMove protocol](https://magmo.com/force-move-games.pdf) is designed to 
 Rock Paper Scissors (henceforth RPS) was the first example of such a game, and is [live on the ropsten test net](https://demo.magmo.com). The code is [open source](https://github.com/magmo/rps-poc), and will be the starting point for developing a second game: Tic Tac Toe (henceforth TTT). 
 
 ## Game logic
-With these resources in hand, the first step is to think about the core logic of Tic Tac Toe; the rules of the game that an adjudicator (i.e. a smart contract deployed to a blochcain) must be aware of in order to settle disputes, and that the players must mutually acknowledge in order for the security of the channel to be counterfactually instantiated. In ForceMove, to specify the rules of the channel we need only provide a single, pure `validTransition` function reurning a boolean from a pair of arguments, each representing the state of the channel. 
+With these resources in hand, the first step is to think about the core logic of Tic Tac Toe; the rules of the game that an adjudicator (i.e. a smart contract deployed to a blochcain) must be aware of in order to settle disputes, and that the players must mutually acknowledge in order for the security of the channel to be counterfactually instantiated. In ForceMove, to specify the rules of the channel we need only provide a single, pure `validTransition` function returning a boolean from a pair of arguments, each representing the state of the channel. 
 
 ### RPS logic
 RPS is a 2 player game based on a simultanous reveal of both player's choice of weapon; the winner is determined by a fixed cyclic ordering of the three weapons. 
@@ -27,7 +27,8 @@ The *gamestate* of RPS is composed of 7 concatenated 32-byte variables, stored i
     // [160 - 191] bytes32 salt
     // [192 - 223] uint256 roundNum
 
-The first variable has a custom type, and can take values from the set  `{ Start, RoundProposed, RoundAccepted, Reveal, Concluded }`. NB in the whitepaper, Start is called Resting. 
+The first variable has a custom type, and can take values from the set  `{ Start, RoundProposed, RoundAccepted, Reveal, Concluded }`. NB in the whitepaper, Start is called Resting. Also, Concluded is a special state, not strictly part of the gamestate (since it must exist in any ForceMove game). So there is an argument for removing it, here. 
+
 The second variable is the stake of of the game -- the amount transferred from the loser to the winner after a single round. `preCommit` is the salted hash of the first player's weapon. `bPlay` and `aPlay` are the second and first player's unencrypted weapon choices: again in a custom type that can take variables from the set `{ Rock, Paper, Scissors }`. `salt` is the salt, and `roundNum` is a counter for the number of rounds that have been played. 
 
 In the file `RockPaperScissorsState.sol`, a library with several helper functions is described. The functions essentially keep track of the position of each of the above variables in the full channel state, and allow other functions to access the variables in a convenient way. 
@@ -64,17 +65,18 @@ The ordering is (presumably?) enforced by the position of each of the possibilit
 
 ### TTT logic
 
-TTT is natively a turn based game, and there is no need to have a commit/reveal stage. There is a 3x3 grid which is alternately marked with a nought "0" (by the first player) or a cross "X" (by the second player). Exactly one mark must be made, and it cannot be made in a location where a mark already exists. If either player successfully achieves three marks in a row, column or diagonal, they win the game. 
+TTT is natively a turn based game, and there is no need to have a commit/reveal stage. There is a 3x3 grid which is alternately marked with a cross "X" (by the first player) or a nought "X" (by the second player). Exactly one mark must be made, and it cannot be made in a location where a mark already exists. If either player successfully achieves three marks in a row, column or diagonal, they win the game. 
 
     // TicTacToe State Fields
     // (relative to gamestate offset) 
     // ==============================
     // [  0 -  31] enum positionType
     // [ 32 -  63] uint256 stake
-    // [ 64 -  65] uint16 noughts
-    // [ 66 -  67] uint16 crosses
+    // [ 64 -  95] uint16 noughts
+    // [ 96 - 127] uint16 crosses
 
-The gamestate of TTT is composed of 4 concatenated 32-byte variables, stored in the last 128 elements of the full state byte array. The `positionType` now takes values in `{ Rest, Propose, Accept, Playing, Victory, Draw }`. Note some differences in the gamestate, compared to that of RPS. Here proposal and acceptance are separated from the game itself. There are now two conclusion positions: `Victory` and `Draw`. I have not included a roundNum nor a salt variable, since these are not necessary. The custom typed `aPlay` and `bPlay` have become `noughts` and `crosses`: integers representing the locations of the marks of each player. The encoding is as follows: 
+
+The gamestate of TTT is composed of 4 concatenated 32-byte variables, stored in the last 128 elements of the full state byte array. The `positionType` now takes values in `{ Rest, Propose, Accept, Playing, Victory, Draw }`. Note some differences in the gamestate, compared to that of RPS. Here proposal and acceptance are separated from the game itself. The two positions `Victory` and `Draw` are introduced because the final moves of the game are different to preceding moves (in RPS, the first player plays the first move simultaneous with their proposition, and the second player plays the last move -- there are no more moves). I have not included a roundNum nor a salt variable, since these are not necessary. The custom typed `aPlay` and `bPlay` have become `noughts` and `crosses`: integers representing the locations of the marks of each player. The encoding is as follows: 
 
     // Unravelling of grid is as follows:
     // 
@@ -176,7 +178,9 @@ Various constants are introduced for readibility, and the `hasWon` function can 
 ## Economic incentives
 In RPS, the `validTransition` function is such that an accepting player is permitted to sign a state assigning themselves the stake for that round. This disincentivizes the proposing player from quiting or stalling, which they might otherwise be tempted to do (knowing that they have essentially lost the round, and that quitting might mean their stake was not lost). 
 
-In TTT, each `Playing` state may assigns the stake to the moving (i.e. signing) party. This prevents the other player from disconnecting when presented with a *surely-losing* board. For example, if the "X" player has the right to move from:
+For the time being, states are encoded as hex strings. In future, it will be far more manageable to store them as structs; we are just waiting for some infrastructure to catch up before implementing that. 
+
+In TTT, each `Playing` state assigns the stake to the moving (i.e. signing) party. This prevents the other player from disconnecting when presented with a *surely-losing* board. For example, if the "X" player has the right to move from:
 
     //      0  |     |  X  
     //   +-----------------+
@@ -233,7 +237,7 @@ export type Position = (
   | Conclude
 );
 ```
-corresponds to the `enum` in the solidity code.
+Does this correspond to the `enum` in the solidity code? Well not really; this lists all possible positions, some of which are core ForceMove positions, and some of which are Game Positions. I believe better separation of these positionsin the code might be a good idea. 
 
 The next thing that happens in this file is the definition of Position Constructors. These are functions that return instances of the above types when fed with any object that includes the correct properties. This is achieved with the help of the following interface:
 
@@ -266,13 +270,20 @@ export function calculateResult(yourMove: Move, theirMove: Move): Result {
 ```
 which is an expression of the core game logic of RPS. 
 
-Deciding who has won is different in TTT. It is not an intrinsic property of the marks of both players, but requires a player to claim victory on their turn. They may fail to do so, and it is possible to reach a state where both players have `won' (looking just at the board):
+Deciding who has won is different in TTT. It is not an intrinsic property of the marks of both players, unless we insist that crosses goes first (as is customary). Then state where both players appear to have `won' (looking just at the board):
 
     //      X  |  X  |  X   
     //   +-----------------+
     //         |     |     
     //   +-----------------+
     //      0  |  0  |  0  
+
+
+can be defaulted to a win for crosses, since they must have had their winning state in place first. <- is this foolproof?
+
+To infer which player has won, me must therefore keep track of which player is crosses, since as discussed above this is not fixed in any given channel (or though it is of course fixed for the duration of a round). 
+
+To get into the draw position, we will require the board to be full.
 
 
 # Questions
@@ -285,9 +296,9 @@ The best place to start is probably test-scenarios, which shows us the which kin
 Why must resting have a roundBuyin? is this the same as a stake?
 
 
-In `encode.ts` we only need to edit a bit of the code, since a lot of it is actually just interfacing with ForceMove. It get's confusing because Conclude is part of fgm-core. For now I have victory and draw both return the statetype conclude. 
+In `encode.ts` we only need to edit a bit of the code, since a lot of it is actually just interfacing with ForceMove.  
 
-When trying to run tests I get 
+<!-- When trying to run tests I get 
 
 ```
 /Users/georgeknee/magmo/TTT/test/ttt-state.js:1
@@ -295,4 +306,4 @@ When trying to run tests I get
                                                               ^^^^^^
 
 SyntaxError: Unexpected token import
-```
+``` -->
