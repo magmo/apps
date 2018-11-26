@@ -6,13 +6,14 @@ import {
   calculateAbsoluteResult,
   convertToAbsoluteResult,
   convertToRelativeResult,
+  Marks,
 } from '../results';
 
-function testOutcome(noughts: number, crosses: number, you: string, expectedResult: Result) {
+function testOutcome(noughts: number, crosses: number, you: Marks, expectedResult: Result) {
   var description: string;
   switch(you) {
-    case "noughts": {description = `When you play noughts = ${noughts} and crosses = ${crosses}`}; break;
-    case "crosses": {description = `When noughts = ${noughts} and you play crosses = ${crosses}`}; break;
+    case Marks.noughts: {description = `When you play noughts = ${noughts} and crosses = ${crosses}`}; break;
+    case Marks.crosses: {description = `When noughts = ${noughts} and you play crosses = ${crosses}`}; break;
     default: description = 'you are not being parsed!!';
   }
   describe(description, () => {
@@ -39,9 +40,9 @@ function testOutcome(noughts: number, crosses: number, you: string, expectedResu
 }
 
 describe('result', () => {
-  testOutcome(0b000111000, 0b101000100, "noughts", Result.YouWin);
-  testOutcome(0b001110010, 0b110001101, "noughts", Result.Tie);
-  testOutcome(0b001110010, 0b110001101, "crosses", Result.Tie);
-  testOutcome(0b100000000, 0b111101010, "crosses", Result.YouWin);
-  testOutcome(0b100000000, 0b111101010, "noughts", Result.YouLose);
+  testOutcome(0b000111000, 0b101000100, Marks.noughts, Result.YouWin);
+  testOutcome(0b001110010, 0b110001101, Marks.noughts, Result.Tie);
+  testOutcome(0b001110010, 0b110001101, Marks.crosses, Result.Tie);
+  testOutcome(0b100000000, 0b111101010, Marks.crosses, Result.YouWin);
+  testOutcome(0b100000000, 0b111101010, Marks.noughts, Result.YouLose);
 })

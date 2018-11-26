@@ -2,6 +2,10 @@
 import BN from 'bn.js'; 
 
 // note that we are only interested in the results once we are in the draw (full board) or victory states. 
+export enum Marks {
+  noughts,
+  crosses,
+}
 
 export enum Result {
   Tie,
@@ -47,13 +51,13 @@ export function isDraw(noughts: number, crosses: number): boolean{
 }
 
 
-export function calculateResult(noughts: number, crosses: number, you: string): Result {
+export function calculateResult(noughts: number, crosses: number, you: Marks): Result {
   if (isWinningMarks(crosses)) {  // crosses takes precedence, since they always move first. 
-    if (you == "crosses") return Result.YouWin;
+    if (you == Marks.crosses) return Result.YouWin;
     else return Result.YouLose;
   }
   else if (isWinningMarks(noughts)) {
-    if (you == "noughts") return Result.YouWin;
+    if (you == Marks.noughts) return Result.YouWin;
     else return Result.YouLose;
   }
   else return Result.Tie;
@@ -70,37 +74,37 @@ export function calculateAbsoluteResult(noughts: number, crosses: number): Absol
 }
 
 
-export function convertToAbsoluteResult(relativeResult: Result, you: string): AbsoluteResult {
+export function convertToAbsoluteResult(relativeResult: Result, you: Marks): AbsoluteResult {
   switch(relativeResult) {
     case Result.Tie:
       return AbsoluteResult.Tie;
     case Result.YouWin:
-      return you == "crosses" ? AbsoluteResult.CrossesWins : AbsoluteResult.NoughtsWins; //conditional type
+      return you == Marks.crosses ? AbsoluteResult.CrossesWins : AbsoluteResult.NoughtsWins; //conditional type
     case Result.YouLose:
-      return you == "crosses" ? AbsoluteResult.NoughtsWins : AbsoluteResult.CrossesWins;
+      return you == Marks.crosses ? AbsoluteResult.NoughtsWins : AbsoluteResult.CrossesWins;
   }
 }
 
-export function convertToRelativeResult(absoluteResult: AbsoluteResult, you: string): Result {
+export function convertToRelativeResult(absoluteResult: AbsoluteResult, you: Marks): Result {
   switch(absoluteResult) {
     case AbsoluteResult.Tie:
       return Result.Tie;
     case AbsoluteResult.NoughtsWins:
-      return you == "crosses" ? Result.YouLose : Result.YouWin;
+      return you == Marks.crosses ? Result.YouLose : Result.YouWin;
     case AbsoluteResult.CrossesWins:
-      return you == "crosses" ? Result.YouWin : Result.YouLose;
+      return you == Marks.crosses ? Result.YouWin : Result.YouLose;
   }
 }
 
-export function balancesAfterResult(absoluteResult: AbsoluteResult, you: string, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
+export function balancesAfterResult(absoluteResult: AbsoluteResult, you: Marks, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
   switch(absoluteResult) {
     case AbsoluteResult.NoughtsWins:
-      if (you == "noughts") return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      if (you == Marks.noughts) return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
       else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
     case AbsoluteResult.CrossesWins:
       return balances;
     case AbsoluteResult.Tie:
-      if (you == "crosses") return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      if (you == Marks.noughts) return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
       else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
   }
 }
