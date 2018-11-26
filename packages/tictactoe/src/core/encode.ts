@@ -5,9 +5,7 @@ import hexToBN from '../utils/hexToBN';
 export default function encode(position: positions.Position) {
   const { libraryAddress, channelNonce, participants, turnNum, balances } = position;
   const channel = new Channel(libraryAddress, channelNonce, participants);
-
   const stateCount = ('stateCount' in position) ? position.stateCount : 0;
-
   const state = new State({
     channel,
     stateType: stateType(position),
@@ -15,7 +13,6 @@ export default function encode(position: positions.Position) {
     stateCount,
     resolution: balances.map(hexToBN),
   });
-
   return state.toHex() + encodeGameAttributes(position);
 }
 
