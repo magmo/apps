@@ -9,14 +9,15 @@ contract('TicTacToeState', (accounts) => {
   // ===========================
 
   const scenario = scenarios.standard;
-  const propose = scenario.propose;
-  const reveal = scenario.reveal;
+  // const propose = scenario.propose;
+  // const reveal = scenario.reveal;
+  const playing1 = scenario.playing1;
+  const playing2 = scenario.playing2;
 
   let stateContract;
 
   before(async () => {
     stateContract = await TTTStateContract.deployed();
-
   });
 
   // // skipped because web3 can't cope with the positionType object that is returned
@@ -25,18 +26,30 @@ contract('TicTacToeState', (accounts) => {
   // });
 
   it("can parse aBal", async () => {
-    const val = await stateContract.aResolution(encode(reveal));
-    assert(val.eq(hexToBN(reveal.balances[0])));
+    const val = await stateContract.aResolution(encode(playing1));
+    assert(val.eq(hexToBN(playing1.balances[0])));
   });
 
-  // it("can parse bBal", async () => {
-  //   const val = await stateContract.bResolution(encode(reveal));
-  //   assert(val.eq(hexToBN(reveal.balances[1])));
+  it("can parse bBal", async () => {
+    const val = await stateContract.bResolution(encode(playing1));
+    assert(val.eq(hexToBN(playing1.balances[1])));
+  });
+
+  it("can parse stake", async () => {
+    const val = await stateContract.stake(encode(playing1));
+    assert(val.eq(hexToBN(playing1.roundBuyIn)));
+  });
+
+  // it("can parse noughts", async () => {
+  //   const val = await stateContract.noughts(encode(playing1));
+  //   console.log(val);
+  //   assert(val.eq(hexToBN(playing1.noughts)));
   // });
 
-  // it("can parse stake", async () => {
-  //   const val = await stateContract.stake(encode(reveal));
-  //   assert(val.eq(hexToBN(reveal.roundBuyIn)));
+  // it("can parse crosses", async () => {
+  //   const val = await stateContract.crosses(encode(playing2));
+  //   console.log(val);
+  //   assert(val.eq(hexToBN(playing2.crosses)));
   // });
 
   // it("can parse preCommit", async () => {
