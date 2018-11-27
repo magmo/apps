@@ -19,7 +19,7 @@ export enum AbsoluteResult {
   CrossesWins,
 }
 
-enum Marks {
+export enum SingleMarks {
   tl = 1 << 8,
   tm = 1 << 7,
   tr = 1 << 6,
@@ -32,21 +32,26 @@ enum Marks {
   bm = 1 << 1,
   br = 1 << 0,
 
+  nn = 0
 }
-const topRow = (Marks.tl | Marks.tm | Marks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
-const midRow = (Marks.ml | Marks.mm | Marks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
-const botRow = (Marks.bl | Marks.bm | Marks.br); /*  0b000000111 =   7 mask for win @ row 3 */
 
-const lefCol = (Marks.tl | Marks.ml | Marks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
-const midCol = (Marks.tm | Marks.mm | Marks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
-const rigCol = (Marks.tr | Marks.mr | Marks.br); /*  0b001001001 =  73 mask for win @ col 3 */
+export type Marks = SingleMarks | SingleMarks;  // union type (not sure if this is doing anything uesful...)
 
-const dhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
-const uhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
-//
-const fullBd = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
 
-export function isWinningMarks(marks): boolean{
+export const topRow = (SingleMarks.tl | SingleMarks.tm | SingleMarks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
+export const midRow = (SingleMarks.ml | SingleMarks.mm | SingleMarks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
+export const botRow = (SingleMarks.bl | SingleMarks.bm | SingleMarks.br); /*  0b000000111 =   7 mask for win @ row 3 */
+
+export const lefCol = (SingleMarks.tl | SingleMarks.ml | SingleMarks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
+export const midCol = (SingleMarks.tm | SingleMarks.mm | SingleMarks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
+export const rigCol = (SingleMarks.tr | SingleMarks.mr | SingleMarks.br); /*  0b001001001 =  73 mask for win @ col 3 */
+
+export const dhDiag = (SingleMarks.tl | SingleMarks.tm | SingleMarks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
+export const uhDiag = (SingleMarks.tl | SingleMarks.tm | SingleMarks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
+
+export const fullBd = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
+
+export function isWinningMarks(marks: Marks): boolean{
   return  (
     ((marks & topRow) == topRow) ||
     ((marks & midRow) == midRow) ||
@@ -59,7 +64,7 @@ export function isWinningMarks(marks): boolean{
   );
 }
 
-export function isDraw(noughts: number, crosses: number): boolean{
+export function isDraw(noughts: Marks, crosses: Marks): boolean{
   if((noughts ^ crosses) == fullBd) { 
       return true; // using XOR. Note that a draw could include a winning position that is unnoticed / unclaimed
   }
@@ -67,7 +72,7 @@ export function isDraw(noughts: number, crosses: number): boolean{
 }
 
 
-export function calculateResult(noughts: number, crosses: number, you: Marker): Result {
+export function calculateResult(noughts: Marks, crosses: Marks, you: Marker): Result {
   if (isWinningMarks(crosses)) {  // crosses takes precedence, since they always move first. 
     if (you == Marker.crosses) return Result.YouWin;
     else return Result.YouLose;
@@ -79,7 +84,7 @@ export function calculateResult(noughts: number, crosses: number, you: Marker): 
   else return Result.Tie;
 }
 
-export function calculateAbsoluteResult(noughts: number, crosses: number): AbsoluteResult {
+export function calculateAbsoluteResult(noughts: Marks, crosses: Marks): AbsoluteResult {
   if (isWinningMarks(crosses)) { 
     return AbsoluteResult.CrossesWins;
   }
@@ -124,5 +129,3 @@ export function balancesAfterResult(absoluteResult: AbsoluteResult, you: Marker,
       else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
   }
 }
-
-// TODO no default case here?

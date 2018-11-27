@@ -7,9 +7,12 @@ import {
   convertToAbsoluteResult,
   convertToRelativeResult,
   Marker,
+  SingleMarks,
+  Marks,
+  midRow,
 } from '../results';
 
-function testOutcome(noughts: number, crosses: number, you: Marker, expectedResult: Result) {
+function testOutcome(noughts: Marks, crosses: Marks, you: Marker, expectedResult: Result) {
   var description: string;
   switch(you) {
     case Marker.noughts: {description = `When you play noughts = ${noughts} and crosses = ${crosses}`}; break;
@@ -40,6 +43,7 @@ function testOutcome(noughts: number, crosses: number, you: Marker, expectedResu
 }
 
 describe('result', () => {
+  testOutcome(midRow, (SingleMarks.tl | SingleMarks.tr | SingleMarks.bl) , Marker.noughts, Result.YouWin);
   testOutcome(0b000111000, 0b101000100, Marker.noughts, Result.YouWin);
   testOutcome(0b001110010, 0b110001101, Marker.noughts, Result.Tie);
   testOutcome(0b001110010, 0b110001101, Marker.crosses, Result.Tie);
