@@ -73,10 +73,14 @@ interface BaseWithBuyIn extends Base {
   
   export interface Victory extends BaseWithBuyIn {
     name: typeof VICTORY;
+    noughts: number;
+    crosses: number;
   }
 
   export interface Draw extends BaseWithBuyIn {
     name: typeof DRAW;
+    noughts: number;
+    crosses: number;
   }
 
   export interface Conclude extends Base {
@@ -141,9 +145,6 @@ export function postFundSetupB(obj: BaseWithBuyInParams): PostFundSetupB {
   return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_B, stateCount: 1 };
 }
 
-// interface ProposeParams extends BaseWithBuyInParams {
-//   preCommit: string;
-// }
 
 export function resting(obj: BaseWithBuyInParams): Resting {
   return { ...baseWithBuyIn(obj), name: RESTING };
@@ -161,12 +162,12 @@ export function playing(obj: PlayingParams): Playing {
   return { ...baseWithBuyIn(obj), name: PLAYING, ...obj };
 }
 
-export function victory(obj: BaseWithBuyInParams): Victory {
-  return { ...baseWithBuyIn(obj), name: VICTORY };
+export function victory(obj: PlayingParams): Victory {
+  return { ...baseWithBuyIn(obj), name: VICTORY, ...obj };
 }
 
-export function draw(obj: BaseWithBuyInParams): Draw {
-  return { ...baseWithBuyIn(obj), name: DRAW };
+export function draw(obj: PlayingParams): Draw {
+  return { ...baseWithBuyIn(obj), name: DRAW, ...obj};
 }
 
 export function conclude(obj: BaseParams): Conclude {

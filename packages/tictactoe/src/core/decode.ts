@@ -98,13 +98,17 @@ export function decodeGameState(state: State, roundBuyIn: string, hexString: str
     case GamePositionType.Accept:
       return positions.accept({...base});
     case GamePositionType.Playing:
-      const noughts1 = extractNoughts(hexString);
-      const crosses1 = extractCrosses(hexString);
-      return positions.playing({...base, noughts: noughts1, crosses: crosses1});
+      const playingnoughts = extractNoughts(hexString);
+      const playingcrosses = extractCrosses(hexString);
+      return positions.playing({...base, noughts: playingnoughts, crosses: playingcrosses});
     case GamePositionType.Victory:
-      return positions.victory({...base});
+    const victorynoughts = extractNoughts(hexString);
+    const victorycrosses = extractCrosses(hexString);
+      return positions.victory({...base, noughts: victorynoughts, crosses: victorycrosses});
     case GamePositionType.Draw:
-      return positions.draw({...base});;
+    const drawnoughts = extractNoughts(hexString);
+    const drawcrosses = extractCrosses(hexString);
+      return positions.draw({...base, noughts: drawnoughts, crosses: drawcrosses});;
   }
 }
 

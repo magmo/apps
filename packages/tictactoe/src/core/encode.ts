@@ -60,6 +60,7 @@ function encodeGameAttributes(position: positions.Position) {
       return packRestingAttributes(position.roundBuyIn);
   }
 }
+// TODO should resting have a roundbuyin?
 
 export enum GamePositionType {
   Resting = 0,
@@ -92,9 +93,6 @@ export function packAcceptAttributes(position: positions.Accept) {
 
 export function packPlayingAttributes(position: positions.Playing) {
   const { roundBuyIn, noughts, crosses } = position;
-  // console.log(noughts);
-  // console.log(toHex32(noughts));
-  // console.log(toHex32(noughts).substr(2));
   return (
     toHex32(GamePositionType.Playing).substr(2) +
     padBytes32(roundBuyIn).substr(2) +
@@ -104,17 +102,21 @@ export function packPlayingAttributes(position: positions.Playing) {
 }
 
 export function packVictoryAttributes(position: positions.Victory) {
-  const { roundBuyIn } = position;
+  const { roundBuyIn, noughts, crosses } = position;
   return (
     toHex32(GamePositionType.Victory).substr(2) +
-    padBytes32(roundBuyIn).substr(2) 
+    padBytes32(roundBuyIn).substr(2) +
+    toHex32(noughts).substr(2) +
+    toHex32(crosses).substr(2) 
   );
 }
 
 export function packDrawAttributes(position: positions.Draw) {
-  const { roundBuyIn } = position;
+  const { roundBuyIn, noughts, crosses } = position;
   return (
     toHex32(GamePositionType.Draw).substr(2) +
-    padBytes32(roundBuyIn).substr(2) 
+    padBytes32(roundBuyIn).substr(2) +
+    toHex32(noughts).substr(2) +
+    toHex32(crosses).substr(2) 
   );
 }

@@ -20,7 +20,7 @@ describe('decode', () => {
   it('encodes Accept', () => {
     expect(encode(scenarios.standard.accept)).toEqual(scenarios.standard.acceptHex);
   });
-  it('encodes Playing', () => {
+  it('encodes a full game ending in a tie', () => {
     expect(encode(scenarios.standard.playing1)).toEqual(scenarios.standard.playing1Hex);
     expect(encode(scenarios.standard.playing2)).toEqual(scenarios.standard.playing2Hex);
     expect(encode(scenarios.standard.playing3)).toEqual(scenarios.standard.playing3Hex);
@@ -29,18 +29,20 @@ describe('decode', () => {
     expect(encode(scenarios.standard.playing6)).toEqual(scenarios.standard.playing6Hex);
     expect(encode(scenarios.standard.playing7)).toEqual(scenarios.standard.playing7Hex);
     expect(encode(scenarios.standard.playing8)).toEqual(scenarios.standard.playing8Hex);
-    expect(encode(scenarios.standard.playing9)).toEqual(scenarios.standard.playing9Hex);
+    expect(encode(scenarios.standard.draw)).toEqual(scenarios.standard.drawHex);
+    expect(encode(scenarios.standard.resting)).toEqual(scenarios.standard.restingHex);
   });
-  it('encodes Resting', () => {
-    expect(encode(scenarios.aResignsAfterOneRound.conclude)).toEqual(scenarios.aResignsAfterOneRound.concludeHex);
-  });
-  // it('encodes Victory', () => {
-  //   expect(encode(scenarios.standard.victory)).toEqual(scenarios.standard.victoryHex);
-  // });
+
   it('encodes Draw', () => {
     expect(encode(scenarios.standard.draw)).toEqual(scenarios.standard.drawHex);
   });
-  it('encodes Conclude', () => {
-    expect(encode(scenarios.standard.conclude)).toEqual(scenarios.standard.concludeHex);
+
+  it('encodes Victory', () => {
+    expect(encode(scenarios.noughtsvictory.victory)).toEqual(scenarios.noughtsvictory.victoryHex);
   });
+
+  it('encodes resigning Conclude', () => {
+    expect(encode(scenarios.aResignsAfterOneRound.conclude)).toEqual(scenarios.aResignsAfterOneRound.concludeHex);
+  });
+
 });
