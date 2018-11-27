@@ -2,7 +2,7 @@
 import BN from 'bn.js'; 
 
 // note that we are only interested in the results once we are in the draw (full board) or victory states. 
-export enum Marks {
+export enum Marker {
   noughts,
   crosses,
 }
@@ -19,18 +19,34 @@ export enum AbsoluteResult {
   CrossesWins,
 }
 
-const topRow: number = 448; /*  0b111000000 = 448 mask for win @ row 1 */
-const midRow: number =  56; /*  0b000111000 =  56 mask for win @ row 2 */
-const botRow: number =   7; /*  0b000000111 =   7 mask for win @ row 3 */
-const lefCol: number = 292; /*  0b100100100 = 292 mask for win @ col 1 */
-const midCol: number = 146; /*  0b010010010 = 146 mask for win @ col 2 */
-const rigCol: number =  73; /*  0b001001001 =  73 mask for win @ col 3 */
-const dhDiag: number = 273; /*  0b100010001 = 273 mask for win @ downhill diag */
-const uhDiag: number =  84; /*  0b001010100 =  84 mask for win @ uphill diag */
-//
-const fullBd: number = 511; /* 0b111111111 = 511 full board */
+enum Marks {
+  tl = 1 << 8,
+  tm = 1 << 7,
+  tr = 1 << 6,
 
-export function isWinningMarks(marks: number): boolean{
+  ml = 1 << 5,
+  mm = 1 << 4,
+  mr = 1 << 3,
+
+  bl = 1 << 2,
+  bm = 1 << 1,
+  br = 1 << 0,
+
+}
+const topRow = (Marks.tl | Marks.tm | Marks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
+const midRow = (Marks.ml | Marks.mm | Marks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
+const botRow = (Marks.bl | Marks.bm | Marks.br); /*  0b000000111 =   7 mask for win @ row 3 */
+
+const lefCol = (Marks.tl | Marks.ml | Marks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
+const midCol = (Marks.tm | Marks.mm | Marks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
+const rigCol = (Marks.tr | Marks.mr | Marks.br); /*  0b001001001 =  73 mask for win @ col 3 */
+
+const dhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
+const uhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
+//
+const fullBd = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
+
+export function isWinningMarks(marks): boolean{
   return  (
     ((marks & topRow) == topRow) ||
     ((marks & midRow) == midRow) ||
@@ -51,13 +67,13 @@ export function isDraw(noughts: number, crosses: number): boolean{
 }
 
 
-export function calculateResult(noughts: number, crosses: number, you: Marks): Result {
+export function calculateResult(noughts: number, crosses: number, you: Marker): Result {
   if (isWinningMarks(crosses)) {  // crosses takes precedence, since they always move first. 
-    if (you == Marks.crosses) return Result.YouWin;
+    if (you == Marker.crosses) return Result.YouWin;
     else return Result.YouLose;
   }
   else if (isWinningMarks(noughts)) {
-    if (you == Marks.noughts) return Result.YouWin;
+    if (you == Marker.noughts) return Result.YouWin;
     else return Result.YouLose;
   }
   else return Result.Tie;
@@ -74,37 +90,37 @@ export function calculateAbsoluteResult(noughts: number, crosses: number): Absol
 }
 
 
-export function convertToAbsoluteResult(relativeResult: Result, you: Marks): AbsoluteResult {
+export function convertToAbsoluteResult(relativeResult: Result, you: Marker): AbsoluteResult {
   switch(relativeResult) {
     case Result.Tie:
       return AbsoluteResult.Tie;
     case Result.YouWin:
-      return you == Marks.crosses ? AbsoluteResult.CrossesWins : AbsoluteResult.NoughtsWins; //conditional type
+      return you == Marker.crosses ? AbsoluteResult.CrossesWins : AbsoluteResult.NoughtsWins; //conditional type
     case Result.YouLose:
-      return you == Marks.crosses ? AbsoluteResult.NoughtsWins : AbsoluteResult.CrossesWins;
+      return you == Marker.crosses ? AbsoluteResult.NoughtsWins : AbsoluteResult.CrossesWins;
   }
 }
 
-export function convertToRelativeResult(absoluteResult: AbsoluteResult, you: Marks): Result {
+export function convertToRelativeResult(absoluteResult: AbsoluteResult, you: Marker): Result {
   switch(absoluteResult) {
     case AbsoluteResult.Tie:
       return Result.Tie;
     case AbsoluteResult.NoughtsWins:
-      return you == Marks.crosses ? Result.YouLose : Result.YouWin;
+      return you == Marker.crosses ? Result.YouLose : Result.YouWin;
     case AbsoluteResult.CrossesWins:
-      return you == Marks.crosses ? Result.YouWin : Result.YouLose;
+      return you == Marker.crosses ? Result.YouWin : Result.YouLose;
   }
 }
 
-export function balancesAfterResult(absoluteResult: AbsoluteResult, you: Marks, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
+export function balancesAfterResult(absoluteResult: AbsoluteResult, you: Marker, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
   switch(absoluteResult) {
     case AbsoluteResult.NoughtsWins:
-      if (you == Marks.noughts) return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      if (you == Marker.noughts) return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
       else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
     case AbsoluteResult.CrossesWins:
       return balances;
     case AbsoluteResult.Tie:
-      if (you == Marks.noughts) return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      if (you == Marker.noughts) return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
       else return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
   }
 }
