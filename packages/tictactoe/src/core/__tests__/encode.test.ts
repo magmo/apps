@@ -32,8 +32,7 @@ describe('decode', () => {
     expect(encode(scenarios.standard.playing9)).toEqual(scenarios.standard.playing9Hex);
   });
   it('encodes Resting', () => {
-    expect(encode(scenarios.standard.resting1)).toEqual(scenarios.standard.resting1Hex);
-    expect(encode(scenarios.standard.resting2)).toEqual(scenarios.standard.resting2Hex);
+    expect(encode(scenarios.aResignsAfterOneRound.conclude)).toEqual(scenarios.aResignsAfterOneRound.concludeHex);
   });
   // it('encodes Victory', () => {
   //   expect(encode(scenarios.standard.victory)).toEqual(scenarios.standard.victoryHex);
