@@ -1,5 +1,3 @@
-// import { Player } from '../players';
-// import { Move } from '../moves';
 import {
   Result,
   calculateResult,

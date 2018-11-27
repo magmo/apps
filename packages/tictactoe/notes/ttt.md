@@ -5,14 +5,14 @@ The [ForceMove protocol](https://magmo.com/force-move-games.pdf) is designed to 
 Rock Paper Scissors (henceforth RPS) was the first example of such a game, and is [live on the ropsten test net](https://demo.magmo.com). The code is [open source](https://github.com/magmo/rps-poc), and will be the starting point for developing a second game: Tic Tac Toe (henceforth TTT). 
 
 ## Game logic
-With these resources in hand, the first step is to think about the core logic of Tic Tac Toe; the rules of the game that an adjudicator (i.e. a smart contract deployed to a blochcain) must be aware of in order to settle disputes, and that the players must mutually acknowledge in order for the security of the channel to be counterfactually instantiated. In ForceMove, to specify the rules of the channel we need only provide a single, pure `validTransition` function returning a boolean from a pair of arguments, each representing the state of the channel. 
+With these resources in hand, the first step is to think about the core logic of Tic Tac Toe; the rules of the game that an adjudicator (i.e. a smart contract deployed to a blochchain) must reference when settling disputes, and that the players must adhere to in order to prevent disputes arising. In ForceMove, to specify the rules of the channel we need only provide a single, pure `validTransition` function returning a boolean from a pair of arguments, each representing the state of the channel. 
 
 ### RPS logic
 RPS is a 2 player game based on a simultanous reveal of both player's choice of weapon; the winner is determined by a fixed cyclic ordering of the three weapons. 
 
 (RPS1) : ...-> Rock -> Scissors -> Paper -...
 
-The game requires some slight modifications to be run asynchronously and trustlessely. Instead of a simultaneous reveal, the first player commits to a move by broadcasting an encrypted version of it to the second. The second player must then be incentivized to choose a weapon, before the first broadcasts their unencrypted choice along with proof that it matches the encrypted version that was committed to earlier. 
+The game requires some slight modifications to be run asynchronously and trustlessely. Instead of a simultaneous reveal, the first player commits to a move by broadcasting an encrypted version of it to the second. The second player must then be incentivized to choose a weapon, before the first broadcasts their unencrypted choice along with proof that it matches the encrypted version that was committed to in the earlier step. 
 
 The *gamestate* of RPS is composed of 7 concatenated 32-byte variables, stored in the last 224 elements of a byte array that represents the full state of the channel. 
 
@@ -27,7 +27,7 @@ The *gamestate* of RPS is composed of 7 concatenated 32-byte variables, stored i
     // [160 - 191] bytes32 salt
     // [192 - 223] uint256 roundNum
 
-The first variable has a custom type, and can take values from the set  `{ Start, RoundProposed, RoundAccepted, Reveal, Concluded }`. NB in the whitepaper, Start is called Resting. Also, Concluded is a special state, not strictly part of the gamestate (since it must exist in any ForceMove game). So there is an argument for removing it, here. 
+The first variable has a custom type, and can take values from the set  `{ Start, RoundProposed, RoundAccepted, Reveal, Concluded }`. NB in the whitepaper, Start is called Resting?. Also, Concluded is a special state, not strictly part of the gamestate (since it must exist in any ForceMove game). So there is an argument for removing it, here. 
 
 The second variable is the stake of of the game -- the amount transferred from the loser to the winner after a single round. `preCommit` is the salted hash of the first player's weapon. `bPlay` and `aPlay` are the second and first player's unencrypted weapon choices: again in a custom type that can take variables from the set `{ Rock, Paper, Scissors }`. `salt` is the salt, and `roundNum` is a counter for the number of rounds that have been played. 
 

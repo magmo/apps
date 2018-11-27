@@ -24,11 +24,9 @@ function stateType(position: positions.Position) {
     case positions.POST_FUND_SETUP_A:
     case positions.POST_FUND_SETUP_B:
       return State.StateType.PostFundSetup;
-    case positions.PROPOSE:
-      return State.StateType.Game; //unecessary since caught by default
-    case positions.ACCEPT:
+    case positions.OPLAYING:
       return State.StateType.Game;
-    case positions.PLAYING:
+    case positions.XPLAYING:
       return State.StateType.Game;
     case positions.VICTORY:
       return State.StateType.Game;
@@ -43,12 +41,10 @@ function stateType(position: positions.Position) {
 
 function encodeGameAttributes(position: positions.Position) {
   switch (position.name) {
-    case positions.PROPOSE:
-      return packProposeAttributes(position);
-    case positions.ACCEPT:
-      return packAcceptAttributes(position);
-    case positions.PLAYING:
-      return packPlayingAttributes(position);
+    case positions.OPLAYING:
+      return packOplayingAttributes(position);
+    case positions.XPLAYING:
+      return packXplayingAttributes(position);
     case positions.VICTORY:
       return packVictoryAttributes(position);
     case positions.DRAW:
@@ -64,37 +60,30 @@ function encodeGameAttributes(position: positions.Position) {
 
 export enum GamePositionType {
   Resting = 0,
-  Propose = 1,
-  Accept  = 2,
-  Playing = 3,
-  Victory = 4,
-  Draw    = 5
+  Xplaying = 1,
+  Oplaying = 2,
+  Victory = 3,
+  Draw    = 4
 }
 
 export function packRestingAttributes(stake: string) {
   return toHex32(GamePositionType.Resting).substr(2) + stake.substr(2); 
 }
 
-export function packProposeAttributes(position: positions.Propose) {
-  const { roundBuyIn } = position;
-  return (
-    toHex32(GamePositionType.Propose).substr(2) +
-    padBytes32(roundBuyIn).substr(2)
-  );
-}
-
-export function packAcceptAttributes(position: positions.Accept) {
-  const { roundBuyIn } = position;
-  return (
-    toHex32(GamePositionType.Accept).substr(2) +
-    padBytes32(roundBuyIn).substr(2) 
-  );
-}
-
-export function packPlayingAttributes(position: positions.Playing) {
+export function packOplayingAttributes(position: positions.Oplaying) {
   const { roundBuyIn, noughts, crosses } = position;
   return (
-    toHex32(GamePositionType.Playing).substr(2) +
+    toHex32(GamePositionType.Oplaying).substr(2) +
+    padBytes32(roundBuyIn).substr(2) +
+    toHex32(noughts).substr(2) +
+    toHex32(crosses).substr(2) 
+  );
+}
+
+export function packXplayingAttributes(position: positions.Xplaying) {
+  const { roundBuyIn, noughts, crosses } = position;
+  return (
+    toHex32(GamePositionType.Xplaying).substr(2) +
     padBytes32(roundBuyIn).substr(2) +
     toHex32(noughts).substr(2) +
     toHex32(crosses).substr(2) 

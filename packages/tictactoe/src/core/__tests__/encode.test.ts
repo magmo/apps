@@ -14,12 +14,6 @@ describe('decode', () => {
   it('encodes PostFundSetupB', () => {
     expect(encode(scenarios.standard.postFundSetupB)).toEqual(scenarios.standard.postFundSetupBHex);
   });
-  it('encodes Propose', () => {
-    expect(encode(scenarios.standard.propose)).toEqual(scenarios.standard.proposeHex);
-  });
-  it('encodes Accept', () => {
-    expect(encode(scenarios.standard.accept)).toEqual(scenarios.standard.acceptHex);
-  });
   it('encodes a full game ending in a tie', () => {
     expect(encode(scenarios.standard.playing1)).toEqual(scenarios.standard.playing1Hex);
     expect(encode(scenarios.standard.playing2)).toEqual(scenarios.standard.playing2Hex);

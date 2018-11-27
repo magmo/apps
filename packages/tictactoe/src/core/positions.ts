@@ -8,9 +8,8 @@ export const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
 export const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
 export const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
 export const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
-export const PROPOSE = 'PROPOSE';
-export const ACCEPT = 'ACCEPT';
-export const PLAYING = 'PLAYING';
+export const OPLAYING = 'PLAYING';
+export const XPLAYING = 'XPLAYING';
 export const RESTING = 'RESTING';
 export const VICTORY = 'VICTORY';
 export const DRAW = 'DRAW';
@@ -53,20 +52,19 @@ interface BaseWithBuyIn extends Base {
     name: typeof POST_FUND_SETUP_B;
   }
   
-  export interface Propose extends BaseWithBuyIn {
-    name: typeof PROPOSE;
-  }
-  
-  export interface Accept extends BaseWithBuyIn {
-    name: typeof ACCEPT;
-  }
-  
+
   export interface Resting extends BaseWithBuyIn {
     name: typeof RESTING;
   }
 
-  export interface Playing extends BaseWithBuyIn {
-    name: typeof PLAYING;
+  export interface Oplaying extends BaseWithBuyIn {
+    name: typeof OPLAYING;
+    noughts: number;
+    crosses: number;
+  }
+
+  export interface Xplaying extends BaseWithBuyIn {
+    name: typeof XPLAYING;
     noughts: number;
     crosses: number;
   }
@@ -92,9 +90,8 @@ interface BaseWithBuyIn extends Base {
     | PreFundSetupB
     | PostFundSetupA
     | PostFundSetupB
-    | Propose
-    | Accept
-    | Playing
+    | Oplaying
+    | Xplaying
     | Resting
     | Victory
     | Draw
@@ -150,16 +147,12 @@ export function resting(obj: BaseWithBuyInParams): Resting {
   return { ...baseWithBuyIn(obj), name: RESTING };
 }
 
-export function propose(obj: BaseWithBuyInParams): Propose {
-  return { ...baseWithBuyIn(obj), name: PROPOSE };
+export function Oplaying(obj: PlayingParams): Oplaying {
+  return { ...baseWithBuyIn(obj), name: OPLAYING, ...obj };
 }
 
-export function accept(obj: BaseWithBuyInParams): Accept {
-  return { ...baseWithBuyIn(obj), name: ACCEPT};
-}
-
-export function playing(obj: PlayingParams): Playing {
-  return { ...baseWithBuyIn(obj), name: PLAYING, ...obj };
+export function Xplaying(obj: PlayingParams): Xplaying {
+  return { ...baseWithBuyIn(obj), name: XPLAYING, ...obj };
 }
 
 export function victory(obj: PlayingParams): Victory {
