@@ -4,7 +4,7 @@ const TTT = artifacts.require("TicTacToeGame.sol");
 
 contract('TicTacToeGame', (accounts) => {
   let tttContract;  
-  let postFundSetupB, propose;
+  let playing1, playing2;
 
   before(async () => {
     
@@ -14,8 +14,10 @@ contract('TicTacToeGame', (accounts) => {
 
     const scenario = scenarios.build(libraryAddress, accounts[0], accounts[1]);
     
-    postFundSetupB = scenario.postFundSetupB;
-    propose = scenario.propose;
+    // postFundSetupB = scenario.postFundSetupB;
+    // propose = scenario.propose;
+    playing1 = scenario.playing1;
+    playing2 = scenario.playing2;
     // accept = scenario.accept;
     // reveal = scenario.reveal;
     // resting = scenario.resting;
@@ -25,10 +27,13 @@ contract('TicTacToeGame', (accounts) => {
     return await tttContract.validTransition(encode(state1), encode(state2));
   };
 
-  it("allows START -> ROUNDPROPOSED", async () => {
-    assert(await validTransition(postFundSetupB, propose));
-  });
+  // Transition function tests
+  // ========================
 
+
+  it("allows XPLAYING -> OPLAYING", async () => {
+    assert(await validTransition(playing1, playing2));
+  });
 
   it("Approves a winning 'marks' integer after 3 marks", async () => {
       assert.isTrue(await tttContract.hasWon.call(0b111000000));

@@ -287,13 +287,13 @@ To get into the draw position, we will require the board to be full.
 
 
 # Questions
-what is statecount?
+what is statecount? It's in the prefundsetup and postfundsetup stages, to check everyone in the channel has agreed and funded it.
 
 
 The best place to start is probably test-scenarios, which shows us the which kind of objects we want to use to construct and represent the state of the channel. 
 
 
-Why must resting have a roundBuyin? is this the same as a stake?
+Why must resting have a roundBuyin? is this the same as a stake? Yes it is the same thing.
 
 
 In `encode.ts` we only need to edit a bit of the code, since a lot of it is actually just interfacing with ForceMove.  

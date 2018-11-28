@@ -142,15 +142,15 @@ contract TicTacToeGame {
     }
 
     function validateXplayingToOplaying(bytes _old, bytes _new) private pure {
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
-            require(_new.bResolution() == _old.bResolution() - 2 * 2 *_new.stake());
-        } else if (State.indexOfMover(_new) == 1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * 2 *_new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * 2 *_new.stake());
-        } // mover gets to claim stake, so that other player incentivised
-        require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
-        require((_new.crosses() == _old.crosses()));   
+        // if (State.indexOfMover(_new) == 0) {
+        //     require(_new.aResolution() == _old.aResolution() + 2 * 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
+        //     require(_new.bResolution() == _old.bResolution() - 2 * 2 *_new.stake());
+        // } else if (State.indexOfMover(_new) == 1) {
+        //     require(_new.aResolution() == _old.aResolution() - 2 * 2 *_new.stake());
+        //     require(_new.bResolution() == _old.bResolution() + 2 * 2 *_new.stake());
+        // } // mover gets to claim stake, so that other player incentivised
+        // require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
+        // require((_new.crosses() == _old.crosses()), " crosses changed. ");   
     }
     
     function validateXplayingToVictory(bytes _old, bytes _new) private pure {
