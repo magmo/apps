@@ -1,7 +1,7 @@
 // import { soliditySha3 } from 'web3-utils';
 // import { padBytes32 } from 'fmg-core';
 // import { positions } from '.';
-
+import {Marks} from './marks';
 // Position names
 // ==============
 export const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
@@ -31,6 +31,11 @@ interface Base {
 interface BaseWithBuyIn extends Base {
     roundBuyIn: string;
   }
+
+interface BaseWitNoughtsAndCrosses extends Base {
+    noughts: Marks;
+    crosses: Marks;
+  }
   
   export interface PreFundSetupA extends BaseWithBuyIn {
     stateCount: 0;
@@ -59,26 +64,23 @@ interface BaseWithBuyIn extends Base {
 
   export interface Oplaying extends BaseWithBuyIn {
     name: typeof OPLAYING;
-    noughts: number;
-    crosses: number;
+    noughts: Marks;
+    crosses: Marks;
   }
 
   export interface Xplaying extends BaseWithBuyIn {
     name: typeof XPLAYING;
-    noughts: number;
-    crosses: number;
+    noughts: Marks;
+    crosses: Marks;
   }
   
-  export interface Victory extends BaseWithBuyIn {
+  export interface Victory extends BaseWitNoughtsAndCrosses {
     name: typeof VICTORY;
-    noughts: number;
-    crosses: number;
   }
 
-  export interface Draw extends BaseWithBuyIn {
+  export interface Draw extends BaseWitNoughtsAndCrosses {
     name: typeof DRAW;
-    noughts: number;
-    crosses: number;
+
   }
 
   export interface Conclude extends Base {
@@ -113,8 +115,13 @@ interface BaseWithBuyInParams extends BaseParams {
 }
 
 interface PlayingParams extends BaseWithBuyInParams {
-  noughts: number;
-  crosses: number;
+  noughts: Marks;
+  crosses: Marks;
+}
+
+interface EndPlayingParams extends Base {
+  noughts: Marks ;
+  crosses: Marks;
 }
 
 function base(obj: BaseParams): Base {
@@ -124,6 +131,10 @@ function base(obj: BaseParams): Base {
 
 function baseWithBuyIn(obj: BaseWithBuyInParams): BaseWithBuyIn {
   return { ...base(obj), roundBuyIn: obj.roundBuyIn };
+}
+
+function baseWithNoughtsAndCrosses(obj: BaseParams): BaseWitNoughtsAndCrosses {
+  return { ...base(obj), noughts: obj.noughts, crosses: obj.crosses };
 }
 
 export function preFundSetupA(obj: BaseWithBuyInParams): PreFundSetupA {
@@ -155,12 +166,12 @@ export function Xplaying(obj: PlayingParams): Xplaying {
   return { ...baseWithBuyIn(obj), name: XPLAYING, ...obj };
 }
 
-export function victory(obj: BaseParams): Victory {
-  return { ...base(obj), name: VICTORY, ...obj };
+export function victory(obj: EndPlayingParams): Victory {
+  return { ...baseWithNoughtsAndCrosses(obj), name: VICTORY };
 }
 
-export function draw(obj: BaseParams): Draw {
-  return { ...basen(obj), name: DRAW, ...obj};
+export function draw(obj: EndPlayingParams): Draw {
+  return { ...baseWithNoughtsAndCrosses(obj), name: DRAW };
 }
 
 export function conclude(obj: BaseParams): Conclude {

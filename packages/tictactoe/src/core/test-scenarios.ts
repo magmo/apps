@@ -249,6 +249,7 @@ export const aRejectsGame = {
 
 }
 
+
 // export const bResignsAfterOneRound = {
 //   ...standard,
 //   conclude: positions.conclude({ ...base, turnNum: 7, balances: sixFour }),
@@ -294,7 +295,7 @@ export function build(customLibraryAddress: string, customAsAddress: string, cus
     postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, stateCount: 1 }),
     // aResult: Result.YouWin,
     // bResult: Result.YouLose,
-    playing1: positions.Xplaying({...base, turnNum:  4, noughts:0b000000000, crosses:0b100000000, balances:fourSix}),
-    playing2: positions.Oplaying({...base, turnNum:  5, noughts:0b000010000, crosses:0b100000000, balances:sixFour}),
+    playing1: positions.Xplaying({...base, turnNum:  4, noughts:0b000000000, crosses:0b100000000, balances:sixFour}),
+    playing2: positions.Oplaying({...base, turnNum:  5, noughts:0b000010000, crosses:0b100000000, balances:fourSix}),
   };
 }

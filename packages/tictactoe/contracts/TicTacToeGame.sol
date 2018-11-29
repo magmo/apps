@@ -160,7 +160,7 @@ contract TicTacToeGame {
     }
     
     function validateXplayingToVictory(bytes _old, bytes _new) private pure {
-        require(hasWon(_new.noughts));
+        require(hasWon(_new.noughts()));
         require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
         require((_new.crosses() == _old.crosses()));   
         if (State.indexOfMover(_new) == 0) { // mover is A
@@ -199,7 +199,7 @@ contract TicTacToeGame {
     }
 
     function validateOplayingToVictory(bytes _old, bytes _new) private pure {
-        require(hasWon(_new.crosses));
+        require(hasWon(_new.crosses()));
         require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
         require((_new.noughts() == _old.noughts()));   
         if (State.indexOfMover(_new) == 0) { // mover is A
