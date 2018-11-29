@@ -31,7 +31,6 @@ contract TicTacToeGame {
     function validTransition(bytes _old, bytes _new) public pure returns (bool) {
 
         if (_old.positionType() == TicTacToeState.PositionType.Rest) {
-            
             if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
 
                 validateRestToXplaying(_old, _new);
@@ -39,12 +38,6 @@ contract TicTacToeGame {
                 return true;
 
             } 
-            // else if (_new.positionType() == TicTacToeState.PositionType.Concluded) {
-
-            //     validateRestToConcluded(_old,_new);
-
-            //     return true;
-            // }
         } else if (_old.positionType() == TicTacToeState.PositionType.Xplaying) {
 
             if (_new.positionType() == TicTacToeState.PositionType.Oplaying) {
@@ -118,92 +111,109 @@ contract TicTacToeGame {
             }
         } 
         revert();
+        // return false;
     }
 
     // transition validations
 
     function validateRestToXplaying(bytes _old, bytes _new) private pure {
+        // require(_new.noughts() == 0, " Noughts is not empty "); // error messages are not yet fully supported
         require(_new.noughts() == 0);
-        require(madeStrictlyOneMark(_new.crosses(),0)); // crosses always goes first. there is no _old.crosses, so set to zero here
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 *_new.stake()); // mover gets to claim stake, so that other player incentivised
-            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
-        } else if (State.indexOfMover(_new) ==1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
+        // require(madeStrictlyOneMark(_new.crosses(),0), "Invalid starting position"); // Xs moves first
+        require(madeStrictlyOneMark(_new.crosses(),0)); // Xs moves first
+        // require(_new.stake() == _old.stake(), " Stake was changed ");
+        require(_new.stake() == _old.stake());
+        // if (State.indexOfMover(_new) == 0) { // mover is A
+        //     require(_new.aResolution() == _old.aResolution() + _new.stake(), " Incorrect resolution ");
+        //     require(_new.bResolution() == _old.bResolution() - _new.stake(), " Incorrect resolution ");
+        // } else if (State.indexOfMover(_new) == 1) { // mover is B
+        //     require(_new.aResolution() == _old.aResolution() - _new.stake(), " Incorrect resolution ");
+        //     require(_new.bResolution() == _old.bResolution() + _new.stake(), " Incorrect resolution ");
+        // }
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + _new.stake());
+            require(_new.bResolution() == _old.bResolution() - _new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - _new.stake());
+            require(_new.bResolution() == _old.bResolution() + _new.stake());
         }
-        
     }
 
     function validateRestToConcluded(bytes _old, bytes _new) private pure {
-        require(_new.stake() == _old.stake());
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
     }
 
     function validateXplayingToOplaying(bytes _old, bytes _new) private pure {
-        // if (State.indexOfMover(_new) == 0) {
-        //     require(_new.aResolution() == _old.aResolution() + 2 * 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
-        //     require(_new.bResolution() == _old.bResolution() - 2 * 2 *_new.stake());
-        // } else if (State.indexOfMover(_new) == 1) {
-        //     require(_new.aResolution() == _old.aResolution() - 2 * 2 *_new.stake());
-        //     require(_new.bResolution() == _old.bResolution() + 2 * 2 *_new.stake());
-        // } // mover gets to claim stake, so that other player incentivised
-        // require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
-        // require((_new.crosses() == _old.crosses()), " crosses changed. ");   
+        require(_new.stake() == _old.stake());
+        require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
+        require((_new.crosses() == _old.crosses()));   
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 *_new.stake()); 
+            require(_new.bResolution() == _old.bResolution() - 2 *_new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 *_new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 *_new.stake());
+            // note factor of 2 to swing fully to other player
+        } 
+
     }
     
     function validateXplayingToVictory(bytes _old, bytes _new) private pure {
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() - 2 * 2 * _new.stake());
-        } else if (State.indexOfMover(_new) ==1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * 2 * _new.stake());
-        } // mover gets to claim stake, so that other player incentivised
+        require(hasWon(_new.noughts));
         require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
         require((_new.crosses() == _old.crosses()));   
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 * _new.stake());
+            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
+        } else if (State.indexOfMover(_new) ==1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
+        } // mover gets to claim stakes
     }
 
     function validateXplayingToRest(bytes _old, bytes _new) private pure {
         require(_old.noughts() == 0); // don't allow this transition unless noughts has yet to make any marks
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
-        } else if (State.indexOfMover(_new) == 1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
-        } // mover gets to claim stake, so that other player incentivised
+        if (State.indexOfMover(_new) == 0) { // Mover is A
+            // revert balances
+            require(_new.aResolution() == _old.aResolution() + _old.stake());
+            require(_new.bResolution() == _old.bResolution() - _old.stake());
+        } else if (State.indexOfMover(_new) == 1) { // Mover is B
+            // revert balances
+            require(_new.aResolution() == _old.aResolution() - _old.stake());
+            require(_new.bResolution() == _old.bResolution() + _old.stake());
+        } 
     }
 
     function validateOplayingToXplaying(bytes _old, bytes _new) private pure {
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
-            require(_new.bResolution() == _old.bResolution() - 2 * 2 *_new.stake());
-        } else if (State.indexOfMover(_new) == 1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * 2 *_new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * 2 *_new.stake());
-        } // mover gets to claim stake, so that other player incentivised
         require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
-        require((_new.noughts() == _old.noughts()));   
-        // crosses always plays first move and always plays the move that completes the board
+        require((_new.noughts() == _old.noughts()));
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
+            require(_new.bResolution() == _old.bResolution() - 2 *_new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 *_new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 *_new.stake());
+        } // mover gets to claim stakes: note factor of 2 to swing fully to other player
+
     }
 
     function validateOplayingToVictory(bytes _old, bytes _new) private pure {
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() - 2 * 2 * _new.stake());
-        } else if (State.indexOfMover(_new) ==1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * 2 * _new.stake());
-        } // mover gets to claim stake, so that other player incentivised
+        require(hasWon(_new.crosses));
         require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
         require((_new.noughts() == _old.noughts()));   
-        // crosses always plays first move and always plays the move that completes the board
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 * _new.stake());
+            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
+        } else if (State.indexOfMover(_new) ==1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 *  _new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 *  _new.stake());
+        } // mover gets to claim stakes: note factor of 2 to swing fully to other player
     }
 
     function validateOplayingToDraw(bytes _old, bytes _new) private pure {
-        require(isDraw(_new.noughts(), _new.crosses())); // check if board full
+        require(isDraw(_new.noughts(), _new.crosses())); // check if board full. 
+        // crosses always plays first move and always plays the move that completes the board
         if (State.indexOfMover(_new) == 0) {
             require(_new.aResolution() == _old.aResolution() + 2 * _new.stake()); // no extra factor of 2, restoring to parity
             require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
@@ -213,7 +223,6 @@ contract TicTacToeGame {
         } // mover gets to restore parity to the winnings
         require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
         require((_new.noughts() == _old.noughts()));
-        // crosses always plays first move and always plays the move that completes the board
     }
 
     function validateVictoryToRest(bytes _old, bytes _new) private pure {

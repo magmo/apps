@@ -155,12 +155,12 @@ export function Xplaying(obj: PlayingParams): Xplaying {
   return { ...baseWithBuyIn(obj), name: XPLAYING, ...obj };
 }
 
-export function victory(obj: PlayingParams): Victory {
-  return { ...baseWithBuyIn(obj), name: VICTORY, ...obj };
+export function victory(obj: BaseParams): Victory {
+  return { ...base(obj), name: VICTORY, ...obj };
 }
 
-export function draw(obj: PlayingParams): Draw {
-  return { ...baseWithBuyIn(obj), name: DRAW, ...obj};
+export function draw(obj: BaseParams): Draw {
+  return { ...basen(obj), name: DRAW, ...obj};
 }
 
 export function conclude(obj: BaseParams): Conclude {

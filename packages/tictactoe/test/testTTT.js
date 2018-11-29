@@ -5,6 +5,7 @@ const TTT = artifacts.require("TicTacToeGame.sol");
 contract('TicTacToeGame', (accounts) => {
   let tttContract;  
   let playing1, playing2;
+  let propose, reject, rest, cheatreject;
 
   before(async () => {
     
@@ -13,14 +14,15 @@ contract('TicTacToeGame', (accounts) => {
     const libraryAddress = tttContract.address;
 
     const scenario = scenarios.build(libraryAddress, accounts[0], accounts[1]);
-    
-    // postFundSetupB = scenario.postFundSetupB;
-    // propose = scenario.propose;
     playing1 = scenario.playing1;
     playing2 = scenario.playing2;
-    // accept = scenario.accept;
-    // reveal = scenario.reveal;
-    // resting = scenario.resting;
+
+    const scenario2 = scenarios.aRejectsGame;
+    rest = scenario2.rest;
+    propose = scenario2.propose;
+    reject = scenario2.reject;
+
+    cheatreject = scenario2.cheatreject
   });
 
   const validTransition = async (state1, state2) => {
@@ -30,6 +32,18 @@ contract('TicTacToeGame', (accounts) => {
   // Transition function tests
   // ========================
 
+  it("allows REST -> XPLAYING", async () => {
+    assert(await validTransition(rest, propose));
+  });
+
+  it("allows XPLAYING -> REST (game rejected)", async () => {
+    assert(await validTransition(propose, reject));
+  });
+
+// TODO not convinced about behavu=iour of assertRevert
+  it("disallows XPLAYING -> REST (game rejected but with incorrect balances)", async () => {
+    assertRevert(await validTransition(propose, cheatreject));
+  });
 
   it("allows XPLAYING -> OPLAYING", async () => {
     assert(await validTransition(playing1, playing2));

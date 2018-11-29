@@ -218,7 +218,7 @@ export const aResignsAfterOneRound = {
   +'0000000000000000000000000000000000000000000000000000000000000006', // bResolution
 };
 
-export const noughtsvictory = {
+export const noughtsVictory = {
   ...standard,
   playing1: positions.Oplaying({...base, turnNum:  7, noughts:0b100000000, crosses:0b000000000, balances:fourSix}),
   playing2: positions.Xplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000010000, balances:sixFour}),
@@ -241,6 +241,13 @@ export const noughtsvictory = {
                     +'0000000000000000000000000000000000000000000000000000000000000018', // [GameAttributes: crosses]
 };
 
+export const aRejectsGame = {
+  rest: positions.resting({...base, turnNum: 0, balances: fiveFive}),
+  propose: positions.Xplaying({...base, turnNum: 1, noughts: 0, crosses: 0b1000000000, balances: fourSix}),
+  reject: positions.resting({...base, turnNum: 2, balances: fiveFive}),
+  cheatreject: positions.resting({...base, turnNum: 2, balances: sixFour}), // note incorrect balances
+
+}
 
 // export const bResignsAfterOneRound = {
 //   ...standard,
