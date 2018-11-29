@@ -101,7 +101,7 @@ contract TicTacToeGame {
                 return true;
 
             }
-        }   else if (_old.positionType() == TicTacToeState.PositionType.Draw) {
+        } else if (_old.positionType() == TicTacToeState.PositionType.Draw) {
 
             if (_new.positionType() == TicTacToeState.PositionType.Rest) {
 
