@@ -60,8 +60,8 @@ function encodeGameAttributes(position: positions.Position) {
 
 export enum GamePositionType {
   Resting = 0,
-  Oplaying = 1,
-  Xplaying = 2,
+  Xplaying = 1,
+  Oplaying = 2,
   Victory = 3,
   Draw    = 4
 }
