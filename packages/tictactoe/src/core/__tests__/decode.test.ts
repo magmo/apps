@@ -21,5 +21,5 @@ describe('decode', () => {
   testEncodeDecode(scenarios.standard.playing6);
   testEncodeDecode(scenarios.standard.draw);
   testEncodeDecode(scenarios.aResignsAfterOneRound.conclude);
-  testEncodeDecode(scenarios.noughtsvictory.victory);
+  testEncodeDecode(scenarios.noughtsVictory.victory);
 });

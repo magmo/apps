@@ -32,7 +32,7 @@ describe('decode', () => {
   });
 
   it('encodes Victory', () => {
-    expect(encode(scenarios.noughtsvictory.victory)).toEqual(scenarios.noughtsvictory.victoryHex);
+    expect(encode(scenarios.noughtsVictory.victory)).toEqual(scenarios.noughtsVictory.victoryHex);
   });
 
   it('encodes resigning Conclude', () => {
