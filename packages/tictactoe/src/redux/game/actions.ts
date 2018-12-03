@@ -1,4 +1,4 @@
-import { Move, Position, positions } from '../../core';
+import { Marks, Position, positions } from '../../core';
 
 export const UPDATE_PROFILE = 'LOGIN.UPDATE_PROFILE';
 export const JOIN_OPEN_GAME = 'GAME.JOIN_OPEN_GAME';
@@ -58,7 +58,7 @@ export const declineGame  = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
-export const chooseMove = (move: Move) => ({
+export const chooseMove = (move: Marks) => ({
   type: CHOOSE_MOVE as typeof CHOOSE_MOVE,
   move,
 });
