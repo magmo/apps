@@ -1,6 +1,4 @@
 import { Result, Marks, Player } from '../../core';
-import { noughtsVictory } from 'src/core/test-scenarios';
-import { POINT_CONVERSION_COMPRESSED } from 'constants';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -115,13 +113,11 @@ interface Base extends TwoChannel {
   roundBuyIn: string;
   myName: string;
   opponentName: string;
+  player: Player;
 }
 
-interface IncludesBase extends Base {
-  [x: string]: any;
-}
 
-export function base(state: IncludesBase) {
+export function base<T extends Base>(state: T): Base {
   const {
     libraryAddress,
     channelNonce,
@@ -151,7 +147,7 @@ export function base(state: IncludesBase) {
   };
 }
 
-export function getOpponentAddress(state: IncludesBase) {
+export function getOpponentAddress<T extends Base>(state: T) {
   return state.participants[1 - state.player];
 }
 
@@ -159,7 +155,7 @@ export interface WaitForGameConfirmationA extends Base {
   name: StateName.WaitForGameConfirmationA;
   player: Player.PlayerA;
 }
-export function waitForGameConfirmationA(state: IncludesBase): WaitForGameConfirmationA {
+export function waitForGameConfirmationA<T extends Base>(state: T): WaitForGameConfirmationA {
   return { ...base(state), name: StateName.WaitForGameConfirmationA, player: Player.PlayerA };
 }
 
@@ -167,7 +163,7 @@ export interface ConfirmGameB extends Base {
   name: StateName.ConfirmGameB;
   player: Player.PlayerB;
 }
-export function confirmGameB(state: IncludesBase): ConfirmGameB {
+export function confirmGameB<T extends Base>(state: T): ConfirmGameB {
   return { ...base(state), name: StateName.ConfirmGameB, player: Player.PlayerB };
 }
 
@@ -175,7 +171,7 @@ export interface DeclineGameB extends Base {
   name: StateName.DeclineGame;
   player: Player.PlayerB;
 }
-export function declineGameB(state: IncludesBase): DeclineGameB {
+export function declineGameB<T extends Base>(state: T): DeclineGameB {
   return { ...base(state), name: StateName.DeclineGame, player: Player.PlayerB };
 }
 
@@ -184,49 +180,56 @@ export interface WaitForFunding extends Base {
   name: StateName.WaitForFunding;
   player: Player;
 }
-export function waitForFunding(state: IncludesBase): WaitForFunding {
-  return { ...base(state), name: StateName.WaitForFunding };
+
+
+
+export function waitForFunding<T extends Base>(state: T): WaitForFunding {
+  return { ...base(state), name: StateName.WaitForFunding, player: state.player };
 }
 
 export interface WaitForPostFundSetup extends Base {
   name: StateName.WaitForPostFundSetup;
   player: Player;
 }
-export function waitForPostFundSetup(state: IncludesBase): WaitForPostFundSetup {
-  return { ...base(state), name: StateName.WaitForPostFundSetup };
+
+
+export function waitForPostFundSetup<T extends Base>(state: T): WaitForPostFundSetup {
+  return { ...base(state), name: StateName.WaitForPostFundSetup, player: state.player };
 }
 
-export interface OsPickMove extends Base {
+interface InPlay extends Base {
+  player: Player;
+  noughts: Marks;
+  crosses: Marks;
+}
+
+function inPlay<T extends InPlay>(state: T): InPlay {
+  return {...base(state), player: state.player, noughts: state.noughts,  crosses: state.crosses };
+}
+
+
+export interface OsPickMove extends InPlay {
   name: StateName.OsPickMove;
-  player: Player;
-  noughts: Marks;
-  crosses: Marks;
 }
-export function osPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): OsPickMove {
-  return { ...base(state), name: StateName.OsPickMove, noughts: noughts, crosses: crosses };
-}
-export interface XsPickMove extends Base {
-  name: StateName.XsPickMove;
-  player: Player;
-  noughts: Marks;
-  crosses: Marks;
-}
-export function xsPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): XsPickMove {
-  return { ...base(state), name: StateName.XsPickMove, noughts: noughts, crosses: crosses };
+export function osPickMove<T extends InPlay>(state: T): OsPickMove {
+  return { ...inPlay(state), name: StateName.OsPickMove };
 }
 
-export interface OsWaitForOpponentToPickMove extends Base {
-  name: StateName.OsWaitForOpponentToPickMove;
-  player: Player;
-  noughts: Marks;
-  crosses: Marks;
+export interface XsPickMove extends InPlay {
+  name: StateName.XsPickMove;
 }
-export function osWaitForOpponentToPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): OsWaitForOpponentToPickMove {
+
+export function xsPickMove<T extends InPlay>(state: T): XsPickMove {
+  return { ...inPlay(state), name: StateName.XsPickMove };
+}
+
+export interface OsWaitForOpponentToPickMove extends InPlay {
+  name: StateName.OsWaitForOpponentToPickMove;
+}
+export function osWaitForOpponentToPickMove<T extends InPlay>(state: T): OsWaitForOpponentToPickMove {
   return {
-    ...base(state),
+    ...inPlay(state),
     name: StateName.OsWaitForOpponentToPickMove,
-    noughts: noughts, 
-    crosses: crosses,
   };
 }
 
@@ -236,12 +239,10 @@ export interface XsWaitForOpponentToPickMove extends Base {
   noughts: Marks;
   crosses: Marks;
 }
-export function xsWaitForOpponentToPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): XsWaitForOpponentToPickMove {
+export function xsWaitForOpponentToPickMove<T extends InPlay>(state: T): XsWaitForOpponentToPickMove {
   return {
-    ...base(state),
+    ...inPlay(state),
     name: StateName.XsWaitForOpponentToPickMove,
-    noughts: noughts, 
-    crosses: crosses,
   };
 }
 
@@ -249,85 +250,77 @@ export function xsWaitForOpponentToPickMove(state: IncludesBase, noughts: Marks,
 //   myMarks: Marks;
 // }
 
-interface IncludesResult extends IncludesBase {
+interface HasResult extends InPlay {
   myMarks: Marks;
   theirMarks: Marks;
   result: Result;
 }
 
-export interface PlayAgain extends Base {
+export interface PlayAgain extends HasResult {
   name: StateName.PlayAgain;
-  myMarks: Marks;
-  theirMarks: Marks;
-  result: Result;
-  player: Player;
-}
-export function playAgain(state: IncludesResult): PlayAgain {
-  const { myMarks, theirMarks, result } = state;
-  return { ...base(state), name: StateName.PlayAgain, myMarks, theirMarks, result };
 }
 
-export interface WaitForResting extends Base {
+function hasResult<T extends HasResult>(state: T): HasResult {
+  const { myMarks, theirMarks, result } = state;
+  return {...inPlay(state), myMarks, theirMarks, result };
+}
+
+
+export function playAgain<T extends HasResult>(state: T): PlayAgain {
+  return { ...hasResult(state), name: StateName.PlayAgain };
+}
+
+export interface WaitForResting extends HasResult {
   name: StateName.WaitForResting;
-  myMarks: Marks;
-  theirMarks: Marks;
-  result: Result;
-  player: Player.PlayerA;
-}
-export function waitForRestingA(state: IncludesResult): WaitForResting {
-  const { myMarks, theirMarks, result } = state;
-  return { ...base(state), name: StateName.WaitForResting, myMarks, theirMarks, result };
 }
 
-export interface InsufficientFunds extends Base {
-  name: StateName.InsufficientFunds;
-  myMarks: Marks;
-  theirMarks: Marks;
-  result: Result;
-  player: Player;
+export function waitForRestingA<T extends HasResult>(state: T): WaitForResting {
+  return { ...hasResult(state), name: StateName.WaitForResting};
 }
-export function insufficientFunds(state: IncludesResult): InsufficientFunds {
-  const { myMarks, theirMarks, result } = state;
-  return { ...base(state), name: StateName.InsufficientFunds, myMarks, theirMarks, result };
+
+export interface InsufficientFunds extends HasResult {
+  name: StateName.InsufficientFunds;
+}
+export function insufficientFunds<T extends HasResult>(state: T): InsufficientFunds {
+  return { ...hasResult(state), name: StateName.InsufficientFunds};
 }
 
 export interface WaitToResign extends Base {
   name: StateName.WaitToResign;
-  player: Player;
+
 }
-export function waitToResign(state: IncludesBase): WaitToResign {
+export function waitToResign<T extends Base>(state: T): WaitToResign {
   return { ...base(state), name: StateName.WaitToResign };
 }
 
 export interface OpponentResigned extends Base {
   name: StateName.OpponentResigned;
-  player: Player;
 }
-export function opponentResigned(state: IncludesBase): OpponentResigned {
+export function opponentResigned<T extends Base>(state: T): OpponentResigned {
   return { ...base(state), name: StateName.OpponentResigned };
 }
 
 export interface WaitForResignationAcknowledgement extends Base {
   name: StateName.WaitForResignationAcknowledgement;
-  player: Player;
+
 }
-export function waitForResignationAcknowledgement(state: IncludesBase): WaitForResignationAcknowledgement {
+export function waitForResignationAcknowledgement<T extends Base>(state: T): WaitForResignationAcknowledgement {
   return { ...base(state), name: StateName.WaitForResignationAcknowledgement };
 }
 
 export interface GameOver extends Base {
   name: StateName.GameOver;
-  player: Player;
+
 }
-export function gameOver(state: IncludesBase): GameOver {
+export function gameOver<T extends Base>(state: T): GameOver {
   return { ...base(state), name: StateName.GameOver };
 }
 
 export interface WaitForWithdrawal extends Base {
   name: StateName.WaitForWithdrawal;
-  player: Player;
+
 }
-export function waitForWithdrawal(state: IncludesBase): WaitForWithdrawal {
+export function waitForWithdrawal<T extends Base>(state: T): WaitForWithdrawal {
   return { ...base(state), name: StateName.WaitForWithdrawal };
 }
 
