@@ -8,80 +8,88 @@ contract TicTacToeGame {
 
     // The following transitions are allowed:
     //
-    // Rest    -> Propose
-    // Rest    -> Conclude
+    // Rest    -> Xplaying
+    // Rest    -> Conclude but Conclude is an FMG position -- does it belong here?
     //
-    // Propose -> Rest // reject game
-    // Propose -> Propose // counter proposal
-    // Propose -> Accept
+    // Xplaying -> Oplaying
+    // Xplaying -> Victory
+    // cannot get to draw (X is always completing the board because X goes first) remember we are transitioning *from& Xplay, so noughts are making the new marks
+    // Xplaying -> Resting ("noughts" player rejects game)
     //
-    // Playing -> Playing
-    // Playing -> Victory
-    // Playing -> Draw
+    // Oplaying -> Xplaying
+    // Oplaying -> Victory
+    // Oplaying -> Draw
+
     //
     // Victory -> Rest
-    // Victory -> Propose
+    // Victory -> Xplaying
     //
     // Draw    -> Rest
-    // Draw    -> Propose
+    // Draw    -> Xplaying
     //
-    //  
-    //
+
     function validTransition(bytes _old, bytes _new) public pure returns (bool) {
 
         if (_old.positionType() == TicTacToeState.PositionType.Rest) {
-            
-            if (_new.positionType() == TicTacToeState.PositionType.Propose) {
+            if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
 
-                validateRestToPropose(_old, _new);
+                validateRestToXplaying(_old, _new);
 
                 return true;
 
             } 
-            else if (_new.positionType() == TicTacToeState.PositionType.Concluded) {
+        } else if (_old.positionType() == TicTacToeState.PositionType.Xplaying) {
 
-                validateRestToConcluded(_old,_new);
+            if (_new.positionType() == TicTacToeState.PositionType.Oplaying) {
 
-                return true;
-            }
-        } else if (_old.positionType() == TicTacToeState.PositionType.Propose) {
-
-            if (_new.positionType() == TicTacToeState.PositionType.Rest) { // game rejected
-
-                validateProposeToRest(_old, _new);
-
-                return true;
-
-            } else if (_new.positionType() == TicTacToeState.PositionType.Accept) {
-
-                validateProposeToAccept(_old, _new);
-
-                return true;
-
-            } else if (_new.positionType() == TicTacToeState.PositionType.Propose) {
-
-                validateProposeToPropose(_old, _new);
-
-                return true;
-
-            }
-        } else if (_old.positionType() == TicTacToeState.PositionType.Playing) {
-
-            if (_new.positionType() == TicTacToeState.PositionType.Playing) {
-
-                validatePlayingToPlaying(_old, _new);
-
-                return true;
-
-            } else if (_new.positionType() == TicTacToeState.PositionType.Draw) {
-
-                validatePlayingToDraw(_old, _new);
+                validateXplayingToOplaying(_old, _new);
 
                 return true;
 
             } else if (_new.positionType() == TicTacToeState.PositionType.Victory) {
 
-                validatePlayingToVictory(_old, _new);
+                validateXplayingToVictory(_old, _new);
+
+                return true;
+
+            } else if (_new.positionType() == TicTacToeState.PositionType.Rest) {
+
+                validateXplayingToRest(_old, _new);
+
+                return true;
+              }
+        } else if (_old.positionType() == TicTacToeState.PositionType.Oplaying) {
+
+            if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
+
+                validateOplayingToXplaying(_old, _new);
+
+                return true;
+
+            } else if (_new.positionType() == TicTacToeState.PositionType.Victory) {
+
+                validateOplayingToVictory(_old, _new);
+
+                return true;
+
+            } else if (_new.positionType() == TicTacToeState.PositionType.Draw) {
+
+                validateOplayingToDraw(_old, _new);
+
+                return true;
+            
+            }
+        } else if (_old.positionType() == TicTacToeState.PositionType.Victory) {
+
+            if (_new.positionType() == TicTacToeState.PositionType.Rest) {
+
+                validateVictoryToRest(_old, _new);
+
+                return true;
+
+            } else if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
+
+                validateVictoryToXplaying(_old, _new);
 
                 return true;
 
@@ -94,118 +102,118 @@ contract TicTacToeGame {
 
                 return true;
 
-            } else if (_new.positionType() == TicTacToeState.PositionType.Propose) {
+            } else if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
 
-                validateDrawToPropose(_old, _new);
+                validateDrawToXplaying(_old, _new);
 
                 return true;
 
             }
-        } else if (_old.positionType() == TicTacToeState.PositionType.Victory) {
-
-            if (_new.positionType() == TicTacToeState.PositionType.Rest) {
-
-                validateVictoryToRest(_old, _new);
-
-                return true;
-
-            } else if (_new.positionType() == TicTacToeState.PositionType.Propose) {
-
-                validateVictoryToPropose(_old, _new);
-
-                return true;
-            }
-        }
+        } 
         revert();
+        // return false;
     }
 
     // transition validations
 
-    function validateRestToPropose(bytes _old, bytes _new) private pure {
-        // require(_new.stake() == _old.stake()); // not if we want to let proposer choose the stake
-        require(_old.aResolution() >= _new.stake()); // cannot stake more than you have to lose
-        require(_old.bResolution() >= _new.stake()); 
-        require(_new.aResolution() == _old.aResolution()); // resolution unchanged
-        require(_new.bResolution() == _old.bResolution()); // resolution unchanged
+    function validateRestToXplaying(bytes _old, bytes _new) private pure {
+        // require(_new.noughts() == 0, " Noughts is not empty "); // error messages are not yet fully supported
+        require(_new.noughts() == 0);
+        // require(madeStrictlyOneMark(_new.crosses(),0), "Invalid starting position"); // Xs moves first
+        require(madeStrictlyOneMark(_new.crosses(),0)); // Xs moves first
+        // require(_new.stake() == _old.stake(), " Stake was changed ");
+        require(_new.stake() == _old.stake());
+        // if (State.indexOfMover(_new) == 0) { // mover is A
+        //     require(_new.aResolution() == _old.aResolution() + _new.stake(), " Incorrect resolution ");
+        //     require(_new.bResolution() == _old.bResolution() - _new.stake(), " Incorrect resolution ");
+        // } else if (State.indexOfMover(_new) == 1) { // mover is B
+        //     require(_new.aResolution() == _old.aResolution() - _new.stake(), " Incorrect resolution ");
+        //     require(_new.bResolution() == _old.bResolution() + _new.stake(), " Incorrect resolution ");
+        // }
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + _new.stake());
+            require(_new.bResolution() == _old.bResolution() - _new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - _new.stake());
+            require(_new.bResolution() == _old.bResolution() + _new.stake());
+        }
     }
 
     function validateRestToConcluded(bytes _old, bytes _new) private pure {
-        require(_new.stake() == _old.stake());
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
     }
 
-    function validateProposeToAccept(bytes _old, bytes _new) private pure {
-        require(_new.aResolution() == _old.aResolution()); // no incentive yet
-        require(_new.bResolution() == _old.bResolution());
+    function validateXplayingToOplaying(bytes _old, bytes _new) private pure {
         require(_new.stake() == _old.stake());
-        require(_new.noughts() == 0);
-        require(_new.crosses() == 0);
-    }
+        require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
+        require((_new.crosses() == _old.crosses()));   
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 *_new.stake()); 
+            require(_new.bResolution() == _old.bResolution() - 2 *_new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 *_new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 *_new.stake());
+            // note factor of 2 to swing fully to other player
+        } 
 
-    function validateProposeToRest(bytes _old, bytes _new) private pure {
-        require(_new.aResolution() == _old.aResolution());
-        require(_new.bResolution() == _old.bResolution());
-        // no requirement on _new.stake()
-    }
-
-    function validateProposeToPropose(bytes _old, bytes _new) private pure {
-        validateRestToPropose(_old, _new);
-    }
-
-    function validateAcceptToPlay(bytes _old, bytes _new) private pure {
-        require(_old.noughts() == 0);
-        require(_old.crosses() == 0);
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 *_new.stake()); // mover gets to claim stake, so that other player incentivised
-            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
-        } else if (State.indexOfMover(_new) ==1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
-        }
-        require(madeStrictlyOneMark(_new.noughts(), _old.noughts())); // noughts always goes first.
-        require(_new.crosses() == _old.crosses());
-    }
-
-
-    function validatePlayingToPlaying(bytes _old, bytes _new) private pure {
-        if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
-            require(_new.bResolution() == _old.bResolution() - 2 * 2 *_new.stake());
-        } else if (State.indexOfMover(_new) == 1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * 2 *_new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * 2 *_new.stake());
-        } // mover gets to claim stake, so that other player incentivised
-        if (popCount(_old.noughts()) == popCount(_old.crosses())) {
-            require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
-            require((_new.crosses() == _old.crosses()));
-        } else if (popCount(_old.noughts()) == 1 + popCount(_old.crosses())) {
-            require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
-            require((_new.noughts() == _old.noughts()));
-        } // infer if noughts or crosses had the right to move.    
     }
     
-    function validatePlayingToVictory(bytes _old, bytes _new) private pure {
-        if (State.indexOfMover(_new) == 0) {
+    function validateXplayingToVictory(bytes _old, bytes _new) private pure {
+        require(hasWon(_new.noughts()));
+        require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
+        require((_new.crosses() == _old.crosses()));   
+        if (State.indexOfMover(_new) == 0) { // mover is A
             require(_new.aResolution() == _old.aResolution() + 2 * _new.stake());
             require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
-        } else if (State.indexOfMover(_new) ==1) {
+        } else if (State.indexOfMover(_new) ==1) { // mover is B
             require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
             require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
-        } // mover gets to claim stake, so that other player incentivised
-        if (popCount(_old.noughts()) == popCount(_old.crosses())) {
-            require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
-            require((_new.crosses() == _old.crosses()));
-            require(hasWon(_new.noughts()));
-        } else if (popCount(_old.noughts()) == 1 + popCount(_old.crosses())) {
-            require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
-            require((_new.noughts() == _old.noughts()));
-            require(hasWon(_new.crosses()));
-        } // infer if the mover has a winning position   
+        } // mover gets to claim stakes
     }
 
-    function validatePlayingToDraw(bytes _old, bytes _new) private pure {
-        require(isDraw(_new.noughts(), _new.crosses())); // check if board full
+    function validateXplayingToRest(bytes _old, bytes _new) private pure {
+        require(_old.noughts() == 0); // don't allow this transition unless noughts has yet to make any marks
+        if (State.indexOfMover(_new) == 0) { // Mover is A
+            // revert balances
+            require(_new.aResolution() == _old.aResolution() + _old.stake());
+            require(_new.bResolution() == _old.bResolution() - _old.stake());
+        } else if (State.indexOfMover(_new) == 1) { // Mover is B
+            // revert balances
+            require(_new.aResolution() == _old.aResolution() - _old.stake());
+            require(_new.bResolution() == _old.bResolution() + _old.stake());
+        } 
+    }
+
+    function validateOplayingToXplaying(bytes _old, bytes _new) private pure {
+        require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
+        require((_new.noughts() == _old.noughts()));
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 *_new.stake()); // note extra factor of 2 to swing fully to other player
+            require(_new.bResolution() == _old.bResolution() - 2 *_new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 *_new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 *_new.stake());
+        } // mover gets to claim stakes: note factor of 2 to swing fully to other player
+
+    }
+
+    function validateOplayingToVictory(bytes _old, bytes _new) private pure {
+        require(hasWon(_new.crosses()));
+        require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
+        require((_new.noughts() == _old.noughts()));   
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + 2 * _new.stake());
+            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
+        } else if (State.indexOfMover(_new) ==1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - 2 *  _new.stake());
+            require(_new.bResolution() == _old.bResolution() + 2 *  _new.stake());
+        } // mover gets to claim stakes: note factor of 2 to swing fully to other player
+    }
+
+    function validateOplayingToDraw(bytes _old, bytes _new) private pure {
+        require(isDraw(_new.noughts(), _new.crosses())); // check if board full. 
+        // crosses always plays first move and always plays the move that completes the board
         if (State.indexOfMover(_new) == 0) {
             require(_new.aResolution() == _old.aResolution() + 2 * _new.stake()); // no extra factor of 2, restoring to parity
             require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
@@ -213,9 +221,8 @@ contract TicTacToeGame {
             require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
             require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
         } // mover gets to restore parity to the winnings
-        require(madeStrictlyOneMark(_new.noughts(), _old.noughts()));
-        require((_new.crosses() == _old.crosses()));
-        // noughts always plays first move and always plays a move that completes the board
+        require(madeStrictlyOneMark(_new.crosses(), _old.crosses()));
+        require((_new.noughts() == _old.noughts()));
     }
 
     function validateVictoryToRest(bytes _old, bytes _new) private pure {
@@ -228,14 +235,21 @@ contract TicTacToeGame {
         require(_new.bResolution() == _old.bResolution());
     }
 
-    function validateVictoryToPropose(bytes _old, bytes _new) private pure {
-        validateRestToPropose(_old, _new);
+    function validateVictoryToXplaying(bytes _old, bytes _new) private pure {
+        require(_new.aResolution() == _old.aResolution());
+        require(_new.bResolution() == _old.bResolution());
+        require(_new.noughts() == 0);
+        require(madeStrictlyOneMark(_new.crosses(),0)); // crosses always goes first. there is no _old.crosses, so set to zero here
     }
 
-    function validateDrawToPropose(bytes _old, bytes _new) private pure {
-        validateRestToPropose(_old, _new);
+    function validateDrawToXplaying(bytes _old, bytes _new) private pure {
+        require(_new.aResolution() == _old.aResolution());
+        require(_new.bResolution() == _old.bResolution());
+        require(_new.noughts() == 0);
+        require(madeStrictlyOneMark(_new.crosses(),0)); // crosses always goes first. there is no _old.crosses, so set to zero here
     }
 
+  
     // helper functions 
     
     // Unravelling of grid is as follows:

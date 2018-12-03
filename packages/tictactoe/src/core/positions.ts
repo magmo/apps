@@ -1,16 +1,15 @@
 // import { soliditySha3 } from 'web3-utils';
 // import { padBytes32 } from 'fmg-core';
 // import { positions } from '.';
-
+import {Marks} from './marks';
 // Position names
 // ==============
 export const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
 export const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
 export const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
 export const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
-export const PROPOSE = 'PROPOSE';
-export const ACCEPT = 'ACCEPT';
-export const PLAYING = 'PLAYING';
+export const OPLAYING = 'OPLAYING';
+export const XPLAYING = 'XPLAYING';
 export const RESTING = 'RESTING';
 export const VICTORY = 'VICTORY';
 export const DRAW = 'DRAW';
@@ -31,6 +30,12 @@ interface Base {
 // All positions apart from Conclude also have the buyIn
 interface BaseWithBuyIn extends Base {
     roundBuyIn: string;
+  }
+
+
+  interface BaseWitNoughtsAndCrossesAndBuyIn extends BaseWithBuyIn {
+    noughts: Marks;
+    crosses: Marks;
   }
   
   export interface PreFundSetupA extends BaseWithBuyIn {
@@ -53,34 +58,30 @@ interface BaseWithBuyIn extends Base {
     name: typeof POST_FUND_SETUP_B;
   }
   
-  export interface Propose extends BaseWithBuyIn {
-    name: typeof PROPOSE;
-  }
-  
-  export interface Accept extends BaseWithBuyIn {
-    name: typeof ACCEPT;
-  }
-  
+
   export interface Resting extends BaseWithBuyIn {
     name: typeof RESTING;
   }
 
-  export interface Playing extends BaseWithBuyIn {
-    name: typeof PLAYING;
-    noughts: number;
-    crosses: number;
-  }
-  
-  export interface Victory extends BaseWithBuyIn {
-    name: typeof VICTORY;
-    noughts: number;
-    crosses: number;
+  export interface Oplaying extends BaseWithBuyIn {
+    name: typeof OPLAYING;
+    noughts: Marks;
+    crosses: Marks;
   }
 
-  export interface Draw extends BaseWithBuyIn {
+  export interface Xplaying extends BaseWithBuyIn {
+    name: typeof XPLAYING;
+    noughts: Marks;
+    crosses: Marks;
+  }
+  
+  export interface Victory extends BaseWitNoughtsAndCrossesAndBuyIn {
+    name: typeof VICTORY;
+  }
+
+  export interface Draw extends BaseWitNoughtsAndCrossesAndBuyIn {
     name: typeof DRAW;
-    noughts: number;
-    crosses: number;
+
   }
 
   export interface Conclude extends Base {
@@ -92,9 +93,8 @@ interface BaseWithBuyIn extends Base {
     | PreFundSetupB
     | PostFundSetupA
     | PostFundSetupB
-    | Propose
-    | Accept
-    | Playing
+    | Oplaying
+    | Xplaying
     | Resting
     | Victory
     | Draw
@@ -116,9 +116,10 @@ interface BaseWithBuyInParams extends BaseParams {
 }
 
 interface PlayingParams extends BaseWithBuyInParams {
-  noughts: number;
-  crosses: number;
+  noughts: Marks;
+  crosses: Marks;
 }
+
 
 function base(obj: BaseParams): Base {
   const { libraryAddress, channelNonce, participants, turnNum, balances } = obj;
@@ -127,6 +128,11 @@ function base(obj: BaseParams): Base {
 
 function baseWithBuyIn(obj: BaseWithBuyInParams): BaseWithBuyIn {
   return { ...base(obj), roundBuyIn: obj.roundBuyIn };
+}
+
+function baseWithNoughtsAndCrossesAndBuyIn(obj: PlayingParams): BaseWitNoughtsAndCrossesAndBuyIn {
+  const { roundBuyIn, noughts, crosses } = obj;
+  return { ...base(obj), roundBuyIn, noughts, crosses };
 }
 
 export function preFundSetupA(obj: BaseWithBuyInParams): PreFundSetupA {
@@ -150,24 +156,20 @@ export function resting(obj: BaseWithBuyInParams): Resting {
   return { ...baseWithBuyIn(obj), name: RESTING };
 }
 
-export function propose(obj: BaseWithBuyInParams): Propose {
-  return { ...baseWithBuyIn(obj), name: PROPOSE };
+export function Oplaying(obj: PlayingParams): Oplaying {
+  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: OPLAYING, ...obj };
 }
 
-export function accept(obj: BaseWithBuyInParams): Accept {
-  return { ...baseWithBuyIn(obj), name: ACCEPT};
-}
-
-export function playing(obj: PlayingParams): Playing {
-  return { ...baseWithBuyIn(obj), name: PLAYING, ...obj };
+export function Xplaying(obj: PlayingParams): Xplaying {
+  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING, ...obj };
 }
 
 export function victory(obj: PlayingParams): Victory {
-  return { ...baseWithBuyIn(obj), name: VICTORY, ...obj };
+  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: VICTORY };
 }
 
 export function draw(obj: PlayingParams): Draw {
-  return { ...baseWithBuyIn(obj), name: DRAW, ...obj};
+  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: DRAW };
 }
 
 export function conclude(obj: BaseParams): Conclude {

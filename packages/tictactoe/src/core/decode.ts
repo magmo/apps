@@ -26,8 +26,8 @@ function extractBytes(hexString: string, byteOffset: number = 0, numBytes: numbe
     // ==============================
     // [  0 -  31] enum positionType
     // [ 32 -  63] uint256 stake
-    // [ 64 -  65] uint16 noughts
-    // [ 66 -  67] uint16 crosses 
+    // [ 64 -  95] uint256 noughts
+    // [ 96 -  127] uint256 crosses 
 
 function extractGamePositionType(hexString: string) {
   return extractInt(hexString, GAME_ATTRIBUTE_OFFSET) as GamePositionType;
@@ -52,7 +52,7 @@ export default function decode(hexString: string) {
   const { channel, turnNum, stateType } = state;
   const { channelType: libraryAddress, channelNonce, participants } = channel;
   const base = { libraryAddress, channelNonce, participants, turnNum, balances };
-
+  
   // conclude is a special case as it doesn't have the buyIn
   if (stateType === State.StateType.Conclude) {
     return positions.conclude(base);
@@ -93,21 +93,21 @@ export function decodeGameState(state: State, roundBuyIn: string, hexString: str
   switch (position) {
     case GamePositionType.Resting:
       return positions.resting(base);
-    case GamePositionType.Propose:
-      return positions.propose({...base});
-    case GamePositionType.Accept:
-      return positions.accept({...base});
-    case GamePositionType.Playing:
-      const playingnoughts = extractNoughts(hexString);
-      const playingcrosses = extractCrosses(hexString);
-      return positions.playing({...base, noughts: playingnoughts, crosses: playingcrosses});
+    case GamePositionType.Oplaying:
+      const oplayingnoughts = extractNoughts(hexString);
+      const oplayingcrosses = extractCrosses(hexString);
+      return positions.Oplaying({...base, noughts: oplayingnoughts, crosses: oplayingcrosses});
+    case GamePositionType.Xplaying:
+      const xplayingnoughts = extractNoughts(hexString);
+      const xplayingcrosses = extractCrosses(hexString);
+      return positions.Oplaying({...base, noughts: xplayingnoughts, crosses: xplayingcrosses});
     case GamePositionType.Victory:
-    const victorynoughts = extractNoughts(hexString);
-    const victorycrosses = extractCrosses(hexString);
+      const victorynoughts = extractNoughts(hexString);
+      const victorycrosses = extractCrosses(hexString);
       return positions.victory({...base, noughts: victorynoughts, crosses: victorycrosses});
     case GamePositionType.Draw:
-    const drawnoughts = extractNoughts(hexString);
-    const drawcrosses = extractCrosses(hexString);
+      const drawnoughts = extractNoughts(hexString);
+      const drawcrosses = extractCrosses(hexString);
       return positions.draw({...base, noughts: drawnoughts, crosses: drawcrosses});;
   }
 }

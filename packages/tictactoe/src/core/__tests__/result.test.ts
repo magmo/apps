@@ -1,5 +1,3 @@
-// import { Player } from '../players';
-// import { Move } from '../moves';
 import {
   Result,
   calculateResult,
@@ -7,10 +5,10 @@ import {
   convertToAbsoluteResult,
   convertToRelativeResult,
   Marker,
-  SingleMarks,
-  Marks,
   midRow,
 } from '../results';
+
+import { Marks, SingleMarks } from '../marks';
 
 function testOutcome(noughts: Marks, crosses: Marks, you: Marker, expectedResult: Result) {
   var description: string;
