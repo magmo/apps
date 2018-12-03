@@ -1,4 +1,4 @@
-import { Marks, Position, positions } from '../../core';
+import { SingleMarks, Position, positions } from '../../core';
 
 export const UPDATE_PROFILE = 'LOGIN.UPDATE_PROFILE';
 export const JOIN_OPEN_GAME = 'GAME.JOIN_OPEN_GAME';
@@ -8,7 +8,8 @@ export const CANCEL_OPEN_GAME = 'GAME.CANCEL_OPEN_GAME';
 export const INITIAL_POSITION_RECEIVED = 'GAME.INITIAL_POSITION_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
 export const DECLINE_GAME = 'GAME.DECLINE_GAME';
-export const CHOOSE_MOVE = 'GAME.CHOOSE_MOVE';
+export const OS_CHOOSE_MOVE = 'GAME.OS_CHOOSE_MOVE';
+export const XS_CHOOSE_MOVE = 'GAME.XS_CHOOSE_MOVE';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
 export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
@@ -58,9 +59,14 @@ export const declineGame  = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
-export const chooseMove = (move: Marks) => ({
-  type: CHOOSE_MOVE as typeof CHOOSE_MOVE,
-  move,
+export const osChooseMove = (noughts: SingleMarks) => ({
+  type: OS_CHOOSE_MOVE as typeof OS_CHOOSE_MOVE,
+  noughts,
+});
+
+export const xsChooseMove = (crosses: SingleMarks) => ({
+  type: XS_CHOOSE_MOVE as typeof XS_CHOOSE_MOVE,
+  crosses,
 });
 
 export const playAgain = () => ({

@@ -1,4 +1,6 @@
 import { Result, Marks, Player } from '../../core';
+import { noughtsVictory } from 'src/core/test-scenarios';
+import { POINT_CONVERSION_COMPRESSED } from 'constants';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -13,10 +15,10 @@ export enum StateName {
   DeclineGame = 'DECLINE_GAME_B',
   WaitForFunding = 'WAIT_FOR_FUNDING',
   WaitForPostFundSetup = 'WAIT_FOR_POST_FUND_SETUP',
-  OsPickMove = 'Os_PICK_MOVE',
-  XsPickMove = 'Xs_PICK_MOVE',
-  OsWaitForOpponentToPickMove = 'Os_WAIT_FOR_OPPONENT_TO_PICK_MOVE',
-  XsWaitForOpponentToPickMove = 'Xs_WAIT_FOR_OPPONENT_TO_PICK_MOVE',
+  OsPickMove = 'OS_PICK_MOVE',
+  XsPickMove = 'XS_PICK_MOVE',
+  OsWaitForOpponentToPickMove = 'OS_WAIT_FOR_OPPONENT_TO_PICK_MOVE',
+  XsWaitForOpponentToPickMove = 'XS_WAIT_FOR_OPPONENT_TO_PICK_MOVE',
   WaitForResting = 'WAIT_FOR_RESTING',
   PlayAgain = 'PLAY_AGAIN',
   InsufficientFunds = 'INSUFFICIENT_FUNDS',
@@ -197,41 +199,49 @@ export function waitForPostFundSetup(state: IncludesBase): WaitForPostFundSetup 
 export interface OsPickMove extends Base {
   name: StateName.OsPickMove;
   player: Player;
+  noughts: Marks;
+  crosses: Marks;
 }
-export function osPickMove(state: IncludesBase): OsPickMove {
-  return { ...base(state), name: StateName.OsPickMove };
+export function osPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): OsPickMove {
+  return { ...base(state), name: StateName.OsPickMove, noughts: noughts, crosses: crosses };
 }
 export interface XsPickMove extends Base {
   name: StateName.XsPickMove;
   player: Player;
+  noughts: Marks;
+  crosses: Marks;
 }
-export function xsPickMove(state: IncludesBase): XsPickMove {
-  return { ...base(state), name: StateName.XsPickMove };
+export function xsPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): XsPickMove {
+  return { ...base(state), name: StateName.XsPickMove, noughts: noughts, crosses: crosses };
 }
 
 export interface OsWaitForOpponentToPickMove extends Base {
   name: StateName.OsWaitForOpponentToPickMove;
-  myMarks: Marks;
   player: Player;
+  noughts: Marks;
+  crosses: Marks;
 }
-export function osWaitForOpponentToPickMove(state: IncludesBase): OsWaitForOpponentToPickMove {
+export function osWaitForOpponentToPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): OsWaitForOpponentToPickMove {
   return {
     ...base(state),
     name: StateName.OsWaitForOpponentToPickMove,
-    myMarks: state.myMarks,
+    noughts: noughts, 
+    crosses: crosses,
   };
 }
 
 export interface XsWaitForOpponentToPickMove extends Base {
   name: StateName.XsWaitForOpponentToPickMove;
-  myMarks: Marks;
   player: Player;
+  noughts: Marks;
+  crosses: Marks;
 }
-export function xsWaitForOpponentToPickMove(state: IncludesBase): XsWaitForOpponentToPickMove {
+export function xsWaitForOpponentToPickMove(state: IncludesBase, noughts: Marks, crosses: Marks): XsWaitForOpponentToPickMove {
   return {
     ...base(state),
     name: StateName.XsWaitForOpponentToPickMove,
-    myMarks: state.myMarks,
+    noughts: noughts, 
+    crosses: crosses,
   };
 }
 
