@@ -48,7 +48,7 @@ describe('player A\'s app', () => {
 
   describe('when in XsPickMove', () => {
     
-    describe('when receiving an inconclusive XS_CHOSE_MOVE', () => {
+    describe('when making an inconclusive XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({...aProps, ...postFundSetupB });
       const action = actions.xsMoveChosen(SingleMarks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -58,7 +58,7 @@ describe('player A\'s app', () => {
       itSends(playing1, updatedState);
     });
 
-    describe('when receiving a drawing XS_CHOSE_MOVE', () => {
+    describe('when making a drawing XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({...aProps, ...playing8 });
       const action = actions.xsMoveChosen(SingleMarks.bm);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -82,7 +82,7 @@ describe('player B\'s app', () => {
 
   describe('when in OsPickMove', () => {
     
-    describe('when receiving an inconclusive OS_CHOSE_MOVE', () => {
+    describe('when making an inconclusive OS_CHOSE_MOVE', () => {
       const gameState = state.osPickMove({...bProps, ...playing1 });
       const action = actions.osMoveChosen(SingleMarks.mm);
       const updatedState = gameReducer({ messageState, gameState }, action);

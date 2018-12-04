@@ -59,21 +59,24 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   let newBalances: [string, string] = balances;
 
   const opponentAddress = states.getOpponentAddress(gameState);
-  let pos: Position;
-  let newGameState: states.GameState;
+  let pos: Position = positions.draw({...gameState, crosses: new_crosses, balances: newBalances}); // default
+  let newGameState: states.GameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses, result: results.Result.Tie});; //default
  
   // if draw
   if (isDraw(noughts, new_crosses)) {
     switch(player){
       case Player.PlayerA: {
-        newBalances = favorA(balances,roundBuyIn); // usually enact a full swing to current player
+        newBalances = favorA(balances,roundBuyIn);
+        break;
       }
-      case Player.PlayerB: {
+      case Player.PlayerB: {  
         newBalances = favorB(balances,roundBuyIn);
+        break;
       }
     }
     newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses, result: results.Result.Tie});
     pos = positions.draw({...newGameState, crosses: new_crosses, balances: newBalances});
+    messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
   };
 
@@ -99,17 +102,16 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
     }
   }
 
-    // if inconclusive
-    if (!isDraw(noughts, new_crosses) && !isWinningMarks(new_crosses)){
-      newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
-      pos = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances});
-    }
+  // if inconclusive
+  if (!isDraw(noughts, new_crosses) && !isWinningMarks(new_crosses)){
+    newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
+    pos = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances});
+  }
 
   // if winning move
   if (isWinningMarks(new_crosses)) {
-    return { gameState: gameState, messageState }; // placeholder
-    // newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
-    // pos = positions.victory({...newGameState, crosses: new_crosses, balances: newBalances})
+    newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses, result: results.Result.YouWin});
+    pos = positions.victory({...newGameState, crosses: new_crosses, balances: newBalances})
   };
 
   messageState = sendMessage(pos, opponentAddress, messageState);
