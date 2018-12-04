@@ -3,7 +3,12 @@ import { Reducer } from 'redux';
 import * as actions from './actions';
 import * as states from './state';
 
-import { MessageState } from '../message-service/state';
+import { positions } from '../../core';
+import { MessageState, sendMessage } from '../message-service/state';
+
+import hexToBN from '../../utils/hexToBN';
+import bnToHex from '../../utils/bnToHex';
+
 
 export interface JointState {
   gameState: states.GameState;
@@ -30,11 +35,17 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
 };
 
 function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageState, action: actions.XsMoveChosen): JointState {
-  const { crosses,  turnNum } = gameState;
-  let newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: crosses + action.crosses});
-  // newGameState.crosses = gameState.crosses & action.crosses;
-  // newGameState.turnNum = gameState.turnNum + 1;
-  // TODO enter logic so that test passes.
+  const { balances, roundBuyIn, crosses,  turnNum } = gameState;
+  const new_crosses = crosses + action.crosses;
+
+  const aBal = bnToHex(hexToBN(balances[0]).sub(hexToBN(roundBuyIn)));
+  const bBal = bnToHex(hexToBN(balances[1]).add(hexToBN(roundBuyIn)));
+  const newBalances = [aBal, bBal] as [string, string];
+
+  const newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
+  const opponentAddress = states.getOpponentAddress(gameState);
+  const xplaying = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances})
+  messageState = sendMessage(xplaying, opponentAddress, messageState);
   return { gameState: newGameState, messageState };
 };
 

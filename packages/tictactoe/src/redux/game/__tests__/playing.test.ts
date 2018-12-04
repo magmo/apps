@@ -14,10 +14,10 @@ import {
 } from './helpers';
 
 const {
-  preFundSetupA,
+  // preFundSetupA,
   // preFundSetupB,
   // postFundSetupA,
-  // postFundSetupB,
+  postFundSetupB,
   playing1,
   // playing2,
   // playing3,
@@ -39,7 +39,7 @@ const messageState = { };
 describe('player A\'s app', () => {
   const aProps = {
     ...base,
-    stateCount: 0,
+    stateCount: 1,
     player: Player.PlayerA,
     noughts: 0,
     crosses: 0,
@@ -47,7 +47,7 @@ describe('player A\'s app', () => {
   };
 
   describe('when in XsPickMove', () => {
-    const gameState = state.xsPickMove({...aProps, ...preFundSetupA });
+    const gameState = state.xsPickMove({...aProps, ...postFundSetupB });
 
     describe('when receiving XS_CHOSE_MOVE', () => {
       const action = actions.xsMoveChosen(SingleMarks.tl);

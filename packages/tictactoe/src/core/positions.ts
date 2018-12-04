@@ -160,8 +160,8 @@ export function Oplaying(obj: PlayingParams): Oplaying {
   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: OPLAYING, ...obj };
 }
 
-export function Xplaying(obj: PlayingParams): Xplaying {
-  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING, ...obj };
+export function Xplaying<T extends PlayingParams> (obj: T): Xplaying {
+  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING };
 }
 
 export function victory(obj: PlayingParams): Victory {
