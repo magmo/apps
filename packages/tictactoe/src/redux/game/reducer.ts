@@ -2,8 +2,9 @@ import { Reducer } from 'redux';
 
 import * as actions from './actions';
 import * as states from './state';
+import * as results from '../../core/results';
 
-import { positions, Player, isDraw, isWinningMarks } from '../../core';
+import { positions, Player, isDraw, isWinningMarks, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 
 import hexToBN from '../../utils/hexToBN';
@@ -57,6 +58,26 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   const new_crosses = crosses + action.crosses;
   let newBalances: [string, string] = balances;
 
+  const opponentAddress = states.getOpponentAddress(gameState);
+  let pos: Position;
+  let newGameState: states.GameState;
+ 
+  // if draw
+  if (isDraw(noughts, new_crosses)) {
+    switch(player){
+      case Player.PlayerA: {
+        newBalances = favorA(balances,roundBuyIn); // usually enact a full swing to current player
+      }
+      case Player.PlayerB: {
+        newBalances = favorB(balances,roundBuyIn);
+      }
+    }
+    newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses, result: results.Result.Tie});
+    pos = positions.draw({...newGameState, crosses: new_crosses, balances: newBalances});
+    return { gameState: newGameState, messageState };
+  };
+
+  // if not draw then full swing to current player, unless its the first turn in a round
   switch(player){
     case Player.PlayerA: {
       if (noughts != 0 && crosses != 0) {
@@ -78,22 +99,11 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
     }
   }
 
-  const opponentAddress = states.getOpponentAddress(gameState);
-  let pos: any;
-  let newGameState: any;
-
-  // if inconclusive
-  if (!isDraw(noughts, new_crosses) && !isWinningMarks(new_crosses)){
-    newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
-    pos = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances})
-  }
-  
-  // if draw
-  if (isDraw(noughts, new_crosses)) {
-    return { gameState: gameState, messageState }; // placeholder
-    // newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
-    // pos = positions.draw({...newGameState, crosses: new_crosses, balances: newBalances})
-  };
+    // if inconclusive
+    if (!isDraw(noughts, new_crosses) && !isWinningMarks(new_crosses)){
+      newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
+      pos = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances});
+    }
 
   // if winning move
   if (isWinningMarks(new_crosses)) {

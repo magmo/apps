@@ -25,8 +25,8 @@ const {
   // playing5,
   // playing6,
   // playing7,
-  // playing8,
-  // draw,
+  playing8,
+  draw,
   // resting,
 } = scenarios.standard;
 
@@ -47,15 +47,25 @@ describe('player A\'s app', () => {
   };
 
   describe('when in XsPickMove', () => {
-    const gameState = state.xsPickMove({...aProps, ...postFundSetupB });
-
-    describe('when receiving XS_CHOSE_MOVE', () => {
+    
+    describe('when receiving an inconclusive XS_CHOSE_MOVE', () => {
+      const gameState = state.xsPickMove({...aProps, ...postFundSetupB });
       const action = actions.xsMoveChosen(SingleMarks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
       itTransitionsTo(state.StateName.XsWaitForOpponentToPickMove, updatedState);
       itSends(playing1, updatedState);
+    });
+
+    describe('when receiving a drawing XS_CHOSE_MOVE', () => {
+      const gameState = state.xsPickMove({...aProps, ...playing8 });
+      const action = actions.xsMoveChosen(SingleMarks.bm);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itTransitionsTo(state.StateName.PlayAgain, updatedState);
+      itSends(draw, updatedState);
     });
 
     // itHandlesResignLikeItsTheirTurn(gameState, messageState);
@@ -71,9 +81,9 @@ describe('player B\'s app', () => {
   };
 
   describe('when in OsPickMove', () => {
-    const gameState = state.osPickMove({...bProps, ...playing1 });
-
-    describe('when receiving OS_CHOSE_MOVE', () => {
+    
+    describe('when receiving an inconclusive OS_CHOSE_MOVE', () => {
+      const gameState = state.osPickMove({...bProps, ...playing1 });
       const action = actions.osMoveChosen(SingleMarks.mm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 

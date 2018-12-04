@@ -244,20 +244,17 @@ export function xsWaitForOpponentToPickMove<T extends InPlay>(state: T): XsWaitF
 }
 
 interface HasResult extends InPlay {
-  myMarks: Marks;
-  theirMarks: Marks;
   result: Result;
+}
+
+function hasResult<T extends HasResult>(state: T): HasResult {
+  const { result } = state;
+  return {...inPlay(state), result };
 }
 
 export interface PlayAgain extends HasResult {
   name: StateName.PlayAgain;
 }
-
-function hasResult<T extends HasResult>(state: T): HasResult {
-  const { myMarks, theirMarks, result } = state;
-  return {...inPlay(state), myMarks, theirMarks, result };
-}
-
 
 export function playAgain<T extends HasResult>(state: T): PlayAgain {
   return { ...hasResult(state), name: StateName.PlayAgain };
