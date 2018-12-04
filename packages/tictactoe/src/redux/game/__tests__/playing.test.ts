@@ -9,7 +9,7 @@ import {
   // itStoresAction,
   itIncreasesTurnNumBy,
   // itHandlesResignLikeItsMyTurn,
-  itHandlesResignLikeItsTheirTurn,
+  // itHandlesResignLikeItsTheirTurn,
   itSends,
 } from './helpers';
 
@@ -19,7 +19,7 @@ const {
   // postFundSetupA,
   postFundSetupB,
   playing1,
-  // playing2,
+  playing2,
   // playing3,
   // playing4,
   // playing5,
@@ -58,6 +58,30 @@ describe('player A\'s app', () => {
       itSends(playing1, updatedState);
     });
 
-    itHandlesResignLikeItsTheirTurn(gameState, messageState);
+    // itHandlesResignLikeItsTheirTurn(gameState, messageState);
+  });
+});
+
+describe('player B\'s app', () => {
+  const aProps = {
+    ...base,
+    stateCount: 1,
+    player: Player.PlayerB,
+    twitterHandle: 'tweet',
+  };
+
+  describe('when in OsWaitForOpponentToPickMove', () => {
+    const gameState = state.osWaitForOpponentToPickMove({...aProps, ...playing1 });
+
+    describe('when receiving OS_CHOSE_MOVE', () => {
+      const action = actions.osMoveChosen(SingleMarks.mm);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
+      itSends(playing2, updatedState);
+    });
+
+    // itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 });
