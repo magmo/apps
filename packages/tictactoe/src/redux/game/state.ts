@@ -203,7 +203,7 @@ interface InPlay extends Base {
   crosses: Marks;
 }
 
-function inPlay<T extends InPlay>(state: T): InPlay {
+export function inPlay<T extends InPlay>(state: T): InPlay {
   return {...base(state), player: state.player, noughts: state.noughts,  crosses: state.crosses };
 }
 
