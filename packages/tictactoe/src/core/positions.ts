@@ -157,10 +157,14 @@ export function resting(obj: BaseWithBuyInParams): Resting {
 }
 
 export function Oplaying(obj: PlayingParams): Oplaying {
-  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: OPLAYING, ...obj };
+  return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: OPLAYING};
 }
 
-export function Xplaying<T extends PlayingParams> (obj: T): Xplaying {
+// export function Xplaying<T extends PlayingParams> (obj: T): Xplaying {
+//   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING };
+// }
+
+export function Xplaying(obj: PlayingParams): Xplaying {
   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING };
 }
 
