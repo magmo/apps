@@ -3,7 +3,7 @@ import { Reducer } from 'redux';
 import * as actions from './actions';
 import * as states from './state';
 
-import { positions, Player } from '../../core';
+import { positions, Player, isDraw, isWinningMarks } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 
 import hexToBN from '../../utils/hexToBN';
@@ -54,10 +54,7 @@ function favorB(balances: [string, string], roundBuyIn): [string, string] {
 
 function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageState, action: actions.XsMoveChosen): JointState {
   const { player, balances, roundBuyIn, noughts, crosses,  turnNum } = gameState;
-
-
   const new_crosses = crosses + action.crosses;
-
   let newBalances: [string, string] = balances;
 
   switch(player){
@@ -81,13 +78,34 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
     }
   }
 
-  const newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
   const opponentAddress = states.getOpponentAddress(gameState);
-  const xplaying = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances})
-  messageState = sendMessage(xplaying, opponentAddress, messageState);
-  return { gameState: newGameState, messageState };
-};
+  let pos: any;
+  let newGameState: any;
 
+  // if inconclusive
+  if (!isDraw(noughts, new_crosses) && !isWinningMarks(new_crosses)){
+    newGameState = states.xsWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
+    pos = positions.Xplaying({...newGameState, crosses: new_crosses, balances: newBalances})
+  }
+  
+  // if draw
+  if (isDraw(noughts, new_crosses)) {
+    return { gameState: gameState, messageState }; // placeholder
+    // newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
+    // pos = positions.draw({...newGameState, crosses: new_crosses, balances: newBalances})
+  };
+
+  // if winning move
+  if (isWinningMarks(new_crosses)) {
+    return { gameState: gameState, messageState }; // placeholder
+    // newGameState = states.playAgain({...gameState, turnNum: turnNum + 1, crosses: new_crosses});
+    // pos = positions.victory({...newGameState, crosses: new_crosses, balances: newBalances})
+  };
+
+  messageState = sendMessage(pos, opponentAddress, messageState);
+  return { gameState: newGameState, messageState }; 
+
+};
 
 function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageState, action: actions.OsMoveChosen): JointState {
   const { player, balances, roundBuyIn, noughts,  turnNum } = gameState;
