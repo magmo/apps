@@ -1,8 +1,9 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 // Once it exists import styling here
-// import '../../index.scss';
-import { Button } from '@storybook/react/demo';
+import '../index.css';
+// import { Button } from '@storybook/react/demo';
+import Board from '../components/board';
 
 
 // BOILER PLATE TAKEN FROM RPS-POC WALLET
@@ -25,5 +26,7 @@ import { Button } from '@storybook/react/demo';
 //   )
 // );
 
-storiesOf('Test example', module)
-  .add('Test Button', () => <Button>Hello world</Button>);
+const noughts = 0;
+const crosses = 0;
+storiesOf('Board', module)
+  .add('Empty Board', () => <Board stateType="blah" noughts={noughts} crosses={crosses}/>);
