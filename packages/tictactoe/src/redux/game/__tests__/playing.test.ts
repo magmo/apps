@@ -63,15 +63,15 @@ describe('player A\'s app', () => {
 });
 
 describe('player B\'s app', () => {
-  const aProps = {
+  const bProps = {
     ...base,
     stateCount: 1,
     player: Player.PlayerB,
     twitterHandle: 'tweet',
   };
 
-  describe('when in OsWaitForOpponentToPickMove', () => {
-    const gameState = state.osWaitForOpponentToPickMove({...aProps, ...playing1 });
+  describe('when in OsPickMove', () => {
+    const gameState = state.osPickMove({...bProps, ...playing1 });
 
     describe('when receiving OS_CHOSE_MOVE', () => {
       const action = actions.osMoveChosen(SingleMarks.mm);
