@@ -1,4 +1,4 @@
-import { Marks, SingleMarks } from './marks';
+import { Marks } from './marks';
 
 import BN from 'bn.js'; 
 
@@ -21,16 +21,16 @@ export enum AbsoluteResult {
 }
 
 
-export const topRow = (SingleMarks.tl | SingleMarks.tm | SingleMarks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
-export const midRow = (SingleMarks.ml | SingleMarks.mm | SingleMarks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
-export const botRow = (SingleMarks.bl | SingleMarks.bm | SingleMarks.br); /*  0b000000111 =   7 mask for win @ row 3 */
+export const topRow = (Marks.tl | Marks.tm | Marks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
+export const midRow = (Marks.ml | Marks.mm | Marks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
+export const botRow = (Marks.bl | Marks.bm | Marks.br); /*  0b000000111 =   7 mask for win @ row 3 */
 
-export const lefCol = (SingleMarks.tl | SingleMarks.ml | SingleMarks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
-export const midCol = (SingleMarks.tm | SingleMarks.mm | SingleMarks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
-export const rigCol = (SingleMarks.tr | SingleMarks.mr | SingleMarks.br); /*  0b001001001 =  73 mask for win @ col 3 */
+export const lefCol = (Marks.tl | Marks.ml | Marks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
+export const midCol = (Marks.tm | Marks.mm | Marks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
+export const rigCol = (Marks.tr | Marks.mr | Marks.br); /*  0b001001001 =  73 mask for win @ col 3 */
 
-export const dhDiag = (SingleMarks.tl | SingleMarks.tm | SingleMarks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
-export const uhDiag = (SingleMarks.tl | SingleMarks.tm | SingleMarks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
+export const dhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
+export const uhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
 
 export const fullBd = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
 

@@ -1,5 +1,5 @@
 import { gameReducer } from '../reducer';
-import { Player, scenarios, SingleMarks } from '../../../core';
+import { Player, scenarios, Marks } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
 
@@ -20,7 +20,7 @@ const {
   postFundSetupB,
   playing1,
   playing2,
-  // playing3,
+  playing3,
   // playing4,
   // playing5,
   // playing6,
@@ -51,7 +51,7 @@ describe('player A\'s app', () => {
     
     describe('when making an inconclusive XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({...aProps, ...postFundSetupB });
-      const action = actions.xsMoveChosen(SingleMarks.tl);
+      const action = actions.xsMoveChosen(Marks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
@@ -61,7 +61,7 @@ describe('player A\'s app', () => {
 
     describe('when making a drawing XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({...aProps, ...playing8 });
-      const action = actions.xsMoveChosen(SingleMarks.bm);
+      const action = actions.xsMoveChosen(Marks.bm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
@@ -74,20 +74,18 @@ describe('player A\'s app', () => {
 
   describe('when in XsWaitForOpponentToPickMove', () => {
     const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...playing1});
-    
+
     describe('when inconclusive Oplaying arrives', () => {
-      const action = actions.positionReceived(playing1);
-      const recieved_noughts = playing1.noughts;
+      const action = actions.marksReceived(playing2.noughts);
+      const received_noughts = playing2.noughts;
 
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      // itSends(reveal, updatedState);
       itTransitionsTo(state.StateName.XsPickMove, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('sets theirMarks', () => {
         const newGameState = updatedState.gameState as state.PlayAgain;
-        expect(newGameState.noughts).toEqual(recieved_noughts);
-        // expect(newGameState.result).toEqual(aResult);
+        expect(newGameState.noughts).toEqual(received_noughts);
       });
     });
   });
@@ -105,7 +103,7 @@ describe('player B\'s app', () => {
     
     describe('when making an inconclusive OS_CHOSE_MOVE', () => {
       const gameState = state.osPickMove({...bProps, ...playing1 });
-      const action = actions.osMoveChosen(SingleMarks.mm);
+      const action = actions.osMoveChosen(Marks.mm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
@@ -115,7 +113,7 @@ describe('player B\'s app', () => {
 
     describe('when making a winning OS_CHOSE_MOVE', () => {
       const gameState = state.osPickMove({...bProps, ...scenarios.noughtsVictory.playing5 });
-      const action = actions.osMoveChosen(SingleMarks.tr);
+      const action = actions.osMoveChosen(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
@@ -124,5 +122,23 @@ describe('player B\'s app', () => {
     });
 
     // itHandlesResignLikeItsTheirTurn(gameState, messageState);
+  });
+  
+  describe('when in OsWaitForOpponentToPickMove', () => {
+    const gameState = state.osWaitForOpponentToPickMove({...bProps, ...playing2});
+
+    describe('when inconclusive Xplaying arrives', () => {
+      const action = actions.marksReceived(playing3.crosses);
+      const received_crosses = playing3.crosses;
+
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.OsPickMove, updatedState);
+      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      it('sets theirMarks', () => {
+        const newGameState = updatedState.gameState as state.PlayAgain;
+        expect(newGameState.crosses).toEqual(received_crosses);
+      });
+    });
   });
 });

@@ -34,6 +34,14 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       if (action.type == actions.OS_MOVE_CHOSEN) {
         return osPickMoveReducer(gameState, messageState, action)
       } else return state;
+    case states.StateName.XsWaitForOpponentToPickMove:
+      if (action.type == actions.MARKS_RECEIVED) {
+        return xsWaitMoveReducer(gameState, messageState, action)
+      } else return state;
+    case states.StateName.OsWaitForOpponentToPickMove:
+      if (action.type == actions.MARKS_RECEIVED) {
+        return osWaitMoveReducer(gameState, messageState, action)
+      } else return state;
     default:
       return state;
   }
@@ -182,27 +190,14 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
 };
 
-// function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageState, action: actions.OsMoveChosen): JointState {
-//   const { player, balances, roundBuyIn, noughts,  turnNum } = gameState;
-//   const new_noughts = noughts + action.noughts;
+function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksReceived): JointState {
+  const received_noughts = action.received_marks;
+  const newGameState = states.xsPickMove({...gameState, noughts: received_noughts});
+  return { gameState: newGameState, messageState }; 
+}
 
-//   let newBalances: [string, string] = balances;
-
-//   switch(player){
-//     case Player.PlayerA: {
-//       newBalances = favorA(favorA(balances,roundBuyIn),roundBuyIn);
-//       break;
-//     }
-//     case Player.PlayerB: {
-//       newBalances = favorB(favorB(balances,roundBuyIn),roundBuyIn);
-//       break;
-//     }
-//   }
-
-//   const newGameState = states.osWaitForOpponentToPickMove({...gameState, turnNum: turnNum + 1, noughts: new_noughts});
-//   const opponentAddress = states.getOpponentAddress(gameState);
-//   const oplaying = positions.Oplaying({...newGameState, noughts: new_noughts, balances: newBalances})
-//   messageState = sendMessage(oplaying, opponentAddress, messageState);
-//   return { gameState: newGameState, messageState };
-// };
-
+function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksReceived): JointState {
+  const received_crosses = action.received_marks;
+  const newGameState = states.osPickMove({...gameState, crosses: received_crosses});
+  return { gameState: newGameState, messageState }; 
+}

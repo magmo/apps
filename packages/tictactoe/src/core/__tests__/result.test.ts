@@ -8,7 +8,7 @@ import {
   midRow,
 } from '../results';
 
-import { Marks, SingleMarks } from '../marks';
+import { Marks } from '../marks';
 
 function testOutcome(noughts: Marks, crosses: Marks, you: Marker, expectedResult: Result) {
   var description: string;
@@ -41,7 +41,7 @@ function testOutcome(noughts: Marks, crosses: Marks, you: Marker, expectedResult
 }
 
 describe('result', () => {
-  testOutcome(midRow, (SingleMarks.tl | SingleMarks.tr | SingleMarks.bl) , Marker.noughts, Result.YouWin);
+  testOutcome(midRow, (Marks.tl | Marks.tr | Marks.bl) , Marker.noughts, Result.YouWin);
   testOutcome(0b000111000, 0b101000100, Marker.noughts, Result.YouWin);
   testOutcome(0b001110010, 0b110001101, Marker.noughts, Result.Tie);
   testOutcome(0b001110010, 0b110001101, Marker.crosses, Result.Tie);
