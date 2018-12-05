@@ -29,5 +29,7 @@ import Board from '../components/board';
 // const noughts = 0;
 // const crosses = 0;
 storiesOf('Board', module)
-  .add('Empty Board', () => <Board stateType="blah" noughts={0} crosses={0} />)
-  .add('Noughts', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011}/>);
+  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} />)
+  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011}/>)
+  .add('Owin', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000}/>)
+  .add('Xwin', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001}/>);
