@@ -247,8 +247,8 @@ export const crossesVictory = {
   playing1: positions.Xplaying({...base, turnNum:  7, noughts:0b000000000, crosses:0b000000001, balances:sixFour}),
   playing2: positions.Oplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000001001, balances:fourSix}),
   playing3: positions.Xplaying({...base, turnNum:  9, noughts:0b100000000, crosses:0b000001001, balances:sixFour}),
-  playing4: positions.Oplaying({...base, turnNum: 10, noughts:0b101000000, crosses:0b000001001, balances:fourSix}),
-  victory: positions.victory({...base, turnNum: 11, noughts:0b101000000, crosses:0b001001001, balances:sixFour}),
+  playing4: positions.Oplaying({...base, turnNum: 10, noughts:0b100010000, crosses:0b000001001, balances:fourSix}),
+  victory: positions.victory({...base, turnNum: 11, noughts:0b100010000, crosses:0b001001001, balances:sixFour}),
   victoryHex:   '0x'+'0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
                     +'0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
                     +'0000000000000000000000000000000000000000000000000000000000000002' // number of participants
