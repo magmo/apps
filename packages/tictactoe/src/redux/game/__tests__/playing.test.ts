@@ -41,16 +41,14 @@ describe('player A\'s app', () => {
   const aProps = {
     ...base,
     stateCount: 1,
-    player: Player.PlayerA,
-    noughts: 0,
-    crosses: 0,
+    player: Player.PlayerA, 
     twitterHandle: 'tweet',
   };
 
   describe('when in XsPickMove', () => {
     
     describe('when making an inconclusive XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({...aProps, ...postFundSetupB });
+      const gameState = state.xsPickMove({...aProps, noughts:0, crosses:0, ...postFundSetupB });
       const action = actions.xsMoveChosen(Marks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -69,7 +67,15 @@ describe('player A\'s app', () => {
       itSends(draw, updatedState);
     });
 
-    // itHandlesResignLikeItsTheirTurn(gameState, messageState);
+    describe('when making a winning XS_CHOSE_MOVE', () => {
+      const gameState = state.xsPickMove({...aProps, ...scenarios.crossesVictory.playing4 });
+      const action = actions.xsMoveChosen(Marks.tr);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itTransitionsTo(state.StateName.PlayAgain, updatedState);
+      itSends(scenarios.crossesVictory.victory, updatedState);
+    });
   });
 
   describe('when in XsWaitForOpponentToPickMove', () => {
@@ -120,8 +126,6 @@ describe('player B\'s app', () => {
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(scenarios.noughtsVictory.victory, updatedState);
     });
-
-    // itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
   
   describe('when in OsWaitForOpponentToPickMove', () => {
