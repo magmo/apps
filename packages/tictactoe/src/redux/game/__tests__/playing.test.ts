@@ -31,6 +31,7 @@ const {
 } = scenarios.standard;
 
 
+
 const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName } = scenarios.standard;
 const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName };
 
@@ -90,6 +91,16 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
       itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
       itSends(playing2, updatedState);
+    });
+
+    describe('when making a winning OS_CHOSE_MOVE', () => {
+      const gameState = state.osPickMove({...bProps, ...scenarios.noughtsVictory.playing4 });
+      const action = actions.osMoveChosen(SingleMarks.tr);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itTransitionsTo(state.StateName.PlayAgain, updatedState);
+      itSends(scenarios.noughtsVictory.victory, updatedState);
     });
 
     // itHandlesResignLikeItsTheirTurn(gameState, messageState);
