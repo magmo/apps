@@ -220,25 +220,26 @@ export const aResignsAfterOneRound = {
 
 export const noughtsVictory = {
   ...standard,
-  playing1: positions.Oplaying({...base, turnNum:  7, noughts:0b100000000, crosses:0b000000000, balances:fourSix}),
-  playing2: positions.Xplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000010000, balances:sixFour}),
-  playing3: positions.Oplaying({...base, turnNum:  9, noughts:0b110000000, crosses:0b000010000, balances:fourSix}),
-  playing4: positions.Xplaying({...base, turnNum: 10, noughts:0b110000000, crosses:0b000011000, balances:sixFour}),
-  victory:  positions.victory({...base, turnNum: 11, noughts:0b111000000, crosses:0b000011000, balances:fourSix}),
+  playing1: positions.Oplaying({...base, turnNum:  7, noughts:0b000000000, crosses:0b000010000, balances:sixFour}),
+  playing2: positions.Xplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000010000, balances:fourSix}),
+  playing3: positions.Oplaying({...base, turnNum:  9, noughts:0b100000000, crosses:0b000010100, balances:sixFour}),
+  playing4: positions.Xplaying({...base, turnNum: 10, noughts:0b110000000, crosses:0b000010100, balances:fourSix}),
+  playing5:  positions.victory({...base, turnNum: 11, noughts:0b110000000, crosses:0b000010101, balances:sixFour}),
+  victory:  positions.victory({...base, turnNum: 12, noughts:0b111000000, crosses:0b000010101, balances:fourSix}),
   victoryHex:   '0x'+'0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
                     +'0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
                     +'0000000000000000000000000000000000000000000000000000000000000002' // number of participants
                     +'000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' // asAddress
                     +'000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' // bsAddress
                     +'0000000000000000000000000000000000000000000000000000000000000002' // StateType (PreFundSetup, PostFundSetup, Game, Conclude)
-                    +'000000000000000000000000000000000000000000000000000000000000000b' // turnNum
+                    +'000000000000000000000000000000000000000000000000000000000000000c' // turnNum
                     +'0000000000000000000000000000000000000000000000000000000000000000' // stateCount ?
                     +'0000000000000000000000000000000000000000000000000000000000000004' // aResolution
                     +'0000000000000000000000000000000000000000000000000000000000000006' // bResolution
                     +'0000000000000000000000000000000000000000000000000000000000000003' // [GameAttributes: GamePositionType = {resting Oplaying Xplaying victory draw}
                     +'0000000000000000000000000000000000000000000000000000000000000001' // [GameAttributes: roundBuyIn]
                     +'00000000000000000000000000000000000000000000000000000000000001c0' // [GameAttributes: noughts
-                    +'0000000000000000000000000000000000000000000000000000000000000018', // [GameAttributes: crosses]
+                    +'0000000000000000000000000000000000000000000000000000000000000015', // [GameAttributes: crosses]
 };
 
 export const aRejectsGame = {

@@ -94,7 +94,7 @@ describe('player B\'s app', () => {
     });
 
     describe('when making a winning OS_CHOSE_MOVE', () => {
-      const gameState = state.osPickMove({...bProps, ...scenarios.noughtsVictory.playing4 });
+      const gameState = state.osPickMove({...bProps, ...scenarios.noughtsVictory.playing5 });
       const action = actions.osMoveChosen(SingleMarks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
