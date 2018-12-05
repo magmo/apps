@@ -26,7 +26,8 @@ import Board from '../components/board';
 //   )
 // );
 
-const noughts = 0;
-const crosses = 0;
+// const noughts = 0;
+// const crosses = 0;
 storiesOf('Board', module)
-  .add('Empty Board', () => <Board stateType="blah" noughts={noughts} crosses={crosses}/>);
+  .add('Empty Board', () => <Board stateType="blah" noughts={0} crosses={0} />)
+  .add('Noughts', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011}/>);
