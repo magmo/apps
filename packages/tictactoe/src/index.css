@@ -18,6 +18,10 @@ td {
     color: #BA4B2B;
 }
 
+.os {
+    color: white;
+}
+
 #tl {
     border-bottom: 2px solid white;
     border-right: 2px solid white;
