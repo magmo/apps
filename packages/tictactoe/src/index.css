@@ -3,73 +3,95 @@ body {
 }
 
 table {
-    font-size: 72px;
+    font-size: 120px;
     font-family: monospace;
     margin: auto;
     text-align: center;
+    vertical-align: center;
+    padding: 0;
+    empty-cells: show;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+tr {
+    height: 200px;
+
 }
 
 td {
-    width: 230px;
-    height: 230px;
+    width: 200px;
+    height: 200px;
+    white-space: pre;
+    padding: 0px;
+    border: 8px
 }
 
 .xs {
     color: #BA4B2B;
+    margin: 0;
+    padding: 0;
 }
 
 .os {
     color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.blank {
+    margin: 0;
+    padding: 0;
 }
 
 #tl {
-    border-bottom: 2px solid white;
-    border-right: 2px solid white;
+    border-bottom: solid white;
+    border-right: solid white;
 }
 
 #tm {
-    border-bottom: 2px solid white;
-    border-right: 2px solid white;
-    border-left: 2px solid white;
+    border-bottom: solid white;
+    border-right: solid white;
+    border-left: solid white;
 }
 
 #tr {
-    border-bottom: 2px solid white;
-    border-left: 2px solid white;
+    border-bottom: solid white;
+    border-left: solid white;
 }
 
 #ml {
-    border-top: 2px solid white;
-    border-bottom: 2px solid white;
-    border-right: 2px solid white;
+    border-top: solid white;
+    border-bottom: solid white;
+    border-right: solid white;
 }
 
 #mm {
-    border-top: 2px solid white;
-    border-bottom: 2px solid white;
-    border-right: 2px solid white;
-    border-left: 2px solid white;
+    border-top: solid white;
+    border-bottom: solid white;
+    border-right: solid white;
+    border-left: solid white;
 }
 
 #mr {
-    border-top: 2px solid white;
-    border-bottom: 2px solid white;
-    border-left: 2px solid white;
+    border-top: solid white;
+    border-bottom: solid white;
+    border-left: solid white;
 }
 
 #bl {
-    border-top: 2px solid white;
-    border-right: 2px solid white;
+    border-top: solid white;
+    border-right: solid white;
 }
 
 #bm {
-    border-top: 2px solid white;
-    border-right: 2px solid white;
-    border-left: 2px solid white;
+    border-top: solid white;
+    border-right: solid white;
+    border-left: solid white;
 }
 
 #br {
-    border-top: 2px solid white;
-    border-left: 2px solid white;
+    border-top: solid white;
+    border-left: solid white;
 }
 

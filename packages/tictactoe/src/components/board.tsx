@@ -10,11 +10,11 @@ interface Props {
 export default class Board extends React.PureComponent<Props> {
   renderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if ((crosses & position) == position){
-    return (<p className="xs">×</p>);
+    return (<div className="xs">×</div>);
     }
     if ((noughts & position) == position){
-      return (<p className="os">○</p>);
-    } else return (<p className="os">&nbsp;</p>)
+      return (<div className="os">○</div>);
+    } else return (<div className="blank">&nbsp;</div>)
   }
 
   render() {
