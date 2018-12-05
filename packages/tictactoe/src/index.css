@@ -1,3 +1,62 @@
-td{
-    border: 1px solid black;
+table {
+    font-size: 72px;
+    margin: auto;
+    text-align: center;
 }
+
+td {
+    width: 230px;
+    height: 230px;
+}
+
+#tl {
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+}
+
+#tm {
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+}
+
+#tr {
+    border-bottom: 2px solid black;
+    border-left: 2px solid black;
+}
+
+#ml {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+}
+
+#mm {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+}
+
+#mr {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-left: 2px solid black;
+}
+
+#bl {
+    border-top: 2px solid black;
+    border-right: 2px solid black;
+}
+
+#bm {
+    border-top: 2px solid black;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+}
+
+#br {
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+}
+

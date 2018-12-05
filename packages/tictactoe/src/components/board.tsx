@@ -11,19 +11,15 @@ export default class Board extends React.PureComponent<Props> {
   render() {
     return (
       <div>
-        <h1>TODO: Screen not implemented!</h1>
-        <p>
-          Screen has not yet been built for the <strong>{this.props.stateType}</strong>!
-        </p>
         <table>
             <tr>
-                <td> tl </td><td> </td><td> </td>
+                <td id="tl">  </td><td id="tm">  </td><td id="tr">  </td>
             </tr>
             <tr>
-                <td> </td><td> mm</td><td> </td>
+                <td id="ml"> </td><td id="mm"> </td><td id="mr"> </td>
             </tr>
             <tr>
-                <td> </td><td> </td><td> </td>
+                <td id="bl"> </td><td id="bm"> </td><td id="br"> </td>
             </tr>
         </table>
       </div>
