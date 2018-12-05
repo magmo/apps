@@ -71,6 +71,26 @@ describe('player A\'s app', () => {
 
     // itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
+
+  describe('when in XsWaitForOpponentToPickMove', () => {
+    const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...playing1});
+    
+    describe('when inconclusive Oplaying arrives', () => {
+      const action = actions.positionReceived(playing1);
+      const recieved_noughts = playing1.noughts;
+
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      // itSends(reveal, updatedState);
+      itTransitionsTo(state.StateName.XsPickMove, updatedState);
+      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      it('sets theirMarks', () => {
+        const newGameState = updatedState.gameState as state.PlayAgain;
+        expect(newGameState.noughts).toEqual(recieved_noughts);
+        // expect(newGameState.result).toEqual(aResult);
+      });
+    });
+  });
 });
 
 describe('player B\'s app', () => {
