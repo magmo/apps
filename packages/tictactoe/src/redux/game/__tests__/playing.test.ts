@@ -95,15 +95,29 @@ describe('player A\'s app', () => {
       });
     });
 
+    // a draw cannot arrive if we are Xs
+
     describe('when Victory arrives', () => {
-      const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...scenarios.noughtsVictory.playing5});
       const action = actions.marksReceived(scenarios.noughtsVictory.victory.noughts);
       const received_noughts = action.received_marks;
-
+    
       describe('but they still have enough funds to continue', () => {
+        const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...scenarios.noughtsVictory.playing5});
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
+        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+       it('sets theirMarks', () => {
+          const newGameState = updatedState.gameState as state.PlayAgain;
+          expect(newGameState.noughts).toEqual(received_noughts);
+        });
+      });
+
+      describe('and there are now insufficient funds', () => {
+        const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...scenarios.noughtsVictory.playing5closetoempty});
+        const updatedState = gameReducer({ messageState, gameState }, action);
+
+        itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
        it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;

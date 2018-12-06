@@ -14,6 +14,8 @@ const roundBuyIn = bnToHex(new BN(1));
 const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 const sixFour = [new BN(6), new BN(4)].map(bnToHex) as [string, string];
 const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
+const oneFour = [new BN(1), new BN(4)].map(bnToHex) as [string, string];
+const zeroSeven = [new BN(0), new BN(7)].map(bnToHex) as [string, string];
 
 const base = {
   libraryAddress,
@@ -225,7 +227,9 @@ export const noughtsVictory = {
   playing3: positions.Xplaying({...base, turnNum:  9, noughts:0b100000000, crosses:0b000010100, balances:sixFour}),
   playing4: positions.Oplaying({...base, turnNum: 10, noughts:0b110000000, crosses:0b000010100, balances:fourSix}),
   playing5: positions.Xplaying({...base, turnNum: 11, noughts:0b110000000, crosses:0b000010101, balances:sixFour}),
+  playing5closetoempty: positions.Xplaying({...base, turnNum: 11, noughts:0b110000000, crosses:0b000010101, balances:oneFour}),
   victory:  positions.victory({...base, turnNum: 12, noughts:0b111000000, crosses:0b000010101, balances:fourSix}),
+  absolutevictory: positions.victory({...base, turnNum: 12, noughts:0b111000000, crosses:0b000010101, balances:zeroSeven}),
   victoryHex:   '0x'+'0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
                     +'0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
                     +'0000000000000000000000000000000000000000000000000000000000000002' // number of participants
