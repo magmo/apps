@@ -224,19 +224,20 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
     // go with default case
   }
 
-  if (!isWinningMarks(received_noughts) && isDraw(received_noughts,crosses)){ // Draw, play again?
-    switch(player){
-      case Player.PlayerB: {
-        newBalances = favorA(balances, roundBuyIn); 
-        break;
-      }
-      case Player.PlayerA: {
-        newBalances = favorB(balances,roundBuyIn);
-        break;
-      }
-    }
-    newGameState = states.playAgain({...gameState, noughts: received_noughts, result: results.Result.Tie, balances: newBalances}); 
-  }
+  // this should never happen!
+  // if (!isWinningMarks(received_noughts) && isDraw(received_noughts,crosses)){ // Draw, play again?
+  //   switch(player){
+  //     case Player.PlayerB: {
+  //       newBalances = favorA(balances, roundBuyIn); 
+  //       break;
+  //     }
+  //     case Player.PlayerA: {
+  //       newBalances = favorB(balances,roundBuyIn);
+  //       break;
+  //     }
+  //   }
+  //   newGameState = states.playAgain({...gameState, noughts: received_noughts, result: results.Result.Tie, balances: newBalances}); 
+  // }
 
   if (isWinningMarks(received_noughts)){ // Lost, if sufficient $ play again?
     if ((player == Player.PlayerA && newBalances[0] > roundBuyIn) || (player == Player.PlayerB && newBalances[1] > roundBuyIn)) {
@@ -251,6 +252,59 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
 
 function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksReceived): JointState {
   const received_crosses = action.received_marks;
-  const newGameState = states.osPickMove({...gameState, crosses: received_crosses});
+  const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
+  let newBalances: [string, string] = balances;
+
+  switch(player){
+    case Player.PlayerB: {
+      if (noughts != 0 && crosses != 0) {
+        newBalances = favorA(favorA(balances,roundBuyIn),roundBuyIn); // usually enact a full swing to current player
+        console.log('full swing!');
+      } else {
+        newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
+        console.log('single swing!');
+      }
+      break;
+    }
+    case Player.PlayerA: {
+      if (noughts > 0 || crosses > 0) {
+        newBalances = favorB(favorB(balances,roundBuyIn),roundBuyIn);
+      } else {
+        console.log('first move of the round')
+        newBalances = favorB(balances,roundBuyIn);
+      }
+      break;
+    }
+  }
+
+  let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
+  = states.osPickMove({...gameState, turnNum: turnNum + 0, crosses: received_crosses, balances: newBalances});
+
+  if (!isWinningMarks(received_crosses) && !isDraw(noughts, received_crosses)){ // Not conclusive, keep playing
+    // go with default case
+  }
+
+  if (!isWinningMarks(received_crosses) && isDraw(noughts, received_crosses)){ // Draw, play again?
+    switch(player){
+      case Player.PlayerB: {
+        newBalances = favorA(balances, roundBuyIn); 
+        break;
+      }
+      case Player.PlayerA: {
+        newBalances = favorB(balances,roundBuyIn);
+        break;
+      }
+    }
+    newGameState = states.playAgain({...gameState, crosses: received_crosses, result: results.Result.Tie, balances: newBalances}); 
+  }
+
+  if (isWinningMarks(received_crosses)){ // Lost, if sufficient $ play again?
+    if ((player == Player.PlayerA && newBalances[0] > roundBuyIn) || (player == Player.PlayerB && newBalances[1] > roundBuyIn)) {
+      newGameState = states.playAgain({...gameState, crosses: received_crosses, balances: newBalances, result: results.Result.YouLose});
+    } else {
+      newGameState = states.insufficientFunds({...gameState, crosses: received_crosses, balances: newBalances, result: results.Result.YouLose});      
+    }
+    
+  }
   return { gameState: newGameState, messageState }; 
 }
