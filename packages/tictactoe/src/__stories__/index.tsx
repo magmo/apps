@@ -6,7 +6,8 @@ import '../index.css';
 import Board from '../components/board';
 import Status from '../components/status';
 import Outcome from '../components/outcome';
-import { Marker, Result } from '../core';
+import Balances from '../components/balances';
+import { Marker, Result, Player } from '../core';
 
 
 // BOILER PLATE TAKEN FROM RPS-POC WALLET
@@ -45,3 +46,7 @@ storiesOf('Board', module)
   .add('YouWin',() => <Outcome stateType="blah" result={Result.YouWin} />)
   .add('YouLose',() => <Outcome stateType="blah" result={Result.YouLose} />)
   .add('Tie',() => <Outcome stateType="blah" result={Result.Tie} />);
+
+  storiesOf('Balances', module)
+  .add('YouWinning',() => <Balances stateType="blah" balances={["6","4"]} player={Player.PlayerA}/>)
+  .add('YouLosing',() => <Balances stateType="blah" balances={["9","4"]} player={Player.PlayerB}/>);
