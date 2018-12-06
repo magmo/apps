@@ -79,9 +79,9 @@ describe('player A\'s app', () => {
   });
 
   describe('when in XsWaitForOpponentToPickMove', () => {
-    const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...playing1});
-
+    
     describe('when inconclusive Oplaying arrives', () => {
+      const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...playing1});
       const action = actions.marksReceived(playing2.noughts);
       const received_noughts = playing2.noughts;
 
@@ -92,6 +92,23 @@ describe('player A\'s app', () => {
       it('sets theirMarks', () => {
         const newGameState = updatedState.gameState as state.PlayAgain;
         expect(newGameState.noughts).toEqual(received_noughts);
+      });
+    });
+
+    describe('when Victory arrives', () => {
+      const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...scenarios.noughtsVictory.playing5});
+      const action = actions.marksReceived(scenarios.noughtsVictory.victory.noughts);
+      const received_noughts = action.received_marks;
+
+      describe('but they still have enough funds to continue', () => {
+        const updatedState = gameReducer({ messageState, gameState }, action);
+
+        itTransitionsTo(state.StateName.PlayAgain, updatedState);
+        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+       it('sets theirMarks', () => {
+          const newGameState = updatedState.gameState as state.PlayAgain;
+          expect(newGameState.noughts).toEqual(received_noughts);
+        });
       });
     });
   });

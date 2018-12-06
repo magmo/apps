@@ -192,7 +192,60 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
 function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksReceived): JointState {
   const received_noughts = action.received_marks;
-  const newGameState = states.xsPickMove({...gameState, noughts: received_noughts});
+  const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
+  let newBalances: [string, string] = balances;
+
+  switch(player){
+    case Player.PlayerB: {
+      if (noughts != 0 && crosses != 0) {
+        newBalances = favorA(favorA(balances,roundBuyIn),roundBuyIn); // usually enact a full swing to current player
+        console.log('full swing!');
+      } else {
+        newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
+        console.log('single swing!');
+      }
+      break;
+    }
+    case Player.PlayerA: {
+      if (noughts > 0 || crosses > 0) {
+        newBalances = favorB(favorB(balances,roundBuyIn),roundBuyIn);
+      } else {
+        console.log('first move of the round')
+        newBalances = favorB(balances,roundBuyIn);
+      }
+      break;
+    }
+  }
+
+  let newGameState: states.XsPickMove | states.PlayAgain | states.InsufficientFunds
+  = states.xsPickMove({...gameState, turnNum: turnNum + 0, noughts: received_noughts, balances: newBalances});
+
+  if (!isWinningMarks(received_noughts) && !isDraw(received_noughts,crosses)){ // Not conclusive, keep playing
+    // go with default case
+  }
+
+  if (!isWinningMarks(received_noughts) && isDraw(received_noughts,crosses)){ // Draw, play again?
+    switch(player){
+      case Player.PlayerB: {
+        newBalances = favorA(balances, roundBuyIn); 
+        break;
+      }
+      case Player.PlayerA: {
+        newBalances = favorB(balances,roundBuyIn);
+        break;
+      }
+    }
+    newGameState = states.playAgain({...gameState, noughts: received_noughts, result: results.Result.Tie, balances: newBalances}); 
+  }
+
+  if (isWinningMarks(received_noughts)){ // Lost, if sufficient $ play again?
+    if ((player == Player.PlayerA && newBalances[0] > roundBuyIn) || (player == Player.PlayerB && newBalances[1] > roundBuyIn)) {
+      newGameState = states.playAgain({...gameState, noughts: received_noughts, balances: newBalances, result: results.Result.YouLose});
+    } else {
+      newGameState = states.insufficientFunds({...gameState, noughts: received_noughts, balances: newBalances, result: results.Result.YouLose});      
+    }
+    
+  }
   return { gameState: newGameState, messageState }; 
 }
 
