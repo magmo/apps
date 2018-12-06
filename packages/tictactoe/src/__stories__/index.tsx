@@ -4,6 +4,9 @@ import { storiesOf } from '@storybook/react';
 import '../index.css';
 // import { Button } from '@storybook/react/demo';
 import Board from '../components/board';
+import Status from '../components/status';
+import Outcome from '../components/outcome';
+import { Marker, Result } from '../core';
 
 
 // BOILER PLATE TAKEN FROM RPS-POC WALLET
@@ -33,3 +36,12 @@ storiesOf('Board', module)
   .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011}/>)
   .add('Owin', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000}/>)
   .add('Xwin', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001}/>);
+
+  storiesOf('Status', module)
+  .add('Noughts',() => <Status stateType="blah" you={Marker.noughts} />)
+  .add('Crosses',() => <Status stateType="blah" you={Marker.crosses} />);
+
+  storiesOf('Outcome', module)
+  .add('YouWin',() => <Outcome stateType="blah" result={Result.YouWin} />)
+  .add('YouLose',() => <Outcome stateType="blah" result={Result.YouLose} />)
+  .add('Tie',() => <Outcome stateType="blah" result={Result.Tie} />);
