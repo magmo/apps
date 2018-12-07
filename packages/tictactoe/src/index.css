@@ -43,7 +43,6 @@ p, h1, .status {
     font-family: monospace;
     color: white;
     text-align: center;
-
 }
 
 #outcome {
@@ -72,8 +71,11 @@ td {
     color: white;
 }
 
-.status {
-
+#magmo-logo {
+    position: absolute;
+    right: 0%;
+    bottom: 30px;
+    transform: translate(0,-00%);
 }
 .blank {
     margin: 0;
