@@ -60,7 +60,7 @@ storiesOf('Game Screen', module)
   you={Marker.crosses} 
   player={Player.PlayerA} 
   result={null} 
-  balances={["6","4"]}
+  balances={["5","5"]}
   />)
   .add('X win', () => <GameScreen 
   stateType="blah"
@@ -74,7 +74,7 @@ storiesOf('Game Screen', module)
   .add('O win', () => <GameScreen 
   stateType="blah"
   noughts={0b100100100} 
-  crosses={0b001001000} 
+  crosses={0b000011001} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
   result={Result.YouLose} 
@@ -82,8 +82,8 @@ storiesOf('Game Screen', module)
   />)
   .add('Tie', () => <GameScreen 
   stateType="blah"
-  noughts={0b100110001} 
-  crosses={0b011001110} 
+  noughts={0b101100010} 
+  crosses={0b010011101} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
   result={Result.Tie} 
