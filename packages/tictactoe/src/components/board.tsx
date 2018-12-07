@@ -1,6 +1,6 @@
 import React from 'react';
 import { Marks } from '../core/marks'
-import { winningPatterns, isWinningMarks } from '../core/results';
+import { winningPatterns, isWinningMarks, isDraw } from '../core/results';
 
 interface Props {
   stateType: string;
@@ -46,8 +46,21 @@ export default class Board extends React.PureComponent<Props> {
     } else return (<span>&nbsp;</span>);
   }
 
+  drawRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
+    if ((crosses & position) == position ){
+      return (<div className="xs dim">×</div>);
+    }
+    if ((noughts & position) == position ){
+      return (<div className="os dim">○</div>);
+    } else return (<span>&nbsp;</span>);
+  }
+
+
   renderMark(noughts: Marks, crosses: Marks, position: Marks) {
-    if (isWinningMarks(noughts) || isWinningMarks(crosses)){
+    if (isDraw(noughts,crosses)) {
+      return this.drawRenderMark(noughts, crosses, position)
+    }
+    else if (isWinningMarks(noughts) || isWinningMarks(crosses)){
       return this.winRenderMark(noughts, crosses, position)
     } else return this.noWinRenderMark(noughts, crosses, position);
   }
