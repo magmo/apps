@@ -20,6 +20,11 @@ export enum AbsoluteResult {
   CrossesWins,
 }
 
+export enum Imperative {
+  Choose = 2,
+  Wait = 3,
+}
+
 
 export const topRow: Marks = (Marks.tl | Marks.tm | Marks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
 export const midRow: Marks = (Marks.ml | Marks.mm | Marks.mr); /*  0b000111000 =  56 mask for win @ row 2 */

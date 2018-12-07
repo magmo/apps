@@ -8,7 +8,7 @@ import { YourMarker, TheirMarker } from '../components/marker';
 import Outcome from '../components/outcome';
 import Balances from '../components/balances';
 import GameScreen from '../components/game-screen';
-import { Marker, Result, Player } from '../core';
+import { Marker, Result, Player, Imperative } from '../core';
 
 
 // BOILER PLATE TAKEN FROM RPS-POC WALLET
@@ -53,13 +53,22 @@ storiesOf('Balances', module)
   .add('You Losing',() => <Balances stateType="blah" balances={["9","4"]} player={Player.PlayerB}/>);
 
 storiesOf('Game Screen', module)
-  .add('Not Yet Concluded', () => <GameScreen 
+  .add('Waiting', () => <GameScreen 
   stateType="blah"
   noughts={0b100100000} 
   crosses={0b000001001} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
-  result={null} 
+  result={Imperative.Wait} 
+  balances={["5","5"]}
+  />)
+  .add('Moving', () => <GameScreen 
+  stateType="blah"
+  noughts={0b100100010} 
+  crosses={0b010001001} 
+  you={Marker.crosses} 
+  player={Player.PlayerA} 
+  result={Imperative.Wait} 
   balances={["5","5"]}
   />)
   .add('X win', () => <GameScreen 

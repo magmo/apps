@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './board';
 import Outcome from './outcome';
 import StatusAndBalances from './statusAndBalances';
-import { Marks, Marker, Result, Player } from '../core';
+import { Marks, Marker, Result, Player, Imperative } from '../core';
 import MAGMO_LOGO from '../images/magmo_logo.svg';
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   crosses: Marks;
   balances: [string, string];
   player: Player;
-  result: Result | null;
+  result: Result | Imperative;
 }
 
 export default class GameScreen extends React.PureComponent<Props> {

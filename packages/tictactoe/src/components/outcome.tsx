@@ -1,14 +1,14 @@
 import React from 'react';
 // import { Marks } from '../core/marks'
-import { Result } from '../core/results'
+import { Result, Imperative } from '../core/results'
 
 interface Props {
   stateType: string;
-  result: Result | null ;
+  result: Result | Imperative ;
 }
 
 export default class Outcome extends React.PureComponent<Props> {
-  renderResult(result: Result | null ) {
+  renderResult(result: Result | Imperative ) {
     if (result == Result.YouWin){
       return (<span>You Win!</span>);
     }
@@ -17,6 +17,12 @@ export default class Outcome extends React.PureComponent<Props> {
     }
     if (result == Result.Tie){
       return (<span>It's a Draw!</span>);
+    }
+    if (result == Imperative.Choose){
+      return (<span>Choose your move</span>);
+    }
+    if (result == Imperative.Wait){
+      return (<span>Wait for Opponent's move!</span>);
     } else return <span>&nbsp;</span>
   }
 
