@@ -9,7 +9,7 @@ export interface OutgoingMessage {
 export interface MessageState {
   opponentOutbox?: OutgoingMessage;
   walletOutbox?: string;
-  actionToRetry?: actions.PositionReceived;
+  actionToRetry?: actions.MarksReceived;
 }
 
 export function sendMessage(position: Position, opponentAddress: string,  state: MessageState): MessageState {
