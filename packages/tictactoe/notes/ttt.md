@@ -309,6 +309,18 @@ Why must resting have a roundBuyin? is this the same as a stake? Yes it is the s
 
 In `encode.ts` we only need to edit a bit of the code, since a lot of it is actually just interfacing with ForceMove.  
 
+
+# App Logic
+The next thing to consider is the app itself, which will present an interface to the user, and allow them to propose, reject and accept games and, of course, choose moves.
+
+A switch of perspective is useful here; we will now consider the app from the user's perspective. Shown below are the various screens the user can transition between, along with any messages they must send (black) or listen for (grey). 
+
+![Tic Tac Toe Gamestate transitions](./TicTacToeUserFlow.svg)
+
+Notice how Player A begins as Xs, but the players may switch depending on the result of the previous game. Note the assymetry in that Draw can only be sent by Xs and only be received by Os. 
+
+
+
 <!-- When trying to run tests I get 
 
 ```
