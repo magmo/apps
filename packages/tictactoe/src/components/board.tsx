@@ -23,33 +23,33 @@ export default class Board extends React.PureComponent<Props> {
   winRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if ((crosses & position) == position ){
       if (this.crucialMark(crosses, position)){
-        return (<div className="crucial-xs">×</div>);
-      } else return (<div className="xs">×</div>);
+        return (<div className="xs">×</div>);
+      } else return (<div className="xs dim">×</div>);
     }
     if ((noughts & position) == position ){
       if (this.crucialMark(noughts, position)){
-        return (<div className="crucial-os">○</div>);
-      } else return (<div className="os">○</div>);
+        return (<div className="os">○</div>);
+      } else return (<div className="os dim">○</div>);
     } else return (<span>&nbsp;</span>);
   }
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if ((crosses & position) == position ){
       if (this.crucialMark(crosses, position)){
-        return (<div className="crucial-xs">×</div>);
-      } else return (<div className="crucial-xs">×</div>);
+        return (<div className="xs">×</div>);
+      } else return (<div className="xs">×</div>);
     }
     if ((noughts & position) == position ){
       if (this.crucialMark(noughts, position)){
-        return (<div className="crucial-os">○</div>);
-      } else return (<div className="crucial-os">○</div>);
+        return (<div className="os">○</div>);
+      } else return (<div className="os">○</div>);
     } else return (<span>&nbsp;</span>);
   }
 
   renderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if (isWinningMarks(noughts) || isWinningMarks(crosses)){
       return this.winRenderMark(noughts, crosses, position)
-    } else return this.noWinRenderMark
+    } else return this.noWinRenderMark(noughts, crosses, position);
   }
 
   render() {
