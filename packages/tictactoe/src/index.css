@@ -50,6 +50,11 @@ p, h1, .status {
     bottom: 0%;
 }
 
+#top-bar{
+    position: absolute;
+    top: 0%;
+}
+
 tr {
     height: 200px;
 }

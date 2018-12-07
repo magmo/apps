@@ -29,7 +29,7 @@ export default class statusAndBalances extends React.PureComponent<Props> {
 
   render() {
     const { balances, player, you } = this.props;
-    return (<h1 className="full-width-bar" ><Status stateType="blah" you={you}/>&nbsp;[You]&nbsp;
+    return (<h1 className="full-width-bar" id="top-bar" ><Status stateType="blah" you={you}/>&nbsp;[You]&nbsp;
       <span>
         {this.renderYourBalance(balances, player)}
       </span>&nbsp;| 
