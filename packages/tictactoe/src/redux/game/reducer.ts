@@ -2,10 +2,9 @@ import { Reducer } from 'redux';
 
 import * as actions from './actions';
 import * as states from './state';
-// import * as results from '../../core/results';
+import * as results from '../../core/results';
 
-// import { positions, Player, isDraw, isWinningMarks, Position } from '../../core';
-import { positions, Player } from '../../core';
+import { positions, Player, isDraw, isWinningMarks, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 
 import hexToBN from '../../utils/hexToBN';
