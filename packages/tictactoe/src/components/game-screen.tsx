@@ -11,7 +11,7 @@ interface Props {
   crosses: Marks;
   balances: [string, string];
   player: Player;
-  result: Result;
+  result: Result | null;
 }
 
 export default class GameScreen extends React.PureComponent<Props> {

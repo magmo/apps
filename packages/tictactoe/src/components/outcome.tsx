@@ -4,11 +4,11 @@ import { Result } from '../core/results'
 
 interface Props {
   stateType: string;
-  result: Result;
+  result: Result | null ;
 }
 
 export default class Outcome extends React.PureComponent<Props> {
-  renderResult(result: Result ) {
+  renderResult(result: Result | null ) {
     if (result == Result.YouWin){
       return (<span>You Win!</span>);
     }
@@ -17,7 +17,7 @@ export default class Outcome extends React.PureComponent<Props> {
     }
     if (result == Result.Tie){
       return (<span>It's a Draw!</span>);
-    } else return
+    } else return <span>&nbsp;</span>
   }
 
   render() {

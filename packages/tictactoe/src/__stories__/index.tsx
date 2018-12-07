@@ -59,6 +59,6 @@ storiesOf('Game Screen', module)
   crosses={0b000001001} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
-  result={Result.Tie} 
+  result={null} 
   balances={["6","4"]}
   />);
