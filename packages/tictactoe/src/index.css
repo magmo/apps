@@ -1,26 +1,56 @@
+html, body {
+    overflow-x: hidden;
+  }
+
 body {
     background-color: black;
 }
 
+.full-width-bar {
+    margin: 0 -9999rem;
+    /* add back negative margin value */
+    padding: 0.25rem 9999rem;
+    background: rgba(0, 0, 0, 0.5); 
+    text-align: center;
+  }
+
+h1.full-width-bar {
+    background: grey;
+}
+
+#table-container #outcome-container {
+    position: relative;
+}
 table {
     font-family: monospace;
-    margin: auto;
+    margin: 0;
     text-align: center;
     vertical-align: center;
     padding: 0;
     empty-cells: show;
     border-collapse: collapse;
     border-spacing: 0;
+    font-size: 120px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0,-50%);
 }
 
-p {
-    font-size: 40px;
+p, h1, .status {
+    font-size: 20px;
     font-family: monospace;
     color: white;
+    text-align: center;
+
 }
+
+#outcome {
+    position: absolute;
+    bottom: 0%;
+}
+
 tr {
     height: 200px;
-
 }
 
 td {
@@ -28,19 +58,21 @@ td {
     height: 200px;
     white-space: pre;
     padding: 0px;
-    border: 8px
+    border: 8px;
+    vertical-align: center;
 }
 
 .xs {
     color: #BA4B2B;
-    font-size: 120px;
 }
 
 .os {
     color: white;
-    font-size: 120px;
 }
 
+.status {
+
+}
 .blank {
     margin: 0;
     padding: 0;

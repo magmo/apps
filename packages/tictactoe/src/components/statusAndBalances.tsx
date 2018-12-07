@@ -1,13 +1,15 @@
 import React from 'react';
-import { Player } from '../core';
+import Status from './status'
+import { Player, Marker } from '../core';
 
 interface Props {
   stateType: string;
   balances: [String, String];
   player: Player;
+  you: Marker;
 }
 
-export default class Balances extends React.PureComponent<Props> {
+export default class statusAndBalances extends React.PureComponent<Props> {
   renderYourBalance(balances: [String, String], player: Player) {
     if (player == Player.PlayerA){
       return <span>{balances[0]}</span>;
@@ -26,8 +28,8 @@ export default class Balances extends React.PureComponent<Props> {
   }
 
   render() {
-    const { balances, player } = this.props;
-    return (<h1 className="full-width-bar" >[You]&nbsp;
+    const { balances, player, you } = this.props;
+    return (<h1 className="full-width-bar" ><Status stateType="blah" you={you}/>&nbsp;[You]&nbsp;
       <span>
         {this.renderYourBalance(balances, player)}
       </span>&nbsp;| 

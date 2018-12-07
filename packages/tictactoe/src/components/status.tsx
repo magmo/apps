@@ -20,11 +20,9 @@ export default class Status extends React.PureComponent<Props> {
 
   render() {
     const { you } = this.props;
-    return (<p> You are&nbsp;
-      <div>
+    return (<span className="status">
         {this.renderYou(you)}
-      </div>
-      </p>
+      </span>
     );
   }
 }

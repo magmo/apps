@@ -20,7 +20,7 @@ export default class Board extends React.PureComponent<Props> {
   render() {
     const { noughts, crosses } = this.props;
     return (
-      <div>
+      <div id="table-containter">
         <table>
             <tr>
                 <td id="tl"> 
