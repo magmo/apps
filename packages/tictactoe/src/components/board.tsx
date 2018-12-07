@@ -1,5 +1,6 @@
 import React from 'react';
 import { Marks } from '../core/marks'
+import { winningPatterns, isWinningMarks } from '../core/results';
 
 interface Props {
   stateType: string;
@@ -8,13 +9,47 @@ interface Props {
 }
 
 export default class Board extends React.PureComponent<Props> {
-  renderMark(noughts: Marks, crosses: Marks, position: Marks) {
-    if ((crosses & position) == position){
-    return (<div className="xs">×</div>);
+  crucialMark(marks: Marks, position: Marks){
+    let pattern: Marks
+    for (pattern of winningPatterns) {
+      if (marks == pattern && ((position & pattern) == position)){
+        return true
+      }
     }
-    if ((noughts & position) == position){
-      return (<div className="os">○</div>);
-    } else return (<div className="blank">&nbsp;</div>)
+    return false;
+  };
+
+
+  winRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
+    if ((crosses & position) == position ){
+      if (this.crucialMark(crosses, position)){
+        return (<div className="crucial-xs">×</div>);
+      } else return (<div className="xs">×</div>);
+    }
+    if ((noughts & position) == position ){
+      if (this.crucialMark(noughts, position)){
+        return (<div className="crucial-os">○</div>);
+      } else return (<div className="os">○</div>);
+    } else return (<span>&nbsp;</span>);
+  }
+
+  noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
+    if ((crosses & position) == position ){
+      if (this.crucialMark(crosses, position)){
+        return (<div className="crucial-xs">×</div>);
+      } else return (<div className="crucial-xs">×</div>);
+    }
+    if ((noughts & position) == position ){
+      if (this.crucialMark(noughts, position)){
+        return (<div className="crucial-os">○</div>);
+      } else return (<div className="crucial-os">○</div>);
+    } else return (<span>&nbsp;</span>);
+  }
+
+  renderMark(noughts: Marks, crosses: Marks, position: Marks) {
+    if (isWinningMarks(noughts) || isWinningMarks(crosses)){
+      return this.winRenderMark(noughts, crosses, position)
+    } else return this.noWinRenderMark
   }
 
   render() {

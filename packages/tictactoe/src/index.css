@@ -62,13 +62,25 @@ td {
     vertical-align: center;
 }
 
+.crucial-xs {
+    color: #BA4B2B;
+    background-color: black;
+}
+
+.crucial-os {
+    color: white;
+    background-color: black;
+}
+
 .xs {
     color: #BA4B2B;
+    opacity: 0.2;
     background-color: black;
 }
 
 .os {
     color: white;
+    opacity: 0.2;
     background-color: black;
 }
 

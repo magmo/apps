@@ -21,19 +21,29 @@ export enum AbsoluteResult {
 }
 
 
-export const topRow = (Marks.tl | Marks.tm | Marks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
-export const midRow = (Marks.ml | Marks.mm | Marks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
-export const botRow = (Marks.bl | Marks.bm | Marks.br); /*  0b000000111 =   7 mask for win @ row 3 */
+export const topRow: Marks = (Marks.tl | Marks.tm | Marks.tr); /*  0b111000000 = 448 mask for win @ row 1 */
+export const midRow: Marks = (Marks.ml | Marks.mm | Marks.mr); /*  0b000111000 =  56 mask for win @ row 2 */
+export const botRow: Marks = (Marks.bl | Marks.bm | Marks.br); /*  0b000000111 =   7 mask for win @ row 3 */
 
-export const lefCol = (Marks.tl | Marks.ml | Marks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
-export const midCol = (Marks.tm | Marks.mm | Marks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
-export const rigCol = (Marks.tr | Marks.mr | Marks.br); /*  0b001001001 =  73 mask for win @ col 3 */
+export const lefCol: Marks = (Marks.tl | Marks.ml | Marks.bl); /*  0b100100100 = 292 mask for win @ col 1 */
+export const midCol: Marks = (Marks.tm | Marks.mm | Marks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
+export const rigCol: Marks = (Marks.tr | Marks.mr | Marks.br); /*  0b001001001 =  73 mask for win @ col 3 */
 
-export const dhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
-export const uhDiag = (Marks.tl | Marks.tm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
+export const dhDiag: Marks = (Marks.tl | Marks.tm | Marks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
+export const uhDiag: Marks = (Marks.tl | Marks.tm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
 
-export const fullBd = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
+export const fullBd: Marks = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
 
+export const winningPatterns = [
+  topRow,
+  midRow,
+  botRow,
+  lefCol,
+  midCol,
+  rigCol,
+  dhDiag,
+  uhDiag,
+];
 
 export function isWinningMarks(marks: Marks): boolean{
   return  (
