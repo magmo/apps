@@ -55,10 +55,19 @@ storiesOf('Balances', module)
 storiesOf('Game Screen', module)
   .add('Not Yet Concluded', () => <GameScreen 
   stateType="blah"
-  noughts={0b101000000} 
+  noughts={0b100100000} 
   crosses={0b000001001} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
   result={null} 
+  balances={["6","4"]}
+  />)
+  .add('X win', () => <GameScreen 
+  stateType="blah"
+  noughts={0b100100000} 
+  crosses={0b001001001} 
+  you={Marker.crosses} 
+  player={Player.PlayerA} 
+  result={Result.YouWin} 
   balances={["6","4"]}
   />);
