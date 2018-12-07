@@ -1,5 +1,6 @@
 import React from 'react';
-import Status from './status'
+import { YourMarker, TheirMarker } from '../components/marker';
+
 import { Player, Marker } from '../core';
 
 interface Props {
@@ -29,16 +30,18 @@ export default class statusAndBalances extends React.PureComponent<Props> {
 
   render() {
     const { balances, player, you } = this.props;
-    return (<h1 className="full-width-bar" id="top-bar" ><Status stateType="blah" you={you}/>&nbsp;[You]&nbsp;
+    return (
+    <div id="status-container">
+    <h1 className="full-width-bar" id="top-bar" ><YourMarker stateType="blah" you={you}/>&nbsp;[You]&nbsp;
       <span>
         {this.renderYourBalance(balances, player)}
       </span>&nbsp;| 
       <span>
       &nbsp;{this.renderTheirBalance(balances, player)}
       </span>
-      &nbsp;[Them]
+      &nbsp;[Them]&nbsp;<TheirMarker stateType="blah" you={you}/>
       </h1>
-
+      </div>
     );
   }
 }

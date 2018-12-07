@@ -23,7 +23,7 @@ export default class Outcome extends React.PureComponent<Props> {
   render() {
     const { result } = this.props;
     return (
-      <div id="outcome-containter">
+      <div id="outcome-container">
         <h1 className="full-width-bar" id="outcome">
             {this.renderResult(result)}
         </h1>

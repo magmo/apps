@@ -1,27 +1,38 @@
 html, body {
     overflow-x: hidden;
-  }
-
-body {
     background-color: black;
-    align-content: center;
-}
+  }
 
 .full-width-bar {
     margin: 0 -9999rem;
     /* add back negative margin value */
-    padding: 0.25rem 9999rem;
-    background: rgba(0, 0, 0, 0.5); 
-    text-align: center;
+    padding: 0.3rem 9999rem;
   }
 
 h1.full-width-bar {
     background: grey;
 }
 
-#table-container #outcome-container {
-    position: relative;
+p, h1, .status {
+    font-size: 20px;
+    font-family: monospace;
+    color: white;
 }
+
+#outcome-container {
+    position: absolute;
+    bottom: 0%;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+
+#status-container {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+
 table {
     font-family: monospace;
     margin: 0;
@@ -36,23 +47,6 @@ table {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-}
-
-p, h1, .status {
-    font-size: 20px;
-    font-family: monospace;
-    color: white;
-    text-align: center;
-}
-
-#outcome {
-    position: absolute;
-    bottom: 0%;
-}
-
-#top-bar{
-    position: absolute;
-    top: 0%;
 }
 
 tr {
@@ -70,10 +64,12 @@ td {
 
 .xs {
     color: #BA4B2B;
+    background-color: black;
 }
 
 .os {
     color: white;
+    background-color: black;
 }
 
 #magmo-logo {

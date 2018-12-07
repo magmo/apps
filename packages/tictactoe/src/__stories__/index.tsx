@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react';
 import '../index.css';
 // import { Button } from '@storybook/react/demo';
 import Board from '../components/board';
-import Status from '../components/status';
+import { YourMarker, TheirMarker } from '../components/marker';
 import Outcome from '../components/outcome';
 import Balances from '../components/balances';
 import GameScreen from '../components/game-screen';
@@ -40,8 +40,8 @@ storiesOf('Board', module)
   .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001}/>);
 
 storiesOf('Status', module)
-  .add('Noughts',() => <Status stateType="blah" you={Marker.noughts} />)
-  .add('Crosses',() => <Status stateType="blah" you={Marker.crosses} />);
+  .add('Your Marker',() => <YourMarker stateType="blah" you={Marker.noughts} />)
+  .add('Their Marker',() => <TheirMarker stateType="blah" you={Marker.crosses} />);
 
 storiesOf('Outcome', module)
   .add('You Win',() => <Outcome stateType="blah" result={Result.YouWin} />)
