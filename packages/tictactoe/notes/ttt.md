@@ -1,8 +1,10 @@
 # Building Tic Tac Toe on ForceMove
 
-The [ForceMove protocol](https://magmo.com/force-move-games.pdf) is designed to support general purpose, $n$ party state channel applications. It has a few restrictions, but is certainly general enough to allow for payments and many types of game. 
+The [ForceMove protocol](https://magmo.com/force-move-games.pdf) is designed to support general purpose, $n$-party state channel applications. It has a few restrictions, but is certainly general enough to allow for payments and many types of game. 
 
 Rock Paper Scissors (henceforth RPS) was the first example of such a game, and is [live on the ropsten test net](https://demo.magmo.com). The code is [open source](https://github.com/magmo/rps-poc), and will be the starting point for developing a second game: Tic Tac Toe (henceforth TTT). 
+
+We are going to work through the building of TTT, using ForceMove as a library and using RPS as an inspiration. The approach will be to build TTT mostly from 'the inside out', starting with the basic smart contract code and building up the overall state of the application piece-by-piece as we make certain design decisions. 
 
 ## Game logic
 With these resources in hand, the first step is to think about the core logic of Tic Tac Toe; the rules of the game that an adjudicator (i.e. a smart contract deployed to a blochchain) must reference when settling disputes, and that the players must adhere to in order to prevent disputes arising. In ForceMove, to specify the rules of the channel we need only provide a single, pure `validTransition` function returning a boolean from a pair of arguments, each representing the state of the channel. 
@@ -27,9 +29,13 @@ The *gamestate* of RPS is composed of 7 concatenated 32-byte variables, stored i
     // [160 - 191] bytes32 salt
     // [192 - 223] uint256 roundNum
 
-The first variable has a custom type, and can take values from the set  `{ Start, RoundProposed, RoundAccepted, Reveal, Concluded }`. NB in the whitepaper, Start is called Resting?. Also, Concluded is a special state, not strictly part of the gamestate (since it must exist in any ForceMove game). So there is an argument for removing it, here. 
+The first variable has a custom type, and can take values from the set  `{ Start, RoundProposed, RoundAccepted, Reveal, Concluded }`. The use of an `enum` is a pattern that we will use throughout the app to constrain ourselves and protect against runtime errors -- both in solidity code and in TypeScript. 
 
-The second variable is the stake of of the game -- the amount transferred from the loser to the winner after a single round. `preCommit` is the salted hash of the first player's weapon. `bPlay` and `aPlay` are the second and first player's unencrypted weapon choices: again in a custom type that can take variables from the set `{ Rock, Paper, Scissors }`. `salt` is the salt, and `roundNum` is a counter for the number of rounds that have been played. 
+The applications are written in [TypeScipt](https://www.typescriptlang.org) a) because it compiles to JavaScript and b) it is a typed language. The first property is important, since JavaScript code can run in the clients browser, and a state channel is designed to be almost exclusively a peer-to-peer protocol in the spirit of the decentralized web. The second property helps the application code follow the solidity code more closely, and provides all of the development benefits with almost no performance cost (with respect to JavaScript).
+
+*   NB in the whitepaper, Start is called Resting?. Also, Concluded is a special state, not strictly part of the gamestate (since it must exist in any ForceMove game). So there is an argument for removing it, here. 
+
+The second variable is the stake of of the game -- the amount transferred from the loser to the winner after a single round. `preCommit` is the salted hash of the first player's weapon. `bPlay` and `aPlay` are the second and first player's unencrypted weapon choices: again, in a custom type that can take variables from the set `{ Rock, Paper, Scissors }`. `salt` is the salt, and `roundNum` is a counter for the number of rounds that have been played. 
 
 In the file `RockPaperScissorsState.sol`, a library with several helper functions is described. The functions essentially keep track of the position of each of the above variables in the full channel state, and allow other functions to access the variables in a convenient way. 
 
@@ -61,11 +67,14 @@ private pure returns (uint256, uint256) {
     }
 }
 ```
-The ordering is (presumably?) enforced by the position of each of the possibilities in the definition of `enum Play`. One edge case must be handled manually ('going around the corner').
+The ordering is enforced by the position of each of the possibilities in the definition of `enum Play`, which get transformed into the `number` type when compiled. One edge case must be handled manually ('going around the corner').
 
 ### TTT logic
 
-TTT is natively a turn based game, and there is no need to have a commit/reveal stage. There is a 3x3 grid which is alternately marked with a cross "X" (by the first player) or a nought "X" (by the second player). Exactly one mark must be made, and it cannot be made in a location where a mark already exists. If either player successfully achieves three marks in a row, column or diagonal, they win the game. 
+TTT is natively a turn based game, and there is no need to have a commit/reveal stage. There is a 3x3 grid which is alternately marked with a cross "X" (by the first player) or a nought "O" (by the second player). Exactly one mark must be made, and it cannot be made in a location where a mark already exists. If either player successfully achieves three marks in a row, column or diagonal, they win the game. 
+
+For the time being, states are encoded as hex strings. In future, it will be far more manageable to store them as structs; we are just waiting for some infrastructure to catch up before implementing that. 
+
 
     // TicTacToe State Fields
     // (relative to gamestate offset) 
@@ -76,7 +85,7 @@ TTT is natively a turn based game, and there is no need to have a commit/reveal 
     // [ 96 - 127] uint16 crosses
 
 
-The gamestate of TTT is composed of 4 concatenated 32-byte variables, stored in the last 128 elements of the full state byte array. The `positionType` now takes values in `{ Rest, Propose, Accept, Playing, Victory, Draw }`. Note some differences in the gamestate, compared to that of RPS. Here proposal and acceptance are separated from the game itself. The two positions `Victory` and `Draw` are introduced because the final moves of the game are different to preceding moves (in RPS, the first player plays the first move simultaneous with their proposition, and the second player plays the last move -- there are no more moves). I have not included a roundNum nor a salt variable, since these are not necessary. The custom typed `aPlay` and `bPlay` have become `noughts` and `crosses`: integers representing the locations of the marks of each player. The encoding is as follows: 
+The gamestate of TTT is composed of 4 concatenated 32-byte variables, stored in the last 128 elements of the full state byte array. The `positionType` now takes values in `{ Rest, Propose, xPlay, OPlay, Victory, Draw }`. Note some differences in the gamestate, compared to that of RPS. Here proposal and acceptance are separated from the game itself. The two positions `Victory` and `Draw` are introduced because the final moves of the game are different to preceding moves (in RPS, the first player plays the first move simultaneous with their proposition, and the second player plays the last move -- there are no more moves). I have not included a roundNum nor a salt variable, since these are not necessary. The custom typed `aPlay` and `bPlay` have become `noughts` and `crosses`: integers representing the locations of the marks of each player. The encoding is as follows: 
 
     // Unravelling of grid is as follows:
     // 
@@ -171,14 +180,12 @@ The gamestate of TTT is composed of 4 concatenated 32-byte variables, stored in 
     }
 ```
 
-Various constants are introduced for readibility, and the `hasWon` function can check a putative `noughts` or `crosses` integer for a winning pattern. The formulae work by checking for equality between a masked input and the mask itself, where each mask represents a distinct winning pattern. Draws are defined as a full board, checked by looking at the disjunctive union of `noughts` and `crosses`. Disjointedness is self explanatory. `popCount` is a helper function, used later on to infer the marks type of the next move. Note that this is not to infer which player goes next (that is determined by the `turnNum` of the channel), but whether the next player should be playing a "0" or an "X". In this implementation of TTT, these roles can be played by either player. This is because we allow transitions from Propose back to Propose:
+Various constants are introduced for readibility, and the `hasWon` function can check a putative `noughts` or `crosses` integer for a winning pattern. The formulae work by checking for equality between a masked input and the mask itself, where each mask represents a distinct winning pattern. Draws are defined as a full board, checked by looking at the disjunctive union of `noughts` and `crosses`. Disjointedness is self explanatory. `popCount` is a helper function, used later on to infer the marks type of the next move. Note that this is not to infer which player goes next (that is determined by the `turnNum` of the channel), but whether the next player should be playing a "0" or an "X". In this implementation of TTT, these roles can be played by either player, after the first round. 
 
 ![Tic Tac Toe Gamestate transitions](./TicTacToe.svg)
 
 ## Economic incentives
 In RPS, the `validTransition` function is such that an accepting player is permitted to sign a state assigning themselves the stake for that round. This disincentivizes the proposing player from quiting or stalling, which they might otherwise be tempted to do (knowing that they have essentially lost the round, and that quitting might mean their stake was not lost). 
-
-For the time being, states are encoded as hex strings. In future, it will be far more manageable to store them as structs; we are just waiting for some infrastructure to catch up before implementing that. 
 
 In TTT, each `Playing` state assigns the stake to the moving (i.e. signing) party. This prevents the other player from disconnecting when presented with a *surely-losing* board. For example, if the "X" player has the right to move from:
 
@@ -196,11 +203,13 @@ These incentives should be encoded into the `validTransition` function.
 ## Core TypeScript
 Having the `validTransition` contract coded in solidity, along with the contracts imported from `fmg-core`, completes the necessary smart contracts for the state channel. 
 
-The rest of the application can now be coded. We choose to do this in TypeScript, which is a typed superset of (and compiles to) JavaScript. The application needs to achieve multiple taks:
+The application needs to achieve multiple taks:
 
 * Present a front-end interface to users so that they can propose and accept games, make moves, and launch and respond to challenges
-* Sign and post and retrieve messages to instances of the app running on other player's clients (browsers). FIREBASE. See article on disruptive signing and ephemeral keys
+* Sign, post and retrieve messages to instances of the app running on other player's clients (browsers). The messaging protocol could be almost anything: carrier-pigeon, SMS, semaphore. We are going to use a cloud-based database (firebase) for the purposes of this proof of concept. See article on disruptive signing and ephemeral keys
 * Interact with the blockchain when necessary.
+
+Some of this funtionality will be extracted into a wallet, so that application/game developers do not need to do the heavy lifting. 
 
 The first step is to write some TypeScript to encode and decode the channel state. This allows the very rigid and minimal formatting of the channel state in solidity to be cast into a more flexible and verbose expression of state that is much more amenable to app development.
 
@@ -251,6 +260,9 @@ the `any` type enables us to opt out of type checking (allowing data of any type
 
 There is likely a more elegant way of doing this. See https://github.com/magmo/rps-poc/commit/77a5b112434a197f19a416d36cf7c0d26641de34 . 
 
+The pattern of defining nested interfaces, along with constructor functions that allow one to 'project out' the required paramters from a larger collection, is a pattern that we will be havily relying on. 
+
+
 ### Example correspondence beetween solidity and typescript
 
 In `results.ts` we have 
@@ -283,7 +295,7 @@ can be defaulted to a win for crosses, since they must have had their winning st
 
 To infer which player has won, me must therefore keep track of which player is crosses, since as discussed above this is not fixed in any given channel (or though it is of course fixed for the duration of a round). 
 
-To get into the draw position, we will require the board to be full.
+To get into the draw position, we will require the board to be full. Only Xs can do this, since they always move first. 
 
 
 # Questions
@@ -295,8 +307,19 @@ The best place to start is probably test-scenarios, which shows us the which kin
 
 Why must resting have a roundBuyin? is this the same as a stake? Yes it is the same thing.
 
-
 In `encode.ts` we only need to edit a bit of the code, since a lot of it is actually just interfacing with ForceMove.  
+
+
+# App Logic
+The next thing to consider is the app itself, which will present an interface to the user, and allow them to propose, reject and accept games and, of course, choose moves.
+
+A switch of perspective is useful here; we will now consider the app from the user's perspective. Shown below are the various screens the user can transition between, along with any messages they must send (black) or listen for (grey). 
+
+![Tic Tac Toe Gamestate transitions](./TicTacToeUserFlow.svg)
+
+Notice how Player A begins as Xs, but the players may switch depending on the result of the previous game. Note the assymetry in that Draw can only be sent by Xs and only be received by Os. 
+
+
 
 <!-- When trying to run tests I get 
 

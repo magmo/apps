@@ -1,4 +1,4 @@
-export enum SingleMarks {
+export enum Marks {
   tl = 1 << 8,
   tm = 1 << 7,
   tr = 1 << 6,
@@ -13,5 +13,3 @@ export enum SingleMarks {
 
   nn = 0
   };
-  
-  export type Marks = SingleMarks | SingleMarks;  // union type (not sure if this is doing anything uesful...)

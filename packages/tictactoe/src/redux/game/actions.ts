@@ -1,4 +1,4 @@
-import { SingleMarks, Position, positions } from '../../core';
+import { Marks, positions } from '../../core';
 
 export const UPDATE_PROFILE = 'LOGIN.UPDATE_PROFILE';
 export const JOIN_OPEN_GAME = 'GAME.JOIN_OPEN_GAME';
@@ -12,7 +12,7 @@ export const OS_MOVE_CHOSEN = 'GAME.OS_MOVE_CHOSEN';
 export const XS_MOVE_CHOSEN = 'GAME.XS_MOVE_CHOSEN';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
-export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
+export const MARKS_RECEIVED = 'GAME.MARKS_RECEIVED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
@@ -59,12 +59,12 @@ export const declineGame  = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
-export const osMoveChosen = (noughts: SingleMarks) => ({
+export const osMoveChosen = (noughts: Marks) => ({
   type: OS_MOVE_CHOSEN as typeof OS_MOVE_CHOSEN,
   noughts,
 });
 
-export const xsMoveChosen = (crosses: SingleMarks) => ({
+export const xsMoveChosen = (crosses: Marks) => ({
   type: XS_MOVE_CHOSEN as typeof XS_MOVE_CHOSEN,
   crosses,
 });
@@ -77,9 +77,9 @@ export const resign = () => ({
   type: RESIGN as typeof RESIGN,
 });
 
-export const positionReceived = (position: Position) => ({
-  type: POSITION_RECEIVED as typeof POSITION_RECEIVED,
-  position,
+export const marksReceived = (received_marks: Marks) => ({
+  type: MARKS_RECEIVED as typeof MARKS_RECEIVED,
+  received_marks,
 });
 
 export const fundingSuccess = () => ({
@@ -118,7 +118,7 @@ export type XsMoveChosen = ReturnType<typeof xsMoveChosen>;
 export type OsMoveChosen = ReturnType<typeof osMoveChosen>;
 export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
-export type PositionReceived = ReturnType<typeof positionReceived>;
+export type MarksReceived = ReturnType<typeof marksReceived>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
@@ -138,7 +138,7 @@ export type GameAction = (
   | XsMoveChosen
   | OsMoveChosen
   | PlayAgain
-  | PositionReceived
+  | MarksReceived
   | FundingSuccess
   | WithdrawalSuccess
   | WithdrawalRequest

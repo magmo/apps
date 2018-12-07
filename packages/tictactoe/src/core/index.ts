@@ -1,7 +1,7 @@
 export * from './results';
 export { Player } from './players';
 export { Position } from './positions';
-export { SingleMarks, Marks } from './marks';
+export { Marks } from './marks';
 
 export { default as encode } from './encode';
 export { default as decode } from './decode';

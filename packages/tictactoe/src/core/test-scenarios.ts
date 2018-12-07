@@ -14,6 +14,10 @@ const roundBuyIn = bnToHex(new BN(1));
 const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 const sixFour = [new BN(6), new BN(4)].map(bnToHex) as [string, string];
 const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
+const oneFour = [new BN(1), new BN(4)].map(bnToHex) as [string, string];
+const zeroSeven = [new BN(0), new BN(7)].map(bnToHex) as [string, string];
+const sevenOne = [new BN(7), new BN(1)].map(bnToHex) as [string, string];
+const sevenZero = [new BN(7), new BN(0)].map(bnToHex) as [string, string];
 
 const base = {
   libraryAddress,
@@ -220,25 +224,53 @@ export const aResignsAfterOneRound = {
 
 export const noughtsVictory = {
   ...standard,
-  playing1: positions.Oplaying({...base, turnNum:  7, noughts:0b100000000, crosses:0b000000000, balances:fourSix}),
-  playing2: positions.Xplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000010000, balances:sixFour}),
-  playing3: positions.Oplaying({...base, turnNum:  9, noughts:0b110000000, crosses:0b000010000, balances:fourSix}),
-  playing4: positions.Xplaying({...base, turnNum: 10, noughts:0b110000000, crosses:0b000011000, balances:sixFour}),
-  victory:  positions.victory({...base, turnNum: 11, noughts:0b111000000, crosses:0b000011000, balances:fourSix}),
+  playing1: positions.Xplaying({...base, turnNum:  7, noughts:0b000000000, crosses:0b000010000, balances:sixFour}),
+  playing2: positions.Oplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000010000, balances:fourSix}),
+  playing3: positions.Xplaying({...base, turnNum:  9, noughts:0b100000000, crosses:0b000010100, balances:sixFour}),
+  playing4: positions.Oplaying({...base, turnNum: 10, noughts:0b110000000, crosses:0b000010100, balances:fourSix}),
+  playing5: positions.Xplaying({...base, turnNum: 11, noughts:0b110000000, crosses:0b000010101, balances:sixFour}),
+  playing5closetoempty: positions.Xplaying({...base, turnNum: 11, noughts:0b110000000, crosses:0b000010101, balances:oneFour}),
+  victory:  positions.victory({...base, turnNum: 12, noughts:0b111000000, crosses:0b000010101, balances:fourSix}),
+  absolutevictory: positions.victory({...base, turnNum: 12, noughts:0b111000000, crosses:0b000010101, balances:zeroSeven}),
   victoryHex:   '0x'+'0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
                     +'0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
                     +'0000000000000000000000000000000000000000000000000000000000000002' // number of participants
                     +'000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' // asAddress
                     +'000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' // bsAddress
                     +'0000000000000000000000000000000000000000000000000000000000000002' // StateType (PreFundSetup, PostFundSetup, Game, Conclude)
-                    +'000000000000000000000000000000000000000000000000000000000000000b' // turnNum
+                    +'000000000000000000000000000000000000000000000000000000000000000c' // turnNum
                     +'0000000000000000000000000000000000000000000000000000000000000000' // stateCount ?
                     +'0000000000000000000000000000000000000000000000000000000000000004' // aResolution
                     +'0000000000000000000000000000000000000000000000000000000000000006' // bResolution
                     +'0000000000000000000000000000000000000000000000000000000000000003' // [GameAttributes: GamePositionType = {resting Oplaying Xplaying victory draw}
                     +'0000000000000000000000000000000000000000000000000000000000000001' // [GameAttributes: roundBuyIn]
                     +'00000000000000000000000000000000000000000000000000000000000001c0' // [GameAttributes: noughts
-                    +'0000000000000000000000000000000000000000000000000000000000000018', // [GameAttributes: crosses]
+                    +'0000000000000000000000000000000000000000000000000000000000000015', // [GameAttributes: crosses]
+};
+
+export const crossesVictory = {
+  ...standard,
+  playing1: positions.Xplaying({...base, turnNum:  7, noughts:0b000000000, crosses:0b000000001, balances:sixFour}),
+  playing2: positions.Oplaying({...base, turnNum:  8, noughts:0b100000000, crosses:0b000001001, balances:fourSix}),
+  playing3: positions.Xplaying({...base, turnNum:  9, noughts:0b100000000, crosses:0b000001001, balances:sixFour}),
+  playing4: positions.Oplaying({...base, turnNum: 10, noughts:0b100010000, crosses:0b000001001, balances:fourSix}),
+  playing4closetoempty: positions.Oplaying({...base, turnNum: 10, noughts:0b100010000, crosses:0b000001001, balances:sevenOne}),
+  victory: positions.victory({...base, turnNum: 11, noughts:0b100010000, crosses:0b001001001, balances:sixFour}),
+  absolutevictory: positions.victory({...base, turnNum: 11, noughts:0b100010000, crosses:0b001001001, balances:sevenZero}),
+  victoryHex:   '0x'+'0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
+                    +'0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
+                    +'0000000000000000000000000000000000000000000000000000000000000002' // number of participants
+                    +'000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' // asAddress
+                    +'000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' // bsAddress
+                    +'0000000000000000000000000000000000000000000000000000000000000002' // StateType (PreFundSetup, PostFundSetup, Game, Conclude)
+                    +'000000000000000000000000000000000000000000000000000000000000000c' // turnNum
+                    +'0000000000000000000000000000000000000000000000000000000000000000' // stateCount ?
+                    +'0000000000000000000000000000000000000000000000000000000000000006' // aResolution
+                    +'0000000000000000000000000000000000000000000000000000000000000004' // bResolution
+                    +'0000000000000000000000000000000000000000000000000000000000000003' // [GameAttributes: GamePositionType = {resting Oplaying Xplaying victory draw}
+                    +'0000000000000000000000000000000000000000000000000000000000000001' // [GameAttributes: roundBuyIn]
+                    +'0000000000000000000000000000000000000000000000000000000000000140' // [GameAttributes: noughts
+                    +'0000000000000000000000000000000000000000000000000000000000000049', // [GameAttributes: crosses]
 };
 
 
@@ -274,6 +306,18 @@ export const aRejectsGame = {
 
 }
 
+export const swapRoles = {
+  // TODO finish this!
+  ...standard,
+  playing9: positions.Xplaying({...base, turnNum:  4, noughts:0b000000000, crosses:0b100000000, balances:sixFour}),
+  playing10: positions.Oplaying({...base, turnNum:  5, noughts:0b000010000, crosses:0b100000000, balances:fourSix}),
+  playing11: positions.Xplaying({...base, turnNum:  6, noughts:0b000010000, crosses:0b100000001, balances:sixFour}),
+  playing12: positions.Oplaying({...base, turnNum:  7, noughts:0b000011000, crosses:0b100000001, balances:fourSix}),
+  playing13: positions.Xplaying({...base, turnNum:  8, noughts:0b000011000, crosses:0b100100001, balances:sixFour}),
+  playing14: positions.Oplaying({...base, turnNum:  9, noughts:0b000011100, crosses:0b100100001, balances:fourSix}),
+  playing15: positions.Xplaying({...base, turnNum: 10, noughts:0b000011100, crosses:0b101100001, balances:sixFour}),
+  playing16: positions.Oplaying({...base, turnNum: 11, noughts:0b010011100, crosses:0b101100001, balances:fourSix}),
+}
 
 // export const bResignsAfterOneRound = {
 //   ...standard,
