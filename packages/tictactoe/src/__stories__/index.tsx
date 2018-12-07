@@ -55,21 +55,21 @@ storiesOf('Balances', module)
 storiesOf('Game Screen', module)
   .add('Waiting', () => <GameScreen 
   stateType="blah"
-  noughts={0b100100000} 
+  noughts={0b000100000} 
   crosses={0b000001001} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
   result={Imperative.Wait} 
-  balances={["5","5"]}
+  balances={["6","4"]}
   />)
-  .add('Moving', () => <GameScreen 
+  .add('Choosing', () => <GameScreen 
   stateType="blah"
-  noughts={0b100100010} 
-  crosses={0b010001001} 
+  noughts={0b000100010} 
+  crosses={0b000001001} 
   you={Marker.crosses} 
   player={Player.PlayerA} 
-  result={Imperative.Wait} 
-  balances={["5","5"]}
+  result={Imperative.Choose} 
+  balances={["4","6"]}
   />)
   .add('X win', () => <GameScreen 
   stateType="blah"
