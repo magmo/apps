@@ -46,11 +46,14 @@ storiesOf('Status', module)
 storiesOf('Outcome', module)
   .add('You Win',() => <Outcome stateType="blah" result={Result.YouWin} />)
   .add('You Lose',() => <Outcome stateType="blah" result={Result.YouLose} />)
-  .add('Tie',() => <Outcome stateType="blah" result={Result.Tie} />);
+  .add('Tie',() => <Outcome stateType="blah" result={Result.Tie} />)
+  .add('Wait',() => <Outcome stateType="blah" result={Imperative.Wait}/>)
+  .add('Choose',() => <Outcome stateType="blah" result={Imperative.Choose}/>);
 
 storiesOf('Balances', module)
   .add('You Winning',() => <Balances stateType="blah" balances={["6","4"]} player={Player.PlayerA}/>)
   .add('You Losing',() => <Balances stateType="blah" balances={["9","4"]} player={Player.PlayerB}/>);
+
 
 storiesOf('Game Screen', module)
   .add('Waiting', () => <GameScreen 
