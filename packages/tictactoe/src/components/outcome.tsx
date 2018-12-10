@@ -10,19 +10,19 @@ interface Props {
 export default class Outcome extends React.PureComponent<Props> {
   renderResult(result: Result | Imperative ) {
     if (result == Result.YouWin){
-      return (<span id="you-win">You Win!</span>);
+      return (<h1 className="full-width-bar"  id="you-win"><span>You Win!</span></h1>);
     }
     if (result == Result.YouLose){
-      return (<span id="you-lose">You Lose!</span>);
+      return (<h1 className="full-width-bar"  id="you-lose"><span>You Lose!</span></h1>);
     }
     if (result == Result.Tie){
-      return (<span id="tie">It's a Draw!</span>);
+      return (<h1 className="full-width-bar"  id="tie"><span>It's a Draw!</span></h1>);
     }
     if (result == Imperative.Choose){
-      return (<span id="choose">Choose your move</span>);
+      return (<h1 className="full-width-bar"  id="choose"><span>Choose your move</span></h1>);
     }
     if (result == Imperative.Wait){
-      return (<span id="wait">Wait for Opponent's move!</span>);
+      return (<h1 className="full-width-bar"  id="wait"><span>Wait for Opponent's move!</span></h1>);
     } else return <span>&nbsp;</span>
   }
 
@@ -30,9 +30,7 @@ export default class Outcome extends React.PureComponent<Props> {
     const { result } = this.props;
     return (
       <div id="outcome-container">
-        <h1 className="full-width-bar" id="outcome">
-            {this.renderResult(result)}
-        </h1>
+        {this.renderResult(result)}
       </div>
 
     );
