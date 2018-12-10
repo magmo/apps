@@ -6,6 +6,8 @@ interface Props {
   stateType: string;
   noughts: Marks;
   crosses: Marks; 
+  osMoveChosen: (noughts: Marks) => void;
+  xsMoveChosen: (crosses: Marks) => void;
 }
 
 export default class Board extends React.PureComponent<Props> {
@@ -71,8 +73,8 @@ export default class Board extends React.PureComponent<Props> {
       <div id="table-containter">
         <table>
             <tr>
-                <td id="tl"> 
-                  {this.renderMark(noughts, crosses, 0b100000000)}
+                <td id="tl" onClick={() => this.props.xsMoveChosen(Marks.tl)}> 
+                  {this.renderMark(noughts, crosses, Marks.tl)}
                 </td>
                 <td id="tm">
                   {this.renderMark(noughts, crosses, 0b010000000)}

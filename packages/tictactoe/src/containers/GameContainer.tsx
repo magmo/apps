@@ -1,66 +1,38 @@
 import React from 'react';
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 
-// import { SiteState } from '../redux/reducer';
-import * as gameActions from '../redux/game/actions';
-import { Marks, Marker, Player, Imperative } from '../core';
+import { SiteState } from '../redux/reducer';
 
-// import { Wallet, actions as walletActions } from '../wallet';
-// import WaitingRoomPage from '../components/WaitingRoomPage';
-// import ConfirmGamePage from '../components/ConfirmGamePage';
-// import FundingConfirmedPage from '../components/FundingConfirmedPage'; // WaitForPostFundSetup
-// import SelectMovePage from '../components/SelectMovePage';
-// import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
+import { Marker, Imperative } from '../core';
 import GameScreen from '../components/GameScreen'
-// import MoveSelectedPage from '../components/MoveSelectedPage'; // WaitForReveal, WaitForResting
-// import PlayAgain from '../components/PlayAgain';
-// import WaitForRestingA from '../components/WaitForRestingA';
-// import InsufficientFunds from '../components/InsufficientFunds';
-// import WaitToResign from '../components/WaitToResign';
-// import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
-// import GameOverPage from '../components/GameOverPage'; // GameOver, OpponentResigned
-// import GameProposedPage from '../components/GameProposedPage';
-// import ProfileContainer from './ProfileContainer';
 
-// import WaitForWallet from '../components/WaitForWallet'; // WaitForFunding, maybe others?
-
+import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
+import * as actions from '../redux/game/actions';
+
+
 
 interface GameProps {
   state: GameState;
-  showWallet: boolean;
-  showWalletHeader: boolean;
-  noughts: (marks: Marks) => void;
-  crosses: (marks: Marks) => void;
-  you: (marker: Marker) => void;
-  player: (player: Player) => void;
-  playAgain: () => void;
-  createBlockchainChallenge: () => void;
-  confirmGame: () => void;
-  declineGame: () => void;
-  createOpenGame: (roundBuyIn: string) => void;
-  cancelOpenGame: () => void;
-  withdraw: () => void;
+  osMoveChosen: (noughts: Marks) => void;
+  xsMoveChosen: (crosses: Marks) => void;
 }
 
 function GameContainer(props: GameProps) {
-  // return <Wallet>{RenderGame(props)}</Wallet>;
-  return <div>{RenderGame(props)}</div>;
-}
-
-function RenderGame(props: GameProps) {
-  const { state, noughts, crosses, player, playAgain, createBlockchainChallenge, confirmGame, declineGame, withdraw } = props;
+  const { state, osMoveChosen, xsMoveChosen } = props;
   switch (state.name) {
-    case StateName.XsWaitForOpponentToPickMove:
+    case StateName.XsPickMove:
       return (
         <GameScreen 
           stateType="blah"
-          noughts={noughts} 
-          crosses={crosses} 
+          noughts={state.noughts} 
+          crosses={state.crosses} 
           you={Marker.crosses} // fixed by StateName
-          player={player} 
-          result={result} 
-          balances={balances}
+          player={state.player} 
+          result={Imperative.Wait} 
+          balances={state.balances}
+          osMoveChosen={osMoveChosen}
+          xsMoveChosen={xsMoveChosen}
           />
       );
     default:
@@ -70,19 +42,12 @@ function RenderGame(props: GameProps) {
 
 const mapStateToProps = (state: SiteState) => ({
   state: state.game.gameState,
-  showWallet: state.wallet.display.showWallet,
-  showWalletHeader: state.wallet.display.showFooter,
+
 });
 
 const mapDispatchToProps = {
-  chooseMove: gameActions.chooseMove,
-  playAgain: gameActions.playAgain,
-  createBlockchainChallenge: walletActions.createChallenge,
-  confirmGame: gameActions.confirmGame,
-  declineGame: gameActions.declineGame,
-  createOpenGame: gameActions.createOpenGame,
-  cancelOpenGame: gameActions.cancelOpenGame,
-  withdraw: gameActions.withdrawalRequest,
+  osMoveChosen: actions.osMoveChosen,
+  xsMoveChosen: actions.xsMoveChosen,
 };
 
 // why does it think that mapStateToProps can return undefined??

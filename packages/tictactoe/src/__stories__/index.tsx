@@ -1,5 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
+import { Provider }  from 'react-redux';
 // Once it exists import styling here
 import '../index.css';
 // import { Button } from '@storybook/react/demo';
@@ -8,36 +9,43 @@ import { YourMarker, TheirMarker } from '../components/Marker';
 import Outcome from '../components/Outcome';
 import Balances from '../components/Balances';
 import GameScreen from '../components/GameScreen';
-import { Marker, Result, Player, Imperative } from '../core';
+import { Marker, Result, Player, Imperative, Marks } from '../core';
+
+import { scenarios } from '../core/';
+
+import { 
+  xsPickMove,
+  // xsWaitForOpponentToPickMove,
+ } from '../redux/game/state';
+
+import GameContainer from '../containers/GameContainer';
 
 
-// BOILER PLATE TAKEN FROM RPS-POC WALLET
+const {
+  playing1,
+} = scenarios.standard;
 
-// const fakeStore = (state) => ({
-//   dispatch: action => {
-//     alert(`Action ${action.type} triggered`);
-//     return action;
-//   },
-//   getState: () => ({ wallet: state }), 
-//   subscribe: () => (() => {/* empty */ }),
-//   replaceReducer: () => { /* empty */ },
-// });
+const shared = {...scenarios.shared, player: Player.PlayerA, stateCount: 1};
 
-// const testState = (state) => (
-//   () => (
-//     <Provider store={fakeStore(state)}>
-//       <Wallet children={<div/>} />
-//     </Provider>
-//   )
-// );
+const initialState = {
+  game: {
+    messageState: {},
+    gameState: xsPickMove({...playing1, ...shared})
+  }
+};
+
+// BOILER PLATE TAKEN FROM RPS-POC WALLET 
+
+
+const fakeMoveChosen = (x: Marks) => alert("move chosen");
 
 // const noughts = 0;
 // const crosses = 0;
 storiesOf('Board', module)
-  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} />)
-  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011}/>)
-  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000}/>)
-  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001}/>);
+  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>)
+  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>)
+  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>)
+  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>);
 
 storiesOf('Status', module)
   .add('Your Marker',() => <YourMarker stateType="blah" you={Marker.crosses} />)
@@ -64,6 +72,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Imperative.Wait} 
   balances={["6","4"]}
+  osMoveChosen={fakeMoveChosen}
+  xsMoveChosen={fakeMoveChosen}
   />)
   .add('Choosing', () => <GameScreen 
   stateType="blah"
@@ -73,6 +83,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Imperative.Choose} 
   balances={["4","6"]}
+  osMoveChosen={fakeMoveChosen}
+  xsMoveChosen={fakeMoveChosen}
   />)
   .add('X win', () => <GameScreen 
   stateType="blah"
@@ -82,6 +94,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Result.YouWin} 
   balances={["6","4"]}
+  osMoveChosen={fakeMoveChosen}
+  xsMoveChosen={fakeMoveChosen}
   />)
   .add('O win', () => <GameScreen 
   stateType="blah"
@@ -91,6 +105,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Result.YouLose} 
   balances={["4","6"]}
+  osMoveChosen={fakeMoveChosen}
+  xsMoveChosen={fakeMoveChosen}
   />)
   .add('Tie', () => <GameScreen 
   stateType="blah"
@@ -100,4 +116,30 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Result.Tie} 
   balances={["5","5"]}
+  osMoveChosen={fakeMoveChosen}
+  xsMoveChosen={fakeMoveChosen}
   />);
+
+const fakeStore = (state) => ({
+  dispatch: action => {
+    alert(`Action ${action.type} triggered`);
+    return action;
+  },
+  getState: () => (state), 
+  subscribe: () => (() => {/* empty */ }),
+  replaceReducer: () => { /* empty */ },
+});
+
+const testState = (state) => (
+  () => (
+    <Provider store={fakeStore(state)}>
+      <GameContainer/>
+    </Provider>
+  )
+);
+
+
+// const currentState = store.getState();
+
+storiesOf('App (reading from the store)', module)
+  .add('test initial state', testState(initialState));

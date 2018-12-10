@@ -5,15 +5,17 @@
   "main": "index.js",
   "module": "src/index.js",
   "dependencies": {
+    "@types/react-redux": "^6.0.11",
     "babel-core": "6",
     "babel-preset-react-app": "^3.1.1",
     "babel-runtime": "^6.23.0",
     "bn.js": "4.11.8",
     "fmg-core": "0.1.6",
     "fmg-simple-adjudicator": "0.1.6",
-    "redux": "^4.0.1",
     "react": "16.6.3",
     "react-dom": "16.6.3",
+    "react-redux": "^6.0.0",
+    "redux": "^4.0.1",
     "truffle": "4.1.14",
     "ts-node": "^7.0.1"
   },
