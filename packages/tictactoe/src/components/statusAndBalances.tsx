@@ -1,5 +1,5 @@
 import React from 'react';
-import { YourMarker, TheirMarker } from '../components/marker';
+import { YourMarker, TheirMarker } from './Marker';
 
 import { Player, Marker } from '../core';
 

@@ -3,11 +3,11 @@ import { storiesOf } from '@storybook/react';
 // Once it exists import styling here
 import '../index.css';
 // import { Button } from '@storybook/react/demo';
-import Board from '../components/board';
-import { YourMarker, TheirMarker } from '../components/marker';
-import Outcome from '../components/outcome';
-import Balances from '../components/balances';
-import GameScreen from '../components/game-screen';
+import Board from '../components/Board';
+import { YourMarker, TheirMarker } from '../components/Marker';
+import Outcome from '../components/Outcome';
+import Balances from '../components/Balances';
+import GameScreen from '../components/GameScreen';
 import { Marker, Result, Player, Imperative } from '../core';
 
 
