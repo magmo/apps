@@ -12,7 +12,7 @@ interface Props {
 export class YourMarker extends React.PureComponent<Props> {
   renderYou(you: Marker) {
     if (you == Marker.crosses){
-    return (<span className="xs">&nbsp;×&nbsp;</span>);
+      return (<span className="xs">&nbsp;×&nbsp;</span>);
     }
     if (you == Marker.noughts){
       return (<span className="os">&nbsp;○&nbsp;</span>);
@@ -27,10 +27,10 @@ export class YourMarker extends React.PureComponent<Props> {
   }
 }
 
-export  class TheirMarker extends React.PureComponent<Props> {
+export class TheirMarker extends React.PureComponent<Props> {
   renderYou(you: Marker) {
     if (you == Marker.noughts){
-    return (<span className="xs">&nbsp;×&nbsp;</span>);
+      return (<span className="xs">&nbsp;×&nbsp;</span>);
     }
     if (you == Marker.crosses){
       return (<span className="os">&nbsp;○&nbsp;</span>);

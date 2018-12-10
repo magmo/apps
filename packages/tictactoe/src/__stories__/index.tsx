@@ -40,7 +40,7 @@ storiesOf('Board', module)
   .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001}/>);
 
 storiesOf('Status', module)
-  .add('Your Marker',() => <YourMarker stateType="blah" you={Marker.noughts} />)
+  .add('Your Marker',() => <YourMarker stateType="blah" you={Marker.crosses} />)
   .add('Their Marker',() => <TheirMarker stateType="blah" you={Marker.crosses} />);
 
 storiesOf('Outcome', module)
