@@ -26,6 +26,22 @@ p, h1, .status {
     transform: translate(-50%,0);
 }
 
+#you-win {
+    background: green;
+}
+
+#you-lose {
+    background: red;
+}
+
+#tie {
+    background: darkorange;
+}
+
+#choose {
+    background: purple;
+}
+
 #status-container {
     position: absolute;
     top: 0%;
