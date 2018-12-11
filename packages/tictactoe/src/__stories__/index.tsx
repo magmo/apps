@@ -7,7 +7,7 @@ import '../index.css';
 import Board from '../components/Board';
 import { YourMarker, TheirMarker } from '../components/Marker';
 import Outcome from '../components/Outcome';
-import Balances from '../components/Balances';
+import StatusAndBalances from '../components/StatusAndBalances';
 import GameScreen from '../components/GameScreen';
 import { Marker, Result, Player, Imperative, Marks } from '../core';
 
@@ -34,18 +34,16 @@ const initialState = {
   }
 };
 
-// BOILER PLATE TAKEN FROM RPS-POC WALLET 
 
-
-const fakeMoveChosen = (x: Marks) => alert("move chosen");
+const fakeMarksMade = (x: Marks) => alert("marks made");
 
 // const noughts = 0;
 // const crosses = 0;
 storiesOf('Board', module)
-  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>)
-  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>)
-  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>)
-  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} osMoveChosen={fakeMoveChosen} xsMoveChosen={fakeMoveChosen}/>);
+  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade}/>)
+  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade}/>)
+  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade}/>)
+  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade}/>);
 
 storiesOf('Status', module)
   .add('Your Marker',() => <YourMarker stateType="blah" you={Marker.crosses} />)
@@ -58,9 +56,9 @@ storiesOf('Outcome', module)
   .add('Wait',() => <Outcome stateType="blah" result={Imperative.Wait}/>)
   .add('Choose',() => <Outcome stateType="blah" result={Imperative.Choose}/>);
 
-storiesOf('Balances', module)
-  .add('You Winning',() => <Balances stateType="blah" balances={["6","4"]} player={Player.PlayerA}/>)
-  .add('You Losing',() => <Balances stateType="blah" balances={["9","4"]} player={Player.PlayerB}/>);
+storiesOf('Status and Balances', module)
+  .add('You Winning',() => <StatusAndBalances stateType="blah" balances={["6","4"]} player={Player.PlayerA} you={Marker.crosses}/>)
+  .add('You Losing',() => <StatusAndBalances stateType="blah" balances={["9","4"]} player={Player.PlayerB} you={Marker.crosses}/>);
 
 
 storiesOf('Game Screen', module)
@@ -72,8 +70,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Imperative.Wait} 
   balances={["6","4"]}
-  osMoveChosen={fakeMoveChosen}
-  xsMoveChosen={fakeMoveChosen}
+  osMoveChosen={fakeMarksMade}
+  xsMoveChosen={fakeMarksMade}
   />)
   .add('Choosing', () => <GameScreen 
   stateType="blah"
@@ -83,8 +81,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Imperative.Choose} 
   balances={["4","6"]}
-  osMoveChosen={fakeMoveChosen}
-  xsMoveChosen={fakeMoveChosen}
+  osMoveChosen={fakeMarksMade}
+  xsMoveChosen={fakeMarksMade}
   />)
   .add('X win', () => <GameScreen 
   stateType="blah"
@@ -94,8 +92,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Result.YouWin} 
   balances={["6","4"]}
-  osMoveChosen={fakeMoveChosen}
-  xsMoveChosen={fakeMoveChosen}
+  osMoveChosen={fakeMarksMade}
+  xsMoveChosen={fakeMarksMade}
   />)
   .add('O win', () => <GameScreen 
   stateType="blah"
@@ -105,8 +103,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Result.YouLose} 
   balances={["4","6"]}
-  osMoveChosen={fakeMoveChosen}
-  xsMoveChosen={fakeMoveChosen}
+  osMoveChosen={fakeMarksMade}
+  xsMoveChosen={fakeMarksMade}
   />)
   .add('Tie', () => <GameScreen 
   stateType="blah"
@@ -116,8 +114,8 @@ storiesOf('Game Screen', module)
   player={Player.PlayerA} 
   result={Result.Tie} 
   balances={["5","5"]}
-  osMoveChosen={fakeMoveChosen}
-  xsMoveChosen={fakeMoveChosen}
+  osMoveChosen={fakeMarksMade}
+  xsMoveChosen={fakeMarksMade}
   />);
 
 const fakeStore = (state) => ({

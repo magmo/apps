@@ -1,30 +1,30 @@
 import React from 'react';
 import { YourMarker, TheirMarker } from './Marker';
-
+import hexToBN from '../utils/hexToBN';
 import { Player, Marker } from '../core';
 
 interface Props {
   stateType: string;
-  balances: [String, String];
+  balances: [string, string];
   player: Player;
   you: Marker;
 }
 
 export default class statusAndBalances extends React.PureComponent<Props> {
-  renderYourBalance(balances: [String, String], player: Player) {
+  renderYourBalance(balances: [string, string], player: Player) {
     if (player == Player.PlayerA){
-      return <span>{balances[0]}</span>;
+      return <span>{hexToBN(balances[0]).toString(10,0)}</span>;
     }
     if (player == Player.PlayerB){
-      return <span>{balances[1]}</span>;
+      return <span>{hexToBN(balances[1]).toString(10,0)}</span>;
     } else return;
   }
-  renderTheirBalance(balances: [String, String], player: Player) {
+  renderTheirBalance(balances: [string, string], player: Player) {
     if (player == Player.PlayerA){
-      return <span>{balances[1]}</span>;
+      return <span>{hexToBN(balances[1]).toString(10,0)}</span>;
     }
     if (player == Player.PlayerB){
-      return <span>{balances[0]}</span>;
+      return <span>{hexToBN(balances[0]).toString(10,0)}</span>;
     } else return;
   }
 

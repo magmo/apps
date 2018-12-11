@@ -1,22 +1,23 @@
 import React from 'react';
 import { Player } from '../core';
+// import hexToBN from '../utils/hexToBN';
 
 interface Props {
   stateType: string;
-  balances: [String, String];
+  balances: [string, string];
   player: Player;
 }
 
 export default class Balances extends React.PureComponent<Props> {
-  renderYourBalance(balances: [String, String], player: Player) {
+  renderYourBalance(balances: [string, string], player: Player) {
     if (player == Player.PlayerA){
-      return <span>{balances[0]}</span>;
+      return <span>?</span>;
     }
     if (player == Player.PlayerB){
-      return <span>{balances[1]}</span>;
+      return <span>?</span>;
     } else return;
   }
-  renderTheirBalance(balances: [String, String], player: Player) {
+  renderTheirBalance(balances: [string, string], player: Player) {
     if (player == Player.PlayerA){
       return <span>{balances[1]}</span>;
     }
