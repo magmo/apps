@@ -1,28 +1,28 @@
 import { combineReducers } from 'redux';
 
-// import { loginReducer, LoginState } from './login/reducer';
-// import { MetamaskState, metamaskReducer } from './metamask/reducer';
+import { loginReducer, LoginState } from './login/reducer';
+import { MetamaskState, metamaskReducer } from './metamask/reducer';
 // import { walletReducer, WalletState } from '../wallet';
 import { gameReducer, JointState } from './game/reducer';
-// import { OpenGameState } from './open-games/state';
-// import { openGamesReducer } from './open-games/reducer';
-// import { rulesReducer } from './global/reducer';
-// import { RulesState } from './global/state';
+import { OpenGameState } from './open-games/state';
+import { openGamesReducer } from './open-games/reducer';
+import { rulesReducer } from './global/reducer';
+import { RulesState } from './global/state';
 
 export interface SiteState {
-  // login: LoginState;
+  login: LoginState;
   // wallet: WalletState;
-  // metamask: MetamaskState;
-  // openGames: OpenGameState;
+  metamask: MetamaskState;
+  openGames: OpenGameState;
   game: JointState;
-  // rules: RulesState;
+  rules: RulesState;
 }
 
 export default combineReducers<SiteState>({
-  // login: loginReducer,
+  login: loginReducer,
   // wallet: walletReducer,
-  // metamask: metamaskReducer,
-  // openGames: openGamesReducer,
+  metamask: metamaskReducer,
+  openGames: openGamesReducer,
   game: gameReducer,
-  // rules: rulesReducer,
+  rules: rulesReducer,
 });

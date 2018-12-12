@@ -8,11 +8,11 @@ import './index.css';
 // import './index.scss';
 import registerServiceWorker from './registerServiceWorker';
 import store from './redux/store';
-import GameContainer from './containers/GameContainer';
+import SiteContainer from './containers/SiteContainer';
 
 render(
   <Provider store={store}>
-    <GameContainer />
+    <SiteContainer />
   </Provider>,
   document.getElementById('root'),
 );
