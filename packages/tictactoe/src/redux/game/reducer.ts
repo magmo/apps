@@ -6,6 +6,8 @@ import * as results from '../../core/results';
 
 import { positions, Player, isDraw, isWinningMarks, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
+import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
+
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
@@ -27,16 +29,45 @@ const emptyJointState: JointState = { messageState: {}, gameState: states.noName
 // const emptyJointState: JointState = { messageState: {}, 
 // gameState: states.xsPickMove({ ...playing1, ...shared}) };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
+// export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
+//   state = singleActionReducer(state, action);
+//   return state;
+// };
+
+export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess) => {
+  if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
+    const myAddress  =  ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
+    const myName = ('myName' in state.gameState) ? state.gameState.myName: ""; 
+    const newGameState = states.lobby({...state.gameState, myAddress, myName});
+    return {gameState:newGameState, messageState:{}};
+  }
+  if (action.type === actions.MESSAGE_SENT) {
+    const { messageState, gameState } = state;
+    const { actionToRetry } = messageState;
+    return { gameState, messageState: { actionToRetry } };
+  }
+  if (action.type === LOGIN_SUCCESS) {
+    const { messageState, gameState } = state;
+    const { libraryAddress } = action;
+    return { gameState: { ...gameState, libraryAddress }, messageState };
+  }
+  // apply the current action to the state
   state = singleActionReducer(state, action);
+  // if we have saved an action previously, see if that will apply now
+  // state = attemptRetry(state);
   return state;
 };
+
 
 function singleActionReducer(state: JointState, action: actions.GameAction) {
   const { messageState, gameState } = state;
   switch (gameState.name) {
     case states.StateName.NoName:
       return noNameReducer(gameState, messageState, action);
+    case states.StateName.Lobby:
+      return lobbyReducer(gameState, messageState, action);
+    case states.StateName.CreatingOpenGame:
+      return creatingOpenGameReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
       if (action.type === actions.XS_MOVE_CHOSEN) {
         return xsPickMoveReducer(gameState, messageState, action);
@@ -72,6 +103,31 @@ function noNameReducer(gameState: states.NoName, messageState: MessageState, act
       return { gameState, messageState };
   }
 }
+
+
+function lobbyReducer(gameState: states.Lobby, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.NEW_OPEN_GAME:
+      const newGameState = states.creatingOpenGame({ ...gameState });
+      return { gameState: newGameState, messageState };
+    default:
+      return { gameState, messageState };
+  }
+}
+
+function creatingOpenGameReducer(gameState: states.CreatingOpenGame, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.CREATE_OPEN_GAME:
+      const newGameState = states.waitingRoom({ ...gameState, roundBuyIn: action.roundBuyIn });
+      return { gameState: newGameState, messageState };
+    case actions.CANCEL_OPEN_GAME:
+      const newGameState1 = states.lobby(gameState);
+      return { gameState: newGameState1, messageState };
+    default:
+      return { gameState, messageState };
+  }
+}
+
 
 function favorA(balances: [string, string], roundBuyIn): [string, string] {
   const aBal: string = bnToHex(hexToBN(balances[0]).add(hexToBN(roundBuyIn)));
