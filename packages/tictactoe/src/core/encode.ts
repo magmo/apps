@@ -63,11 +63,11 @@ export enum GamePositionType {
   Xplaying = 1,
   Oplaying = 2,
   Victory = 3,
-  Draw    = 4
+  Draw = 4,
 }
 
 export function packRestingAttributes(stake: string) {
-  return toHex32(GamePositionType.Resting).substr(2) + stake.substr(2); 
+  return toHex32(GamePositionType.Resting).substr(2) + stake.substr(2);
 }
 
 export function packOplayingAttributes(position: positions.Oplaying) {
@@ -76,7 +76,7 @@ export function packOplayingAttributes(position: positions.Oplaying) {
     toHex32(GamePositionType.Oplaying).substr(2) +
     padBytes32(roundBuyIn).substr(2) +
     toHex32(noughts).substr(2) +
-    toHex32(crosses).substr(2) 
+    toHex32(crosses).substr(2)
   );
 }
 
@@ -86,7 +86,7 @@ export function packXplayingAttributes(position: positions.Xplaying) {
     toHex32(GamePositionType.Xplaying).substr(2) +
     padBytes32(roundBuyIn).substr(2) +
     toHex32(noughts).substr(2) +
-    toHex32(crosses).substr(2) 
+    toHex32(crosses).substr(2)
   );
 }
 
@@ -96,7 +96,7 @@ export function packVictoryAttributes(position: positions.Victory) {
     toHex32(GamePositionType.Victory).substr(2) +
     padBytes32(roundBuyIn).substr(2) +
     toHex32(noughts).substr(2) +
-    toHex32(crosses).substr(2) 
+    toHex32(crosses).substr(2)
   );
 }
 
@@ -106,6 +106,6 @@ export function packDrawAttributes(position: positions.Draw) {
     toHex32(GamePositionType.Draw).substr(2) +
     padBytes32(roundBuyIn).substr(2) +
     toHex32(noughts).substr(2) +
-    toHex32(crosses).substr(2) 
+    toHex32(crosses).substr(2)
   );
 }

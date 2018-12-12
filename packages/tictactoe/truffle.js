@@ -3,8 +3,8 @@
 require('dotenv').config()
 
 if (process.env.NODE_ENV === 'test') {
-    require('ts-node/register'); 
-  }
+  require('ts-node/register');
+}
 
 require("babel-register"); // To handle es6 syntax in the tests
 
@@ -12,10 +12,10 @@ module.exports = {
   networks: {
     development: {
       host: "localhost",
-      port: 7545, // Using ganache as development network
+      port: 8545, // Using ganache as development network
       network_id: "*",
-      gas: 4712388,
-      gasPrice: 100000000000,
+      gas: 6721975,
+      gasPrice: 20000000,
     }
   },
   solc: {

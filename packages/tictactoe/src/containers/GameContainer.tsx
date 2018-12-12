@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { SiteState } from '../redux/reducer';
 
 import { Marker, Imperative } from '../core';
-import GameScreen from '../components/GameScreen'
+import GameScreen from '../components/GameScreen';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
@@ -23,17 +23,17 @@ function GameContainer(props: GameProps) {
   switch (state.name) {
     case StateName.XsPickMove:
       return (
-        <GameScreen 
+        <GameScreen
           stateType="blah"
-          noughts={state.noughts} 
-          crosses={state.crosses} 
+          noughts={state.noughts}
+          crosses={state.crosses}
           you={Marker.crosses} // fixed by StateName
-          player={state.player} 
-          result={Imperative.Wait} 
+          player={state.player}
+          result={Imperative.Wait}
           balances={state.balances}
           osMoveChosen={osMoveChosen}
           xsMoveChosen={xsMoveChosen}
-          />
+        />
       );
     default:
       throw new Error(`View not created for ${state.name}`);

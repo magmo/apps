@@ -11,6 +11,6 @@ export enum Marks {
   bm = 1 << 1,
   br = 1 << 0,
 
-  nn = 0
-  };
+  nn = 0,
+}
 
