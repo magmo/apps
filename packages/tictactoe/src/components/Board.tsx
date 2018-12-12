@@ -27,41 +27,41 @@ export default class Board extends React.PureComponent<Props> {
     // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       if (this.crucialMark(crosses, position)) {
-        return (<span className="xs">×</span>);
-      } else { return (<span className="xs dim">×</span>); }
+        return (<span className="xs tile">×</span>);
+      } else { return (<span className="xs tile dim">×</span>); }
     }
     // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       if (this.crucialMark(noughts, position)) {
-        return (<span className="os">○</span>);
-      } else { return (<span className="os dim">○</span>); }
-    } else { return (<span className="empty">&nbsp;</span>); }
+        return (<span className="os tile">○</span>);
+      } else { return (<span className="os tile dim">○</span>); }
+    } else { return (<span className="empty tile">&nbsp;</span>); }
   }
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       if (this.crucialMark(crosses, position)) {
-        return (<span className="xs">×</span>);
-      } else { return (<span className="xs">×</span>); }
+        return (<span className="xs tile">×</span>);
+      } else { return (<span className="xs tile">×</span>); }
     }
     // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       if (this.crucialMark(noughts, position)) {
-        return (<span className="os">○</span>);
-      } else { return (<span className="os">○</span >); }
-    } else { return (<span className="empty">&nbsp;</span>); }
+        return (<span className="os tile">○</span>);
+      } else { return (<span className="os tile">○</span >); }
+    } else { return (<span className="empty tile">&nbsp;</span>); }
   }
 
   drawRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
-      return (<span className="xs dim">×</span >);
+      return (<span className="xs tile dim">×</span >);
     }
     // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
-      return (<span className="os dim">○</span >);
-    } else { return (<span className="empty">&nbsp;</span>); }
+      return (<span className="os tile dim">○</span >);
+    } else { return (<span className="empty tile">&nbsp;</span>); }
   }
 
 

@@ -49,6 +49,11 @@ p, h1, .status {
     transform: translate(-50%,0);
 }
 
+.status {
+    background-color: black;
+    font-size: 20px;
+}
+
 #table-container {
     height: 300px;
     width: 300px;
@@ -80,21 +85,6 @@ td {
     position: relative;
     font-size: 100px;
 }
-/* 
-td:first-of-type {
-    border-left-color: transparent;
-    border-top-color: transparent;
-}
-td:nth-of-type(2) {
-    border-top-color: transparent;
-}
-td:nth-of-type(3) {
-    border-right-color: transparent;
-    border-top-color: transparent;
-}
-tr:nth-of-type(3) td {
-    border-bottom-color: transparent;
-} */
 
 td:after {
     content: '';
@@ -105,22 +95,23 @@ td:after {
 
 .xs {
     color: #BA4B2B;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    /* margin-top: -30px;
-    margin-bottom: -30px; */
-    transform: translate(-50%,-50%);
 }
 
 .os {
     color: white;
+
+}
+
+.tile {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
 }
 
+.dark {
+    background-color: black;
+}
 .empty {
     position: absolute;
     top: 50%;
