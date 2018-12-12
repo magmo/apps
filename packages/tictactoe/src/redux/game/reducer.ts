@@ -11,23 +11,25 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-// import { scenarios } from '../../core/';
+import { scenarios } from '../../core/';
 
 export interface JointState {
   gameState: states.GameState;
   messageState: MessageState;
 }
 
-const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
+// const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-// const {
-//   playing1,
-// } = scenarios.standard;
+const {
+  playing1,
+} = scenarios.standard;
 
-// const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
+const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
 
-// const emptyJointState: JointState = { messageState: {}, 
-// gameState: states.xsPickMove({ ...playing1, ...shared}) };
+const emptyJointState: JointState = { 
+  messageState: {}, 
+  gameState: states.xsPickMove({ ...playing1, ...shared}),
+};
 
 // export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
 //   state = singleActionReducer(state, action);
