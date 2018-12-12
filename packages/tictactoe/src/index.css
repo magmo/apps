@@ -109,9 +109,9 @@ td:after {
     transform: translate(-50%,-50%);
 }
 
-.tile:hover{
-    background-color: #BA4B2B;
-}
+/* .tile:hover{
+
+} */
 
 .dark {
     background-color: black;

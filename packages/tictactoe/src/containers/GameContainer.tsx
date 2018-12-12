@@ -35,6 +35,20 @@ function GameContainer(props: GameProps) {
           xsMoveChosen={xsMoveChosen}
         />
       );
+      case StateName.XsWaitForOpponentToPickMove:
+      return (
+        <GameScreen
+          stateType="blah"
+          noughts={state.noughts}
+          crosses={state.crosses}
+          you={Marker.crosses} // fixed by StateName
+          player={state.player}
+          result={state.result}
+          balances={state.balances}
+          osMoveChosen={osMoveChosen}
+          xsMoveChosen={xsMoveChosen}
+        />
+      );
     default:
       throw new Error(`View not created for ${state.name}`);
   }

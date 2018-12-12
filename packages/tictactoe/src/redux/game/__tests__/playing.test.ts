@@ -81,7 +81,7 @@ describe('player A\'s app', () => {
   describe('when in XsWaitForOpponentToPickMove', () => {
 
     describe('when inconclusive Oplaying arrives', () => {
-      const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...playing1 });
+      const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...playing1, result: Imperative.Wait });
       const action = actions.marksReceived(playing2.noughts);
       const receivedNoughts = playing2.noughts;
 
@@ -102,7 +102,7 @@ describe('player A\'s app', () => {
       const receivedNoughts = action.receivedMarks;
 
       describe('but they still have enough funds to continue', () => {
-        const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5 });
+        const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5, result: Imperative.Wait });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
@@ -114,7 +114,7 @@ describe('player A\'s app', () => {
       });
 
       describe('and there are now insufficient funds', () => {
-        const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5closetoempty });
+        const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5closetoempty, result: Imperative.Wait });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);

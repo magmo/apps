@@ -197,7 +197,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
 
   // if inconclusive
   if (!isDraw(noughts, newCrosses) && !isWinningMarks(newCrosses)) {
-    newGameState = states.xsWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses });
+    newGameState = states.xsWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Imperative.Wait });
     pos = positions.Xplaying({ ...newGameState, crosses: newCrosses, balances: newBalances });
   }
 

@@ -233,12 +233,12 @@ export function osWaitForOpponentToPickMove<T extends InPlay>(state: T): OsWaitF
   };
 }
 
-export interface XsWaitForOpponentToPickMove extends InPlay {
+export interface XsWaitForOpponentToPickMove extends HasResult {
   name: StateName.XsWaitForOpponentToPickMove;
 }
-export function xsWaitForOpponentToPickMove<T extends InPlay>(state: T): XsWaitForOpponentToPickMove {
+export function xsWaitForOpponentToPickMove<T extends HasResult>(state: T): XsWaitForOpponentToPickMove {
   return {
-    ...inPlay(state),
+    ...hasResult(state),
     name: StateName.XsWaitForOpponentToPickMove,
   };
 }
