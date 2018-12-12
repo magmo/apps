@@ -27,41 +27,41 @@ export default class Board extends React.PureComponent<Props> {
     // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       if (this.crucialMark(crosses, position)) {
-        return (<div className="xs">×</div>);
-      } else { return (<div className="xs dim">×</div>); }
+        return (<span className="xs">×</span>);
+      } else { return (<span className="xs dim">×</span>); }
     }
     // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       if (this.crucialMark(noughts, position)) {
-        return (<div className="os">○</div>);
-      } else { return (<div className="os dim">○</div>); }
-    } else { return (<span>&nbsp;</span>); }
+        return (<span className="os">○</span>);
+      } else { return (<span className="os dim">○</span>); }
+    } else { return (<span className="empty">&nbsp;</span>); }
   }
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       if (this.crucialMark(crosses, position)) {
-        return (<div className="xs">×</div>);
-      } else { return (<div className="xs">×</div>); }
+        return (<span className="xs">×</span>);
+      } else { return (<span className="xs">×</span>); }
     }
     // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       if (this.crucialMark(noughts, position)) {
-        return (<div className="os">○</div>);
-      } else { return (<div className="os">○</div>); }
-    } else { return (<span>&nbsp;</span>); }
+        return (<span className="os">○</span>);
+      } else { return (<span className="os">○</span >); }
+    } else { return (<span className="empty">&nbsp;</span>); }
   }
 
   drawRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
-      return (<div className="xs dim">×</div>);
+      return (<span className="xs dim">×</span >);
     }
     // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
-      return (<div className="os dim">○</div>);
-    } else { return (<span>&nbsp;</span>); }
+      return (<span className="os dim">○</span >);
+    } else { return (<span className="empty">&nbsp;</span>); }
   }
 
 
@@ -77,7 +77,7 @@ export default class Board extends React.PureComponent<Props> {
   render() {
     const { noughts, crosses } = this.props;
     return (
-      <div id="table-containter">
+      <div id="table-container">
         <table>
           <tr>
             <td id="tl" onClick={() => this.props.xsMoveChosen(Marks.tl)}>

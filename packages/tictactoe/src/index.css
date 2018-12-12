@@ -49,44 +49,83 @@ p, h1, .status {
     transform: translate(-50%,0);
 }
 
-table {
-    font-family: monospace;
-    margin: 0;
-    text-align: center;
-    vertical-align: center;
-    padding: 0;
-    empty-cells: show;
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-size: 100px;
+#table-container {
+    height: 300px;
+    width: 300px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    z-index: -1;
-}
+    }
 
-tr {
-    height: 100px;
+table {
+    table-layout: fixed;
+    width: 100%;
+    height: 100%;
+    font-family: monospace;
+    margin: 0;
+    text-align: center;
+    padding: 0;
+    empty-cells: show;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
 td {
-    width: 100px;
-    height: 100px;
+    width: 33.333%;
+    height: 33.333%;
     white-space: pre;
     padding: 0px;
     border: 8px;
-    vertical-align: center;
+    position: relative;
+    font-size: 100px;
 }
+/* 
+td:first-of-type {
+    border-left-color: transparent;
+    border-top-color: transparent;
+}
+td:nth-of-type(2) {
+    border-top-color: transparent;
+}
+td:nth-of-type(3) {
+    border-right-color: transparent;
+    border-top-color: transparent;
+}
+tr:nth-of-type(3) td {
+    border-bottom-color: transparent;
+} */
+
+td:after {
+    content: '';
+    display: block;
+    margin-top: 100%;
+}
+
 
 .xs {
     color: #BA4B2B;
-    background-color: black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* margin-top: -30px;
+    margin-bottom: -30px; */
+    transform: translate(-50%,-50%);
 }
 
 .os {
     color: white;
-    background-color: black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
 
 .dim {
@@ -97,7 +136,7 @@ td {
     position: absolute;
     right: 0%;
     bottom: 30px;
-    transform: translate(0,-00%);
+    transform: translate(0,0);
 }
 .blank {
     margin: 0;
@@ -107,6 +146,7 @@ td {
 #tl {
     border-bottom: solid white;
     border-right: solid white;
+    padding: 0;
 }
 
 #tm {
