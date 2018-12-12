@@ -6,8 +6,7 @@ interface Props {
   stateType: string;
   noughts: Marks;
   crosses: Marks;
-  osMoveChosen: (noughts: Marks) => void;
-  xsMoveChosen: (crosses: Marks) => void;
+  marksMade: (marks: Marks) => void;
 }
 
 export default class Board extends React.PureComponent<Props> {
@@ -80,35 +79,35 @@ export default class Board extends React.PureComponent<Props> {
       <div id="table-container">
         <table>
           <tr>
-            <td id="tl" onClick={() => this.props.xsMoveChosen(Marks.tl)}>
+            <td id="tl" onClick={() => this.props.marksMade(Marks.tl)}>
               {this.renderMark(noughts, crosses, Marks.tl)}
             </td>
-            <td id="tm" onClick={() => this.props.xsMoveChosen(Marks.tm)}>
+            <td id="tm" onClick={() => this.props.marksMade(Marks.tm)}>
               {this.renderMark(noughts, crosses, Marks.tm)}
             </td>
-            <td id="tr" onClick={() => this.props.xsMoveChosen(Marks.tr)}>
+            <td id="tr" onClick={() => this.props.marksMade(Marks.tr)}>
               {this.renderMark(noughts, crosses, Marks.tr)}
             </td>
           </tr>
           <tr>
-            <td id="ml" onClick={() => this.props.xsMoveChosen(Marks.ml)}>
+            <td id="ml" onClick={() => this.props.marksMade(Marks.ml)}>
               {this.renderMark(noughts, crosses, Marks.ml)}
             </td>
-            <td id="mm" onClick={() => this.props.xsMoveChosen(Marks.mm)}>
+            <td id="mm" onClick={() => this.props.marksMade(Marks.mm)}>
               {this.renderMark(noughts, crosses, Marks.mm)}
             </td>
-            <td id="mr" onClick={() => this.props.xsMoveChosen(Marks.mr)}>
+            <td id="mr" onClick={() => this.props.marksMade(Marks.mr)}>
               {this.renderMark(noughts, crosses, Marks.mr)}
             </td>
           </tr>
           <tr>
-            <td id="bl" onClick={() => this.props.xsMoveChosen(Marks.bl)}>
+            <td id="bl" onClick={() => this.props.marksMade(Marks.bl)}>
               {this.renderMark(noughts, crosses, Marks.bl)}
             </td>
-            <td id="bm" onClick={() => this.props.xsMoveChosen(Marks.bm)}>
+            <td id="bm" onClick={() => this.props.marksMade(Marks.bm)}>
               {this.renderMark(noughts, crosses, Marks.bm)}
             </td>
-            <td id="br" onClick={() => this.props.xsMoveChosen(Marks.br)}>
+            <td id="br" onClick={() => this.props.marksMade(Marks.br)}>
               {this.renderMark(noughts, crosses, Marks.br)}
             </td>
           </tr>

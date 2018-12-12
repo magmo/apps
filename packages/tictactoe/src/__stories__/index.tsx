@@ -40,15 +40,15 @@ const initialState = {
 };
 
 
-const fakeMarksMade = (x: Marks) => alert("marks made");
+const marksMade = (x: Marks) => alert("marks made");
 
 // const noughts = 0;
 // const crosses = 0;
 storiesOf('Board', module)
-  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade} />)
-  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade} />)
-  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade} />)
-  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} osMoveChosen={fakeMarksMade} xsMoveChosen={fakeMarksMade} />);
+  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} marksMade={marksMade} />)
+  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} marksMade={marksMade} />)
+  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} marksMade={marksMade} />)
+  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} marksMade={marksMade} />);
 
 storiesOf('Status', module)
   .add('Your Marker', () => <YourMarker stateType="blah" you={Marker.crosses} />)
@@ -75,8 +75,7 @@ storiesOf('Game Screen', module)
     player={Player.PlayerA}
     result={Imperative.Wait}
     balances={["6", "4"]}
-    osMoveChosen={fakeMarksMade}
-    xsMoveChosen={fakeMarksMade}
+    marksMade={marksMade}
   />)
   .add('Choosing', () => <GameScreen
     stateType="blah"
@@ -86,8 +85,7 @@ storiesOf('Game Screen', module)
     player={Player.PlayerA}
     result={Imperative.Choose}
     balances={["4", "6"]}
-    osMoveChosen={fakeMarksMade}
-    xsMoveChosen={fakeMarksMade}
+    marksMade={marksMade}
   />)
   .add('X win', () => <GameScreen
     stateType="blah"
@@ -97,8 +95,7 @@ storiesOf('Game Screen', module)
     player={Player.PlayerA}
     result={Result.YouWin}
     balances={["6", "4"]}
-    osMoveChosen={fakeMarksMade}
-    xsMoveChosen={fakeMarksMade}
+    marksMade={marksMade}
   />)
   .add('O win', () => <GameScreen
     stateType="blah"
@@ -108,8 +105,7 @@ storiesOf('Game Screen', module)
     player={Player.PlayerA}
     result={Result.YouLose}
     balances={["4", "6"]}
-    osMoveChosen={fakeMarksMade}
-    xsMoveChosen={fakeMarksMade}
+    marksMade={marksMade}
   />)
   .add('Tie', () => <GameScreen
     stateType="blah"
@@ -119,8 +115,7 @@ storiesOf('Game Screen', module)
     player={Player.PlayerA}
     result={Result.Tie}
     balances={["5", "5"]}
-    osMoveChosen={fakeMarksMade}
-    xsMoveChosen={fakeMarksMade}
+    marksMade={marksMade}
   />);
 
 const fakeStore = (state) => ({

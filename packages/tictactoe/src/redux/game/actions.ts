@@ -8,8 +8,7 @@ export const CANCEL_OPEN_GAME = 'GAME.CANCEL_OPEN_GAME';
 export const INITIAL_POSITION_RECEIVED = 'GAME.INITIAL_POSITION_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
 export const DECLINE_GAME = 'GAME.DECLINE_GAME';
-export const OS_MOVE_CHOSEN = 'GAME.OS_MOVE_CHOSEN';
-export const XS_MOVE_CHOSEN = 'GAME.XS_MOVE_CHOSEN';
+export const MARKS_MADE = 'GAME.MARKS_MADE';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
 export const MARKS_RECEIVED = 'GAME.MARKS_RECEIVED';
@@ -59,14 +58,9 @@ export const declineGame = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
-export const osMoveChosen = (noughts: Marks) => ({
-  type: OS_MOVE_CHOSEN as typeof OS_MOVE_CHOSEN,
-  noughts,
-});
-
-export const xsMoveChosen = (crosses: Marks) => ({
-  type: XS_MOVE_CHOSEN as typeof XS_MOVE_CHOSEN,
-  crosses,
+export const marksMade = (marks: Marks) => ({
+  type: MARKS_MADE as typeof MARKS_MADE,
+  marks,
 });
 
 export const playAgain = () => ({
@@ -114,8 +108,7 @@ export type CancelOpenGame = ReturnType<typeof cancelOpenGame>;
 export type JoinOpenGame = ReturnType<typeof joinOpenGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
 export type DeclineGame = ReturnType<typeof declineGame>;
-export type XsMoveChosen = ReturnType<typeof xsMoveChosen>;
-export type OsMoveChosen = ReturnType<typeof osMoveChosen>;
+export type MarksMade = ReturnType<typeof marksMade>;
 export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
 export type MarksReceived = ReturnType<typeof marksReceived>;
@@ -135,8 +128,7 @@ export type GameAction = (
   | ConfirmGame
   | DeclineGame
   | JoinOpenGame
-  | XsMoveChosen
-  | OsMoveChosen
+  | MarksMade
   | PlayAgain
   | MarksReceived
   | FundingSuccess

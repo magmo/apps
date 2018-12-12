@@ -49,7 +49,7 @@ describe('player A\'s app', () => {
 
     describe('when making an inconclusive XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({ ...aProps, noughts: 0, crosses: 0, ...postFundSetupB, result: Imperative.Wait });
-      const action = actions.xsMoveChosen(Marks.tl);
+      const action = actions.marksMade(Marks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
@@ -59,7 +59,7 @@ describe('player A\'s app', () => {
 
     describe('when making a drawing XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({ ...aProps, ...playing8, result: Imperative.Wait });
-      const action = actions.xsMoveChosen(Marks.bm);
+      const action = actions.marksMade(Marks.bm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
@@ -69,7 +69,7 @@ describe('player A\'s app', () => {
 
     describe('when making a winning XS_CHOSE_MOVE', () => {
       const gameState = state.xsPickMove({ ...aProps, ...scenarios.crossesVictory.playing4, result: Imperative.Wait });
-      const action = actions.xsMoveChosen(Marks.tr);
+      const action = actions.marksMade(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
@@ -140,7 +140,7 @@ describe('player B\'s app', () => {
 
     describe('when making an inconclusive OS_CHOSE_MOVE', () => {
       const gameState = state.osPickMove({ ...bProps, ...playing1 });
-      const action = actions.osMoveChosen(Marks.mm);
+      const action = actions.marksMade(Marks.mm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
@@ -150,7 +150,7 @@ describe('player B\'s app', () => {
 
     describe('when making a winning OS_CHOSE_MOVE', () => {
       const gameState = state.osPickMove({ ...bProps, ...scenarios.noughtsVictory.playing5 });
-      const action = actions.osMoveChosen(Marks.tr);
+      const action = actions.marksMade(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);

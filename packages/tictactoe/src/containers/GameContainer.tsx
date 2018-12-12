@@ -14,12 +14,11 @@ import * as actions from '../redux/game/actions';
 
 interface GameProps {
   state: GameState;
-  osMoveChosen: (noughts: Marks) => void;
-  xsMoveChosen: (crosses: Marks) => void;
+  marksMade: (marks: Marks) => void;
 }
 
 function GameContainer(props: GameProps) {
-  const { state, osMoveChosen, xsMoveChosen } = props;
+  const { state, marksMade } = props;
   switch (state.name) {
     case StateName.XsPickMove:
       return (
@@ -31,8 +30,7 @@ function GameContainer(props: GameProps) {
           player={state.player}
           result={state.result}
           balances={state.balances}
-          osMoveChosen={osMoveChosen}
-          xsMoveChosen={xsMoveChosen}
+          marksMade={marksMade}
         />
       );
       case StateName.XsWaitForOpponentToPickMove:
@@ -45,8 +43,7 @@ function GameContainer(props: GameProps) {
           player={state.player}
           result={state.result}
           balances={state.balances}
-          osMoveChosen={osMoveChosen}
-          xsMoveChosen={xsMoveChosen}
+          marksMade={marksMade}
         />
       );
     default:
@@ -60,8 +57,7 @@ const mapStateToProps = (state: SiteState) => ({
 });
 
 const mapDispatchToProps = {
-  osMoveChosen: actions.osMoveChosen,
-  xsMoveChosen: actions.xsMoveChosen,
+  marksMade: actions.marksMade,
 };
 
 // why does it think that mapStateToProps can return undefined??

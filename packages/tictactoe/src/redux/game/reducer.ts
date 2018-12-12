@@ -76,11 +76,11 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
     case states.StateName.CreatingOpenGame:
       return creatingOpenGameReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
-      if (action.type === actions.XS_MOVE_CHOSEN) {
+      if (action.type === actions.MARKS_MADE) {
         return xsPickMoveReducer(gameState, messageState, action);
       } else { return state; }
     case states.StateName.OsPickMove:
-      if (action.type === actions.OS_MOVE_CHOSEN) {
+      if (action.type === actions.MARKS_MADE) {
         return osPickMoveReducer(gameState, messageState, action);
       } else { return state; }
     case states.StateName.XsWaitForOpponentToPickMove:
@@ -148,9 +148,9 @@ function favorB(balances: [string, string], roundBuyIn): [string, string] {
   return [aBal, bBal];
 }
 
-function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageState, action: actions.XsMoveChosen): JointState {
+function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageState, action: actions.MarksMade): JointState {
   const { player, balances, roundBuyIn, noughts, crosses, turnNum } = gameState;
-  const newCrosses = crosses + action.crosses;
+  const newCrosses = crosses + action.marks;
   let newBalances: [string, string] = balances;
 
   const opponentAddress = states.getOpponentAddress(gameState);
@@ -211,9 +211,9 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   return { gameState: newGameState, messageState };
 }
 
-function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageState, action: actions.OsMoveChosen): JointState {
+function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageState, action: actions.MarksMade): JointState {
   const { player, balances, roundBuyIn, noughts, crosses, turnNum } = gameState;
-  const newNoughts = noughts + action.noughts;
+  const newNoughts = noughts + action.marks;
   let newBalances: [string, string] = balances;
 
   const opponentAddress = states.getOpponentAddress(gameState);
