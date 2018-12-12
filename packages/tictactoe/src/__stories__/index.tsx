@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 // Once it exists import styling here
 import '../index.css';
 // import { Button } from '@storybook/react/demo';
+import HomePage from '../components/HomePage';
 import Board from '../components/Board';
 import { YourMarker, TheirMarker } from '../components/Marker';
 import Outcome from '../components/Outcome';
@@ -13,11 +14,14 @@ import { Marker, Result, Player, Imperative, Marks } from '../core';
 import BN from "bn.js";
 import bnToHex from '../utils/bnToHex';
 import { scenarios } from '../core/';
+import * as loginActions from '../redux/login/actions';
 
 import * as states from '../redux/game/state';
 
 import GameContainer from '../containers/GameContainer';
 
+import '../index.css';
+import '../index.scss';
 
 const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 
@@ -42,8 +46,10 @@ const initialState = {
 
 const marksMade = (x: Marks) => alert("marks made");
 
-// const noughts = 0;
-// const crosses = 0;
+
+storiesOf('HomePage', module).add('Home', () => <HomePage login={loginActions.loginRequest}/>);
+
+
 storiesOf('Board', module)
   .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} marksMade={marksMade} />)
   .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} marksMade={marksMade} />)

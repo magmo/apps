@@ -13,7 +13,6 @@ export default class Board extends React.PureComponent<Props> {
   crucialMark(marks: Marks, position: Marks) {
     let pattern: Marks;
     for (pattern of winningPatterns) {
-      // tslint:disable-next-line:no-bitwise
       if (marks === pattern && ((position & pattern) === position)) {
         return true;
       }
@@ -23,13 +22,11 @@ export default class Board extends React.PureComponent<Props> {
 
 
   winRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
-    // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       if (this.crucialMark(crosses, position)) {
         return (<span className="xs tile">×</span>);
       } else { return (<span className="xs tile dim">×</span>); }
     }
-    // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       if (this.crucialMark(noughts, position)) {
         return (<span className="os tile">○</span>);
@@ -38,13 +35,11 @@ export default class Board extends React.PureComponent<Props> {
   }
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
-    // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       if (this.crucialMark(crosses, position)) {
         return (<span className="xs tile">×</span>);
       } else { return (<span className="xs tile">×</span>); }
     }
-    // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       if (this.crucialMark(noughts, position)) {
         return (<span className="os tile">○</span>);
@@ -53,11 +48,9 @@ export default class Board extends React.PureComponent<Props> {
   }
 
   drawRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
-    // tslint:disable-next-line:no-bitwise
     if ((crosses & position) === position) {
       return (<span className="xs tile dim">×</span >);
     }
-    // tslint:disable-next-line:no-bitwise
     if ((noughts & position) === position) {
       return (<span className="os tile dim">○</span >);
     } else { return (<span className="empty tile">&nbsp;</span>); }
