@@ -136,8 +136,5 @@ const testState = (state) => (
   )
 );
 
-
-// const currentState = store.getState();
-
-storiesOf('App (reading from the store)', module)
+storiesOf('App (reading from the fake store)', module)
   .add('test initial state', testState(initialState));

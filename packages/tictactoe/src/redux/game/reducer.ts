@@ -9,14 +9,23 @@ import { MessageState, sendMessage } from '../message-service/state';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-
+import { scenarios } from '../../core/';
 
 export interface JointState {
   gameState: states.GameState;
   messageState: MessageState;
 }
 
-const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
+// const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
+
+const {
+  playing1,
+} = scenarios.standard;
+
+const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
+
+const emptyJointState: JointState = { messageState: {}, 
+gameState: states.xsPickMove({ ...playing1, ...shared}) };
 
 export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
   state = singleActionReducer(state, action);
@@ -26,6 +35,8 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
 function singleActionReducer(state: JointState, action: actions.GameAction) {
   const { messageState, gameState } = state;
   switch (gameState.name) {
+    case states.StateName.NoName:
+      return noNameReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
       if (action.type === actions.XS_MOVE_CHOSEN) {
         return xsPickMoveReducer(gameState, messageState, action);
@@ -44,6 +55,21 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       } else { return state; }
     default:
       return state;
+  }
+}
+
+function noNameReducer(gameState: states.NoName, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.UPDATE_PROFILE:
+      const { name, twitterHandle } = action;
+      const { myAddress, libraryAddress } = gameState;
+
+      const lobby = states.lobby({
+        ...action, myName: name, myAddress, libraryAddress, twitterHandle,
+      });
+      return { gameState: lobby, messageState };
+    default:
+      return { gameState, messageState };
   }
 }
 
