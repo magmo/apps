@@ -10,20 +10,20 @@ interface Props {
 
 export default class Balances extends React.PureComponent<Props> {
   renderYourBalance(balances: [string, string], player: Player) {
-    if (player == Player.PlayerA){
+    if (player === Player.PlayerA) {
       return <span>?</span>;
     }
-    if (player == Player.PlayerB){
+    if (player === Player.PlayerB) {
       return <span>?</span>;
-    } else return;
+    } else { return; }
   }
   renderTheirBalance(balances: [string, string], player: Player) {
-    if (player == Player.PlayerA){
+    if (player === Player.PlayerA) {
       return <span>{balances[1]}</span>;
     }
-    if (player == Player.PlayerB){
+    if (player === Player.PlayerB) {
       return <span>{balances[0]}</span>;
-    } else return;
+    } else { return; }
   }
 
   render() {
@@ -31,9 +31,9 @@ export default class Balances extends React.PureComponent<Props> {
     return (<h1 className="full-width-bar" >[You]&nbsp;
       <span>
         {this.renderYourBalance(balances, player)}
-      </span>&nbsp;| 
+      </span>&nbsp;|
       <span>
-      &nbsp;{this.renderTheirBalance(balances, player)}
+        &nbsp;{this.renderTheirBalance(balances, player)}
       </span>
       &nbsp;[Them]
       </h1>

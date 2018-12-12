@@ -2,7 +2,7 @@
 
 import React from 'react';
 // import { Marks } from '../core/marks'
-import { Marker } from '../core/results'
+import { Marker } from '../core/results';
 
 interface Props {
   stateType: string;
@@ -11,36 +11,36 @@ interface Props {
 
 export class YourMarker extends React.PureComponent<Props> {
   renderYou(you: Marker) {
-    if (you == Marker.crosses){
+    if (you === Marker.crosses) {
       return (<span className="xs">&nbsp;×&nbsp;</span>);
     }
-    if (you == Marker.noughts){
+    if (you === Marker.noughts) {
       return (<span className="os">&nbsp;○&nbsp;</span>);
-    } else return (<span className="blank">&nbsp;&nbsp;&nbsp;</span>)
+    } else { return (<span className="blank">&nbsp;&nbsp;&nbsp;</span>); }
   }
   render() {
     const { you } = this.props;
     return (<span className="status">
-        {this.renderYou(you)}
-      </span>
+      {this.renderYou(you)}
+    </span>
     );
   }
 }
 
 export class TheirMarker extends React.PureComponent<Props> {
   renderYou(you: Marker) {
-    if (you == Marker.noughts){
+    if (you === Marker.noughts) {
       return (<span className="xs">&nbsp;×&nbsp;</span>);
     }
-    if (you == Marker.crosses){
+    if (you === Marker.crosses) {
       return (<span className="os">&nbsp;○&nbsp;</span>);
-    } else return (<span className="blank">&nbsp;&nbsp;&nbsp;</span>)
+    } else { return (<span className="blank">&nbsp;&nbsp;&nbsp;</span>); }
   }
   render() {
     const { you } = this.props;
     return (<span className="status">
-        {this.renderYou(you)}
-      </span>
+      {this.renderYou(you)}
+    </span>
     );
   }
 }

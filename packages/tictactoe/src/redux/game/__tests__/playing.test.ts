@@ -35,55 +35,55 @@ const {
 const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName } = scenarios.standard;
 const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName };
 
-const messageState = { };
+const messageState = {};
 
 describe('player A\'s app', () => {
   const aProps = {
     ...base,
     stateCount: 1,
-    player: Player.PlayerA, 
+    player: Player.PlayerA,
     twitterHandle: 'tweet',
   };
 
   describe('when in XsPickMove', () => {
-    
+
     describe('when making an inconclusive XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({...aProps, noughts:0, crosses:0, ...postFundSetupB });
+      const gameState = state.xsPickMove({ ...aProps, noughts: 0, crosses: 0, ...postFundSetupB });
       const action = actions.xsMoveChosen(Marks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.XsWaitForOpponentToPickMove, updatedState);
       itSends(playing1, updatedState);
     });
 
     describe('when making a drawing XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({...aProps, ...playing8 });
+      const gameState = state.xsPickMove({ ...aProps, ...playing8 });
       const action = actions.xsMoveChosen(Marks.bm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(draw, updatedState);
     });
 
     describe('when making a winning XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({...aProps, ...scenarios.crossesVictory.playing4 });
+      const gameState = state.xsPickMove({ ...aProps, ...scenarios.crossesVictory.playing4 });
       const action = actions.xsMoveChosen(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(scenarios.crossesVictory.victory, updatedState);
     });
   });
 
   describe('when in XsWaitForOpponentToPickMove', () => {
-    
+
     describe('when inconclusive Oplaying arrives', () => {
-      const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...playing1});
+      const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...playing1 });
       const action = actions.marksReceived(playing2.noughts);
-      const received_noughts = playing2.noughts;
+      const receivedNoughts = playing2.noughts;
 
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -91,7 +91,7 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('sets theirMarks', () => {
         const newGameState = updatedState.gameState as state.PlayAgain;
-        expect(newGameState.noughts).toEqual(received_noughts);
+        expect(newGameState.noughts).toEqual(receivedNoughts);
       });
     });
 
@@ -99,29 +99,29 @@ describe('player A\'s app', () => {
 
     describe('when Victory arrives', () => {
       const action = actions.marksReceived(scenarios.noughtsVictory.victory.noughts);
-      const received_noughts = action.received_marks;
-    
+      const receivedNoughts = action.receivedMarks;
+
       describe('but they still have enough funds to continue', () => {
-        const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...scenarios.noughtsVictory.playing5});
+        const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5 });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-       it('sets theirMarks', () => {
+        it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.noughts).toEqual(received_noughts);
+          expect(newGameState.noughts).toEqual(receivedNoughts);
         });
       });
 
       describe('and there are now insufficient funds', () => {
-        const gameState = state.xsWaitForOpponentToPickMove({...aProps, ...scenarios.noughtsVictory.playing5closetoempty});
+        const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5closetoempty });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-       it('sets theirMarks', () => {
+        it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.noughts).toEqual(received_noughts);
+          expect(newGameState.noughts).toEqual(receivedNoughts);
         });
       });
     });
@@ -137,34 +137,34 @@ describe('player B\'s app', () => {
   };
 
   describe('when in OsPickMove', () => {
-    
+
     describe('when making an inconclusive OS_CHOSE_MOVE', () => {
-      const gameState = state.osPickMove({...bProps, ...playing1 });
+      const gameState = state.osPickMove({ ...bProps, ...playing1 });
       const action = actions.osMoveChosen(Marks.mm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
       itSends(playing2, updatedState);
     });
 
     describe('when making a winning OS_CHOSE_MOVE', () => {
-      const gameState = state.osPickMove({...bProps, ...scenarios.noughtsVictory.playing5 });
+      const gameState = state.osPickMove({ ...bProps, ...scenarios.noughtsVictory.playing5 });
       const action = actions.osMoveChosen(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(scenarios.noughtsVictory.victory, updatedState);
     });
   });
-  
+
   describe('when in OsWaitForOpponentToPickMove', () => {
-    
+
     describe('when inconclusive Xplaying arrives', () => {
-      const gameState = state.osWaitForOpponentToPickMove({...bProps, ...playing2});
+      const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing2 });
       const action = actions.marksReceived(playing3.crosses);
-      const received_crosses = playing3.crosses;
+      const receivedCrosses = playing3.crosses;
 
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -172,48 +172,48 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('sets theirMarks', () => {
         const newGameState = updatedState.gameState as state.PlayAgain;
-        expect(newGameState.crosses).toEqual(received_crosses);
+        expect(newGameState.crosses).toEqual(receivedCrosses);
       });
     });
 
     describe('when Draw arrives', () => {
-      const gameState = state.osWaitForOpponentToPickMove({...bProps, ...playing8});
+      const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing8 });
       const action = actions.marksReceived(draw.crosses);
-      const received_crosses = action.received_marks;
+      const receivedCrosses = action.receivedMarks;
       const updatedState = gameReducer({ messageState, gameState }, action);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-     it('sets theirMarks', () => {
+      it('sets theirMarks', () => {
         const newGameState = updatedState.gameState as state.PlayAgain;
-        expect(newGameState.crosses).toEqual(received_crosses);
+        expect(newGameState.crosses).toEqual(receivedCrosses);
       });
     });
 
     describe('when Victory arrives', () => {
       const action = actions.marksReceived(scenarios.crossesVictory.victory.crosses);
-      const received_crosses = action.received_marks;
-    
+      const receivedCrosses = action.receivedMarks;
+
       describe('but they still have enough funds to continue', () => {
-        const gameState = state.osWaitForOpponentToPickMove({...bProps, ...scenarios.crossesVictory.playing4});
+        const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4 });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-       it('sets theirMarks', () => {
+        it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.crosses).toEqual(received_crosses);
+          expect(newGameState.crosses).toEqual(receivedCrosses);
         });
       });
 
       describe('and there are now insufficient funds', () => {
-        const gameState = state.osWaitForOpponentToPickMove({...bProps, ...scenarios.crossesVictory.playing4closetoempty});
+        const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4closetoempty });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-       it('sets theirMarks', () => {
+        it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.crosses).toEqual(received_crosses);
+          expect(newGameState.crosses).toEqual(receivedCrosses);
         });
       });
     });
