@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { SiteState } from '../redux/reducer';
 
-import { Marker, Imperative } from '../core';
+import { Marker } from '../core';
 import GameScreen from '../components/GameScreen';
 
 import { Marks } from '../core';
@@ -29,7 +29,7 @@ function GameContainer(props: GameProps) {
           crosses={state.crosses}
           you={Marker.crosses} // fixed by StateName
           player={state.player}
-          result={Imperative.Wait}
+          result={state.result}
           balances={state.balances}
           osMoveChosen={osMoveChosen}
           xsMoveChosen={xsMoveChosen}

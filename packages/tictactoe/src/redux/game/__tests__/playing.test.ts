@@ -1,5 +1,5 @@
 import { gameReducer } from '../reducer';
-import { Player, scenarios, Marks } from '../../../core';
+import { Player, scenarios, Marks, Imperative } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
 
@@ -48,7 +48,7 @@ describe('player A\'s app', () => {
   describe('when in XsPickMove', () => {
 
     describe('when making an inconclusive XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({ ...aProps, noughts: 0, crosses: 0, ...postFundSetupB });
+      const gameState = state.xsPickMove({ ...aProps, noughts: 0, crosses: 0, ...postFundSetupB, result: Imperative.Wait });
       const action = actions.xsMoveChosen(Marks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -58,7 +58,7 @@ describe('player A\'s app', () => {
     });
 
     describe('when making a drawing XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({ ...aProps, ...playing8 });
+      const gameState = state.xsPickMove({ ...aProps, ...playing8, result: Imperative.Wait });
       const action = actions.xsMoveChosen(Marks.bm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -68,7 +68,7 @@ describe('player A\'s app', () => {
     });
 
     describe('when making a winning XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({ ...aProps, ...scenarios.crossesVictory.playing4 });
+      const gameState = state.xsPickMove({ ...aProps, ...scenarios.crossesVictory.playing4, result: Imperative.Wait });
       const action = actions.xsMoveChosen(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 

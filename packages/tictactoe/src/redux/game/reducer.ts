@@ -2,13 +2,13 @@ import { Reducer } from 'redux';
 
 import * as actions from './actions';
 import * as states from './state';
-import * as results from '../../core/results';
+import { Result, Imperative } from '../../core/results';
 
 import { positions, Player, isDraw, isWinningMarks, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
-
+import BN from "bn.js";
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
 import { scenarios } from '../../core/';
@@ -20,15 +20,20 @@ export interface JointState {
 
 // const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-const {
-  playing1,
-} = scenarios.standard;
+const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 
 const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
 
 const emptyJointState: JointState = { 
   messageState: {}, 
-  gameState: states.xsPickMove({ ...playing1, ...shared}),
+  gameState: states.xsPickMove({
+    ...shared,
+    noughts: 0,
+    crosses: 0,
+    balances: fiveFive,
+    turnNum: 4,
+    result: Imperative.Choose,
+  }),
 };
 
 // export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
@@ -150,7 +155,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
 
   const opponentAddress = states.getOpponentAddress(gameState);
   let pos: Position = positions.draw({ ...gameState, crosses: newCrosses, balances: newBalances }); // default
-  let newGameState: states.GameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: results.Result.Tie }); // default
+  let newGameState: states.GameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie }); // default
 
   // if draw
   if (isDraw(noughts, newCrosses)) {
@@ -164,7 +169,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: results.Result.Tie });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie });
     pos = positions.draw({ ...newGameState, crosses: newCrosses, balances: newBalances });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -198,7 +203,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
 
   // if winning move
   if (isWinningMarks(newCrosses)) {
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: results.Result.YouWin });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.YouWin });
     pos = positions.victory({ ...newGameState, crosses: newCrosses, balances: newBalances });
   }
 
@@ -213,7 +218,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   const opponentAddress = states.getOpponentAddress(gameState);
   let pos: Position = positions.draw({ ...gameState, noughts: newNoughts, balances: newBalances }); // default
-  let newGameState: states.GameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: results.Result.Tie }); // default
+  let newGameState: states.GameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.Tie }); // default
 
   // if draw
   if (isDraw(newNoughts, crosses)) {
@@ -227,7 +232,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: results.Result.Tie });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.Tie });
     pos = positions.draw({ ...newGameState, noughts: newNoughts, balances: newBalances });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -264,7 +269,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   // if winning move
   if (isWinningMarks(newNoughts)) {
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: results.Result.YouWin });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.YouWin });
     pos = positions.victory({ ...newGameState, noughts: newNoughts, balances: newBalances });
   }
 
@@ -301,7 +306,7 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
   }
 
   let newGameState: states.XsPickMove | states.PlayAgain | states.InsufficientFunds
-    = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, balances: newBalances });
+    = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, balances: newBalances, result: Imperative.Choose });
 
   if (!isWinningMarks(receivedNoughts) && !isDraw(receivedNoughts, crosses)) { // Not conclusive, keep playing
     // go with default case
@@ -319,14 +324,14 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
   //       break;
   //     }
   //   }
-  //   newGameState = states.playAgain({...gameState, noughts: receivedNoughts, result: results.Result.Tie, balances: newBalances}); 
+  //   newGameState = states.playAgain({...gameState, noughts: receivedNoughts, result: Result.Tie, balances: newBalances}); 
   // }
 
   if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
     if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
-      newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: results.Result.YouLose });
+      newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
     } else {
-      newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: results.Result.YouLose });
+      newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
     }
 
   }
@@ -378,14 +383,14 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: results.Result.Tie, balances: newBalances });
+    newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: Result.Tie, balances: newBalances });
   }
 
   if (isWinningMarks(receivedCrosses)) { // Lost, if sufficient $ play again?
     if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
-      newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: results.Result.YouLose });
+      newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
     } else {
-      newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: results.Result.YouLose });
+      newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
     }
 
   }

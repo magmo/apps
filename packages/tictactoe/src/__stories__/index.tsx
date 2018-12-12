@@ -10,27 +10,32 @@ import Outcome from '../components/Outcome';
 import StatusAndBalances from '../components/StatusAndBalances';
 import GameScreen from '../components/GameScreen';
 import { Marker, Result, Player, Imperative, Marks } from '../core';
-
+import BN from "bn.js";
+import bnToHex from '../utils/bnToHex';
 import { scenarios } from '../core/';
 
-import {
-  xsPickMove,
-  // xsWaitForOpponentToPickMove,
-} from '../redux/game/state';
+import * as states from '../redux/game/state';
 
 import GameContainer from '../containers/GameContainer';
 
 
-const {
-  playing1,
-} = scenarios.standard;
+const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 
-const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
+const shared = { ...scenarios.shared };
 
 const initialState = {
   game: {
     messageState: {},
-    gameState: xsPickMove({ ...playing1, ...shared }),
+    gameState: states.xsPickMove({
+      ...shared,
+      stateCount: 1,
+      noughts: 0,
+      crosses: 0,
+      balances: fiveFive,
+      turnNum: 4,
+      result: Imperative.Choose,
+      player: Player.PlayerA,
+    }),
   },
 };
 

@@ -1,4 +1,4 @@
-import { Result, Marks, Player } from '../../core';
+import { Result, Imperative, Marks, Player } from '../../core';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -215,12 +215,12 @@ export function osPickMove<T extends InPlay>(state: T): OsPickMove {
   return { ...inPlay(state), name: StateName.OsPickMove };
 }
 
-export interface XsPickMove extends InPlay {
+export interface XsPickMove extends HasResult {
   name: StateName.XsPickMove;
 }
 
-export function xsPickMove<T extends InPlay>(state: T): XsPickMove {
-  return { ...inPlay(state), name: StateName.XsPickMove };
+export function xsPickMove<T extends HasResult>(state: T): XsPickMove {
+  return { ...hasResult(state), name: StateName.XsPickMove };
 }
 
 export interface OsWaitForOpponentToPickMove extends InPlay {
@@ -244,7 +244,7 @@ export function xsWaitForOpponentToPickMove<T extends InPlay>(state: T): XsWaitF
 }
 
 interface HasResult extends InPlay {
-  result: Result;
+  result: Result | Imperative;
 }
 
 function hasResult<T extends HasResult>(state: T): HasResult {
