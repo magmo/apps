@@ -5,6 +5,9 @@ import { Provider } from 'react-redux';
 import '../index.css';
 // import { Button } from '@storybook/react/demo';
 import HomePage from '../components/HomePage';
+import { OpenGame } from "../redux/open-games/state";
+import { OpenGameEntry } from '../components/OpenGameCard';
+import Button from '../components/Button';
 import Board from '../components/Board';
 import { YourMarker, TheirMarker } from '../components/Marker';
 import Outcome from '../components/Outcome';
@@ -45,10 +48,27 @@ const initialState = {
 
 
 const marksMade = (x: Marks) => alert("marks made");
-
+const joinOpenGame = () => alert("join open game");
+// const newOpenGame = () => alert("new open game");
 
 storiesOf('HomePage', module).add('Home', () => <HomePage login={loginActions.loginRequest}/>);
 
+const openGame: OpenGame = {
+  address:"test address",
+  name: "test player",
+  stake: "10000000000000000",
+  isPublic: true,
+  createdAt: 0,
+};
+storiesOf('LobbyPage', module)
+  .add('Open Game Entry', () => <OpenGameEntry 
+  openGame={openGame} 
+  joinOpenGame={joinOpenGame}
+  />)
+  .add('Button', () => <Button
+  children={"Click Me"}
+  onClick={() => alert("button clicked")}
+  />);
 
 storiesOf('Board', module)
   .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} marksMade={marksMade} />)

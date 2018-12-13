@@ -1,6 +1,8 @@
 html, body {
     overflow-x: hidden;
     background-color: black;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
   }
 
 .full-width-bar {
