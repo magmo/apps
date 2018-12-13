@@ -16,8 +16,9 @@ import GameScreen from '../components/GameScreen';
 import { Marker, Result, Player, Imperative, Marks } from '../core';
 import BN from "bn.js";
 import bnToHex from '../utils/bnToHex';
-import { scenarios } from '../core/';
+import { scenarios } from '../core';
 import * as loginActions from '../redux/login/actions';
+import { cancelOpenGame } from '../redux/game/actions';
 
 import * as states from '../redux/game/state';
 
@@ -157,7 +158,7 @@ const fakeStore = (state) => ({
 const testState = (state) => (
   () => (
     <Provider store={fakeStore(state)}>
-      <GameContainer />
+      <GameContainer cancelOpenGame={cancelOpenGame} />
     </Provider>
   )
 );

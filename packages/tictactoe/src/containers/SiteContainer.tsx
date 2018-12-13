@@ -9,6 +9,7 @@ import MetamaskErrorPage from '../components/MetamaskErrorPage';
 import { MetamaskError } from '../redux/metamask/actions';
 import LoadingPage from '../components/LoadingPage';
 
+
 interface SiteProps {
   isAuthenticated: boolean;
   metamaskError: MetamaskError | null;
