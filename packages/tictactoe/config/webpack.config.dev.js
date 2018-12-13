@@ -293,8 +293,8 @@ module.exports = {
       tslint: paths.appTsLint,
     }),
     new webpack.EnvironmentPlugin({
-      FIREBASE_PROJECT: 'rock-paper-scissors-dev',
-      FIREBASE_API_KEY: 'AIzaSyAlGe17xjJjfoJ_KDYjCREg7ZL4ns61Chc',
+      FIREBASE_PROJECT: 'tic-tac-toe-dev-3a21f',
+      FIREBASE_API_KEY: 'AIzaSyAFlVSCTROvaGr4HcrnjpFhBGSkEMklcb8',
       TARGET_NETWORK: process.env.TARGET_NETWORK,
     })
   ],
