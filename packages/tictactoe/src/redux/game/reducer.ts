@@ -8,33 +8,33 @@ import { positions, Player, isDraw, isWinningMarks, Position } from '../../core'
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
-import BN from "bn.js";
+// import BN from "bn.js";
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-import { scenarios } from '../../core/';
+// import { scenarios } from '../../core/';
 
 export interface JointState {
   gameState: states.GameState;
   messageState: MessageState;
 }
 
-// const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
+const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
+// const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 
-const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
+// const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
 
-const emptyJointState: JointState = { 
-  messageState: {}, 
-  gameState: states.xsPickMove({
-    ...shared,
-    noughts: 0,
-    crosses: 0,
-    balances: fiveFive,
-    turnNum: 4,
-    result: Imperative.Choose,
-  }),
-};
+// const emptyJointState: JointState = { 
+//   messageState: {}, 
+//   gameState: states.xsPickMove({
+//     ...shared,
+//     noughts: 0,
+//     crosses: 0,
+//     balances: fiveFive,
+//     turnNum: 4,
+//     result: Imperative.Choose,
+//   }),
+// };
 
 // export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
 //   state = singleActionReducer(state, action);

@@ -5,6 +5,7 @@ import { SiteState } from '../redux/reducer';
 
 import { Marker } from '../core';
 import GameScreen from '../components/GameScreen';
+import ProfileContainer from './ProfileContainer';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
@@ -20,6 +21,8 @@ interface GameProps {
 function GameContainer(props: GameProps) {
   const { state, marksMade } = props;
   switch (state.name) {
+    case StateName.NoName:
+      return <ProfileContainer />;
     case StateName.XsPickMove:
       return (
         <GameScreen
