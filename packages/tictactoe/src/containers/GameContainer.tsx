@@ -77,7 +77,7 @@ const mapStateToProps = (state: SiteState) => ({
 
 const mapDispatchToProps = {
   marksMade: actions.marksMade,
-  cancelGame: actions.cancelOpenGame,
+  cancelOpenGame: actions.cancelOpenGame,
 };
 
 // why does it think that mapStateToProps can return undefined??

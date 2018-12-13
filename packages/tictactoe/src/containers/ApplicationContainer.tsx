@@ -5,7 +5,6 @@ import { SiteState } from '../redux/reducer';
 import GameContainer from './GameContainer';
 import LobbyContainer from './LobbyContainer';
 import * as gameStates from '../redux/game/state';
-import { cancelOpenGame } from '../redux/game/actions';
 
 interface ApplicationProps {
   gameState: gameStates.GameState;
@@ -20,7 +19,7 @@ function Application(props: ApplicationProps) {
         <LobbyContainer />
       );
     default:
-      return <GameContainer cancelOpenGame={cancelOpenGame}/>; // why is it not getting this property from the store?
+      return <GameContainer />; // why is it not getting this property from the store?
   }
 }
 
