@@ -73,6 +73,8 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return noNameReducer(gameState, messageState, action);
     case states.StateName.Lobby:
       return lobbyReducer(gameState, messageState, action);
+    case states.StateName.WaitingRoom:
+      return waitingRoomReducer(gameState, messageState, action);
     case states.StateName.CreatingOpenGame:
       return creatingOpenGameReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
@@ -117,6 +119,24 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
     case actions.NEW_OPEN_GAME:
       const newGameState = states.creatingOpenGame({ ...gameState });
       return { gameState: newGameState, messageState };
+    default:
+      return { gameState, messageState };
+  }
+}
+
+function waitingRoomReducer(gameState: states.WaitingRoom, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.INITIAL_POSITION_RECEIVED:
+      const { position, opponentName } = action;
+      const { myName, twitterHandle} = gameState;
+
+      if (position.name !== positions.PRE_FUND_SETUP_A) { return { gameState, messageState }; }
+
+      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB });
+      return { gameState: newGameState, messageState };
+    case actions.CANCEL_OPEN_GAME:
+      const newGameState1 = states.lobby(gameState);
+      return { gameState: newGameState1, messageState };
     default:
       return { gameState, messageState };
   }

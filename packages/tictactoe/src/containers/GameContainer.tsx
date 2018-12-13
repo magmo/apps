@@ -7,6 +7,8 @@ import { Marker } from '../core';
 import GameScreen from '../components/GameScreen';
 import ProfileContainer from './ProfileContainer';
 import WaitingRoomPage from '../components/WaitingRoomPage';
+import ConfirmGamePage from '../components/ConfirmGamePage';
+import GameProposedPage from '../components/GameProposedPage';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
@@ -16,6 +18,8 @@ interface GameProps {
   state: GameState;
   marksMade: (marks: Marks) => void;
   cancelOpenGame: () => void;
+  confirmGame: () => void;
+  declineGame: () => void;
 }
 
 function GameContainer(props: GameProps) {
@@ -29,7 +33,7 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, marksMade } = props;
+  const { state, marksMade, confirmGame, declineGame, } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
@@ -40,6 +44,10 @@ function RenderGame(props: GameProps) {
           roundBuyIn={state.roundBuyIn}
         />
       );
+    case StateName.WaitForGameConfirmationA:
+      return <GameProposedPage message='Waiting for opponent to confirm' />;
+    case StateName.ConfirmGameB:
+      return <ConfirmGamePage confirmGame={confirmGame} cancelGame={declineGame} stake={state.roundBuyIn} opponentName={state.opponentName} />;
     case StateName.XsPickMove:
       return (
         <GameScreen
@@ -78,6 +86,8 @@ const mapStateToProps = (state: SiteState) => ({
 const mapDispatchToProps = {
   marksMade: actions.marksMade,
   cancelOpenGame: actions.cancelOpenGame,
+  confirmGame: actions.confirmGame,
+  declineGame: actions.declineGame,
 };
 
 // why does it think that mapStateToProps can return undefined??
