@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { SiteState } from '../redux/reducer';
@@ -6,23 +6,40 @@ import { SiteState } from '../redux/reducer';
 import { Marker } from '../core';
 import GameScreen from '../components/GameScreen';
 import ProfileContainer from './ProfileContainer';
+import WaitingRoomPage from '../components/WaitingRoomPage';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
 import * as actions from '../redux/game/actions';
 
-
-
 interface GameProps {
   state: GameState;
   marksMade: (marks: Marks) => void;
+  cancelOpenGame: () => void;
 }
 
 function GameContainer(props: GameProps) {
+  return (
+    <Fragment>
+      {RenderGame(props)}
+
+      {/* <Wallet /> */}
+    </Fragment>
+  );
+}
+
+function RenderGame(props: GameProps) {
   const { state, marksMade } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
+    case StateName.WaitingRoom:
+      return (
+        <WaitingRoomPage
+          cancelOpenGame={props.cancelOpenGame} 
+          roundBuyIn={state.roundBuyIn}
+        />
+      );
     case StateName.XsPickMove:
       return (
         <GameScreen
@@ -56,11 +73,11 @@ function GameContainer(props: GameProps) {
 
 const mapStateToProps = (state: SiteState) => ({
   state: state.game.gameState,
-
 });
 
 const mapDispatchToProps = {
   marksMade: actions.marksMade,
+  cancelGame: actions.cancelOpenGame,
 };
 
 // why does it think that mapStateToProps can return undefined??
