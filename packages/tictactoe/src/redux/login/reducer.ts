@@ -8,7 +8,7 @@ export interface LoginState {
 }
 
 const initialState: LoginState = {
-  loading: false, // hack to bypass metamask
+  loading: true, // hack to bypass metamask
   loggedIn: false, // hack to bypass login
   user: null,
 };

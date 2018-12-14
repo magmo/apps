@@ -1,8 +1,8 @@
-import { call, fork, put, take, takeEvery, cps } from 'redux-saga/effects';
+import { call, fork, put, take, takeEvery, cps, cancel } from 'redux-saga/effects';
 
 import * as loginActions from './actions';
 import { reduxSagaFirebase } from '../../gateways/firebase';
-// import { walletSaga } from '../../wallet';
+import { walletSaga } from '../../wallet';
 import metamaskSaga from '../metamask/saga';
 
 import TTTGameArtifact from '../../../contracts/artifacts/TicTacToeGame.json';
@@ -31,20 +31,20 @@ function* loginStatusWatcherSaga() {
   // Events on this channel are triggered on login and logout
   const channel = yield call(reduxSagaFirebase.auth.channel);
   // let playerHeartbeatThread;
-  // let applicationThread;
+  let applicationThread;
 
   while (true) {
     const { user } = yield take(channel);
 
     if (user) {
-      // applicationThread = yield fork(walletSaga, user.uid);
+      applicationThread = yield fork(walletSaga, user.uid);
       const libraryAddress = yield getLibraryAddress();
       yield put(loginActions.loginSuccess(user, libraryAddress));
 
     } else {
-      // if (applicationThread) {
-        // yield cancel(applicationThread);
-      // }
+      if (applicationThread) {
+        yield cancel(applicationThread);
+      }
       yield put(loginActions.logoutSuccess());
     }
   }
