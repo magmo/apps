@@ -1,13 +1,14 @@
-import { call, fork, put, take, takeEvery } from 'redux-saga/effects';
+import { call, fork, put, take, takeEvery, cps } from 'redux-saga/effects';
 
 import * as loginActions from './actions';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 // import { walletSaga } from '../../wallet';
 import metamaskSaga from '../metamask/saga';
 
-// import RPSGameArtifact from '../../../contracts/artifacts/RockPaperScissorsGame.json';
+import TTTGameArtifact from '../../../contracts/artifacts/TicTacToeGame.json';
 
 function* loginSaga() {
+  console.log('trying to connect to firebase');
   try {
     yield call(reduxSagaFirebase.auth.signInAnonymously);
     // successful login will trigger the loginStatusWatcher, which will update the state
@@ -65,8 +66,7 @@ export default function* loginRootSaga() {
 }
 
 function* getLibraryAddress() {
-  // const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10);
-  return;
-  // return RPSGameArtifact.networks[selectedNetworkId].address;
+  const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10);
+  return TTTGameArtifact.networks[selectedNetworkId].address;
 }
 
