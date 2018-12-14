@@ -22,7 +22,8 @@ export default function* openGameSaga() {
     yield take('*');
 
     const gameState: GameState = yield select(getGameState);
-    const address: string = yield select(getWalletAddress);
+    // const address: string = yield select(getWalletAddress);
+    const address = "0xabc123";
 
     if (gameState.name === StateName.Lobby) {
       // if we're in the lobby we need to sync openGames
@@ -39,7 +40,7 @@ export default function* openGameSaga() {
     if (gameState.name === StateName.WaitingRoom) {
       // if we don't have a wallet address, something's gone very wrong
       if (address) {
-        const myOpenGameKey = `/challenges/${address}`;
+        const myOpenGameKey = `/open-games/${address}`;
 
         if (!myGameIsOnFirebase) {
           // my game isn't on firebase (as far as the app knows)
@@ -66,7 +67,7 @@ export default function* openGameSaga() {
 
         // if we don't have a wallet address, something's gone very wrong
         if (address) {
-          const myOpenGameKey = `/challenges/${address}`;
+          const myOpenGameKey = `/open-games/${address}`;
           yield call(reduxSagaFirebase.database.delete, myOpenGameKey);
           myGameIsOnFirebase = false;
         }

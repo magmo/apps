@@ -7,7 +7,7 @@ import { Result, Imperative } from '../../core/results';
 import { Player, isDraw, isWinningMarks, positions, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
-import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/external';
+// import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/external';
 
 
 // import BN from "bn.js";
@@ -43,7 +43,7 @@ const emptyJointState: JointState = { messageState: {}, gameState: states.noName
 //   return state;
 // };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess ) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress  =  ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName: ""; 
@@ -60,11 +60,11 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
   }
-  if (action.type === INITIALIZATION_SUCCESS) {
-    const { messageState, gameState } = state;
-    const { address: myAddress } = action;
-    return { gameState: { ...gameState, myAddress, }, messageState };
-  }
+  // if (action.type === INITIALIZATION_SUCCESS) {
+  //   const { messageState, gameState } = state;
+  //   const { address: myAddress } = action;
+  //   return { gameState: { ...gameState, myAddress, }, messageState };
+  // }
   // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now
