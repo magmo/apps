@@ -4,9 +4,11 @@ import * as actions from './actions';
 import * as states from './state';
 import { Result, Imperative } from '../../core/results';
 
-import { positions, Player, isDraw, isWinningMarks, Position } from '../../core';
+import { Player, isDraw, isWinningMarks, positions, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
+import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/external';
+
 
 // import BN from "bn.js";
 import hexToBN from '../../utils/hexToBN';
@@ -41,7 +43,7 @@ const emptyJointState: JointState = { messageState: {}, gameState: states.noName
 //   return state;
 // };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress  =  ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName: ""; 
@@ -58,12 +60,29 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
   }
+  if (action.type === INITIALIZATION_SUCCESS) {
+    const { messageState, gameState } = state;
+    const { address: myAddress } = action;
+    return { gameState: { ...gameState, myAddress, }, messageState };
+  }
   // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now
-  // state = attemptRetry(state);
+  state = attemptRetry(state);
   return state;
 };
+
+function attemptRetry(state: JointState): JointState {
+  const { gameState } = state;
+  let { messageState } = state;
+
+  const actionToRetry = messageState.actionToRetry;
+  if (actionToRetry) {
+    messageState = { ...messageState, actionToRetry: undefined };
+    state = singleActionReducer({ messageState, gameState }, actionToRetry);
+  }
+  return state;
+}
 
 
 function singleActionReducer(state: JointState, action: actions.GameAction) {
@@ -77,6 +96,14 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return waitingRoomReducer(gameState, messageState, action);
     case states.StateName.CreatingOpenGame:
       return creatingOpenGameReducer(gameState, messageState, action);
+    case states.StateName.WaitForGameConfirmationA:
+      return waitForGameConfirmationAReducer(gameState, messageState, action);
+    case states.StateName.ConfirmGameB:
+      return confirmGameBReducer(gameState, messageState, action);
+    case states.StateName.WaitForFunding:
+      return waitForFundingReducer(gameState, messageState, action);
+    case states.StateName.WaitForPostFundSetup:
+      return waitForPostFundSetupReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
       if (action.type === actions.MARKS_MADE) {
         return xsPickMoveReducer(gameState, messageState, action);
@@ -86,11 +113,11 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
         return osPickMoveReducer(gameState, messageState, action);
       } else { return state; }
     case states.StateName.XsWaitForOpponentToPickMove:
-      if (action.type === actions.MARKS_RECEIVED) {
+      if (action.type === actions.MARKS_MADE) {
         return xsWaitMoveReducer(gameState, messageState, action);
       } else { return state; }
     case states.StateName.OsWaitForOpponentToPickMove:
-      if (action.type === actions.MARKS_RECEIVED) {
+      if (action.type === actions.MARKS_MADE) {
         return osWaitMoveReducer(gameState, messageState, action);
       } else { return state; }
     default:
@@ -113,12 +140,37 @@ function noNameReducer(gameState: states.NoName, messageState: MessageState, act
   }
 }
 
-
 function lobbyReducer(gameState: states.Lobby, messageState: MessageState, action: actions.GameAction): JointState {
   switch (action.type) {
     case actions.NEW_OPEN_GAME:
       const newGameState = states.creatingOpenGame({ ...gameState });
       return { gameState: newGameState, messageState };
+    case actions.JOIN_OPEN_GAME:
+      const { roundBuyIn, opponentAddress } = action;
+      const { myName, myAddress, libraryAddress, twitterHandle } = gameState;
+      const balances = [hexToBN(roundBuyIn).muln(5), hexToBN(roundBuyIn).muln(5)].map(bnToHex) as [string, string];
+      const participants: [string, string] = [myAddress, opponentAddress];
+      const turnNum = 0;
+      const stateCount = 1;
+
+      const waitForConfirmationState = states.waitForGameConfirmationA({
+        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle, player: Player.PlayerA,
+      });
+      messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
+      return { gameState: waitForConfirmationState, messageState };
+    default:
+      return { gameState, messageState };
+  }
+}
+
+function creatingOpenGameReducer(gameState: states.CreatingOpenGame, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.CREATE_OPEN_GAME:
+      const newGameState = states.waitingRoom({ ...gameState, roundBuyIn: action.roundBuyIn });
+      return { gameState: newGameState, messageState };
+    case actions.CANCEL_OPEN_GAME:
+      const newGameState1 = states.lobby(gameState);
+      return { gameState: newGameState1, messageState };
     default:
       return { gameState, messageState };
   }
@@ -142,19 +194,92 @@ function waitingRoomReducer(gameState: states.WaitingRoom, messageState: Message
   }
 }
 
-function creatingOpenGameReducer(gameState: states.CreatingOpenGame, messageState: MessageState, action: actions.GameAction): JointState {
-  switch (action.type) {
-    case actions.CREATE_OPEN_GAME:
-      const newGameState = states.waitingRoom({ ...gameState, roundBuyIn: action.roundBuyIn });
-      return { gameState: newGameState, messageState };
-    case actions.CANCEL_OPEN_GAME:
-      const newGameState1 = states.lobby(gameState);
-      return { gameState: newGameState1, messageState };
-    default:
-      return { gameState, messageState };
+function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmationA, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+  // only action we need to handle in this state is to receiving a PreFundSetupB
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+  // if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
+
+  // request funding
+  messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+
+  // transition to Wait for Funding
+  const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
+
+  return { messageState, gameState: newGameState };
+}
+
+function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+
+  if (action.type !== actions.CONFIRM_GAME && action.type !== actions.DECLINE_GAME) { return { gameState, messageState }; }
+
+  if (action.type === actions.CONFIRM_GAME) {
+    const { turnNum } = gameState;
+
+    const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
+    const newPosition = positions.preFundSetupB(newGameState);
+
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(newPosition, opponentAddress, messageState);
+    messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+
+    return { gameState: newGameState, messageState };
+  } else {
+
+    const { myName, participants, libraryAddress, player, twitterHandle } = gameState;
+    // TODO: Probably should return to the waiting room instead of getting kicked back to the lobby
+    const newGameState = states.lobby({ myName, myAddress: participants[player], libraryAddress, twitterHandle });
+    // TODO: Send a message to the other player that the game has been declined
+    return { gameState: newGameState, messageState };
   }
 }
 
+function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+
+  if (action.type === actions.POSITION_RECEIVED) {
+    const position = action.position;
+    if (position.name !== positions.POST_FUND_SETUP_A || gameState.player !== Player.PlayerB) {
+      return { gameState, messageState };
+    }
+    messageState = { ...messageState, actionToRetry: action };
+
+    return { gameState, messageState };
+  }
+
+  if (action.type !== actions.FUNDING_SUCCESS) { return { gameState, messageState }; }
+  const turnNum = gameState.player === Player.PlayerA ? gameState.turnNum + 1 : gameState.turnNum;
+  const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
+
+  if (gameState.player === Player.PlayerA) {
+    const postFundSetupA = positions.postFundSetupA(newGameState);
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
+  }
+  return { gameState: newGameState, messageState };
+
+}
+
+function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+
+  const { turnNum } = gameState;
+  const newGameState = states.xsPickMove({ ...gameState, turnNum: turnNum + 1, result: Imperative.Choose, noughts: 0, crosses: 0 });
+  if (gameState.player === Player.PlayerB) {
+    newGameState.turnNum += 1;
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(positions.postFundSetupB(newGameState), opponentAddress, messageState);
+  }
+
+  return { gameState: newGameState, messageState };
+}
 
 function favorA(balances: [string, string], roundBuyIn): [string, string] {
   const aBal: string = bnToHex(hexToBN(balances[0]).add(hexToBN(roundBuyIn)));
@@ -310,121 +435,173 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
 }
 
-function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksReceived): JointState {
-  const receivedNoughts = action.receivedMarks;
-  const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
-  let newBalances: [string, string] = balances;
+function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksMade): JointState {
+  if (action.type === actions.MARKS_MADE) {
+    const receivedNoughts = action.marks;
+    const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
+    let newBalances: [string, string] = balances;
 
-  switch (player) {
-    case Player.PlayerB: {
-      if (noughts !== 0 && crosses !== 0) {
-        newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
-        console.log('full swing!');
-      } else {
-        newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
-        console.log('single swing!');
-      }
-      break;
-    }
-    case Player.PlayerA: {
-      if (noughts > 0 || crosses > 0) {
-        newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
-      } else {
-        console.log('first move of the round');
-        newBalances = favorB(balances, roundBuyIn);
-      }
-      break;
-    }
-  }
-
-  let newGameState: states.XsPickMove | states.PlayAgain | states.InsufficientFunds
-    = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, balances: newBalances, result: Imperative.Choose });
-
-  if (!isWinningMarks(receivedNoughts) && !isDraw(receivedNoughts, crosses)) { // Not conclusive, keep playing
-    // go with default case
-  }
-
-  // this should never happen!
-  // if (!isWinningMarks(receivedNoughts) && isDraw(receivedNoughts,crosses)){ // Draw, play again?
-  //   switch(player){
-  //     case Player.PlayerB: {
-  //       newBalances = favorA(balances, roundBuyIn); 
-  //       break;
-  //     }
-  //     case Player.PlayerA: {
-  //       newBalances = favorB(balances,roundBuyIn);
-  //       break;
-  //     }
-  //   }
-  //   newGameState = states.playAgain({...gameState, noughts: receivedNoughts, result: Result.Tie, balances: newBalances}); 
-  // }
-
-  if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
-    if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
-      newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
-    } else {
-      newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
-    }
-
-  }
-  return { gameState: newGameState, messageState };
-}
-
-function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksReceived): JointState {
-  const receivedCrosses = action.receivedMarks;
-  const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
-  let newBalances: [string, string] = balances;
-
-  switch (player) {
-    case Player.PlayerB: {
-      if (noughts !== 0 && crosses !== 0) {
-        newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
-        console.log('full swing!');
-      } else {
-        newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
-        console.log('single swing!');
-      }
-      break;
-    }
-    case Player.PlayerA: {
-      if (noughts > 0 || crosses > 0) {
-        newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
-      } else {
-        console.log('first move of the round');
-        newBalances = favorB(balances, roundBuyIn);
-      }
-      break;
-    }
-  }
-
-  let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
-    = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, balances: newBalances });
-
-  if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) { // Not conclusive, keep playing
-    // go with default case
-  }
-
-  if (!isWinningMarks(receivedCrosses) && isDraw(noughts, receivedCrosses)) { // Draw, play again?
     switch (player) {
       case Player.PlayerB: {
-        newBalances = favorA(balances, roundBuyIn);
+        if (noughts !== 0 && crosses !== 0) {
+          newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
+          console.log('full swing!');
+        } else {
+          newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
+          console.log('single swing!');
+        }
         break;
       }
       case Player.PlayerA: {
-        newBalances = favorB(balances, roundBuyIn);
+        if (noughts > 0 || crosses > 0) {
+          newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
+        } else {
+          console.log('first move of the round');
+          newBalances = favorB(balances, roundBuyIn);
+        }
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: Result.Tie, balances: newBalances });
-  }
 
-  if (isWinningMarks(receivedCrosses)) { // Lost, if sufficient $ play again?
-    if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
-      newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
-    } else {
-      newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
+    let newGameState: states.XsPickMove | states.PlayAgain | states.InsufficientFunds
+      = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, balances: newBalances, result: Imperative.Choose });
+
+    if (!isWinningMarks(receivedNoughts) && !isDraw(receivedNoughts, crosses)) { // Not conclusive, keep playing
+      // go with default case
+      return { gameState: newGameState, messageState };
     }
 
+    // this should never happen!
+    // if (!isWinningMarks(receivedNoughts) && isDraw(receivedNoughts,crosses)){ // Draw, play again?
+    //   switch(player){
+    //     case Player.PlayerB: {
+    //       newBalances = favorA(balances, roundBuyIn); 
+    //       break;
+    //     }
+    //     case Player.PlayerA: {
+    //       newBalances = favorB(balances,roundBuyIn);
+    //       break;
+    //     }
+    //   }
+    //   newGameState = states.playAgain({...gameState, noughts: receivedNoughts, result: Result.Tie, balances: newBalances}); 
+    // }
+
+    if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
+      if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
+        newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
+      } else {
+        newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
+      }
+    }
+    return { gameState: newGameState, messageState };
   }
-  return { gameState: newGameState, messageState };
+  else { return { gameState, messageState }; }
+}
+
+function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.MARKS_MADE) {
+    const receivedCrosses = action.marks;
+    const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
+    let newBalances: [string, string] = balances;
+
+    switch (player) {
+      case Player.PlayerB: {
+        if (noughts !== 0 && crosses !== 0) {
+          newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
+          console.log('full swing!');
+        } else {
+          newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
+          console.log('single swing!');
+        }
+        break;
+      }
+      case Player.PlayerA: {
+        if (noughts > 0 || crosses > 0) {
+          newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
+        } else {
+          console.log('first move of the round');
+          newBalances = favorB(balances, roundBuyIn);
+        }
+        break;
+      }
+    }
+
+    let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
+      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, balances: newBalances });
+
+    if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) { // Not conclusive, keep playing
+      // go with default case
+    }
+
+    if (!isWinningMarks(receivedCrosses) && isDraw(noughts, receivedCrosses)) { // Draw, play again?
+      switch (player) {
+        case Player.PlayerB: {
+          newBalances = favorA(balances, roundBuyIn);
+          break;
+        }
+        case Player.PlayerA: {
+          newBalances = favorB(balances, roundBuyIn);
+          break;
+        }
+      }
+      newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: Result.Tie, balances: newBalances });
+    }
+
+    if (isWinningMarks(receivedCrosses)) { // Lost, if sufficient $ play again?
+      if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
+        newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
+      } else {
+        newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
+      }
+
+    }
+    return { gameState: newGameState, messageState };
+  }
+  else { return { gameState, messageState }; }
+}
+
+function itsMyTurn(gameState: states.PlayingState) {
+  const nextTurnNum = gameState.turnNum + 1;
+  return nextTurnNum % 2 === gameState.player;
+}
+
+function receivedConclude(action: actions.GameAction) {
+  return action.type === actions.POSITION_RECEIVED && action.position.name === positions.CONCLUDE;
+}
+
+function resignationReducer(gameState: states.PlayingState, messageState: MessageState): JointState {
+  if (itsMyTurn(gameState)) {
+    const { turnNum } = gameState;
+    // transition to WaitForResignationAcknowledgement
+    gameState = states.waitForResignationAcknowledgement({ ...gameState, turnNum: turnNum + 1 });
+
+    // and send the latest state to our opponent
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
+  } else {
+    // transition to WaitToResign
+    gameState = states.waitToResign(gameState);
+  }
+
+  return { gameState, messageState };
+}
+
+
+function opponentResignationReducer(gameState: states.PlayingState, messageState: MessageState, action: actions.GameAction) {
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+
+  const position = action.position;
+  if (position.name !== positions.CONCLUDE) { return { gameState, messageState }; }
+  // in taking the turnNum from their position, we're trusting the wallet to have caught
+  // the case where they resign when it isn't their turn
+  const { turnNum } = position;
+
+  // transition to OpponentResigned
+  gameState = states.opponentResigned({ ...gameState, turnNum: turnNum + 1 });
+
+  // send Conclude to our opponent
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
+
+  return { gameState, messageState };
 }

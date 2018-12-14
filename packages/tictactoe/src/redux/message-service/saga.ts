@@ -48,7 +48,7 @@ export function* sendMessagesSaga() {
     gameActions.CREATE_OPEN_GAME,
     gameActions.INITIAL_POSITION_RECEIVED,
     gameActions.PLAY_AGAIN,
-    gameActions.MARKS_RECEIVED,
+    gameActions.POSITION_RECEIVED,
     gameActions.FUNDING_SUCCESS,
     gameActions.WITHDRAWAL_REQUEST,
     gameActions.WITHDRAWAL_SUCCESS,

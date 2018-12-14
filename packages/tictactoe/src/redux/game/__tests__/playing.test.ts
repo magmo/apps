@@ -82,7 +82,7 @@ describe('player A\'s app', () => {
 
     describe('when inconclusive Oplaying arrives', () => {
       const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...playing1, result: Imperative.Wait });
-      const action = actions.marksReceived(playing2.noughts);
+      const action = actions.marksMade(playing2.noughts);
       const receivedNoughts = playing2.noughts;
 
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -90,7 +90,7 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.XsPickMove, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('sets theirMarks', () => {
-        const newGameState = updatedState.gameState as state.PlayAgain;
+        const newGameState = updatedState.gameState as state.XsPickMove;
         expect(newGameState.noughts).toEqual(receivedNoughts);
       });
     });
@@ -98,8 +98,8 @@ describe('player A\'s app', () => {
     // a draw cannot arrive if we are Xs
 
     describe('when Victory arrives', () => {
-      const action = actions.marksReceived(scenarios.noughtsVictory.victory.noughts);
-      const receivedNoughts = action.receivedMarks;
+      const action = actions.marksMade(scenarios.noughtsVictory.victory.noughts);
+      const receivedNoughts = scenarios.noughtsVictory.victory.noughts;
 
       describe('but they still have enough funds to continue', () => {
         const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5, result: Imperative.Wait });
@@ -108,7 +108,7 @@ describe('player A\'s app', () => {
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
         it('sets theirMarks', () => {
-          const newGameState = updatedState.gameState as state.PlayAgain;
+          const newGameState = updatedState.gameState as state.XsPickMove;
           expect(newGameState.noughts).toEqual(receivedNoughts);
         });
       });
@@ -120,7 +120,7 @@ describe('player A\'s app', () => {
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
         it('sets theirMarks', () => {
-          const newGameState = updatedState.gameState as state.PlayAgain;
+          const newGameState = updatedState.gameState as state.XsPickMove;
           expect(newGameState.noughts).toEqual(receivedNoughts);
         });
       });
@@ -163,7 +163,7 @@ describe('player B\'s app', () => {
 
     describe('when inconclusive Xplaying arrives', () => {
       const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing2 });
-      const action = actions.marksReceived(playing3.crosses);
+      const action = actions.marksMade(playing3.crosses);
       const receivedCrosses = playing3.crosses;
 
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -171,27 +171,27 @@ describe('player B\'s app', () => {
       itTransitionsTo(state.StateName.OsPickMove, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('sets theirMarks', () => {
-        const newGameState = updatedState.gameState as state.PlayAgain;
+        const newGameState = updatedState.gameState as state.OsPickMove;
         expect(newGameState.crosses).toEqual(receivedCrosses);
       });
     });
 
     describe('when Draw arrives', () => {
       const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing8 });
-      const action = actions.marksReceived(draw.crosses);
-      const receivedCrosses = action.receivedMarks;
+      const action = actions.marksMade(draw.crosses);
+      const receivedCrosses = draw.crosses;
       const updatedState = gameReducer({ messageState, gameState }, action);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('sets theirMarks', () => {
-        const newGameState = updatedState.gameState as state.PlayAgain;
+        const newGameState = updatedState.gameState as state.OsPickMove;
         expect(newGameState.crosses).toEqual(receivedCrosses);
       });
     });
 
     describe('when Victory arrives', () => {
-      const action = actions.marksReceived(scenarios.crossesVictory.victory.crosses);
-      const receivedCrosses = action.receivedMarks;
+      const action = actions.marksMade(scenarios.crossesVictory.victory.crosses);
+      const receivedCrosses = scenarios.crossesVictory.victory.crosses;
 
       describe('but they still have enough funds to continue', () => {
         const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4 });
@@ -200,7 +200,7 @@ describe('player B\'s app', () => {
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
         it('sets theirMarks', () => {
-          const newGameState = updatedState.gameState as state.PlayAgain;
+          const newGameState = updatedState.gameState as state.OsPickMove;
           expect(newGameState.crosses).toEqual(receivedCrosses);
         });
       });
@@ -212,7 +212,7 @@ describe('player B\'s app', () => {
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
         it('sets theirMarks', () => {
-          const newGameState = updatedState.gameState as state.PlayAgain;
+          const newGameState = updatedState.gameState as state.OsPickMove;
           expect(newGameState.crosses).toEqual(receivedCrosses);
         });
       });
