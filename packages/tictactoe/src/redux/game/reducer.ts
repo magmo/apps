@@ -20,7 +20,7 @@ export interface JointState {
   messageState: MessageState;
 }
 
-const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
+const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', libraryAddress: '' }) };
 
 // const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 

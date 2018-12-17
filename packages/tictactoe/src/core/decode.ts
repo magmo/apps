@@ -76,9 +76,9 @@ export default function decode(hexString: string) {
       } else {
         return positions.postFundSetupB({ ...base, stateCount, roundBuyIn });
       }
-
     default:
-      throw new Error('unreachable');
+      console.log(state);
+      throw new Error('unreachable (failed to match stateType)');
   }
 }
 
