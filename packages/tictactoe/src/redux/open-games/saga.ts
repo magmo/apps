@@ -90,7 +90,7 @@ const openGameTransformer = (dict) => {
 function* openGameSyncer() {
   yield fork(
     reduxSagaFirebase.database.sync,
-    'challenges',
+    'open-games',
     {
       successActionCreator: actions.syncOpenGames,
       transform: openGameTransformer,
