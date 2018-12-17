@@ -215,5 +215,5 @@ function* signMessage(data) {
   //   signatureResponse = yield take(actionFilter);
   // }
   // return signatureResponse.signature;
-  return "0x000";
+  return "0x000"; // TODO check length of this dummy sig
 }

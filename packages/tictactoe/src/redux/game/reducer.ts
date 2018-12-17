@@ -113,11 +113,11 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
         return osPickMoveReducer(gameState, messageState, action);
       } else { return state; }
     case states.StateName.XsWaitForOpponentToPickMove:
-      if (action.type === actions.MARKS_MADE) {
+      if (action.type === actions.POSITION_RECEIVED) {
         return xsWaitMoveReducer(gameState, messageState, action);
       } else { return state; }
     case states.StateName.OsWaitForOpponentToPickMove:
-      if (action.type === actions.MARKS_MADE) {
+      if (action.type === actions.POSITION_RECEIVED) {
         return osWaitMoveReducer(gameState, messageState, action);
       } else { return state; }
     default:
@@ -223,14 +223,16 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
     const { turnNum } = gameState;
 
     // const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
-    // const newPosition = positions.preFundSetupB(newGameState);
 
-    // const opponentAddress = states.getOpponentAddress(gameState);
-    // messageState = sendMessage(newPosition, opponentAddress, messageState);
-    // messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
     // skip funding stage
     const newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts:0, crosses:0, result: Imperative.Wait });
+
+    const newPosition = positions.preFundSetupB(newGameState);
+
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(newPosition, opponentAddress, messageState);
+    messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
     return { gameState: newGameState, messageState };
   } else {
@@ -371,6 +373,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   }
 
   messageState = sendMessage(pos, opponentAddress, messageState);
+  // console.log(newGameState);
   return { gameState: newGameState, messageState };
 }
 
@@ -441,9 +444,9 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
 }
 
-function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.MarksMade): JointState {
-  if (action.type === actions.MARKS_MADE) {
-    const receivedNoughts = action.marks;
+function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived): JointState {
+  if ((action.type === actions.POSITION_RECEIVED) && (action.position.name === positions.OPLAYING)) { // should only allow a change in gamestate if we receieve the appropriate position.
+    const receivedNoughts = action.position.noughts;
     const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
     let newBalances: [string, string] = balances;
 
@@ -504,9 +507,9 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
   else { return { gameState, messageState }; }
 }
 
-function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type === actions.MARKS_MADE) {
-    const receivedCrosses = action.marks;
+function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived): JointState {
+  if ((action.type === actions.POSITION_RECEIVED) && (action.position.name === positions.XPLAYING)) {
+    const receivedCrosses = action.position.crosses;
     const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
     let newBalances: [string, string] = balances;
 

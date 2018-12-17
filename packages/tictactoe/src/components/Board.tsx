@@ -71,6 +71,7 @@ export default class Board extends React.PureComponent<Props> {
     return (
       <div id="table-container">
         <table>
+          <tbody>
           <tr>
             <td id="tl" onClick={() => this.props.marksMade(Marks.tl)}>
               {this.renderMark(noughts, crosses, Marks.tl)}
@@ -104,6 +105,7 @@ export default class Board extends React.PureComponent<Props> {
               {this.renderMark(noughts, crosses, Marks.br)}
             </td>
           </tr>
+          </tbody>
         </table>
       </div>
     );
