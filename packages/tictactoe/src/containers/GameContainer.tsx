@@ -48,6 +48,8 @@ function RenderGame(props: GameProps) {
       return <GameProposedPage message='Waiting for opponent to confirm' />;
     case StateName.ConfirmGameB:
       return <ConfirmGamePage confirmGame={confirmGame} cancelGame={declineGame} stake={state.roundBuyIn} opponentName={state.opponentName} />;
+    // case StateName.WaitForFunding:
+    //   return <WaitForWallet reason={"Waiting for funding confirmation."} />;
     case StateName.XsPickMove:
       return (
         <GameScreen
@@ -61,7 +63,33 @@ function RenderGame(props: GameProps) {
           marksMade={marksMade}
         />
       );
-      case StateName.XsWaitForOpponentToPickMove:
+    case StateName.XsWaitForOpponentToPickMove:
+      return (
+        <GameScreen
+          stateType="blah"
+          noughts={state.noughts}
+          crosses={state.crosses}
+          you={Marker.crosses} // fixed by StateName
+          player={state.player}
+          result={state.result}
+          balances={state.balances}
+          marksMade={marksMade}
+        />
+      );
+    case StateName.OsPickMove:
+      return (
+        <GameScreen
+          stateType="blah"
+          noughts={state.noughts}
+          crosses={state.crosses}
+          you={Marker.crosses} // fixed by StateName
+          player={state.player}
+          result={state.result}
+          balances={state.balances}
+          marksMade={marksMade}
+        />
+      );
+    case StateName.OsWaitForOpponentToPickMove:
       return (
         <GameScreen
           stateType="blah"

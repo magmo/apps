@@ -1,5 +1,5 @@
 import { gameReducer } from '../reducer';
-import { Player, scenarios, Marks, Imperative } from '../../../core';
+import { Player, scenarios, Marks, Imperative, Result } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
 
@@ -139,7 +139,7 @@ describe('player B\'s app', () => {
   describe('when in OsPickMove', () => {
 
     describe('when making an inconclusive OS_CHOSE_MOVE', () => {
-      const gameState = state.osPickMove({ ...bProps, ...playing1 });
+      const gameState = state.osPickMove({ ...bProps, ...playing1, result: Imperative.Wait });
       const action = actions.marksMade(Marks.mm);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -149,7 +149,7 @@ describe('player B\'s app', () => {
     });
 
     describe('when making a winning OS_CHOSE_MOVE', () => {
-      const gameState = state.osPickMove({ ...bProps, ...scenarios.noughtsVictory.playing5 });
+      const gameState = state.osPickMove({ ...bProps, ...scenarios.noughtsVictory.playing5, result: Result.YouWin });
       const action = actions.marksMade(Marks.tr);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -162,7 +162,7 @@ describe('player B\'s app', () => {
   describe('when in OsWaitForOpponentToPickMove', () => {
 
     describe('when inconclusive Xplaying arrives', () => {
-      const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing2 });
+      const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing2, result: Imperative.Wait });
       const action = actions.marksMade(playing3.crosses);
       const receivedCrosses = playing3.crosses;
 
@@ -177,7 +177,7 @@ describe('player B\'s app', () => {
     });
 
     describe('when Draw arrives', () => {
-      const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing8 });
+      const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...playing8, result: Imperative.Wait  });
       const action = actions.marksMade(draw.crosses);
       const receivedCrosses = draw.crosses;
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -194,7 +194,7 @@ describe('player B\'s app', () => {
       const receivedCrosses = scenarios.crossesVictory.victory.crosses;
 
       describe('but they still have enough funds to continue', () => {
-        const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4 });
+        const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4, result: Imperative.Wait  });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
@@ -206,7 +206,7 @@ describe('player B\'s app', () => {
       });
 
       describe('and there are now insufficient funds', () => {
-        const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4closetoempty });
+        const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4closetoempty, result: Imperative.Wait  });
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);

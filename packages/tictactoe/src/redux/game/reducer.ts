@@ -205,8 +205,11 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   // transition to Wait for Funding
-  const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
+  // const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
 
+  // skip funding and go straight to game
+  const newGameState = states.xsPickMove({ ...gameState, turnNum: gameState.turnNum + 1, noughts:0, crosses:0, result:Imperative.Choose });
+ 
   return { messageState, gameState: newGameState };
 }
 
@@ -219,12 +222,15 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   if (action.type === actions.CONFIRM_GAME) {
     const { turnNum } = gameState;
 
-    const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
-    const newPosition = positions.preFundSetupB(newGameState);
+    // const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
+    // const newPosition = positions.preFundSetupB(newGameState);
 
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(newPosition, opponentAddress, messageState);
-    messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+    // const opponentAddress = states.getOpponentAddress(gameState);
+    // messageState = sendMessage(newPosition, opponentAddress, messageState);
+    // messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+
+    // skip funding stage
+    const newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts:0, crosses:0, result: Imperative.Wait });
 
     return { gameState: newGameState, messageState };
   } else {

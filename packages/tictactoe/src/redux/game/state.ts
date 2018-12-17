@@ -208,11 +208,11 @@ export function inPlay<T extends InPlay>(state: T): InPlay {
 }
 
 
-export interface OsPickMove extends InPlay {
+export interface OsPickMove extends HasResult {
   name: StateName.OsPickMove;
 }
-export function osPickMove<T extends InPlay>(state: T): OsPickMove {
-  return { ...inPlay(state), name: StateName.OsPickMove };
+export function osPickMove<T extends HasResult>(state: T): OsPickMove {
+  return { ...hasResult(state), name: StateName.OsPickMove };
 }
 
 export interface XsPickMove extends HasResult {
@@ -223,12 +223,12 @@ export function xsPickMove<T extends HasResult>(state: T): XsPickMove {
   return { ...hasResult(state), name: StateName.XsPickMove };
 }
 
-export interface OsWaitForOpponentToPickMove extends InPlay {
+export interface OsWaitForOpponentToPickMove extends HasResult {
   name: StateName.OsWaitForOpponentToPickMove;
 }
-export function osWaitForOpponentToPickMove<T extends InPlay>(state: T): OsWaitForOpponentToPickMove {
+export function osWaitForOpponentToPickMove<T extends HasResult>(state: T): OsWaitForOpponentToPickMove {
   return {
-    ...inPlay(state),
+    ...hasResult(state),
     name: StateName.OsWaitForOpponentToPickMove,
   };
 }
