@@ -438,7 +438,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   // if inconclusive
   if (!isDraw(newNoughts, crosses) && !isWinningMarks(newNoughts)) {
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts });
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait });
     pos = positions.Oplaying({ ...newGameState, noughts: newNoughts, balances: newBalances });
   }
 
@@ -545,7 +545,7 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
     }
 
     let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
-      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, balances: newBalances });
+      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, balances: newBalances, result: Imperative.Choose  });
 
     if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) { // Not conclusive, keep playing
       // go with default case
