@@ -81,7 +81,6 @@ interface BaseWithBuyIn extends Base {
 
   export interface Draw extends BaseWitNoughtsAndCrossesAndBuyIn {
     name: typeof DRAW;
-
   }
 
   export interface Conclude extends Base {

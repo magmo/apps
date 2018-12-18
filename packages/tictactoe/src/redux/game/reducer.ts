@@ -454,7 +454,10 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 }
 
 function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived): JointState {
-  if ((action.type === actions.POSITION_RECEIVED) && (action.position.name === positions.OPLAYING)) { // should only allow a change in gamestate if we receieve the appropriate position.
+  if ((action.type === actions.POSITION_RECEIVED) 
+  && ((action.position.name === positions.OPLAYING) ||
+     (action.position.name === positions.DRAW) || 
+     (action.position.name === positions.VICTORY))) { // should only allow a change in gamestate if we receieve the appropriate position.
     const receivedNoughts = action.position.noughts;
     const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
     let newBalances: [string, string] = balances;
@@ -517,7 +520,10 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
 }
 
 function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived): JointState {
-  if ((action.type === actions.POSITION_RECEIVED) && (action.position.name === positions.XPLAYING)) {
+  if ((action.type === actions.POSITION_RECEIVED) 
+  && ((action.position.name === positions.XPLAYING) ||
+     (action.position.name === positions.DRAW) || 
+     (action.position.name === positions.VICTORY))) {
     const receivedCrosses = action.position.crosses;
     const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
     let newBalances: [string, string] = balances;
