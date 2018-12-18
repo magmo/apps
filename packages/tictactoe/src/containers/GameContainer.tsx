@@ -82,7 +82,7 @@ function RenderGame(props: GameProps) {
           stateType="blah"
           noughts={state.noughts}
           crosses={state.crosses}
-          you={Marker.crosses} // fixed by StateName
+          you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
           balances={state.balances}
@@ -95,7 +95,7 @@ function RenderGame(props: GameProps) {
           stateType="blah"
           noughts={state.noughts}
           crosses={state.crosses}
-          you={Marker.crosses} // fixed by StateName
+          you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
           balances={state.balances}

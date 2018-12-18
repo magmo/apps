@@ -20,11 +20,16 @@ export enum Queue {
   GAME_ENGINE = 'GAME_ENGINE',
 }
 
-// export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
-export const getWalletAddress = (storeObj: any) => '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; // this is the same hard coded value chosen in open-games saga;
+export function getWalletAddress(storeObj: any) :string | null {
+  const prop = 'myAddress';
+  if (storeObj.game.gameState.hasOwnProperty(prop)) {
+    return storeObj.game.gameState.myAddress;
+  } else {return null;}
+} 
+// export const getWalletAddress = (storeObj: any) => '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; // this is the same hard coded value chosen in open-games saga;
 
 export default function* messageSaga() {
-  yield fork(receiveFromFirebaseSaga);
+  yield fork(waitForWalletThenReceiveFromFirebaseSaga);
   yield fork(sendMessagesSaga);
   // yield fork(receiveFromWalletSaga);
   // yield fork(sendWalletMessageSaga);
@@ -89,22 +94,19 @@ export function* sendMessagesSaga() {
   }
 }
 
-// function* waitForWalletThenReceiveFromFirebaseSaga() {
-//   while (true) {
-//     // yield take('*');
+function* waitForWalletThenReceiveFromFirebaseSaga() {
+  while (true) {
+    yield take('*');
+    const address = yield select(getWalletAddress);
+    if (address) {
+      // this will only return if address exists!
+      yield receiveFromFirebaseSaga(address);
+    }
+  }
+}
 
-//     // const address = yield select(getWalletAddress);
-//     const address = "0xabc123"; // this is the same hard coded value chosen in open-games saga
-
-//     // if (address) {
-//       // this will never return
-//     yield receiveFromFirebaseSaga(address);
-//     // }
-//   }
-// }
-
-function* receiveFromFirebaseSaga() {
-  const address = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+function* receiveFromFirebaseSaga(address) {
+  // const address = yield select(getWalletAddress);
   // address = address.toLowerCase();
 
   const channel = yield call(
@@ -115,11 +117,12 @@ function* receiveFromFirebaseSaga() {
   );
 
   while (true) {
+    // console.log(address);
     const message = yield take(channel);
-
     const key = message.snapshot.key;
     const { data, queue, userName } = message.value;
-
+    // console.log(message.value);
+    // console.log(key, signature);
     if (queue === Queue.GAME_ENGINE) {
       // const { signature } = message.value;
       // const validMessage = yield validateMessage(data, signature);
@@ -128,6 +131,7 @@ function* receiveFromFirebaseSaga() {
       // }
       // yield put(walletActions.messageReceived(data, signature));
       const position = decode(data);
+      console.log(position.name);
       if (position.name === positions.PRE_FUND_SETUP_A) {
         yield put(gameActions.initialPositionReceived(position, userName ? userName : 'Opponent'));
       } else {
@@ -136,7 +140,7 @@ function* receiveFromFirebaseSaga() {
     // } else {
       // yield put(walletActions.receiveMessage(data));
     }
-    yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
+    yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);  
   }
 }
 
@@ -215,5 +219,5 @@ function* signMessage(data) {
   //   signatureResponse = yield take(actionFilter);
   // }
   // return signatureResponse.signature;
-  return "0x000"; // TODO check length of this dummy sig
+  return '0x407d8596ce01a5731b31067333366e527027b37f318369b9b6d02364f607c4e33c326c2df49c4d2c2b4a1d38e2dbe849db23518933643c8761aed29907633adf1b'; // this is a hack
 }

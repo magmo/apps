@@ -20,7 +20,7 @@ export interface JointState {
   messageState: MessageState;
 }
 
-const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', libraryAddress: '' }) };
+const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
 // const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 
@@ -60,12 +60,17 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
   }
-  // if (action.type === INITIALIZATION_SUCCESS) {
+  // if (action.type === actions.NEW_OPEN_GAME) {
   //   const { messageState, gameState } = state;
-  //   const { address: myAddress } = action;
+  //   state.game.gameState.myAddress = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';   
   //   return { gameState: { ...gameState, myAddress, }, messageState };
   // }
-  // apply the current action to the state
+  // if (action.type === actions.JOIN_OPEN_GAME) {
+  //   const { messageState, gameState } = state;
+  //   const myAddress = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  //   return { gameState: { ...gameState, myAddress, }, messageState };
+  // }
+  // // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now
   state = attemptRetry(state);
@@ -146,8 +151,9 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const newGameState = states.creatingOpenGame({ ...gameState });
       return { gameState: newGameState, messageState };
     case actions.JOIN_OPEN_GAME:
+      const myAddress = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; // this is a hack until the wallet arrives!
       const { roundBuyIn, opponentAddress } = action;
-      const { myName, myAddress, libraryAddress, twitterHandle } = gameState;
+      const { myName, libraryAddress, twitterHandle } = gameState;
       const balances = [hexToBN(roundBuyIn).muln(5), hexToBN(roundBuyIn).muln(5)].map(bnToHex) as [string, string];
       const participants: [string, string] = [myAddress, opponentAddress];
       const turnNum = 0;
@@ -156,8 +162,10 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const waitForConfirmationState = states.waitForGameConfirmationA({
         ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle, player: Player.PlayerA,
       });
+      
+
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
-      return { gameState: waitForConfirmationState, messageState };
+      return { gameState: { ...waitForConfirmationState, myAddress}, messageState };
     default:
       return { gameState, messageState };
   }
@@ -167,7 +175,8 @@ function creatingOpenGameReducer(gameState: states.CreatingOpenGame, messageStat
   switch (action.type) {
     case actions.CREATE_OPEN_GAME:
       const newGameState = states.waitingRoom({ ...gameState, roundBuyIn: action.roundBuyIn });
-      return { gameState: newGameState, messageState };
+      const myAddress = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'; // this is a hack until the wallet arrives!
+      return { gameState: { ...newGameState, myAddress }, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
       return { gameState: newGameState1, messageState };

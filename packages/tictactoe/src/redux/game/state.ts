@@ -105,7 +105,7 @@ interface TwoChannel {
   participants: [string, string];
 }
 
-interface Base extends TwoChannel {
+export interface Base extends TwoChannel {
   turnNum: number;
   balances: [string, string];
   stateCount: number;

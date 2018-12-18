@@ -1,7 +1,7 @@
 import { fork, take, select, cancel, call, apply } from 'redux-saga/effects';
 
 export const getGameState = (storeObj: any) => storeObj.game.gameState;
-export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
+export const getWalletAddress = (storeObj: any) => storeObj.game.gameState.myAddress;
 
 import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -22,8 +22,9 @@ export default function* openGameSaga() {
     yield take('*');
 
     const gameState: GameState = yield select(getGameState);
-    // const address: string = yield select(getWalletAddress);
-    const address = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    const address: string = yield select(getWalletAddress);
+    // console.log(address);
+    // const address = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
     if (gameState.name === StateName.Lobby) {
       // if we're in the lobby we need to sync openGames
