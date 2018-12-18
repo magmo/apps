@@ -93,8 +93,8 @@ interface BaseWithBuyIn extends Base {
     | PreFundSetupB
     | PostFundSetupA
     | PostFundSetupB
-    | Oplaying
     | Xplaying
+    | Oplaying
     | Resting
     | Victory
     | Draw
@@ -159,10 +159,6 @@ export function resting(obj: BaseWithBuyInParams): Resting {
 export function Oplaying(obj: PlayingParams): Oplaying {
   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: OPLAYING};
 }
-
-// export function Xplaying<T extends PlayingParams> (obj: T): Xplaying {
-//   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING };
-// }
 
 export function Xplaying(obj: PlayingParams): Xplaying {
   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING };

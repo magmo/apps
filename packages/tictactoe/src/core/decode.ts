@@ -100,7 +100,7 @@ export function decodeGameState(state: State, roundBuyIn: string, hexString: str
     case GamePositionType.Xplaying:
       const xplayingnoughts = extractNoughts(hexString);
       const xplayingcrosses = extractCrosses(hexString);
-      return positions.Oplaying({ ...base, noughts: xplayingnoughts, crosses: xplayingcrosses });
+      return positions.Xplaying({ ...base, noughts: xplayingnoughts, crosses: xplayingcrosses });
     case GamePositionType.Victory:
       const victorynoughts = extractNoughts(hexString);
       const victorycrosses = extractCrosses(hexString);
