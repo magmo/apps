@@ -9,6 +9,7 @@ import ProfileContainer from './ProfileContainer';
 import WaitingRoomPage from '../components/WaitingRoomPage';
 import ConfirmGamePage from '../components/ConfirmGamePage';
 import GameProposedPage from '../components/GameProposedPage';
+import PlayAgain from '../components/PlayAgain';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
@@ -102,6 +103,19 @@ function RenderGame(props: GameProps) {
           marksMade={marksMade}
         />
       );
+    case StateName.PlayAgain:
+        return (
+        <PlayAgain
+        stateType="blah"
+        noughts={state.noughts}
+        crosses={state.crosses}
+        you={Marker.noughts} // TODO this should take either value
+        player={state.player}
+        result={state.result}
+        balances={state.balances}
+        marksMade={marksMade}
+        />
+        );
     default:
       throw new Error(`View not created for ${state.name}`);
   }
