@@ -1,6 +1,7 @@
 import React from 'react';
 import { Marks, Marker, Result, Player, Imperative } from '../core';
 import GameScreen from './GameScreen';
+import { Button } from 'reactstrap';
 
 
 interface Props {
@@ -12,7 +13,8 @@ interface Props {
   player: Player;
   result: Result | Imperative;
   // action goes here (.e.g. player picks a move)
-  marksMade: (marks: Marks) => void;
+  playAgain: () => void;
+  marksMade: (x: Marks) => void;
 }
 
 
@@ -20,18 +22,23 @@ interface Props {
 
 export default class PlayAgain extends React.PureComponent<Props> {
   render() {
-    const { noughts, crosses, you, player, result, balances, marksMade } = this.props;
+    const { noughts, crosses, you, player, result, balances, marksMade, playAgain } = this.props;
     return (
-      <GameScreen
-      stateType="blah"
-      noughts={noughts}
-      crosses={crosses}
-      you={you} // fixed by StateName
-      player={player}
-      result={result}
-      balances={balances}
-      marksMade={marksMade}
-      />
+      <div>
+        <GameScreen
+        stateType="blah"
+        noughts={noughts}
+        crosses={crosses}
+        you={you} // fixed by StateName
+        player={player}
+        result={result}
+        balances={balances}
+        marksMade={marksMade}
+        />
+        <Button className="cog-button homePage-loginButton" onClick={playAgain} >
+        Play Again!
+        </Button>
+      </div>
     );
   }
 }

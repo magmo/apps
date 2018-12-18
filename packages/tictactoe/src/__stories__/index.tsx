@@ -18,6 +18,7 @@ import BN from "bn.js";
 import bnToHex from '../utils/bnToHex';
 import { scenarios } from '../core';
 import * as loginActions from '../redux/login/actions';
+import PlayAgain from '../components/PlayAgain';
 
 import * as states from '../redux/game/state';
 
@@ -49,6 +50,7 @@ const initialState = {
 
 const marksMade = (x: Marks) => alert("marks made");
 const joinOpenGame = () => alert("join open game");
+const playAgain = () => alert('playing again');
 // const newOpenGame = () => alert("new open game");
 
 storiesOf('HomePage', module).add('Home', () => <HomePage login={loginActions.loginRequest}/>);
@@ -152,6 +154,7 @@ const fakeStore = (state) => ({
   getState: () => (state),
   subscribe: () => (() => {/* empty */ }),
   replaceReducer: () => { /* empty */ },
+  playAgain: () => { /* empty */ },
 });
 
 const testState = (state) => (
@@ -164,3 +167,15 @@ const testState = (state) => (
 
 storiesOf('App (reading from the fake store)', module)
   .add('test initial state', testState(initialState));
+
+  storiesOf('Post game', module).add('Play Again', () => <PlayAgain
+    stateType="blah"
+    noughts={0}
+    crosses={0}
+    you={Marker.noughts} // TODO this should take either value
+    player={Player.PlayerA}
+    result={Result.YouWin}
+    balances={["6", "4"]}
+    marksMade={marksMade}
+    playAgain={playAgain}
+    />);

@@ -21,6 +21,7 @@ interface GameProps {
   cancelOpenGame: () => void;
   confirmGame: () => void;
   declineGame: () => void;
+  playAgain: () => void;
 }
 
 function GameContainer(props: GameProps) {
@@ -34,7 +35,7 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, marksMade, confirmGame, declineGame, } = props;
+  const { state, marksMade, confirmGame, declineGame, playAgain } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
@@ -114,6 +115,7 @@ function RenderGame(props: GameProps) {
         result={state.result}
         balances={state.balances}
         marksMade={marksMade}
+        playAgain={playAgain}
         />
         );
     default:
@@ -130,6 +132,7 @@ const mapDispatchToProps = {
   cancelOpenGame: actions.cancelOpenGame,
   confirmGame: actions.confirmGame,
   declineGame: actions.declineGame,
+  playAgain: actions.playAgain,
 };
 
 // why does it think that mapStateToProps can return undefined??
