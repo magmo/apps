@@ -331,8 +331,8 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie });
-    pos = positions.draw({ ...newGameState, crosses: newCrosses, balances: newBalances });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie, balances: newBalances });
+    pos = positions.draw({ ...newGameState, crosses: newCrosses});
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
   }
@@ -438,14 +438,14 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   // if inconclusive
   if (!isDraw(newNoughts, crosses) && !isWinningMarks(newNoughts)) {
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait });
-    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts, balances: newBalances });
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait, balances: newBalances  });
+    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts});
   }
 
   // if winning move
   if (isWinningMarks(newNoughts)) {
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.YouWin });
-    pos = positions.victory({ ...newGameState, noughts: newNoughts, balances: newBalances });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.YouWin, balances: newBalances });
+    pos = positions.victory({ ...newGameState, noughts: newNoughts });
   }
 
   messageState = sendMessage(pos, opponentAddress, messageState);

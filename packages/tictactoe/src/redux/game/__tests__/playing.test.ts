@@ -13,6 +13,7 @@ import {
   itSends,
   itFullySwingsTheBalancesToA,
   itHalfSwingsTheBalancesToA,
+  itFullySwingsTheBalancesToB,
 } from './helpers';
 
 const {
@@ -50,14 +51,14 @@ describe('player A\'s app', () => {
   describe('when in XsPickMove', () => {
 
     describe('when making an inconclusive XS_CHOSE_MOVE', () => {
-      const gameState = state.xsPickMove({ ...aProps, noughts: 0, crosses: 0, ...postFundSetupB, result: Imperative.Wait });
+      const gameState = state.xsPickMove({ ...aProps, noughts: 0, crosses: 0, ...postFundSetupB, turnNum: 3, result: Imperative.Wait });
       const action = actions.marksMade(Marks.tl);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.XsWaitForOpponentToPickMove, updatedState);
       itSends(playing1, updatedState);
-      if (gameState.crosses === 0) {
+      if (gameState.turnNum === 3) {
         itHalfSwingsTheBalancesToA(Number(aProps.roundBuyIn), {gameState, messageState}, updatedState);
       } else {
         itFullySwingsTheBalancesToA(Number(aProps.roundBuyIn), {gameState, messageState}, updatedState);
@@ -116,7 +117,7 @@ describe('player A\'s app', () => {
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-        
+                
         it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
           expect(newGameState.noughts).toEqual(receivedNoughts);
@@ -156,6 +157,7 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
       itSends(playing2, updatedState);
+      itFullySwingsTheBalancesToB(Number(bProps.roundBuyIn), {gameState, messageState}, updatedState);
     });
 
     describe('when making a winning OS_CHOSE_MOVE', () => {
@@ -166,6 +168,7 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(scenarios.noughtsVictory.victory, updatedState);
+      itFullySwingsTheBalancesToB(Number(bProps.roundBuyIn), {gameState, messageState}, updatedState);
     });
   });
 
