@@ -39,9 +39,11 @@ const initialState = {
       noughts: 0,
       crosses: 0,
       balances: finneyFiveFive,
+      onScreenBalances: finneyFiveFive,
       turnNum: 4,
       result: Imperative.Choose,
       player: Player.PlayerA,
+      you: Marker.crosses,
     }),
   },
 };
@@ -89,8 +91,8 @@ storiesOf('Outcome', module)
   .add('Choose', () => <Outcome stateType="blah" result={Imperative.Choose} />);
 
 storiesOf('Status and Balances', module)
-  .add('You Winning', () => <StatusAndBalances stateType="blah" balances={finneySixFour} player={Player.PlayerA} you={Marker.crosses} />)
-  .add('You Losing', () => <StatusAndBalances stateType="blah" balances={finneyFourSix} player={Player.PlayerB} you={Marker.crosses} />);
+  .add('You Winning', () => <StatusAndBalances stateType="blah" onScreenBalances={finneySixFour} player={Player.PlayerA} you={Marker.crosses} />)
+  .add('You Losing', () => <StatusAndBalances stateType="blah" onScreenBalances={finneyFourSix} player={Player.PlayerB} you={Marker.crosses} />);
 
 
 storiesOf('Game Screen', module)
@@ -101,7 +103,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Imperative.Wait}
-    balances={finneySixFour}
+    onScreenBalances={finneySixFour}
     marksMade={marksMade}
   />)
   .add('Choosing', () => <GameScreen
@@ -111,7 +113,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Imperative.Choose}
-    balances={finneyFourSix}
+    onScreenBalances={finneyFourSix}
     marksMade={marksMade}
   />)
   .add('X win', () => <GameScreen
@@ -121,7 +123,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Result.YouWin}
-    balances={finneySixFour}
+    onScreenBalances={finneySixFour}
     marksMade={marksMade}
   />)
   .add('Double X win', () => <GameScreen
@@ -131,7 +133,7 @@ storiesOf('Game Screen', module)
   you={Marker.crosses}
   player={Player.PlayerA}
   result={Result.YouWin}
-  balances={finneySixFour}
+  onScreenBalances={finneySixFour}
   marksMade={marksMade}
 />)
   .add('O win', () => <GameScreen
@@ -141,7 +143,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Result.YouLose}
-    balances={finneyFourSix}
+    onScreenBalances={finneyFourSix}
     marksMade={marksMade}
   />)
   .add('Tie', () => <GameScreen
@@ -151,7 +153,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Result.Tie}
-    balances={finneyFiveFive}
+    onScreenBalances={finneyFiveFive}
     marksMade={marksMade}
   />);
 
@@ -184,7 +186,7 @@ storiesOf('App (reading from the fake store)', module)
     you={Marker.noughts} // TODO this should take either value
     player={Player.PlayerA}
     result={Result.YouWin}
-    balances={finneySixFour}
+    onScreenBalances={finneySixFour}
     marksMade={marksMade}
     playAgain={playAgain}
     />);

@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 // import { Marks } from '../core/marks'
 import { Marker } from '../core/results';

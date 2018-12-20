@@ -4,12 +4,12 @@ import { Player } from '../core';
 
 interface Props {
   stateType: string;
-  balances: [string, string];
+  onScreenBalances: [string, string];
   player: Player;
 }
 
 export default class Balances extends React.PureComponent<Props> {
-  renderYourBalance(balances: [string, string], player: Player) {
+  renderYourBalance(onScreenBalances: [string, string], player: Player) {
     if (player === Player.PlayerA) {
       return <span>?</span>;
     }
@@ -17,23 +17,23 @@ export default class Balances extends React.PureComponent<Props> {
       return <span>?</span>;
     } else { return; }
   }
-  renderTheirBalance(balances: [string, string], player: Player) {
+  renderTheirBalance(onScreenBalances: [string, string], player: Player) {
     if (player === Player.PlayerA) {
-      return <span>{balances[1]}</span>;
+      return <span>{onScreenBalances[1]}</span>;
     }
     if (player === Player.PlayerB) {
-      return <span>{balances[0]}</span>;
+      return <span>{onScreenBalances[0]}</span>;
     } else { return; }
   }
 
   render() {
-    const { balances, player } = this.props;
+    const { onScreenBalances, player } = this.props;
     return (<h1 className="full-width-bar" >[You]&nbsp;
       <span>
-        {this.renderYourBalance(balances, player)}
+        {this.renderYourBalance(onScreenBalances, player)}
       </span>&nbsp;|
       <span>
-        &nbsp;{this.renderTheirBalance(balances, player)}
+        &nbsp;{this.renderTheirBalance(onScreenBalances, player)}
       </span>
       &nbsp;[Them]
       </h1>

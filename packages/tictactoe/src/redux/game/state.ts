@@ -1,4 +1,4 @@
-import { Result, Imperative, Marks, Player } from '../../core';
+import { Result, Imperative, Marks, Player, Marker } from '../../core';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -201,10 +201,12 @@ interface InPlay extends Base {
   player: Player;
   noughts: Marks;
   crosses: Marks;
+  onScreenBalances: [string, string];
+  you: Marker;
 }
 
 export function inPlay<T extends InPlay>(state: T): InPlay {
-  return {...base(state), player: state.player, noughts: state.noughts,  crosses: state.crosses };
+  return {...base(state), player: state.player, noughts: state.noughts,  crosses: state.crosses,   onScreenBalances: state.onScreenBalances, you: state.you };
 }
 
 

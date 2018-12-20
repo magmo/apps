@@ -53,39 +53,39 @@ export const itHandlesResignLikeItsMyTurn = (gameState: state.PlayingState, mess
   });
 };
 
-export const itFullySwingsTheBalancesToA = (stake: number, oldState: JointState, newState: JointState) => {
-  it(`swings the balance by ${stake}`, () => {
+export const itFullySwingsTheBalancesToA = (stake: string, oldState: JointState, newState: JointState) => {
+  it(`swings the balance by ${String(2 * Number(stake))}`, () => {
     if (!('balances' in newState.gameState) || !('balances' in oldState.gameState)) {
       return fail('balances does not exist on one of the states');
     }
-    expect(Number(newState.gameState.balances[0])).toEqual(Number(oldState.gameState.balances[0]) + 2 * stake);
-    expect(Number(newState.gameState.balances[1])).toEqual(Number(oldState.gameState.balances[1]) - 2 * stake);
+    expect(Number(newState.gameState.balances[0])).toEqual(Number(oldState.gameState.balances[0]) + 2 * Number(stake));
+    expect(Number(newState.gameState.balances[1])).toEqual(Number(oldState.gameState.balances[1]) - 2 * Number(stake));
   }
   );
 };
 
-export const itFullySwingsTheBalancesToB = (stake: number, oldState: JointState, newState: JointState) => {
-  const negativeStake = - stake;
+export const itFullySwingsTheBalancesToB = (stake: string, oldState: JointState, newState: JointState) => {
+  const negativeStake = String(- Number(stake));
   itFullySwingsTheBalancesToA(negativeStake, oldState, newState);
 };
 
-export const itHalfSwingsTheBalancesToA = (stake: number, oldState: JointState, newState: JointState) => {
-  const halfStake = 0.5 *  stake;
+export const itHalfSwingsTheBalancesToA = (stake: string, oldState: JointState, newState: JointState) => {
+  const halfStake = String(0.5 *  Number(stake));
   itFullySwingsTheBalancesToA(halfStake, oldState, newState);
 };
 
-export const itHalfSwingsTheBalancesToB = (stake: number, oldState: JointState, newState: JointState) => {
-  const negativeHalfStake = - 0.5 * stake;
+export const itHalfSwingsTheBalancesToB = (stake: string, oldState: JointState, newState: JointState) => {
+  const negativeHalfStake = String(- 0.5 * Number(stake));
   itFullySwingsTheBalancesToA(negativeHalfStake, oldState, newState);
 };
 
 export const itPreservesOnScreenBalances = (oldState: JointState, newState: JointState) => {
   it(`preserves the balances`, () => {
-    if (!('balances' in newState.gameState) || !('balances' in oldState.gameState)) {
+    if (!('onScreenBalances' in newState.gameState) || !('onScreenBalances' in oldState.gameState)) {
       return fail('balances does not exist on one of the states');
     }
-    expect(Number(newState.gameState.balances[0])).toEqual(Number(oldState.gameState.balances[0]));
-    expect(Number(newState.gameState.balances[1])).toEqual(Number(oldState.gameState.balances[1]));
+    expect(Number(newState.gameState.onScreenBalances[0])).toEqual(Number(oldState.gameState.onScreenBalances[0]));
+    expect(Number(newState.gameState.onScreenBalances[1])).toEqual(Number(oldState.gameState.onScreenBalances[1]));
   }
   );
 };

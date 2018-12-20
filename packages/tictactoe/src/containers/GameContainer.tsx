@@ -61,7 +61,7 @@ function RenderGame(props: GameProps) {
           you={Marker.crosses} // fixed by StateName
           player={state.player}
           result={state.result}
-          balances={state.balances}
+          onScreenBalances={state.onScreenBalances}
           marksMade={marksMade}
         />
       );
@@ -74,7 +74,7 @@ function RenderGame(props: GameProps) {
           you={Marker.crosses} // fixed by StateName
           player={state.player}
           result={state.result}
-          balances={state.balances}
+          onScreenBalances={state.onScreenBalances}
           marksMade={marksMade}
         />
       );
@@ -87,7 +87,7 @@ function RenderGame(props: GameProps) {
           you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
-          balances={state.balances}
+          onScreenBalances={state.onScreenBalances}
           marksMade={marksMade}
         />
       );
@@ -100,7 +100,7 @@ function RenderGame(props: GameProps) {
           you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
-          balances={state.balances}
+          onScreenBalances={state.onScreenBalances}
           marksMade={marksMade}
         />
       );
@@ -110,10 +110,10 @@ function RenderGame(props: GameProps) {
         stateType="blah"
         noughts={state.noughts}
         crosses={state.crosses}
-        you={Marker.noughts} // TODO this should take either value
+        you={state.you} // TODO this should take either value
         player={state.player}
         result={state.result}
-        balances={state.balances}
+        onScreenBalances={state.onScreenBalances}
         marksMade={marksMade}
         playAgain={playAgain}
         />

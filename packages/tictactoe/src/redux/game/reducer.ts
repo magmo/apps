@@ -2,7 +2,7 @@ import { Reducer } from 'redux';
 
 import * as actions from './actions';
 import * as states from './state';
-import { Result, Imperative } from '../../core/results';
+import { Result, Imperative, Marker } from '../../core/results';
 
 import { Player, isDraw, isWinningMarks, positions, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
@@ -155,12 +155,13 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const { roundBuyIn, opponentAddress } = action;
       const { myName, libraryAddress, twitterHandle } = gameState;
       const balances = [hexToBN(roundBuyIn).muln(5), hexToBN(roundBuyIn).muln(5)].map(bnToHex) as [string, string];
+      const onScreenBalances = balances;
       const participants: [string, string] = [myAddress, opponentAddress];
       const turnNum = 0;
       const stateCount = 1;
 
       const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle, player: Player.PlayerA,
+        ...action, myName, balances, onScreenBalances, participants, turnNum, stateCount, libraryAddress, twitterHandle, player: Player.PlayerA,
       });
       
 
@@ -193,7 +194,7 @@ function waitingRoomReducer(gameState: states.WaitingRoom, messageState: Message
 
       if (position.name !== positions.PRE_FUND_SETUP_A) { return { gameState, messageState }; }
 
-      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB });
+      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB});
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
@@ -217,7 +218,14 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   // const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
 
   // skip funding and go straight to game
-  const newGameState = states.xsPickMove({ ...gameState, turnNum: gameState.turnNum + 1, noughts:0, crosses:0, result:Imperative.Choose });
+  const newGameState = states.xsPickMove({
+     ...gameState,
+    turnNum: gameState.turnNum + 1,
+    noughts:0,
+    crosses:0,
+    result:Imperative.Choose,
+    onScreenBalances: gameState.balances,
+    you: Marker.crosses, });
  
   return { messageState, gameState: newGameState };
 }
@@ -235,7 +243,15 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
 
 
     // skip funding stage
-    const newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts:0, crosses:0, result: Imperative.Wait });
+    const newGameState = states.osWaitForOpponentToPickMove({
+       ...gameState,
+      turnNum: turnNum + 1,
+      noughts:0,
+      crosses:0,
+      result: Imperative.Wait,
+      onScreenBalances: gameState.balances,
+      you: Marker.noughts,
+      });
 
     const newPosition = positions.preFundSetupB(newGameState);
 
@@ -288,7 +304,14 @@ function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, mes
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const { turnNum } = gameState;
-  const newGameState = states.xsPickMove({ ...gameState, turnNum: turnNum + 1, result: Imperative.Choose, noughts: 0, crosses: 0 });
+  const newGameState = states.xsPickMove({ ...gameState,
+    turnNum: turnNum + 1,
+    result: Imperative.Choose,
+    noughts: 0,
+    crosses: 0,
+    onScreenBalances: gameState.balances, 
+    you: Marker.noughts,
+    });
   if (gameState.player === Player.PlayerB) {
     newGameState.turnNum += 1;
     const opponentAddress = states.getOpponentAddress(gameState);
@@ -331,7 +354,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie, balances: newBalances });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie, balances: newBalances, onScreenBalances: balances });
     pos = positions.draw({ ...newGameState, crosses: newCrosses});
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -340,7 +363,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   // if not draw then full swing to current player, unless its the first turn in a round
   switch (player) {
     case Player.PlayerA: {
-      if (noughts !== 0 && crosses !== 0) {
+      if (noughts !== 0) {
         newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
       } else {
         newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
@@ -348,7 +371,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
       break;
     }
     case Player.PlayerB: {
-      if (noughts !== 0 && crosses !== 0) {
+      if (crosses !== 0) {
         newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
       } else {
         newBalances = favorB(balances, roundBuyIn);
@@ -364,8 +387,9 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
        turnNum: turnNum + 1,
        crosses: newCrosses,
        result: Imperative.Wait,
+       balances: newBalances,
        });
-    pos = positions.Xplaying({ ...newGameState, balances: newBalances});
+    pos = positions.Xplaying({ ...newGameState});
   }
 
   // if winning move
@@ -376,6 +400,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
       crosses: newCrosses, 
       result: Result.YouWin,
       balances: newBalances, 
+      onScreenBalances: newBalances,
      });
     pos = positions.victory({ ...newGameState});
   }
@@ -406,7 +431,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.Tie });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.Tie, balances: newBalances, onScreenBalances: newBalances });
     pos = positions.draw({ ...newGameState, noughts: newNoughts, balances: newBalances });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -415,7 +440,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
   // if not draw then full swing to current player, unless its the first turn in a round
   switch (player) {
     case Player.PlayerA: {
-      if (noughts !== 0 && crosses !== 0) {
+      if (crosses !== 0) {
         newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
         console.log('full swing!');
       } else {
@@ -425,7 +450,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
       break;
     }
     case Player.PlayerB: {
-      if (noughts > 0 || crosses > 0) {
+      if (crosses !== 0) {
         newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
       } else {
         console.log('first move of the round');
@@ -437,13 +462,13 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   // if inconclusive
   if (!isDraw(newNoughts, crosses) && !isWinningMarks(newNoughts)) {
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait });
-    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts, balances: newBalances });
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait, balances: newBalances });
+    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts });
   }
 
   // if winning move
   if (isWinningMarks(newNoughts)) {
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.YouWin, balances: newBalances });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.YouWin, balances: newBalances, onScreenBalances: newBalances });
     pos = positions.victory({ ...newGameState, noughts: newNoughts });
   }
 
@@ -508,9 +533,9 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
 
     if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
       if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
-        newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
+        newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
       } else {
-        newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, result: Result.YouLose });
+        newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
       }
     }
     return { gameState: newGameState, messageState };
@@ -567,14 +592,14 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
           break;
         }
       }
-      newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: Result.Tie, balances: newBalances });
+      newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: Result.Tie, balances: newBalances, onScreenBalances: newBalances });
     }
 
     if (isWinningMarks(receivedCrosses)) { // Lost, if sufficient $ play again?
       if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
-        newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
+        newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, onScreenBalances: newBalances , result: Result.YouLose });
       } else {
-        newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, result: Result.YouLose });
+        newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, onScreenBalances: newBalances , result: Result.YouLose });
       }
 
     }

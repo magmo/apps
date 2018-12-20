@@ -5,39 +5,39 @@ import { Player, Marker } from '../core';
 
 interface Props {
   stateType: string;
-  balances: [string, string];
+  onScreenBalances: [string, string];
   player: Player;
   you: Marker;
 }
 
 export default class StatusAndBalances extends React.PureComponent<Props> {
-  renderYourBalance(balances: [string, string], player: Player) {
+  renderYourBalance(onScreenBalances: [string, string], player: Player) {
     if (player === Player.PlayerA) {
-      return <span>{web3Utils.fromWei(balances[0], 'ether')}</span>;
+      return <span>{web3Utils.fromWei(onScreenBalances[0], 'ether')}</span>;
     }
     if (player === Player.PlayerB) {
-      return <span>{web3Utils.fromWei(balances[1], 'ether')} </span>;
+      return <span>{web3Utils.fromWei(onScreenBalances[1], 'ether')} </span>;
     } else { return; }
   }
-  renderTheirBalance(balances: [string, string], player: Player) {
+  renderTheirBalance(onScreenBalances: [string, string], player: Player) {
     if (player === Player.PlayerA) {
-      return <span>{web3Utils.fromWei(balances[1], 'ether')}</span>;
+      return <span>{web3Utils.fromWei(onScreenBalances[1], 'ether')}</span>;
     }
     if (player === Player.PlayerB) {
-      return <span>{web3Utils.fromWei(balances[0], 'ether')} </span>;
+      return <span>{web3Utils.fromWei(onScreenBalances[0], 'ether')} </span>;
     } else { return; }
   }
 
   render() {
-    const { balances, player, you } = this.props;
+    const { onScreenBalances, player, you } = this.props;
     return (
       <div id="status-container">
         <h1 className="full-width-bar" id="top-bar" >&nbsp;<YourMarker stateType="blah" you={you} />&nbsp;[You]&nbsp;
       <span>
-            {this.renderYourBalance(balances, player)} ETH
+            {this.renderYourBalance(onScreenBalances, player)} ETH
           </span>&nbsp;|
       <span>
-            &nbsp;{this.renderTheirBalance(balances, player)} ETH
+            &nbsp;{this.renderTheirBalance(onScreenBalances, player)} ETH
           </span>
           &nbsp;[Them]&nbsp;<TheirMarker stateType="blah" you={you} />
         </h1>

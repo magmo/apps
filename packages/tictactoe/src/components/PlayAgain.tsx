@@ -9,7 +9,7 @@ interface Props {
   you: Marker;
   noughts: Marks;
   crosses: Marks;
-  balances: [string, string];
+  onScreenBalances: [string, string];
   player: Player;
   result: Result | Imperative;
   // action goes here (.e.g. player picks a move)
@@ -22,7 +22,7 @@ interface Props {
 
 export default class PlayAgain extends React.PureComponent<Props> {
   render() {
-    const { noughts, crosses, you, player, result, balances, marksMade, playAgain } = this.props;
+    const { noughts, crosses, you, player, result, onScreenBalances, marksMade, playAgain } = this.props;
     return (
       <div>
         <GameScreen
@@ -32,7 +32,7 @@ export default class PlayAgain extends React.PureComponent<Props> {
         you={you} // fixed by StateName
         player={player}
         result={result}
-        balances={balances}
+        onScreenBalances={onScreenBalances}
         marksMade={marksMade}
         />
         <Button className="cog-button homePage-loginButton" onClick={playAgain} >
