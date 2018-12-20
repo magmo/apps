@@ -87,20 +87,21 @@ describe('player A\'s app', () => {
 
   describe('when in XsWaitForOpponentToPickMove', () => {
 
-    // describe('when inconclusive Oplaying arrives', () => {
-    //   const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...playing1, result: Imperative.Wait });
-    //   const action = actions.positionReceived({ ...playing2 });
-    //   const receivedNoughts = playing2.noughts;
+    describe('when inconclusive Oplaying arrives', () => {
+      const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...playing1, result: Imperative.Wait });
+      const action = actions.positionReceived({ ...playing2 });
+      const receivedNoughts = playing2.noughts;
 
-    //   const updatedState = gameReducer({ messageState, gameState }, action);
+      const updatedState = gameReducer({ messageState, gameState }, action);
 
-    //   itTransitionsTo(state.StateName.XsPickMove, updatedState);
-    //   itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-    //   it('sets theirMarks', () => {
-    //     const newGameState = updatedState.gameState as state.XsPickMove;
-    //     expect(newGameState.noughts).toEqual(receivedNoughts);
-    //   });
-    // });
+      itTransitionsTo(state.StateName.XsPickMove, updatedState);
+      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      it('sets theirMarks', () => {
+        const newGameState = updatedState.gameState as state.XsPickMove;
+        expect(newGameState.noughts).toEqual(receivedNoughts);
+      });
+      itPreservesOnScreenBalances( {gameState, messageState}, updatedState );
+    });
 
     // a draw cannot arrive if we are Xs
 
@@ -114,11 +115,11 @@ describe('player A\'s app', () => {
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-                
+        const newGameState = updatedState.gameState as state.PlayAgain;
         it('sets theirMarks', () => {
-          const newGameState = updatedState.gameState as state.PlayAgain;
           expect(newGameState.noughts).toEqual(receivedNoughts);
         });
+        itFullySwingsTheBalancesToB(Number(roundBuyIn), {gameState, messageState}, updatedState );
       });
 
       describe('and there are now insufficient funds', () => {
@@ -127,6 +128,7 @@ describe('player A\'s app', () => {
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+        itFullySwingsTheBalancesToB(Number(roundBuyIn), {gameState, messageState}, updatedState );
         it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.XsPickMove;
           expect(newGameState.noughts).toEqual(receivedNoughts);
@@ -228,6 +230,7 @@ describe('player B\'s app', () => {
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+        itFullySwingsTheBalancesToA(Number(roundBuyIn), {gameState, messageState}, updatedState);
         it('sets theirMarks', () => {
           const newGameState = updatedState.gameState as state.OsPickMove;
           expect(newGameState.crosses).toEqual(receivedCrosses);

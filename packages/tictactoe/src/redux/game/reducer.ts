@@ -484,7 +484,7 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
     }
 
     let newGameState: states.XsPickMove | states.PlayAgain | states.InsufficientFunds
-      = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, balances: newBalances, result: Imperative.Choose });
+      = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, result: Imperative.Choose });
 
     if (!isWinningMarks(receivedNoughts) && !isDraw(receivedNoughts, crosses)) { // Not conclusive, keep playing
       // go with default case

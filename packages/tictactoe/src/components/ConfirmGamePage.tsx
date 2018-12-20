@@ -15,12 +15,13 @@ export default class ConfirmGamePage extends React.PureComponent<Props> {
   render() {
 
     const { confirmGame, cancelGame, stake, opponentName } = this.props;
+    const gameBuyIn = String(Number(stake)*5);
     return (
       <ApplicationLayout>
         <div className="w-100 text-center mb-5">
           <h1 className="w-100">Game Proposed!</h1>
           <div>
-            <p>{opponentName} has accepted your challenge with a {web3Utils.fromWei(stake, 'ether')} ETH buy in.</p>
+            <p>{opponentName} has accepted your challenge with a {web3Utils.fromWei(gameBuyIn, 'ether')} ETH game buy in.</p>
             <p>Do you want to play?</p>
 
             <div>
