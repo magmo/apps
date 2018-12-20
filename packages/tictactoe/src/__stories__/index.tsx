@@ -12,12 +12,11 @@ import Outcome from '../components/Outcome';
 import StatusAndBalances from '../components/StatusAndBalances';
 import GameScreen from '../components/GameScreen';
 import { Marker, Result, Player, Imperative, Marks } from '../core';
-import BN from "bn.js";
-import bnToHex from '../utils/bnToHex';
 import { scenarios } from '../core';
 import * as loginActions from '../redux/login/actions';
 import PlayAgain from '../components/PlayAgain';
-
+import BN from "bn.js";
+import bnToHex from "../utils/bnToHex";
 import * as states from '../redux/game/state';
 
 import GameContainer from '../containers/GameContainer';
@@ -25,7 +24,9 @@ import GameContainer from '../containers/GameContainer';
 import '../index.scss';
 import '../index.css';
 
-const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
+const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(bnToHex) as [string, string]; // in wei
+const finneyFiveFive = [new BN(5000000000000000), new BN(5000000000000000)].map(bnToHex) as [string, string];
+const finneySixFour = [new BN(6000000000000000), new BN(4000000000000000)].map(bnToHex) as [string, string];
 
 const shared = { ...scenarios.shared };
 
@@ -37,7 +38,7 @@ const initialState = {
       stateCount: 1,
       noughts: 0,
       crosses: 0,
-      balances: fiveFive,
+      balances: finneyFiveFive,
       turnNum: 4,
       result: Imperative.Choose,
       player: Player.PlayerA,
@@ -88,8 +89,8 @@ storiesOf('Outcome', module)
   .add('Choose', () => <Outcome stateType="blah" result={Imperative.Choose} />);
 
 storiesOf('Status and Balances', module)
-  .add('You Winning', () => <StatusAndBalances stateType="blah" balances={["6", "4"]} player={Player.PlayerA} you={Marker.crosses} />)
-  .add('You Losing', () => <StatusAndBalances stateType="blah" balances={["9", "4"]} player={Player.PlayerB} you={Marker.crosses} />);
+  .add('You Winning', () => <StatusAndBalances stateType="blah" balances={finneySixFour} player={Player.PlayerA} you={Marker.crosses} />)
+  .add('You Losing', () => <StatusAndBalances stateType="blah" balances={finneyFourSix} player={Player.PlayerB} you={Marker.crosses} />);
 
 
 storiesOf('Game Screen', module)
@@ -100,7 +101,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Imperative.Wait}
-    balances={["6", "4"]}
+    balances={finneySixFour}
     marksMade={marksMade}
   />)
   .add('Choosing', () => <GameScreen
@@ -110,7 +111,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Imperative.Choose}
-    balances={["4", "6"]}
+    balances={finneyFourSix}
     marksMade={marksMade}
   />)
   .add('X win', () => <GameScreen
@@ -120,7 +121,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Result.YouWin}
-    balances={["6", "4"]}
+    balances={finneySixFour}
     marksMade={marksMade}
   />)
   .add('O win', () => <GameScreen
@@ -130,7 +131,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Result.YouLose}
-    balances={["4", "6"]}
+    balances={finneyFourSix}
     marksMade={marksMade}
   />)
   .add('Tie', () => <GameScreen
@@ -140,7 +141,7 @@ storiesOf('Game Screen', module)
     you={Marker.crosses}
     player={Player.PlayerA}
     result={Result.Tie}
-    balances={["5", "5"]}
+    balances={finneyFiveFive}
     marksMade={marksMade}
   />);
 
@@ -173,7 +174,7 @@ storiesOf('App (reading from the fake store)', module)
     you={Marker.noughts} // TODO this should take either value
     player={Player.PlayerA}
     result={Result.YouWin}
-    balances={["6", "4"]}
+    balances={finneySixFour}
     marksMade={marksMade}
     playAgain={playAgain}
     />);
