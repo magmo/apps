@@ -53,6 +53,34 @@ export const itHandlesResignLikeItsMyTurn = (gameState: state.PlayingState, mess
   });
 };
 
+export const itFullySwingsTheBalancesToA = (stake: number, oldState: JointState, newState: JointState) => {
+  it(`swings the balance by ${stake}`, () => {
+    if (!('balances' in newState.gameState) || !('balances' in oldState.gameState)) {
+      return fail('balances does not exist on one of the states');
+    }
+    expect(Number(newState.gameState.balances[0])).toEqual(Number(oldState.gameState.balances[0]) + 2 * stake);
+    expect(Number(newState.gameState.balances[1])).toEqual(Number(oldState.gameState.balances[1]) - 2 * stake);
+  }
+  );
+};
+
+export const itFullySwingsTheBalancesToB = (stake: number, oldState: JointState, newState: JointState) => {
+  const negativeStake = - stake;
+  itFullySwingsTheBalancesToA(negativeStake, oldState, newState);
+};
+
+export const itHalfSwingsTheBalancesToA = (stake: number, oldState: JointState, newState: JointState) => {
+  const halfStake = 0.5 *  stake;
+  itFullySwingsTheBalancesToA(halfStake, oldState, newState);
+};
+
+export const itHalfSwingsTheBalancesToB = (stake: number, oldState: JointState, newState: JointState) => {
+  const negativeHalfStake = - 0.5 * stake;
+  itFullySwingsTheBalancesToA(negativeHalfStake, oldState, newState);
+};
+
+
+
 // export const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => {
 //   const { turnNum } = gameState;
 //   const isTheirTurn = gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;

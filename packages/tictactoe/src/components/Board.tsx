@@ -13,8 +13,8 @@ export default class Board extends React.PureComponent<Props> {
   crucialMark(marks: Marks, position: Marks) {
     let pattern: Marks;
     for (pattern of winningPatterns) {
-      if (marks === pattern && ((position & pattern) === position)) {
-        return true;
+      if (((marks & pattern) === pattern) && ((position & pattern) === position)) {
+        return true; // does this pattern contain 
       }
     }
     return false;
@@ -58,12 +58,13 @@ export default class Board extends React.PureComponent<Props> {
 
 
   renderMark(noughts: Marks, crosses: Marks, position: Marks) {
-    if (isDraw(noughts, crosses)) {
-      return this.drawRenderMark(noughts, crosses, position);
-    }
-    else if (isWinningMarks(noughts) || isWinningMarks(crosses)) {
+    if (isWinningMarks(noughts) || isWinningMarks(crosses)) {
       return this.winRenderMark(noughts, crosses, position);
-    } else { return this.noWinRenderMark(noughts, crosses, position); }
+    } else if (isDraw(noughts, crosses)) {
+      return this.drawRenderMark(noughts, crosses, position);
+    } else {
+      return this.noWinRenderMark(noughts, crosses, position); 
+    }
   }
 
   render() {

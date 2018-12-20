@@ -34,8 +34,8 @@ export const lefCol: Marks = (Marks.tl | Marks.ml | Marks.bl); /*  0b100100100 =
 export const midCol: Marks = (Marks.tm | Marks.mm | Marks.bm); /*  0b010010010 = 146 mask for win @ col 2 */
 export const rigCol: Marks = (Marks.tr | Marks.mr | Marks.br); /*  0b001001001 =  73 mask for win @ col 3 */
 
-export const dhDiag: Marks = (Marks.tl | Marks.tm | Marks.tr); /*  0b100010001 = 273 mask for win @ downhill diag */
-export const uhDiag: Marks = (Marks.tl | Marks.tm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
+export const dhDiag: Marks = (Marks.tl | Marks.mm | Marks.br); /*  0b100010001 = 273 mask for win @ downhill diag */
+export const uhDiag: Marks = (Marks.bl | Marks.mm | Marks.tr); /*  0b001010100 =  84 mask for win @ uphill diag */
 
 export const fullBd: Marks = (topRow | midRow | botRow); /* 0b111111111 = 511 full board */
 

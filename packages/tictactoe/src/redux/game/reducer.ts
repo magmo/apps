@@ -320,7 +320,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   let newGameState: states.GameState = states.playAgain({ ...gameState, turnNum: turnNum + 1,  result: Result.Tie }); // default
 
   // if draw
-  if (isDraw(noughts, newCrosses)) {
+  if (isDraw(noughts, newCrosses) && !isWinningMarks(newCrosses)) {
     switch (player) {
       case Player.PlayerA: {
         newBalances = favorA(balances, roundBuyIn);

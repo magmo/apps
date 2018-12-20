@@ -11,6 +11,8 @@ import {
   // itHandlesResignLikeItsMyTurn,
   // itHandlesResignLikeItsTheirTurn,
   itSends,
+  itFullySwingsTheBalancesToA,
+  itHalfSwingsTheBalancesToA,
 } from './helpers';
 
 const {
@@ -55,6 +57,11 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.XsWaitForOpponentToPickMove, updatedState);
       itSends(playing1, updatedState);
+      if (gameState.crosses === 0) {
+        itHalfSwingsTheBalancesToA(Number(aProps.roundBuyIn), {gameState, messageState}, updatedState);
+      } else {
+        itFullySwingsTheBalancesToA(Number(aProps.roundBuyIn), {gameState, messageState}, updatedState);
+      }
     });
 
     describe('when making a drawing XS_CHOSE_MOVE', () => {
@@ -65,6 +72,7 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(draw, updatedState);
+      itHalfSwingsTheBalancesToA(Number(aProps.roundBuyIn), {gameState, messageState}, updatedState);
     });
 
     describe('when making a winning XS_CHOSE_MOVE', () => {
@@ -75,6 +83,7 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
       itSends(scenarios.crossesVictory.victory, updatedState);
+      itFullySwingsTheBalancesToA(Number(aProps.roundBuyIn), {gameState, messageState}, updatedState);
     });
   });
 

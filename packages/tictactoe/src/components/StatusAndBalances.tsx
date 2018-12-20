@@ -13,7 +13,6 @@ interface Props {
 export default class StatusAndBalances extends React.PureComponent<Props> {
   renderYourBalance(balances: [string, string], player: Player) {
     if (player === Player.PlayerA) {
-      // return <span>{hexToBN(balances[0]).toString(10, 0)}</span>;
       return <span>{web3Utils.fromWei(balances[0], 'ether')}</span>;
     }
     if (player === Player.PlayerB) {

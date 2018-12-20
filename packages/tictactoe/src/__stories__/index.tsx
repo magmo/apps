@@ -124,6 +124,16 @@ storiesOf('Game Screen', module)
     balances={finneySixFour}
     marksMade={marksMade}
   />)
+  .add('Double X win', () => <GameScreen
+  stateType="blah"
+  noughts={0b010100110}
+  crosses={0b101011001}
+  you={Marker.crosses}
+  player={Player.PlayerA}
+  result={Result.YouWin}
+  balances={finneySixFour}
+  marksMade={marksMade}
+/>)
   .add('O win', () => <GameScreen
     stateType="blah"
     noughts={0b100100100}
