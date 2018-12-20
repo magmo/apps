@@ -5,6 +5,8 @@ import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 
 import web3Utils from 'web3-utils';
 
+// import BN from 'bn.js';
+
 interface Props {
   visible: boolean;
   createOpenGame: (roundBuyIn: string) => void;
@@ -53,7 +55,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
   createOpenGameHandler(e) {
     e.preventDefault();
     if (this.state.errorMessage === "") {
-      this.props.createOpenGame(web3Utils.toWei(this.state.buyIn, 'ether'));
+      this.props.createOpenGame(web3Utils.toWei(String(this.calculateRoundBuyIn()), 'ether'));
     } else {
       this.setState({ buyInChanged: true });
     }
