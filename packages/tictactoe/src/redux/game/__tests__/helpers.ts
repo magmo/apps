@@ -79,7 +79,16 @@ export const itHalfSwingsTheBalancesToB = (stake: number, oldState: JointState, 
   itFullySwingsTheBalancesToA(negativeHalfStake, oldState, newState);
 };
 
-
+export const itPreservesOnScreenBalances = (oldState: JointState, newState: JointState) => {
+  it(`preserves the balances`, () => {
+    if (!('balances' in newState.gameState) || !('balances' in oldState.gameState)) {
+      return fail('balances does not exist on one of the states');
+    }
+    expect(Number(newState.gameState.balances[0])).toEqual(Number(oldState.gameState.balances[0]));
+    expect(Number(newState.gameState.balances[1])).toEqual(Number(oldState.gameState.balances[1]));
+  }
+  );
+};
 
 // export const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => {
 //   const { turnNum } = gameState;

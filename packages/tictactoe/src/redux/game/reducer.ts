@@ -364,9 +364,8 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
        turnNum: turnNum + 1,
        crosses: newCrosses,
        result: Imperative.Wait,
-       balances: newBalances,
        });
-    pos = positions.Xplaying({ ...newGameState});
+    pos = positions.Xplaying({ ...newGameState, balances: newBalances});
   }
 
   // if winning move
@@ -376,9 +375,9 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
       turnNum: turnNum + 1, 
       crosses: newCrosses, 
       result: Result.YouWin,
-      balances: newBalances,
+      balances: newBalances, 
      });
-    pos = positions.victory({ ...newGameState });
+    pos = positions.victory({ ...newGameState});
   }
 
   messageState = sendMessage(pos, opponentAddress, messageState);
@@ -438,8 +437,8 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   // if inconclusive
   if (!isDraw(newNoughts, crosses) && !isWinningMarks(newNoughts)) {
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait, balances: newBalances  });
-    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts});
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Imperative.Wait });
+    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts, balances: newBalances });
   }
 
   // if winning move
@@ -551,7 +550,7 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
     }
 
     let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
-      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, balances: newBalances, result: Imperative.Choose  });
+      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, result: Imperative.Choose  });
 
     if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) { // Not conclusive, keep playing
       // go with default case
