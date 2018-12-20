@@ -1,8 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { Provider } from 'react-redux';
-// Once it exists import styling here
-import '../index.css';
 // import { Button } from '@storybook/react/demo';
 import HomePage from '../components/HomePage';
 import { OpenGame } from "../redux/open-games/state";
@@ -24,8 +22,8 @@ import * as states from '../redux/game/state';
 
 import GameContainer from '../containers/GameContainer';
 
-import '../index.css';
 import '../index.scss';
+import '../index.css';
 
 const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 

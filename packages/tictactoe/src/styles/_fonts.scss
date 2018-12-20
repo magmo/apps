@@ -1,9 +1,12 @@
-$rps-font-family: WoodfordBourne; 
+$rps-font-family: RobotoMono; 
 
+/* roboto-mono-regular - latin */
 @font-face {
-  font-family: "WoodfordBourne";
-  src: url("./woodfordbourne-regular-webfont.woff2") format("woff2"),
-  // url("./fonts/woodfordbourne-regular-webfont.woff") format("woff"),
+  font-family: 'RobotoMono';
+  font-style: normal;
+  src: 
+       url('./fonts/roboto-mono-v5-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('./fonts/roboto-mono-v5-latin-regular.woff') format('woff'), /* Modern Browsers */
 }
 
 // Bootstrap overrides
