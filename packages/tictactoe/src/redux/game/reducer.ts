@@ -90,6 +90,8 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       if (action.type === actions.POSITION_RECEIVED) {
         return osWaitMoveReducer(gameState, messageState, action);
       } else { return state; }
+    case states.StateName.PlayAgain:
+      return playAgainReducer(gameState, messageState, action);
     default:
       return state;
   }
@@ -504,6 +506,21 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
     return { gameState: newGameState, messageState };
   }
   else { return { gameState, messageState }; }
+}
+
+function playAgainReducer(gameState: states.PlayAgain, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+  let newGameState: states.GameState;
+  if (gameState.result !== Result.YouLose) {
+    // transition to WaitForResting
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, noughts:0, crosses:0, result:Imperative.Wait });
+
+  } else {
+    // transition to PickMove
+    newGameState = states.xsPickMove({ ...gameState, noughts:0, crosses:0, result: Imperative.Choose});
+  }
+  return { gameState: newGameState, messageState };
 }
 
 function itsMyTurn(gameState: states.PlayingState) {
