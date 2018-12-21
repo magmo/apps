@@ -10,6 +10,7 @@ import WaitingRoomPage from '../components/WaitingRoomPage';
 import ConfirmGamePage from '../components/ConfirmGamePage';
 import GameProposedPage from '../components/GameProposedPage';
 import PlayAgain from '../components/PlayAgain';
+import InsufficientFunds from '../components/InsufficientFunds';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
@@ -123,6 +124,19 @@ function RenderGame(props: GameProps) {
         playAgain={playAgain}
         />
         );
+      case StateName.InsufficientFunds:
+      return (
+        <InsufficientFunds
+      stateType="blah"
+      noughts={state.noughts}
+      crosses={state.crosses}
+      you={state.you} // TODO this should take either value
+      player={state.player}
+      result={state.result}
+      onScreenBalances={state.onScreenBalances}
+      marksMade={marksMade}
+      />
+      );
     default:
       throw new Error(`View not created for ${state.name}`);
   }

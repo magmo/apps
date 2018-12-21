@@ -361,14 +361,25 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
 
   // if winning move
   if (isWinningMarks(newCrosses)) {
-    newGameState = states.playAgain({
-      ...gameState, 
-      turnNum: turnNum + 1, 
-      crosses: newCrosses, 
-      result: Result.YouWin,
-      balances: newBalances, 
-      onScreenBalances: newBalances,
-     });
+    if (( newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
+      newGameState = states.playAgain({
+        ...gameState, 
+        turnNum: turnNum + 1, 
+        crosses: newCrosses, 
+        result: Result.YouWin,
+        balances: newBalances, 
+        onScreenBalances: newBalances,
+      });
+    } else {
+      newGameState = states.insufficientFunds({
+        ...gameState,
+        turnNum: turnNum + 1, 
+        crosses: newCrosses,
+        balances: newBalances,
+        onScreenBalances: newBalances,
+        result: Result.YouWin,
+      });
+    }
     pos = positions.victory({ ...newGameState});
   }
 
@@ -435,13 +446,30 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
 
   // if winning move
   if (isWinningMarks(newNoughts)) {
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, noughts: newNoughts, result: Result.YouWin, balances: newBalances, onScreenBalances: newBalances });
-    pos = positions.victory({ ...newGameState, noughts: newNoughts });
+    if (( newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
+      newGameState = states.playAgain({
+        ...gameState, 
+        turnNum: turnNum + 1, 
+        noughts: newNoughts, 
+        result: Result.YouWin,
+        balances: newBalances, 
+        onScreenBalances: newBalances,
+      });
+    } else {
+      newGameState = states.insufficientFunds({
+        ...gameState,
+        turnNum: turnNum + 1, 
+        noughts: newNoughts,
+        balances: newBalances,
+        onScreenBalances: newBalances,
+        result: Result.YouWin,
+      });
+    }
   }
-
+  pos = positions.victory({ ...newGameState});
   messageState = sendMessage(pos, opponentAddress, messageState);
+  // console.log(newGameState);
   return { gameState: newGameState, messageState };
-
 }
 
 function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived): JointState {
@@ -450,7 +478,7 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
      (action.position.name === positions.DRAW) || 
      (action.position.name === positions.VICTORY))) { // should only allow a change in gamestate if we receieve the appropriate position.
     const receivedNoughts = action.position.noughts;
-    const { player, turnNum } = gameState;
+    const { turnNum } = gameState;
     const { crosses, balances, roundBuyIn} = action.position;
     const newBalances: [string, string] = balances;
 
@@ -463,7 +491,7 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
     }
 
     if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
-      if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
+      if (( newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
         newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
       } else {
         newGameState = states.insufficientFunds({ ...gameState, noughts: receivedNoughts, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
@@ -480,7 +508,7 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
      (action.position.name === positions.DRAW) || 
      (action.position.name === positions.VICTORY))) {
     const receivedCrosses = action.position.crosses;
-    const { player, turnNum } = gameState;
+    const { turnNum } = gameState;
     const { noughts, balances, roundBuyIn} = action.position;
     const newBalances: [string, string] = balances;
 
@@ -496,7 +524,7 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
     }
 
     if (isWinningMarks(receivedCrosses)) { // Lost, if sufficient $ play again?
-      if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
+      if (( newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
         newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, onScreenBalances: newBalances , result: Result.YouLose });
       } else {
         newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, onScreenBalances: newBalances , result: Result.YouLose });
@@ -512,15 +540,16 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
   let newGameState: states.GameState;
-  if (gameState.result !== Result.YouLose) {
-    // transition to WaitForResting
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, noughts:0, crosses:0, result:Imperative.Wait });
-
-  } else {
-    // transition to PickMove
-    newGameState = states.xsPickMove({ ...gameState, noughts:0, crosses:0, result: Imperative.Choose});
-  }
-  return { gameState: newGameState, messageState };
+  if (action.type === actions.PLAY_AGAIN) {
+    if (gameState.result !== Result.YouLose) {
+      // transition to WaitForResting
+      newGameState = states.osWaitForOpponentToPickMove({ ...gameState, noughts:0, crosses:0, result:Imperative.Wait });
+    } else {
+      // transition to PickMove
+      newGameState = states.xsPickMove({ ...gameState, noughts:0, crosses:0, result: Imperative.Choose});
+    }
+    return { gameState: newGameState, messageState };
+  } else {return { gameState, messageState }; }
 }
 
 function itsMyTurn(gameState: states.PlayingState) {

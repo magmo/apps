@@ -20,6 +20,12 @@ interface Props {
 export default class InsufficientFunds extends React.PureComponent<Props> {
   render() {
     const {you, onScreenBalances, player, result} = this.props;
+    let Loser: string = "";
+    if (result === Result.YouLose){
+      Loser = "You have run ";
+    } else {
+      Loser = "Your opponent has run";
+    }
     return (
     <div id="main-container">
       <StatusAndBalances stateType="blah" onScreenBalances={onScreenBalances} player={player} you = {you}/>
@@ -27,7 +33,7 @@ export default class InsufficientFunds extends React.PureComponent<Props> {
         <div id="main-container">
               Game concluding:
             {/* TODO: Display which player ran out of funds. */}
-            <h2 className="w-100 text-center">You or your opponent has run out of funds.</h2>
+            <h2 className="w-100 text-center">{ Loser } out of funds.</h2>
         <div id="magmo-logo"><img src={MAGMO_LOGO}/></div>
         </div>
       </div>
