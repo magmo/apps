@@ -11,6 +11,9 @@ import ConfirmGamePage from '../components/ConfirmGamePage';
 import GameProposedPage from '../components/GameProposedPage';
 import PlayAgain from '../components/PlayAgain';
 import InsufficientFunds from '../components/InsufficientFunds';
+import WaitToResign from '../components/WaitToResign';
+import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
+import GameOverPage from '../components/GameOverPage';
 
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
@@ -23,6 +26,9 @@ interface GameProps {
   confirmGame: () => void;
   declineGame: () => void;
   playAgain: () => void;
+  resign: () => void;
+  // withdraw: () => void;
+  exitToLobby: () => void;
 }
 
 function GameContainer(props: GameProps) {
@@ -36,7 +42,7 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, marksMade, confirmGame, declineGame, playAgain } = props;
+  const { state, marksMade, confirmGame, declineGame, playAgain, resign } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
@@ -65,6 +71,7 @@ function RenderGame(props: GameProps) {
           onScreenBalances={state.onScreenBalances} 
           // onScreenBalances={state.balances} // display enforceable outcome
           marksMade={marksMade}
+          resign={resign}
         />
       );
     case StateName.XsWaitForOpponentToPickMove:
@@ -79,6 +86,7 @@ function RenderGame(props: GameProps) {
           onScreenBalances={state.onScreenBalances}
           // onScreenBalances={state.balances}
           marksMade={marksMade}
+          resign={resign}
         />
       );
     case StateName.OsPickMove:
@@ -93,6 +101,7 @@ function RenderGame(props: GameProps) {
           onScreenBalances={state.onScreenBalances} 
           // onScreenBalances={state.balances} // display enforceable outcome
           marksMade={marksMade}
+          resign={resign}
         />
       );
     case StateName.OsWaitForOpponentToPickMove:
@@ -107,6 +116,7 @@ function RenderGame(props: GameProps) {
           onScreenBalances={state.onScreenBalances}
           // onScreenBalances={state.balances}
           marksMade={marksMade}
+          resign={resign}
         />
       );
     case StateName.PlayAgain:
@@ -122,6 +132,7 @@ function RenderGame(props: GameProps) {
           // onScreenBalances={state.balances}
         marksMade={marksMade}
         playAgain={playAgain}
+        resign={resign}
         />
         );
       case StateName.InsufficientFunds:
@@ -137,6 +148,13 @@ function RenderGame(props: GameProps) {
       marksMade={marksMade}
       />
       );
+    case StateName.WaitToResign:
+      return <WaitToResign />;
+    case StateName.WaitForResignationAcknowledgement:
+      return <WaitForResignationAcknowledgement />;
+    case StateName.GameOver:
+    case StateName.OpponentResigned:
+      return <GameOverPage visible={state.name === (StateName.OpponentResigned || StateName.GameOver)} exitToLobby={actions.exitToLobby} />;
     default:
       throw new Error(`View not created for ${state.name}`);
   }
@@ -152,6 +170,8 @@ const mapDispatchToProps = {
   confirmGame: actions.confirmGame,
   declineGame: actions.declineGame,
   playAgain: actions.playAgain,
+  resign: actions.resign,
+  exitToLobby: actions.exitToLobby,
 };
 
 // why does it think that mapStateToProps can return undefined??

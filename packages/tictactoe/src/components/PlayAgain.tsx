@@ -15,6 +15,7 @@ interface Props {
   // action goes here (.e.g. player picks a move)
   playAgain: () => void;
   marksMade: (x: Marks) => void;
+  resign: () => void;
 }
 
 
@@ -22,7 +23,7 @@ interface Props {
 
 export default class PlayAgain extends React.PureComponent<Props> {
   render() {
-    const { noughts, crosses, you, player, result, onScreenBalances, marksMade, playAgain } = this.props;
+    const { noughts, crosses, you, player, result, onScreenBalances, marksMade, playAgain, resign } = this.props;
     return (
       <div>
         <GameScreen
@@ -34,6 +35,7 @@ export default class PlayAgain extends React.PureComponent<Props> {
         result={result}
         onScreenBalances={onScreenBalances}
         marksMade={marksMade}
+        resign={resign}
         />
         <Button className="cog-button homePage-loginButton" onClick={playAgain} >
         Play Again!

@@ -139,6 +139,15 @@ td:after {
     bottom: 45px;
     transform: translate(0,0);
 }
+
+.resignButton {
+    position: absolute;
+    left: 5px;
+    bottom: 45px;
+    font-size: 20px;
+    transform: translate(0,0);
+  }
+
 .blank {
     margin: 0;
     padding: 0;
@@ -195,4 +204,5 @@ td:after {
     border-top: solid white;
     border-left: solid white;
 }
+
 

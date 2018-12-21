@@ -53,6 +53,7 @@ const initialState = {
 const marksMade = (x: Marks) => alert("marks made");
 const joinOpenGame = () => alert("join open game");
 const playAgain = () => alert('playing again');
+const resign = () => alert('resigned');
 // const newOpenGame = () => alert("new open game");
 
 storiesOf('HomePage', module).add('Home', () => <HomePage login={loginActions.loginRequest}/>);
@@ -106,6 +107,7 @@ storiesOf('Game Screen', module)
     result={Imperative.Wait}
     onScreenBalances={finneySixFour}
     marksMade={marksMade}
+    resign={resign}
   />)
   .add('Choosing', () => <GameScreen
     stateType="blah"
@@ -116,6 +118,7 @@ storiesOf('Game Screen', module)
     result={Imperative.Choose}
     onScreenBalances={finneyFourSix}
     marksMade={marksMade}
+    resign={resign}
   />)
   .add('X win', () => <GameScreen
     stateType="blah"
@@ -126,16 +129,18 @@ storiesOf('Game Screen', module)
     result={Result.YouWin}
     onScreenBalances={finneySixFour}
     marksMade={marksMade}
+    resign={resign}
   />)
   .add('Double X win', () => <GameScreen
-  stateType="blah"
-  noughts={0b010100110}
-  crosses={0b101011001}
-  you={Marker.crosses}
-  player={Player.PlayerA}
-  result={Result.YouWin}
-  onScreenBalances={finneySixFour}
-  marksMade={marksMade}
+    stateType="blah"
+    noughts={0b010100110}
+    crosses={0b101011001}
+    you={Marker.crosses}
+    player={Player.PlayerA}
+    result={Result.YouWin}
+    onScreenBalances={finneySixFour}
+    marksMade={marksMade}
+    resign={resign}
 />)
   .add('O win', () => <GameScreen
     stateType="blah"
@@ -146,6 +151,7 @@ storiesOf('Game Screen', module)
     result={Result.YouLose}
     onScreenBalances={finneyFourSix}
     marksMade={marksMade}
+    resign={resign}
   />)
   .add('Tie', () => <GameScreen
     stateType="blah"
@@ -156,6 +162,7 @@ storiesOf('Game Screen', module)
     result={Result.Tie}
     onScreenBalances={finneyFiveFive}
     marksMade={marksMade}
+    resign={resign}
   />);
 
 const fakeStore = (state) => ({
@@ -167,6 +174,7 @@ const fakeStore = (state) => ({
   subscribe: () => (() => {/* empty */ }),
   replaceReducer: () => { /* empty */ },
   playAgain: () => { /* empty */ },
+  resign: () => { /* empty */ },
 });
 
 const testState = (state) => (
@@ -191,6 +199,7 @@ storiesOf('App (reading from the fake store)', module)
       onScreenBalances={finneySixFour}
       marksMade={marksMade}
       playAgain={playAgain}
+      resign={resign}
       />)
     .add('Insufficient Funds', () => <InsufficientFunds
       stateType="blah"
