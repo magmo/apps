@@ -128,7 +128,8 @@ describe('player A\'s app', () => {
 
       describe('and there are now insufficient funds', () => {
         const gameState = state.xsWaitForOpponentToPickMove({ ...aProps, ...scenarios.noughtsVictory.playing5closetoempty, result: Imperative.Wait, onScreenBalances: ["",""]  });
-        const updatedState = gameReducer({ messageState, gameState }, action);
+        const action1 = actions.positionReceived({ ...scenarios.noughtsVictory.absolutevictory});
+        const updatedState = gameReducer({ messageState, gameState }, action1);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
@@ -231,7 +232,8 @@ describe('player B\'s app', () => {
 
       describe('and there are now insufficient funds', () => {
         const gameState = state.osWaitForOpponentToPickMove({ ...bProps, ...scenarios.crossesVictory.playing4closetoempty, result: Imperative.Wait, onScreenBalances: ["",""]   });
-        const updatedState = gameReducer({ messageState, gameState }, action);
+        const action2 = actions.positionReceived({ ...scenarios.crossesVictory.absolutevictory});
+        const updatedState = gameReducer({ messageState, gameState }, action2);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);

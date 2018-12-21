@@ -15,9 +15,9 @@ const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 const sixFour = [new BN(6), new BN(4)].map(bnToHex) as [string, string];
 const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
 const twoFour = [new BN(2), new BN(4)].map(bnToHex) as [string, string];
-const zeroSeven = [new BN(0), new BN(7)].map(bnToHex) as [string, string];
-const sevenTwo = [new BN(7), new BN(2)].map(bnToHex) as [string, string];
-const sevenZero = [new BN(7), new BN(0)].map(bnToHex) as [string, string];
+const zeroSix = [new BN(0), new BN(6)].map(bnToHex) as [string, string];
+const fourTwo = [new BN(4), new BN(2)].map(bnToHex) as [string, string];
+const sixZero = [new BN(6), new BN(0)].map(bnToHex) as [string, string];
 
 const base = {
   libraryAddress,
@@ -231,7 +231,7 @@ export const noughtsVictory = {
   playing5: positions.Xplaying({ ...base, turnNum: 11, noughts: 0b110000000, crosses: 0b000010101, balances: sixFour }),
   playing5closetoempty: positions.Xplaying({ ...base, turnNum: 11, noughts: 0b110000000, crosses: 0b000010101, balances: twoFour }),
   victory: positions.victory({ ...base, turnNum: 12, noughts: 0b111000000, crosses: 0b000010101, balances: fourSix }),
-  absolutevictory: positions.victory({ ...base, turnNum: 12, noughts: 0b111000000, crosses: 0b000010101, balances: zeroSeven }),
+  absolutevictory: positions.victory({ ...base, turnNum: 12, noughts: 0b111000000, crosses: 0b000010101, balances: zeroSix }),
   victoryHex: '0x' + '0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
     + '0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
     + '0000000000000000000000000000000000000000000000000000000000000002' // number of participants
@@ -254,9 +254,9 @@ export const crossesVictory = {
   playing2: positions.Oplaying({ ...base, turnNum: 8, noughts: 0b100000000, crosses: 0b000001001, balances: fourSix }),
   playing3: positions.Xplaying({ ...base, turnNum: 9, noughts: 0b100000000, crosses: 0b000001001, balances: sixFour }),
   playing4: positions.Oplaying({ ...base, turnNum: 10, noughts: 0b100010000, crosses: 0b000001001, balances: fourSix }),
-  playing4closetoempty: positions.Oplaying({ ...base, turnNum: 10, noughts: 0b100010000, crosses: 0b000001001, balances: sevenTwo }),
+  playing4closetoempty: positions.Oplaying({ ...base, turnNum: 10, noughts: 0b100010000, crosses: 0b000001001, balances: fourTwo }),
   victory: positions.victory({ ...base, turnNum: 11, noughts: 0b100010000, crosses: 0b001001001, balances: sixFour }),
-  absolutevictory: positions.victory({ ...base, turnNum: 11, noughts: 0b100010000, crosses: 0b001001001, balances: sevenZero }),
+  absolutevictory: positions.victory({ ...base, turnNum: 11, noughts: 0b100010000, crosses: 0b001001001, balances: sixZero }),
   victoryHex: '0x' + '0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
     + '0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
     + '0000000000000000000000000000000000000000000000000000000000000002' // number of participants
