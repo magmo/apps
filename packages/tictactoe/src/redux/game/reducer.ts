@@ -7,13 +7,9 @@ import { Result, Imperative, Marker } from '../../core/results';
 import { Player, isDraw, isWinningMarks, positions, Position } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
-// import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/external';
 
-
-// import BN from "bn.js";
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-// import { scenarios } from '../../core/';
 
 export interface JointState {
   gameState: states.GameState;
@@ -21,27 +17,6 @@ export interface JointState {
 }
 
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
-
-// const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
-
-// const shared = { ...scenarios.shared, player: Player.PlayerA, stateCount: 1 };
-
-// const emptyJointState: JointState = { 
-//   messageState: {}, 
-//   gameState: states.xsPickMove({
-//     ...shared,
-//     noughts: 0,
-//     crosses: 0,
-//     balances: fiveFive,
-//     turnNum: 4,
-//     result: Imperative.Choose,
-//   }),
-// };
-
-// export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
-//   state = singleActionReducer(state, action);
-//   return state;
-// };
 
 export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess ) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
@@ -60,16 +35,6 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
   }
-  // if (action.type === actions.NEW_OPEN_GAME) {
-  //   const { messageState, gameState } = state;
-  //   state.game.gameState.myAddress = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';   
-  //   return { gameState: { ...gameState, myAddress, }, messageState };
-  // }
-  // if (action.type === actions.JOIN_OPEN_GAME) {
-  //   const { messageState, gameState } = state;
-  //   const myAddress = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-  //   return { gameState: { ...gameState, myAddress, }, messageState };
-  // }
   // // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now
@@ -363,7 +328,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
   // if not draw then full swing to current player, unless its the first turn in a round
   switch (player) {
     case Player.PlayerA: {
-      if (noughts !== 0) {
+      if (crosses !== 0) {
         newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
       } else {
         newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
@@ -483,53 +448,17 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
      (action.position.name === positions.DRAW) || 
      (action.position.name === positions.VICTORY))) { // should only allow a change in gamestate if we receieve the appropriate position.
     const receivedNoughts = action.position.noughts;
-    const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
-    let newBalances: [string, string] = balances;
-
-    switch (player) {
-      case Player.PlayerB: {
-        if (noughts !== 0 && crosses !== 0) {
-          newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
-          console.log('full swing!');
-        } else {
-          newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
-          console.log('single swing!');
-        }
-        break;
-      }
-      case Player.PlayerA: {
-        if (noughts > 0 || crosses > 0) {
-          newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
-        } else {
-          console.log('first move of the round');
-          newBalances = favorB(balances, roundBuyIn);
-        }
-        break;
-      }
-    }
+    const { player, turnNum } = gameState;
+    const { crosses, balances, roundBuyIn} = action.position;
+    const newBalances: [string, string] = balances;
 
     let newGameState: states.XsPickMove | states.PlayAgain | states.InsufficientFunds
-      = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, result: Imperative.Choose });
+      = states.xsPickMove({ ...gameState, turnNum: turnNum + 0, noughts: receivedNoughts, result: Imperative.Choose, balances: newBalances });
 
     if (!isWinningMarks(receivedNoughts) && !isDraw(receivedNoughts, crosses)) { // Not conclusive, keep playing
       // go with default case
       return { gameState: newGameState, messageState };
     }
-
-    // this should never happen!
-    // if (!isWinningMarks(receivedNoughts) && isDraw(receivedNoughts,crosses)){ // Draw, play again?
-    //   switch(player){
-    //     case Player.PlayerB: {
-    //       newBalances = favorA(balances, roundBuyIn); 
-    //       break;
-    //     }
-    //     case Player.PlayerA: {
-    //       newBalances = favorB(balances,roundBuyIn);
-    //       break;
-    //     }
-    //   }
-    //   newGameState = states.playAgain({...gameState, noughts: receivedNoughts, result: Result.Tie, balances: newBalances}); 
-    // }
 
     if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
       if ((player === Player.PlayerA && newBalances[0] > roundBuyIn) || (player === Player.PlayerB && newBalances[1] > roundBuyIn)) {
@@ -549,49 +478,18 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
      (action.position.name === positions.DRAW) || 
      (action.position.name === positions.VICTORY))) {
     const receivedCrosses = action.position.crosses;
-    const { noughts, crosses, balances, player, roundBuyIn, turnNum } = gameState;
-    let newBalances: [string, string] = balances;
-
-    switch (player) {
-      case Player.PlayerB: {
-        if (noughts !== 0 && crosses !== 0) {
-          newBalances = favorA(favorA(balances, roundBuyIn), roundBuyIn); // usually enact a full swing to current player
-          console.log('full swing!');
-        } else {
-          newBalances = favorA(balances, roundBuyIn); // if first move of a round, simply assign roundBuyIn to current player.
-          console.log('single swing!');
-        }
-        break;
-      }
-      case Player.PlayerA: {
-        if (noughts > 0 || crosses > 0) {
-          newBalances = favorB(favorB(balances, roundBuyIn), roundBuyIn);
-        } else {
-          console.log('first move of the round');
-          newBalances = favorB(balances, roundBuyIn);
-        }
-        break;
-      }
-    }
+    const { player, turnNum } = gameState;
+    const { noughts, balances, roundBuyIn} = action.position;
+    const newBalances: [string, string] = balances;
 
     let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
-      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, result: Imperative.Choose  });
+      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, result: Imperative.Choose, balances: newBalances   });
 
     if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) { // Not conclusive, keep playing
       // go with default case
     }
 
     if (!isWinningMarks(receivedCrosses) && isDraw(noughts, receivedCrosses)) { // Draw, play again?
-      switch (player) {
-        case Player.PlayerB: {
-          newBalances = favorA(balances, roundBuyIn);
-          break;
-        }
-        case Player.PlayerA: {
-          newBalances = favorB(balances, roundBuyIn);
-          break;
-        }
-      }
       newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, result: Result.Tie, balances: newBalances, onScreenBalances: newBalances });
     }
 

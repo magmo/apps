@@ -61,7 +61,8 @@ function RenderGame(props: GameProps) {
           you={Marker.crosses} // fixed by StateName
           player={state.player}
           result={state.result}
-          onScreenBalances={state.onScreenBalances}
+          // onScreenBalances={state.onScreenBalances} 
+          onScreenBalances={state.balances} // display enforceable outcome
           marksMade={marksMade}
         />
       );
@@ -74,7 +75,8 @@ function RenderGame(props: GameProps) {
           you={Marker.crosses} // fixed by StateName
           player={state.player}
           result={state.result}
-          onScreenBalances={state.onScreenBalances}
+          // onScreenBalances={state.onScreenBalances}
+          onScreenBalances={state.balances}
           marksMade={marksMade}
         />
       );
@@ -87,7 +89,8 @@ function RenderGame(props: GameProps) {
           you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
-          onScreenBalances={state.onScreenBalances}
+          // onScreenBalances={state.onScreenBalances} 
+          onScreenBalances={state.balances} // display enforceable outcome
           marksMade={marksMade}
         />
       );
@@ -100,7 +103,8 @@ function RenderGame(props: GameProps) {
           you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
-          onScreenBalances={state.onScreenBalances}
+          // onScreenBalances={state.onScreenBalances}
+          onScreenBalances={state.balances}
           marksMade={marksMade}
         />
       );
@@ -113,7 +117,8 @@ function RenderGame(props: GameProps) {
         you={state.you} // TODO this should take either value
         player={state.player}
         result={state.result}
-        onScreenBalances={state.onScreenBalances}
+          // onScreenBalances={state.onScreenBalances}
+          onScreenBalances={state.balances}
         marksMade={marksMade}
         playAgain={playAgain}
         />
