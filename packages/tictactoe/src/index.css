@@ -76,6 +76,9 @@ table {
     empty-cells: show;
     border-collapse: collapse;
     border-spacing: 0;
+    -webkit-user-select: none; 
+    -moz-user-select: none;     
+    -ms-user-select: none;  
 }
 
 td {
