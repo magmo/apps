@@ -42,7 +42,7 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, marksMade, confirmGame, declineGame, playAgain, resign } = props;
+  const { state, marksMade, confirmGame, declineGame, playAgain, resign, exitToLobby } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
@@ -154,7 +154,7 @@ function RenderGame(props: GameProps) {
       return <WaitForResignationAcknowledgement />;
     case StateName.GameOver:
     case StateName.OpponentResigned:
-      return <GameOverPage visible={state.name === (StateName.OpponentResigned || StateName.GameOver)} exitToLobby={actions.exitToLobby} />;
+      return <GameOverPage visible={(state.name === StateName.OpponentResigned) || (state.name === StateName.GameOver)} exitToLobby={exitToLobby} />;
     default:
       throw new Error(`View not created for ${state.name}`);
   }
