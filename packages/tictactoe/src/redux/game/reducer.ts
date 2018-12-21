@@ -319,7 +319,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
         break;
       }
     }
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie, balances: newBalances, onScreenBalances: balances });
+    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie, balances: newBalances, onScreenBalances: newBalances });
     pos = positions.draw({ ...newGameState, crosses: newCrosses});
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
