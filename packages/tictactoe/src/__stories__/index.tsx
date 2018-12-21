@@ -11,6 +11,7 @@ import { YourMarker, TheirMarker } from '../components/Marker';
 import Outcome from '../components/Outcome';
 import StatusAndBalances from '../components/StatusAndBalances';
 import GameScreen from '../components/GameScreen';
+import InsufficientFunds from '../components/InsufficientFunds';
 import { Marker, Result, Player, Imperative, Marks } from '../core';
 import { scenarios } from '../core';
 import * as loginActions from '../redux/login/actions';
@@ -179,14 +180,25 @@ const testState = (state) => (
 storiesOf('App (reading from the fake store)', module)
   .add('test initial state', testState(initialState));
 
-  storiesOf('Post game', module).add('Play Again', () => <PlayAgain
-    stateType="blah"
-    noughts={0}
-    crosses={0}
-    you={Marker.noughts} // TODO this should take either value
-    player={Player.PlayerA}
-    result={Result.YouWin}
-    onScreenBalances={finneySixFour}
-    marksMade={marksMade}
-    playAgain={playAgain}
-    />);
+  storiesOf('Post game', module)
+    .add('Play Again', () => <PlayAgain
+      stateType="blah"
+      noughts={0}
+      crosses={0}
+      you={Marker.noughts} // TODO this should take either value
+      player={Player.PlayerA}
+      result={Result.YouWin}
+      onScreenBalances={finneySixFour}
+      marksMade={marksMade}
+      playAgain={playAgain}
+      />)
+    .add('Insufficient Funds', () => <InsufficientFunds
+      stateType="blah"
+      noughts={0}
+      crosses={0}
+      you={Marker.noughts} // TODO this should take either value
+      player={Player.PlayerA}
+      result={Result.YouWin}
+      onScreenBalances={finneySixFour}
+      marksMade={marksMade}
+      />);
