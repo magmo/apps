@@ -477,8 +477,8 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
         result: Result.YouWin,
       });
     }
-  }
   pos = positions.victory({ ...newGameState});
+  }
   messageState = sendMessage(pos, opponentAddress, messageState);
   // console.log(newGameState);
   return { gameState: newGameState, messageState };
