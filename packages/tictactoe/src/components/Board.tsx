@@ -1,11 +1,13 @@
 import React from 'react';
 import { Marks } from '../core/marks';
 import { winningPatterns, isWinningMarks, isDraw } from '../core/results';
+import { Marker } from '../core';
 
 interface Props {
   stateType: string;
   noughts: Marks;
   crosses: Marks;
+  you: Marker;
   marksMade: (marks: Marks) => void;
 }
 
@@ -20,6 +22,14 @@ export default class Board extends React.PureComponent<Props> {
     return false;
   }
 
+  blankRenderMark(you: Marker) {
+    switch (you) {
+      case Marker.noughts:
+        return (<span className="os empty tile">○</span>);
+      case Marker.crosses:
+        return (<span className="xs empty tile">×</span>);
+    }
+  }
 
   winRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if ((crosses & position) === position) {
@@ -31,8 +41,9 @@ export default class Board extends React.PureComponent<Props> {
       if (this.crucialMark(noughts, position)) {
         return (<span className="os tile">○</span>);
       } else { return (<span className="os tile dim">○</span>); }
-    } else { return (<span className="empty tile">○</span>); }
+    } else { return this.blankRenderMark(this.props.you); } // todo switch on marker to draw an o or an x
   }
+
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if ((crosses & position) === position) {
@@ -44,7 +55,7 @@ export default class Board extends React.PureComponent<Props> {
       if (this.crucialMark(noughts, position)) {
         return (<span className="os tile">○</span>);
       } else { return (<span className="os tile">○</span >); }
-    } else { return (<span className="empty tile">○</span>); }
+    } else { return this.blankRenderMark(this.props.you); }
   }
 
   drawRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
@@ -53,7 +64,7 @@ export default class Board extends React.PureComponent<Props> {
     }
     if ((noughts & position) === position) {
       return (<span className="os tile dim">○</span >);
-    } else { return (<span className="empty tile">○</span>); }
+    } else { return this.blankRenderMark(this.props.you); }
   }
 
 

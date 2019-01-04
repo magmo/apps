@@ -26,7 +26,7 @@ export default class GameScreen extends React.PureComponent<Props> {
     return (
     <div id="main-container">
       <StatusAndBalances stateType="blah" onScreenBalances={onScreenBalances} player={player} you = {you}/>
-      <Board stateType="blah" noughts={noughts} crosses={crosses} marksMade={marksMade}/>
+      <Board stateType="blah" noughts={noughts} crosses={crosses} marksMade={marksMade} you = {you}/>
       <div id="magmo-logo"><img src={MAGMO_LOGO}/></div>
       <Button className="cog-button-small resignButton" outline={false} onClick={resign}>
             Resign

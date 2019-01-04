@@ -76,10 +76,10 @@ storiesOf('LobbyPage', module)
   />);
 
 storiesOf('Board', module)
-  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} marksMade={marksMade} />)
-  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} marksMade={marksMade} />)
-  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} marksMade={marksMade} />)
-  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} marksMade={marksMade} />);
+  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} marksMade={marksMade} you={Marker.noughts}/>)
+  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} marksMade={marksMade} you={Marker.noughts} />)
+  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} marksMade={marksMade} you={Marker.noughts} />)
+  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} marksMade={marksMade} you={Marker.noughts} />);
 
 storiesOf('Status', module)
   .add('Your Marker', () => <YourMarker stateType="blah" you={Marker.crosses} />)
