@@ -5,6 +5,7 @@ html, body {
     font-family: 'Courier New', Courier, monospace;
   }
 
+
 .full-width-bar {
     margin: 0 -9999rem;
     /* add back negative margin value */
@@ -94,6 +95,7 @@ td {
     border: 8px;
     position: relative;
     font-size: 100px;
+    cursor: "crosshair";
 }
 
 td:after {
@@ -131,6 +133,11 @@ td:after {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
+    opacity: 0;
+}
+
+.empty:hover {
+    opacity: 1;
 }
 
 .dim {

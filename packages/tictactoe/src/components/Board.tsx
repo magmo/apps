@@ -31,7 +31,7 @@ export default class Board extends React.PureComponent<Props> {
       if (this.crucialMark(noughts, position)) {
         return (<span className="os tile">○</span>);
       } else { return (<span className="os tile dim">○</span>); }
-    } else { return (<span className="empty tile">&nbsp;</span>); }
+    } else { return (<span className="empty tile">○</span>); }
   }
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
@@ -44,7 +44,7 @@ export default class Board extends React.PureComponent<Props> {
       if (this.crucialMark(noughts, position)) {
         return (<span className="os tile">○</span>);
       } else { return (<span className="os tile">○</span >); }
-    } else { return (<span className="empty tile">&nbsp;</span>); }
+    } else { return (<span className="empty tile">○</span>); }
   }
 
   drawRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
@@ -53,7 +53,7 @@ export default class Board extends React.PureComponent<Props> {
     }
     if ((noughts & position) === position) {
       return (<span className="os tile dim">○</span >);
-    } else { return (<span className="empty tile">&nbsp;</span>); }
+    } else { return (<span className="empty tile">○</span>); }
   }
 
 
@@ -69,7 +69,9 @@ export default class Board extends React.PureComponent<Props> {
 
   mouseOverHandler() {
     console.log('mouseover detected');
-    return;
+    // this.getElementById("tl").innerHTML = "A";
+    // document.getElementById("tl").innerHTML = (<span className="os tile">○</span>);
+    // return;
   }
 
 
