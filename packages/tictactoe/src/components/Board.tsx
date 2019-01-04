@@ -67,6 +67,12 @@ export default class Board extends React.PureComponent<Props> {
     }
   }
 
+  mouseOverHandler() {
+    console.log('mouseover detected');
+    return;
+  }
+
+
   render() {
     const { noughts, crosses } = this.props;
     return (
@@ -74,7 +80,7 @@ export default class Board extends React.PureComponent<Props> {
         <table>
           <tbody>
           <tr>
-            <td id="tl" onClick={() => this.props.marksMade(Marks.tl)}>
+            <td id="tl" onClick={() => this.props.marksMade(Marks.tl)} onMouseOver={this.mouseOverHandler}>
               {this.renderMark(noughts, crosses, Marks.tl)}
             </td>
             <td id="tm" onClick={() => this.props.marksMade(Marks.tm)}>
