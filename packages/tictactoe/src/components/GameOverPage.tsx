@@ -18,7 +18,7 @@ export default class GameOverPage extends React.PureComponent<Props> {
         <ModalBody>
 
           <div className="game-over-content">
-            <h1>The Game is over!</h1>
+            <span className="game-over-message">The Game is over!</span>
             {/* <div>You must withdraw your funds to exit the game.</div> */}
             <Button className="game-over-button" onClick={this.props.exitToLobby} block={false}>
               Back To Lobby

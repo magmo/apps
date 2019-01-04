@@ -18,7 +18,11 @@ h1.full-width-bar {
 p, h1, .status {
     font-size: 20px;
     font-family: monospace;
-    color: #4285f4;
+    color: white;
+}
+
+.game-over-message {
+    color: purple;
 }
 
 
