@@ -10,6 +10,7 @@ import WaitingRoomPage from '../components/WaitingRoomPage';
 import ConfirmGamePage from '../components/ConfirmGamePage';
 import GameProposedPage from '../components/GameProposedPage';
 import PlayAgain from '../components/PlayAgain';
+import PlayAgainWait from '../components/PlayAgainWait';
 import InsufficientFunds from '../components/InsufficientFunds';
 import WaitToResign from '../components/WaitToResign';
 import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
@@ -62,7 +63,6 @@ function RenderGame(props: GameProps) {
     case StateName.XsPickMove:
       return (
         <GameScreen
-          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.crosses} // fixed by StateName
@@ -77,7 +77,6 @@ function RenderGame(props: GameProps) {
     case StateName.XsWaitForOpponentToPickMove:
       return (
         <GameScreen
-          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.crosses} // fixed by StateName
@@ -92,7 +91,6 @@ function RenderGame(props: GameProps) {
     case StateName.OsPickMove:
       return (
         <GameScreen
-          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.noughts} // fixed by StateName
@@ -107,7 +105,6 @@ function RenderGame(props: GameProps) {
     case StateName.OsWaitForOpponentToPickMove:
       return (
         <GameScreen
-          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.noughts} // fixed by StateName
@@ -122,7 +119,21 @@ function RenderGame(props: GameProps) {
     case StateName.PlayAgain:
         return (
         <PlayAgain
-        
+        noughts={state.noughts}
+        crosses={state.crosses}
+        you={state.you} 
+        player={state.player}
+        result={state.result}
+          onScreenBalances={state.onScreenBalances}
+          // onScreenBalances={state.balances}
+        marksMade={marksMade}
+        playAgain={playAgain}
+        resign={resign}
+        />
+        );
+      case StateName.WaitForResting:
+        return (
+        <PlayAgainWait
         noughts={state.noughts}
         crosses={state.crosses}
         you={state.you} 
@@ -138,7 +149,6 @@ function RenderGame(props: GameProps) {
       case StateName.InsufficientFunds:
       return (
         <InsufficientFunds
-      
       noughts={state.noughts}
       crosses={state.crosses}
       you={state.you}

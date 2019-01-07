@@ -10,6 +10,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
+import { RESTING } from 'src/core/positions';
 
 export interface JointState {
   gameState: states.GameState;
@@ -92,6 +93,8 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       } else { return state; }
     case states.StateName.PlayAgain:
       return playAgainReducer(gameState, messageState, action);
+    case states.StateName.WaitForResting:
+      return waitToPlayAgainReducer(gameState, messageState, action);
     case states.StateName.WaitToResign:
       return waitToResignReducer(gameState, messageState, action);
     case states.StateName.WaitForResignationAcknowledgement:
@@ -553,20 +556,74 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
   else { return { gameState, messageState }; }
 }
 
+function youWentLast(gameState) {
+  if (gameState.you === Marker.noughts) {
+    if (popCount(gameState.crosses) === popCount(gameState.noughts) ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  else {
+    if (popCount(gameState.crosses) > popCount(gameState.noughts) ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+function popCount(marks) {
+  let i: number;
+  let count: number = 0;
+  for (i = 0; i < 9; i++){
+      if ((marks >> i)%2 === 1 ){
+          count++; // erased a mark
+      } 
+  }
+  return count;
+}
+
 function playAgainReducer(gameState: states.PlayAgain, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+  const opponentAddress = states.getOpponentAddress(gameState);
   let newGameState: states.GameState;
-  if (action.type === actions.PLAY_AGAIN) {
-    if (gameState.result !== Result.YouLose) {
-      // transition to WaitForResting
-      newGameState = states.osWaitForOpponentToPickMove({ ...gameState, noughts:0, crosses:0, result:Imperative.Wait });
-    } else {
-      // transition to PickMove
-      newGameState = states.xsPickMove({ ...gameState, noughts:0, crosses:0, result: Imperative.Choose});
-    }
+  if (action.type === actions.PLAY_AGAIN && youWentLast(gameState)) {
+    newGameState = states.waitForRestingA({ ...gameState});
     return { gameState: newGameState, messageState };
-  } else {return { gameState, messageState }; }
+  }
+  if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
+    const pos = positions.resting({ ...gameState});
+    messageState = sendMessage(pos, opponentAddress, messageState);
+    newGameState = states.waitForRestingA({ ...gameState});
+    return { gameState: newGameState, messageState };
+  }
+  return { gameState, messageState };
+}
+
+function waitToPlayAgainReducer(gameState: states.WaitForResting, messageState: MessageState, action: actions.GameAction): JointState {
+  console.log(gameState.you);
+  console.log(youWentLast(gameState));
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+  const opponentAddress = states.getOpponentAddress(gameState);
+  let newGameState: states.GameState;
+  if (action.type === actions.POSITION_RECEIVED && action.position.name === RESTING && youWentLast(gameState)) {
+    const pos = positions.resting({ ...gameState, crosses: 0, noughts: 0});
+    messageState = sendMessage(pos, opponentAddress, messageState);
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, noughts:0, crosses:0, result: Imperative.Wait, you: Marker.noughts});
+    return { gameState: newGameState, messageState };
+  }
+  if (action.type === actions.POSITION_RECEIVED && action.position.name === RESTING && !youWentLast(gameState)) {
+    newGameState = states.xsPickMove({ ...gameState, noughts:0, crosses:0, result: Imperative.Choose, you: Marker.crosses});
+    return { gameState: newGameState, messageState };
+  }
+  if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
+    const pos = positions.resting({ ...gameState});
+    messageState = sendMessage(pos, opponentAddress, messageState);
+  }
+  return { gameState, messageState };
 }
 
 function itsMyTurn(gameState: states.PlayingState) {

@@ -42,7 +42,7 @@ library TicTacToeState {
     }
 
     // utility functions
-    function aResolution(bytes _state) public pure returns (uint256) {
+    function aResolution(bytes _state) public pure returns (uint256 _aBal) {
         return State.resolution(_state)[0];
     }
 

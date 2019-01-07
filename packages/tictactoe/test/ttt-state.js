@@ -20,11 +20,6 @@ contract('TicTacToeState', (accounts) => {
     stateContract = await TTTStateContract.deployed();
   });
 
-  // // skipped because web3 can't cope with the positionType object that is returned
-  // it.skip("can parse positionType", async () => {
-  //   assert.equal(await stateContract.positionType(encode(reveal)), 'some type');
-  // });
-
   it("can parse aBal", async () => {
     const val = await stateContract.aResolution(encode(playing1));
     assert(val.eq(hexToBN(playing1.balances[0])));
@@ -40,34 +35,13 @@ contract('TicTacToeState', (accounts) => {
     assert(val.eq(hexToBN(playing1.roundBuyIn)));
   });
 
-  // it("can parse noughts", async () => {
-  //   const val = await stateContract.noughts(encode(playing1));
-  //   console.log(val);
-  //   assert(val.eq(hexToBN(playing1.noughts)));
-  // });
+  it("can parse noughts", async () => {
+    const val = await stateContract.noughts(encode(playing1));
+    assert(val.eq(playing1.noughts));
+  });
 
-  // it("can parse crosses", async () => {
-  //   const val = await stateContract.crosses(encode(playing2));
-  //   console.log(val);
-  //   assert(val.eq(hexToBN(playing2.crosses)));
-  // });
-
-  // it("can parse preCommit", async () => {
-  //   assert.equal(await stateContract.preCommit(encode(propose)), propose.preCommit);
-  // });
-
-  // // skipped because web3 can't cope with the Play object that is returned
-  // it.skip("can parse bPlay", async () => {
-  //   assert.equal(await stateContract.bPlay.call(encode(reveal)), reveal.bsMove);
-  // });
-
-  // // skipped because web3 can't cope with the Play object that is returned
-  // it.skip("can parse aPlay", async () => {
-  //   assert.equal(await stateContract.aPlay.call(encode(reveal)), reveal.asMove);
-  // });
-
-  // it("can parse salt", async () => {
-  //   assert.equal(await stateContract.salt(encode(reveal)), reveal.salt);
-  // });
-
+  it("can parse crosses", async () => {
+    const val = await stateContract.crosses(encode(playing2));
+    assert(val.eq(playing2.crosses));
+  });
 });
