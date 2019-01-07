@@ -6,7 +6,6 @@ import MAGMO_LOGO from '../images/magmo_logo.svg';
 
 
 interface Props {
-  stateType: string;
   you: Marker;
   noughts: Marks;
   crosses: Marks;
@@ -28,7 +27,7 @@ export default class InsufficientFunds extends React.PureComponent<Props> {
     }
     return (
     <div id="main-container">
-      <StatusAndBalances stateType="blah" onScreenBalances={onScreenBalances} player={player} you = {you}/>
+      <StatusAndBalances onScreenBalances={onScreenBalances} player={player} you = {you}/>
       <div id="table-container">
         <div id="main-container">
               Game concluding:
@@ -37,7 +36,7 @@ export default class InsufficientFunds extends React.PureComponent<Props> {
         <div id="magmo-logo"><img src={MAGMO_LOGO}/></div>
         </div>
       </div>
-      <Outcome stateType="blah" result={result} />
+      <Outcome result={result} />
     </div>
     );
   }

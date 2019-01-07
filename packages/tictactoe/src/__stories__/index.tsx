@@ -76,30 +76,29 @@ storiesOf('LobbyPage', module)
   />);
 
 storiesOf('Board', module)
-  .add('Empty', () => <Board stateType="blah" noughts={0} crosses={0} marksMade={marksMade} you={Marker.noughts}/>)
-  .add('Draw', () => <Board stateType="blah" noughts={0b010011100} crosses={0b101100011} marksMade={marksMade} you={Marker.noughts} />)
-  .add('O win', () => <Board stateType="blah" noughts={0b111000000} crosses={0b000011000} marksMade={marksMade} you={Marker.noughts} />)
-  .add('X win', () => <Board stateType="blah" noughts={0b100010000} crosses={0b001001001} marksMade={marksMade} you={Marker.noughts} />);
+  .add('Empty', () => <Board noughts={0} crosses={0} marksMade={marksMade} you={Marker.noughts}/>)
+  .add('Draw', () => <Board noughts={0b010011100} crosses={0b101100011} marksMade={marksMade} you={Marker.noughts} />)
+  .add('O win', () => <Board noughts={0b111000000} crosses={0b000011000} marksMade={marksMade} you={Marker.noughts} />)
+  .add('X win', () => <Board noughts={0b100010000} crosses={0b001001001} marksMade={marksMade} you={Marker.noughts} />);
 
 storiesOf('Status', module)
-  .add('Your Marker', () => <YourMarker stateType="blah" you={Marker.crosses} />)
-  .add('Their Marker', () => <TheirMarker stateType="blah" you={Marker.crosses} />);
+  .add('Your Marker', () => <YourMarker you={Marker.crosses} />)
+  .add('Their Marker', () => <TheirMarker you={Marker.crosses} />);
 
 storiesOf('Outcome', module)
-  .add('You Win', () => <Outcome stateType="blah" result={Result.YouWin} />)
-  .add('You Lose', () => <Outcome stateType="blah" result={Result.YouLose} />)
-  .add('Tie', () => <Outcome stateType="blah" result={Result.Tie} />)
-  .add('Wait', () => <Outcome stateType="blah" result={Imperative.Wait} />)
-  .add('Choose', () => <Outcome stateType="blah" result={Imperative.Choose} />);
+  .add('You Win', () => <Outcome result={Result.YouWin} />)
+  .add('You Lose', () => <Outcome result={Result.YouLose} />)
+  .add('Tie', () => <Outcome result={Result.Tie} />)
+  .add('Wait', () => <Outcome result={Imperative.Wait} />)
+  .add('Choose', () => <Outcome result={Imperative.Choose} />);
 
 storiesOf('Status and Balances', module)
-  .add('You Winning', () => <StatusAndBalances stateType="blah" onScreenBalances={finneySixFour} player={Player.PlayerA} you={Marker.crosses} />)
-  .add('You Losing', () => <StatusAndBalances stateType="blah" onScreenBalances={finneyFourSix} player={Player.PlayerB} you={Marker.crosses} />);
+  .add('You Winning', () => <StatusAndBalances onScreenBalances={finneySixFour} player={Player.PlayerA} you={Marker.crosses} />)
+  .add('You Losing', () => <StatusAndBalances onScreenBalances={finneyFourSix} player={Player.PlayerB} you={Marker.crosses} />);
 
 
 storiesOf('Game Screen', module)
   .add('Waiting', () => <GameScreen
-    stateType="blah"
     noughts={0b000100000}
     crosses={0b000001001}
     you={Marker.crosses}
@@ -110,7 +109,6 @@ storiesOf('Game Screen', module)
     resign={resign}
   />)
   .add('Choosing', () => <GameScreen
-    stateType="blah"
     noughts={0b000100010}
     crosses={0b000001001}
     you={Marker.crosses}
@@ -121,7 +119,6 @@ storiesOf('Game Screen', module)
     resign={resign}
   />)
   .add('X win', () => <GameScreen
-    stateType="blah"
     noughts={0b100100000}
     crosses={0b001001001}
     you={Marker.crosses}
@@ -132,7 +129,6 @@ storiesOf('Game Screen', module)
     resign={resign}
   />)
   .add('Double X win', () => <GameScreen
-    stateType="blah"
     noughts={0b010100110}
     crosses={0b101011001}
     you={Marker.crosses}
@@ -143,7 +139,6 @@ storiesOf('Game Screen', module)
     resign={resign}
 />)
   .add('O win', () => <GameScreen
-    stateType="blah"
     noughts={0b100100100}
     crosses={0b000011001}
     you={Marker.crosses}
@@ -154,7 +149,6 @@ storiesOf('Game Screen', module)
     resign={resign}
   />)
   .add('Tie', () => <GameScreen
-    stateType="blah"
     noughts={0b101100010}
     crosses={0b010011101}
     you={Marker.crosses}
@@ -190,7 +184,6 @@ storiesOf('App (reading from the fake store)', module)
 
   storiesOf('Post game', module)
     .add('Play Again', () => <PlayAgain
-      stateType="blah"
       noughts={0}
       crosses={0}
       you={Marker.noughts} // TODO this should take either value
@@ -202,7 +195,6 @@ storiesOf('App (reading from the fake store)', module)
       resign={resign}
       />)
     .add('Insufficient Funds', () => <InsufficientFunds
-      stateType="blah"
       noughts={0}
       crosses={0}
       you={Marker.noughts} // TODO this should take either value

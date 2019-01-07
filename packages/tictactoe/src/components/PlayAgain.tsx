@@ -5,7 +5,6 @@ import { Button } from 'reactstrap';
 
 
 interface Props {
-  stateType: string;
   you: Marker;
   noughts: Marks;
   crosses: Marks;
@@ -18,16 +17,12 @@ interface Props {
   resign: () => void;
 }
 
-
-
-
 export default class PlayAgain extends React.PureComponent<Props> {
   render() {
     const { noughts, crosses, you, player, result, onScreenBalances, marksMade, playAgain, resign } = this.props;
     return (
       <div>
         <GameScreen
-        stateType="blah"
         noughts={noughts}
         crosses={crosses}
         you={you} // fixed by StateName

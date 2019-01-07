@@ -3,7 +3,6 @@ import React from 'react';
 import { Result, Imperative } from '../core/results';
 
 interface Props {
-  stateType: string;
   result: Result | Imperative;
 }
 

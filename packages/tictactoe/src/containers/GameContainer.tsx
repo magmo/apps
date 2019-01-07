@@ -62,7 +62,7 @@ function RenderGame(props: GameProps) {
     case StateName.XsPickMove:
       return (
         <GameScreen
-          stateType="blah"
+          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.crosses} // fixed by StateName
@@ -77,7 +77,7 @@ function RenderGame(props: GameProps) {
     case StateName.XsWaitForOpponentToPickMove:
       return (
         <GameScreen
-          stateType="blah"
+          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.crosses} // fixed by StateName
@@ -92,7 +92,7 @@ function RenderGame(props: GameProps) {
     case StateName.OsPickMove:
       return (
         <GameScreen
-          stateType="blah"
+          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.noughts} // fixed by StateName
@@ -107,7 +107,7 @@ function RenderGame(props: GameProps) {
     case StateName.OsWaitForOpponentToPickMove:
       return (
         <GameScreen
-          stateType="blah"
+          
           noughts={state.noughts}
           crosses={state.crosses}
           you={Marker.noughts} // fixed by StateName
@@ -122,10 +122,10 @@ function RenderGame(props: GameProps) {
     case StateName.PlayAgain:
         return (
         <PlayAgain
-        stateType="blah"
+        
         noughts={state.noughts}
         crosses={state.crosses}
-        you={state.you} // TODO this should take either value
+        you={state.you} 
         player={state.player}
         result={state.result}
           onScreenBalances={state.onScreenBalances}
@@ -138,10 +138,10 @@ function RenderGame(props: GameProps) {
       case StateName.InsufficientFunds:
       return (
         <InsufficientFunds
-      stateType="blah"
+      
       noughts={state.noughts}
       crosses={state.crosses}
-      you={state.you} // TODO this should take either value
+      you={state.you}
       player={state.player}
       result={state.result}
       onScreenBalances={state.onScreenBalances}

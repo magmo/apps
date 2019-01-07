@@ -3,7 +3,6 @@ import React from 'react';
 import { Marker } from '../core/results';
 
 interface Props {
-  stateType: string;
   you: Marker;
 }
 

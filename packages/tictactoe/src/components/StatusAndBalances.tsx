@@ -4,7 +4,6 @@ import web3Utils from 'web3-utils';
 import { Player, Marker } from '../core';
 
 interface Props {
-  stateType: string;
   onScreenBalances: [string, string];
   player: Player;
   you: Marker;
@@ -32,14 +31,14 @@ export default class StatusAndBalances extends React.PureComponent<Props> {
     const { onScreenBalances, player, you } = this.props;
     return (
       <div id="status-container">
-        <h1 className="full-width-bar" id="top-bar" >&nbsp;<YourMarker stateType="blah" you={you} />&nbsp;[You]&nbsp;
+        <h1 className="full-width-bar" id="top-bar" >&nbsp;<YourMarker you={you} />&nbsp;[You]&nbsp;
       <span>
             {this.renderYourBalance(onScreenBalances, player)} ETH
           </span>&nbsp;|
       <span>
             &nbsp;{this.renderTheirBalance(onScreenBalances, player)} ETH
           </span>
-          &nbsp;[Them]&nbsp;<TheirMarker stateType="blah" you={you} />
+          &nbsp;[Them]&nbsp;<TheirMarker you={you} />
         </h1>
       </div>
     );

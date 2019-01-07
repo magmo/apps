@@ -19,7 +19,7 @@ function Application(props: ApplicationProps) {
         <LobbyContainer />
       );
     default:
-      return <GameContainer />; // why is it not getting this property from the store?
+      return <GameContainer />;
   }
 }
 

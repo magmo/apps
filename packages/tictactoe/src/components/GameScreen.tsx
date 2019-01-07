@@ -8,7 +8,6 @@ import { Button } from 'reactstrap';
 
 
 interface Props {
-  stateType: string;
   you: Marker;
   noughts: Marks;
   crosses: Marks;
@@ -25,13 +24,13 @@ export default class GameScreen extends React.PureComponent<Props> {
     const {you, noughts, crosses, onScreenBalances, player, result, marksMade, resign} = this.props;
     return (
     <div id="main-container">
-      <StatusAndBalances stateType="blah" onScreenBalances={onScreenBalances} player={player} you = {you}/>
-      <Board stateType="blah" noughts={noughts} crosses={crosses} marksMade={marksMade} you = {you}/>
+      <StatusAndBalances onScreenBalances={onScreenBalances} player={player} you = {you}/>
+      <Board noughts={noughts} crosses={crosses} marksMade={marksMade} you = {you}/>
       <div id="magmo-logo"><img src={MAGMO_LOGO}/></div>
       <Button className="cog-button-small resignButton" outline={false} onClick={resign}>
             Resign
       </Button>
-      <Outcome stateType="blah" result={result} />
+      <Outcome result={result} />
     </div>
     );
   }

@@ -13,7 +13,7 @@ contract TicTacToeGame {
     //
     // Xplaying -> Oplaying
     // Xplaying -> Victory
-    // cannot get to draw (X is always completing the board because X goes first) remember we are transitioning *from& Xplay, so noughts are making the new marks
+    // cannot get to draw (X is always completing the board because X goes first) remember we are transitioning *from* Xplay, so noughts are making the new marks
     // Xplaying -> Resting ("noughts" player rejects game)
     //
     // Oplaying -> Xplaying
