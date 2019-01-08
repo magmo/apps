@@ -297,12 +297,58 @@ To infer which player has won, me must therefore keep track of which player is c
 
 To get into the draw position, we will require the board to be full. Only Xs can do this, since they always move first. 
 
+## Example game
+In `/src/core/test-scenarios.ts` we will define a sequence of states, to be signed alternately by each player and representing an entire run through of the happy path of Tic Tac Toe:
+
+```javascript
+  preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, stateCount: 0 }),
+  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, stateCount: 1 }),
+  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, stateCount: 0 }),
+  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, stateCount: 1 }),
+  playing1: positions.Xplaying({ ...base, turnNum: 4, noughts: 0b000000000, crosses: 0b100000000, balances: sixFour }),
+  playing2: positions.Oplaying({ ...base, turnNum: 5, noughts: 0b000010000, crosses: 0b100000000, balances: fourSix }),
+  playing3: positions.Xplaying({ ...base, turnNum: 6, noughts: 0b000010000, crosses: 0b100000001, balances: sixFour }),
+  playing4: positions.Oplaying({ ...base, turnNum: 7, noughts: 0b000011000, crosses: 0b100000001, balances: fourSix }),
+  playing5: positions.Xplaying({ ...base, turnNum: 8, noughts: 0b000011000, crosses: 0b100100001, balances: sixFour }),
+  playing6: positions.Oplaying({ ...base, turnNum: 9, noughts: 0b000011100, crosses: 0b100100001, balances: fourSix }),
+  playing7: positions.Xplaying({ ...base, turnNum: 10, noughts: 0b000011100, crosses: 0b101100001, balances: sixFour }),
+  playing8: positions.Oplaying({ ...base, turnNum: 11, noughts: 0b010011100, crosses: 0b101100001, balances: fourSix }),
+  draw: positions.draw({ ...base, turnNum: 12, noughts: 0b010011100, crosses: 0b101100011, balances: fiveFive }),
+  resting: positions.resting({ ...base, turnNum: 13, balances: fiveFive }),
+```
+ The balances are defined elsewhere in this file, as are the base parameters shared by all of these states. As an example, considered the encoded version of one of these states:
+
+ ```javascript
+   playing4Hex: '0x' + '0000000000000000000000001111111111111111111111111111111111111111' // libraryAdress
+    + '0000000000000000000000000000000000000000000000000000000000000004' // channelNonce
+    + '0000000000000000000000000000000000000000000000000000000000000002' // number of participants
+    + '000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' // asAddress
+    + '000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' // bsAddress
+    + '0000000000000000000000000000000000000000000000000000000000000002' // StateType (PreFundSetup, PostFundSetup, Game, Conclude)
+    + '0000000000000000000000000000000000000000000000000000000000000007' // turnNum
+    + '0000000000000000000000000000000000000000000000000000000000000000' // stateCount ?
+    + '0000000000000000000000000000000000000000000000000000000000000004' // aResolution
+    + '0000000000000000000000000000000000000000000000000000000000000006' // bResolution
+    + '0000000000000000000000000000000000000000000000000000000000000002' // [GameAttributes: GamePositionType]
+    + '0000000000000000000000000000000000000000000000000000000000000001' // [GameAttributes: roundBuyIn]
+    + '0000000000000000000000000000000000000000000000000000000000000018' // [GameAttributes: noughts
+    + '0000000000000000000000000000000000000000000000000000000000000101', // [GameAttributes: crosses]
+ ```
+ This raw data, along with an appropriate signature, could be used to raise a challenge on chain. We must now write functions that will appropriately convert between these two represenations-- on the one hand, TypeScript interfaces containing human-readable properties of the game, and on the other hand long hex strings representing the same information. 
+
+
+### Front end (React)
+Let us create some view components for the board, the balances and so on. We shall arrange these in an attractive way, using some html and css to help. The code needs to translate the 'human readable' TypeScript description of the board and render something beautiful and instantly recognizable as a game. It also must allow a move to be made with a simple click, and make the appropriate changes to the state of the app. 
+
+### Back end (Redux)
+We need to constrain the user to follow a happy path, allowing them to send and listen for state channel messages at the appropriate times. 
+
 
 # Questions
 what is statecount? It's in the prefundsetup and postfundsetup stages, to check everyone in the channel has agreed and funded it.
 
 
-The best place to start is probably test-scenarios, which shows us the which kind of objects we want to use to construct and represent the state of the channel. 
+<!-- The best place to start is probably test-scenarios, which shows us the which kind of objects we want to use to construct and represent the state of the channel.  -->
 
 
 Why must resting have a roundBuyin? is this the same as a stake? Yes it is the same thing.
@@ -315,7 +361,7 @@ The next thing to consider is the app itself, which will present an interface to
 
 A switch of perspective is useful here; we will now consider the app from the user's perspective. Shown below are the various screens the user can transition between, along with any messages they must send (black) or listen for (grey). 
 
-![Tic Tac Toe Gamestate transitions](./TicTacToeUserFlow.svg)
+![Tic Tac Toe Gamestate transitions](./TicTacToeUserFlowTrim.svg)
 
 Notice how Player A begins as Xs, but the players may switch depending on the result of the previous game. Note the assymetry in that Draw can only be sent by Xs and only be received by Os. 
 
