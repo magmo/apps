@@ -22,6 +22,16 @@ To run the app on your machine, clone the code and follow the instructions below
 
 ### Development Info
 
+#### To run storybook
+
+  We use [Storybook](https://storybook.js.org/) to view our react components during development. You can start Storybook by running:
+ ```
+ yarn storybook
+ ```
+ This will fire up the Storybook panel inside a browser.
+
+ 
+
 #### To run a dev server:
 
 1. Run the server
