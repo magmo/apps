@@ -3,8 +3,7 @@ import { buffers } from 'redux-saga';
 import hash from 'object-hash';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
-import * as fromWalletActions from '../../wallet/interface/outgoing';
-import * as toWalletActions from '../../wallet/interface/incoming';
+
 import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
 import { MessageState, WalletMessage } from './state';
@@ -13,7 +12,9 @@ import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
 
 import hexToBN from '../../utils/hexToBN';
-
+// TODO: use actual wallet interface (what will that look like?)
+const toWalletActions: any = {};
+const fromWalletActions: any = {};
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
@@ -219,7 +220,7 @@ function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
   yield put(toWalletActions.validationRequest(requestId, data, signature));
   const actionFilter = [fromWalletActions.VALIDATION_SUCCESS, fromWalletActions.VALIDATION_FAILURE];
-  let action: fromWalletActions.ValidationResponse = yield take(actionFilter);
+  let action: any = yield take(actionFilter);
   if (action.type === fromWalletActions.VALIDATION_SUCCESS) {
     return true;
   } else {
@@ -243,7 +244,7 @@ function* signMessage(data) {
   yield put(toWalletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
   const actionFilter = [fromWalletActions.SIGNATURE_SUCCESS, fromWalletActions.SIGNATURE_FAILURE];
-  let action: fromWalletActions.SignatureResponse = yield take(actionFilter);
+  let action: any = yield take(actionFilter);
   if (action.type === fromWalletActions.SIGNATURE_SUCCESS) {
     return action.signature;
   } else {

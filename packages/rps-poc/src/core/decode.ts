@@ -1,5 +1,4 @@
 import { State } from 'fmg-core';
-import decodeState from '../wallet/utils/decode-utils';
 
 import * as positions from './positions';
 import { Move } from './moves';
@@ -58,7 +57,7 @@ function extractSalt(hexString: string) {
 }
 
 export default function decode(hexString: string) {
-  const state = decodeState(hexString);
+  const state: any = {};// decodeState(hexString);
   const balances = state.resolution.map(bnToHex) as [string, string];
   const { channel, turnNum, stateType } = state;
   const { channelType: libraryAddress, channelNonce, participants } = channel;
