@@ -19,7 +19,10 @@ export interface JointState {
 
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess ) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState,
+  
+  
+  action: actions.GameAction | LoginSuccess ) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress  =  ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName: ""; 
@@ -154,8 +157,7 @@ function creatingOpenGameReducer(gameState: states.CreatingOpenGame, messageStat
   switch (action.type) {
     case actions.CREATE_OPEN_GAME:
       const newGameState = states.waitingRoom({ ...gameState, roundBuyIn: action.roundBuyIn });
-      const myAddress = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'; // this is a hack until the wallet arrives!
-      return { gameState: { ...newGameState, myAddress }, messageState };
+      return { gameState: { ...newGameState}, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
       return { gameState: newGameState1, messageState };
@@ -190,20 +192,20 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   // if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
 
   // request funding
-  messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+  messageState = { ...messageState, walletOutbox: { type: 'FUNDING_REQUESTED' } };
 
   // transition to Wait for Funding
-  // const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
+  const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
 
   // skip funding and go straight to game
-  const newGameState = states.xsPickMove({
-     ...gameState,
-    turnNum: gameState.turnNum + 1,
-    noughts:0,
-    crosses:0,
-    result:Imperative.Choose,
-    onScreenBalances: gameState.balances,
-    you: Marker.crosses, });
+  // const newGameState = states.xsPickMove({
+  //    ...gameState,
+  //   turnNum: gameState.turnNum + 1,
+  //   noughts:0,
+  //   crosses:0,
+  //   result:Imperative.Choose,
+  //   onScreenBalances: gameState.balances,
+  //   you: Marker.crosses, });
  
   return { messageState, gameState: newGameState };
 }
@@ -217,25 +219,25 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   if (action.type === actions.CONFIRM_GAME) {
     const { turnNum } = gameState;
 
-    // const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
+    const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
 
 
     // skip funding stage
-    const newGameState = states.osWaitForOpponentToPickMove({
-       ...gameState,
-      turnNum: turnNum + 1,
-      noughts:0,
-      crosses:0,
-      result: Imperative.Wait,
-      onScreenBalances: gameState.balances,
-      you: Marker.noughts,
-      });
+    // const newGameState = states.osWaitForOpponentToPickMove({
+    //    ...gameState,
+    //   turnNum: turnNum + 1,
+    //   noughts:0,
+    //   crosses:0,
+    //   result: Imperative.Wait,
+    //   onScreenBalances: gameState.balances,
+    //   you: Marker.noughts,
+    //   });
 
     const newPosition = positions.preFundSetupB(newGameState);
 
     const opponentAddress = states.getOpponentAddress(gameState);
     messageState = sendMessage(newPosition, opponentAddress, messageState);
-    messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+    messageState = { ...messageState, walletOutbox: { type: 'FUNDING_REQUESTED' } };
 
     return { gameState: newGameState, messageState };
   } else {
@@ -700,7 +702,7 @@ function gameOverReducer(gameState: states.GameOver, messageState: MessageState,
   if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
 
   const newGameState = states.waitForWithdrawal(gameState);
-  messageState = { ...messageState, walletOutbox: 'WITHDRAWAL_REQUESTED' };
+  messageState = { ...messageState, walletOutbox: { type: 'WITHDRAWAL_REQUESTED' } };
 
   return { gameState: newGameState, messageState };
 }
@@ -709,7 +711,7 @@ function opponentResignedReducer(gameState: states.OpponentResigned, messageStat
   if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
 
   const newGameState = states.waitForWithdrawal(gameState);
-  messageState = { ...messageState, walletOutbox: 'WITHDRAWAL_REQUESTED' };
+  messageState = { ...messageState, walletOutbox: { type: 'WITHDRAWAL_REQUESTED' } };
 
   return { gameState: newGameState, messageState };
 }

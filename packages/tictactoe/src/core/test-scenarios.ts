@@ -4,10 +4,13 @@ import BN from "bn.js";
 import * as positions from './positions';
 // import { randomHex } from "../utils/randomHex";
 import bnToHex from "../utils/bnToHex";
+import { Channel } from "fmg-core";
 
 const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = 4;
+const asPrivateKey = '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d';
 const asAddress = '0x' + 'a'.repeat(40);
+const bsPrivateKey = '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72';
 const bsAddress = '0x' + 'b'.repeat(40);
 const participants: [string, string] = [asAddress, bsAddress];
 const roundBuyIn = bnToHex(new BN(1));
@@ -19,7 +22,10 @@ const zeroSix = [new BN(0), new BN(6)].map(bnToHex) as [string, string];
 const fourTwo = [new BN(4), new BN(2)].map(bnToHex) as [string, string];
 const sixZero = [new BN(6), new BN(0)].map(bnToHex) as [string, string];
 
+const channelId = new Channel(libraryAddress, channelNonce, participants).id;
+
 const base = {
+  channelId,
   libraryAddress,
   channelNonce,
   participants,
@@ -33,6 +39,8 @@ export const shared = {
   bsAddress,
   myName: 'Tom',
   opponentName: 'Alex',
+  asPrivateKey,
+  bsPrivateKey,
 };
 
 

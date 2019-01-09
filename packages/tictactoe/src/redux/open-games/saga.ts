@@ -23,8 +23,6 @@ export default function* openGameSaga() {
 
     const gameState: GameState = yield select(getGameState);
     const address: string = yield select(getWalletAddress);
-    // console.log(address);
-    // const address = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
     if (gameState.name === StateName.Lobby) {
       // if we're in the lobby we need to sync openGames
