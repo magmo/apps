@@ -1,4 +1,4 @@
-import { scenarios } from '../../../core';
+import * as scenarios from '../../redux/reducers/__tests__/scenarios';
 import { signPositionHex, validSignature, signVerificationData } from '../signing-utils';
 
 const s = scenarios.standard;
