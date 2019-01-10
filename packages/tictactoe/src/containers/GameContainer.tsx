@@ -16,6 +16,8 @@ import WaitToResign from '../components/WaitToResign';
 import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
 import GameOverPage from '../components/GameOverPage';
 
+import WaitForWallet from '../components/WaitForWallet'; // WaitForFunding, maybe others?
+
 import { Marks } from '../core';
 import { GameState, StateName } from '../redux/game/state';
 import * as actions from '../redux/game/actions';
@@ -165,7 +167,11 @@ function RenderGame(props: GameProps) {
     case StateName.GameOver:
     case StateName.OpponentResigned:
       return <GameOverPage visible={(state.name === StateName.OpponentResigned) || (state.name === StateName.GameOver)} exitToLobby={exitToLobby} />;
-    default:
+    case StateName.WaitForFunding:
+      return <WaitForWallet reason={"Waiting for funding confirmation."} />;
+    case StateName.WaitForWithdrawal:
+      return <WaitForWallet reason={"Waiting for funds withdrawal."} />;
+      default:
       throw new Error(`View not created for ${state.name}`);
   }
 }
