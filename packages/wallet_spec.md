@@ -11,6 +11,8 @@ The wallet is almost its own mini-application. It has its own front end views/co
 # Logging in to firebase
 The first responsibility of the wallet is to manage the login of firebase, and the generation of an ephemeral key for the state channel in question. In firebase, we create a record under 'wallets' that has a title, and data including a uid, address and private key. This information is then stored in the wallet part of the store, so that application actions (such as creating a new game) can access it. 
 
+# Signing the PreFundSetup
+
 
 
 

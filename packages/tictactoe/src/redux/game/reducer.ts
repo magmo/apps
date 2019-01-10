@@ -132,9 +132,8 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const newGameState = states.creatingOpenGame({ ...gameState });
       return { gameState: newGameState, messageState };
     case actions.JOIN_OPEN_GAME:
-      const myAddress = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; // this is a hack until the wallet arrives!
       const { roundBuyIn, opponentAddress } = action;
-      const { myName, libraryAddress, twitterHandle } = gameState;
+      const { myName, myAddress, libraryAddress, twitterHandle } = gameState;
       const balances = [hexToBN(roundBuyIn).muln(5), hexToBN(roundBuyIn).muln(5)].map(bnToHex) as [string, string];
       const onScreenBalances = balances;
       const participants: [string, string] = [myAddress, opponentAddress];
@@ -145,9 +144,8 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
         ...action, myName, balances, onScreenBalances, participants, turnNum, stateCount, libraryAddress, twitterHandle, player: Player.PlayerA,
       });
       
-
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
-      return { gameState: { ...waitForConfirmationState, myAddress}, messageState };
+      return { gameState: { ...waitForConfirmationState}, messageState };
     default:
       return { gameState, messageState };
   }

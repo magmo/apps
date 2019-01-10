@@ -25,7 +25,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
     case actions.OWN_POSITION_RECEIVED:
       const data = action.data;
       const ownPosition = decode(data);
-
+      console.log(ownPosition);
       // all these checks will fail silently for the time being
       // check it's a PreFundSetupA
       if (ownPosition.stateType !== State.StateType.PreFundSetup) { return state; }
