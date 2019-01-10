@@ -1,7 +1,7 @@
 import { fork, take, select, cancel, call, apply } from 'redux-saga/effects';
 
 export const getGameState = (storeObj: any) => storeObj.game.gameState;
-export const getWalletAddress = (storeObj: any) => storeObj.game.gameState.myAddress;
+export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
 
 import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
 

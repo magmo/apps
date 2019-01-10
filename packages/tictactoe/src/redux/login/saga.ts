@@ -66,7 +66,6 @@ export default function* loginRootSaga() {
 
 function* getLibraryAddress() {
   const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10); 
-  console.log(selectedNetworkId);
   return TTTGameArtifact.networks[selectedNetworkId].address;
 }
 
