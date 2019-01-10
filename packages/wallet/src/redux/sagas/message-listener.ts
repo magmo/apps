@@ -1,14 +1,34 @@
-import { actionChannel, take, put } from "redux-saga/effects";
+import { actionChannel, take, put, fork } from "redux-saga/effects";
 
 
 import * as incoming from '../../interface/incoming';
 
 import * as actions from "../actions";
+import { eventChannel } from 'redux-saga';
 
+function* postMessageListener() {
+  const postMessageEventChannel = eventChannel(emitter => {
+    window.addEventListener('message', (event: Event) => {
+      emitter(event);
+    });
+    return () => { /* End channel here*/ };
+  });
+  while (true) {
+
+    const event = yield take(postMessageEventChannel);
+    console.log(event);
+    if (event.data.type === 'INITIALIZE_WALLET') {
+
+      yield put(actions.loggedIn(event.data.userId));
+    }
+  }
+
+}
 // this is the only thing in the wallet which is allowed to listen for app actions
 // if we move to an iframe, this would be modified to listen to events on a given
 // postMessage channel
 export function* messageListener() {
+  yield fork(postMessageListener);
   // todo: restrict this to the application actions we actually
   // want to listen for
   const channel = yield actionChannel('*');

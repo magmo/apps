@@ -20,14 +20,20 @@ export enum Queue {
   GAME_ENGINE = 'GAME_ENGINE',
 }
 
-export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
+// export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
 
 export default function* messageSaga() {
-  yield fork(waitForWalletThenReceiveFromFirebaseSaga);
-  yield fork(receiveFromWalletSaga);
-  yield fork(sendMessagesSaga);
-  yield fork(sendWalletMessageSaga);
+  const runOldSaga = false;
+  if (runOldSaga) {
+    yield fork(waitForWalletThenReceiveFromFirebaseSaga);
+    // yield fork(receiveFromWalletSaga);
+    yield fork(sendMessagesSaga);
+    yield fork(sendWalletMessageSaga);
+  }
 }
+
+
+
 
 export function* sendWalletMessageSaga() {
   while (true) {
@@ -38,6 +44,7 @@ export function* sendWalletMessageSaga() {
     yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
   }
 }
+
 
 export function* sendMessagesSaga() {
   // We need to use an actionChannel to queue up actions that
@@ -91,7 +98,8 @@ function* waitForWalletThenReceiveFromFirebaseSaga() {
   while (true) {
     yield take('*');
 
-    const address = yield select(getWalletAddress);
+    const gameState: gameStates.GameState = yield select(getGameState);
+    const address = gameState.myAddress;
 
     if (address) {
       // this will never return
@@ -207,13 +215,13 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
 }
 
 
-function* receiveFromWalletSaga() {
-  while (true) {
-    const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
-    const position = decode(positionData);
-    yield put(gameActions.positionReceived(position));
-  }
-}
+// function* receiveFromWalletSaga() {
+//   while (true) {
+//     const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
+//     const position = decode(positionData);
+//     yield put(gameActions.positionReceived(position));
+//   }
+// }
 
 
 function* validateMessage(data, signature) {

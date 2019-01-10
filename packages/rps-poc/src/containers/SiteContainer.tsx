@@ -16,15 +16,17 @@ interface SiteProps {
 }
 
 function Site(props: SiteProps) {
+  let component;
   if (props.loading) {
-    return <LoadingPage />;
+    component = <LoadingPage />;
   } else if (props.metamaskError !== null) {
-    return <MetamaskErrorPage error={props.metamaskError} />;
+    component = <MetamaskErrorPage error={props.metamaskError} />;
   } else if (props.isAuthenticated) {
-    return <ApplicationContainer />;
+    component = <ApplicationContainer />;
   } else {
-    return <HomePageContainer />;
+    component = <HomePageContainer />;
   }
+  return <div><iframe src="http://localhost:3000" id="walletId" />{component}</div>;
 }
 
 const mapStateToProps = (state: SiteState): SiteProps => {

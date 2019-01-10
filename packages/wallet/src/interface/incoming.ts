@@ -6,6 +6,15 @@ export enum PlayerIndex {
   'A' = 0,
   'B' = 1,
 }
+
+
+export const SET_USER_ID = 'WALLET.SET_USER_ID';
+export const setUserId = (userId: string) => ({
+  type: SET_USER_ID as typeof SET_USER_ID,
+  userId,
+});
+export type SetUserId = ReturnType<typeof setUserId>;
+
 // FUNDING
 // =======
 

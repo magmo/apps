@@ -1,11 +1,12 @@
-import { call, put } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 
 import { default as firebase, reduxSagaFirebase } from '../../../gateways/firebase';
 import ChannelWallet from '../../domain/ChannelWallet';
 import { keysLoaded } from '../actions';
 import { getProvider } from '../../utils/contract-utils';
 import { ethers } from 'ethers';
-
+import { WalletState } from '../..';
+import { WAIT_FOR_ADDRESS } from '../../states';
 
 interface WalletParams {
   uid: string;
@@ -14,8 +15,10 @@ interface WalletParams {
 }
 
 export function* keyLoader() {
-  const uid = 'FAKE';
-
+  const state: WalletState = yield select((walletState: WalletState) => walletState);
+  if (state.type !== WAIT_FOR_ADDRESS) { return; }
+  const { uid } = state;
+  console.log(uid);
   let wallet = yield* fetchWallet(uid);
 
   if (!wallet) {
@@ -45,6 +48,7 @@ const walletRef = uid => {
 };
 
 function* fetchWallet(uid: string) {
+  console.log(uid);
   const query = walletRef(uid);
 
   // const wallet = yield call(reduxSagaFirebase.database.read, query);

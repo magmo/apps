@@ -6,14 +6,13 @@ import * as states from './state';
 import { randomHex } from '../../utils/randomHex';
 import { calculateResult, balancesAfterResult, calculateAbsoluteResult, Player, positions } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
-import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
+import { LoginSuccess, LOGIN_SUCCESS, InitializeWalletSuccess, INITIALIZE_WALLET_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
 // TODO import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested, CLOSE_SUCCESS, CloseSuccess } from '../../wallet/interface/outgoing';
-const { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested, CLOSE_SUCCESS, CloseSuccess } = {} as any;
+const { CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested, CLOSE_SUCCESS, CloseSuccess } = {} as any;
 import { PostFundSetupB, POST_FUND_SETUP_B } from '../../core/positions';
-type InitializationSuccess = any;
 type CloseSuccess = any;
 type ChallengePositionReceived = any;
 type ChallengeResponseRequested = any;
@@ -25,7 +24,7 @@ export interface JointState {
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
 export const gameReducer: Reducer<JointState> = (state = emptyJointState,
-  action: actions.GameAction | LoginSuccess | InitializationSuccess | CloseSuccess | ChallengePositionReceived | ChallengeResponseRequested) => {
+  action: actions.GameAction | LoginSuccess | InitializeWalletSuccess | CloseSuccess | ChallengePositionReceived | ChallengeResponseRequested) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
@@ -43,7 +42,7 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState,
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
   }
-  if (action.type === INITIALIZATION_SUCCESS) {
+  if (action.type === INITIALIZE_WALLET_SUCCESS) {
     const { messageState, gameState } = state;
     const { address: myAddress } = action;
     return { gameState: { ...gameState, myAddress, }, messageState };
@@ -163,7 +162,7 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const stateCount = 1;
 
       const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle,
+        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle, myAddress,
       });
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
       return { gameState: waitForConfirmationState, messageState };
@@ -189,11 +188,11 @@ function waitingRoomReducer(gameState: states.WaitingRoom, messageState: Message
   switch (action.type) {
     case actions.INITIAL_POSITION_RECEIVED:
       const { position, opponentName } = action;
-      const { myName, twitterHandle } = gameState;
+      const { myName, twitterHandle, myAddress } = gameState;
 
       if (position.name !== positions.PRE_FUND_SETUP_A) { return { gameState, messageState }; }
 
-      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle });
+      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, myAddress });
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);

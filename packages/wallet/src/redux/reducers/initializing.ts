@@ -28,7 +28,7 @@ export const initializingReducer = (state: InitializingState, action: WalletActi
 const waitForLoginReducer = (state: WaitForLogin, action: any) => {
   switch (action.type) {
     case LOGGED_IN:
-      const { uid } = action.uid;
+      const { uid } = action;
       return waitForAddress({ ...state, uid });
     default:
       return state;
