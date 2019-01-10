@@ -10,6 +10,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
+import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested, CLOSE_SUCCESS, CloseSuccess } from '../../wallet/interface/outgoing';
 import { RESTING } from 'src/core/positions';
 
 export interface JointState {
@@ -20,16 +21,14 @@ export interface JointState {
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
 export const gameReducer: Reducer<JointState> = (state = emptyJointState,
-  
-  
-  action: actions.GameAction | LoginSuccess ) => {
+  action: actions.GameAction | LoginSuccess | InitializationSuccess | CloseSuccess | ChallengePositionReceived | ChallengeResponseRequested) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress  =  ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName: ""; 
     const newGameState = states.lobby({...state.gameState, myAddress, myName});
     return {gameState:newGameState, messageState:{}};
   }
-  if (action.type === actions.MESSAGE_SENT) {
+  if (action.type === actions.MESSAGE_SENT || action.type === CHALLENGE_POSITION_RECEIVED) {
     const { messageState, gameState } = state;
     const { actionToRetry } = messageState;
     return { gameState, messageState: { actionToRetry } };
@@ -38,6 +37,32 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState,
     const { messageState, gameState } = state;
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
+  }
+  if (action.type === INITIALIZATION_SUCCESS) {
+    const { messageState, gameState } = state;
+    const { address: myAddress } = action;
+    return { gameState: { ...gameState, myAddress, }, messageState };
+  }
+  if (action.type === CHALLENGE_RESPONSE_REQUESTED) {
+    if (state.gameState.name === states.StateName.OsPickMove || state.gameState.name === states.StateName.XsPickMove) {
+      const { messageState, gameState } = state;
+      return {
+        gameState: states.pickChallengeMove(gameState),
+        messageState,
+      };
+    } else {
+      return state;
+    }
+  }
+  if (action.type === CLOSE_SUCCESS) {
+    const { messageState, gameState } = state;
+    if ('participants' in gameState) {
+      const { myName, libraryAddress, twitterHandle } = gameState;
+      const myAddress = gameState.participants[gameState.player];
+      const newGameState = states.lobby({ myName, myAddress, libraryAddress, twitterHandle });
+      return { gameState: newGameState, messageState };
+    }
+    return state;
   }
   // // apply the current action to the state
   state = singleActionReducer(state, action);

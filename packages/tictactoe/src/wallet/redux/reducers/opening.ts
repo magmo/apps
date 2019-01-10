@@ -33,7 +33,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
 
       const ourAddress = ownPosition.channel.participants[0] as string;
 
-      if (ourAddress !== state.address) { return state; }
+      if (ourAddress !== state.address) {  return state; }
 
       const signature = signPositionHex(data, state.privateKey);
       // if so, unpack its contents into the state

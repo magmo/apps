@@ -25,6 +25,7 @@ export enum StateName {
   WaitForResignationAcknowledgement = 'WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT',
   GameOver = 'GAME_OVER',
   WaitForWithdrawal = 'WAIT_FOR_WITHDRAWAL',
+  PickChallengeMove = 'PICK_CHALLENGE_MOVE',
 }
 
 export interface NoName {
@@ -245,6 +246,14 @@ export function xsWaitForOpponentToPickMove<T extends HasResult>(state: T): XsWa
   };
 }
 
+export interface PickChallengeMove extends Base {
+  name: StateName.PickChallengeMove;
+  player: Player;
+}
+export function pickChallengeMove<T extends InPlay>(state: T): PickChallengeMove {
+  return { ...base(state), name: StateName.PickChallengeMove };
+}
+
 interface HasResult extends InPlay {
   result: Result | Imperative;
 }
@@ -334,6 +343,7 @@ export type PlayingState = (
   | WaitForResignationAcknowledgement
   | GameOver
   | WaitForWithdrawal
+  | PickChallengeMove
 );
 
 export type GameState = (
