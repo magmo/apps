@@ -22,6 +22,10 @@ p, h1, .status {
     color: white;
 }
 
+.wallet {
+    color:black;
+}
+
 .game-over-message {
     color: purple;
 }

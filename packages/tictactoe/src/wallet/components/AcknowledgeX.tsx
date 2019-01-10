@@ -16,10 +16,10 @@ export default class AcknowledgeX extends React.PureComponent<Props> {
     const { title, action, actionTitle, description } = this.props;
     return (
       <SidebarLayout>
-        <h1>
+        <h1 className='wallet'>
           {title}
         </h1>
-        <p>
+        <p className='wallet'>
           {description}
         </p>
         <div className="challenge-expired-button-container" >

@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { SiteState } from '../redux/reducer';
-
+import { Wallet } from '../wallet';
 import { Marker } from '../core';
 import GameScreen from '../components/GameScreen';
 import ProfileContainer from './ProfileContainer';
@@ -25,12 +25,11 @@ import * as actions from '../redux/game/actions';
 interface GameProps {
   state: GameState;
   marksMade: (marks: Marks) => void;
-  cancelOpenGame: () => void;
+  playAgain: () => void;
   confirmGame: () => void;
   declineGame: () => void;
-  playAgain: () => void;
+  cancelOpenGame: () => void;
   resign: () => void;
-  // withdraw: () => void;
   exitToLobby: () => void;
 }
 
@@ -38,8 +37,7 @@ function GameContainer(props: GameProps) {
   return (
     <Fragment>
       {RenderGame(props)}
-
-      {/* <Wallet /> */}
+      <Wallet />
     </Fragment>
   );
 }

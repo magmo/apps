@@ -18,8 +18,8 @@ export default class ApproveX extends React.PureComponent<Props> {
     const { yesMessage, noMessage, approvalAction, rejectionAction, title, description } = this.props;
     return (
       <SidebarLayout>
-        <h1>{title}</h1>
-        <p>{description}</p>
+        <h1 className='wallet'>{title}</h1>
+        <p className='wallet'>{description}</p>
 
         <YesOrNo yesAction={approvalAction} noAction={rejectionAction} yesMessage={yesMessage} noMessage={noMessage} />
       </SidebarLayout>

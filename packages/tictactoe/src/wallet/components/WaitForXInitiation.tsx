@@ -11,8 +11,8 @@ export default class WaitForXInitiation extends React.PureComponent<Props> {
 
     return (
       <SidebarLayout>
-        <h1>Preparing your {name}</h1>
-        <p>
+        <h1 className='wallet'>Preparing your {name}</h1>
+        <p className='wallet'>
           Your {name} will be sent to MetaMask very soon...           
           {/* So soon, in fact,
           that if you have time to read this, there's a good chance something

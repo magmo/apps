@@ -10,8 +10,8 @@ export default class WaitForXConfirmation extends React.PureComponent<Props> {
     const { name } = this.props;
     return (
       <SidebarLayout>
-        <h1>Confirming your {name}</h1>
-        <p>
+        <h1 className='wallet'>Confirming your {name}</h1>
+        <p className='wallet'>
           Hold tight! Visit <a>this link [TODO]</a> to check on its status.
         </p>
       </SidebarLayout>
