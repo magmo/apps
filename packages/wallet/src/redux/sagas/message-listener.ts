@@ -17,7 +17,7 @@ function* postMessageListener() {
 
     const event = yield take(postMessageEventChannel);
     console.log(event);
-    if (event.data.type === 'INITIALIZE_WALLET') {
+    if (event.data.type === incoming.INITIALIZE_REQUEST) {
 
       yield put(actions.loggedIn(event.data.userId));
     }
