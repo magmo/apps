@@ -1,6 +1,6 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { sendMessage, fundingSuccess, fundingFailure } from '../../interface/outgoing';
+import { sendMessage, fundingSuccess, fundingFailure } from 'wallet-comm/lib/interface/from-wallet';
 
 import decode, { extractGameAttributes } from '../../utils/decode-utils';
 import { unreachable, validTransition } from '../../utils/reducer-utils';

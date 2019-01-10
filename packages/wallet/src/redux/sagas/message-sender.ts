@@ -1,6 +1,6 @@
 import { put } from "redux-saga/effects";
 import { messageSent } from "../actions";
-import { INITIALIZATION_SUCCESS } from '../../interface/outgoing';
+import { INITIALIZATION_SUCCESS } from 'wallet-comm/lib/interface/from-wallet';
 
 
 export function* messageSender(message) {

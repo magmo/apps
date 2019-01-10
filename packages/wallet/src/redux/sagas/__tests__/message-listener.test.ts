@@ -1,5 +1,5 @@
 import { put } from 'redux-saga/effects';
-import * as incoming from '../../../interface/incoming';
+import * as incoming from 'wallet-comm/lib/interface/to-wallet';
 
 import { messageListener } from '../message-listener';
 import * as actions from '../../actions';

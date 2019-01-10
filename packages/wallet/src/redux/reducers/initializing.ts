@@ -11,7 +11,7 @@ import {
 
 import { WalletAction, KEYS_LOADED, LOGGED_IN } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
-import { initializationSuccess } from '../../interface/outgoing';
+import { initializationSuccess } from 'wallet-comm/lib/interface/from-wallet';
 
 
 export const initializingReducer = (state: InitializingState, action: WalletAction): WalletState => {

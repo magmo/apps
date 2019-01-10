@@ -1,7 +1,7 @@
 import { actionChannel, take, put, fork } from "redux-saga/effects";
 
 
-import * as incoming from '../../interface/incoming';
+import * as incoming from 'wallet-comm/lib/interface/to-wallet';
 
 import * as actions from "../actions";
 import { eventChannel } from 'redux-saga';

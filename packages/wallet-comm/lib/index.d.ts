@@ -1,2 +1,3 @@
-export declare function sendTestMessage(IFrameId: string, message: string): void;
-export declare function initializeWallet(iFrameId: string, userId: string): Promise<string>;
+export * from './wallet-functions';
+export * from './interface/from-wallet';
+export * from './interface/to-wallet';

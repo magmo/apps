@@ -7,7 +7,7 @@ import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
-import { challengeResponseRequested, challengeComplete } from '../../interface/outgoing';
+import { challengeResponseRequested, challengeComplete } from 'wallet-comm/lib/interface/from-wallet';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import decode from '../../utils/decode-utils';
 

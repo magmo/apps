@@ -4,7 +4,7 @@ import { unreachable } from '../../utils/reducer-utils';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import { createWithdrawTransaction } from '../../utils/transaction-generator';
 import { signVerificationData } from '../../utils/signing-utils';
-import { closeSuccess } from '../../interface/outgoing';
+import { closeSuccess } from 'wallet-comm/lib/interface/from-wallet';
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state

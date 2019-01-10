@@ -1,5 +1,4 @@
 import { State, Channel } from 'fmg-core';
-import { SignableData } from '../domain/ChannelWallet';
 import BN from 'bn.js';
 
 export enum PlayerIndex {
@@ -7,13 +6,11 @@ export enum PlayerIndex {
   'B' = 1,
 }
 
-
-export const SET_USER_ID = 'WALLET.SET_USER_ID';
-export const setUserId = (userId: string) => ({
-  type: SET_USER_ID as typeof SET_USER_ID,
-  userId,
+export const INITIALIZE_REQUEST = 'WALLET.INITIALIZE_REQUEST';
+export const initializeRequest = () => ({
+  type: INITIALIZE_REQUEST as typeof INITIALIZE_REQUEST,
 });
-export type SetUserId = ReturnType<typeof setUserId>;
+export type InitializeRequest = ReturnType<typeof initializeRequest>;
 
 // FUNDING
 // =======
@@ -74,7 +71,7 @@ export type CloseChannelRequest = ReturnType<typeof closeChannelRequest>;
 
 // Called when a signed position is received from an opponent.
 export const VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
-export const validationRequest = (requestId: string, data: SignableData, signature: string) => ({
+export const validationRequest = (requestId: string, data: any, signature: string) => ({
   type: VALIDATION_REQUEST as typeof VALIDATION_REQUEST,
   requestId,
   data,
@@ -88,7 +85,7 @@ export type ValidationRequest = ReturnType<typeof validationRequest>;
 
 // Called to obtain a signature on a state before sending to an opponent.
 export const SIGNATURE_REQUEST = 'WALLET.SIGNATURE.REQUEST';
-export const signatureRequest = (requestId: string, data: SignableData) => ({
+export const signatureRequest = (requestId: string, data: any) => ({
   type: SIGNATURE_REQUEST as typeof SIGNATURE_REQUEST,
   requestId,
   data,
