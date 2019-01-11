@@ -4,6 +4,7 @@ import * as positions from './positions';
 import { Move } from './moves';
 import { GamePositionType } from './encode';
 import bnToHex from '../utils/bnToHex';
+import decodeState from 'wallet-comm/lib/decode-utils';
 
 const PREFIX_CHARS = 2; // the 0x takes up 2 characters
 const CHARS_PER_BYTE = 2;
@@ -57,11 +58,11 @@ function extractSalt(hexString: string) {
 }
 
 export default function decode(hexString: string) {
-  const state: any = {};// decodeState(hexString);
+  const state = decodeState(hexString);
   const balances = state.resolution.map(bnToHex) as [string, string];
   const { channel, turnNum, stateType } = state;
   const { channelType: libraryAddress, channelNonce, participants } = channel;
-  const base = { libraryAddress, channelNonce, participants, turnNum, balances };
+  const base = { libraryAddress, channelNonce, participants: participants as [string, string], turnNum, balances };
 
   // conclude is a special case as it doesn't have the buyIn
   if (stateType === State.StateType.Conclude) {

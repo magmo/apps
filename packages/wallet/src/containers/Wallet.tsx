@@ -17,7 +17,7 @@ class Wallet extends PureComponent<WalletProps> {
 
   render() {
     const { state } = this.props;
-
+    console.log(state);
     switch (state.stage) {
       case states.FUNDING:
         return <FundingContainer state={state} />;

@@ -23,14 +23,14 @@ describe('message listener', () => {
 
   // todo: is OWN_POSITION_RECEIVED actually easier to think about than SIGNATURE_REQUEST?
   it('converts SIGNATURE_REQUEST into OWN_POSITION_RECEIVED', () => {
-    const output = saga.next(incoming.signatureRequest('req-id', 'data')).value;
+    const output = saga.next(incoming.signatureRequest('data')).value;
     saga.next(); // the take
 
     expect(output).toEqual(put(actions.ownPositionReceived('data')));
   });
 
   it('converts VALIDATION_REQUEST into OPPONENT_POSITION_RECEIVED', () => {
-    const output = saga.next(incoming.validationRequest('requestId', 'data', 'signature')).value;
+    const output = saga.next(incoming.validationRequest('data', 'signature')).value;
     saga.next(); // the take
 
     expect(output).toEqual(put(actions.opponentPositionReceived('data', 'signature')));

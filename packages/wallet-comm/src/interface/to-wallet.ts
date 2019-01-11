@@ -7,8 +7,9 @@ export enum PlayerIndex {
 }
 
 export const INITIALIZE_REQUEST = 'WALLET.INITIALIZE_REQUEST';
-export const initializeRequest = () => ({
+export const initializeRequest = (userId) => ({
   type: INITIALIZE_REQUEST as typeof INITIALIZE_REQUEST,
+  userId,
 });
 export type InitializeRequest = ReturnType<typeof initializeRequest>;
 
@@ -66,14 +67,13 @@ export const closeChannelRequest = () => ({
 export type CloseChannelRequest = ReturnType<typeof closeChannelRequest>;
 
 
-// VALIDATION
+// VAßLIDATION
 // ==========
 
 // Called when a signed position is received from an opponent.
 export const VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
-export const validationRequest = (requestId: string, data: any, signature: string) => ({
+export const validationRequest = (data: any, signature: string) => ({
   type: VALIDATION_REQUEST as typeof VALIDATION_REQUEST,
-  requestId,
   data,
   signature,
 });
@@ -85,9 +85,8 @@ export type ValidationRequest = ReturnType<typeof validationRequest>;
 
 // Called to obtain a signature on a state before sending to an opponent.
 export const SIGNATURE_REQUEST = 'WALLET.SIGNATURE.REQUEST';
-export const signatureRequest = (requestId: string, data: any) => ({
+export const signatureRequest = (data: any) => ({
   type: SIGNATURE_REQUEST as typeof SIGNATURE_REQUEST,
-  requestId,
   data,
 });
 export type SignatureRequest = ReturnType<typeof signatureRequest>;

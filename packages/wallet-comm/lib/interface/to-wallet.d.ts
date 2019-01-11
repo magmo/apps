@@ -4,8 +4,9 @@ export declare enum PlayerIndex {
     'B' = 1
 }
 export declare const INITIALIZE_REQUEST = "WALLET.INITIALIZE_REQUEST";
-export declare const initializeRequest: () => {
+export declare const initializeRequest: (userId: any) => {
     type: "WALLET.INITIALIZE_REQUEST";
+    userId: any;
 };
 export declare type InitializeRequest = ReturnType<typeof initializeRequest>;
 export declare const FUNDING_REQUEST = "WALLET.FUNDING.REQUEST";
@@ -36,17 +37,15 @@ export declare const closeChannelRequest: () => {
 };
 export declare type CloseChannelRequest = ReturnType<typeof closeChannelRequest>;
 export declare const VALIDATION_REQUEST = "WALLET.VALIDATION.REQUEST";
-export declare const validationRequest: (requestId: string, data: any, signature: string) => {
+export declare const validationRequest: (data: any, signature: string) => {
     type: "WALLET.VALIDATION.REQUEST";
-    requestId: string;
     data: any;
     signature: string;
 };
 export declare type ValidationRequest = ReturnType<typeof validationRequest>;
 export declare const SIGNATURE_REQUEST = "WALLET.SIGNATURE.REQUEST";
-export declare const signatureRequest: (requestId: string, data: any) => {
+export declare const signatureRequest: (data: any) => {
     type: "WALLET.SIGNATURE.REQUEST";
-    requestId: string;
     data: any;
 };
 export declare type SignatureRequest = ReturnType<typeof signatureRequest>;

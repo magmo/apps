@@ -6,4 +6,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./wallet-functions"));
 __export(require("./interface/from-wallet"));
 __export(require("./interface/to-wallet"));
+__export(require("./decode-utils"));
 //# sourceMappingURL=index.js.map

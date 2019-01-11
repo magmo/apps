@@ -14,13 +14,36 @@ function* postMessageListener() {
     return () => { /* End channel here*/ };
   });
   while (true) {
-
     const event = yield take(postMessageEventChannel);
-    console.log(event);
-    if (event.data.type === incoming.INITIALIZE_REQUEST) {
-
-      yield put(actions.loggedIn(event.data.userId));
+    const action = event.data;
+    switch (event.data.type) {
+      case incoming.CREATE_CHALLENGE_REQUEST:
+        yield put(actions.challengeRequested());
+        break;
+      case incoming.FUNDING_REQUEST:
+        yield put(actions.fundingRequested());
+        break;
+      case incoming.INITIALIZE_REQUEST:
+        yield put(actions.loggedIn(action.userId));
+        break;
+      case incoming.SIGNATURE_REQUEST:
+        yield put(actions.ownPositionReceived(action.data));
+        break;
+      case incoming.VALIDATION_REQUEST:
+        yield put(actions.opponentPositionReceived(action.data, action.signature));
+        break;
+      case incoming.RECEIVE_MESSAGE:
+        yield put(actions.messageReceived(action.data, action.signature));
+        break;
+      case incoming.RESPOND_TO_CHALLENGE:
+        yield put(actions.challengePositionReceived(action.position));
+        break;
+      case incoming.CONCLUDE_CHANNEL_REQUEST:
+        yield put(actions.concludeRequested());
+        break;
+      default:
     }
+
   }
 
 }

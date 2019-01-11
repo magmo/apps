@@ -6,8 +6,9 @@ var PlayerIndex;
     PlayerIndex[PlayerIndex["B"] = 1] = "B";
 })(PlayerIndex = exports.PlayerIndex || (exports.PlayerIndex = {}));
 exports.INITIALIZE_REQUEST = 'WALLET.INITIALIZE_REQUEST';
-exports.initializeRequest = () => ({
+exports.initializeRequest = (userId) => ({
     type: exports.INITIALIZE_REQUEST,
+    userId,
 });
 exports.FUNDING_REQUEST = 'WALLET.FUNDING.REQUEST';
 exports.fundingRequest = (channelId, myAddress, opponentAddress, myBalance, opponentBalance, playerIndex) => ({
@@ -33,16 +34,14 @@ exports.closeChannelRequest = () => ({
     type: exports.CLOSE_CHANNEL_REQUEST,
 });
 exports.VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
-exports.validationRequest = (requestId, data, signature) => ({
+exports.validationRequest = (data, signature) => ({
     type: exports.VALIDATION_REQUEST,
-    requestId,
     data,
     signature,
 });
 exports.SIGNATURE_REQUEST = 'WALLET.SIGNATURE.REQUEST';
-exports.signatureRequest = (requestId, data) => ({
+exports.signatureRequest = (data) => ({
     type: exports.SIGNATURE_REQUEST,
-    requestId,
     data,
 });
 exports.WITHDRAWAL_REQUEST = 'WALLET.WITHDRAWAL.REQUEST';
