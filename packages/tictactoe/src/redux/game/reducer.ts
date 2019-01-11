@@ -200,7 +200,7 @@ function waitingRoomReducer(gameState: states.WaitingRoom, messageState: Message
 
       if (position.name !== positions.PRE_FUND_SETUP_A) { return { gameState, messageState }; }
 
-      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB});
+      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB, onScreenBalances: position.balances});
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);

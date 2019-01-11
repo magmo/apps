@@ -109,6 +109,7 @@ interface TwoChannel {
 export interface Base extends TwoChannel {
   turnNum: number;
   balances: [string, string];
+  onScreenBalances: [string, string];
   stateCount: number;
   twitterHandle: string;
   roundBuyIn: string;
@@ -125,6 +126,7 @@ export function base<T extends Base>(state: T): Base {
     participants,
     turnNum,
     balances,
+    onScreenBalances,
     stateCount,
     roundBuyIn,
     myName,
@@ -139,6 +141,7 @@ export function base<T extends Base>(state: T): Base {
     participants,
     turnNum,
     balances,
+    onScreenBalances,
     stateCount,
     roundBuyIn,
     myName,
@@ -202,7 +205,6 @@ interface InPlay extends Base {
   player: Player;
   noughts: Marks;
   crosses: Marks;
-  onScreenBalances: [string, string];
   you: Marker;
 }
 

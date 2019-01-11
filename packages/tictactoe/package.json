@@ -4,6 +4,9 @@
   "private": true,
   "main": "index.js",
   "module": "src/index.js",
+  "resolutions": {
+    "firebase/**/grpc": "^1.16.1"
+  },
   "dependencies": {
     "@types/react-redux": "^6.0.11",
     "@types/reactstrap": "^6.4.3",
