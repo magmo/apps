@@ -58,8 +58,6 @@ function RenderGame(props: GameProps) {
       return <GameProposedPage message='Waiting for opponent to confirm' />;
     case StateName.ConfirmGameB:
       return <ConfirmGamePage confirmGame={confirmGame} cancelGame={declineGame} stake={state.roundBuyIn} opponentName={state.opponentName} />;
-    // case StateName.WaitForFunding:
-    //   return <WaitForWallet reason={"Waiting for funding confirmation."} />;
     case StateName.XsPickMove:
       return (
         <GameScreen

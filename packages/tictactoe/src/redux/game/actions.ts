@@ -119,6 +119,7 @@ export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
 export type PositionReceived = ReturnType<typeof positionReceived>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
+export type FundingFailure = ReturnType<typeof fundingFailure>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 export type CreateOpenGame = ReturnType<typeof createOpenGame>;
@@ -138,6 +139,7 @@ export type GameAction = (
   | PlayAgain
   | PositionReceived
   | FundingSuccess
+  | FundingFailure
   | WithdrawalSuccess
   | WithdrawalRequest
   | Resign

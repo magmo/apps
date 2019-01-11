@@ -12,6 +12,7 @@ import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
 import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested, CLOSE_SUCCESS, CloseSuccess } from '../../wallet/interface/outgoing';
 import { RESTING } from 'src/core/positions';
+import { PostFundSetupB, POST_FUND_SETUP_B } from '../../core/positions';
 
 export interface JointState {
   gameState: states.GameState;
@@ -101,8 +102,8 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return confirmGameBReducer(gameState, messageState, action);
     case states.StateName.WaitForFunding:
       return waitForFundingReducer(gameState, messageState, action);
-    case states.StateName.WaitForPostFundSetup:
-      return waitForPostFundSetupReducer(gameState, messageState, action);
+    // case states.StateName.WaitForPostFundSetup:
+    //   return waitForPostFundSetupReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
       if (action.type === actions.MARKS_MADE || action.type === actions.RESIGN) {
         return xsPickMoveReducer(gameState, messageState, action);
@@ -273,56 +274,103 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   }
 }
 
+
+
 function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+  if (action.type === actions.FUNDING_FAILURE) {
+    const { participants, player } = gameState;
+    const lobbyGameState = states.lobby({ ...gameState, myAddress: participants[player] });
+    return { gameState: lobbyGameState, messageState: {} };
+  }
 
-  if (action.type === actions.POSITION_RECEIVED) {
-    const position = action.position;
-    if (position.name !== positions.POST_FUND_SETUP_A || gameState.player !== Player.PlayerB) {
-      return { gameState, messageState };
+  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+
+  if (action.type === actions.FUNDING_SUCCESS) {
+    if (action.position.name !== POST_FUND_SETUP_B) {
+      throw new Error("Game reducer expected PostFundSetupB on FUNDING_SUCCESS");
     }
-    messageState = { ...messageState, actionToRetry: action };
+    const postFundPositionB = action.position as PostFundSetupB;
+    const turnNum = postFundPositionB.turnNum;
+    const balances = postFundPositionB.balances;
 
-    return { gameState, messageState };
+    switch (gameState.player) {
+      case Player.PlayerA:
+        const newGameState1 = states.xsPickMove({ ...gameState,
+          turnNum: turnNum + 1,
+          result: Imperative.Choose,
+          noughts: 0,
+          crosses: 0,
+          onScreenBalances: balances, 
+          you: Marker.crosses,
+          });
+          return { gameState: newGameState1, messageState };
+      case Player.PlayerB:
+        const newGameState2 = states.osWaitForOpponentToPickMove({ ...gameState,
+          turnNum: turnNum + 0,
+          noughts: 0,
+          crosses: 0,
+          onScreenBalances: balances, 
+          you: Marker.noughts, 
+          result: Imperative.Wait,
+           });
+        return { gameState: newGameState2, messageState };
+    }
   }
 
-  if (action.type !== actions.FUNDING_SUCCESS) { return { gameState, messageState }; }
-  const turnNum = gameState.player === Player.PlayerA ? gameState.turnNum + 1 : gameState.turnNum;
-  const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
-
-  if (gameState.player === Player.PlayerA) {
-    const postFundSetupA = positions.postFundSetupA(newGameState);
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
-  }
-  return { gameState: newGameState, messageState };
-
+  return { gameState, messageState };
 }
 
-function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+// function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
+//   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+//   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
-  const { turnNum } = gameState;
-  const newGameState = states.xsPickMove({ ...gameState,
-    turnNum: turnNum + 1,
-    result: Imperative.Choose,
-    noughts: 0,
-    crosses: 0,
-    onScreenBalances: gameState.balances, 
-    you: Marker.noughts,
-    });
-  if (gameState.player === Player.PlayerB) {
-    newGameState.turnNum += 1;
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(positions.postFundSetupB(newGameState), opponentAddress, messageState);
-  }
+//   if (action.type === actions.POSITION_RECEIVED) {
+//     const position = action.position;
+//     if (position.name !== positions.POST_FUND_SETUP_A || gameState.player !== Player.PlayerB) {
+//       return { gameState, messageState };
+//     }
+//     messageState = { ...messageState, actionToRetry: action };
 
-  return { gameState: newGameState, messageState };
-}
+//     return { gameState, messageState };
+//   }
+
+//   if (action.type !== actions.FUNDING_SUCCESS) { return { gameState, messageState }; }
+//   const turnNum = gameState.player === Player.PlayerA ? gameState.turnNum + 1 : gameState.turnNum;
+//   const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
+
+//   if (gameState.player === Player.PlayerA) {
+//     const postFundSetupA = positions.postFundSetupA(newGameState);
+//     const opponentAddress = states.getOpponentAddress(gameState);
+//     messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
+//   }
+//   return { gameState: newGameState, messageState };
+
+// }
+
+// function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
+//   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
+//   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+
+//   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+
+//   const { turnNum } = gameState;
+//   const newGameState = states.xsPickMove({ ...gameState,
+//     turnNum: turnNum + 1,
+//     result: Imperative.Choose,
+//     noughts: 0,
+//     crosses: 0,
+//     onScreenBalances: gameState.balances, 
+//     you: Marker.noughts,
+//     });
+//   if (gameState.player === Player.PlayerB) {
+//     newGameState.turnNum += 1;
+//     const opponentAddress = states.getOpponentAddress(gameState);
+//     messageState = sendMessage(positions.postFundSetupB(newGameState), opponentAddress, messageState);
+//   }
+
+//   return { gameState: newGameState, messageState };
+// }
 
 function favorA(balances: [string, string], roundBuyIn): [string, string] {
   const aBal: string = bnToHex(hexToBN(balances[0]).add(hexToBN(roundBuyIn)));
