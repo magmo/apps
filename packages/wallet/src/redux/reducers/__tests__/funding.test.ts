@@ -200,7 +200,7 @@ describe('start in WaitForDeployConfirmation', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
-    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
+    expect((updatedState.messageOutbox as outgoing.MessageRequest).type).toEqual(outgoing.MESSAGE_REQUEST);
   });
 });
 
@@ -213,7 +213,7 @@ describe('start in AWaitForDeposit', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
-    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
+    expect((updatedState.messageOutbox as outgoing.MessageRequest).type).toEqual(outgoing.MESSAGE_REQUEST);
   });
 });
 
@@ -324,7 +324,7 @@ describe('start in BWaitForPostFundSetup', () => {
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
-    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
+    expect((updatedState.messageOutbox as outgoing.MessageRequest).type).toEqual(outgoing.MESSAGE_REQUEST);
   });
 });
 

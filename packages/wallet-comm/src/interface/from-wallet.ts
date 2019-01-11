@@ -146,26 +146,23 @@ export const closeSuccess = () => ({
 export type CloseSuccess = ReturnType<typeof closeSuccess>;
 
 
+
+
 // MESSAGING
 // =========
-export const SEND_MESSAGE = 'WALLET.MESSAGING.SEND';
+export const MESSAGE_REQUEST = 'WALLET.MESSAGING.MESSAGE_REQUEST';
 
-export const sendMessage = (to: string, data: string, signature: string) => ({
-  type: SEND_MESSAGE as typeof SEND_MESSAGE,
+export const messageRequest = (to: string, data: string, signature: string) => ({
+  type: MESSAGE_REQUEST as typeof MESSAGE_REQUEST,
   to,
   data,
   signature,
 });
 
-export type SendMessage = ReturnType<typeof sendMessage>;
+export type MessageRequest = ReturnType<typeof messageRequest>;
 
-export const MESSAGE_RECEIVED = 'WALLET.MESSAGING.MESSAGE_RECEIVED';
-export const messageReceived = (positionData: string, signature: string) => ({
-  type: MESSAGE_RECEIVED as typeof MESSAGE_RECEIVED,
-  positionData,
-  signature,
-});
-export type MessageReceived = ReturnType<typeof messageReceived>;
+
+
 
 export const CHALLENGE_POSITION_RECEIVED = 'WALLET.MESSAGING.CHALLENGE_POSITION_RECEIVED';
 export const challengePositionReceived = (positionData: string) => ({
@@ -193,6 +190,28 @@ export const challengeComplete = () => ({
 });
 export type ChallengeComplete = ReturnType<typeof challengeComplete>;
 
+export type ResponseActionTypes =
+  typeof CHALLENGE_COMPLETE |
+  typeof CHALLENGE_RESPONSE_REQUESTED |
+  typeof CHALLENGE_REJECTED |
+  typeof CHALLENGE_POSITION_RECEIVED |
+  typeof MESSAGE_REQUEST |
+  typeof CLOSE_SUCCESS |
+  typeof CONCLUDE_FAILURE |
+  typeof CONCLUDE_SUCCESS |
+  typeof WITHDRAWAL_FAILURE |
+  typeof WITHDRAWAL_SUCCESS |
+  typeof SIGNATURE_FAILURE |
+  typeof SIGNATURE_SUCCESS |
+  typeof VALIDATION_FAILURE |
+  typeof VALIDATION_SUCCESS |
+  typeof FUNDING_FAILURE |
+  typeof FUNDING_SUCCESS |
+  typeof CHANNEL_OPENED |
+  typeof CHANNEL_CLOSED;
+
+
+// TODO: This could live exclusively in the wallet
 export type ResponseAction =
   InitializationSuccess |
   ConcludeSuccess |
@@ -207,4 +226,4 @@ export type ResponseAction =
   ChallengeRejected |
   ChallengeResponseRequested |
   ChallengeComplete |
-  SendMessage;
+  MessageRequest;

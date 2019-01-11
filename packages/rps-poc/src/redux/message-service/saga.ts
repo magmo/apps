@@ -1,5 +1,5 @@
 import { fork, take, call, put, select, actionChannel } from 'redux-saga/effects';
-import { buffers } from 'redux-saga';
+import { buffers, eventChannel } from 'redux-saga';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -9,7 +9,8 @@ import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
-import { openChannel, requestFunding, signData, validateSignature } from 'wallet-comm';
+import WalletEventListener from 'wallet-comm/lib/wallet-listener';
+import { openChannel, startFunding, signData, validateSignature, ResponseActionTypes as WalletEventTypes, MessageRequest, messageWallet, MESSAGE_REQUEST, FUNDING_SUCCESS } from 'wallet-comm';
 import hexToBN from '../../utils/hexToBN';
 // TODO: use actual wallet interface (what will that look like?)
 const toWalletActions: any = {};
@@ -22,28 +23,18 @@ export enum Queue {
 // export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
 
 export default function* messageSaga() {
-  const runOldSaga = false;
   yield fork(sendMessagesSaga);
   yield fork(waitForWalletThenReceiveFromFirebaseSaga);
-  if (runOldSaga) {
 
-    // yield fork(receiveFromWalletSaga);
-
-    yield fork(sendWalletMessageSaga);
-  }
 }
 
 
-
-
-export function* sendWalletMessageSaga() {
-  while (true) {
-    const action = yield take(fromWalletActions.SEND_MESSAGE);
-    const queue = Queue.WALLET;
-    const { data, to, signature } = action;
-    const message = { data, queue, signature };
-    yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
-  }
+export function* sendMessageToOpponentWallet(messageRequest: MessageRequest) {
+  const queue = Queue.WALLET;
+  const { data, to, signature } = messageRequest;
+  const message = { data, queue, signature };
+  console.log('message snet');
+  yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
 }
 
 
@@ -78,7 +69,6 @@ export function* sendMessagesSaga() {
       const message = { data, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
 
-      // yield put(toWalletActions.messageSent(data, signature));
       yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
       yield put(gameActions.messageSent());
     }
@@ -140,12 +130,34 @@ function* receiveFromFirebaseSaga(address) {
       }
     } else {
       const { signature } = message.value;
-      yield put(toWalletActions.receiveMessage(data, signature));
+      // TODO: Should be stored in a single place
+      console.log('message received');
+      const walletFrameId = 'walletId';
+      messageWallet(walletFrameId, data, signature);
+
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
 }
+
+// TODO: Type this properly
+function createWalletEventChannel(iFrameId: string, eventTypes: WalletEventTypes[]) {
+  return eventChannel(emit => {
+    const walletListener = new WalletEventListener(iFrameId);
+    eventTypes.forEach(eventType => {
+      walletListener.on(eventType, (event) => {
+        console.log(' emit ', event);
+        emit(event);
+      });
+    });
+    return () => {
+      walletListener.removeAllListeners();
+    };
+  });
+}
+
 function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.PlayingState) {
+
   const { libraryAddress, channelNonce, player, balances, participants } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
   const channelId = channel.id;
@@ -166,9 +178,28 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
       const myBalance = hexToBN(balances[myIndex]);
       const opponentBalance = hexToBN(balances[1 - myIndex]);
 
-      const fundingResult = yield requestFunding("walletId", channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
+      // TODO: Should be stored in a single place
+      const walletFrameId = 'walletId';
+      const fundingChannel = createWalletEventChannel(walletFrameId, [MESSAGE_REQUEST, FUNDING_SUCCESS]);
+      startFunding(walletFrameId, channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
+      let fundingOver = false;
+      let fundingResponse;
+      while (!fundingOver) {
+        // TODO: FUNDING_FAILURE
+        fundingResponse = yield take(fundingChannel);
+        console.log('funding response', fundingResponse);
+        switch (fundingResponse.type) {
+          case MESSAGE_REQUEST:
+            yield sendMessageToOpponentWallet(fundingResponse);
+            break;
+          case FUNDING_SUCCESS:
+            fundingOver = true;
+            break;
+        }
+      }
+
       yield put(gameActions.messageSent());
-      const position = decode(fundingResult.position);
+      const position = decode(fundingResponse.position);
       yield put(gameActions.fundingSuccess(position));
 
       break;

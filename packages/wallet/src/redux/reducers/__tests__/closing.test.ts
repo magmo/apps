@@ -64,7 +64,7 @@ describe('start in ApproveConclude', () => {
     describe(' where the adjudicator exists', () => {
       const updatedState = walletReducer(state, action);
       itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
-      expect((updatedState.messageOutbox!).type).toEqual(outgoing.SEND_MESSAGE);
+      expect((updatedState.messageOutbox!).type).toEqual(outgoing.MESSAGE_REQUEST);
     });
     describe(' where the adjudicator does not exist', () => {
       state.adjudicator = undefined;

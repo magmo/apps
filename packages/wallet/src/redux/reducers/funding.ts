@@ -1,6 +1,6 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { sendMessage, fundingSuccess, fundingFailure } from 'wallet-comm/lib/interface/from-wallet';
+import { messageRequest, fundingSuccess, fundingFailure } from 'wallet-comm/lib/interface/from-wallet';
 
 import decode, { extractGameAttributes } from '../../utils/decode-utils';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
@@ -130,7 +130,7 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
       return states.aSubmitDeployInMetaMask({ ...state, unhandledAction: action });
     case actions.TRANSACTION_CONFIRMED:
       if (!action.contractAddress) { return state; }
-      const sendAdjudicatorAddressAction = sendMessage(state.participants[1 - state.ourIndex], action.contractAddress, "");
+      const sendAdjudicatorAddressAction = messageRequest(state.participants[1 - state.ourIndex], action.contractAddress, "");
       const updatedState = states.aWaitForDeposit({
         ...state,
         adjudicator: action.contractAddress,
@@ -318,7 +318,7 @@ const composePostFundState = (state: states.AWaitForDeposit | states.BWaitForPos
   const positionData = channelState.toHex() + extractGameAttributes(state.lastPosition.data);
   const positionSignature = signPositionHex(positionData, state.privateKey);
 
-  const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
+  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], positionData, positionSignature);
   return { positionData, positionSignature, sendMessageAction };
 };
 

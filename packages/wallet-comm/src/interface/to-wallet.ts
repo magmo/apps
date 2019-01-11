@@ -134,18 +134,6 @@ export const receiveMessage = (data: string, signature?: string) => ({
 });
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 
-// Called by the app's messaging-service when any message is sent to the opponent.
-// We use this to update the channel's state - which we only do after the the state is actually sent.
-// TODO: we probably don't need this after the refactor. The wallet should probably store
-// and update at the signing stage. Otherwise, poor app design (or app crashing) could lead
-// to a state being sent to the opponent that the wallet no longer has, which would be bad.
-export const MESSAGE_SENT = 'WALLET.MESSAGING.MESSAGE_SENT';
-export const messageSent = (positionData: string, signature: string) => ({
-  type: MESSAGE_SENT as typeof MESSAGE_SENT,
-  positionData,
-  signature,
-});
-export type MessageSent = ReturnType<typeof messageSent>;
 
 // Requests
 // ========
