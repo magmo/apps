@@ -122,6 +122,8 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       } else { return state; }
     case states.StateName.PlayAgain:
       return playAgainReducer(gameState, messageState, action);
+      case states.StateName.InsufficientFunds:
+      return insufficientFundsReducer(gameState, messageState, action);
     case states.StateName.WaitForResting:
       return waitToPlayAgainReducer(gameState, messageState, action);
     case states.StateName.WaitToResign:
@@ -456,6 +458,7 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
         balances: newBalances, 
         onScreenBalances: newBalances,
       });
+      pos = positions.victory({ ...newGameState});
     } else {
       newGameState = states.insufficientFunds({
         ...gameState,
@@ -465,8 +468,9 @@ function xsPickMoveReducer(gameState: states.XsPickMove, messageState: MessageSt
         onScreenBalances: newBalances,
         result: Result.YouWin,
       });
+      pos = positions.conclude({ ...newGameState});
     }
-    pos = positions.victory({ ...newGameState});
+    
   }
 
   messageState = sendMessage(pos, opponentAddress, messageState);
@@ -543,6 +547,7 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
         balances: newBalances, 
         onScreenBalances: newBalances,
       });
+      pos = positions.victory({ ...newGameState});
     } else {
       newGameState = states.insufficientFunds({
         ...gameState,
@@ -552,8 +557,9 @@ function osPickMoveReducer(gameState: states.OsPickMove, messageState: MessageSt
         onScreenBalances: newBalances,
         result: Result.YouWin,
       });
+      pos = positions.conclude({ ...newGameState});
     }
-  pos = positions.victory({ ...newGameState});
+  
   }
   messageState = sendMessage(pos, opponentAddress, messageState);
   // console.log(newGameState);
@@ -724,6 +730,29 @@ function resignationReducer(gameState: states.PlayingState, messageState: Messag
   }
 
   return { gameState, messageState };
+}
+
+function insufficientFundsReducer(gameState: states.InsufficientFunds, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+
+  const position = action.position;
+  if (position.name !== positions.CONCLUDE) { return { gameState, messageState }; }
+
+  const { turnNum } = position;
+
+  // transition to gameOver
+  const newGameState = states.gameOver({ ...gameState, turnNum });
+
+  if (gameState.player === Player.PlayerA) {
+    newGameState.turnNum = newGameState.turnNum + 1;
+    // send conclude if player A
+    const conclude = positions.conclude(newGameState);
+
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(conclude, opponentAddress, messageState);
+  }
+
+  return { gameState: newGameState, messageState };
 }
 
 function waitToResignReducer(gameState: states.WaitToResign, messageState: MessageState, action: actions.GameAction): JointState {

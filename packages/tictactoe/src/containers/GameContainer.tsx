@@ -31,6 +31,7 @@ interface GameProps {
   cancelOpenGame: () => void;
   resign: () => void;
   exitToLobby: () => void;
+  withdraw: () => void;
 }
 
 function GameContainer(props: GameProps) {
@@ -43,7 +44,7 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, marksMade, confirmGame, declineGame, playAgain, resign, exitToLobby } = props;
+  const { state, marksMade, confirmGame, declineGame, playAgain, resign, withdraw } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
@@ -162,7 +163,7 @@ function RenderGame(props: GameProps) {
       return <WaitForResignationAcknowledgement />;
     case StateName.GameOver:
     case StateName.OpponentResigned:
-      return <GameOverPage visible={(state.name === StateName.OpponentResigned) || (state.name === StateName.GameOver)} exitToLobby={exitToLobby} />;
+      return <GameOverPage visible={state.name === StateName.OpponentResigned || state.name === StateName.GameOver} withdraw={withdraw} />;
     case StateName.WaitForFunding:
       return <WaitForWallet reason={"Waiting for funding confirmation."} />;
     case StateName.WaitForWithdrawal:
@@ -184,6 +185,7 @@ const mapDispatchToProps = {
   playAgain: actions.playAgain,
   resign: actions.resign,
   exitToLobby: actions.exitToLobby,
+  withdraw: actions.withdrawalRequest,
 };
 
 // why does it think that mapStateToProps can return undefined??
