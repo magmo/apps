@@ -4,7 +4,7 @@ import * as states from '../../../states';
 import * as actions from '../../actions';
 
 import { itTransitionsToStateType } from './helpers';
-import * as scenarios from './scenarios';
+import * as scenarios from './../../../tests/app-utils/scenarios';
 
 const {
   asPrivateKey,

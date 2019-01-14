@@ -1,5 +1,5 @@
-import { WalletState } from "..";
 import { State } from "fmg-core";
+import { WalletState } from '../states';
 
 export function unreachable(x: never) { return x; }
 

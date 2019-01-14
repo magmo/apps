@@ -1,8 +1,8 @@
-// import BN from 'bn.js';
+import BN from 'bn.js';
 import { ethers } from "ethers";
 import { Channel } from "fmg-core";
 import { put } from "redux-saga/effects";
-// import { bnToHex } from './test-utils';
+
 import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
 import { transactionSender } from "../redux/sagas/transaction-sender";
 import { signPositionHex, signVerificationData } from '../utils/signing-utils';
@@ -20,6 +20,13 @@ import {
 } from '../utils/transaction-generator';
 
 import { deployContract, depositContract, createChallenge, concludeGame } from './test-utils';
+import { bnToHex, randomHex } from './test-utils';
+// TODO: These are currently copied from RPS. 
+// Ideally we should create a test contract some we can test the wallet
+// without deploying the RPS contract.
+import encode from './app-utils/encode';
+import * as positions from './app-utils/positions';
+import { Move } from "./app-utils/moves";
 
 jest.setTimeout(20000);
 
@@ -29,8 +36,8 @@ describe('transactions', () => {
   let nonce = 5;
   const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-  // const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
-  // const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
+  const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
+  const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
   const participantA = ethers.Wallet.createRandom();
   const participantB = ethers.Wallet.createRandom();
   const participants = [participantA.address, participantB.address] as [string, string];
@@ -82,28 +89,28 @@ describe('transactions', () => {
     const { channelNonce } = channel;
     const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
-    // const baseMoveArgs = {
-    //   salt: randomHex(64),
-    //   asMove: 0,
-    //   roundBuyIn: '0x1',
-    //   participants,
-    // };
+    const baseMoveArgs = {
+      salt: randomHex(64),
+      asMove: Move.Rock,
+      roundBuyIn: '0x1',
+      participants,
+    };
 
-    // const proposeArgs = {
-    //   ...baseMoveArgs,
-    //   turnNum: 5,
-    //   balances: fiveFive,
-    // };
+    const proposeArgs = {
+      ...baseMoveArgs,
+      turnNum: 5,
+      balances: fiveFive,
+    };
 
-    // const acceptArgs = {
-    //   ...baseMoveArgs,
-    //   preCommit: '0x',//  positions.hashCommitment(baseMoveArgs.asMove, baseMoveArgs.salt),
-    //   bsMove: 1,
-    //   turnNum: 6,
-    //   balances: fourSix,
-    // };
-    const fromPosition = '0x';// encode(positions.proposeFromSalt({ libraryAddress, channelNonce, ...proposeArgs }));
-    const toPosition = '0x';// encode(positions.accept({ libraryAddress, channelNonce, ...acceptArgs }));
+    const acceptArgs = {
+      ...baseMoveArgs,
+      preCommit: positions.hashCommitment(baseMoveArgs.asMove, baseMoveArgs.salt),
+      bsMove: Move.Paper,
+      turnNum: 6,
+      balances: fourSix,
+    };
+    const fromPosition = encode(positions.proposeFromSalt({ libraryAddress, channelNonce, ...proposeArgs }));
+    const toPosition = encode(positions.accept({ libraryAddress, channelNonce, ...acceptArgs }));
     const fromSig = signPositionHex(fromPosition, participantB.privateKey);
     const toSig = signPositionHex(toPosition, participantA.privateKey);
 
@@ -118,19 +125,19 @@ describe('transactions', () => {
     const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
     await createChallenge(contractAddress, channelNonce, participantA, participantB);
-    // const revealArgs = {
-    //   turnNum: 7,
-    //   balances: fourSix,
-    //   salt: randomHex(64),
-    //   asMove: 0,
-    //   bsMove: 1,
-    //   roundBuyIn: '0x1',
-    //   libraryAddress,
-    //   channelNonce,
-    //   participants,
-    // };
+    const revealArgs = {
+      turnNum: 7,
+      balances: fourSix,
+      salt: randomHex(64),
+      asMove: Move.Rock,
+      bsMove: Move.Paper,
+      roundBuyIn: '0x1',
+      libraryAddress,
+      channelNonce,
+      participants,
+    };
 
-    const toPosition = '0x';// encode(positions.reveal(revealArgs));
+    const toPosition = encode(positions.reveal(revealArgs));
 
     const toSig = signPositionHex(toPosition, participantB.privateKey);
 
@@ -145,18 +152,18 @@ describe('transactions', () => {
     await depositContract(contractAddress);
     await createChallenge(contractAddress, channelNonce, participantA, participantB);
 
-    // const secondProposeArgs = {
-    //   salt: randomHex(64),
-    //   asMove: 0,
-    //   roundBuyIn: '0x1',
-    //   participants,
-    //   turnNum: 100,
-    //   balances: fiveFive,
-    //   channelNonce,
-    //   libraryAddress,
-    // };
+    const secondProposeArgs = {
+      salt: randomHex(64),
+      asMove: Move.Rock,
+      roundBuyIn: '0x1',
+      participants,
+      turnNum: 100,
+      balances: fiveFive,
+      channelNonce,
+      libraryAddress,
+    };
 
-    const toPosition = '0x';//  encode(positions.proposeFromSalt(secondProposeArgs));
+    const toPosition = encode(positions.proposeFromSalt(secondProposeArgs));
     const toSig = signPositionHex(toPosition, participantA.privateKey);
 
     const refuteTransaction = createRefuteTransaction(contractAddress, toPosition, toSig);
@@ -169,19 +176,19 @@ describe('transactions', () => {
     const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
 
-    // const concludeArgs = {
-    //   salt: randomHex(64),
-    //   asMove: 0,
-    //   roundBuyIn: '0x1',
-    //   participants,
-    //   balances: fiveFive,
-    //   libraryAddress,
-    //   channelNonce,
+    const concludeArgs = {
+      salt: randomHex(64),
+      asMove: Move.Rock,
+      roundBuyIn: '0x1',
+      participants,
+      balances: fiveFive,
+      libraryAddress,
+      channelNonce,
 
-    // };
-    const fromState = '0x';// encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
+    };
+    const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
     const fromSignature = signPositionHex(fromState, participantA.privateKey);
-    const toState = '0x';//  encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
+    const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
     const toSignature = signPositionHex(toState, participantB.privateKey);
     const verificationSignature = signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey);
     const concludeAndWithdrawArgs: ConcludeAndWithdrawArgs = {
@@ -205,19 +212,19 @@ describe('transactions', () => {
     const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
 
-    // const concludeArgs = {
-    //   salt: randomHex(64),
-    //   asMove: 0,
-    //   roundBuyIn: '0x1',
-    //   participants,
-    //   balances: fiveFive,
-    //   libraryAddress,
-    //   channelNonce,
+    const concludeArgs = {
+      salt: randomHex(64),
+      asMove: Move.Rock,
+      roundBuyIn: '0x1',
+      participants,
+      balances: fiveFive,
+      libraryAddress,
+      channelNonce,
 
-    // };
-    const fromState = '0x';// encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
+    };
+    const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
     const fromSignature = signPositionHex(fromState, participantA.privateKey);
-    const toState = '0x';// encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
+    const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
     const toSignature = signPositionHex(toState, participantB.privateKey);
 
     const concludeTransaction = createConcludeTransaction(contractAddress, fromState, toState, fromSignature, toSignature);

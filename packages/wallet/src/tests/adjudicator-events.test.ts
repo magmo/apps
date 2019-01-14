@@ -15,7 +15,6 @@ describe('adjudicator listener', () => {
     return ++nonce;
   }
 
-
   it("should handle a funds received event", async () => {
     const channelNonce = getNextNonce();
     const contractAddress = await deployContract(channelNonce, participantA, participantB);
