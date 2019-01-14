@@ -102,6 +102,7 @@ export function messageWallet(iFrameId: string, data, signature: string) {
   iFrame.contentWindow.postMessage(message, '*');
 }
 
+// TODO: Would it make sense to just accept an event handler as an argument instead of returning the event listener?
 /**
  * Starts the funding process. 
  * @return {WalletEventListener} A wallet event listener to subscribe to that raises funding events.
