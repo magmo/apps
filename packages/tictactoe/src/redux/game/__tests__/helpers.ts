@@ -70,7 +70,7 @@ export const itFullySwingsTheBalancesToB = (stake: string, oldState: JointState,
 };
 
 export const itHalfSwingsTheBalancesToA = (stake: string, oldState: JointState, newState: JointState) => {
-  const halfStake = String(0.5 *  Number(stake));
+  const halfStake = String(0.5 * Number(stake));
   itFullySwingsTheBalancesToA(halfStake, oldState, newState);
 };
 
