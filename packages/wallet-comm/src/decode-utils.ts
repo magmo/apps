@@ -1,3 +1,5 @@
+// TODO: This is a copy of decode from the wallet
+// This functionality should be pulled out to fmg-core so it can be properly shared
 import { Channel, State, } from 'fmg-core';
 import * as BN from 'bn.js';
 
@@ -62,7 +64,7 @@ export function extractGameAttributes(hexString: string): string {
   return hexString.substr(charOffset);
 }
 
-export default function decode(hexString) {
+export function decode(hexString) {
   const channel = extractChannel(hexString);
   const turnNum = extractTurnNum(hexString);
   const stateType = extractStateType(hexString);

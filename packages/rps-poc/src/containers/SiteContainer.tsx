@@ -25,8 +25,9 @@ function Site(props: SiteProps) {
     component = <ApplicationContainer />;
   } else {
     component = <HomePageContainer />;
-  }
-  return <div><iframe src="http://localhost:3000" id="walletId" width="100%" height="100%" allowTransparency={true} />{component}</div>;
+  }  
+
+  return component;
 }
 
 const mapStateToProps = (state: SiteState): SiteProps => {

@@ -11,7 +11,10 @@ import SiteContainer from './containers/SiteContainer';
 
 render(
   <Provider store={store}>
-    <SiteContainer />
+    <div>
+      <iframe src="http://localhost:3000" id="walletId" style={{ width: '400px', height: '400px' }} />
+      <SiteContainer />
+    </div>
   </Provider>,
   document.getElementById('root'),
 );

@@ -9,8 +9,8 @@ import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
-import WalletEventListener from 'wallet-comm/lib/wallet-listener';
-import { openChannel, startFunding, signData, validateSignature, ResponseActionTypes as WalletEventTypes, MessageRequest, messageWallet, MESSAGE_REQUEST, FUNDING_SUCCESS } from 'wallet-comm';
+import * as Wallet from 'wallet-comm';
+import { openChannel, startFunding, signData, validateSignature, MessageRequest, messageWallet, MESSAGE_REQUEST, FUNDING_SUCCESS } from 'wallet-comm';
 import hexToBN from '../../utils/hexToBN';
 // TODO: use actual wallet interface (what will that look like?)
 const toWalletActions: any = {};
@@ -33,7 +33,6 @@ export function* sendMessageToOpponentWallet(messageRequest: MessageRequest) {
   const queue = Queue.WALLET;
   const { data, to, signature } = messageRequest;
   const message = { data, queue, signature };
-  console.log('message snet');
   yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
 }
 
@@ -141,17 +140,14 @@ function* receiveFromFirebaseSaga(address) {
 }
 
 // TODO: Type this properly
-function createWalletEventChannel(iFrameId: string, eventTypes: WalletEventTypes[]) {
+function createWalletEventChannel(walletListener: Wallet.WalletEventListener) {
   return eventChannel(emit => {
-    const walletListener = new WalletEventListener(iFrameId);
-    eventTypes.forEach(eventType => {
-      walletListener.on(eventType, (event) => {
-        console.log(' emit ', event);
-        emit(event);
-      });
+    walletListener.subscribe((event) => {
+      emit(event);
     });
+
     return () => {
-      walletListener.removeAllListeners();
+      walletListener.unSubscribe();
     };
   });
 }
@@ -180,14 +176,15 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
 
       // TODO: Should be stored in a single place
       const walletFrameId = 'walletId';
-      const fundingChannel = createWalletEventChannel(walletFrameId, [MESSAGE_REQUEST, FUNDING_SUCCESS]);
-      startFunding(walletFrameId, channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
+      const walletListener = startFunding(walletFrameId, channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
+      const fundingChannel = createWalletEventChannel(walletListener);
+
+
       let fundingOver = false;
       let fundingResponse;
       while (!fundingOver) {
         // TODO: FUNDING_FAILURE
         fundingResponse = yield take(fundingChannel);
-        console.log('funding response', fundingResponse);
         switch (fundingResponse.type) {
           case MESSAGE_REQUEST:
             yield sendMessageToOpponentWallet(fundingResponse);
