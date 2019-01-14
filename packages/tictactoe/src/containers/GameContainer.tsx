@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { SiteState } from '../redux/reducer';
-import { Wallet } from '../wallet';
+import Wallet from '../wallet/containers/Wallet';
 import { Marker } from '../core';
 import GameScreen from '../components/GameScreen';
 import ProfileContainer from './ProfileContainer';
