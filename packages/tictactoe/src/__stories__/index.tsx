@@ -11,6 +11,8 @@ import { OpenGame } from "../redux/open-games/state";
 import '../index.scss';
 import '../index.css';
 import { scenarios } from '../core';
+import { SiteState } from '../redux/reducer';
+import { WAIT_FOR_LOGIN, INITIALIZING } from '../wallet/states';
 
 const finneySixFour = [new BN(6000000000000000), new BN(4000000000000000)].map(bnToHex) as [string, string];
 
@@ -34,20 +36,42 @@ const testState = (state) => (
 
 const shared = { ...scenarios.shared };
 
-const initialState = {
+const initialState: SiteState = {
+  login: {
+    loading: false,
+    loggedIn: true,
+    user: null,
+  },
+  wallet: {
+    type: WAIT_FOR_LOGIN,
+    stage: INITIALIZING,
+  },
+  metamask: {
+    loading: false,
+    error: null,
+    success: true,
+  },
+  openGames:[],
+  rules: {
+    visible: false,
+  },
   game: {
     messageState: {},
     gameState: states.xsPickMove({
       ...shared,
-      stateCount: 1,
-      noughts: 0,
-      crosses: 0,
-      balances: finneySixFour,
-      onScreenBalances: finneySixFour,
-      turnNum: 4,
-      result: Imperative.Choose,
-      player: Player.PlayerA,
+      noughts: 0b000100000,
+      crosses: 0b000001001,
       you: Marker.crosses,
+      player: Player.PlayerA,
+      result: Imperative.Wait,
+      onScreenBalances: finneySixFour,
+      turnNum: 5,
+      balances: finneySixFour,
+      stateCount: 1,
+      twitterHandle: 'twtr',
+      roundBuyIn: '1',
+      myName: 'George',
+      opponentName: 'Mike',
     }),
   },
 };
@@ -71,24 +95,6 @@ joinOpenGame={joinOpenGame}
 />);
 
 storiesOf('Game Screens / Crosses', module)
-  .add('Waiting', testState(states.xsWaitForOpponentToPickMove({
-    ...shared,
-    ...initialState,
-    noughts: 0b000100000,
-    crosses: 0b000001001,
-    you: Marker.crosses,
-    player: Player.PlayerA,
-    result: Imperative.Wait,
-    onScreenBalances: finneySixFour,
-    turnNum: 5,
-    balances: finneySixFour,
-    stateCount: 1,
-    twitterHandle: 'twtr',
-    roundBuyIn: '1',
-    myName: 'George',
-    opponentName: 'Mike',
-  }
-  ))
-  );
+  .add('Waiting', testState(initialState));
 
 

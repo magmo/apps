@@ -4,6 +4,7 @@ import {
 
 function loadStories() {
   require('../src/wallet/__stories__');
+  require('../src/__stories__');
   // You can require as many stories as you need.
 }
 configure(loadStories, module);
