@@ -5,8 +5,7 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { keysLoaded } from '../actions';
 import { getProvider } from '../../utils/contract-utils';
 import { ethers } from 'ethers';
-import { WalletState } from '../..';
-import { WAIT_FOR_ADDRESS } from '../../states';
+import { WAIT_FOR_ADDRESS, WalletState } from '../../states';
 
 interface WalletParams {
   uid: string;
