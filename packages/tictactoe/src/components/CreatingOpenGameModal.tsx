@@ -26,7 +26,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
   constructor(props) {
     super(props);
     this.buyInInput = React.createRef();
-    this.state = { errorMessage: "", buyIn: "", buyInChanged: false };
+    this.state = { errorMessage: "", buyIn: String(MIN_BUYIN), buyInChanged: true };
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
     this.handleBuyInChange = this.handleBuyInChange.bind(this);
     this.modalClosed = this.modalClosed.bind(this);
@@ -91,7 +91,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                   className="cog-input form-control"
                   name="buyin"
                   id="buyin"
-                  value={this.state.buyIn}
+                  value={MIN_BUYIN}
                   ref={this.buyInInput}
                   onChange={e => this.handleBuyInChange(e)}
                 />

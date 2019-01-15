@@ -128,6 +128,18 @@ const xsTie = siteStateFromGameState(states.playAgain({
   balances: finneyFiveFive,
 }));
 
+const xsWaitToPlayAgain = siteStateFromGameState(states.waitForRestingA({
+  ...shared,
+  noughts: 0b010011100,
+  crosses: 0b101100011,
+  you: Marker.crosses,
+  player: Player.PlayerA,
+  result: Result.Tie,
+  onScreenBalances: finneyFiveFive,
+  turnNum: 6,
+  balances: finneyFiveFive,
+}));
+
 const osChoosing = siteStateFromGameState(states.osPickMove({
   ...shared,
   noughts: 0b000000000,
@@ -210,7 +222,8 @@ storiesOf('Game Screens / Crosses', module)
   .add('Waiting', testState(xsWaiting))
   .add('Winning', testState(xsVictory))
   .add('Losing', testState(xsDefeat))
-  .add('Drawing', testState(xsTie));
+  .add('Drawing', testState(xsTie))
+  .add('Wait to Play Again', testState(xsWaitToPlayAgain));
 
 storiesOf('Game Screens / Noughts', module)
   .add('Choosing', testState(osChoosing))
