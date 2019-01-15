@@ -10,7 +10,7 @@ import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
 import * as Wallet from 'wallet-comm';
-import { openChannel, startFunding, startConcludingGame, signData, validateSignature, MessageRequest, messageWallet, MESSAGE_REQUEST, FUNDING_SUCCESS, CONCLUDE_SUCCESS } from 'wallet-comm';
+import { openChannel, startFunding, startConcludingGame, signData, validateSignature, messageWallet, MESSAGE_REQUEST, FUNDING_SUCCESS, CONCLUDE_SUCCESS, CLOSE_SUCCESS } from 'wallet-comm';
 import hexToBN from '../../utils/hexToBN';
 // TODO: use actual wallet interface (what will that look like?)
 const toWalletActions: any = {};
@@ -26,6 +26,7 @@ export default function* messageSaga() {
   yield fork(sendMessagesSaga);
   yield fork(waitForWalletThenReceiveFromFirebaseSaga);
   yield fork(sendWalletMessageSaga);
+  yield fork(exitGameSaga);
 
 }
 
@@ -39,14 +40,14 @@ export function* sendWalletMessageSaga() {
     yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
   }
 }
-export function* sendMessageToOpponentWallet(messageRequest: MessageRequest) {
-  const queue = Queue.WALLET;
-  const { data, to, signature } = messageRequest;
-  const message = { data, queue, signature };
 
-  yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
+export function* exitGameSaga() {
+  const closeGameChannel = createWalletEventChannel([CLOSE_SUCCESS]);
+  while (true) {
+    yield take(closeGameChannel);
+    yield put(gameActions.exitToLobby());
+  }
 }
-
 
 export function* sendMessagesSaga() {
   // We need to use an actionChannel to queue up actions that
@@ -217,6 +218,7 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
       startConcludingGame(walletFrameId);
       yield take(conclusionChannel);
       yield put(gameActions.messageSent());
+      yield put(gameActions.exitToLobby());
       break;
   }
 }
