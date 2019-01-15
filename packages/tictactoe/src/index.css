@@ -226,3 +226,13 @@ td:after {
     right: 0;
     transform: translate(0,-50%);
 }
+
+a {
+    color:white;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: white;
+    text-decoration: none;
+}

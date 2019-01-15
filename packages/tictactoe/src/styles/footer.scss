@@ -2,20 +2,19 @@
   font-weight: bold;
   font-size: 16px;
   color: $white;
-
   width: 188px;
   height: 40px;
   border-radius: 5px;
   border: solid 1px $rps-lobby-border-off-white;
-  background-color: $rps-footer-grey;
+  // background-color: $rps-footer-grey;
 }
 
 .footer-resign:hover, .footer-challenge:hover {
-  color: $rps-footer-grey;
+  color: $black;
   width: 188px;
   height: 40px;
   border-radius: 5px;
-  border: $rps-lobby-border-off-white;
+  border: $black;
   background-color: $white;
 }
 

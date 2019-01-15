@@ -10,6 +10,7 @@ import { Player } from '../core/players';
 function mapStateToProps(state: SiteState) {
   const gameState = state.game.gameState as PlayingState;
   const { player, turnNum } = gameState;
+  const result = gameState.result;
   const isNotOurTurn = player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;
   const canChallenge = gameState.name === StateName.OsWaitForOpponentToPickMove || gameState.name === StateName.XsWaitForOpponentToPickMove;
   const challengeOngoing = gameState.name === "PICK_CHALLENGE_MOVE";
@@ -17,6 +18,7 @@ function mapStateToProps(state: SiteState) {
     isNotOurTurn,
     canChallenge,
     challengeOngoing,
+    result,
   };
 }
 const mapDispatchToProps = {

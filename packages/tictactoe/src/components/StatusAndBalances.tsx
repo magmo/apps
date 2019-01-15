@@ -28,6 +28,10 @@ export default class StatusAndBalances extends React.PureComponent<Props> {
   }
 
   render() {
+    
+    
+    
+    
     const { onScreenBalances, player, you } = this.props;
     return (
       <div id="status-container">

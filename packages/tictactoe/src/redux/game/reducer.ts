@@ -168,7 +168,20 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const stateCount = 1;
 
       const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, myName, balances, onScreenBalances, participants, turnNum, stateCount, libraryAddress, twitterHandle, player: Player.PlayerA,
+        ...action,
+        myName,
+        balances,
+        onScreenBalances,
+        participants,
+        turnNum,
+        stateCount,
+        libraryAddress,
+        twitterHandle,
+        result: Imperative.Wait,
+        player: Player.PlayerA,
+        you: Marker.crosses,
+        noughts: 0,
+        crosses: 0,
       });
 
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
@@ -199,7 +212,19 @@ function waitingRoomReducer(gameState: states.WaitingRoom, messageState: Message
 
       if (position.name !== positions.PRE_FUND_SETUP_A) { return { gameState, messageState }; }
 
-      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB, onScreenBalances: position.balances });
+      const newGameState = states.confirmGameB({
+        ...position,
+        myName,
+        opponentName,
+        twitterHandle,
+        player: Player.PlayerB,
+        onScreenBalances: position.balances,
+        result: Imperative.Wait,
+        noughts: 0,
+        crosses: 0,
+        you: Marker.noughts,
+         });
+
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
@@ -815,4 +840,5 @@ function opponentResignedReducer(gameState: states.OpponentResigned, messageStat
   messageState = { ...messageState, walletOutbox: { type: 'WITHDRAWAL_REQUESTED' } };
 
   return { gameState: newGameState, messageState };
+
 }

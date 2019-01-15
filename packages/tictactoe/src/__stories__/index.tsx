@@ -36,6 +36,9 @@ const testState = (state) => (
 
 const shared = { ...scenarios.shared };
 
+
+
+
 const initialState: SiteState = {
   login: {
     loading: false,
@@ -60,10 +63,10 @@ const initialState: SiteState = {
     gameState: states.xsPickMove({
       ...shared,
       noughts: 0b000100000,
-      crosses: 0b000001001,
+      crosses: 0b000001000,
       you: Marker.crosses,
       player: Player.PlayerA,
-      result: Imperative.Wait,
+      result: Imperative.Choose,
       onScreenBalances: finneySixFour,
       turnNum: 5,
       balances: finneySixFour,
@@ -76,6 +79,29 @@ const initialState: SiteState = {
   },
 };
 
+export function siteStateFromGameState<T extends states.GameState>(gamestate: T): SiteState {
+  return {
+    ...initialState,
+    game: {messageState: {}, gameState: gamestate},
+  };
+}
+
+const xsWaiting = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+  ...shared,
+  noughts: 0b000100000,
+  crosses: 0b000001001,
+  you: Marker.crosses,
+  player: Player.PlayerA,
+  result: Imperative.Wait,
+  onScreenBalances: finneySixFour,
+  turnNum: 6,
+  balances: finneySixFour,
+  stateCount: 1,
+  twitterHandle: 'twtr',
+  roundBuyIn: '1',
+  myName: 'George',
+  opponentName: 'Mike',
+}));
 
 const joinOpenGame = () => alert("join open game");
 
@@ -95,6 +121,7 @@ joinOpenGame={joinOpenGame}
 />);
 
 storiesOf('Game Screens / Crosses', module)
-  .add('Waiting', testState(initialState));
+  .add('Choosing', testState(initialState))
+  .add('Waiting', testState(xsWaiting));
 
 
