@@ -1,6 +1,6 @@
 import { Channel } from 'fmg-core';
-import { INITIALIZATION_SUCCESS, INITIALIZATION_FAILURE, CHANNEL_OPENED, ChannelOpened, FUNDING_FAILURE, FUNDING_SUCCESS, FundingResponse, SIGNATURE_FAILURE, SIGNATURE_SUCCESS, SignatureResponse, VALIDATION_SUCCESS, VALIDATION_FAILURE, ValidationResponse, messageRequest, MESSAGE_REQUEST, SHOW_WALLET, HIDE_WALLET } from './interface/from-wallet';
-import { INITIALIZE_REQUEST, openChannelRequest, initializeRequest, fundingRequest, signatureRequest, validationRequest, receiveMessage } from './interface/to-wallet';
+import { INITIALIZATION_SUCCESS, INITIALIZATION_FAILURE, CHANNEL_OPENED, ChannelOpened, FUNDING_FAILURE, FUNDING_SUCCESS, FundingResponse, SIGNATURE_FAILURE, SIGNATURE_SUCCESS, SignatureResponse, VALIDATION_SUCCESS, VALIDATION_FAILURE, ValidationResponse, messageRequest, MESSAGE_REQUEST, SHOW_WALLET, HIDE_WALLET, CONCLUDE_FAILURE, CONCLUDE_SUCCESS } from './interface/from-wallet';
+import { INITIALIZE_REQUEST, openChannelRequest, initializeRequest, fundingRequest, signatureRequest, validationRequest, receiveMessage, concludeChannelRequest } from './interface/to-wallet';
 import BN from 'bn.js';
 import { WalletEventListener } from '.';
 
@@ -137,10 +137,17 @@ export function messageWallet(iFrameId: string, data, signature: string) {
   iFrame.contentWindow.postMessage(message, '*');
 }
 
+export function startConcludingGame(iFrameId: string): void {
+
+  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const message = concludeChannelRequest();
+  iFrame.contentWindow.postMessage(message, "*");
+}
+
 // TODO: Would it make sense to just accept an event handler as an argument instead of returning the event listener?
 /**
  * Starts the funding process. 
- * @return {WalletEventListener} A wallet event listener to subscribe to that raises funding events.
+ 
  */
 export function startFunding(iFrameId: string,
   channelId: string,
@@ -148,12 +155,9 @@ export function startFunding(iFrameId: string,
   opponentAddress: string,
   myBalance: BN,
   opponentBalance: BN,
-  playerIndex: number): WalletEventListener {
+  playerIndex: number): void {
 
   const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
   const message = fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, playerIndex);
-  const eventListener = new WalletEventListener(iFrameId, [FUNDING_FAILURE, FUNDING_SUCCESS, MESSAGE_REQUEST]);
   iFrame.contentWindow.postMessage(message, "*");
-  return eventListener;
-
 }

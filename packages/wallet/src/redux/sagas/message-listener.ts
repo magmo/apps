@@ -35,6 +35,8 @@ export function* messageListener() {
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
+        // TODO: Put hide/show logic in the correct spot (displayOutbox on state maybe?)
+        window.parent.postMessage(outgoing.showWallet(), '*');
         yield put(actions.messageReceived(action.data, action.signature));
         break;
       case incoming.RESPOND_TO_CHALLENGE:
@@ -42,6 +44,7 @@ export function* messageListener() {
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.concludeRequested());
+        window.parent.postMessage(outgoing.showWallet(), '*');
         break;
       default:
     }
