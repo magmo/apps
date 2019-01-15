@@ -61,8 +61,8 @@ const initialState: SiteState = {
     messageState: {},
     gameState: states.xsPickMove({
       ...shared,
-      noughts: 0b000100000,
-      crosses: 0b000001000,
+      noughts: 0b000000000,
+      crosses: 0b000000000,
       you: Marker.crosses,
       player: Player.PlayerA,
       result: Imperative.Choose,
@@ -82,8 +82,8 @@ export function siteStateFromGameState<T extends states.GameState>(gamestate: T)
 
 const xsWaiting = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   ...shared,
-  noughts: 0b000100000,
-  crosses: 0b000001001,
+  noughts: 0b000000000,
+  crosses: 0b000000001,
   you: Marker.crosses,
   player: Player.PlayerA,
   result: Imperative.Wait,
@@ -92,7 +92,7 @@ const xsWaiting = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   balances: finneySixFour,
 }));
 
-const xsVictory = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+const xsVictory = siteStateFromGameState(states.playAgain({
   ...shared,
   noughts: 0b000010010,
   crosses: 0b001001001,
@@ -104,7 +104,7 @@ const xsVictory = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   balances: finneySixFour,
 }));
 
-const xsDefeat = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+const xsDefeat = siteStateFromGameState(states.playAgain({
   ...shared,
   noughts: 0b111010000,
   crosses: 0b000001011,
@@ -116,12 +116,72 @@ const xsDefeat = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   balances: finneyFourSix,
 }));
 
-const xsTie = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+const xsTie = siteStateFromGameState(states.playAgain({
   ...shared,
   noughts: 0b010011100,
   crosses: 0b101100011,
   you: Marker.crosses,
   player: Player.PlayerA,
+  result: Result.Tie,
+  onScreenBalances: finneyFiveFive,
+  turnNum: 6,
+  balances: finneyFiveFive,
+}));
+
+const osChoosing = siteStateFromGameState(states.osPickMove({
+  ...shared,
+  noughts: 0b000000000,
+  crosses: 0b000000001,
+  you: Marker.noughts,
+  player: Player.PlayerB,
+  result: Imperative.Choose,
+  onScreenBalances: finneyFiveFive,
+  turnNum: 6,
+  balances: finneySixFour,
+}));
+
+const osWaiting = siteStateFromGameState(states.osWaitForOpponentToPickMove({
+  ...shared,
+  noughts: 0b000000000,
+  crosses: 0b000000001,
+  you: Marker.noughts,
+  player: Player.PlayerB,
+  result: Imperative.Wait,
+  onScreenBalances: finneyFiveFive,
+  turnNum: 6,
+  balances: finneySixFour,
+}));
+
+const osVictory = siteStateFromGameState(states.playAgain({
+  ...shared,
+  noughts: 0b001001001,
+  crosses: 0b000010010,
+  you: Marker.crosses,
+  player: Player.PlayerB,
+  result: Result.YouWin,
+  onScreenBalances: finneySixFour,
+  turnNum: 6,
+  balances: finneySixFour,
+}));
+
+const osDefeat = siteStateFromGameState(states.playAgain({
+  ...shared,
+  noughts: 0b000001011,
+  crosses: 0b111010000,
+  you: Marker.crosses,
+  player: Player.PlayerB,
+  result: Result.YouLose,
+  onScreenBalances: finneyFourSix,
+  turnNum: 6,
+  balances: finneyFourSix,
+}));
+
+const osTie = siteStateFromGameState(states.playAgain({
+  ...shared,
+  noughts: 0b010011100,
+  crosses: 0b101100011,
+  you: Marker.crosses,
+  player: Player.PlayerB,
   result: Result.Tie,
   onScreenBalances: finneyFiveFive,
   turnNum: 6,
@@ -151,4 +211,11 @@ storiesOf('Game Screens / Crosses', module)
   .add('Winning', testState(xsVictory))
   .add('Losing', testState(xsDefeat))
   .add('Drawing', testState(xsTie));
+
+storiesOf('Game Screens / Noughts', module)
+  .add('Choosing', testState(osChoosing))
+  .add('Waiting', testState(osWaiting))
+  .add('Winning', testState(osVictory))
+  .add('Losing', testState(osDefeat))
+  .add('Drawing', testState(osTie));
 
