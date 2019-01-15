@@ -1,3 +1,4 @@
+import { create } from 'domain';
 
 // FUNDING
 // =======
@@ -146,7 +147,18 @@ export const closeSuccess = () => ({
 export type CloseSuccess = ReturnType<typeof closeSuccess>;
 
 
+//DISPLAY
+export const SHOW_WALLET = 'WALLET.DISPLAY.SHOW_WALLET';
+export const showWallet = () => ({
+  type: SHOW_WALLET as typeof SHOW_WALLET,
+});
+export type ShowWallet = ReturnType<typeof showWallet>;
 
+export const HIDE_WALLET = 'WALLET.DISPLAY.HIDE_WALLET';
+export const hideWallet = () => ({
+  type: HIDE_WALLET as typeof HIDE_WALLET,
+});
+export type HideWallet = ReturnType<typeof hideWallet>;
 
 // MESSAGING
 // =========

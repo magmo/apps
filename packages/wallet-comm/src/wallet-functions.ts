@@ -1,8 +1,43 @@
 import { Channel } from 'fmg-core';
-import { INITIALIZATION_SUCCESS, INITIALIZATION_FAILURE, CHANNEL_OPENED, ChannelOpened, FUNDING_FAILURE, FUNDING_SUCCESS, FundingResponse, SIGNATURE_FAILURE, SIGNATURE_SUCCESS, SignatureResponse, VALIDATION_SUCCESS, VALIDATION_FAILURE, ValidationResponse, messageRequest, MESSAGE_REQUEST } from './interface/from-wallet';
+import { INITIALIZATION_SUCCESS, INITIALIZATION_FAILURE, CHANNEL_OPENED, ChannelOpened, FUNDING_FAILURE, FUNDING_SUCCESS, FundingResponse, SIGNATURE_FAILURE, SIGNATURE_SUCCESS, SignatureResponse, VALIDATION_SUCCESS, VALIDATION_FAILURE, ValidationResponse, messageRequest, MESSAGE_REQUEST, SHOW_WALLET, HIDE_WALLET } from './interface/from-wallet';
 import { INITIALIZE_REQUEST, openChannelRequest, initializeRequest, fundingRequest, signatureRequest, validationRequest, receiveMessage } from './interface/to-wallet';
 import BN from 'bn.js';
 import { WalletEventListener } from '.';
+
+
+export function createWalletIFrame(iframeId: string, walletUrl: string): HTMLIFrameElement {
+  const iFrame = document.createElement("iframe");
+  iFrame.src = walletUrl;
+  iFrame.id = iframeId;
+  iFrame.style.display = 'none';
+  iFrame.style.position = 'absolute';
+  iFrame.style.left = '0px';
+  iFrame.style.right = '0px';
+  iFrame.style.bottom = '0px';
+  iFrame.style.top = '0px';
+  iFrame.width = '0';
+  iFrame.height = '0';
+  iFrame.style.zIndex = '9999';
+  iFrame
+
+  window.addEventListener('message', (event => {
+    if (event.data && event.data.type && event.data.type === SHOW_WALLET) {
+      iFrame.style.display = 'initial';
+      document.body.style.overflow = 'hidden';
+      iFrame.width = '100%';
+      iFrame.height = '100%';
+    }
+    if (event.data && event.data.type && event.data.type === HIDE_WALLET) {
+      iFrame.style.display = 'none';
+      document.body.style.overflow = 'initial';
+      iFrame.width = '0';
+      iFrame.height = '0';
+
+    }
+  }));
+  return iFrame;
+}
+
 
 /**
  * Initialized the wallet with a given user id.
