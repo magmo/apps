@@ -4,7 +4,7 @@ import SiteContainer from '../containers/SiteContainer';
 import { Provider } from 'react-redux';
 import { OpenGameEntry } from '../components/OpenGameCard';
 import *  as states from '../redux/game/state';
-import { Marker, Player, Imperative } from '../core';
+import { Marker, Player, Imperative, Result } from '../core';
 import BN from "bn.js";
 import bnToHex from "../utils/bnToHex";
 import { OpenGame } from "../redux/open-games/state";
@@ -14,6 +14,8 @@ import { scenarios } from '../core';
 import { SiteState } from '../redux/reducer';
 import { WAIT_FOR_LOGIN, INITIALIZING } from '../wallet/states';
 
+const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(bnToHex) as [string, string]; // in wei
+const finneyFiveFive = [new BN(5000000000000000), new BN(5000000000000000)].map(bnToHex) as [string, string];
 const finneySixFour = [new BN(6000000000000000), new BN(4000000000000000)].map(bnToHex) as [string, string];
 
 const fakeStore = (state) => ({
@@ -67,9 +69,9 @@ const initialState: SiteState = {
       you: Marker.crosses,
       player: Player.PlayerA,
       result: Imperative.Choose,
-      onScreenBalances: finneySixFour,
+      onScreenBalances: finneyFourSix,
       turnNum: 5,
-      balances: finneySixFour,
+      balances: finneyFiveFive,
       stateCount: 1,
       twitterHandle: 'twtr',
       roundBuyIn: '1',
@@ -93,9 +95,60 @@ const xsWaiting = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   you: Marker.crosses,
   player: Player.PlayerA,
   result: Imperative.Wait,
+  onScreenBalances: finneyFiveFive,
+  turnNum: 6,
+  balances: finneySixFour,
+  stateCount: 1,
+  twitterHandle: 'twtr',
+  roundBuyIn: '1',
+  myName: 'George',
+  opponentName: 'Mike',
+}));
+
+const xsVictory = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+  ...shared,
+  noughts: 0b000010010,
+  crosses: 0b001001001,
+  you: Marker.crosses,
+  player: Player.PlayerA,
+  result: Result.YouWin,
   onScreenBalances: finneySixFour,
   turnNum: 6,
   balances: finneySixFour,
+  stateCount: 1,
+  twitterHandle: 'twtr',
+  roundBuyIn: '1',
+  myName: 'George',
+  opponentName: 'Mike',
+}));
+
+const xsDefeat = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+  ...shared,
+  noughts: 0b111010000,
+  crosses: 0b000001011,
+  you: Marker.crosses,
+  player: Player.PlayerA,
+  result: Result.YouLose,
+  onScreenBalances: finneyFourSix,
+  turnNum: 6,
+  balances: finneyFourSix,
+  stateCount: 1,
+  twitterHandle: 'twtr',
+  roundBuyIn: '1',
+  myName: 'George',
+  opponentName: 'Mike',
+}));
+
+const xsTie = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
+  ...shared,
+  noughts: 0b010011100,
+  crosses: 0b101100011,
+  you: Marker.crosses,
+  player: Player.PlayerA,
+  result: Result.Tie,
+  onScreenBalances: finneyFiveFive,
+  turnNum: 6,
+  balances: finneyFiveFive,
   stateCount: 1,
   twitterHandle: 'twtr',
   roundBuyIn: '1',
@@ -122,6 +175,8 @@ joinOpenGame={joinOpenGame}
 
 storiesOf('Game Screens / Crosses', module)
   .add('Choosing', testState(initialState))
-  .add('Waiting', testState(xsWaiting));
-
+  .add('Waiting', testState(xsWaiting))
+  .add('Winning', testState(xsVictory))
+  .add('Losing', testState(xsDefeat))
+  .add('Drawing', testState(xsTie));
 
