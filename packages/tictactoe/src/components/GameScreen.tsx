@@ -2,6 +2,7 @@ import React from 'react';
 import Board from './Board';
 import NavigationBarContainer from "../containers/NavigationBarContainer";
 // import GameBarContainer from "../containers/GameBarContainer";
+import MAGMO_LOGO from '../images/magmo_logo.svg';
 import GameFooterContainer from "../containers/GameFooterContainer";
 import { Marks, Marker, Result, Player, Imperative } from '../core';
 
@@ -27,6 +28,13 @@ export default class GameScreen extends React.PureComponent<Props> {
 
       <div className="container centered-container w-100 game-container">
         <Board noughts={noughts} crosses={crosses} marksMade={marksMade} you = {you}/>
+      </div>
+
+      <div className="footer-logo-container">
+        <img src={MAGMO_LOGO} className="magmo-logo"/> <br/>
+            <small className="text-white">
+                Something not working? Email us at <a href="oops@magmo.com">oops@magmo.com</a>
+            </small>
       </div>
 
       <GameFooterContainer />

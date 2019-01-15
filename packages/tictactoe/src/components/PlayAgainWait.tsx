@@ -35,6 +35,7 @@ export default class PlayAgainWait extends React.PureComponent<Props> {
         </div>
         <Button className="cog-button homePage-loginButton" onClick={playAgain} >
         Waiting..
+        
         </Button>  
         <GameFooterContainer />
       </div>

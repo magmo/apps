@@ -220,4 +220,9 @@ td:after {
     border-left: solid white;
 }
 
-
+.magmo-logo {
+    height: 40px;
+    position: absolute;
+    right: 0;
+    transform: translate(0,-50%);
+}
