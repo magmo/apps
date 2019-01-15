@@ -196,7 +196,7 @@ export interface DeclineGameB extends HasResult {
   player: Player.PlayerB;
 }
 export function declineGameB<T extends HasResult>(state: T): DeclineGameB {
-  return { ...base(state), name: StateName.DeclineGame, player: Player.PlayerB, noughts:0, crosses:0, result: Imperative.Wait, you: Marker.noughts };
+  return { ...hasResult(state), name: StateName.DeclineGame, player: Player.PlayerB, noughts:0, crosses:0, result: Imperative.Wait, you: Marker.noughts };
 }
 
 
@@ -206,7 +206,7 @@ export interface WaitForFunding extends HasResult {
 }
 
 export function waitForFunding<T extends HasResult>(state: T): WaitForFunding {
-  return { ...base(state), name: StateName.WaitForFunding, player: state.player, noughts:0, crosses:0, result: Imperative.Wait | Imperative.Choose, you: Marker.noughts | Marker.crosses };
+  return { ...hasResult(state), name: StateName.WaitForFunding};
 }
 
 export interface WaitForPostFundSetup extends HasResult {
