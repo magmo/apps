@@ -55,7 +55,7 @@ export function* sendMessagesSaga() {
   ]);
   while (true) {
     // We take any action that might trigger the outbox to be updated
-    const action = yield take(channel);
+    yield take(channel);
     const messageState: MessageState = yield select(getMessageState);
     const gameState: gameStates.GameState = yield select(getGameState);
     if (messageState.opponentOutbox) {
