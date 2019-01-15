@@ -6,6 +6,7 @@ import GameBarContainer from "../containers/GameBarContainer";
 import GameFooterContainer from "../containers/GameFooterContainer";
 
 import { Button } from 'reactstrap';
+import MagmoLogo from './MagmoLogo';
 
 
 interface Props {
@@ -31,10 +32,12 @@ export default class PlayAgain extends React.PureComponent<Props> {
   
         <div className="container centered-container w-100 game-container">
           <Board noughts={noughts} crosses={crosses} marksMade={marksMade} you = {you}/>
+          <Button className="footer-playagain navbar-button ml-auto" onClick={playAgain} >
+            Play Again!
+          </Button>  
         </div>
-        <Button className="cog-button homePage-loginButton" onClick={playAgain} >
-        Play Again!
-        </Button>  
+
+        <MagmoLogo />
         <GameFooterContainer />
       </div>
       );
