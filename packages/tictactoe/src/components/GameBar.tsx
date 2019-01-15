@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default class GameBar extends React.PureComponent<Props> {
-
+  
   myDot = () => (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="10" cy="10" r="5" fill="white" />
@@ -37,9 +37,10 @@ export default class GameBar extends React.PureComponent<Props> {
   )
 
   render() {
-    const { myName, opponentName, roundBuyIn, myBalance, opponentBalance} = this.props;
-
+    const { myName, opponentName, myBalance, opponentBalance, roundBuyIn} = this.props;
+    console.log(roundBuyIn);
     const myGameCount = Math.round(hexToBN(myBalance).div(hexToBN(roundBuyIn)).toNumber());
+    console.log(myGameCount);
     const opponentGameCount = Math.round(hexToBN(opponentBalance).div(hexToBN(roundBuyIn)).toNumber());
 
     return (

@@ -36,10 +36,7 @@ const testState = (state) => (
   )
 );
 
-const shared = { ...scenarios.shared };
-
-
-
+const shared = { ...scenarios.shared, stateCount: 1, roundBuyIn: bnToHex(new BN(1000000000000000))};
 
 const initialState: SiteState = {
   login: {
@@ -72,11 +69,6 @@ const initialState: SiteState = {
       onScreenBalances: finneyFourSix,
       turnNum: 5,
       balances: finneyFiveFive,
-      stateCount: 1,
-      twitterHandle: 'twtr',
-      roundBuyIn: '1',
-      myName: 'George',
-      opponentName: 'Mike',
     }),
   },
 };
@@ -98,11 +90,6 @@ const xsWaiting = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   onScreenBalances: finneyFiveFive,
   turnNum: 6,
   balances: finneySixFour,
-  stateCount: 1,
-  twitterHandle: 'twtr',
-  roundBuyIn: '1',
-  myName: 'George',
-  opponentName: 'Mike',
 }));
 
 const xsVictory = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
@@ -115,11 +102,6 @@ const xsVictory = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   onScreenBalances: finneySixFour,
   turnNum: 6,
   balances: finneySixFour,
-  stateCount: 1,
-  twitterHandle: 'twtr',
-  roundBuyIn: '1',
-  myName: 'George',
-  opponentName: 'Mike',
 }));
 
 const xsDefeat = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
@@ -132,11 +114,6 @@ const xsDefeat = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   onScreenBalances: finneyFourSix,
   turnNum: 6,
   balances: finneyFourSix,
-  stateCount: 1,
-  twitterHandle: 'twtr',
-  roundBuyIn: '1',
-  myName: 'George',
-  opponentName: 'Mike',
 }));
 
 const xsTie = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
@@ -149,11 +126,6 @@ const xsTie = siteStateFromGameState(states.xsWaitForOpponentToPickMove({
   onScreenBalances: finneyFiveFive,
   turnNum: 6,
   balances: finneyFiveFive,
-  stateCount: 1,
-  twitterHandle: 'twtr',
-  roundBuyIn: '1',
-  myName: 'George',
-  opponentName: 'Mike',
 }));
 
 const joinOpenGame = () => alert("join open game");
