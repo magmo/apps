@@ -22,7 +22,6 @@ export async function depositFunds(address: string, amount: BN) {
 }
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
-  console.log(web3.currentProvider);
   return await new ethers.providers.Web3Provider(web3.currentProvider);
 }
 

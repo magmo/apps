@@ -17,7 +17,6 @@ export function* keyLoader() {
   const state: WalletState = yield select((walletState: WalletState) => walletState);
   if (state.type !== WAIT_FOR_ADDRESS) { return; }
   const { uid } = state;
-  console.log(uid);
   let wallet = yield* fetchWallet(uid);
 
   if (!wallet) {
@@ -47,7 +46,6 @@ const walletRef = uid => {
 };
 
 function* fetchWallet(uid: string) {
-  console.log(uid);
   const query = walletRef(uid);
 
   // const wallet = yield call(reduxSagaFirebase.database.read, query);

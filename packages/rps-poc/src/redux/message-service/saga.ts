@@ -38,7 +38,6 @@ export function* sendMessageToOpponentWallet(messageRequest: MessageRequest) {
 
 
 export function* sendMessagesSaga() {
-  console.log('send message started');
   // We need to use an actionChannel to queue up actions that
   // might be put from this saga
   const channel = yield actionChannel([
@@ -57,7 +56,6 @@ export function* sendMessagesSaga() {
   while (true) {
     // We take any action that might trigger the outbox to be updated
     const action = yield take(channel);
-    console.log('action messageSend ', action);
     const messageState: MessageState = yield select(getMessageState);
     const gameState: gameStates.GameState = yield select(getGameState);
     if (messageState.opponentOutbox) {
@@ -130,7 +128,6 @@ function* receiveFromFirebaseSaga(address) {
     } else {
       const { signature } = message.value;
       // TODO: Should be stored in a single place
-      console.log('message received');
       const walletFrameId = 'walletId';
       messageWallet(walletFrameId, data, signature);
 
