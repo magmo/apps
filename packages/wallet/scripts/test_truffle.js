@@ -11,7 +11,7 @@ process.env.NODE_ENV = 'test';
 process.env.PUBLIC_URL = '';
 
 if (!process.env.DEV_GANACHE_PORT) {
-  process.env.DEV_GANACHE_PORT = 5732;
+  process.env.DEV_GANACHE_PORT = 5733;
 }
 
 process.on('unhandledRejection', err => {
