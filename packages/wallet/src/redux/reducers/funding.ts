@@ -1,6 +1,6 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { messageRequest, fundingSuccess, fundingFailure } from 'wallet-comm/lib/interface/from-wallet';
+import { messageRequest, fundingSuccess, fundingFailure, showWallet, hideWallet } from 'wallet-comm/lib/interface/from-wallet';
 
 import decode, { extractGameAttributes } from '../../utils/decode-utils';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
@@ -52,7 +52,7 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
 const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_REQUESTED:
-      return states.approveFunding(state);
+      return states.approveFunding({ ...state, displayOutbox: showWallet() });
     default:
       return state;
   }
@@ -283,6 +283,7 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
       return states.waitForUpdate({
         ...state,
+        displayOutbox: hideWallet(),
         messageOutbox: fundingSuccess(state.channelId, state.lastPosition.data),
       });
     default:

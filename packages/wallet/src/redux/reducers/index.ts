@@ -21,17 +21,21 @@ import { challengingReducer } from './challenging';
 import { respondingReducer } from './responding';
 import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
-import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, MESSAGE_SENT, TRANSACTION_SENT_TO_METAMASK } from '../actions';
+import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, MESSAGE_SENT, TRANSACTION_SENT_TO_METAMASK, DISPLAY_MESSAGE_SENT } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import decode from '../../utils/decode-utils';
 import { validSignature } from '../../utils/signing-utils';
 import { State } from 'fmg-core';
+import { showWallet } from 'wallet-comm/lib/interface/from-wallet';
 
 const initialState = waitForLogin();
 
 export const walletReducer = (state: WalletState = initialState, action: WalletAction): WalletState => {
   if (action.type === MESSAGE_SENT) {
     return { ...state, messageOutbox: undefined };
+  }
+  if (action.type === DISPLAY_MESSAGE_SENT) {
+    return { ...state, displayOutbox: undefined };
   }
 
   if (action.type === TRANSACTION_SENT_TO_METAMASK) {
@@ -69,7 +73,7 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
 const receivedValidOwnConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
-  return approveConclude(state);
+  return approveConclude({ ...state, displayOutbox: showWallet() });
 };
 
 const receivedValidOpponentConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
@@ -97,6 +101,7 @@ const receivedValidOpponentConclusionRequest = (state: WalletState, action: Wall
     turnNum: position.turnNum,
     lastPosition: { data: action.data, signature: action.signature },
     penultimatePosition: state.lastPosition,
+    displayOutbox: showWallet(),
   });
 };
 

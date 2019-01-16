@@ -7,7 +7,7 @@ import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
-import { challengeResponseRequested, challengeComplete } from 'wallet-comm/lib/interface/from-wallet';
+import { challengeResponseRequested, challengeComplete, hideWallet, showWallet } from 'wallet-comm/lib/interface/from-wallet';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import decode from '../../utils/decode-utils';
 
@@ -54,7 +54,7 @@ export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, 
 export const chooseResponseReducer = (state: states.ChooseResponse, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.RESPOND_WITH_MOVE_CHOSEN:
-      return states.takeMoveInApp({ ...state, messageOutbox: challengeResponseRequested() });
+      return states.takeMoveInApp({ ...state, messageOutbox: challengeResponseRequested(), displayOutbox: hideWallet() });
     case actions.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
       const { data, signature } = state.lastPosition;
       const transaction = createRespondWithMoveTransaction(state.adjudicator, data, signature);
@@ -90,6 +90,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
         lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
         transactionOutbox: transaction,
+        displayOutbox: showWallet(),
       });
 
     case actions.CHALLENGE_TIMED_OUT:
@@ -130,7 +131,7 @@ export const waitForResponseConfirmationReducer = (state: states.WaitForResponse
 export const acknowledgeChallengeCompleteReducer = (state: states.AcknowledgeChallengeComplete, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
-      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete() });
+      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete(), displayOutbox: hideWallet() });
     default:
       return state;
   }

@@ -6,7 +6,7 @@ import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
-import { challengePositionReceived, challengeComplete } from 'wallet-comm/lib/interface/from-wallet';
+import { challengePositionReceived, challengeComplete, hideWallet } from 'wallet-comm/lib/interface/from-wallet';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
@@ -107,7 +107,7 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
 const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeResponse, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
-      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete() });
+      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete(), displayOutbox: hideWallet() });
     default:
       return state;
   }
@@ -116,7 +116,7 @@ const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeR
 const acknowledgeChallengeTimeoutReducer = (state: states.AcknowledgeChallengeTimeout, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
-      return withdrawalStates.approveWithdrawal({ ...state, messageOutbox: challengeComplete() });
+      return withdrawalStates.approveWithdrawal({ ...state, messageOutbox: challengeComplete(), displayOutbox: hideWallet() });
     default:
       return state;
   }

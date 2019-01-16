@@ -1,8 +1,9 @@
 import { TransactionRequest } from "ethers/providers";
-import { ResponseAction } from "wallet-comm/lib/interface/from-wallet";
+import { ResponseAction, DisplayAction } from "wallet-comm/lib/interface/from-wallet";
 import { Action } from 'redux';
 
 export interface Base {
+  displayOutbox?: DisplayAction;
   messageOutbox?: ResponseAction;
   transactionOutbox?: TransactionRequest;
 }
@@ -51,8 +52,8 @@ export interface ChallengeExists extends AdjudicatorExists {
 
 // creators
 export function base<T extends Base>(params: T): Base {
-  const { messageOutbox, transactionOutbox } = params;
-  return { messageOutbox, transactionOutbox };
+  const { messageOutbox, transactionOutbox, displayOutbox } = params;
+  return { messageOutbox, transactionOutbox, displayOutbox };
 }
 
 export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {

@@ -4,7 +4,7 @@ import { unreachable } from '../../utils/reducer-utils';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import { createWithdrawTransaction } from '../../utils/transaction-generator';
 import { signVerificationData } from '../../utils/signing-utils';
-import { closeSuccess } from 'wallet-comm/lib/interface/from-wallet';
+import { closeSuccess, hideWallet } from 'wallet-comm/lib/interface/from-wallet';
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
@@ -62,7 +62,7 @@ const acknowledgeWithdrawalSuccessReducer = (state: states.AcknowledgeWithdrawal
   switch (action.type) {
     case actions.WITHDRAWAL_SUCCESS_ACKNOWLEDGED:
       // TODO: We shouldn't be sending out a close success in the withdrawal reducer
-      return states.waitForChannel({ ...state, messageOutbox: closeSuccess() });
+      return states.waitForChannel({ ...state, messageOutbox: closeSuccess(), displayOutbox: hideWallet() });
     default:
       return state;
   }

@@ -56,6 +56,11 @@ export const messageSent = () => ({
 });
 export type MessageSent = ReturnType<typeof messageSent>;
 
+export const DISPLAY_MESSAGE_SENT = 'WALLET.DISPLAY_MESSAGE_SENT';
+export const displayMessageSent = ()=> ({
+type: DISPLAY_MESSAGE_SENT as typeof DISPLAY_MESSAGE_SENT,
+});
+export type DisplayMessageSent = ReturnType < typeof displayMessageSent> ;
 
 export const FUNDING_REQUESTED = 'WALLET.FUNDING_REQUESTED';
 export const fundingRequested = () => ({
@@ -366,6 +371,7 @@ export type WalletAction = (
   | WithdrawalSuccessAcknowledged
   | MessageReceived
   | MessageSent
+  | DisplayMessageSent
   | GameConcludedEvent
   | ConcludeRequested
   | ConcludeApproved

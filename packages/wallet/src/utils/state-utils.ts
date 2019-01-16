@@ -1,13 +1,13 @@
 import { WalletState } from '../states';
 import { OWN_POSITION_RECEIVED, OPPONENT_POSITION_RECEIVED, WalletAction } from '../redux/actions';
-import { signatureFailure, signatureSuccess, validationFailure, validationSuccess, SignatureFailureReasons, ValidationFailureReasons, ResponseAction } from 'wallet-comm/lib/interface/from-wallet';
+import { signatureFailure, signatureSuccess, validationFailure, validationSuccess, ResponseAction } from 'wallet-comm/lib/interface/from-wallet';
 import { signPositionHex, validSignature } from './signing-utils';
 
 export function handleSignatureAndValidationMessages(state: WalletState, action: WalletAction): ResponseAction | undefined {
   switch (action.type) {
     case OWN_POSITION_RECEIVED:
       if (state.stage !== "RUNNING") {
-        return signatureFailure(SignatureFailureReasons.WalletBusy);
+        return signatureFailure('WalletBusy');
       } else {
         const data = action.data;
         // check it's our turn
@@ -20,17 +20,17 @@ export function handleSignatureAndValidationMessages(state: WalletState, action:
       }
     case OPPONENT_POSITION_RECEIVED:
       if (state.stage !== "RUNNING") {
-        return validationFailure(ValidationFailureReasons.WalletBusy);
+        return validationFailure('WalletBusy');
 
       } else {
         const opponentAddress = state.participants[1 - state.ourIndex];
 
         if (!action.signature) {
-          return validationFailure(ValidationFailureReasons.InvalidSignature);
+          return validationFailure('InvalidSignature');
         }
         const messageSignature = action.signature as string;
         if (!validSignature(action.data, messageSignature, opponentAddress)) {
-          return validationFailure(ValidationFailureReasons.InvalidSignature);
+          return validationFailure('InvalidSignature');
         }
 
         return validationSuccess();

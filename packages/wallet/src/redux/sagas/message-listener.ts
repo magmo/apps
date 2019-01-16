@@ -1,8 +1,5 @@
 import { take, put } from "redux-saga/effects";
-
-
 import * as incoming from 'wallet-comm/lib/interface/to-wallet';
-import * as outgoing from 'wallet-comm/lib/interface/from-wallet';
 
 import * as actions from "../actions";
 import { eventChannel } from 'redux-saga';
@@ -23,7 +20,6 @@ export function* messageListener() {
         break;
       case incoming.FUNDING_REQUEST:
         yield put(actions.fundingRequested());
-        window.parent.postMessage(outgoing.showWallet(), '*');
         break;
       case incoming.INITIALIZE_REQUEST:
         yield put(actions.loggedIn(action.userId));
@@ -35,8 +31,6 @@ export function* messageListener() {
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
-        // TODO: Put hide/show logic in the correct spot (displayOutbox on state maybe?)
-        window.parent.postMessage(outgoing.showWallet(), '*');
         yield put(actions.messageReceived(action.data, action.signature));
         break;
       case incoming.RESPOND_TO_CHALLENGE:
@@ -44,7 +38,6 @@ export function* messageListener() {
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.concludeRequested());
-        window.parent.postMessage(outgoing.showWallet(), '*');
         break;
       default:
     }

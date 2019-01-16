@@ -1,10 +1,15 @@
 import { Channel } from 'fmg-core';
 import { INITIALIZATION_SUCCESS, INITIALIZATION_FAILURE, CHANNEL_OPENED, ChannelOpened, FUNDING_FAILURE, FUNDING_SUCCESS, FundingResponse, SIGNATURE_FAILURE, SIGNATURE_SUCCESS, SignatureResponse, VALIDATION_SUCCESS, VALIDATION_FAILURE, ValidationResponse, messageRequest, MESSAGE_REQUEST, SHOW_WALLET, HIDE_WALLET, CONCLUDE_FAILURE, CONCLUDE_SUCCESS } from './interface/from-wallet';
-import { INITIALIZE_REQUEST, openChannelRequest, initializeRequest, fundingRequest, signatureRequest, validationRequest, receiveMessage, concludeChannelRequest } from './interface/to-wallet';
+import { openChannelRequest, initializeRequest, fundingRequest, signatureRequest, validationRequest, receiveMessage, concludeChannelRequest, createChallenge, respondToChallenge } from './interface/to-wallet';
 import BN from 'bn.js';
 import { WalletEventListener } from '.';
 
-
+/**
+ * 
+ * @param iframeId The id to create the iFrame with
+ * @param walletUrl The url of the hosted wallet
+ * @returns {HTMLIFrameElement} The iframe
+ */
 export function createWalletIFrame(iframeId: string, walletUrl: string): HTMLIFrameElement {
   const iFrame = document.createElement("iframe");
   iFrame.src = walletUrl;
@@ -18,7 +23,8 @@ export function createWalletIFrame(iframeId: string, walletUrl: string): HTMLIFr
   iFrame.width = '0';
   iFrame.height = '0';
   iFrame.style.zIndex = '9999';
-  iFrame
+
+  iFrame.setAttribute('allowtransparency', 'true');
 
   window.addEventListener('message', (event => {
     if (event.data && event.data.type && event.data.type === SHOW_WALLET) {
@@ -159,5 +165,17 @@ export function startFunding(iFrameId: string,
 
   const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
   const message = fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, playerIndex);
+  iFrame.contentWindow.postMessage(message, "*");
+}
+
+export function startChallenge(iFrameId: string) {
+  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const message = createChallenge();
+  iFrame.contentWindow.postMessage(message, "*");
+}
+
+export function respondToOngoingChallenge(iFrameId: string, responsePosition: string) {
+  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const message = respondToChallenge(responsePosition);
   iFrame.contentWindow.postMessage(message, "*");
 }

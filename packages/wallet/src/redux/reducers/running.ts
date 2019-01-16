@@ -5,7 +5,7 @@ import decode from '../../utils/decode-utils';
 
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { challengeRejected } from 'wallet-comm/lib/interface/from-wallet';
+import { challengeRejected, showWallet } from 'wallet-comm/lib/interface/from-wallet';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 
@@ -67,7 +67,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
 
     case actions.CHALLENGE_CREATED_EVENT:
       // transition to responding
-      return states.acknowledgeChallenge({ ...state, challengeExpiry: action.expirationTime });
+      return states.acknowledgeChallenge({ ...state, challengeExpiry: action.expirationTime, displayOutbox: showWallet() });
 
     case actions.CHALLENGE_REQUESTED:
       // The application should validate this but just in case we check as well
@@ -76,7 +76,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
         return states.waitForUpdate({ ...state, messageOutbox: message });
       }
       // transition to challenging
-      return states.approveChallenge(state);
+      return states.approveChallenge({ ...state, displayOutbox: showWallet() });
 
     default:
       return state;

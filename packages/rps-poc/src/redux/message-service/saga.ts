@@ -7,14 +7,11 @@ import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
 import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
-import { Channel, State } from 'fmg-core';
+import { Channel } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
 import * as Wallet from 'wallet-comm';
-import { openChannel, startFunding, startConcludingGame, signData, validateSignature, messageWallet, MESSAGE_REQUEST, FUNDING_SUCCESS, CONCLUDE_SUCCESS, CLOSE_SUCCESS } from 'wallet-comm';
 import hexToBN from '../../utils/hexToBN';
-// TODO: use actual wallet interface (what will that look like?)
-const toWalletActions: any = {};
-const fromWalletActions: any = {};
+
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
@@ -27,12 +24,14 @@ export default function* messageSaga() {
   yield fork(waitForWalletThenReceiveFromFirebaseSaga);
   yield fork(sendWalletMessageSaga);
   yield fork(exitGameSaga);
+  yield fork(receiveChallengePositionFromWalletSaga);
+  yield fork(receiveChallengeFromWalletSaga);
 
 }
 
 export function* sendWalletMessageSaga() {
   while (true) {
-    const sendMessageChannel = createWalletEventChannel([MESSAGE_REQUEST]);
+    const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_REQUEST]);
     const messageRequest = yield take(sendMessageChannel);
     const queue = Queue.WALLET;
     const { data, to, signature } = messageRequest;
@@ -42,7 +41,7 @@ export function* sendWalletMessageSaga() {
 }
 
 export function* exitGameSaga() {
-  const closeGameChannel = createWalletEventChannel([CLOSE_SUCCESS]);
+  const closeGameChannel = createWalletEventChannel([Wallet.CLOSE_SUCCESS]);
   while (true) {
     yield take(closeGameChannel);
     yield put(gameActions.exitToLobby());
@@ -64,6 +63,7 @@ export function* sendMessagesSaga() {
     gameActions.WITHDRAWAL_SUCCESS,
     gameActions.JOIN_OPEN_GAME,
     gameActions.RESIGN,
+    gameActions.CREATE_CHALLENGE
   ]);
   while (true) {
     // We take any action that might trigger the outbox to be updated
@@ -142,7 +142,7 @@ function* receiveFromFirebaseSaga(address) {
       const { signature } = message.value;
       // TODO: Should be stored in a single place
       const walletFrameId = 'walletId';
-      messageWallet(walletFrameId, data, signature);
+      Wallet.messageWallet(walletFrameId, data, signature);
 
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
@@ -160,7 +160,7 @@ function createWalletEventChannel(walletEventTypes: Wallet.ResponseActionTypes[]
     });
 
     return () => {
-      listener.unSubscribe();
+      listener.unSubscribeAll();
     };
   });
 }
@@ -173,22 +173,26 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
   const walletFrameId = 'walletId';
   switch (walletMessage.type) {
     case "RESPOND_TO_CHALLENGE":
-      if (state.name === gameStates.StateName.WaitForOpponentToPickMoveA || state.name === gameStates.StateName.WaitForOpponentToPickMoveB) {
-        yield put(toWalletActions.respondToChallenge(encode(walletMessage.data)));
+      if (state.name === gameStates.StateName.WaitForOpponentToPickMoveA || state.name === gameStates.StateName.WaitForRevealB) {
+        Wallet.respondToOngoingChallenge('walletId', encode(walletMessage.data));
+        yield put(gameActions.messageSent());
+        const challengeCompleteChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
+        yield take(challengeCompleteChannel);
+        yield put(gameActions.challengeCompleted());
       }
       break;
     case "FUNDING_REQUESTED":
       // TODO: We need to close the channel at some point
-      openChannel("walletId", channel);
+      Wallet.openChannel("walletId", channel);
       const myIndex = player === Player.PlayerA ? 0 : 1;
 
       const opponentAddress = participants[1 - myIndex];
       const myAddress = participants[myIndex];
       const myBalance = hexToBN(balances[myIndex]);
       const opponentBalance = hexToBN(balances[1 - myIndex]);
-      const fundingChannel = createWalletEventChannel([FUNDING_SUCCESS]);
+      const fundingChannel = createWalletEventChannel([Wallet.FUNDING_SUCCESS]);
 
-      startFunding(walletFrameId, channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
+      Wallet.startFunding(walletFrameId, channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
       const fundingResponse = yield take(fundingChannel);
 
       yield put(gameActions.messageSent());
@@ -196,51 +200,51 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
       yield put(gameActions.fundingSuccess(position));
 
       break;
-    case "WITHDRAWAL_REQUESTED":
-      const { turnNum } = positions.conclude(state);
-      const channelState = new State({
-        channel,
-        stateType: State.StateType.Conclude,
-        turnNum,
-        resolution: balances.map(hexToBN),
-        stateCount: 0,
-      });
-      yield put(toWalletActions.withdrawalRequest(channelState));
-      yield take(fromWalletActions.WITHDRAWAL_SUCCESS);
-      yield put(gameActions.messageSent());
-      yield put(gameActions.withdrawalSuccess());
-      yield put(toWalletActions.closeChannelRequest());
-      break;
     case "CONCLUDE_REQUESTED":
 
       // TODO: handle failure
-      const conclusionChannel = createWalletEventChannel([CONCLUDE_SUCCESS]);
-      startConcludingGame(walletFrameId);
+      const conclusionChannel = createWalletEventChannel([Wallet.CONCLUDE_SUCCESS]);
+      Wallet.startConcludingGame(walletFrameId);
       yield take(conclusionChannel);
       yield put(gameActions.messageSent());
       yield put(gameActions.exitToLobby());
       break;
+    case "CHALLENGE_REQUESTED":
+      // TODO: handle failure and timeout?
+      const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
+      Wallet.startChallenge(walletFrameId);
+      yield put(gameActions.messageSent());
+      yield take(challengeChannel);
+      yield put(gameActions.challengeCompleted());
+
+      break;
+  }
+}
+
+function* receiveChallengeFromWalletSaga() {
+  const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_RESPONSE_REQUESTED]);
+
+  while (true) {
+    yield take(challengeChannel);
+    yield put(gameActions.challengeResponseRequested());
+
+
+  }
+}
+function* receiveChallengePositionFromWalletSaga() {
+  const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_POSITION_RECEIVED]);
+  while (true) {
+    const { positionData } = yield take(challengeChannel);
+    const position = decode(positionData);
+    yield put(gameActions.positionReceived(position));
   }
 }
 
 
-// function* receiveFromWalletSaga() {
-//   while (true) {
-//     const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
-//     const position = decode(positionData);
-//     yield put(gameActions.positionReceived(position));
-//   }
-// }
-
-
 function* validateMessage(data, signature) {
-  // TODO: Handle wallet busy and failure
-
-  return yield validateSignature('walletId', data, signature);
+  return yield Wallet.validateSignature('walletId', data, signature);
 }
 
 function* signMessage(data) {
-  // TODO: Handle wallet busy / error
-  return yield signData('walletId', data);
-
+  return yield Wallet.signData('walletId', data);
 }

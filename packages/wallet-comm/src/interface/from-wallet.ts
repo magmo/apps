@@ -41,7 +41,6 @@ export type ChannelClosed = ReturnType<typeof channelClosed>;
 
 // VALIDATION
 // ==========
-export const enum ValidationFailureReasons { WalletBusy = "WalletBusy", InvalidSignature = "InvalidSignature", Other = "Other" }
 
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
@@ -49,7 +48,7 @@ export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 export const validationSuccess = () => ({
   type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
 });
-export const validationFailure = (reason: ValidationFailureReasons, error?: string) => ({
+export const validationFailure = (reason: "WalletBusy" | "InvalidSignature" | "Other", error?: string) => ({
   type: VALIDATION_FAILURE as typeof VALIDATION_FAILURE,
   reason,
   error,
@@ -63,8 +62,6 @@ export type ValidationResponse = ValidationSuccess | ValidationFailure;
 // SIGNATURE
 // =========
 
-export const enum SignatureFailureReasons { WalletBusy = "WalletBusy", Other = "Other" }
-
 export const SIGNATURE_SUCCESS = 'WALLET.SIGNATURE.SUCCESS';
 export const SIGNATURE_FAILURE = 'WALLET.SIGNATURE.FAILURE';
 
@@ -73,7 +70,7 @@ export const signatureSuccess = (signature: string) => ({
   signature,
 });
 
-export const signatureFailure = (reason: SignatureFailureReasons, error?: string) => ({
+export const signatureFailure = (reason: "WalletBusy" | "Other", error?: string) => ({
   type: SIGNATURE_FAILURE as typeof SIGNATURE_FAILURE,
   reason,
   error,
@@ -190,13 +187,13 @@ export const challengeRejected = (reason) => ({
 });
 export type ChallengeRejected = ReturnType<typeof challengeRejected>;
 
-export const CHALLENGE_RESPONSE_REQUESTED = 'CHALLENGE_RESPONSE_REQUESTED';
+export const CHALLENGE_RESPONSE_REQUESTED = 'WALLET.CHALLENGING.CHALLENGE_RESPONSE_REQUESTED';
 export const challengeResponseRequested = () => ({
   type: CHALLENGE_RESPONSE_REQUESTED as typeof CHALLENGE_RESPONSE_REQUESTED,
 });
 export type ChallengeResponseRequested = ReturnType<typeof challengeResponseRequested>;
 
-export const CHALLENGE_COMPLETE = 'CHALLENGE_COMPLETE';
+export const CHALLENGE_COMPLETE = 'WALLET.CHALLENGING.CHALLENGE_COMPLETE';
 export const challengeComplete = () => ({
   type: CHALLENGE_COMPLETE as typeof CHALLENGE_COMPLETE,
 });
@@ -222,6 +219,7 @@ export type ResponseActionTypes =
   typeof CHANNEL_OPENED |
   typeof CHANNEL_CLOSED;
 
+export type DisplayAction = ShowWallet | HideWallet;
 
 // TODO: This could live exclusively in the wallet
 export type ResponseAction =

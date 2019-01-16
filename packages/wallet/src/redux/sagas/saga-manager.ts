@@ -10,6 +10,7 @@ import { adjudicatorWatcher } from './adjudicator-watcher';
 import { WalletState, WAIT_FOR_ADDRESS } from '../../states';
 import { getProvider } from '../../utils/contract-utils';
 import challengeTimeout from './challenge-timeout';
+import { displaySender } from './display-sender';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -56,7 +57,10 @@ export function* sagaManager(): IterableIterator<any> {
       const messageToSend = state.messageOutbox;
       yield messageSender(messageToSend);
     }
-
+    if (state.displayOutbox) {
+      const displayMessageToSend = state.displayOutbox;
+      yield displaySender(displayMessageToSend);
+    }
     // if we have an outgoing transaction, make sure that the transaction-sender runs
     if (state.transactionOutbox) {
       const transactionToSend = state.transactionOutbox;
