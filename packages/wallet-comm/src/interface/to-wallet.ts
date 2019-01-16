@@ -67,7 +67,7 @@ export const closeChannelRequest = () => ({
 export type CloseChannelRequest = ReturnType<typeof closeChannelRequest>;
 
 
-// VAßLIDATION
+// VALIDATION
 // ==========
 
 // Called when a signed position is received from an opponent.
