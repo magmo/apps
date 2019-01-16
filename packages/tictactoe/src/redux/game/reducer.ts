@@ -239,23 +239,13 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
   // only action we need to handle in this state is to receiving a PreFundSetupB
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
-  // if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
+  if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
 
   // request funding
   messageState = { ...messageState, walletOutbox: { type: 'FUNDING_REQUESTED' } };
 
   // transition to Wait for Funding
   const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
-
-  // skip funding and go straight to game
-  // const newGameState = states.xsPickMove({
-  //    ...gameState,
-  //   turnNum: gameState.turnNum + 1,
-  //   noughts:0,
-  //   crosses:0,
-  //   result:Imperative.Choose,
-  //   onScreenBalances: gameState.balances,
-  //   you: Marker.crosses, });
 
   return { messageState, gameState: newGameState };
 }
@@ -270,19 +260,6 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
     const { turnNum } = gameState;
 
     const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
-
-
-    // skip funding stage
-    // const newGameState = states.osWaitForOpponentToPickMove({
-    //    ...gameState,
-    //   turnNum: turnNum + 1,
-    //   noughts:0,
-    //   crosses:0,
-    //   result: Imperative.Wait,
-    //   onScreenBalances: gameState.balances,
-    //   you: Marker.noughts,
-    //   });
-
     const newPosition = positions.preFundSetupB(newGameState);
 
     const opponentAddress = states.getOpponentAddress(gameState);
@@ -694,6 +671,12 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
   const opponentAddress = states.getOpponentAddress(gameState);
   let newGameState: states.GameState;
+  if (action.type === actions.POSITION_RECEIVED) {
+    const position = action.position;
+    if (position.name !== positions.RESTING) { return { gameState, messageState }; }
+    messageState = { ...messageState, actionToRetry: action };
+    return { gameState, messageState };
+  }
   if (action.type === actions.PLAY_AGAIN && youWentLast(gameState)) {
     newGameState = states.waitForRestingA({ ...gameState });
     return { gameState: newGameState, messageState };
