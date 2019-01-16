@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Reducer } from "redux";
 
 import * as actions from "./actions";
@@ -32,21 +31,6 @@ import {
   POST_FUND_SETUP_B,
   RESTING
 } from "../../core/positions";
-=======
-import { Reducer } from 'redux';
-
-import * as actions from './actions';
-import * as states from './state';
-import { Result, Imperative, Marker } from '../../core/results';
-
-import { Player, isDraw, isWinningMarks, positions, Position } from '../../core';
-import { MessageState, sendMessage } from '../message-service/state';
-import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
-
-import hexToBN from '../../utils/hexToBN';
-import bnToHex from '../../utils/bnToHex';
-import { RESTING } from '../../core/positions';
->>>>>>> master
 
 export interface JointState {
   gameState: states.GameState;
@@ -58,7 +42,6 @@ const emptyJointState: JointState = {
   gameState: states.noName({ myAddress: "", libraryAddress: "" })
 };
 
-<<<<<<< HEAD
 export const gameReducer: Reducer<JointState> = (
   state = emptyJointState,
   action:
@@ -81,13 +64,6 @@ export const gameReducer: Reducer<JointState> = (
       myAddress,
       myName
     });
-=======
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess) => {
-  if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
-    const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
-    const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
-    const newGameState = states.lobby({ ...state.gameState, myAddress, myName });
->>>>>>> master
     return { gameState: newGameState, messageState: {} };
   }
   if (
@@ -294,7 +270,6 @@ function lobbyReducer(
         noughts: 0,
         crosses: 0
       });
-<<<<<<< HEAD
 
       messageState = sendMessage(
         positions.preFundSetupA(waitForConfirmationState),
@@ -302,12 +277,6 @@ function lobbyReducer(
         messageState
       );
       return { gameState: { ...waitForConfirmationState }, messageState };
-=======
-
-
-      messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
-      return { gameState: { ...waitForConfirmationState, myAddress }, messageState };
->>>>>>> master
     default:
       return { gameState, messageState };
   }
@@ -360,10 +329,6 @@ function waitingRoomReducer(
         you: Marker.noughts
       });
 
-<<<<<<< HEAD
-=======
-      const newGameState = states.confirmGameB({ ...position, myName, opponentName, twitterHandle, player: Player.PlayerB });
->>>>>>> master
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
@@ -399,23 +364,9 @@ function waitForGameConfirmationAReducer(
   };
 
   // transition to Wait for Funding
-<<<<<<< HEAD
   const newGameState = states.waitForFunding({
     ...gameState,
     turnNum: gameState.turnNum + 1
-=======
-  // const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
-
-  // skip funding and go straight to game
-  const newGameState = states.xsPickMove({
-    ...gameState,
-    turnNum: gameState.turnNum + 1,
-    noughts: 0,
-    crosses: 0,
-    result: Imperative.Choose,
-    onScreenBalances: gameState.balances,
-    you: Marker.crosses,
->>>>>>> master
   });
 
   return { messageState, gameState: newGameState };
@@ -443,27 +394,10 @@ function confirmGameBReducer(
   if (action.type === actions.CONFIRM_GAME) {
     const { turnNum } = gameState;
 
-<<<<<<< HEAD
     const newGameState = states.waitForFunding({
       ...gameState,
       turnNum: turnNum + 1
     });
-=======
-    // const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
-
-
-    // skip funding stage
-    const newGameState = states.osWaitForOpponentToPickMove({
-      ...gameState,
-      turnNum: turnNum + 1,
-      noughts: 0,
-      crosses: 0,
-      result: Imperative.Wait,
-      onScreenBalances: gameState.balances,
-      you: Marker.noughts,
-    });
-
->>>>>>> master
     const newPosition = positions.preFundSetupB(newGameState);
 
     const opponentAddress = states.getOpponentAddress(gameState);
@@ -560,7 +494,6 @@ function waitForFundingReducer(
   return { gameState, messageState };
 }
 
-<<<<<<< HEAD
 // function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
 //   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
 //   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
@@ -611,32 +544,6 @@ function waitForFundingReducer(
 
 //   return { gameState: newGameState, messageState };
 // }
-=======
-function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
-
-  const { turnNum } = gameState;
-  const newGameState = states.xsPickMove({
-    ...gameState,
-    turnNum: turnNum + 1,
-    result: Imperative.Choose,
-    noughts: 0,
-    crosses: 0,
-    onScreenBalances: gameState.balances,
-    you: Marker.noughts,
-  });
-  if (gameState.player === Player.PlayerB) {
-    newGameState.turnNum += 1;
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(positions.postFundSetupB(newGameState), opponentAddress, messageState);
-  }
-
-  return { gameState: newGameState, messageState };
-}
->>>>>>> master
 
 function favorA(balances: [string, string], roundBuyIn): [string, string] {
   const aBal: string = bnToHex(hexToBN(balances[0]).add(hexToBN(roundBuyIn)));
@@ -666,7 +573,6 @@ function xsPickMoveReducer(
   let newBalances: [string, string] = balances;
 
   const opponentAddress = states.getOpponentAddress(gameState);
-<<<<<<< HEAD
   let pos: Position = positions.draw({
     ...gameState,
     crosses: newCrosses,
@@ -677,10 +583,6 @@ function xsPickMoveReducer(
     turnNum: turnNum + 1,
     result: Result.Tie
   }); // default
-=======
-  let pos: Position = positions.draw({ ...gameState, crosses: newCrosses, balances: newBalances }); // default
-  let newGameState: states.GameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, result: Result.Tie }); // default
->>>>>>> master
 
   // if draw
   if (isDraw(noughts, newCrosses) && !isWinningMarks(newCrosses)) {
@@ -694,7 +596,6 @@ function xsPickMoveReducer(
         break;
       }
     }
-<<<<<<< HEAD
     newGameState = states.playAgain({
       ...gameState,
       turnNum: turnNum + 1,
@@ -703,9 +604,6 @@ function xsPickMoveReducer(
       balances: newBalances,
       onScreenBalances: newBalances
     });
-=======
-    newGameState = states.playAgain({ ...gameState, turnNum: turnNum + 1, crosses: newCrosses, result: Result.Tie, balances: newBalances, onScreenBalances: newBalances });
->>>>>>> master
     pos = positions.draw({ ...newGameState, crosses: newCrosses });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -738,33 +636,21 @@ function xsPickMoveReducer(
       turnNum: turnNum + 1,
       crosses: newCrosses,
       result: Imperative.Wait,
-<<<<<<< HEAD
       balances: newBalances
-=======
-      balances: newBalances,
->>>>>>> master
     });
     pos = positions.Xplaying({ ...newGameState });
   }
 
   // if winning move
   if (isWinningMarks(newCrosses)) {
-<<<<<<< HEAD
     if (newBalances[0] >= roundBuyIn && newBalances[1] >= roundBuyIn) {
-=======
-    if ((newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
->>>>>>> master
       newGameState = states.playAgain({
         ...gameState,
         turnNum: turnNum + 1,
         crosses: newCrosses,
         result: Result.YouWin,
         balances: newBalances,
-<<<<<<< HEAD
         onScreenBalances: newBalances
-=======
-        onScreenBalances: newBalances,
->>>>>>> master
       });
       pos = positions.victory({ ...newGameState });
     } else {
@@ -778,10 +664,6 @@ function xsPickMoveReducer(
       });
       pos = positions.conclude({ ...newGameState });
     }
-<<<<<<< HEAD
-=======
-    pos = positions.victory({ ...newGameState });
->>>>>>> master
   }
 
   messageState = sendMessage(pos, opponentAddress, messageState);
@@ -883,22 +765,14 @@ function osPickMoveReducer(
 
   // if winning move
   if (isWinningMarks(newNoughts)) {
-<<<<<<< HEAD
     if (newBalances[0] >= roundBuyIn && newBalances[1] >= roundBuyIn) {
-=======
-    if ((newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
->>>>>>> master
       newGameState = states.playAgain({
         ...gameState,
         turnNum: turnNum + 1,
         noughts: newNoughts,
         result: Result.YouWin,
         balances: newBalances,
-<<<<<<< HEAD
         onScreenBalances: newBalances
-=======
-        onScreenBalances: newBalances,
->>>>>>> master
       });
       pos = positions.victory({ ...newGameState });
     } else {
@@ -912,17 +786,12 @@ function osPickMoveReducer(
       });
       pos = positions.conclude({ ...newGameState });
     }
-<<<<<<< HEAD
-=======
-    pos = positions.victory({ ...newGameState });
->>>>>>> master
   }
   messageState = sendMessage(pos, opponentAddress, messageState);
   // console.log(newGameState);
   return { gameState: newGameState, messageState };
 }
 
-<<<<<<< HEAD
 function xsWaitMoveReducer(
   gameState: states.XsWaitForOpponentToPickMove,
   messageState: MessageState,
@@ -941,15 +810,6 @@ function xsWaitMoveReducer(
       action.position.name === positions.VICTORY)
   ) {
     // should only allow a change in gamestate if we receieve the appropriate position.
-=======
-function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived | actions.Resign): JointState {
-  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-  if ((action.type === actions.POSITION_RECEIVED)
-    && ((action.position.name === positions.OPLAYING) ||
-      (action.position.name === positions.DRAW) ||
-      (action.position.name === positions.VICTORY))) { // should only allow a change in gamestate if we receieve the appropriate position.
->>>>>>> master
     const receivedNoughts = action.position.noughts;
     const { turnNum } = gameState;
     const { crosses, balances, roundBuyIn } = action.position;
@@ -972,7 +832,6 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
       return { gameState: newGameState, messageState };
     }
 
-<<<<<<< HEAD
     if (isWinningMarks(receivedNoughts)) {
       // Lost, if sufficient $ play again?
       if (newBalances[0] >= roundBuyIn && newBalances[1] >= roundBuyIn) {
@@ -983,11 +842,6 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
           onScreenBalances: newBalances,
           result: Result.YouLose
         });
-=======
-    if (isWinningMarks(receivedNoughts)) { // Lost, if sufficient $ play again?
-      if ((newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
-        newGameState = states.playAgain({ ...gameState, noughts: receivedNoughts, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
->>>>>>> master
       } else {
         newGameState = states.insufficientFunds({
           ...gameState,
@@ -1004,7 +858,6 @@ function xsWaitMoveReducer(gameState: states.XsWaitForOpponentToPickMove, messag
   }
 }
 
-<<<<<<< HEAD
 function osWaitMoveReducer(
   gameState: states.OsWaitForOpponentToPickMove,
   messageState: MessageState,
@@ -1023,22 +876,11 @@ function osWaitMoveReducer(
       action.position.name === positions.DRAW ||
       action.position.name === positions.VICTORY)
   ) {
-=======
-function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messageState: MessageState, action: actions.PositionReceived | actions.Resign): JointState {
-  if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-
-  if ((action.type === actions.POSITION_RECEIVED)
-    && ((action.position.name === positions.XPLAYING) ||
-      (action.position.name === positions.DRAW) ||
-      (action.position.name === positions.VICTORY))) {
->>>>>>> master
     const receivedCrosses = action.position.crosses;
     const { turnNum } = gameState;
     const { noughts, balances, roundBuyIn } = action.position;
     const newBalances: [string, string] = balances;
 
-<<<<<<< HEAD
     let newGameState:
       | states.OsPickMove
       | states.PlayAgain
@@ -1049,10 +891,6 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
       result: Imperative.Choose,
       balances: newBalances
     });
-=======
-    let newGameState: states.OsPickMove | states.PlayAgain | states.InsufficientFunds
-      = states.osPickMove({ ...gameState, turnNum: turnNum + 0, crosses: receivedCrosses, result: Imperative.Choose, balances: newBalances });
->>>>>>> master
 
     if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) {
       // Not conclusive, keep playing
@@ -1070,7 +908,6 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
       });
     }
 
-<<<<<<< HEAD
     if (isWinningMarks(receivedCrosses)) {
       // Lost, if sufficient $ play again?
       if (newBalances[0] >= roundBuyIn && newBalances[1] >= roundBuyIn) {
@@ -1089,13 +926,6 @@ function osWaitMoveReducer(gameState: states.OsWaitForOpponentToPickMove, messag
           onScreenBalances: newBalances,
           result: Result.YouLose
         });
-=======
-    if (isWinningMarks(receivedCrosses)) { // Lost, if sufficient $ play again?
-      if ((newBalances[0] >= roundBuyIn) && (newBalances[1] >= roundBuyIn)) {
-        newGameState = states.playAgain({ ...gameState, crosses: receivedCrosses, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
-      } else {
-        newGameState = states.insufficientFunds({ ...gameState, crosses: receivedCrosses, balances: newBalances, onScreenBalances: newBalances, result: Result.YouLose });
->>>>>>> master
       }
     }
     return { gameState: newGameState, messageState };
@@ -1111,12 +941,7 @@ function youWentLast(gameState) {
     } else {
       return false;
     }
-<<<<<<< HEAD
   } else {
-=======
-  }
-  else {
->>>>>>> master
     if (popCount(gameState.crosses) > popCount(gameState.noughts)) {
       return true;
     } else {
@@ -1185,7 +1010,6 @@ function waitToPlayAgainReducer(
   }
   const opponentAddress = states.getOpponentAddress(gameState);
   let newGameState: states.GameState;
-<<<<<<< HEAD
   if (
     action.type === actions.POSITION_RECEIVED &&
     action.position.name === RESTING &&
@@ -1214,16 +1038,6 @@ function waitToPlayAgainReducer(
       result: Imperative.Choose,
       you: Marker.crosses
     });
-=======
-  if (action.type === actions.POSITION_RECEIVED && action.position.name === RESTING && youWentLast(gameState)) {
-    const pos = positions.resting({ ...gameState, crosses: 0, noughts: 0 });
-    messageState = sendMessage(pos, opponentAddress, messageState);
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, noughts: 0, crosses: 0, result: Imperative.Wait, you: Marker.noughts });
-    return { gameState: newGameState, messageState };
-  }
-  if (action.type === actions.POSITION_RECEIVED && action.position.name === RESTING && !youWentLast(gameState)) {
-    newGameState = states.xsPickMove({ ...gameState, noughts: 0, crosses: 0, result: Imperative.Choose, you: Marker.crosses });
->>>>>>> master
     return { gameState: newGameState, messageState };
   }
   if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
