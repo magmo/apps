@@ -288,6 +288,13 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
 
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
 
+  if (action.type === actions.POSITION_RECEIVED) {
+    const position = action.position;
+    if (position.name !== positions.OPLAYING) { return { gameState, messageState }; }
+    messageState = { ...messageState, actionToRetry: action };
+  return { gameState, messageState };
+  }
+
   if (action.type === actions.FUNDING_SUCCESS) {
     if (action.position.name !== POST_FUND_SETUP_B) {
       throw new Error("Game reducer expected PostFundSetupB on FUNDING_SUCCESS");
