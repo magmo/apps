@@ -39,7 +39,7 @@ export interface JointState {
 
 const emptyJointState: JointState = {
   messageState: {},
-  gameState: states.noName({ myAddress: "", libraryAddress: "" })
+  gameState: states.noName({ myAddress: "", libraryAddress: "" }),
 };
 
 export const gameReducer: Reducer<JointState> = (
@@ -62,7 +62,7 @@ export const gameReducer: Reducer<JointState> = (
     const newGameState = states.lobby({
       ...state.gameState,
       myAddress,
-      myName
+      myName,
     });
     return { gameState: newGameState, messageState: {} };
   }
@@ -92,7 +92,7 @@ export const gameReducer: Reducer<JointState> = (
       const { messageState, gameState } = state;
       return {
         gameState: states.pickChallengeMove(gameState),
-        messageState
+        messageState,
       };
     } else {
       return state;
@@ -107,7 +107,7 @@ export const gameReducer: Reducer<JointState> = (
         myName,
         myAddress,
         libraryAddress,
-        twitterHandle
+        twitterHandle,
       });
       return { gameState: newGameState, messageState };
     }
@@ -225,7 +225,7 @@ function noNameReducer(
         myName: name,
         myAddress,
         libraryAddress,
-        twitterHandle
+        twitterHandle,
       });
       return { gameState: lobby, messageState };
     default:
@@ -268,7 +268,7 @@ function lobbyReducer(
         player: Player.PlayerA,
         you: Marker.crosses,
         noughts: 0,
-        crosses: 0
+        crosses: 0,
       });
 
       messageState = sendMessage(
@@ -291,7 +291,7 @@ function creatingOpenGameReducer(
     case actions.CREATE_OPEN_GAME:
       const newGameState = states.waitingRoom({
         ...gameState,
-        roundBuyIn: action.roundBuyIn
+        roundBuyIn: action.roundBuyIn,
       });
       return { gameState: { ...newGameState }, messageState };
     case actions.CANCEL_OPEN_GAME:
@@ -326,7 +326,7 @@ function waitingRoomReducer(
         result: Imperative.Wait,
         noughts: 0,
         crosses: 0,
-        you: Marker.noughts
+        you: Marker.noughts,
       });
 
       return { gameState: newGameState, messageState };
@@ -360,13 +360,13 @@ function waitForGameConfirmationAReducer(
   // request funding
   messageState = {
     ...messageState,
-    walletOutbox: { type: "FUNDING_REQUESTED" }
+    walletOutbox: { type: "FUNDING_REQUESTED" },
   };
 
   // transition to Wait for Funding
   const newGameState = states.waitForFunding({
     ...gameState,
-    turnNum: gameState.turnNum + 1
+    turnNum: gameState.turnNum + 1,
   });
 
   return { messageState, gameState: newGameState };
@@ -396,7 +396,7 @@ function confirmGameBReducer(
 
     const newGameState = states.waitForFunding({
       ...gameState,
-      turnNum: turnNum + 1
+      turnNum: turnNum + 1,
     });
     const newPosition = positions.preFundSetupB(newGameState);
 
@@ -404,7 +404,7 @@ function confirmGameBReducer(
     messageState = sendMessage(newPosition, opponentAddress, messageState);
     messageState = {
       ...messageState,
-      walletOutbox: { type: "FUNDING_REQUESTED" }
+      walletOutbox: { type: "FUNDING_REQUESTED" },
     };
 
     return { gameState: newGameState, messageState };
@@ -414,14 +414,14 @@ function confirmGameBReducer(
       participants,
       libraryAddress,
       player,
-      twitterHandle
+      twitterHandle,
     } = gameState;
     // TODO: Probably should return to the waiting room instead of getting kicked back to the lobby
     const newGameState = states.lobby({
       myName,
       myAddress: participants[player],
       libraryAddress,
-      twitterHandle
+      twitterHandle,
     });
     // TODO: Send a message to the other player that the game has been declined
     return { gameState: newGameState, messageState };
@@ -437,7 +437,7 @@ function waitForFundingReducer(
     const { participants, player } = gameState;
     const lobbyGameState = states.lobby({
       ...gameState,
-      myAddress: participants[player]
+      myAddress: participants[player],
     });
     return { gameState: lobbyGameState, messageState: {} };
   }
@@ -474,7 +474,7 @@ function waitForFundingReducer(
           noughts: 0,
           crosses: 0,
           onScreenBalances: balances,
-          you: Marker.crosses
+          you: Marker.crosses,
         });
         return { gameState: newGameState1, messageState };
       case Player.PlayerB:
@@ -485,7 +485,7 @@ function waitForFundingReducer(
           crosses: 0,
           onScreenBalances: balances,
           you: Marker.noughts,
-          result: Imperative.Wait
+          result: Imperative.Wait,
         });
         return { gameState: newGameState2, messageState };
     }
@@ -576,12 +576,12 @@ function xsPickMoveReducer(
   let pos: Position = positions.draw({
     ...gameState,
     crosses: newCrosses,
-    balances: newBalances
+    balances: newBalances,
   }); // default
   let newGameState: states.GameState = states.playAgain({
     ...gameState,
     turnNum: turnNum + 1,
-    result: Result.Tie
+    result: Result.Tie,
   }); // default
 
   // if draw
@@ -602,7 +602,7 @@ function xsPickMoveReducer(
       crosses: newCrosses,
       result: Result.Tie,
       balances: newBalances,
-      onScreenBalances: newBalances
+      onScreenBalances: newBalances,
     });
     pos = positions.draw({ ...newGameState, crosses: newCrosses });
     messageState = sendMessage(pos, opponentAddress, messageState);
@@ -636,7 +636,7 @@ function xsPickMoveReducer(
       turnNum: turnNum + 1,
       crosses: newCrosses,
       result: Imperative.Wait,
-      balances: newBalances
+      balances: newBalances,
     });
     pos = positions.Xplaying({ ...newGameState });
   }
@@ -650,7 +650,7 @@ function xsPickMoveReducer(
         crosses: newCrosses,
         result: Result.YouWin,
         balances: newBalances,
-        onScreenBalances: newBalances
+        onScreenBalances: newBalances,
       });
       pos = positions.victory({ ...newGameState });
     } else {
@@ -660,7 +660,7 @@ function xsPickMoveReducer(
         crosses: newCrosses,
         balances: newBalances,
         onScreenBalances: newBalances,
-        result: Result.YouWin
+        result: Result.YouWin,
       });
       pos = positions.conclude({ ...newGameState });
     }
@@ -690,13 +690,13 @@ function osPickMoveReducer(
   let pos: Position = positions.draw({
     ...gameState,
     noughts: newNoughts,
-    balances: newBalances
+    balances: newBalances,
   }); // default
   let newGameState: states.GameState = states.playAgain({
     ...gameState,
     turnNum: turnNum + 1,
     noughts: newNoughts,
-    result: Result.Tie
+    result: Result.Tie,
   }); // default
 
   // if draw
@@ -717,12 +717,12 @@ function osPickMoveReducer(
       noughts: newNoughts,
       result: Result.Tie,
       balances: newBalances,
-      onScreenBalances: newBalances
+      onScreenBalances: newBalances,
     });
     pos = positions.draw({
       ...newGameState,
       noughts: newNoughts,
-      balances: newBalances
+      balances: newBalances,
     });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -758,7 +758,7 @@ function osPickMoveReducer(
       turnNum: turnNum + 1,
       noughts: newNoughts,
       result: Imperative.Wait,
-      balances: newBalances
+      balances: newBalances,
     });
     pos = positions.Oplaying({ ...newGameState, noughts: newNoughts });
   }
@@ -772,7 +772,7 @@ function osPickMoveReducer(
         noughts: newNoughts,
         result: Result.YouWin,
         balances: newBalances,
-        onScreenBalances: newBalances
+        onScreenBalances: newBalances,
       });
       pos = positions.victory({ ...newGameState });
     } else {
@@ -782,7 +782,7 @@ function osPickMoveReducer(
         noughts: newNoughts,
         balances: newBalances,
         onScreenBalances: newBalances,
-        result: Result.YouWin
+        result: Result.YouWin,
       });
       pos = positions.conclude({ ...newGameState });
     }
@@ -823,7 +823,7 @@ function xsWaitMoveReducer(
       turnNum: turnNum + 0,
       noughts: receivedNoughts,
       result: Imperative.Choose,
-      balances: newBalances
+      balances: newBalances,
     });
 
     if (!isWinningMarks(receivedNoughts) && !isDraw(receivedNoughts, crosses)) {
@@ -840,7 +840,7 @@ function xsWaitMoveReducer(
           noughts: receivedNoughts,
           balances: newBalances,
           onScreenBalances: newBalances,
-          result: Result.YouLose
+          result: Result.YouLose,
         });
       } else {
         newGameState = states.insufficientFunds({
@@ -848,7 +848,7 @@ function xsWaitMoveReducer(
           noughts: receivedNoughts,
           balances: newBalances,
           onScreenBalances: newBalances,
-          result: Result.YouLose
+          result: Result.YouLose,
         });
       }
     }
@@ -889,7 +889,7 @@ function osWaitMoveReducer(
       turnNum: turnNum + 0,
       crosses: receivedCrosses,
       result: Imperative.Choose,
-      balances: newBalances
+      balances: newBalances,
     });
 
     if (!isWinningMarks(receivedCrosses) && !isDraw(noughts, receivedCrosses)) {
@@ -904,7 +904,7 @@ function osWaitMoveReducer(
         crosses: receivedCrosses,
         result: Result.Tie,
         balances: newBalances,
-        onScreenBalances: newBalances
+        onScreenBalances: newBalances,
       });
     }
 
@@ -916,7 +916,7 @@ function osWaitMoveReducer(
           crosses: receivedCrosses,
           balances: newBalances,
           onScreenBalances: newBalances,
-          result: Result.YouLose
+          result: Result.YouLose,
         });
       } else {
         newGameState = states.insufficientFunds({
@@ -924,7 +924,7 @@ function osWaitMoveReducer(
           crosses: receivedCrosses,
           balances: newBalances,
           onScreenBalances: newBalances,
-          result: Result.YouLose
+          result: Result.YouLose,
         });
       }
     }
@@ -1022,7 +1022,7 @@ function waitToPlayAgainReducer(
       noughts: 0,
       crosses: 0,
       result: Imperative.Wait,
-      you: Marker.noughts
+      you: Marker.noughts,
     });
     return { gameState: newGameState, messageState };
   }
@@ -1036,7 +1036,7 @@ function waitToPlayAgainReducer(
       noughts: 0,
       crosses: 0,
       result: Imperative.Choose,
-      you: Marker.crosses
+      you: Marker.crosses,
     });
     return { gameState: newGameState, messageState };
   }
@@ -1069,7 +1069,7 @@ function resignationReducer(
     // transition to WaitForResignationAcknowledgement
     gameState = states.waitForResignationAcknowledgement({
       ...gameState,
-      turnNum: turnNum + 1
+      turnNum: turnNum + 1,
     });
 
     // and send the latest state to our opponent
@@ -1134,7 +1134,7 @@ function waitToResignReducer(
 
   const newGameState = states.waitForResignationAcknowledgement({
     ...gameState,
-    turnNum
+    turnNum,
   });
 
   const newPosition = positions.conclude(newGameState);
@@ -1189,7 +1189,7 @@ function waitForResignationAcknowledgementReducer(
 
   const newGameState = states.gameOver({
     ...gameState,
-    turnNum: gameState.turnNum + 1
+    turnNum: gameState.turnNum + 1,
   });
   return { gameState: newGameState, messageState };
 }
@@ -1206,7 +1206,7 @@ function gameOverReducer(
   const newGameState = states.waitForWithdrawal(gameState);
   messageState = {
     ...messageState,
-    walletOutbox: { type: "WITHDRAWAL_REQUESTED" }
+    walletOutbox: { type: "WITHDRAWAL_REQUESTED" },
   };
 
   return { gameState: newGameState, messageState };
@@ -1224,7 +1224,7 @@ function opponentResignedReducer(
   const newGameState = states.waitForWithdrawal(gameState);
   messageState = {
     ...messageState,
-    walletOutbox: { type: "WITHDRAWAL_REQUESTED" }
+    walletOutbox: { type: "WITHDRAWAL_REQUESTED" },
   };
 
   return { gameState: newGameState, messageState };
