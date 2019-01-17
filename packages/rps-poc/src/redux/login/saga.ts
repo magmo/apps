@@ -36,7 +36,7 @@ function* loginStatusWatcherSaga() {
     if (user) {
       // TODO: pass uid to wallet
       const libraryAddress = yield getLibraryAddress();
-      const walletAddress = yield initializeWallet("walletId", user.uid);
+      const walletAddress = yield initializeWallet(WALLET_FRAME_ID, user.uid);
       yield put(loginActions.initializeWalletSuccess(walletAddress));
       yield put(loginActions.loginSuccess(user, libraryAddress));
 

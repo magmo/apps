@@ -9,6 +9,7 @@ import MetamaskErrorPage from '../components/MetamaskErrorPage';
 import { MetamaskError } from '../redux/metamask/actions';
 import LoadingPage from '../components/LoadingPage';
 import { createWalletIFrame } from 'wallet-comm';
+import { WALLET_IFRAME_ID, WALLET_URL } from '../constants';
 interface SiteProps {
   isAuthenticated: boolean;
   metamaskError: MetamaskError | null;
@@ -22,7 +23,7 @@ class Site extends React.PureComponent<SiteProps>{
     this.walletDiv = React.createRef();
   }
   componentDidMount() {
-    const walletIframe = createWalletIFrame('walletId', 'http://localhost:3000');
+    const walletIframe = createWalletIFrame(WALLET_IFRAME_ID, WALLET_URL);
     this.walletDiv.current.appendChild(walletIframe);
 
   }
