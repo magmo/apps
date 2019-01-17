@@ -1,15 +1,8 @@
 import { ethers } from 'ethers';
-import { getLibraryAddress } from '../utils/contract-utils';
-import { Channel, padBytes32 } from 'fmg-core';
+import { Channel, padBytes32, State } from 'fmg-core';
 import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction, createRespondWithMoveTransaction, } from '../utils/transaction-generator';
 import { signPositionHex } from '../utils/signing-utils';
-
-// TODO: These are currently copied from RPS. 
-// Ideally we should create a test contract some we can test the wallet
-// without deploying the RPS contract.
-import encode from './app-utils/encode';
-import * as positions from './app-utils/positions';
-import { Move } from "./app-utils/moves";
+import testGameArtifact from '../../build/contracts/TestGame.json';
 
 import BN from 'bn.js';
 
@@ -21,6 +14,10 @@ export function randomHex(n) {
   return '0x' + '4'.repeat(n);
 }
 
+export function getLibraryAddress(networkId) {
+  return testGameArtifact.networks[networkId].address;
+
+}
 export const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 export const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
 
@@ -52,39 +49,28 @@ export async function createChallenge(address, channelNonce, participantA, parti
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const baseMoveArgs = {
-    salt: randomHex(64),
-    asMove: Move.Rock,
-    roundBuyIn: '0x1',
-    participants: [participantA.address, participantB.address] as [string, string],
-  };
+  const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const proposeArgs = {
-    ...baseMoveArgs,
+  const fromState = new State({
+    channel,
+    resolution: [new BN(5), new BN(5)],
     turnNum: 5,
-    balances: fiveFive,
-    libraryAddress,
-    channelNonce,
-  };
+    stateType: State.StateType.Game,
+  }).toHex();
 
-  const acceptArgs = {
-    ...baseMoveArgs,
-    preCommit: positions.hashCommitment(baseMoveArgs.asMove, baseMoveArgs.salt),
-    bsMove: Move.Paper,
+  const toState = new State({
+    channel,
+    resolution: [new BN(6), new BN(4)],
     turnNum: 6,
-    balances: fourSix,
-    libraryAddress,
-    channelNonce,
-  };
+    stateType: State.StateType.Game,
+  }).toHex();
 
-  const fromPosition = encode(positions.proposeFromSalt(proposeArgs));
-  const toPosition = encode(positions.accept(acceptArgs));
-  const fromSig = signPositionHex(fromPosition, participantB.privateKey);
-  const toSig = signPositionHex(toPosition, participantA.privateKey);
-  const challengeTransaction = createForceMoveTransaction(address, fromPosition, toPosition, fromSig, toSig);
+  const fromSig = signPositionHex(fromState, participantB.privateKey);
+  const toSig = signPositionHex(toState, participantA.privateKey);
+  const challengeTransaction = createForceMoveTransaction(address, fromState, toState, fromSig, toSig);
   const transactionReceipt = await signer.sendTransaction(challengeTransaction);
   await transactionReceipt.wait();
-  return toPosition;
+  return toState;
 }
 
 export async function concludeGame(address, channelNonce, participantA, participantB) {
@@ -93,20 +79,23 @@ export async function concludeGame(address, channelNonce, participantA, particip
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
+  const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const concludeArgs = {
-    salt: randomHex(64),
-    asMove: Move.Rock,
-    roundBuyIn: '0x1',
-    participants: [participantA.address, participantB.address] as [string, string],
-    balances: fiveFive,
-    libraryAddress,
-    channelNonce,
+  const fromState = new State({
+    channel,
+    resolution: [new BN(5), new BN(5)],
+    turnNum: 50,
+    stateType: State.StateType.Conclude,
+  }).toHex();
 
-  };
-  const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
+  const toState = new State({
+    channel,
+    resolution: [new BN(5), new BN(5)],
+    turnNum: 51,
+    stateType: State.StateType.Conclude,
+  }).toHex();
+
   const fromSignature = signPositionHex(fromState, participantA.privateKey);
-  const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
   const toSignature = signPositionHex(toState, participantB.privateKey);
 
   const concludeTransaction = createConcludeTransaction(address, fromState, toState, fromSignature, toSignature);
@@ -120,27 +109,20 @@ export async function respondWithMove(address, channelNonce, participantA, parti
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const participants = [participantA.address, participantB.address] as [string, string];
+  const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const revealArgs = {
+  const toState = new State({
+    channel,
+    resolution: [new BN(6), new BN(4)],
     turnNum: 7,
-    balances: fourSix,
-    salt: randomHex(64),
-    asMove: Move.Rock,
-    bsMove: Move.Paper,
-    roundBuyIn: '0x1',
-    libraryAddress,
-    channelNonce,
-    participants,
-  };
+    stateType: State.StateType.Game,
+  }).toHex();
+  const toSig = signPositionHex(toState, participantB.privateKey);
 
-  const toPosition = encode(positions.reveal(revealArgs));
-  const toSig = signPositionHex(toPosition, participantB.privateKey);
-
-  const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toPosition, toSig);
+  const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toState, toSig);
   const transactionReceipt = await signer.sendTransaction(respondWithMoveTransaction);
   await transactionReceipt.wait();
-  return toPosition;
+  return toState;
 }
 
 export async function refuteChallenge(address, channelNonce, participantA, participantB) {
@@ -149,21 +131,17 @@ export async function refuteChallenge(address, channelNonce, participantA, parti
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const secondProposeArgs = {
-    salt: randomHex(64),
-    asMove: Move.Rock,
-    roundBuyIn: '0x1',
-    participants: [participantA.address, participantB.address] as [string, string],
-    turnNum: 100,
-    balances: fiveFive,
-    channelNonce,
-    libraryAddress,
-  };
+  const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const toPosition = encode(positions.proposeFromSalt(secondProposeArgs));
-  const toSig = signPositionHex(toPosition, participantA.privateKey);
-  const refuteTransaction = createRefuteTransaction(address, toPosition, toSig);
+  const toState = new State({
+    channel,
+    resolution: [new BN(5), new BN(5)],
+    turnNum: 100,
+    stateType: State.StateType.Game,
+  }).toHex();
+  const toSig = signPositionHex(toState, participantA.privateKey);
+  const refuteTransaction = createRefuteTransaction(address, toState, toSig);
   const transactionReceipt = await signer.sendTransaction(refuteTransaction);
   await transactionReceipt.wait();
-  return toPosition;
+  return toState;
 }

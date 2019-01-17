@@ -4,7 +4,7 @@ import * as states from '../../../states';
 import * as actions from '../../actions';
 
 import { itTransitionsToStateType, itDoesntTransition } from './helpers';
-import * as scenarios from './../../../tests/app-utils/scenarios';
+import * as scenarios from './test-scenarios';
 
 const {
   preFundSetupAHex,
@@ -22,7 +22,7 @@ const {
 } = scenarios.standard;
 
 const defaults = {
-  networkId:123,
+  networkId: 123,
   uid: 'uid',
   address: asAddress,
   privateKey: asPrivateKey,

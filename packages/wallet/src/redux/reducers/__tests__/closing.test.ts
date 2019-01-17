@@ -4,7 +4,7 @@ import * as states from '../../../states';
 import * as actions from '../../actions';
 import * as outgoing from 'wallet-comm/lib/interface/from-wallet';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
-import * as scenarios from './../../../tests/app-utils/scenarios';
+import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType } from './helpers';
 
 const {

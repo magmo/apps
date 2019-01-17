@@ -1,5 +1,5 @@
 import { walletReducer } from '..';
-import * as scenarios from './../../../tests/app-utils/scenarios';
+import * as scenarios from './test-scenarios';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType, itSendsAMessage } from './helpers';
