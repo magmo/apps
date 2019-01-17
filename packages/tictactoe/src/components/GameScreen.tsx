@@ -1,10 +1,10 @@
-import React from 'react';
-import Board from './Board';
+import React from "react";
+import Board from "./Board";
 import NavigationBarContainer from "../containers/NavigationBarContainer";
 import GameBarContainer from "../containers/GameBarContainer";
-import MagmoLogo from './MagmoLogo';
+import MagmoLogoContainer from "../containers/MagmoLogoContainer";
 import GameFooterContainer from "../containers/GameFooterContainer";
-import { Marks, Marker, Result, Player, Imperative } from '../core';
+import { Marks, Marker, Result, Player, Imperative } from "../core";
 
 interface Props {
   you: Marker;
@@ -20,20 +20,25 @@ interface Props {
 
 export default class GameScreen extends React.PureComponent<Props> {
   render() {
-    const {you, noughts, crosses, marksMade} = this.props;
+    const { you, noughts, crosses, marksMade } = this.props;
     return (
       <div className="w-100">
-      <NavigationBarContainer />
-      <GameBarContainer />
+        <NavigationBarContainer />
+        <GameBarContainer />
 
-      <div className="container centered-container w-100 game-container">
-        <Board noughts={noughts} crosses={crosses} marksMade={marksMade} you = {you}/>
+        <div className="container centered-container w-100 game-container">
+          <Board
+            noughts={noughts}
+            crosses={crosses}
+            marksMade={marksMade}
+            you={you}
+          />
+        </div>
+
+        <MagmoLogoContainer />
+
+        <GameFooterContainer />
       </div>
-
-      <MagmoLogo />
-
-      <GameFooterContainer />
-    </div>
     );
   }
 }

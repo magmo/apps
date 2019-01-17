@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import NavigationBarContainer from "../containers/NavigationBarContainer";
 import GameBarContainer from "../containers/GameBarContainer";
-import MagmoLogo from "./MagmoLogo";
+import MagmoLogoContainer from "../containers/MagmoLogoContainer";
 import GameFooterContainer from "../containers/GameFooterContainer";
 import { Button, Modal, ModalBody } from "reactstrap";
 
@@ -36,7 +36,7 @@ export default class GameOverPage extends React.PureComponent<Props> {
             </div>
           </ModalBody>
         </Modal>
-        <MagmoLogo />
+        <MagmoLogoContainer />
         <GameFooterContainer />
       </div>
     );

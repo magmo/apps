@@ -134,10 +134,6 @@ function attemptRetry(state: JointState): JointState {
 
 function singleActionReducer(state: JointState, action: actions.GameAction) {
   const { messageState, gameState } = state;
-  if ("turnNum" in state.gameState) {
-    console.log("turnNum is");
-    console.log(state.gameState.turnNum);
-  }
   switch (gameState.name) {
     case states.StateName.NoName:
       return noNameReducer(gameState, messageState, action);
@@ -273,7 +269,7 @@ function lobbyReducer(
         messageState
       );
       return {
-        gameState: { ...waitForConfirmationState, turnNum: 1 },
+        gameState: { ...waitForConfirmationState },
         messageState,
       };
     default:
@@ -365,6 +361,7 @@ function waitForGameConfirmationAReducer(
   // transition to Wait for Funding
   const newGameState = states.waitForFunding({
     ...gameState,
+    turnNum: gameState.turnNum + 1,
   });
 
   return { messageState, gameState: newGameState };
@@ -390,9 +387,10 @@ function confirmGameBReducer(
   }
 
   if (action.type === actions.CONFIRM_GAME) {
+    const { turnNum } = gameState;
     const newGameState = states.waitForFunding({
       ...gameState,
-      turnNum: 1,
+      turnNum: turnNum + 1,
     });
     const newPosition = positions.preFundSetupB(newGameState);
 
@@ -403,7 +401,7 @@ function confirmGameBReducer(
       walletOutbox: { type: "FUNDING_REQUESTED" },
     };
 
-    return { gameState: { ...newGameState, turnNum: 2 }, messageState };
+    return { gameState: { ...newGameState }, messageState };
   } else {
     const {
       myName,
@@ -522,6 +520,7 @@ function xsPickMoveReducer(
     ...gameState,
     crosses: newCrosses,
     balances: newBalances,
+    turnNum: turnNum + 1,
   }); // default
   let newGameState: states.GameState = states.playAgain({
     ...gameState,
@@ -552,7 +551,7 @@ function xsPickMoveReducer(
     pos = positions.draw({ ...newGameState, crosses: newCrosses });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return {
-      gameState: { ...newGameState, turnNum: turnNum + 2 },
+      gameState: { ...newGameState },
       messageState,
     };
   }
@@ -616,7 +615,7 @@ function xsPickMoveReducer(
 
   messageState = sendMessage(pos, opponentAddress, messageState);
   // console.log(newGameState);
-  return { gameState: { ...newGameState, turnNum: turnNum + 2 }, messageState };
+  return { gameState: { ...newGameState }, messageState };
 }
 
 function osPickMoveReducer(
@@ -674,7 +673,7 @@ function osPickMoveReducer(
     });
     messageState = sendMessage(pos, opponentAddress, messageState);
     return {
-      gameState: { ...newGameState, turnNum: turnNum + 2 },
+      gameState: { ...newGameState },
       messageState,
     };
   }
@@ -740,7 +739,7 @@ function osPickMoveReducer(
   }
   messageState = sendMessage(pos, opponentAddress, messageState);
   // console.log(newGameState);
-  return { gameState: { ...newGameState, turnNum: turnNum + 2 }, messageState };
+  return { gameState: { ...newGameState }, messageState };
 }
 
 function xsWaitMoveReducer(
