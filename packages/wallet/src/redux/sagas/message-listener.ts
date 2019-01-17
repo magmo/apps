@@ -12,9 +12,9 @@ export function* messageListener() {
     return () => { /* End channel here*/ };
   });
   while (true) {
-    const event = yield take(postMessageEventChannel);
-    const action = event.data;
-    switch (event.data.type) {
+    const messageEvent = yield take(postMessageEventChannel);
+    const action = messageEvent.data;
+    switch (messageEvent.data.type) {
       case incoming.CREATE_CHALLENGE_REQUEST:
         yield put(actions.challengeRequested());
         break;
