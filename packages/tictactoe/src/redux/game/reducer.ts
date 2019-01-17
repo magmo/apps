@@ -149,8 +149,6 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return confirmGameBReducer(gameState, messageState, action);
     case states.StateName.WaitForFunding:
       return waitForFundingReducer(gameState, messageState, action);
-    // case states.StateName.WaitForPostFundSetup:
-    //   return waitForPostFundSetupReducer(gameState, messageState, action);
     case states.StateName.XsPickMove:
       if (
         action.type === actions.MARKS_MADE ||
@@ -195,16 +193,10 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return waitToPlayAgainReducer(gameState, messageState, action);
     case states.StateName.WaitToResign:
       return waitToResignReducer(gameState, messageState, action);
-    case states.StateName.WaitForResignationAcknowledgement:
-      return waitForResignationAcknowledgementReducer(
-        gameState,
-        messageState,
-        action
-      );
     case states.StateName.GameOver:
       return gameOverReducer(gameState, messageState, action);
-    case states.StateName.OpponentResigned:
-      return opponentResignedReducer(gameState, messageState, action);
+    case states.StateName.WaitForWithdrawal:
+      return waitForWithdrawalReducer(gameState, messageState, action);
     default:
       return state;
   }
@@ -1000,8 +992,6 @@ function waitToPlayAgainReducer(
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
-  console.log(gameState.you);
-  console.log(youWentLast(gameState));
   if (action.type === actions.RESIGN) {
     return resignationReducer(gameState, messageState);
   }
@@ -1106,9 +1096,9 @@ function insufficientFundsReducer(
   // transition to gameOver
   const newGameState = states.gameOver({ ...gameState, turnNum });
 
-  if (gameState.player === Player.PlayerA) {
+  if (youWentLast(gameState)) {
     newGameState.turnNum = newGameState.turnNum + 1;
-    // send conclude if player A
+    // send conclude if you played last
     const conclude = positions.conclude(newGameState);
 
     const opponentAddress = states.getOpponentAddress(gameState);
@@ -1175,25 +1165,6 @@ function opponentResignationReducer(
   return { gameState, messageState };
 }
 
-function waitForResignationAcknowledgementReducer(
-  gameState: states.WaitForResignationAcknowledgement,
-  messageState: MessageState,
-  action: actions.GameAction
-): JointState {
-  if (action.type !== actions.POSITION_RECEIVED) {
-    return { gameState, messageState };
-  }
-  if (action.position.name !== positions.CONCLUDE) {
-    return { gameState, messageState };
-  }
-
-  const newGameState = states.gameOver({
-    ...gameState,
-    turnNum: gameState.turnNum + 1,
-  });
-  return { gameState: newGameState, messageState };
-}
-
 function gameOverReducer(
   gameState: states.GameOver,
   messageState: MessageState,
@@ -1212,20 +1183,21 @@ function gameOverReducer(
   return { gameState: newGameState, messageState };
 }
 
-function opponentResignedReducer(
-  gameState: states.OpponentResigned,
+function waitForWithdrawalReducer(
+  gameState: states.WaitForWithdrawal,
   messageState: MessageState,
   action: actions.GameAction
 ) {
-  if (action.type !== actions.WITHDRAWAL_REQUEST) {
+  if (action.type !== actions.WITHDRAWAL_SUCCESS) {
     return { gameState, messageState };
   }
-
-  const newGameState = states.waitForWithdrawal(gameState);
-  messageState = {
-    ...messageState,
-    walletOutbox: { type: "WITHDRAWAL_REQUESTED" },
-  };
-
-  return { gameState: newGameState, messageState };
+  const { myName, libraryAddress, twitterHandle } = gameState;
+  const myAddress = gameState.participants[gameState.player];
+  const newGameState = states.lobby({
+    myName,
+    myAddress,
+    libraryAddress,
+    twitterHandle,
+  });
+  return { gameState: newGameState, messageState: {} };
 }
