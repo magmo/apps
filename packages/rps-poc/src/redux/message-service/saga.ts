@@ -242,9 +242,17 @@ function* receiveChallengePositionFromWalletSaga() {
 
 
 function* validateMessage(data, signature) {
-  return yield Wallet.validateSignature('walletId', data, signature);
+  try {
+    return yield Wallet.validateSignature('walletId', data, signature);
+  } catch (err) {
+    console.warn('Validate message error: ', err);
+  }
 }
 
 function* signMessage(data) {
-  return yield Wallet.signData('walletId', data);
+  try {
+    return yield Wallet.signData('walletId', data);
+  } catch (err) {
+    console.warn('sign message error: ', err);
+  }
 }
