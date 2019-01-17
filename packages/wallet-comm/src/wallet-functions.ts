@@ -51,7 +51,7 @@ export function createWalletIFrame(iframeId: string, walletUrl: string): HTMLIFr
  * The promise returns the wallet address.
  */
 export async function initializeWallet(iFrameId: string, userId: string): Promise<string> {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = initializeRequest(userId);
 
   const initPromise = new Promise<string>((resolve, reject) => {
@@ -77,9 +77,9 @@ export async function initializeWallet(iFrameId: string, userId: string): Promis
 /**
  * Opens the channel.
  */
-//TODO: Can this be part of funding instead of it's own method
+// TODO: Can this be part of funding instead of it's own method
 export function openChannel(iFrameId: string, channel: Channel): void {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = openChannelRequest(channel);
   iFrame.contentWindow.postMessage(message, "*");
 
@@ -89,7 +89,7 @@ export function openChannel(iFrameId: string, channel: Channel): void {
  * Promise resolves when the data is verified or an error occurs.
  */
 export async function validateSignature(iFrameId: string, data, signature: string): Promise<boolean> {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = validationRequest(data, signature);
 
   const validatePromise = new Promise<boolean>((resolve, reject) => {
@@ -117,7 +117,7 @@ export async function validateSignature(iFrameId: string, data, signature: strin
  * Promise resolves when a signature is received from the wallet or an error occurs.
  */
 export async function signData(iFrameId: string, data): Promise<string> {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = signatureRequest(data);
 
   const signPromise = new Promise<string>((resolve, reject) => {
@@ -147,14 +147,14 @@ export async function signData(iFrameId: string, data): Promise<string> {
  */
 // TODO: Come up with a clearer name.
 export function messageWallet(iFrameId: string, data, signature: string) {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = receiveMessage(data, signature);
   iFrame.contentWindow.postMessage(message, '*');
 }
 
 export function startConcludingGame(iFrameId: string): void {
 
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = concludeChannelRequest();
   iFrame.contentWindow.postMessage(message, "*");
 }
@@ -162,7 +162,6 @@ export function startConcludingGame(iFrameId: string): void {
 // TODO: Would it make sense to just accept an event handler as an argument instead of returning the event listener?
 /**
  * Starts the funding process. 
- 
  */
 export function startFunding(iFrameId: string,
   channelId: string,
@@ -172,19 +171,19 @@ export function startFunding(iFrameId: string,
   opponentBalance: BN,
   playerIndex: number): void {
 
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, playerIndex);
   iFrame.contentWindow.postMessage(message, "*");
 }
 
 export function startChallenge(iFrameId: string) {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = createChallenge();
   iFrame.contentWindow.postMessage(message, "*");
 }
 
 export function respondToOngoingChallenge(iFrameId: string, responsePosition: string) {
-  const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = respondToChallenge(responsePosition);
   iFrame.contentWindow.postMessage(message, "*");
 }

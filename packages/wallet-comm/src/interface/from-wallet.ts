@@ -144,7 +144,7 @@ export const closeSuccess = () => ({
 export type CloseSuccess = ReturnType<typeof closeSuccess>;
 
 
-//DISPLAY
+// DISPLAY
 export const SHOW_WALLET = 'WALLET.DISPLAY.SHOW_WALLET';
 export const showWallet = () => ({
   type: SHOW_WALLET as typeof SHOW_WALLET,
