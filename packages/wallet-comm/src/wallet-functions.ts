@@ -53,8 +53,8 @@ export function createWalletIFrame(iframeId: string, walletUrl: string): HTMLIFr
 export async function initializeWallet(iFrameId: string, userId: string): Promise<string> {
   const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
   const message = initializeRequest(userId);
-  iFrame.contentWindow.postMessage(message, "*");
-  return new Promise((resolve, reject) => {
+
+  const initPromise = new Promise<string>((resolve, reject) => {
     window.addEventListener("message", function eventListener(event: MessageEvent) {
       if (event.data && event.data.type && (
         event.data.type === INITIALIZATION_SUCCESS || event.data.type === INITIALIZATION_FAILURE)) {
@@ -68,6 +68,9 @@ export async function initializeWallet(iFrameId: string, userId: string): Promis
       }
     });
   });
+
+  iFrame.contentWindow.postMessage(message, "*");
+  return initPromise;
 }
 
 
@@ -88,8 +91,8 @@ export function openChannel(iFrameId: string, channel: Channel): void {
 export async function validateSignature(iFrameId: string, data, signature: string): Promise<boolean> {
   const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
   const message = validationRequest(data, signature);
-  iFrame.contentWindow.postMessage(message, "*");
-  return new Promise((resolve, reject) => {
+
+  const validatePromise = new Promise<boolean>((resolve, reject) => {
     window.addEventListener("message", function eventListener(event: MessageEvent) {
       if (event.data && event.data.type &&
         (event.data.type === VALIDATION_SUCCESS || event.data.type === VALIDATION_FAILURE)) {
@@ -104,6 +107,9 @@ export async function validateSignature(iFrameId: string, data, signature: strin
       }
     });
   });
+
+  iFrame.contentWindow.postMessage(message, "*");
+  return validatePromise;
 }
 
 /**
@@ -113,8 +119,8 @@ export async function validateSignature(iFrameId: string, data, signature: strin
 export async function signData(iFrameId: string, data): Promise<string> {
   const iFrame = <HTMLIFrameElement>document.getElementById(iFrameId);
   const message = signatureRequest(data);
-  iFrame.contentWindow.postMessage(message, "*");
-  return new Promise((resolve, reject) => {
+
+  const signPromise = new Promise<string>((resolve, reject) => {
     window.addEventListener("message", function eventListener(event: MessageEvent) {
       if (event.data && event.data.type &&
         (event.data.type === SIGNATURE_SUCCESS || event.data.type === SIGNATURE_FAILURE)) {
@@ -130,6 +136,9 @@ export async function signData(iFrameId: string, data): Promise<string> {
       }
     });
   });
+
+  iFrame.contentWindow.postMessage(message, "*");
+  return signPromise;
 }
 
 /**
