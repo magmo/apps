@@ -7,7 +7,6 @@ interface Props {
 
 export default class MagmoLogo extends React.PureComponent<Props> {
   render() {
-    console.log(this.props.turnNum);
     return (
       <div className="footer-logo-container">
         <span className="text-white turn-num">Turn: {this.props.turnNum}</span>

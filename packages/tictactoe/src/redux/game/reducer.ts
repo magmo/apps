@@ -474,7 +474,7 @@ function waitForFundingReducer(
       case Player.PlayerB:
         const newGameState2 = states.osWaitForOpponentToPickMove({
           ...gameState,
-          turnNum: turnNum + 0,
+          turnNum: turnNum + 1,
           noughts: 0,
           crosses: 0,
           onScreenBalances: balances,
@@ -770,7 +770,7 @@ function xsWaitMoveReducer(
       | states.PlayAgain
       | states.InsufficientFunds = states.xsPickMove({
       ...gameState,
-      turnNum: turnNum + 0,
+      turnNum: turnNum + 1,
       noughts: receivedNoughts,
       result: Imperative.Choose,
       balances: newBalances,
@@ -836,7 +836,7 @@ function osWaitMoveReducer(
       | states.PlayAgain
       | states.InsufficientFunds = states.osPickMove({
       ...gameState,
-      turnNum: turnNum + 0,
+      turnNum: turnNum + 1,
       crosses: receivedCrosses,
       result: Imperative.Choose,
       balances: newBalances,
