@@ -85,19 +85,23 @@ export const gameReducer: Reducer<JointState> = (
     return { gameState: { ...gameState, myAddress }, messageState };
   }
   if (action.type === CHALLENGE_RESPONSE_REQUESTED) {
-    if (
-      state.gameState.name === states.StateName.OsPickMove ||
-      state.gameState.name === states.StateName.XsPickMove
-    ) {
-      const { messageState, gameState } = state;
+    const { messageState, gameState } = state;
+    if (gameState.name === states.StateName.OsPickMove) {
       return {
-        gameState: states.pickChallengeMove(gameState),
+        gameState: states.osPickChallengeMove(gameState),
+        messageState,
+      };
+    }
+    if (gameState.name === states.StateName.XsPickMove) {
+      return {
+        gameState: states.xsPickChallengeMove(gameState),
         messageState,
       };
     } else {
       return state;
     }
   }
+
   if (action.type === CLOSE_SUCCESS) {
     const { messageState, gameState } = state;
     if ("participants" in gameState) {
@@ -149,6 +153,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return confirmGameBReducer(gameState, messageState, action);
     case states.StateName.WaitForFunding:
       return waitForFundingReducer(gameState, messageState, action);
+    case states.StateName.XsPickChallengeMove:
     case states.StateName.XsPickMove:
       if (
         action.type === actions.MARKS_MADE ||
@@ -158,6 +163,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       } else {
         return state;
       }
+    // case states.StateName.OsPickChallengeMove: // TODO copy conditional messaging (wallet or other player) from osPickMoveReducer
     case states.StateName.OsPickMove:
       if (
         action.type === actions.MARKS_MADE ||
@@ -197,6 +203,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return gameOverReducer(gameState, messageState, action);
     case states.StateName.WaitForWithdrawal:
       return waitForWithdrawalReducer(gameState, messageState, action);
+    case states.StateName.OsPickChallengeMove:
     default:
       return state;
   }
@@ -501,7 +508,7 @@ function favorB(balances: [string, string], roundBuyIn): [string, string] {
 }
 
 function xsPickMoveReducer(
-  gameState: states.XsPickMove,
+  gameState: states.XsPickMove | states.XsPickChallengeMove,
   messageState: MessageState,
   action: actions.MarksMade | actions.Resign
 ): JointState {
@@ -549,7 +556,14 @@ function xsPickMoveReducer(
       onScreenBalances: newBalances,
     });
     pos = positions.draw({ ...newGameState, crosses: newCrosses });
-    messageState = sendMessage(pos, opponentAddress, messageState);
+    if (gameState.name === states.StateName.XsPickChallengeMove) {
+      messageState = {
+        walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
+      };
+    }
+    if (gameState.name === states.StateName.XsPickMove) {
+      messageState = sendMessage(pos, opponentAddress, messageState);
+    }
     return {
       gameState: { ...newGameState },
       messageState,
@@ -612,9 +626,14 @@ function xsPickMoveReducer(
       pos = positions.conclude({ ...newGameState });
     }
   }
-
-  messageState = sendMessage(pos, opponentAddress, messageState);
-  // console.log(newGameState);
+  if (gameState.name === states.StateName.XsPickChallengeMove) {
+    messageState = {
+      walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
+    };
+  }
+  if (gameState.name === states.StateName.XsPickMove) {
+    messageState = sendMessage(pos, opponentAddress, messageState);
+  }
   return { gameState: { ...newGameState }, messageState };
 }
 

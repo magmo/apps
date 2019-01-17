@@ -1,31 +1,32 @@
-import { Result, Imperative, Marks, Player, Marker } from '../../core';
+import { Result, Imperative, Marks, Player, Marker } from "../../core";
 
 // States of the form *A are player A only
 // States of the form *B are player B only
 // All other states are both players
 export enum StateName {
-  NoName = 'NO_NAME',
-  Lobby = 'Lobby',
-  CreatingOpenGame = 'CREATING_OPEN_GAME',
-  WaitingRoom = 'WaitingRoom',
-  WaitForGameConfirmationA = 'WAIT_FOR_GAME_CONFIRMATION_A',
-  ConfirmGameB = 'CONFIRM_GAME_B',
-  DeclineGame = 'DECLINE_GAME_B',
-  WaitForFunding = 'WAIT_FOR_FUNDING',
-  WaitForPostFundSetup = 'WAIT_FOR_POST_FUND_SETUP',
-  OsPickMove = 'OS_PICK_MOVE',
-  XsPickMove = 'XS_PICK_MOVE',
-  OsWaitForOpponentToPickMove = 'OS_WAIT_FOR_OPPONENT_TO_PICK_MOVE',
-  XsWaitForOpponentToPickMove = 'XS_WAIT_FOR_OPPONENT_TO_PICK_MOVE',
-  WaitForResting = 'WAIT_FOR_RESTING',
-  PlayAgain = 'PLAY_AGAIN',
-  InsufficientFunds = 'INSUFFICIENT_FUNDS',
-  WaitToResign = 'WAIT_TO_RESIGN',
-  OpponentResigned = 'OPPONENT_RESIGNED',
-  WaitForResignationAcknowledgement = 'WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT',
-  GameOver = 'GAME_OVER',
-  WaitForWithdrawal = 'WAIT_FOR_WITHDRAWAL',
-  PickChallengeMove = 'PICK_CHALLENGE_MOVE',
+  NoName = "NO_NAME",
+  Lobby = "Lobby",
+  CreatingOpenGame = "CREATING_OPEN_GAME",
+  WaitingRoom = "WaitingRoom",
+  WaitForGameConfirmationA = "WAIT_FOR_GAME_CONFIRMATION_A",
+  ConfirmGameB = "CONFIRM_GAME_B",
+  DeclineGame = "DECLINE_GAME_B",
+  WaitForFunding = "WAIT_FOR_FUNDING",
+  WaitForPostFundSetup = "WAIT_FOR_POST_FUND_SETUP",
+  OsPickMove = "OS_PICK_MOVE",
+  XsPickMove = "XS_PICK_MOVE",
+  OsWaitForOpponentToPickMove = "OS_WAIT_FOR_OPPONENT_TO_PICK_MOVE",
+  XsWaitForOpponentToPickMove = "XS_WAIT_FOR_OPPONENT_TO_PICK_MOVE",
+  WaitForResting = "WAIT_FOR_RESTING",
+  PlayAgain = "PLAY_AGAIN",
+  InsufficientFunds = "INSUFFICIENT_FUNDS",
+  WaitToResign = "WAIT_TO_RESIGN",
+  OpponentResigned = "OPPONENT_RESIGNED",
+  WaitForResignationAcknowledgement = "WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT",
+  GameOver = "GAME_OVER",
+  WaitForWithdrawal = "WAIT_FOR_WITHDRAWAL",
+  XsPickChallengeMove = "XS_PICK_CHALLENGE_MOVE",
+  OsPickChallengeMove = "OS_PICK_CHALLENGE_MOVE",
 }
 
 export interface NoName {
@@ -62,7 +63,13 @@ interface LobbyParams {
 
 export function lobby(obj: LobbyParams): Lobby {
   const { myName, myAddress, libraryAddress, twitterHandle } = obj;
-  return { name: StateName.Lobby, myName, myAddress, libraryAddress, twitterHandle };
+  return {
+    name: StateName.Lobby,
+    myName,
+    myAddress,
+    libraryAddress,
+    twitterHandle,
+  };
 }
 
 export interface CreatingOpenGame {
@@ -75,7 +82,13 @@ export interface CreatingOpenGame {
 
 export function creatingOpenGame(obj: LobbyParams): CreatingOpenGame {
   const { myName, myAddress, libraryAddress, twitterHandle } = obj;
-  return { name: StateName.CreatingOpenGame, myName, myAddress, libraryAddress, twitterHandle };
+  return {
+    name: StateName.CreatingOpenGame,
+    myName,
+    myAddress,
+    libraryAddress,
+    twitterHandle,
+  };
 }
 
 export interface WaitingRoom {
@@ -97,7 +110,14 @@ interface WaitingRoomParams {
 }
 export function waitingRoom(obj: WaitingRoomParams): WaitingRoom {
   const { myName, roundBuyIn, libraryAddress, myAddress, twitterHandle } = obj;
-  return { name: StateName.WaitingRoom, myName, roundBuyIn, libraryAddress, myAddress, twitterHandle };
+  return {
+    name: StateName.WaitingRoom,
+    myName,
+    roundBuyIn,
+    libraryAddress,
+    myAddress,
+    twitterHandle,
+  };
 }
 
 interface TwoChannel {
@@ -117,7 +137,6 @@ export interface Base extends TwoChannel {
   opponentName: string;
   player: Player;
 }
-
 
 export function base<T extends Base>(state: T): Base {
   const {
@@ -159,7 +178,14 @@ interface InPlay extends Base {
 }
 
 export function inPlay<T extends InPlay>(state: T): InPlay {
-  return {...base(state), player: state.player, noughts: state.noughts,  crosses: state.crosses,   onScreenBalances: state.onScreenBalances, you: state.you };
+  return {
+    ...base(state),
+    player: state.player,
+    noughts: state.noughts,
+    crosses: state.crosses,
+    onScreenBalances: state.onScreenBalances,
+    you: state.you,
+  };
 }
 
 interface HasResult extends InPlay {
@@ -168,7 +194,7 @@ interface HasResult extends InPlay {
 
 function hasResult<T extends HasResult>(state: T): HasResult {
   const { result } = state;
-  return {...inPlay(state), result };
+  return { ...inPlay(state), result };
 }
 
 export function getOpponentAddress<T extends Base>(state: T) {
@@ -179,8 +205,18 @@ export interface WaitForGameConfirmationA extends HasResult {
   name: StateName.WaitForGameConfirmationA;
   player: Player.PlayerA;
 }
-export function waitForGameConfirmationA<T extends HasResult>(state: T): WaitForGameConfirmationA {
-  return { ...base(state), name: StateName.WaitForGameConfirmationA, player: Player.PlayerA, noughts:0, crosses:0, result: Imperative.Choose, you: Marker.crosses };
+export function waitForGameConfirmationA<T extends HasResult>(
+  state: T
+): WaitForGameConfirmationA {
+  return {
+    ...base(state),
+    name: StateName.WaitForGameConfirmationA,
+    player: Player.PlayerA,
+    noughts: 0,
+    crosses: 0,
+    result: Imperative.Choose,
+    you: Marker.crosses,
+  };
 }
 
 export interface ConfirmGameB extends HasResult {
@@ -188,7 +224,15 @@ export interface ConfirmGameB extends HasResult {
   player: Player.PlayerB;
 }
 export function confirmGameB<T extends HasResult>(state: T): ConfirmGameB {
-  return { ...base(state), name: StateName.ConfirmGameB, player: Player.PlayerB, noughts:0, crosses:0, result: Imperative.Wait, you: Marker.noughts };
+  return {
+    ...base(state),
+    name: StateName.ConfirmGameB,
+    player: Player.PlayerB,
+    noughts: 0,
+    crosses: 0,
+    result: Imperative.Wait,
+    you: Marker.noughts,
+  };
 }
 
 export interface DeclineGameB extends HasResult {
@@ -196,9 +240,16 @@ export interface DeclineGameB extends HasResult {
   player: Player.PlayerB;
 }
 export function declineGameB<T extends HasResult>(state: T): DeclineGameB {
-  return { ...hasResult(state), name: StateName.DeclineGame, player: Player.PlayerB, noughts:0, crosses:0, result: Imperative.Wait, you: Marker.noughts };
+  return {
+    ...hasResult(state),
+    name: StateName.DeclineGame,
+    player: Player.PlayerB,
+    noughts: 0,
+    crosses: 0,
+    result: Imperative.Wait,
+    you: Marker.noughts,
+  };
 }
-
 
 export interface WaitForFunding extends HasResult {
   name: StateName.WaitForFunding;
@@ -206,7 +257,7 @@ export interface WaitForFunding extends HasResult {
 }
 
 export function waitForFunding<T extends HasResult>(state: T): WaitForFunding {
-  return { ...hasResult(state), name: StateName.WaitForFunding};
+  return { ...hasResult(state), name: StateName.WaitForFunding };
 }
 
 export interface WaitForPostFundSetup extends HasResult {
@@ -214,11 +265,19 @@ export interface WaitForPostFundSetup extends HasResult {
   player: Player;
 }
 
-
-export function waitForPostFundSetup<T extends HasResult>(state: T): WaitForPostFundSetup {
-  return { ...base(state), name: StateName.WaitForPostFundSetup, player: state.player, noughts:0, crosses:0, result: Imperative.Wait | Imperative.Choose, you: Marker.noughts | Marker.crosses  };
+export function waitForPostFundSetup<T extends HasResult>(
+  state: T
+): WaitForPostFundSetup {
+  return {
+    ...base(state),
+    name: StateName.WaitForPostFundSetup,
+    player: state.player,
+    noughts: 0,
+    crosses: 0,
+    result: Imperative.Wait | Imperative.Choose,
+    you: Marker.noughts | Marker.crosses,
+  };
 }
-
 
 export interface OsPickMove extends HasResult {
   name: StateName.OsPickMove;
@@ -238,7 +297,9 @@ export function xsPickMove<T extends HasResult>(state: T): XsPickMove {
 export interface OsWaitForOpponentToPickMove extends HasResult {
   name: StateName.OsWaitForOpponentToPickMove;
 }
-export function osWaitForOpponentToPickMove<T extends HasResult>(state: T): OsWaitForOpponentToPickMove {
+export function osWaitForOpponentToPickMove<T extends HasResult>(
+  state: T
+): OsWaitForOpponentToPickMove {
   return {
     ...hasResult(state),
     name: StateName.OsWaitForOpponentToPickMove,
@@ -248,22 +309,34 @@ export function osWaitForOpponentToPickMove<T extends HasResult>(state: T): OsWa
 export interface XsWaitForOpponentToPickMove extends HasResult {
   name: StateName.XsWaitForOpponentToPickMove;
 }
-export function xsWaitForOpponentToPickMove<T extends HasResult>(state: T): XsWaitForOpponentToPickMove {
+export function xsWaitForOpponentToPickMove<T extends HasResult>(
+  state: T
+): XsWaitForOpponentToPickMove {
   return {
     ...hasResult(state),
     name: StateName.XsWaitForOpponentToPickMove,
   };
 }
 
-export interface PickChallengeMove extends HasResult {
-  name: StateName.PickChallengeMove;
+export interface XsPickChallengeMove extends HasResult {
+  name: StateName.XsPickChallengeMove;
   player: Player;
 }
-export function pickChallengeMove<T extends HasResult>(state: T): PickChallengeMove {
-  return { ...hasResult(state), name: StateName.PickChallengeMove };
+export function xsPickChallengeMove<T extends HasResult>(
+  state: T
+): XsPickChallengeMove {
+  return { ...hasResult(state), name: StateName.XsPickChallengeMove };
 }
 
-
+export interface OsPickChallengeMove extends HasResult {
+  name: StateName.OsPickChallengeMove;
+  player: Player;
+}
+export function osPickChallengeMove<T extends HasResult>(
+  state: T
+): OsPickChallengeMove {
+  return { ...hasResult(state), name: StateName.OsPickChallengeMove };
+}
 
 export interface PlayAgain extends HasResult {
   name: StateName.PlayAgain;
@@ -278,19 +351,20 @@ export interface WaitForResting extends HasResult {
 }
 
 export function waitForRestingA<T extends HasResult>(state: T): WaitForResting {
-  return { ...hasResult(state), name: StateName.WaitForResting};
+  return { ...hasResult(state), name: StateName.WaitForResting };
 }
 
 export interface InsufficientFunds extends HasResult {
   name: StateName.InsufficientFunds;
 }
-export function insufficientFunds<T extends HasResult>(state: T): InsufficientFunds {
-  return { ...hasResult(state), name: StateName.InsufficientFunds};
+export function insufficientFunds<T extends HasResult>(
+  state: T
+): InsufficientFunds {
+  return { ...hasResult(state), name: StateName.InsufficientFunds };
 }
 
 export interface WaitToResign extends HasResult {
   name: StateName.WaitToResign;
-
 }
 export function waitToResign<T extends HasResult>(state: T): WaitToResign {
   return { ...hasResult(state), name: StateName.WaitToResign };
@@ -299,21 +373,26 @@ export function waitToResign<T extends HasResult>(state: T): WaitToResign {
 export interface OpponentResigned extends HasResult {
   name: StateName.OpponentResigned;
 }
-export function opponentResigned<T extends HasResult>(state: T): OpponentResigned {
+export function opponentResigned<T extends HasResult>(
+  state: T
+): OpponentResigned {
   return { ...hasResult(state), name: StateName.OpponentResigned };
 }
 
 export interface WaitForResignationAcknowledgement extends HasResult {
   name: StateName.WaitForResignationAcknowledgement;
-
 }
-export function waitForResignationAcknowledgement<T extends HasResult>(state: T): WaitForResignationAcknowledgement {
-  return { ...hasResult(state), name: StateName.WaitForResignationAcknowledgement };
+export function waitForResignationAcknowledgement<T extends HasResult>(
+  state: T
+): WaitForResignationAcknowledgement {
+  return {
+    ...hasResult(state),
+    name: StateName.WaitForResignationAcknowledgement,
+  };
 }
 
 export interface GameOver extends HasResult {
   name: StateName.GameOver;
-
 }
 export function gameOver<T extends HasResult>(state: T): GameOver {
   return { ...hasResult(state), name: StateName.GameOver };
@@ -321,13 +400,14 @@ export function gameOver<T extends HasResult>(state: T): GameOver {
 
 export interface WaitForWithdrawal extends HasResult {
   name: StateName.WaitForWithdrawal;
-
 }
-export function waitForWithdrawal<T extends HasResult>(state: T): WaitForWithdrawal {
+export function waitForWithdrawal<T extends HasResult>(
+  state: T
+): WaitForWithdrawal {
   return { ...hasResult(state), name: StateName.WaitForWithdrawal };
 }
 
-export type PlayingState = (
+export type PlayingState =
   | WaitForGameConfirmationA
   | ConfirmGameB
   | DeclineGameB
@@ -345,13 +425,12 @@ export type PlayingState = (
   | WaitForResignationAcknowledgement
   | GameOver
   | WaitForWithdrawal
-  | PickChallengeMove
-);
+  | XsPickChallengeMove
+  | OsPickChallengeMove;
 
-export type GameState = (
+export type GameState =
   | NoName
   | Lobby
   | CreatingOpenGame
   | WaitingRoom
-  | PlayingState
-);
+  | PlayingState;
