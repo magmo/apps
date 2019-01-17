@@ -5,6 +5,7 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 import metamaskSaga from '../metamask/saga';
 import { initializeWallet } from 'wallet-comm';
 import RPSGameArtifact from '../../../build/contracts/RockPaperScissorsGame.json';
+import { WALLET_IFRAME_ID } from '../../constants';
 
 function* loginSaga() {
   try {
@@ -36,7 +37,7 @@ function* loginStatusWatcherSaga() {
     if (user) {
       // TODO: pass uid to wallet
       const libraryAddress = yield getLibraryAddress();
-      const walletAddress = yield initializeWallet(WALLET_FRAME_ID, user.uid);
+      const walletAddress = yield initializeWallet(WALLET_IFRAME_ID, user.uid);
       yield put(loginActions.initializeWalletSuccess(walletAddress));
       yield put(loginActions.loginSuccess(user, libraryAddress));
 
