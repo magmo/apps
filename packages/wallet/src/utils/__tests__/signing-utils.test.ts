@@ -1,4 +1,4 @@
-import * as scenarios from '../../tests/app-utils/scenarios';
+import * as scenarios from '../../redux/reducers/__tests__/test-scenarios';
 import { signPositionHex, validSignature, signVerificationData } from '../signing-utils';
 
 const s = scenarios.standard;
