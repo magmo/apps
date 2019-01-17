@@ -9,7 +9,7 @@ import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
 import { Channel } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
-import * as Wallet from 'wallet-comm';
+import * as Wallet from 'wallet-client';
 import hexToBN from '../../utils/hexToBN';
 import { WALLET_IFRAME_ID } from '../../constants';
 

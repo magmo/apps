@@ -1,5 +1,5 @@
 {
-  "name": "wallet-comm",
+  "name": "wallet-client",
   "version": "0.0.1",
   "description": "Utility library for communicating with the magmo wallet",
   "author": "",

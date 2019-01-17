@@ -5,7 +5,7 @@ import decode from '../../utils/decode-utils';
 
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { challengeRejected, showWallet } from 'wallet-comm/lib/interface/from-wallet';
+import { challengeRejected, showWallet } from 'wallet-client/lib/interface/from-wallet';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 

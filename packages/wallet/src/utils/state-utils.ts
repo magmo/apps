@@ -1,6 +1,6 @@
 import { WalletState } from '../states';
 import { OWN_POSITION_RECEIVED, OPPONENT_POSITION_RECEIVED, WalletAction } from '../redux/actions';
-import { signatureFailure, signatureSuccess, validationFailure, validationSuccess, ResponseAction } from 'wallet-comm/lib/interface/from-wallet';
+import { signatureFailure, signatureSuccess, validationFailure, validationSuccess, ResponseAction } from 'wallet-client/lib/interface/from-wallet';
 import { signPositionHex, validSignature } from './signing-utils';
 
 export function handleSignatureAndValidationMessages(state: WalletState, action: WalletAction): ResponseAction | undefined {
