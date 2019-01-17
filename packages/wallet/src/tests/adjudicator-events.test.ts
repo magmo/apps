@@ -7,7 +7,7 @@ import { deployContract, depositContract, createChallenge, concludeGame, refuteC
 jest.setTimeout(60000);
 
 describe('adjudicator listener', () => {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const participantA = ethers.Wallet.createRandom();
   const participantB = ethers.Wallet.createRandom();
   let nonce = 5;

@@ -27,7 +27,7 @@ describe('transactions', () => {
   let networkId;
   let libraryAddress;
   let nonce = 5;
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
 
   const participantA = ethers.Wallet.createRandom();
   const participantB = ethers.Wallet.createRandom();
