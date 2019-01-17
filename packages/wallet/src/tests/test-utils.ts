@@ -22,7 +22,7 @@ export const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 export const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
 
 export async function deployContract(channelNonce, participantA, participantB) {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
@@ -36,7 +36,7 @@ export async function deployContract(channelNonce, participantA, participantB) {
 }
 
 export async function depositContract(address) {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const signer = provider.getSigner();
   const deployTransaction = createDepositTransaction(address, '0x5');
   const transactionReceipt = await signer.sendTransaction(deployTransaction);
@@ -44,7 +44,7 @@ export async function depositContract(address) {
 }
 
 export async function createChallenge(address, channelNonce, participantA, participantB) {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
@@ -74,7 +74,7 @@ export async function createChallenge(address, channelNonce, participantA, parti
 }
 
 export async function concludeGame(address, channelNonce, participantA, participantB) {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
@@ -104,7 +104,7 @@ export async function concludeGame(address, channelNonce, participantA, particip
 }
 
 export async function respondWithMove(address, channelNonce, participantA, participantB) {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
@@ -126,7 +126,7 @@ export async function respondWithMove(address, channelNonce, participantA, parti
 }
 
 export async function refuteChallenge(address, channelNonce, participantA, participantB) {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
