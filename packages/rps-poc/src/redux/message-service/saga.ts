@@ -33,6 +33,7 @@ export function* sendWalletMessageSaga() {
   while (true) {
     const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_REQUEST]);
     const messageRequest = yield take(sendMessageChannel);
+    console.log('sendwalletmessage ', messageRequest);
     const queue = Queue.WALLET;
     const { data, to, signature } = messageRequest;
     const message = { data, queue, signature };
@@ -245,7 +246,12 @@ function* validateMessage(data, signature) {
   try {
     return yield Wallet.validateSignature('walletId', data, signature);
   } catch (err) {
-    console.warn('Validate message error: ', err);
+    if (err.type && err.type === 'WalletBusy') {
+      const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
+      yield take(challengeChannel);
+      return yield Wallet.validateSignature('walletId', data, signature);
+
+    }
   }
 }
 
@@ -253,6 +259,11 @@ function* signMessage(data) {
   try {
     return yield Wallet.signData('walletId', data);
   } catch (err) {
-    console.warn('sign message error: ', err);
+    if (err.type && err.type === 'WalletBusy') {
+      const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
+      yield take(challengeChannel);
+      return yield Wallet.signData('walletId', data);
+
+    }
   }
 }
