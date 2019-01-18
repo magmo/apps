@@ -44,7 +44,7 @@ describe('transactions', () => {
     const signer = provider.getSigner();
     const transactionReceipt = await signer.sendTransaction(transactionToSend);
     saga.next();
-    expect(saga.next(transactionReceipt).value).toEqual(put(transactionSubmitted()));
+    expect(saga.next(transactionReceipt).value).toEqual(put(transactionSubmitted('0x0')));
     const confirmedTransaction = await transactionReceipt.wait();
     saga.next();
     expect(saga.next(confirmedTransaction).value).toEqual(put(transactionConfirmed(confirmedTransaction.contractAddress)));
