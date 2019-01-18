@@ -1050,28 +1050,13 @@ function resignationReducer(
   gameState: states.PlayingState,
   messageState: MessageState
 ): JointState {
-  console.log("resignation reducer triggered");
-  const turnNum = gameState.turnNum;
   if (itsMyTurn(gameState)) {
-    // transition to WaitForResignationAcknowledgement
-    gameState = states.waitForResignationAcknowledgement({
-      ...gameState,
-      turnNum: turnNum + 1,
-    });
-
-    // and send the latest state to our opponent
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(
-      positions.conclude(gameState),
-      opponentAddress,
-      messageState
-    );
-  } else {
-    // transition to WaitToResign
-    gameState = states.waitToResign(gameState);
+    messageState = {
+      ...messageState,
+      walletOutbox: { type: "CONCLUDE_REQUESTED" },
+    };
   }
-
-  return { gameState: { ...gameState, turnNum: turnNum + 2 }, messageState };
+  return { gameState, messageState };
 }
 
 function insufficientFundsReducer(
