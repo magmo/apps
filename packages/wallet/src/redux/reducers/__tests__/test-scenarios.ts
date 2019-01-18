@@ -1,6 +1,6 @@
 import BN from "bn.js";
 
-import { randomHex, bnToHex } from "../../../tests/test-utils";
+import { randomHex, bnToHex } from "../../../integration-tests/test-utils";
 
 import { Channel, padBytes32 } from "fmg-core";
 
