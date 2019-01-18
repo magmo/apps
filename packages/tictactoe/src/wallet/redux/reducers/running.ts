@@ -4,7 +4,7 @@ import decode from "../../utils/decode-utils";
 
 import { ourTurn, validTransition } from "../../utils/reducer-utils";
 import { signPositionHex, validSignature } from "../../utils/signing-utils";
-// import { challengeRejected } from "../../interface/outgoing";
+import { challengeRejected } from "../../interface/outgoing";
 import { handleSignatureAndValidationMessages } from "../../utils/state-utils";
 
 export const runningReducer = (
@@ -91,10 +91,12 @@ const waitForUpdateReducer = (
 
     case actions.CHALLENGE_REQUESTED:
       // The application should validate this but just in case we check as well
-      // if (ourTurn(state)) {
-      //   const message = challengeRejected("Challenges can only be issued when waiting for the other user.");
-      //   return states.waitForUpdate({ ...state, messageOutbox: message });
-      // }
+      if (ourTurn(state)) {
+        const message = challengeRejected(
+          "Challenges can only be issued when waiting for the other user."
+        );
+        return states.waitForUpdate({ ...state, messageOutbox: message });
+      }
       // transition to challenging
       return states.approveChallenge(state);
 

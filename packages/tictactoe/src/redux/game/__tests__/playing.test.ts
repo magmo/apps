@@ -161,7 +161,7 @@ describe("player A's app", () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.XsPickMove, updatedState);
-      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       it("sets theirMarks", () => {
         const newGameState = updatedState.gameState as state.XsPickMove;
         expect(newGameState.noughts).toEqual(receivedNoughts);
@@ -292,7 +292,7 @@ describe("player B's app", () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.OsPickMove, updatedState);
-      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       it("sets theirMarks", () => {
         const newGameState = updatedState.gameState as state.OsPickMove;
         expect(newGameState.crosses).toEqual(receivedCrosses);
