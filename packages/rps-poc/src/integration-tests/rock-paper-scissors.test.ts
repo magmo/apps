@@ -1,8 +1,5 @@
 import BN from 'bn.js';
 import {
-  assertRevert
-} from 'fmg-core';
-import {
   scenarios,
   encode
 } from '../core';
@@ -10,7 +7,7 @@ import {
 import hexToBN from '../utils/hexToBN';
 import bnToHex from '../utils/bnToHex';
 import * as ethers from 'ethers';
-import { Wallet } from 'ethers';
+
 
 import RPSGameArtifact from '../../build/contracts/RockPaperScissorsGame.json';
 
