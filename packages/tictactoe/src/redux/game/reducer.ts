@@ -163,7 +163,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       } else {
         return state;
       }
-    // case states.StateName.OsPickChallengeMove: // TODO copy conditional messaging (wallet or other player) from osPickMoveReducer
+    case states.StateName.OsPickChallengeMove:
     case states.StateName.OsPickMove:
       if (
         action.type === actions.MARKS_MADE ||
@@ -638,7 +638,7 @@ function xsPickMoveReducer(
 }
 
 function osPickMoveReducer(
-  gameState: states.OsPickMove,
+  gameState: states.OsPickMove | states.OsPickChallengeMove,
   messageState: MessageState,
   action: actions.MarksMade | actions.Resign
 ): JointState {
@@ -690,7 +690,14 @@ function osPickMoveReducer(
       noughts: newNoughts,
       balances: newBalances,
     });
-    messageState = sendMessage(pos, opponentAddress, messageState);
+    if (gameState.name === states.StateName.OsPickChallengeMove) {
+      messageState = {
+        walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
+      };
+    }
+    if (gameState.name === states.StateName.OsPickMove) {
+      messageState = sendMessage(pos, opponentAddress, messageState);
+    }
     return {
       gameState: { ...newGameState },
       messageState,
@@ -756,8 +763,14 @@ function osPickMoveReducer(
       pos = positions.conclude({ ...newGameState });
     }
   }
-  messageState = sendMessage(pos, opponentAddress, messageState);
-  // console.log(newGameState);
+  if (gameState.name === states.StateName.OsPickChallengeMove) {
+    messageState = {
+      walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
+    };
+  }
+  if (gameState.name === states.StateName.OsPickMove) {
+    messageState = sendMessage(pos, opponentAddress, messageState);
+  }
   return { gameState: { ...newGameState }, messageState };
 }
 
