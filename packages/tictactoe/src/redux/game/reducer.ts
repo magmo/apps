@@ -197,8 +197,6 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return insufficientFundsReducer(gameState, messageState, action);
     case states.StateName.WaitForResting:
       return waitToPlayAgainReducer(gameState, messageState, action);
-    case states.StateName.WaitToResign:
-      return waitToResignReducer(gameState, messageState, action);
     case states.StateName.GameOver:
       return gameOverReducer(gameState, messageState, action);
     case states.StateName.WaitForWithdrawal:
@@ -394,10 +392,9 @@ function confirmGameBReducer(
   }
 
   if (action.type === actions.CONFIRM_GAME) {
-    const { turnNum } = gameState;
     const newGameState = states.waitForFunding({
       ...gameState,
-      turnNum: turnNum + 1,
+      turnNum: 1,
     });
     const newPosition = positions.preFundSetupB(newGameState);
 
@@ -434,6 +431,7 @@ function waitForFundingReducer(
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
+  const turnNum = gameState.turnNum;
   if (action.type === actions.FUNDING_FAILURE) {
     const { participants, player } = gameState;
     const lobbyGameState = states.lobby({
@@ -463,14 +461,13 @@ function waitForFundingReducer(
       );
     }
     const postFundPositionB = action.position as PostFundSetupB;
-    const turnNum = postFundPositionB.turnNum;
     const balances = postFundPositionB.balances;
 
     switch (gameState.player) {
       case Player.PlayerA:
         const newGameState1 = states.xsPickMove({
           ...gameState,
-          turnNum: turnNum + 1,
+          turnNum: turnNum + 2,
           result: Imperative.Choose,
           noughts: 0,
           crosses: 0,
@@ -481,7 +478,7 @@ function waitForFundingReducer(
       case Player.PlayerB:
         const newGameState2 = states.osWaitForOpponentToPickMove({
           ...gameState,
-          turnNum: turnNum + 1,
+          turnNum: turnNum + 2,
           noughts: 0,
           crosses: 0,
           onScreenBalances: balances,
@@ -823,6 +820,7 @@ function xsWaitMoveReducer(
           balances: newBalances,
           onScreenBalances: newBalances,
           result: Result.YouLose,
+          turnNum: gameState.turnNum + 1,
         });
       } else {
         newGameState = states.insufficientFunds({
@@ -831,6 +829,7 @@ function xsWaitMoveReducer(
           balances: newBalances,
           onScreenBalances: newBalances,
           result: Result.YouLose,
+          turnNum: gameState.turnNum + 1,
         });
       }
     }
@@ -887,6 +886,7 @@ function osWaitMoveReducer(
         result: Result.Tie,
         balances: newBalances,
         onScreenBalances: newBalances,
+        turnNum: gameState.turnNum + 1,
       });
     }
 
@@ -899,6 +899,7 @@ function osWaitMoveReducer(
           balances: newBalances,
           onScreenBalances: newBalances,
           result: Result.YouLose,
+          turnNum: gameState.turnNum + 1,
         });
       } else {
         newGameState = states.insufficientFunds({
@@ -907,6 +908,7 @@ function osWaitMoveReducer(
           balances: newBalances,
           onScreenBalances: newBalances,
           result: Result.YouLose,
+          turnNum: gameState.turnNum + 1,
         });
       }
     }
@@ -1001,14 +1003,15 @@ function waitToPlayAgainReducer(
     messageState = sendMessage(pos, opponentAddress, messageState);
     newGameState = states.osWaitForOpponentToPickMove({
       ...gameState,
+      ...pos,
       noughts: 0,
       crosses: 0,
-      turnNum: turnNum + 1,
+      turnNum: turnNum + 0,
       result: Imperative.Wait,
       you: Marker.noughts,
     });
     return {
-      gameState: { ...newGameState, turnNum: turnNum + 2 },
+      gameState: newGameState,
       messageState,
     };
   }
@@ -1021,7 +1024,7 @@ function waitToPlayAgainReducer(
       ...gameState,
       noughts: 0,
       crosses: 0,
-      turnNum: turnNum + 1,
+      turnNum: turnNum + 0,
       result: Imperative.Choose,
       you: Marker.crosses,
     });
@@ -1031,7 +1034,7 @@ function waitToPlayAgainReducer(
     const pos = positions.resting({ ...gameState });
     messageState = sendMessage(pos, opponentAddress, messageState);
   }
-  return { gameState: { ...gameState, turnNum: turnNum + 2 }, messageState };
+  return { gameState: { ...gameState }, messageState };
 }
 
 function itsMyTurn(gameState: states.PlayingState) {
@@ -1073,45 +1076,18 @@ function insufficientFundsReducer(
     return { gameState, messageState };
   }
 
-  const { turnNum } = position;
+  const { turnNum } = gameState;
 
   // transition to gameOver
-  const newGameState = states.gameOver({ ...gameState, turnNum });
+  const newGameState = states.gameOver({ ...gameState, turnNum: turnNum + 1 });
 
   if (youWentLast(gameState)) {
-    newGameState.turnNum = newGameState.turnNum + 1;
     // send conclude if you played last
     const conclude = positions.conclude(newGameState);
 
     const opponentAddress = states.getOpponentAddress(gameState);
     messageState = sendMessage(conclude, opponentAddress, messageState);
   }
-
-  return { gameState: { ...newGameState, turnNum: turnNum + 2 }, messageState };
-}
-
-function waitToResignReducer(
-  gameState: states.WaitToResign,
-  messageState: MessageState,
-  action: actions.GameAction
-): JointState {
-  if (receivedConclude(action)) {
-    return opponentResignationReducer(gameState, messageState, action);
-  }
-
-  if (action.type !== actions.POSITION_RECEIVED) {
-    return { gameState, messageState };
-  }
-  const turnNum = action.position.turnNum + 1;
-
-  const newGameState = states.waitForResignationAcknowledgement({
-    ...gameState,
-    turnNum,
-  });
-
-  const newPosition = positions.conclude(newGameState);
-  const opponentAddress = states.getOpponentAddress(gameState);
-  messageState = sendMessage(newPosition, opponentAddress, messageState);
 
   return { gameState: newGameState, messageState };
 }

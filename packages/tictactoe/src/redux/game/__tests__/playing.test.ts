@@ -187,7 +187,7 @@ describe("player A's app", () => {
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
-        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         const newGameState = updatedState.gameState as state.PlayAgain;
         it("sets theirMarks", () => {
           expect(newGameState.noughts).toEqual(receivedNoughts);
@@ -212,7 +212,7 @@ describe("player A's app", () => {
         const updatedState = gameReducer({ messageState, gameState }, action1);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
-        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         itFullySwingsTheBalancesToB(
           roundBuyIn,
           { gameState, messageState },
@@ -312,7 +312,7 @@ describe("player B's app", () => {
       const receivedCrosses = position.crosses;
       const updatedState = gameReducer({ messageState, gameState }, action);
       itTransitionsTo(state.StateName.PlayAgain, updatedState);
-      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       it("sets theirMarks", () => {
         const newGameState = updatedState.gameState as state.OsPickMove;
         expect(newGameState.crosses).toEqual(receivedCrosses);
@@ -341,7 +341,7 @@ describe("player B's app", () => {
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
-        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         it("sets theirMarks", () => {
           const newGameState = updatedState.gameState as state.OsPickMove;
           expect(newGameState.crosses).toEqual(receivedCrosses);
@@ -366,7 +366,7 @@ describe("player B's app", () => {
         const updatedState = gameReducer({ messageState, gameState }, action2);
 
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
-        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         itFullySwingsTheBalancesToA(
           roundBuyIn,
           { gameState, messageState },
