@@ -71,7 +71,7 @@ This will fire up the Storybook panel inside a browser.
 
 #### To run smart contract tests:
 
-`yarn run test:integration`
+`yarn run test:contracts`
 
 #### To run all tests (before submitting a PR):
 
