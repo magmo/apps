@@ -143,10 +143,10 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return noNameReducer(gameState, messageState, action);
     case states.StateName.Lobby:
       return lobbyReducer(gameState, messageState, action);
-    case states.StateName.WaitingRoom:
-      return waitingRoomReducer(gameState, messageState, action);
     case states.StateName.CreatingOpenGame:
       return creatingOpenGameReducer(gameState, messageState, action);
+    case states.StateName.WaitingRoom:
+      return waitingRoomReducer(gameState, messageState, action);
     case states.StateName.WaitForGameConfirmationA:
       return waitForGameConfirmationAReducer(gameState, messageState, action);
     case states.StateName.ConfirmGameB:
@@ -193,15 +193,14 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       }
     case states.StateName.PlayAgain:
       return playAgainReducer(gameState, messageState, action);
-    case states.StateName.InsufficientFunds:
-      return insufficientFundsReducer(gameState, messageState, action);
     case states.StateName.WaitForResting:
       return waitToPlayAgainReducer(gameState, messageState, action);
+    case states.StateName.InsufficientFunds:
+      return insufficientFundsReducer(gameState, messageState, action);
     case states.StateName.GameOver:
       return gameOverReducer(gameState, messageState, action);
     case states.StateName.WaitForWithdrawal:
       return waitForWithdrawalReducer(gameState, messageState, action);
-    case states.StateName.OsPickChallengeMove:
     default:
       return state;
   }
