@@ -15,7 +15,7 @@ const bsPrivateKey =
   "0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72";
 const bsAddress = "0x" + "b".repeat(40);
 const participants: [string, string] = [asAddress, bsAddress];
-const roundBuyIn = bnToHex(new BN(1));
+export const roundBuyIn = bnToHex(new BN(1));
 export const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
 const sixFour = [new BN(6), new BN(4)].map(bnToHex) as [string, string];
 const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
@@ -387,6 +387,11 @@ export const noughtsVictory = {
     turnNum: 12,
     noughts: 0b111000000,
     crosses: 0b000010101,
+    balances: zeroSix,
+  }),
+  conclude: positions.conclude({
+    ...base,
+    turnNum: 12,
     balances: zeroSix,
   }),
   victoryHex:

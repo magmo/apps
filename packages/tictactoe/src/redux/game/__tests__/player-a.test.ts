@@ -5,10 +5,13 @@ import {
   Marks,
   Imperative,
   positions,
-  Marker
+  Marker,
+  Result
 } from "../../../core";
 import * as actions from "../actions";
 import * as state from "../state";
+import BN from "bn.js";
+import bnToHex from "../../../utils/bnToHex";
 
 import {
   // itSends,
@@ -33,13 +36,16 @@ const {
   playing2,
   // playing3,
   // playing4,
-  // playing5,
+  playing5,
   // playing6,
   // playing7,
   playing8,
   draw,
-  // resting,
+  resting,
 } = scenarios.standard;
+
+const noughtsabsolutevictory = scenarios.noughtsVictory.absolutevictory;
+const noughtsconclude = scenarios.noughtsVictory.conclude;
 
 const {
   libraryAddress,
@@ -60,6 +66,7 @@ const base = {
 
 const messageState = {};
 const fiveFive = scenarios.fiveFive;
+const oneFive = [new BN(1), new BN(5)].map(bnToHex) as [string, string];
 
 describe("player A's app", () => {
   const aProps = {
@@ -257,6 +264,82 @@ describe("player A's app", () => {
         it("sets theirMarks", () => {
           const newGameState = updatedState.gameState as state.XsPickMove;
           expect(newGameState.noughts).toEqual(receivedNoughts);
+        });
+      });
+    });
+  });
+
+  describe("when in PlayAgain", () => {
+    const gameState = state.playAgain({
+      ...aProps,
+      ...draw,
+      result: Result.Tie,
+    });
+
+    describe("if the player decides to continue", () => {
+      const action = actions.playAgain();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
+      // TODO check that whomever did not play last sends resting
+      //   (here we assume PlayerA = Xs and went last)
+    });
+
+  });
+
+  describe("when in Wait To Play Again", () => {
+    const gameState = state.waitToPlayAgain({
+      ...aProps,
+      ...draw,
+      result: Result.Tie,
+    });
+
+    describe("when resting arrives", () => {
+      const action = actions.positionReceived(resting);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
+      itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
+    });
+  });
+
+  describe("when in InsufficientFunds", () => {
+    const gameState = state.insufficientFunds({
+      ...aProps,
+      ...playing5,
+      result: Result.YouLose,
+      roundBuyIn,
+      balances: oneFive,
+    });
+
+    describe("when Conclude arrives", () => {
+      const action = actions.positionReceived(noughtsconclude);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
+      // itSends(noughtsabsolutevictory, updatedState);
+      itTransitionsTo(state.StateName.GameOver, updatedState);
+    });
+  });
+
+  describe("when in GameOver", () => {
+    const gameState = state.gameOver({
+      ...aProps,
+      ...noughtsabsolutevictory,
+      result: Result.YouLose,
+    });
+
+    describe("when the player wants to withdraw their funds", () => {
+      const action = actions.withdrawalRequest();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.WaitForWithdrawal, updatedState);
+      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+
+      it("requests a withdrawal from the wallet", () => {
+        expect(updatedState.messageState.walletOutbox).toEqual({
+          type: "WITHDRAWAL_REQUESTED",
         });
       });
     });

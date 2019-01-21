@@ -17,7 +17,7 @@ export enum StateName {
   XsPickMove = "XS_PICK_MOVE",
   OsWaitForOpponentToPickMove = "OS_WAIT_FOR_OPPONENT_TO_PICK_MOVE",
   XsWaitForOpponentToPickMove = "XS_WAIT_FOR_OPPONENT_TO_PICK_MOVE",
-  WaitForResting = "WAIT_FOR_RESTING",
+  WaitToPlayAgain = "WAIT_TO_PLAY_AGAIN",
   PlayAgain = "PLAY_AGAIN",
   InsufficientFunds = "INSUFFICIENT_FUNDS",
   WaitToResign = "WAIT_TO_RESIGN",
@@ -338,12 +338,12 @@ export function playAgain<T extends HasResult>(state: T): PlayAgain {
   return { ...hasResult(state), name: StateName.PlayAgain };
 }
 
-export interface WaitForResting extends HasResult {
-  name: StateName.WaitForResting;
+export interface WaitToPlayAgain extends HasResult {
+  name: StateName.WaitToPlayAgain;
 }
 
-export function waitForRestingA<T extends HasResult>(state: T): WaitForResting {
-  return { ...hasResult(state), name: StateName.WaitForResting };
+export function waitToPlayAgain<T extends HasResult>(state: T): WaitToPlayAgain {
+  return { ...hasResult(state), name: StateName.WaitToPlayAgain };
 }
 
 export interface InsufficientFunds extends HasResult {
@@ -408,7 +408,7 @@ export type PlayingState =
   | OsWaitForOpponentToPickMove
   | XsWaitForOpponentToPickMove
   | PlayAgain
-  | WaitForResting
+  | WaitToPlayAgain
   | InsufficientFunds
   | WaitToResign
   | OpponentResigned

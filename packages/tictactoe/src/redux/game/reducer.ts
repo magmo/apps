@@ -193,7 +193,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       }
     case states.StateName.PlayAgain:
       return playAgainReducer(gameState, messageState, action);
-    case states.StateName.WaitForResting:
+    case states.StateName.WaitToPlayAgain:
       return waitToPlayAgainReducer(gameState, messageState, action);
     case states.StateName.InsufficientFunds:
       return insufficientFundsReducer(gameState, messageState, action);
@@ -966,20 +966,20 @@ function playAgainReducer(
     return { gameState, messageState };
   }
   if (action.type === actions.PLAY_AGAIN && youWentLast(gameState)) {
-    newGameState = states.waitForRestingA({ ...gameState });
+    newGameState = states.waitToPlayAgain({ ...gameState });
     return { gameState: newGameState, messageState };
   }
   if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
-    const pos = positions.resting({ ...gameState });
+    const pos = positions.resting({ ...gameState, turnNum: gameState.turnNum + 1 });
     messageState = sendMessage(pos, opponentAddress, messageState);
-    newGameState = states.waitForRestingA({ ...gameState });
+    newGameState = states.waitToPlayAgain({ ...gameState });
     return { gameState: newGameState, messageState };
   }
   return { gameState, messageState };
 }
 
 function waitToPlayAgainReducer(
-  gameState: states.WaitForResting,
+  gameState: states.WaitToPlayAgain,
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
@@ -997,18 +997,17 @@ function waitToPlayAgainReducer(
     action.position.name === RESTING &&
     youWentLast(gameState)
   ) {
-    const pos = positions.resting({ ...gameState, crosses: 0, noughts: 0 });
-
-    messageState = sendMessage(pos, opponentAddress, messageState);
+       
     newGameState = states.osWaitForOpponentToPickMove({
       ...gameState,
-      ...pos,
       noughts: 0,
       crosses: 0,
-      turnNum: turnNum + 0,
+      turnNum: turnNum + 2, // because we recieve and immediately send
       result: Imperative.Wait,
       you: Marker.noughts,
     });
+    const pos = positions.resting({ ...newGameState });
+    messageState = sendMessage(pos, opponentAddress, messageState);
     return {
       gameState: newGameState,
       messageState,
@@ -1023,7 +1022,7 @@ function waitToPlayAgainReducer(
       ...gameState,
       noughts: 0,
       crosses: 0,
-      turnNum: turnNum + 0,
+      turnNum: turnNum + 1,
       result: Imperative.Choose,
       you: Marker.crosses,
     });
@@ -1061,35 +1060,41 @@ function resignationReducer(
   return { gameState, messageState };
 }
 
+
 function insufficientFundsReducer(
   gameState: states.InsufficientFunds,
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
-  if (action.type !== actions.POSITION_RECEIVED) {
-    return { gameState, messageState };
+  const opponentAddress = states.getOpponentAddress(gameState);
+  if (youWentLast) {
+    if (
+      action.type === actions.POSITION_RECEIVED && 
+      action.position.name === positions.CONCLUDE 
+      ) {
+        const newGameState = states.gameOver({ ...gameState, turnNum: gameState.turnNum + 2});
+        const conclude = positions.conclude( {...newGameState});
+        messageState = sendMessage(conclude, opponentAddress, messageState);
+        return { gameState: newGameState, messageState };
+      }
   }
-
-  const position = action.position;
-  if (position.name !== positions.CONCLUDE) {
-    return { gameState, messageState };
+  if (!youWentLast) {
+    if (action.type !== actions.POSITION_RECEIVED) {
+      const conclude = positions.conclude( {...gameState, turnNum: gameState.turnNum + 1});
+      messageState = sendMessage(conclude, opponentAddress, messageState);
+      return { gameState, messageState };
+    }
+    if (
+      action.type === actions.POSITION_RECEIVED && 
+      action.position.name === positions.CONCLUDE 
+      ) {
+        const newGameState2 = states.gameOver({ ...gameState, turnNum: gameState.turnNum + 2});
+        return { gameState: newGameState2, messageState };
+      }
   }
-
-  const { turnNum } = gameState;
-
-  // transition to gameOver
-  const newGameState = states.gameOver({ ...gameState, turnNum: turnNum + 1 });
-
-  if (youWentLast(gameState)) {
-    // send conclude if you played last
-    const conclude = positions.conclude(newGameState);
-
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(conclude, opponentAddress, messageState);
-  }
-
-  return { gameState: newGameState, messageState };
+  return { gameState, messageState };
 }
+
 
 function opponentResignationReducer(
   gameState: states.PlayingState,
