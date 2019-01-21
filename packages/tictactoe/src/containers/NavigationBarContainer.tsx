@@ -1,19 +1,19 @@
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import NavigationBar from '../components/NavigationBar';
-import * as loginActions from '../redux/login/actions';
-import * as globalActions from '../redux/global/actions';
-import { PlayingState } from '../redux/game/state';
+import NavigationBar from "../components/NavigationBar";
+import * as loginActions from "../redux/login/actions";
+import * as globalActions from "../redux/global/actions";
 
-import { SiteState } from '../redux/reducer';
+import { SiteState } from "../redux/reducer";
 
 const mapStateToProps = (state: SiteState) => {
-  const name = ('myName' in state.game.gameState) ? state.game.gameState.myName : "";
-  const gameState = state.game.gameState as PlayingState;
+  const name =
+    "myName" in state.game.gameState ? state.game.gameState.myName : "";
+  const you = "you" in state.game.gameState ? state.game.gameState.you : "";
   return {
     showRules: state.rules.visible,
     loginDisplayName: name,
-    you: gameState.you,
+    you,
   };
 };
 
@@ -24,5 +24,5 @@ const mapDispatchToProps = {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(NavigationBar);

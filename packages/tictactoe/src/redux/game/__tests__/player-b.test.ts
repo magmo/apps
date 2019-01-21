@@ -27,7 +27,7 @@ import {
 
 const {
   // preFundSetupA,
-  // preFundSetupB,
+  preFundSetupB,
   // postFundSetupA,
   postFundSetupB,
   playing1,
@@ -60,181 +60,56 @@ const base = {
 };
 
 const messageState = {};
-
-describe("player A's app", () => {
-  const aProps = {
-    ...base,
-    stateCount: 1,
-    player: Player.PlayerA,
-    twitterHandle: "tweet",
-    you: Marker.crosses,
-  };
-
-  describe("when in XsPickMove", () => {
-    describe("when making an inconclusive XS_CHOSE_MOVE", () => {
-      const gameState = state.xsPickMove({
-        ...aProps,
-        noughts: 0,
-        crosses: 0,
-        ...postFundSetupB,
-        turnNum: 3,
-        result: Imperative.Wait,
-        onScreenBalances: ["", ""],
-      });
-      const action = actions.marksMade(Marks.tl);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(
-        state.StateName.XsWaitForOpponentToPickMove,
-        updatedState
-      );
-      itSends(playing1, updatedState);
-      if (gameState.crosses === 0) {
-        itHalfSwingsTheBalancesToA(
-          roundBuyIn,
-          { gameState, messageState },
-          updatedState
-        );
-      } else {
-        itFullySwingsTheBalancesToA(
-          roundBuyIn,
-          { gameState, messageState },
-          updatedState
-        );
-      }
-      itPreservesOnScreenBalances({ gameState, messageState }, updatedState);
-    });
-
-    describe("when making a drawing XS_CHOSE_MOVE", () => {
-      const gameState = state.xsPickMove({
-        ...aProps,
-        ...playing8,
-        result: Imperative.Wait,
-        onScreenBalances: playing8.balances,
-      });
-      const action = actions.marksMade(Marks.bm);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PlayAgain, updatedState);
-      itSends(draw, updatedState);
-      itHalfSwingsTheBalancesToA(
-        aProps.roundBuyIn,
-        { gameState, messageState },
-        updatedState
-      );
-    });
-
-    describe("when making a winning XS_CHOSE_MOVE", () => {
-      const gameState = state.xsPickMove({
-        ...aProps,
-        ...scenarios.crossesVictory.playing4,
-        result: Imperative.Wait,
-        onScreenBalances: scenarios.crossesVictory.playing4.balances,
-      });
-      const action = actions.marksMade(Marks.tr);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PlayAgain, updatedState);
-      itSends(scenarios.crossesVictory.victory, updatedState);
-      itFullySwingsTheBalancesToA(
-        aProps.roundBuyIn,
-        { gameState, messageState },
-        updatedState
-      );
-    });
-  });
-
-  describe("when in XsWaitForOpponentToPickMove", () => {
-    describe("when inconclusive Oplaying arrives", () => {
-      const gameState = state.xsWaitForOpponentToPickMove({
-        ...aProps,
-        ...playing1,
-        result: Imperative.Wait,
-        onScreenBalances: playing1.balances,
-      });
-      const action = actions.positionReceived({ ...playing2 });
-      const receivedNoughts = playing2.noughts;
-
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itTransitionsTo(state.StateName.XsPickMove, updatedState);
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      it("sets theirMarks", () => {
-        const newGameState = updatedState.gameState as state.XsPickMove;
-        expect(newGameState.noughts).toEqual(receivedNoughts);
-      });
-      itPreservesOnScreenBalances({ gameState, messageState }, updatedState);
-    });
-
-    // a draw cannot arrive if we are Xs
-
-    describe("when Victory arrives", () => {
-      const action = actions.positionReceived({
-        ...scenarios.noughtsVictory.victory,
-      });
-      const position = action.position as positions.Victory;
-      const receivedNoughts = position.noughts;
-      describe("but they still have enough funds to continue", () => {
-        const gameState = state.xsWaitForOpponentToPickMove({
-          ...aProps,
-          ...scenarios.noughtsVictory.playing5,
-          result: Imperative.Wait,
-          onScreenBalances: ["", ""],
-        });
-        const updatedState = gameReducer({ messageState, gameState }, action);
-
-        itTransitionsTo(state.StateName.PlayAgain, updatedState);
-        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-        const newGameState = updatedState.gameState as state.PlayAgain;
-        it("sets theirMarks", () => {
-          expect(newGameState.noughts).toEqual(receivedNoughts);
-        });
-        itFullySwingsTheBalancesToB(
-          roundBuyIn,
-          { gameState, messageState },
-          updatedState
-        );
-      });
-
-      describe("and there are now insufficient funds", () => {
-        const gameState = state.xsWaitForOpponentToPickMove({
-          ...aProps,
-          ...scenarios.noughtsVictory.playing5closetoempty,
-          result: Imperative.Wait,
-          onScreenBalances: ["", ""],
-        });
-        const action1 = actions.positionReceived({
-          ...scenarios.noughtsVictory.absolutevictory,
-        });
-        const updatedState = gameReducer({ messageState, gameState }, action1);
-
-        itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
-        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-        itFullySwingsTheBalancesToB(
-          roundBuyIn,
-          { gameState, messageState },
-          updatedState
-        );
-        it("sets theirMarks", () => {
-          const newGameState = updatedState.gameState as state.XsPickMove;
-          expect(newGameState.noughts).toEqual(receivedNoughts);
-        });
-      });
-    });
-  });
-});
+const fiveFive = scenarios.fiveFive;
 
 describe("player B's app", () => {
   const bProps = {
     ...base,
     stateCount: 1,
+    turnNum: 0,
     player: Player.PlayerB,
     twitterHandle: "tweet",
     you: Marker.noughts,
+    noughts: 0,
+    crosses: 0,
+    balances: fiveFive,
+    onScreenBalances: fiveFive,
   };
+
+  describe("when in confirmGameB", () => {
+    const gameState = state.confirmGameB({ ...bProps });
+
+    describe("when player B confirms", () => {
+      const action = actions.confirmGame();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itSends(preFundSetupB, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+
+      it("requests funding from the wallet", () => {
+        expect(updatedState.messageState.walletOutbox).toEqual({
+          type: "FUNDING_REQUESTED",
+        });
+      });
+
+      itTransitionsTo(state.StateName.WaitForFunding, updatedState);
+    });
+  });
+
+  describe("when in waitForFunding", () => {
+    const gameState = state.waitForFunding({ ...bProps, ...preFundSetupB });
+
+    describe("when funding is successful", () => {
+      const action = actions.fundingSuccess(postFundSetupB);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
+      itTransitionsTo(
+        state.StateName.OsWaitForOpponentToPickMove,
+        updatedState
+      );
+    });
+  });
 
   describe("when in OsPickMove", () => {
     describe("when making an inconclusive OS_CHOSE_MOVE", () => {

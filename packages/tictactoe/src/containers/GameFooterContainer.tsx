@@ -4,11 +4,25 @@ import GameFooter from "../components/GameFooter";
 import * as gameActions from "../redux/game/actions";
 import * as walletActions from "../wallet/interface/incoming";
 import { SiteState } from "../redux/reducer";
-import { PlayingState, StateName } from "../redux/game/state";
+import {
+  StateName,
+  XsPickMove,
+  OsPickMove,
+  XsPickChallengeMove,
+  OsPickChallengeMove,
+  XsWaitForOpponentToPickMove,
+  OsWaitForOpponentToPickMove
+} from "../redux/game/state";
 import { Player } from "../core/players";
 
 function mapStateToProps(state: SiteState) {
-  const gameState = state.game.gameState as PlayingState;
+  const gameState = state.game.gameState as
+    | XsPickMove
+    | OsPickMove
+    | XsPickChallengeMove
+    | OsPickChallengeMove
+    | XsWaitForOpponentToPickMove
+    | OsWaitForOpponentToPickMove;
   const { player, turnNum } = gameState;
   const result = gameState.result;
   const isNotOurTurn =

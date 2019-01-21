@@ -201,37 +201,29 @@ export function getOpponentAddress<T extends Base>(state: T) {
   return state.participants[1 - state.player];
 }
 
-export interface WaitForGameConfirmationA extends HasResult {
+export interface WaitForGameConfirmationA extends Base {
   name: StateName.WaitForGameConfirmationA;
   player: Player.PlayerA;
 }
-export function waitForGameConfirmationA<T extends HasResult>(
+export function waitForGameConfirmationA<T extends Base>(
   state: T
 ): WaitForGameConfirmationA {
   return {
     ...base(state),
     name: StateName.WaitForGameConfirmationA,
     player: Player.PlayerA,
-    noughts: 0,
-    crosses: 0,
-    result: Imperative.Choose,
-    you: Marker.crosses,
   };
 }
 
-export interface ConfirmGameB extends HasResult {
+export interface ConfirmGameB extends Base {
   name: StateName.ConfirmGameB;
   player: Player.PlayerB;
 }
-export function confirmGameB<T extends HasResult>(state: T): ConfirmGameB {
+export function confirmGameB<T extends Base>(state: T): ConfirmGameB {
   return {
     ...base(state),
     name: StateName.ConfirmGameB,
     player: Player.PlayerB,
-    noughts: 0,
-    crosses: 0,
-    result: Imperative.Wait,
-    you: Marker.noughts,
   };
 }
 
@@ -251,13 +243,13 @@ export function declineGameB<T extends HasResult>(state: T): DeclineGameB {
   };
 }
 
-export interface WaitForFunding extends HasResult {
+export interface WaitForFunding extends Base {
   name: StateName.WaitForFunding;
   player: Player;
 }
 
-export function waitForFunding<T extends HasResult>(state: T): WaitForFunding {
-  return { ...hasResult(state), name: StateName.WaitForFunding };
+export function waitForFunding<T extends Base>(state: T): WaitForFunding {
+  return { ...base(state), name: StateName.WaitForFunding };
 }
 
 export interface WaitForPostFundSetup extends HasResult {
@@ -370,13 +362,11 @@ export function waitToResign<T extends HasResult>(state: T): WaitToResign {
   return { ...hasResult(state), name: StateName.WaitToResign };
 }
 
-export interface OpponentResigned extends HasResult {
+export interface OpponentResigned extends Base {
   name: StateName.OpponentResigned;
 }
-export function opponentResigned<T extends HasResult>(
-  state: T
-): OpponentResigned {
-  return { ...hasResult(state), name: StateName.OpponentResigned };
+export function opponentResigned<T extends Base>(state: T): OpponentResigned {
+  return { ...base(state), name: StateName.OpponentResigned };
 }
 
 export interface WaitForResignationAcknowledgement extends HasResult {
