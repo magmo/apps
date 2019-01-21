@@ -136,9 +136,15 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
       return states.aSubmitDeployInMetaMask(state);
     case actions.FUNDING_RECEIVED_EVENT:
       return states.aWaitForDeployToBeSentToMetaMask({ ...state, unhandledAdjudicatorEvent: action });
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
     default:
       return state;
   }
+  return state;
 };
 
 const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
@@ -152,13 +158,24 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
         ...state,
         messageOutbox: fundingFailure(state.channelId, "Other", action.error.message),
       });
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
     default:
       return state;
   }
+  return state;
 };
 
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
     case actions.FUNDING_RECEIVED_EVENT:
       return states.aSubmitDeployInMetaMask({ ...state, unhandledAction: action });
     case actions.TRANSACTION_CONFIRMED:
@@ -180,10 +197,16 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
     default:
       return state;
   }
+  return state;
 };
 
 const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
     case actions.FUNDING_RECEIVED_EVENT:
       const resolutions = decode(state.lastPosition.data).resolution;
       const totalFunds = resolutions[state.ourIndex].add(resolutions[1 - state.ourIndex]);
@@ -203,6 +226,7 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
     default:
       return state;
   }
+  return state;
 };
 
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
