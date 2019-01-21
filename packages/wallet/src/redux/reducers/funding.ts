@@ -44,9 +44,38 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return bWaitForPostFundSetupReducer(state, action);
     case states.ACKNOWLEDGE_FUNDING_SUCCESS:
       return acknowledgeFundingSuccessReducer(state, action);
+    case states.SEND_FUNDING_DECLINED_MESSAGE:
+      return sendFundingDeclinedMessageReducer(state, action);
+    case states.ACKNOWLEDGE_FUNDING_DECLINED:
+      return acknowledgeFundingDeclinedReducer(state, action);
     default:
       return unreachable(state);
   }
+};
+
+const acknowledgeFundingDeclinedReducer = (state: states.AcknowledgeFundingDeclined, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.FUNDING_DECLINED_ACKNOWLEDGED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, 'FundingDeclined'),
+        displayOutbox: hideWallet(),
+      });
+  }
+  return state;
+};
+
+const sendFundingDeclinedMessageReducer = (state: states.SendFundingDeclinedMessage, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.MESSAGE_SENT:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, 'FundingDeclined'),
+        displayOutbox: hideWallet(),
+      });
+      break;
+  }
+  return state;
 };
 
 const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, action: actions.WalletAction) => {
@@ -79,16 +108,22 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
         });
       }
     case actions.FUNDING_REJECTED:
-      return states.waitForChannel({
+      const sendFundingDeclinedAction = messageRequest(state.participants[1 - state.ourIndex], 'FundingDeclined', "");
+      return states.sendFundingDeclinedMessage({
         ...state,
-        messageOutbox: fundingFailure(state.channelId, action.type),
+        messageOutbox: sendFundingDeclinedAction,
+        displayOutbox: hideWallet(),
       });
     case actions.MESSAGE_RECEIVED:
-      if (state.ourIndex === 1) {
-        return states.approveFunding({
-          ...state,
-          adjudicator: action.data,
-        });
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      } else {
+        if (state.ourIndex === 1) {
+          return states.approveFunding({
+            ...state,
+            adjudicator: action.data,
+          });
+        }
       }
     default:
       return state;
@@ -115,7 +150,7 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
     case actions.TRANSACTION_SUBMISSION_FAILED:
       return states.waitForChannel({
         ...state,
-        messageOutbox: fundingFailure(state.channelId, action.error),
+        messageOutbox: fundingFailure(state.channelId, "Other", action.error.message),
       });
     default:
       return state;
@@ -225,7 +260,7 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
     case actions.TRANSACTION_SUBMISSION_FAILED:
       return states.waitForChannel({
         ...state,
-        messageOutbox: fundingFailure(state.channelId, action.error),
+        messageOutbox: fundingFailure(state.channelId, "Other", action.error.message),
       });
     default:
       return state;
