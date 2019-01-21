@@ -87,7 +87,7 @@ export default class Board extends React.PureComponent<Props> {
       return;
       }
     else {
-      return this.props.marksMade(marks);
+      return this.props.marksMade(marks); // only allow this if tile is unoccupied
     }
     
   }

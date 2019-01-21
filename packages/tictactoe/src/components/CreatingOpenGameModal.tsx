@@ -89,7 +89,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                   className="cog-input form-control"
                   name="buyin"
                   id="buyin"
-                  value={MIN_BUYIN}
+                  value={this.state.buyIn}
                   ref={this.buyInInput}
                   onChange={e => this.handleBuyInChange(e)}
                 />
