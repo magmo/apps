@@ -151,7 +151,7 @@ const xsTie = siteStateFromGameState(
 );
 
 const xsWaitToPlayAgain = siteStateFromGameState(
-  states.waitForRestingA({
+  states.waitToPlayAgain({
     ...shared,
     noughts: 0b010011100,
     crosses: 0b101100011,

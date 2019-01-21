@@ -147,7 +147,7 @@ function RenderGame(props: GameProps) {
           resign={resign}
         />
       );
-    case StateName.WaitForResting:
+    case StateName.WaitToPlayAgain:
       return (
         <PlayAgainWait
           noughts={state.noughts}
