@@ -12,7 +12,6 @@ import "../index.scss";
 import "../index.css";
 import { scenarios } from "../core";
 import { SiteState } from "../redux/reducer";
-import { WAIT_FOR_LOGIN, INITIALIZING } from "../../../wallet/src/states";
 
 const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
   bnToHex
@@ -56,10 +55,6 @@ const initialState: SiteState = {
     loading: false,
     loggedIn: true,
     user: null,
-  },
-  wallet: {
-    type: WAIT_FOR_LOGIN,
-    stage: INITIALIZING,
   },
   metamask: {
     loading: false,
