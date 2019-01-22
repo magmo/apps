@@ -153,6 +153,7 @@ export function base<T extends Base>(state: T): Base {
     opponentName,
     twitterHandle,
     player,
+    myAddress,
   } = state;
 
   return {
@@ -168,6 +169,7 @@ export function base<T extends Base>(state: T): Base {
     twitterHandle,
     opponentName,
     player,
+    myAddress,
   };
 }
 
