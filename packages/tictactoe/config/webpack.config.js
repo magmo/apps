@@ -419,6 +419,7 @@ module.exports = function (webpackEnv) {
         FIREBASE_PROJECT: isEnvProduction ? '' : 'tic-tac-toe-dev-3a21f',
         FIREBASE_API_KEY: isEnvProduction ? '' : 'AIzaSyAFlVSCTROvaGr4HcrnjpFhBGSkEMklcb8',
         TARGET_NETWORK: process.env.TARGET_NETWORK,
+        WALLET_URL: 'http://localhost:3000'
       }),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(

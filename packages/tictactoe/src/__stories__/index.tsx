@@ -12,7 +12,7 @@ import "../index.scss";
 import "../index.css";
 import { scenarios } from "../core";
 import { SiteState } from "../redux/reducer";
-import { WAIT_FOR_LOGIN, INITIALIZING } from "../wallet/states";
+import { WAIT_FOR_LOGIN, INITIALIZING } from "../../../wallet/src/states";
 
 const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
   bnToHex
@@ -48,6 +48,7 @@ const shared = {
   ...scenarios.shared,
   stateCount: 1,
   roundBuyIn: bnToHex(new BN(1000000000000000)),
+  myAddress: '',
 };
 
 const initialState: SiteState = {
