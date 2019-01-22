@@ -122,6 +122,7 @@ export function waitingRoom(obj: WaitingRoomParams): WaitingRoom {
 
 interface TwoChannel {
   libraryAddress: string;
+  myAddress: string;
   channelNonce: number;
   participants: [string, string];
 }

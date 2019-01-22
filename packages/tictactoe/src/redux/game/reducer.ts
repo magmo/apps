@@ -12,20 +12,11 @@ import {
   Position
 } from "../../core";
 import { MessageState, sendMessage } from "../message-service/state";
-import { LoginSuccess, LOGIN_SUCCESS } from "../login/actions";
+import { LoginSuccess, LOGIN_SUCCESS, InitializeWalletSuccess, INITIALIZE_WALLET_SUCCESS } from "../login/actions";
 
 import hexToBN from "../../utils/hexToBN";
 import bnToHex from "../../utils/bnToHex";
-import {
-  INITIALIZATION_SUCCESS,
-  InitializationSuccess,
-  CHALLENGE_POSITION_RECEIVED,
-  ChallengePositionReceived,
-  CHALLENGE_RESPONSE_REQUESTED,
-  ChallengeResponseRequested,
-  CLOSE_SUCCESS,
-  CloseSuccess
-} from "../../wallet/interface/outgoing";
+
 import {
   PostFundSetupB,
   POST_FUND_SETUP_B,
@@ -47,10 +38,7 @@ export const gameReducer: Reducer<JointState> = (
   action:
     | actions.GameAction
     | LoginSuccess
-    | InitializationSuccess
-    | CloseSuccess
-    | ChallengePositionReceived
-    | ChallengeResponseRequested
+    | InitializeWalletSuccess
 ) => {
   if (
     action.type === actions.EXIT_TO_LOBBY &&
@@ -67,8 +55,7 @@ export const gameReducer: Reducer<JointState> = (
     return { gameState: newGameState, messageState: {} };
   }
   if (
-    action.type === actions.MESSAGE_SENT ||
-    action.type === CHALLENGE_POSITION_RECEIVED
+    action.type === actions.MESSAGE_SENT
   ) {
     const { messageState, gameState } = state;
     const { actionToRetry } = messageState;
@@ -79,12 +66,12 @@ export const gameReducer: Reducer<JointState> = (
     const { libraryAddress } = action;
     return { gameState: { ...gameState, libraryAddress }, messageState };
   }
-  if (action.type === INITIALIZATION_SUCCESS) {
+  if (action.type === INITIALIZE_WALLET_SUCCESS) {
     const { messageState, gameState } = state;
     const { address: myAddress } = action;
     return { gameState: { ...gameState, myAddress }, messageState };
   }
-  if (action.type === CHALLENGE_RESPONSE_REQUESTED) {
+  if (action.type === actions.CHALLENGE_RESPONSE_REQUESTED) {
     const { messageState, gameState } = state;
     if (gameState.name === states.StateName.OsPickMove) {
       return {
@@ -100,22 +87,6 @@ export const gameReducer: Reducer<JointState> = (
     } else {
       return state;
     }
-  }
-
-  if (action.type === CLOSE_SUCCESS) {
-    const { messageState, gameState } = state;
-    if ("participants" in gameState) {
-      const { myName, libraryAddress, twitterHandle } = gameState;
-      const myAddress = gameState.participants[gameState.player];
-      const newGameState = states.lobby({
-        myName,
-        myAddress,
-        libraryAddress,
-        twitterHandle,
-      });
-      return { gameState: newGameState, messageState };
-    }
-    return state;
   }
   // // apply the current action to the state
   state = singleActionReducer(state, action);
@@ -260,11 +231,8 @@ function lobbyReducer(
         stateCount,
         libraryAddress,
         twitterHandle,
-        result: Imperative.Wait,
+        myAddress,
         player: Player.PlayerA,
-        you: Marker.crosses,
-        noughts: 0,
-        crosses: 0,
       });
 
       messageState = sendMessage(
@@ -309,7 +277,7 @@ function waitingRoomReducer(
   switch (action.type) {
     case actions.INITIAL_POSITION_RECEIVED:
       const { position, opponentName } = action;
-      const { myName, twitterHandle } = gameState;
+      const { myName, twitterHandle, myAddress } = gameState;
 
       if (position.name !== positions.PRE_FUND_SETUP_A) {
         return { gameState, messageState };
@@ -322,9 +290,7 @@ function waitingRoomReducer(
         twitterHandle,
         player: Player.PlayerB,
         onScreenBalances: position.balances,
-        result: Imperative.Wait,
-        noughts: 0,
-        crosses: 0,
+        myAddress,
         you: Marker.noughts,
       });
 
