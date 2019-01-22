@@ -34,7 +34,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
-      - run: npx lerna run test:ci --stream
+      - run: npx lerna run test:ci --stream --concurrency 1
 
 
 
