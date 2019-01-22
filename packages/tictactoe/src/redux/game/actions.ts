@@ -13,6 +13,7 @@ export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
 export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
+export const FUNDING_FAILURE = 'GAME.FUNDING_FAILURE';
 export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
 export const EXIT_TO_LOBBY = 'GAME.EXIT_TO_LOBBY';
@@ -76,8 +77,13 @@ export const positionReceived = (position: Position) => ({
   position,
 });
 
-export const fundingSuccess = () => ({
+export const fundingSuccess = (position: Position) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
+  position,
+});
+
+export const fundingFailure = () => ({
+  type: FUNDING_FAILURE as typeof FUNDING_FAILURE,
 });
 
 export const withdrawalRequest = () => ({
@@ -113,6 +119,7 @@ export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
 export type PositionReceived = ReturnType<typeof positionReceived>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
+export type FundingFailure = ReturnType<typeof fundingFailure>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 export type CreateOpenGame = ReturnType<typeof createOpenGame>;
@@ -132,6 +139,7 @@ export type GameAction = (
   | PlayAgain
   | PositionReceived
   | FundingSuccess
+  | FundingFailure
   | WithdrawalSuccess
   | WithdrawalRequest
   | Resign
