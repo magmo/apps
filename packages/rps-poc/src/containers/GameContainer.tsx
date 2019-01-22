@@ -12,7 +12,6 @@ import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
 import MoveSelectedPage from '../components/MoveSelectedPage'; // WaitForReveal, WaitForResting
 import PlayAgain from '../components/PlayAgain';
 import WaitForRestingA from '../components/WaitForRestingA';
-import InsufficientFunds from '../components/InsufficientFunds';
 import WaitToResign from '../components/WaitToResign';
 import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
 import GameOverPage from '../components/GameOverPage'; // GameOver, OpponentResigned
@@ -115,8 +114,6 @@ function RenderGame(props: GameProps) {
           playAgain={playAgain}
         />
       );
-    case StateName.InsufficientFunds:
-      return <InsufficientFunds />;
     case StateName.WaitToResign:
       return <WaitToResign />;
     case StateName.WaitForResignationAcknowledgement:

@@ -31,7 +31,6 @@ const {
   accept: acceptInsufficientFunds,
   reveal: revealInsufficientFunds,
   conclude: concludeInsufficientFunds,
-  conclude2: concludeInsufficientFunds2,
 
 } = scenarios.insufficientFunds;
 
@@ -158,7 +157,7 @@ describe('player B\'s app', () => {
 
         itIncreasesTurnNumBy(2, { gameState: gameState2, messageState }, updatedState);
         itSends(concludeInsufficientFunds, updatedState);
-        itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
+        itTransitionsTo(state.StateName.GameOver, updatedState);
       });
     });
   });
@@ -177,17 +176,6 @@ describe('player B\'s app', () => {
     });
   });
 
-  describe('when in InsufficientFunds', () => {
-    const gameState = state.insufficientFunds({ ...bProps, ...concludeInsufficientFunds });
-
-    describe('when Conclude arrives', () => {
-      const action = actions.positionReceived(concludeInsufficientFunds2);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.GameOver, updatedState);
-    });
-  });
 
   describe('when in GameOver', () => {
     const gameState = state.gameOver({ ...bProps, ...conclude });
