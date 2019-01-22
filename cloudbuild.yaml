@@ -7,6 +7,8 @@ steps:
   args: [ 'lerna','run','build']
 - name: gcr.io/cloud-builders/gsutil
   args: ["-m", "rsync", "-r", "-c", "-d", "./packages/wallet/build", "gs://wallet.magmo.com"]
+- name: gcr.io/cloud-builders/gsutil
+  args: ["-m", "rsync", "-r", "-c", "-d", "./packages/wallet/rps-poc", "gs://demo.magmo.com"]
 options:
  machineType: 'N1_HIGHCPU_8'
   
