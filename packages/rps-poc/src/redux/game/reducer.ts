@@ -383,6 +383,7 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
   let newGameState;
   if (insufficientFunds(newBalances, roundBuyIn)) {
     newGameState = states.gameOver({ ...gameState, ...newProperties, messageState: { walletOutbox: {} } });
+
   } else {
     newGameState = states.playAgain({ ...gameState, ...newProperties });
   }
@@ -434,12 +435,11 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
 
   const result = calculateResult(myMove, theirMove);
   const newProperties = { theirMove, result, balances, turnNum };
-
   if (insufficientFunds(balances, roundBuyIn)) {
     const newGameState1 = states.gameOver({
       ...gameState,
       ...newProperties,
-      turnNum: turnNum + 1,
+      turnNum,
     });
 
     return { gameState: newGameState1, messageState };
@@ -508,7 +508,7 @@ function waitForRestingAReducer(gameState: states.WaitForRestingA, messageState:
 
 
 function gameOverReducer(gameState: states.GameOver, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
+  if (action.type !== actions.RESIGN) { return { gameState, messageState }; }
 
   const newGameState = states.waitForWithdrawal(gameState);
   messageState = { ...messageState, walletOutbox: { type: 'CONCLUDE_REQUESTED' } };
@@ -517,7 +517,7 @@ function gameOverReducer(gameState: states.GameOver, messageState: MessageState,
 }
 
 function waitForWithdrawalReducer(gameState: states.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
-  if (action.type !== actions.WITHDRAWAL_SUCCESS) {
+  if (action.type !== actions.RESIGN) {
     return { gameState, messageState };
   }
   const { myName, libraryAddress, twitterHandle } = gameState;
