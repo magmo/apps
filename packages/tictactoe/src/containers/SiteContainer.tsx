@@ -42,7 +42,7 @@ class Site extends React.PureComponent<SiteProps>{
       component = <HomePageContainer />;
     }
 
-    return <div><div ref={this.walletDiv} />{component}</div>;
+    return <div className="w-100"><div ref={this.walletDiv} />{component}</div>;
   }
 }
 
