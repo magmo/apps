@@ -2,7 +2,6 @@ import React, { Fragment } from "react";
 import { connect } from "react-redux";
 
 import { SiteState } from "../redux/reducer";
-import Wallet from "../wallet/containers/Wallet";
 import { Marker } from "../core";
 import GameScreen from "../components/GameScreen";
 import ProfileContainer from "./ProfileContainer";
@@ -38,7 +37,6 @@ function GameContainer(props: GameProps) {
   return (
     <Fragment>
       {RenderGame(props)}
-      <Wallet />
     </Fragment>
   );
 }
@@ -208,6 +206,7 @@ const mapDispatchToProps = {
   confirmGame: actions.confirmGame,
   declineGame: actions.declineGame,
   playAgain: actions.playAgain,
+  createBlockchainChallenge: () => {/* TODO: Call create challenge on wallet */ },
   resign: actions.resign,
   exitToLobby: actions.exitToLobby,
   withdraw: actions.withdrawalRequest,

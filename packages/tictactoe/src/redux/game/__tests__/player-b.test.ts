@@ -49,6 +49,7 @@ const {
   roundBuyIn,
   myName,
   opponentName,
+  bsAddress,
 } = scenarios.standard;
 const base = {
   libraryAddress,
@@ -57,6 +58,7 @@ const base = {
   roundBuyIn,
   myName,
   opponentName,
+  myAddress: bsAddress,
 };
 
 const messageState = {};
