@@ -12,7 +12,7 @@ export const APPROVE_CLOSE_ON_CHAIN = 'APPROVE_CLOSE_ON_CHAIN';
 export const WAIT_FOR_CLOSE_INITIATION = 'WAIT_FOR_CLOSE_INITIATION';
 export const WAIT_FOR_CLOSE_SUBMISSION = 'WAIT_FOR_CLOSE_SUBMISSION';
 export const WAIT_FOR_CLOSE_CONFIRMED = 'WAIT_FOR_CLOSE_CONFIRMED';
-export const WAIT_FOR_OPPONENT_CLOSE = 'WALT_FOR_OPPONENT_CLOSE';
+export const WAIT_FOR_OPPONENT_CLOSE = 'WAIT_FOR_OPPONENT_CLOSE';
 export interface WaitForCloseConfirmed extends AdjudicatorExists, TransactionExists {
   type: typeof WAIT_FOR_CLOSE_CONFIRMED;
   stage: typeof CLOSING;
