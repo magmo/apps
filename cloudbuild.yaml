@@ -1,8 +1,8 @@
 steps:
 - name: 'gcr.io/cloud-builders/yarn'
-  args: ['install']
-# - name: 'gcr.io/cloud-builders/yarn'
-#   args: [ 'lerna','run','build']
+  args: ['lerna','bootstrap']
+- name: 'gcr.io/cloud-builders/yarn'
+  args: [ 'lerna','run','build']
 # - name: gcr.io/cloud-builders/gsutil
 #   args: ["-m", "rsync", "-r", "-c", "-d", "./build", "gs://demo.magmo.com"]
 options:
