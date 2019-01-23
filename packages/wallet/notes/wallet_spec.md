@@ -10,21 +10,14 @@ The wallet is a general purpose state signer and verifier for any state channel 
 
 In RPS and TTT, there are a number of points in the user flow where the wallet is necessary. This document aims to specify where these are and how the app should interact with the wallet. 
 
-The wallet is *almost* its own mini-application. It has its own front end views/components, its own redux machinery (states, actions, reducers) as well as its own sagas. Of course it shares the store with the application, and currently this is how communication between app and wallet is achieved. In future this may change to a postmessage/onmessage communication between an iframe and its parent page. In that case the wallet will be fully its own application. 
-
-At the present time things like styling (css for example) are shared between wallet and app. 
-
-### Logging in to firebase
-The first responsibility of the wallet is to help with the login to firebase, and the generation of an ephemeral key for the state channel in question. In firebase, we create a record under 'wallets' that has a title, and data including a uid, address and private key. This information is then stored in the wallet part of the store, so that application actions (such as creating a new game) can access it. 
+The wallet is now its own mini-application. It has its own front end views/components, its own redux machinery (states, actions, reducers) as well as its own sagas. It is served in an iFrame of the parent app. Communication between app and wallet is achieved via pasing messages between the iframe and the parent window. 
 
 ### Signing the states
 It would be good to get clear on a diagram such as the following: 
 
 ![Wallet connectivity](./wallet_connectivity.png)
 
-The app talks to the wallet, which signs states and returns them to the app, which broadcasts them.. In the reverse direction, the app gobbles up messages from firebase, decodes them, and passes them to the wallet to verify.
-
- Or something?
+The app talks to the wallet, which signs states and returns them to the app, which broadcasts them. In the reverse direction, the app gobbles up messages from firebase, decodes them, and passes them to the wallet to verify.
 
 
 
