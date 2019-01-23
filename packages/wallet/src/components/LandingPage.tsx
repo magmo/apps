@@ -4,15 +4,14 @@ import walletIcon from '../images/wallet_icon.svg';
 export default class LandingPage extends React.PureComponent {
 
   render() {
+
     return (
-      <div>
+      <div className="pt-5 container-fluid pagination-centered text-center">
         <h1>Welcome to the the Magmo Wallet!</h1>
-         <img src={walletIcon} />
+        <img className="p-3" src={walletIcon} />
         <p>The Magmo wallet cannot be directly accessed from here.</p>
         <p>Check out some of the applications that use the Magmo wallet:</p>
-        <ul>
-        <li><a href="https://demo.magmo.com">Rock Paper Scissors (by Magmo)</a></li>
-          </ul>
+        <p><a href="https://demo.magmo.com">Rock Paper Scissors (by Magmo)</a></p>
       </div>
     );
   }
