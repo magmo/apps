@@ -2,7 +2,7 @@
 
 The [ForceMove protocol](https://magmo.com/force-move-games.pdf) is designed to support general purpose, $n$-party state channel applications. It has a few restrictions, but is certainly general enough to allow for payments and many types of game.
 
-Rock Paper Scissors (henceforth RPS) was the first example of such a game, and is [live on the ropsten test net](https://demo.magmo.com). The code is [open source](https://github.com/magmo/rps-poc), and will be the starting point for developing a second game: Tic Tac Toe (henceforth TTT).
+Rock Paper Scissors (henceforth RPS) was the first example of such a game, and is [live on the ropsten test net](https://demo.magmo.com). The code is [open source](https://github.com/magmo/apps), and was the starting point for developing a second game: Tic Tac Toe (henceforth TTT).
 
 We are going to work through the building of TTT, using ForceMove as a library and using RPS as an inspiration. The approach will be to build TTT mostly from 'the inside out', starting with the basic smart contract code and building up the overall state of the application piece-by-piece as we make certain design decisions.
 
@@ -209,7 +209,7 @@ Having the `validTransition` contract coded in solidity, along with the contract
 The application needs to achieve multiple taks:
 
 - Present a front-end interface to users so that they can propose and accept games, make moves, and launch and respond to challenges
-- Sign, post and retrieve messages to instances of the app running on other player's clients (browsers). The messaging protocol could be almost anything: carrier-pigeon, SMS, semaphore. We are going to use a cloud-based database (firebase) for the purposes of this proof of concept. See article on disruptive signing and ephemeral keys
+- Sign, post and retrieve messages to instances of the app running on other player's clients (browsers). The messaging protocol could be almost anything: carrier-pigeon, SMS, semaphore. We are going to use a cloud-based database (firebase) for the purposes of this proof of concept. See [article on disruptive signing and ephemeral keys](https://github.com/magmo/apps/blob/master/packages/rps-poc/notes/how-to-handle-the-wallet.md).
 - Interact with the blockchain when necessary.
 
 Some of this funtionality will be extracted into a wallet, so that application/game developers do not need to do the heavy lifting.
@@ -241,7 +241,7 @@ all other position types will be extensions of this position type (meaning that 
 export type Position = PreFundSetupA | PreFundSetupB | PostFundSetupA | PostFundSetupB | Propose | Accept | Reveal | Resting | Conclude;
 ```
 
-Does this correspond to the `enum` in the solidity code? Well not really; this lists all possible positions, some of which are core ForceMove positions, and some of which are Game Positions. I believe better separation of these positionsin the code might be a good idea.
+Does this correspond to the `enum` in the solidity code? Well not really; this lists all possible positions, some of which are core ForceMove positions, and some of which are Game Positions. I believe better separation of these positions in the code might be a good idea.
 
 The next thing that happens in this file is the definition of Position Constructors. These are functions that return instances of the above types when fed with any object that includes the correct properties. This is achieved with the help of the following interface:
 
