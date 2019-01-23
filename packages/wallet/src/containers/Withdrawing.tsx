@@ -36,8 +36,6 @@ class WithdrawingContainer extends PureComponent<Props> {
             description="Do you wish to withdraw your funds from this channel?"
             approvalAction={() => withdrawalApproved('todo address')}
             rejectionAction={withdrawalRejected}
-            yesMessage="Withdraw"
-            noMessage="Cancel"
           />
         );
       case states.WAIT_FOR_WITHDRAWAL_INITIATION:

@@ -39,10 +39,8 @@ class FundingContainer extends PureComponent<Props> {
       case states.APPROVE_FUNDING:
         return (
           <ApproveX
-            title="Funding requested"
-            description="Do you wish to open this state channel?"
-            yesMessage="Fund Channel"
-            noMessage="Cancel"
+            title="Fund your channel!"
+            description="Do you wish to open this channel?"
             approvalAction={fundingApproved}
             rejectionAction={fundingRejected}
           />
@@ -75,7 +73,7 @@ class FundingContainer extends PureComponent<Props> {
       case states.ACKNOWLEDGE_FUNDING_SUCCESS:
         return (
           <AcknowledgeX
-            title="Funding successful"
+            title="Funding successful!"
             action={fundingSuccessAcknowledged}
             description="You have successfully deposited funds into your channel"
             actionTitle="Return to game"

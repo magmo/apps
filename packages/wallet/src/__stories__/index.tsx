@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import * as states from '../states';
 
 import * as scenarios from '../redux/reducers/__tests__/test-scenarios';
+import '../../index.scss';
 
 
 const {

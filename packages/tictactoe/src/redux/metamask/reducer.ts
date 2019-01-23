@@ -8,7 +8,7 @@ export interface MetamaskState {
 }
 
 const initialState: MetamaskState = {
-  loading: true,
+  loading: false,
   error: null,
   success: false,
 };

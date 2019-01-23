@@ -1,13 +1,14 @@
-import { call, fork, put, take, takeEvery, cps } from 'redux-saga/effects';
+import { call, fork, put, take, takeEvery } from 'redux-saga/effects';
 
 import * as loginActions from './actions';
 import { reduxSagaFirebase } from '../../gateways/firebase';
+// import { walletSaga } from '../../wallet';
 import metamaskSaga from '../metamask/saga';
-import { initializeWallet } from 'wallet-client';
-import TTTGameArtifact from '../../../build/contracts/TicTacToeGame.json';
-import { WALLET_IFRAME_ID } from '../../constants';
+
+// import TTTGameArtifact from '../../../contracts/artifacts/TicTacToeGame.json';
 
 function* loginSaga() {
+  console.log('trying to connect to firebase');
   try {
     yield call(reduxSagaFirebase.auth.signInAnonymously);
     // successful login will trigger the loginStatusWatcher, which will update the state
@@ -30,20 +31,20 @@ function* loginStatusWatcherSaga() {
   // Events on this channel are triggered on login and logout
   const channel = yield call(reduxSagaFirebase.auth.channel);
   // let playerHeartbeatThread;
+  // let applicationThread;
 
   while (true) {
     const { user } = yield take(channel);
 
     if (user) {
-      // TODO: pass uid to wallet
+      // applicationThread = yield fork(walletSaga, user.uid);
       const libraryAddress = yield getLibraryAddress();
-      const walletAddress = yield initializeWallet(WALLET_IFRAME_ID, user.uid);
-      yield put(loginActions.initializeWalletSuccess(walletAddress));
       yield put(loginActions.loginSuccess(user, libraryAddress));
 
-
-
     } else {
+      // if (applicationThread) {
+      //   yield cancel(applicationThread);
+      // }
       yield put(loginActions.logoutSuccess());
     }
   }
@@ -51,9 +52,9 @@ function* loginStatusWatcherSaga() {
 
 export default function* loginRootSaga() {
   const metaMask = yield metamaskSaga();
-
+  
   // If metamask is not properly set up we can halt processing and wait for the reload
-  if (!metaMask) {
+  if (!metaMask){
     return;
   }
 
@@ -65,7 +66,8 @@ export default function* loginRootSaga() {
 }
 
 function* getLibraryAddress() {
-  const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10);
-  return TTTGameArtifact.networks[selectedNetworkId].address;
+  // const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10);
+  // return TTTGameArtifact.networks[selectedNetworkId].address;
+  return '0x0000000000000000000000000000000000000111';
 }
 

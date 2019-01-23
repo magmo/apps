@@ -1,11 +1,9 @@
 import React from 'react';
-// import walletIcon from '../../images/wallet_icon.svg';
-import SidebarLayout from './SidebarLayout';
+import walletIcon from '../images/wallet_icon.svg';
 import YesOrNo from './YesOrNo';
+import SidebarLayout from './SidebarLayout';
 
 interface Props {
-  yesMessage: string;
-  noMessage: string;
   title: string;
   approvalAction: () => void;
   rejectionAction: () => void;
@@ -15,13 +13,14 @@ interface Props {
 export default class ApproveX extends React.PureComponent<Props> {
 
   render() {
-    const { yesMessage, noMessage, approvalAction, rejectionAction, title, description } = this.props;
+    const { approvalAction, rejectionAction, title, description } = this.props;
     return (
       <SidebarLayout>
-        <h1>{title}</h1>
+        <img src={walletIcon} />
+        <div className="challenge-expired-title">{title}</div>
         <p>{description}</p>
 
-        <YesOrNo yesAction={approvalAction} noAction={rejectionAction} yesMessage={yesMessage} noMessage={noMessage} />
+        <YesOrNo yesAction={approvalAction} noAction={rejectionAction} />
       </SidebarLayout>
     );
   }

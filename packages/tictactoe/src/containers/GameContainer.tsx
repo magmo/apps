@@ -1,78 +1,65 @@
-import React, { Fragment } from "react";
-import { connect } from "react-redux";
+import React, { Fragment } from 'react';
+import { connect } from 'react-redux';
 
-import { SiteState } from "../redux/reducer";
-import { Marker } from "../core";
-import GameScreen from "../components/GameScreen";
-import ProfileContainer from "./ProfileContainer";
-import WaitingRoomPage from "../components/WaitingRoomPage";
-import ConfirmGamePage from "../components/ConfirmGamePage";
-import GameProposedPage from "../components/GameProposedPage";
-import PlayAgain from "../components/PlayAgain";
-import PlayAgainWait from "../components/PlayAgainWait";
-import InsufficientFunds from "../components/InsufficientFunds";
-import WaitToResign from "../components/WaitToResign";
-import WaitForResignationAcknowledgement from "../components/WaitForResignationAcknowledgement";
-import GameOverPage from "../components/GameOverPage";
+import { SiteState } from '../redux/reducer';
 
-import WaitForWallet from "../components/WaitForWallet"; // WaitForFunding, maybe others?
+import { Marker } from '../core';
+import GameScreen from '../components/GameScreen';
+import ProfileContainer from './ProfileContainer';
+import WaitingRoomPage from '../components/WaitingRoomPage';
+import ConfirmGamePage from '../components/ConfirmGamePage';
+import GameProposedPage from '../components/GameProposedPage';
+import PlayAgain from '../components/PlayAgain';
+import PlayAgainWait from '../components/PlayAgainWait';
+import InsufficientFunds from '../components/InsufficientFunds';
+import WaitToResign from '../components/WaitToResign';
+import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
+import GameOverPage from '../components/GameOverPage';
 
-import { Marks } from "../core";
-import { GameState, StateName } from "../redux/game/state";
-import * as actions from "../redux/game/actions";
+import { Marks } from '../core';
+import { GameState, StateName } from '../redux/game/state';
+import * as actions from '../redux/game/actions';
 
 interface GameProps {
   state: GameState;
   marksMade: (marks: Marks) => void;
-  playAgain: () => void;
+  cancelOpenGame: () => void;
   confirmGame: () => void;
   declineGame: () => void;
-  cancelOpenGame: () => void;
+  playAgain: () => void;
   resign: () => void;
+  // withdraw: () => void;
   exitToLobby: () => void;
-  withdraw: () => void;
 }
 
 function GameContainer(props: GameProps) {
   return (
     <Fragment>
       {RenderGame(props)}
+
+      {/* <Wallet /> */}
     </Fragment>
   );
 }
 
 function RenderGame(props: GameProps) {
-  const {
-    state,
-    marksMade,
-    confirmGame,
-    declineGame,
-    playAgain,
-    resign,
-    withdraw,
-  } = props;
+  const { state, marksMade, confirmGame, declineGame, playAgain, resign, exitToLobby } = props;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
     case StateName.WaitingRoom:
       return (
         <WaitingRoomPage
-          cancelOpenGame={props.cancelOpenGame}
+          cancelOpenGame={props.cancelOpenGame} 
           roundBuyIn={state.roundBuyIn}
         />
       );
     case StateName.WaitForGameConfirmationA:
-      return <GameProposedPage message="Waiting for opponent to confirm" />;
+      return <GameProposedPage message='Waiting for opponent to confirm' />;
     case StateName.ConfirmGameB:
-      return (
-        <ConfirmGamePage
-          confirmGame={confirmGame}
-          cancelGame={declineGame}
-          stake={state.roundBuyIn}
-          opponentName={state.opponentName}
-        />
-      );
-    case StateName.XsPickChallengeMove:
+      return <ConfirmGamePage confirmGame={confirmGame} cancelGame={declineGame} stake={state.roundBuyIn} opponentName={state.opponentName} />;
+    // case StateName.WaitForFunding:
+    //   return <WaitForWallet reason={"Waiting for funding confirmation."} />;
     case StateName.XsPickMove:
       return (
         <GameScreen
@@ -81,7 +68,7 @@ function RenderGame(props: GameProps) {
           you={Marker.crosses} // fixed by StateName
           player={state.player}
           result={state.result}
-          onScreenBalances={state.onScreenBalances}
+          onScreenBalances={state.onScreenBalances} 
           // onScreenBalances={state.balances} // display enforceable outcome
           marksMade={marksMade}
           resign={resign}
@@ -101,7 +88,6 @@ function RenderGame(props: GameProps) {
           resign={resign}
         />
       );
-    case StateName.OsPickChallengeMove:
     case StateName.OsPickMove:
       return (
         <GameScreen
@@ -110,7 +96,7 @@ function RenderGame(props: GameProps) {
           you={Marker.noughts} // fixed by StateName
           player={state.player}
           result={state.result}
-          onScreenBalances={state.onScreenBalances}
+          onScreenBalances={state.onScreenBalances} 
           // onScreenBalances={state.balances} // display enforceable outcome
           marksMade={marksMade}
           resign={resign}
@@ -131,46 +117,46 @@ function RenderGame(props: GameProps) {
         />
       );
     case StateName.PlayAgain:
-      return (
+        return (
         <PlayAgain
-          noughts={state.noughts}
-          crosses={state.crosses}
-          you={state.you}
-          player={state.player}
-          result={state.result}
+        noughts={state.noughts}
+        crosses={state.crosses}
+        you={state.you} 
+        player={state.player}
+        result={state.result}
           onScreenBalances={state.onScreenBalances}
           // onScreenBalances={state.balances}
-          marksMade={marksMade}
-          playAgain={playAgain}
-          resign={resign}
+        marksMade={marksMade}
+        playAgain={playAgain}
+        resign={resign}
         />
-      );
-    case StateName.WaitToPlayAgain:
-      return (
+        );
+      case StateName.WaitForResting:
+        return (
         <PlayAgainWait
-          noughts={state.noughts}
-          crosses={state.crosses}
-          you={state.you}
-          player={state.player}
-          result={state.result}
+        noughts={state.noughts}
+        crosses={state.crosses}
+        you={state.you} 
+        player={state.player}
+        result={state.result}
           onScreenBalances={state.onScreenBalances}
           // onScreenBalances={state.balances}
-          marksMade={marksMade}
-          playAgain={playAgain}
-          resign={resign}
+        marksMade={marksMade}
+        playAgain={playAgain}
+        resign={resign}
         />
-      );
-    case StateName.InsufficientFunds:
+        );
+      case StateName.InsufficientFunds:
       return (
         <InsufficientFunds
-          noughts={state.noughts}
-          crosses={state.crosses}
-          you={state.you}
-          player={state.player}
-          result={state.result}
-          onScreenBalances={state.onScreenBalances}
-          marksMade={marksMade}
-        />
+      noughts={state.noughts}
+      crosses={state.crosses}
+      you={state.you}
+      player={state.player}
+      result={state.result}
+      onScreenBalances={state.onScreenBalances}
+      marksMade={marksMade}
+      />
       );
     case StateName.WaitToResign:
       return <WaitToResign />;
@@ -178,19 +164,7 @@ function RenderGame(props: GameProps) {
       return <WaitForResignationAcknowledgement />;
     case StateName.GameOver:
     case StateName.OpponentResigned:
-      return (
-        <GameOverPage
-          visible={
-            state.name === StateName.OpponentResigned ||
-            state.name === StateName.GameOver
-          }
-          withdraw={withdraw}
-        />
-      );
-    case StateName.WaitForFunding:
-      return <WaitForWallet reason={"Waiting for funding confirmation."} />;
-    case StateName.WaitForWithdrawal:
-      return <WaitForWallet reason={"Waiting for funds withdrawal."} />;
+      return <GameOverPage visible={(state.name === StateName.OpponentResigned) || (state.name === StateName.GameOver)} exitToLobby={exitToLobby} />;
     default:
       throw new Error(`View not created for ${state.name}`);
   }
@@ -206,15 +180,13 @@ const mapDispatchToProps = {
   confirmGame: actions.confirmGame,
   declineGame: actions.declineGame,
   playAgain: actions.playAgain,
-  createBlockchainChallenge: () => {/* TODO: Call create challenge on wallet */ },
   resign: actions.resign,
   exitToLobby: actions.exitToLobby,
-  withdraw: actions.withdrawalRequest,
 };
 
 // why does it think that mapStateToProps can return undefined??
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(GameContainer);

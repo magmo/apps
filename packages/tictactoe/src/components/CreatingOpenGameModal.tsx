@@ -5,6 +5,8 @@ import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 
 import web3Utils from 'web3-utils';
 
+// import BN from 'bn.js';
+
 interface Props {
   visible: boolean;
   createOpenGame: (roundBuyIn: string) => void;
@@ -24,7 +26,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
   constructor(props) {
     super(props);
     this.buyInInput = React.createRef();
-    this.state = { errorMessage: "", buyIn: String(MIN_BUYIN), buyInChanged: true };
+    this.state = { errorMessage: "", buyIn: "", buyInChanged: false };
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
     this.handleBuyInChange = this.handleBuyInChange.bind(this);
     this.modalClosed = this.modalClosed.bind(this);
@@ -109,7 +111,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                 This is 20% of the game buy in amount.
               </small>
             </div>
-            <Button className="cog-button" type="submit" disabled={this.state.errorMessage !== "" } block={true}>
+            <Button className="cog-button" type="submit" disabled={this.state.errorMessage !== "" || !this.state.buyInChanged } block={true}>
               Create Game
             </Button>
           </form>

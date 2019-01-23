@@ -1,12 +1,8 @@
-import React from "react";
-import Board from "./Board";
-import { Marks, Marker, Result, Player, Imperative } from "../core";
-import NavigationBarContainer from "../containers/NavigationBarContainer";
-import GameBarContainer from "../containers/GameBarContainer";
-import GameFooterContainer from "../containers/GameFooterContainer";
+import React from 'react';
+import { Marks, Marker, Result, Player, Imperative } from '../core';
+import GameScreen from './GameScreen';
+import { Button } from 'reactstrap';
 
-import { Button } from "reactstrap";
-import MagmoLogoContainer from "../containers/MagmoLogoContainer";
 
 interface Props {
   you: Marker;
@@ -23,29 +19,22 @@ interface Props {
 
 export default class PlayAgain extends React.PureComponent<Props> {
   render() {
-    const { you, noughts, crosses, marksMade, playAgain } = this.props;
+    const { noughts, crosses, you, player, result, onScreenBalances, marksMade, playAgain, resign } = this.props;
     return (
-      <div className="w-100">
-        <NavigationBarContainer />
-        <GameBarContainer />
-
-        <div className="container centered-container w-100 game-container">
-          <Board
-            noughts={noughts}
-            crosses={crosses}
-            marksMade={marksMade}
-            you={you}
-          />
-          <Button
-            className="footer-playagain navbar-button ml-auto"
-            onClick={playAgain}
-          >
-            Play Again!
-          </Button>
-        </div>
-
-        <MagmoLogoContainer />
-        <GameFooterContainer />
+      <div>
+        <GameScreen
+        noughts={noughts}
+        crosses={crosses}
+        you={you} // fixed by StateName
+        player={player}
+        result={result}
+        onScreenBalances={onScreenBalances}
+        marksMade={marksMade}
+        resign={resign}
+        />
+        <Button className="cog-button homePage-loginButton" onClick={playAgain} >
+        Play Again!
+        </Button>
       </div>
     );
   }

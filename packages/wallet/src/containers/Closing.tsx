@@ -40,8 +40,6 @@ class ClosingContainer extends PureComponent<Props> {
             description="Do you wish to conclude this game?"
             approvalAction={concludeApproved}
             rejectionAction={concludeRejected}
-            yesMessage="Conclude"
-            noMessage="Cancel"
           />
         );
       case states.WAIT_FOR_OPPONENT_CONCLUDE:
@@ -80,6 +78,8 @@ class ClosingContainer extends PureComponent<Props> {
         return <WaitForXInitiation name="close" />;
       case states.WAIT_FOR_CLOSE_CONFIRMED:
         return <WaitForXConfirmation name="close" transactionID={state.transactionHash} networkId={state.networkId} />;
+      case states.WAIT_FOR_OPPONENT_CLOSE:
+        return <WaitForOtherPlayer name="close" />;
       default:
         return unreachable(state);
     }
