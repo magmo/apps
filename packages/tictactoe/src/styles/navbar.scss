@@ -36,3 +36,17 @@
     font-size: 15px;
     color: $rps-white;
 }
+
+#status-container {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+  
+  .status {
+    background-color: black;
+    font-size: 50px;
+    text-emphasis: bold;
+    font-family: monospace;
+  }

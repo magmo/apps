@@ -9,7 +9,6 @@ import BN from "bn.js";
 import bnToHex from "../utils/bnToHex";
 import { OpenGame } from "../redux/open-games/state";
 import "../index.scss";
-import "../index.css";
 import { scenarios } from "../core";
 import { SiteState } from "../redux/reducer";
 
@@ -193,7 +192,7 @@ const osVictory = siteStateFromGameState(
     ...shared,
     noughts: 0b001001001,
     crosses: 0b000010010,
-    you: Marker.crosses,
+    you: Marker.noughts,
     player: Player.PlayerB,
     result: Result.YouWin,
     onScreenBalances: finneySixFour,
@@ -207,7 +206,7 @@ const osDefeat = siteStateFromGameState(
     ...shared,
     noughts: 0b000001011,
     crosses: 0b111010000,
-    you: Marker.crosses,
+    you: Marker.noughts,
     player: Player.PlayerB,
     result: Result.YouLose,
     onScreenBalances: finneyFourSix,
@@ -221,7 +220,7 @@ const osTie = siteStateFromGameState(
     ...shared,
     noughts: 0b010011100,
     crosses: 0b101100011,
-    you: Marker.crosses,
+    you: Marker.noughts,
     player: Player.PlayerB,
     result: Result.Tie,
     onScreenBalances: finneyFiveFive,
@@ -235,7 +234,7 @@ const winnerGameOver = siteStateFromGameState(
     ...shared,
     noughts: 0b000011000,
     crosses: 0b111000000,
-    you: Marker.crosses,
+    you: Marker.noughts,
     player: Player.PlayerA,
     result: Result.YouWin,
     onScreenBalances: finneyFiveFive,

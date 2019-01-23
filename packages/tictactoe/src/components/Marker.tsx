@@ -9,10 +9,10 @@ interface Props {
 export class YourMarker extends React.PureComponent<Props> {
   renderYou(you: Marker) {
     if (you === Marker.crosses) {
-      return (<span className="xs dark status">&nbsp;×&nbsp;</span>);
+      return (<span className="xs">&nbsp;×&nbsp;</span>);
     }
     if (you === Marker.noughts) {
-      return (<span className="os dark">&nbsp;○&nbsp;</span>);
+      return (<span className="os">&nbsp;○&nbsp;</span>);
     } else { return (<span className="blank dark status">&nbsp;&nbsp;&nbsp;</span>); }
   }
   render() {
