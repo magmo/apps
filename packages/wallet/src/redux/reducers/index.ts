@@ -26,7 +26,7 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import decode from '../../utils/decode-utils';
 import { validSignature } from '../../utils/signing-utils';
 import { State } from 'fmg-core';
-import { showWallet } from '../../../../wallet-client/lib/interface/from-wallet';
+import { showWallet } from 'wallet-client/lib/interface/from-wallet';
 
 const initialState = waitForLogin();
 

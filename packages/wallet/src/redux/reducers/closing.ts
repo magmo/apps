@@ -7,7 +7,7 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { State, Channel } from 'fmg-core';
 import decode from '../../utils/decode-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { messageRequest, closeSuccess, concludeSuccess } from '../../../../wallet-client/lib/interface/from-wallet';
+import { messageRequest, closeSuccess, concludeSuccess } from 'wallet-client/lib/interface/from-wallet';
 import { createConcludeTransaction } from '../../utils/transaction-generator';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
