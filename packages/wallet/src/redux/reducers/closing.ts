@@ -7,7 +7,7 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { State, Channel } from 'fmg-core';
 import decode from '../../utils/decode-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { messageRequest, closeSuccess, concludeSuccess, hideWallet, concludeFailure } from 'wallet-client/lib/interface/from-wallet';
+import { messageRequest, closeSuccess, concludeSuccess, concludeFailure, hideWallet } from 'wallet-client/lib/interface/from-wallet';
 import { createConcludeTransaction } from '../../utils/transaction-generator';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
@@ -30,42 +30,42 @@ export const closingReducer = (state: ClosingState, action: WalletAction): Walle
       return waitForCloseConfirmedReducer(state, action);
     case states.WAIT_FOR_OPPONENT_CLOSE:
       return waitForOpponentCloseReducer(state, action);
-    case states.SEND_CONCLUDE_REJECTED:
-      return sendConcludeRejectedReducer(state, action);
-    case states.ACKNOWLEDGE_CONCLUDE_REJECTED:
-      return acknowledgeConcludeRejectedReducer(state, action);
+    case states.ACKNOWLEDGE_CONCLUDE:
+      return acknowledgeConcludeReducer(state, action);
+
     default:
       return unreachable(state);
   }
 };
 
-const acknowledgeConcludeRejectedReducer = (state: states.AcknowledgeConcludeRejected, action: actions.WalletAction) => {
+const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.CONCLUDE_DECLINED_ACKNOWLEDGED:
-      const messageOutbox = concludeFailure("UserDeclined");
-      const displayOutbox = hideWallet();
-      if (state.adjudicator) {
-        return states.waitForUpdate({ ...state, adjudicator: state.adjudicator, displayOutbox, messageOutbox });
-      } else {
-        return states.waitForChannel({ ...state, displayOutbox, messageOutbox });
+    case actions.CONCLUDE_APPROVED:
+      if (!ourTurn(state)) { return state; }
+      const { positionData, positionSignature, sendMessageAction } = composeConcludePosition(state);
+      const lastState = decode(state.lastPosition.data);
+      if (lastState.stateType === State.StateType.Conclude) {
+        if (state.adjudicator) {
+          return states.approveCloseOnChain({
+            ...state,
+            adjudicator: state.adjudicator,
+            turnNum: decode(positionData).turnNum,
+            penultimatePosition: state.lastPosition,
+            lastPosition: { data: positionData, signature: positionSignature },
+            messageOutbox: sendMessageAction,
+          });
+        } else {
+          return states.acknowledgeCloseSuccess({
+            ...state,
+            messageOutbox: concludeSuccess(),
+          });
+        }
       }
   }
   return state;
 };
 
-const sendConcludeRejectedReducer = (state: states.SendConcludeRejected, action: actions.WalletAction) => {
-  switch (action.type) {
-    case actions.MESSAGE_SENT:
-      const messageOutbox = concludeFailure("UserDeclined");
-      const displayOutbox = hideWallet();
-      if (state.adjudicator) {
-        return states.waitForUpdate({ ...state, adjudicator: state.adjudicator, displayOutbox, messageOutbox });
-      } else {
-        return states.waitForChannel({ ...state, displayOutbox, messageOutbox });
-      }
-  }
-  return state;
-};
+
 const waitForOpponentCloseReducer = (state: states.WaitForOpponentClose, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.GAME_CONCLUDED_EVENT:
@@ -165,9 +165,11 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
       }
       break;
     case actions.CONCLUDE_REJECTED:
-      const signature = signPositionHex('ConcludeRejected', state.privateKey);
-      const messageOutbox = messageRequest(state.participants[1 - state.ourIndex], 'ConcludeRejected', signature);
-      return states.sendConcludeRejected({ ...state, messageOutbox });
+      if (state.adjudicator) {
+        return states.waitForUpdate({ ...state, adjudicator: state.adjudicator, displayOutbox: hideWallet(), messageOutbox: concludeFailure('UserDeclined') });
+      } else {
+        return states.waitForChannel({ ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('UserDeclined') });
+      }
     default:
       return state;
   }
@@ -178,13 +180,10 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
     case actions.MESSAGE_RECEIVED:
 
       if (!action.signature) { return state; }
-      const concludePosition = decode(action.data);
-      const opponentAddress = state.participants[1 - state.ourIndex];
 
+      const opponentAddress = state.participants[1 - state.ourIndex];
       if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
-      if (action.data === 'ConcludeRejected') {
-        return
-      }
+      const concludePosition = decode(action.data);
       // check transition
       if (!validTransition(state, concludePosition)) { return state; }
       if (state.adjudicator !== undefined) {

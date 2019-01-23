@@ -130,7 +130,7 @@ export const concludeSuccess = () => ({
   type: CONCLUDE_SUCCESS as typeof CONCLUDE_SUCCESS,
 });
 
-export const concludeFailure = (reason: "UserDeclined" | "OpponentDeclined" | "Other", error?: string) => ({
+export const concludeFailure = (reason: "UserDeclined" | "Other", error?: string) => ({
   type: CONCLUDE_FAILURE as typeof CONCLUDE_FAILURE,
   reason,
   error,

@@ -114,12 +114,6 @@ export const fundingDeclinedAcknowledged = () => ({
 });
 export type FundingDeclinedAcknowledged = ReturnType<typeof fundingDeclinedAcknowledged>;
 
-export const CONCLUDE_DECLINED_ACKNOWLEDGED = 'CONCLUDE_DECLINED_ACKNOWLEDGED';
-export const concludeDeclinedAcknowledged = () => ({
-  type: CONCLUDE_DECLINED_ACKNOWLEDGED as typeof CONCLUDE_DECLINED_ACKNOWLEDGED,
-});
-export type ConcludeDeclinedAcknowledged = ReturnType<typeof concludeDeclinedAcknowledged>;
-
 
 export const POST_FUND_SETUP_RECEIVED = 'WALLET.POST_FUND_SETUP_RECEIVED'; // when X blocks deep
 export const postFundSetupReceived = (data: string, signature: string) => ({
@@ -395,5 +389,4 @@ export type WalletAction = (
   | ApproveClose
   | FundingDeclinedAcknowledged
   | ConcludeRejected
-  | ConcludeDeclinedAcknowledged
 );

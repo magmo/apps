@@ -13,19 +13,14 @@ export const WAIT_FOR_CLOSE_INITIATION = 'WAIT_FOR_CLOSE_INITIATION';
 export const WAIT_FOR_CLOSE_SUBMISSION = 'WAIT_FOR_CLOSE_SUBMISSION';
 export const WAIT_FOR_CLOSE_CONFIRMED = 'WAIT_FOR_CLOSE_CONFIRMED';
 export const WAIT_FOR_OPPONENT_CLOSE = 'WAIT_FOR_OPPONENT_CLOSE';
-export const SEND_CONCLUDE_REJECTED = 'SEND_CONCLUDE_REJECTED';
-export const ACKNOWLEDGE_CONCLUDE_REJECTED = 'ACKNOWLEDGE_CONCLUDE_REJECTED';
+export const ACKNOWLEDGE_CONCLUDE = 'ACKNOWLEDGE_CONCLUDE';
 
 
-export interface AcknowledgeConcludeRejected extends AdjudicatorMightExist {
-  type: typeof ACKNOWLEDGE_CONCLUDE_REJECTED;
+export interface AcknowledgeConclude extends AdjudicatorMightExist {
+  type: typeof ACKNOWLEDGE_CONCLUDE;
   stage: typeof CLOSING;
 }
 
-export interface SendConcludeRejected extends AdjudicatorMightExist {
-  type: typeof SEND_CONCLUDE_REJECTED;
-  stage: typeof CLOSING;
-}
 export interface WaitForCloseConfirmed extends AdjudicatorExists, TransactionExists {
   type: typeof WAIT_FOR_CLOSE_CONFIRMED;
   stage: typeof CLOSING;
@@ -76,10 +71,6 @@ export interface WaitForOpponentClose extends AdjudicatorExists {
   stage: typeof CLOSING;
 }
 
-export function sendConcludeRejected<T extends AdjudicatorMightExist>(params: T): SendConcludeRejected {
-  return { type: SEND_CONCLUDE_REJECTED, stage: CLOSING, ...adjudicatorMightExist(params) };
-
-}
 
 export function approveConclude<T extends AdjudicatorMightExist>(params: T): ApproveConclude {
   return { type: APPROVE_CONCLUDE, stage: CLOSING, ...adjudicatorMightExist(params) };
@@ -114,8 +105,8 @@ export function waitForCloseConfirmed<T extends AdjudicatorExists & TransactionE
 export function waitForOpponentClose<T extends AdjudicatorExists>(params: T): WaitForOpponentClose {
   return { type: WAIT_FOR_OPPONENT_CLOSE, stage: CLOSING, ...adjudicatorExists(params) };
 }
-export function acknowledgeConcludeRejected<T extends AdjudicatorMightExist>(params: T): AcknowledgeConcludeRejected {
-  return { type: ACKNOWLEDGE_CONCLUDE_REJECTED, stage: CLOSING, ...adjudicatorMightExist(params) };
+export function acknowledgeConclude<T extends AdjudicatorMightExist>(params: T): AcknowledgeConclude {
+  return { type: ACKNOWLEDGE_CONCLUDE, stage: CLOSING, ...adjudicatorMightExist(params) };
 }
 
 
@@ -129,6 +120,5 @@ export type ClosingState = (
   | WaitForCloseSubmission
   | WaitForCloseConfirmed
   | WaitForOpponentClose
-  | SendConcludeRejected
-  | AcknowledgeConcludeRejected
+  | AcknowledgeConclude
 );
