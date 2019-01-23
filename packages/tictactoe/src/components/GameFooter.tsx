@@ -32,7 +32,7 @@ export default class GameFooter extends React.PureComponent<Props> {
       return (
         <Navbar id="you-win" className="navbar fixed-bottom footer-bar">
           {this.renderResignButton(resign, isNotOurTurn)}
-          <h1><span>You Win!</span></h1>
+          <span>You Win!</span>
           {this.renderChallengeButton( createBlockchainChallenge, canChallenge)}
         </Navbar>
       );
@@ -41,7 +41,7 @@ export default class GameFooter extends React.PureComponent<Props> {
       return (
         <Navbar id="you-lose" className="navbar fixed-bottom footer-bar">
           {this.renderResignButton(resign, isNotOurTurn)}
-          <h1><span>You Lose!</span></h1>
+          <span>You Lose!</span>
           {this.renderChallengeButton( createBlockchainChallenge, canChallenge)}
         </Navbar>
       );
@@ -50,7 +50,7 @@ export default class GameFooter extends React.PureComponent<Props> {
       return (
         <Navbar id="tie" className="navbar fixed-bottom footer-bar">
           {this.renderResignButton(resign, isNotOurTurn)}
-          <h1><span>It's a Draw!</span></h1>
+          <span>It's a Draw!</span>
           {this.renderChallengeButton( createBlockchainChallenge, canChallenge)}
         </Navbar>
       );
@@ -59,7 +59,7 @@ export default class GameFooter extends React.PureComponent<Props> {
       return (
         <Navbar id="choose" className="navbar fixed-bottom footer-bar">
         {this.renderResignButton(resign, isNotOurTurn)}
-        <h1><span>Choose your move</span></h1>
+        <span>Choose your move</span>
         {this.renderChallengeButton( createBlockchainChallenge, canChallenge)}
       </Navbar>
       );
@@ -68,7 +68,7 @@ export default class GameFooter extends React.PureComponent<Props> {
       return (
         <Navbar id="wait" className="navbar fixed-bottom footer-bar">
           {this.renderResignButton(resign, isNotOurTurn)}
-          <h1><span>Wait for Opponent's move!</span></h1>
+          <span>Wait for Opponent's move!</span>
           {this.renderChallengeButton( createBlockchainChallenge, canChallenge)}
         </Navbar>
       );

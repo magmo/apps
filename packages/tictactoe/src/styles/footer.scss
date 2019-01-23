@@ -44,6 +44,9 @@
 
 .navbar.footer-bar {
   background-color: $rps-footer-grey;
+  font-size: 20px;
+  font-family: monospace;
+  color: white;
 }
 
 .footer-logo-container {
@@ -52,4 +55,29 @@
   bottom: $navbar-height;
   text-align: right;
   align-content: right;
+}
+
+
+#you-win {
+  background: green;
+}
+
+#you-lose {
+  background: red;
+}
+
+#tie {
+  background: darkorange;
+}
+
+#choose {
+  background: purple;
+}
+
+.resignButton {
+  position: absolute;
+  left: 5px;
+  bottom: 45px;
+  font-size: 20px;
+  transform: translate(0, 0);
 }
