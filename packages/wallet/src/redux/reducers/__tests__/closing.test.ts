@@ -41,6 +41,18 @@ const defaultsA = {
 };
 
 describe('start in ApproveConclude', () => {
+  describe('action taken: conclude rejected', () => {
+    const state = states.approveConclude({
+      ...defaultsA,
+      penultimatePosition: { data: proposeHex, signature: 'sig' },
+      lastPosition: { data: acceptHex, signature: 'sig' },
+      turnNum: 1,
+    });
+    const action = actions.concludeRejected();
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+  });
+
   describe('action taken: conclude approved, first conclude state', () => {
     const state = states.approveConclude({
       ...defaultsA,
@@ -125,11 +137,11 @@ describe('start in ApproveCloseOnChain', () => {
     itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });
 
-  describe('action taken: opponent started close message',()=>{
+  describe('action taken: opponent started close message', () => {
     const validateSignatureMock = jest.fn();
     validateSignatureMock.mockReturnValue(true);
-    Object.defineProperty(SigningUtils,'validSignature',{value:validateSignatureMock});
-    const action = actions.messageReceived('CloseStarted','0x0');
+    Object.defineProperty(SigningUtils, 'validSignature', { value: validateSignatureMock });
+    const action = actions.messageReceived('CloseStarted', '0x0');
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_OPPONENT_CLOSE, updatedState);
   });

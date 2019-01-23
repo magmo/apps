@@ -82,6 +82,17 @@ class ClosingContainer extends PureComponent<Props> {
         return <WaitForXConfirmation name="close" transactionID={state.transactionHash} networkId={state.networkId} />;
       case states.WAIT_FOR_OPPONENT_CLOSE:
         return <WaitForOtherPlayer name="close" />;
+      case states.SEND_CONCLUDE_REJECTED:
+        return null;
+      case states.ACKNOWLEDGE_CONCLUDE_REJECTED:
+        return (
+          <AcknowledgeX
+            title="Opponent declined close!"
+            action={closeSuccessAcknowledged}
+            description="Your opponent has declined to close the channel"
+            actionTitle="Return to Game"
+          />
+        );
       default:
         return unreachable(state);
     }
