@@ -256,4 +256,23 @@ describe("player B's app", () => {
       });
     });
   });
+  describe("when in PlayAgain", () => {
+    const gameState = state.playAgain({
+      ...bProps,
+      ...draw,
+      result: Result.Tie,
+    });
+
+    describe("if the player decides to continue", () => {
+      const action = actions.playAgain();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+      itSends(scenarios.swapRoles.resting2, updatedState);
+      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
+      // TODO check that whomever did not play last sends resting
+      //   (here we assume PlayerB = Os and did not play last)
+    });
+
+  });
 });

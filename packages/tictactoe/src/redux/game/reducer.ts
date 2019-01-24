@@ -938,7 +938,7 @@ function playAgainReducer(
   if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
     const pos = positions.resting({ ...gameState, turnNum: gameState.turnNum + 1 });
     messageState = sendMessage(pos, opponentAddress, messageState);
-    newGameState = states.waitToPlayAgain({ ...gameState });
+    newGameState = states.waitToPlayAgain({ ...gameState, turnNum: gameState.turnNum + 1 });
     return { gameState: newGameState, messageState };
   }
   return { gameState, messageState };
