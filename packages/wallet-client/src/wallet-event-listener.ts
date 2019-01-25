@@ -3,7 +3,7 @@ import { EventEmitter2 } from 'eventemitter2';
 import { WalletEventType, WalletEvent } from './wallet-events';
 
 /**
- * A wallet event listener that be used to listen to the various [[WalletEvent]] that occur in the wallet.
+ * A wallet event listener that can be used to listen to the various [[WalletEvent]] that occur in the wallet.
  */
 export class WalletEventListener {
   private eventEmitter: EventEmitter2;
