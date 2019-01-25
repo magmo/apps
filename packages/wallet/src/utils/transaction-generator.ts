@@ -110,3 +110,12 @@ export function createDepositTransaction(contractAddress: string, depositAmount:
     value: depositAmount,
   };
 }
+
+export function createValidTransitionTransaction(contractAddress: string, fromState: string, toState: string): TransactionRequest {
+  const adjudicatorInterface = getSimpleAdjudicatorInterface();
+  const data = adjudicatorInterface.functions.validTransition.encode([fromState, toState]);
+  return {
+    to: contractAddress,
+    data,
+  };
+} 
