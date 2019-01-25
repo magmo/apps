@@ -883,7 +883,7 @@ function osWaitMoveReducer(
   }
 }
 
-function youWentLast(gameState) {
+export function youWentLast(gameState) {
   if (gameState.you === Marker.noughts) {
     if (popCount(gameState.crosses) === popCount(gameState.noughts)) {
       return true;
@@ -1093,30 +1093,17 @@ function opponentResignationReducer(
   return { gameState, messageState };
 }
 
-function gameOverReducer(
-  gameState: states.GameOver,
-  messageState: MessageState,
-  action: actions.GameAction
-): JointState {
-  if (action.type !== actions.WITHDRAWAL_REQUEST) {
-    return { gameState, messageState };
-  }
+function gameOverReducer(gameState: states.GameOver, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type !== actions.RESIGN) { return { gameState, messageState }; }
 
   const newGameState = states.waitForWithdrawal(gameState);
-  messageState = {
-    ...messageState,
-    walletOutbox: { type: "WITHDRAWAL_REQUESTED" },
-  };
+  messageState = { ...messageState, walletOutbox: { type: 'CONCLUDE_REQUESTED' } };
 
   return { gameState: newGameState, messageState };
 }
 
-function waitForWithdrawalReducer(
-  gameState: states.WaitForWithdrawal,
-  messageState: MessageState,
-  action: actions.GameAction
-) {
-  if (action.type !== actions.WITHDRAWAL_SUCCESS) {
+function waitForWithdrawalReducer(gameState: states.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
+  if (action.type !== actions.RESIGN) {
     return { gameState, messageState };
   }
   const { myName, libraryAddress, twitterHandle } = gameState;

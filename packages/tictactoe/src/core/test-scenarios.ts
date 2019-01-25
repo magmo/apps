@@ -501,6 +501,11 @@ export const swapRoles = {
     turnNum: 13,
     balances: fiveFive,
   }),
+  resting3: positions.resting({
+    ...base,
+    turnNum: 14,
+    balances: fiveFive,
+  }),
   round2playing1: positions.Xplaying({
     ...base,
     turnNum: 14,
