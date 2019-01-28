@@ -34,7 +34,7 @@ export default class GameOverPage extends React.PureComponent<Props> {
                 block={true}
               >
                 Close & Withdraw
-              </Button>}
+              </Button>
               {!ourTurn && <div>Waiting on the other player to close the channel so your funds can be withdrawn.</div>}
             </div>
           </ModalBody>
