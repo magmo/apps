@@ -166,8 +166,6 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return playAgainReducer(gameState, messageState, action);
     case states.StateName.WaitToPlayAgain:
       return waitToPlayAgainReducer(gameState, messageState, action);
-    case states.StateName.InsufficientFunds:
-      return insufficientFundsReducer(gameState, messageState, action);
     case states.StateName.GameOver:
       return gameOverReducer(gameState, messageState, action);
     case states.StateName.WaitForWithdrawal:
@@ -587,7 +585,7 @@ function xsPickMoveReducer(
       });
       pos = positions.victory({ ...newGameState });
     } else {
-      newGameState = states.insufficientFunds({
+      newGameState = states.gameOver({
         ...gameState,
         turnNum: turnNum + 1,
         crosses: newCrosses,
@@ -724,7 +722,7 @@ function osPickMoveReducer(
       });
       pos = positions.victory({ ...newGameState });
     } else {
-      newGameState = states.insufficientFunds({
+      newGameState = states.gameOver({
         ...gameState,
         turnNum: turnNum + 1,
         noughts: newNoughts,
@@ -774,7 +772,7 @@ function xsWaitMoveReducer(
     let newGameState:
       | states.XsPickMove
       | states.PlayAgain
-      | states.InsufficientFunds = states.xsPickMove({
+      | states.GameOver = states.xsPickMove({
       ...gameState,
       turnNum: turnNum + 1,
       noughts: receivedNoughts,
@@ -800,7 +798,7 @@ function xsWaitMoveReducer(
           turnNum: gameState.turnNum + 1,
         });
       } else {
-        newGameState = states.insufficientFunds({
+        newGameState = states.gameOver({
           ...gameState,
           noughts: receivedNoughts,
           balances: newBalances,
@@ -844,7 +842,7 @@ function osWaitMoveReducer(
     let newGameState:
       | states.OsPickMove
       | states.PlayAgain
-      | states.InsufficientFunds = states.osPickMove({
+      | states.GameOver = states.osPickMove({
       ...gameState,
       turnNum: turnNum + 1,
       crosses: receivedCrosses,
@@ -881,7 +879,7 @@ function osWaitMoveReducer(
           turnNum: gameState.turnNum + 1,
         });
       } else {
-        newGameState = states.insufficientFunds({
+        newGameState = states.gameOver({
           ...gameState,
           crosses: receivedCrosses,
           balances: newBalances,
@@ -1041,42 +1039,6 @@ function resignationReducer(
   }
   return { gameState, messageState };
 }
-
-
-function insufficientFundsReducer(
-  gameState: states.InsufficientFunds,
-  messageState: MessageState,
-  action: actions.GameAction
-): JointState {
-  const opponentAddress = states.getOpponentAddress(gameState);
-  if (youWentLast) {
-    if (
-      action.type === actions.POSITION_RECEIVED && 
-      action.position.name === positions.CONCLUDE 
-      ) {
-        const newGameState = states.gameOver({ ...gameState, turnNum: gameState.turnNum + 2});
-        const conclude = positions.conclude( {...newGameState});
-        messageState = sendMessage(conclude, opponentAddress, messageState);
-        return { gameState: newGameState, messageState };
-      }
-  }
-  if (!youWentLast) {
-    if (action.type !== actions.POSITION_RECEIVED) {
-      const conclude = positions.conclude( {...gameState, turnNum: gameState.turnNum + 1});
-      messageState = sendMessage(conclude, opponentAddress, messageState);
-      return { gameState, messageState };
-    }
-    if (
-      action.type === actions.POSITION_RECEIVED && 
-      action.position.name === positions.CONCLUDE 
-      ) {
-        const newGameState2 = states.gameOver({ ...gameState, turnNum: gameState.turnNum + 2});
-        return { gameState: newGameState2, messageState };
-      }
-  }
-  return { gameState, messageState };
-}
-
 
 function opponentResignationReducer(
   gameState: states.PlayingState,
