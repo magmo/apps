@@ -52,7 +52,7 @@ const closeTransactionFailedReducer = (state: states.CloseTransactionFailed, act
       return states.waitForCloseSubmission({ ...state, transactionOutbox });
   }
   return state;
-}
+};
 
 const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: actions.WalletAction) => {
   switch (action.type) {
