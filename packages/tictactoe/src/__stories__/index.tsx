@@ -11,6 +11,7 @@ import { OpenGame } from "../redux/open-games/state";
 import "../index.scss";
 import { scenarios } from "../core";
 import { SiteState } from "../redux/reducer";
+import HomePage from "../components/HomePage";
 
 const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
   bnToHex
@@ -49,7 +50,7 @@ const shared = {
   myAddress: '',
 };
 
-const initialState: SiteState = {
+const lobbyState: SiteState = {
   login: {
     loading: false,
     loggedIn: true,
@@ -65,6 +66,16 @@ const initialState: SiteState = {
     rulesVisible: false,
     walletVisible: false,
   },
+  game: {
+    messageState: {},
+    gameState: states.lobby({
+      ...shared,
+    }),
+  },
+};
+
+const initialState: SiteState = {
+...lobbyState,
   game: {
     messageState: {},
     gameState: states.xsPickMove({
@@ -270,9 +281,14 @@ const openGame: OpenGame = {
   createdAt: 0,
 };
 
-storiesOf("Lobby", module).add("Open Game Entry", () => (
-  <OpenGameEntry openGame={openGame} joinOpenGame={joinOpenGame} />
-));
+storiesOf("Home Page", module)
+.add("Home Page", () => (
+<HomePage login={()=>alert('login')}/>));
+
+storiesOf("Lobby", module)
+.add("Open Game Entry", () => (
+  <OpenGameEntry openGame={openGame} joinOpenGame={joinOpenGame} />))
+  .add("Lobby Page", testState(lobbyState));
 
 storiesOf("Game Screens / Crosses", module)
   .add("Choosing", testState(initialState))
