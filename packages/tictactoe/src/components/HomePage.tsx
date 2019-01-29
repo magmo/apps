@@ -13,12 +13,14 @@ const HomePage: React.SFC<IProps> = ({ login }) => {
       <div className="homePage">
         <div className="homePage-container">
           <div className="homePage-title-container">
-            <h1 className={css(styles.title)}>Welcome to Tic Tac Toe</h1>
-            <h1 className={css(styles.title)}>a ForceMove State Channel Game</h1>
-          </div>
-          <Button className="cog-button homePage-loginButton" onClick={login} >
+            <h1 className={css(styles.title)}>Tic Tac Toe</h1>
+            <br />
+            <p className={css(styles.title)}>[ a ForceMove State Channel Game ]</p>
+            <Button className="cog-button homePage-loginButton" onClick={login} >
             Start Playing!
           </Button>
+          </div>
+
         </div>
       </div>
     <div className="homePage-image" />
@@ -42,6 +44,7 @@ const styles = StyleSheet.create({
   title: {
     marginBottom: 0,
     color: 'white',
+    textAlign: 'center',
   },
 
   centeredGroup: {

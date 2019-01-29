@@ -1,4 +1,4 @@
-@import "./_colors";
+@import "./colors";
 
 .cog-container {
   width: 350px;
@@ -27,16 +27,16 @@
   width: 252px;
   height: 50px;
   border-radius: 40px;
-  background-color: $rps-red;
-  border-color: $rps-red;
+  background-color: $ttt-mid-blue;
+  border-color: $ttt-mid-blue;
 }
 
 .cog-button-small {
   width: 152px;
   height: 4 0px;
   border-radius: 20px;
-  background-color: $rps-red;
-  border-color: $rps-red;
+  background-color: $ttt-mid-blue;
+  border-color: $ttt-mid-blue;
   vertical-align: center;
 }
 

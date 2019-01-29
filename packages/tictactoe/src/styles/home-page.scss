@@ -1,4 +1,4 @@
-@import "./_colors";
+@import "./colors";
 
 $loginButton-height: 44px;
 $homePage-container-max-width: 70%;
@@ -7,7 +7,7 @@ $background-image-width: 70%;
 $background-image-max-width: 400px;
 
 .homePage {
-	background-color: $rps-dark-blue;
+	background-color: $ttt-dark-blue;
 	height: 100%;
 	position: absolute;
 	width: 100%;
@@ -30,11 +30,14 @@ $background-image-max-width: 400px;
 
 .homePage-loginButton {
   margin-top: $loginButton-height;
-  font-size: 20px;
+	font-size: 20px;
+	align-self: center;
+	border-radius: 5px;
+	border: $ttt-background;
 }
 
 .homePage-image {
-  // background-image: url(images/homepage_image.png);
+  background-image: url(images/homepage_image.png);
   background-repeat: no-repeat;
   background-size: $background-image-size;
 	height: 100%;

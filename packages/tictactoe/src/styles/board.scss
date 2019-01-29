@@ -1,3 +1,5 @@
+@import "./colors";
+@import "./dimensions";
 
 #table-container {
     height: 300px;
@@ -5,7 +7,9 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: 
+    translate(-150px, -150px)
+    translate(0,+$navbar-height)
   }
   
   table {
@@ -62,7 +66,7 @@
   } */
   
   .dark {
-    background-color: black;
+    background-color: $ttt-background;
   }
   .empty {
     position: absolute;

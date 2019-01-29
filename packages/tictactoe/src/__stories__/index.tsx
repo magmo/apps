@@ -101,6 +101,35 @@ export function siteStateFromGameState<T extends states.GameState>(
   };
 }
 
+
+const waitingRoom = siteStateFromGameState(
+  states.waitingRoom({
+    ...shared,
+  })
+);
+
+const gameProposed = siteStateFromGameState(
+  states.waitForGameConfirmationA({
+    ...shared,
+    player: Player.PlayerA,
+    onScreenBalances: finneyFiveFive,
+    turnNum: 6,
+    balances: finneySixFour,
+    stateCount: 0,
+  })
+);
+
+const confirmGame = siteStateFromGameState(
+  states.confirmGameB({
+    ...shared,    
+    player: Player.PlayerB,
+    onScreenBalances: finneyFiveFive,
+    turnNum: 6,
+    balances: finneySixFour,
+    stateCount: 0,
+  })
+);
+
 const xsWaiting = siteStateFromGameState(
   states.xsWaitForOpponentToPickMove({
     ...shared,
@@ -289,6 +318,11 @@ storiesOf("Lobby", module)
 .add("Open Game Entry", () => (
   <OpenGameEntry openGame={openGame} joinOpenGame={joinOpenGame} />))
   .add("Lobby Page", testState(lobbyState));
+
+storiesOf("Game Opening", module)
+.add("Waiting Room", testState(waitingRoom))
+.add("Game Proposed", testState(gameProposed))
+.add("Confirm Game", testState(confirmGame));
 
 storiesOf("Game Screens / Crosses", module)
   .add("Choosing", testState(initialState))
