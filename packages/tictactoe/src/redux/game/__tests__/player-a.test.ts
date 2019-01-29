@@ -10,16 +10,11 @@ import {
 } from "../../../core";
 import * as actions from "../actions";
 import * as state from "../state";
-// import BN from "bn.js";
-// import bnToHex from "../../../utils/bnToHex";
+
 
 import {
-  // itSends,
   itTransitionsTo,
-  // itStoresAction,
   itIncreasesTurnNumBy,
-  // itHandlesResignLikeItsMyTurn,
-  // itHandlesResignLikeItsTheirTurn,
   itSends,
   itFullySwingsTheBalancesToA,
   itHalfSwingsTheBalancesToA,
@@ -30,15 +25,9 @@ import {
 const {
   preFundSetupA,
   preFundSetupB,
-  // postFundSetupA,
   postFundSetupB,
   playing1,
   playing2,
-  // playing3,
-  // playing4,
-  // playing5,
-  // playing6,
-  // playing7,
   playing8,
   draw,
 } = scenarios.standard;
@@ -49,7 +38,6 @@ const {
 } = scenarios.swapRoles;
 
 const noughtsabsolutevictory = scenarios.noughtsVictory.absolutevictory;
-// const noughtsconclude = scenarios.noughtsVictory.conclude;
 
 const {
   libraryAddress,
@@ -72,7 +60,6 @@ const base = {
 
 const messageState = {};
 const fiveFive = scenarios.fiveFive;
-// const oneFive = [new BN(1), new BN(5)].map(bnToHex) as [string, string];
 
 describe("player A's app", () => {
   const aProps = {
