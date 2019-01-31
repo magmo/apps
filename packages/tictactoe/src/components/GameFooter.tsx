@@ -26,6 +26,7 @@ interface Props {
 }
 
 export default class GameFooter extends React.PureComponent<Props> {
+  
   renderResignButton(resign, isNotOurTurn){
     return (
       <Button className="footer-resign navbar-button mr-auto" outline={true} onClick={resign} disabled={isNotOurTurn}>
@@ -90,7 +91,9 @@ export default class GameFooter extends React.PureComponent<Props> {
       myGameCount,
       opponentGameCount,
       opponentBalance,
-      opponentName) {
+      opponentName,
+      footerClass,
+      footerMsg) {
       return (
         <div>
         <Navbar className="game-bar fixed-top">
@@ -124,9 +127,10 @@ export default class GameFooter extends React.PureComponent<Props> {
           Sign Out
         </Button>
       </Navbar>
-        <Navbar id="you-win" className="navbar fixed-bottom footer-bar">
+
+        <Navbar id={footerClass} className="navbar fixed-bottom footer-bar">
           {this.renderResignButton(resign, isNotOurTurn)}
-          <span>You Win!</span>
+          <span>{footerMsg}</span>
           {this.renderChallengeButton( createBlockchainChallenge, canChallenge)}
         </Navbar>
         </div>
@@ -157,6 +161,32 @@ export default class GameFooter extends React.PureComponent<Props> {
         .div(hexToBN(roundBuyIn))
         .toNumber()
     );
+    
+    let footerClass: string = "";
+    let footerMsg: string = "";
+
+    switch(result) {
+      case Result.Tie:
+        footerClass = "tie";
+        footerMsg = "It's a draw!";
+        break;
+      case Result.YouWin:
+        footerClass = "you-win";
+        footerMsg = "You win!";
+        break;
+      case Result.YouLose:
+        footerClass = "you-lose";
+        footerMsg = "You lose!";
+        break;
+      case Imperative.Choose:
+        footerClass = "choose";
+        footerMsg = "Choose your move";
+        break;
+      case Imperative.Wait:
+        footerClass = "wait";
+        footerMsg = "Wait for opponent";
+        break;
+    }
       return (
       this.renderResultAndButtonsAndDots(
         result,
@@ -169,7 +199,9 @@ export default class GameFooter extends React.PureComponent<Props> {
         myGameCount,
         opponentGameCount,
         opponentBalance,
-        opponentName)
+        opponentName,
+        footerClass,
+        footerMsg,)
     );
   }
 }
