@@ -12,6 +12,11 @@ import "../index.scss";
 import { scenarios } from "../core";
 import { SiteState } from "../redux/reducer";
 import HomePage from "../components/HomePage";
+import LoadingPage from "../components/LoadingPage";
+import MetamaskErrorPage from '../components/MetamaskErrorPage';
+import { MetamaskErrorType } from '../redux/metamask/actions';
+import ProfilePage from "../components/ProfilePage";
+import CreatingOpenGameModal from "../components/CreatingOpenGameModal";
 
 const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
   bnToHex
@@ -310,14 +315,23 @@ const openGame: OpenGame = {
   createdAt: 0,
 };
 
-storiesOf("Home Page", module)
+storiesOf("Setup", module)
+.add("Loading Page", () => (
+  <LoadingPage />))
+.add("MetaMask Error Page", () => (
+  <MetamaskErrorPage error={ {errorType: MetamaskErrorType.WrongNetwork} }/>))
 .add("Home Page", () => (
-<HomePage login={()=>alert('login')}/>));
+  <HomePage login={()=>alert('login')}/>))
+.add("Profile Modal", () => (
+  <ProfilePage updateProfile={() => ('') } logout={() => ('')} />
+));
 
 storiesOf("Lobby", module)
 .add("Open Game Entry", () => (
   <OpenGameEntry openGame={openGame} joinOpenGame={joinOpenGame} />))
-  .add("Lobby Page", testState(lobbyState));
+.add("Open Game Modal", () => (
+  <CreatingOpenGameModal visible={true} createOpenGame={()=>('')} cancelOpenGame={()=>('')}/>))
+.add("Lobby Page", testState(lobbyState));
 
 storiesOf("Game Opening", module)
 .add("Waiting Room", testState(waitingRoom))

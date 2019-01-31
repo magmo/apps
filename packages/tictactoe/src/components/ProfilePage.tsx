@@ -82,7 +82,7 @@ export default class ProfilePage extends React.PureComponent<Props, State> {
                   onChange={e => this.handleNameChange(e)}
                 />
                 <small className="form-text text-muted">
-                  This will display to other players.
+                  This will displayed to other players.
               </small>
                 <small className="form-text text-danger">
                   {this.state.nameErrorMessage}
@@ -97,9 +97,6 @@ export default class ProfilePage extends React.PureComponent<Props, State> {
                   value={this.state.twitterHandle}
                   onChange={e => this.handleTwitterChange(e)}
                 />
-                <small className="form-text text-muted">
-                  This will be used for your twitter shout-out if you beat the psychic bot.
-              </small>
                 <small className="form-text text-danger">
                   {this.state.twitterErrorMessage}
                 </small>
