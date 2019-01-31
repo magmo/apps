@@ -1,5 +1,4 @@
 import React from "react";
-// import NavigationBarContainer from "../containers/NavigationBarContainer";
 import GameFooterContainer from "../containers/GameFooterContainer";
 
 export const GameScreenNoGameBar = props => {
