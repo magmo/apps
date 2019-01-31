@@ -40,13 +40,13 @@ class Site extends React.PureComponent<SiteProps>{
     } else if (this.props.isAuthenticated) {
       component = <ApplicationContainer />;
       const iFrame = document.getElementById(WALLET_IFRAME_ID) as HTMLIFrameElement;
-      if (this.props.walletVisible) {
+      if (iFrame && this.props.walletVisible) {
         iFrame.style.display = 'initial';
         document.body.style.overflow = 'hidden';
         iFrame.width = '100%';
         iFrame.height = '100%';
       }
-      else {
+      else if (iFrame && !this.props.walletVisible) {
         iFrame.style.display = 'none';
         document.body.style.overflow = 'initial';
         iFrame.width = '0';
