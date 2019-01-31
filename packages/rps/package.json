@@ -81,7 +81,6 @@
     "ganache:start": "npx start-ganache",
     "postinstall": "rm -f node_modules/web3/index.d.ts",
     "storybook": "start-storybook -p 9001 -c .storybook"
-
   },
   "devDependencies": {
     "@babel/runtime": "^7.0.0-beta.53",
@@ -132,7 +131,8 @@
     "typescript-eslint-parser": "^17.0.1",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "url-loader": "^1.1.2",
-    "workbox-webpack-plugin": "3.6.3"
+    "workbox-webpack-plugin": "3.6.3",
+    "yargs": "12.0.5"
   },
   "jest": {
     "collectCoverageFrom": [
