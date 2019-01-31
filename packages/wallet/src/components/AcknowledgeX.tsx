@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import { StyleSheet, css } from 'aphrodite';
 import SidebarLayout from './SidebarLayout';
-import magmoFireBall from '../images/white_fireball.svg';
+import magmoFireBall from '../images/white_white_fireball.svg';
 
 interface Props {
   title: string;
