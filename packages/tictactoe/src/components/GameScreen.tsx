@@ -1,7 +1,5 @@
 import React from "react";
 import Board from "./Board";
-import NavigationBarContainer from "../containers/NavigationBarContainer";
-import GameBarContainer from "../containers/GameBarContainer";
 import MagmoLogoContainer from "../containers/MagmoLogoContainer";
 import GameFooterContainer from "../containers/GameFooterContainer";
 import { Marks, Marker, Result, Player, Imperative } from "../core";
@@ -23,9 +21,6 @@ export default class GameScreen extends React.PureComponent<Props> {
     const { you, noughts, crosses, marksMade } = this.props;
     return (
       <div>
-        <NavigationBarContainer />
-        <GameBarContainer />
-
         <div className="container centered-container game-container">
           <Board
             noughts={noughts}

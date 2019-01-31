@@ -8,8 +8,8 @@
     top: 50%;
     left: 50%;
     transform: 
-    translate(-150px, -150px)
-    translate(0,+$navbar-height)
+    translate(-150px, -150px);
+    // translate(0,+$gamebar-height)
   }
   
   table {
@@ -66,9 +66,9 @@
   
   } */
   
-  .dark {
-    background-color: $ttt-background;
-  }
+  // .dark {
+  //   // background-color: $ttt-background;
+  // }
   .empty {
     position: absolute;
     top: 50%;

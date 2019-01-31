@@ -1,7 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import NavigationBarContainer from "../containers/NavigationBarContainer";
-import GameBarContainer from "../containers/GameBarContainer";
 import MagmoLogoContainer from "../containers/MagmoLogoContainer";
 import GameFooterContainer from "../containers/GameFooterContainer";
 import { Button, Modal, ModalBody } from "reactstrap";
@@ -17,8 +15,6 @@ export default class GameOverPage extends React.PureComponent<Props> {
     const { ourTurn } = this.props;
     return (
       <div className="w-100">
-        <NavigationBarContainer />
-        <GameBarContainer />
         <Modal
           className="game-over-container"
           isOpen={this.props.visible}
