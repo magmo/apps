@@ -51,7 +51,7 @@ function mapStateToProps(state: SiteState) {
     myBalance,
     opponentBalance,
     roundBuyIn,
-    showRules: state.rules.visible,
+    showRules: state.overlay.rulesVisible,
     loginDisplayName: name,
     you,
   };
@@ -60,7 +60,7 @@ const mapDispatchToProps = {
   resign: gameActions.resign,
   createBlockchainChallenge: gameActions.createChallenge,
   logoutRequest: loginActions.logoutRequest,
-  rulesRequest: globalActions.toggleVisibility,
+  rulesRequest: globalActions.toggleRulesVisibility,
 };
 
 export default connect(

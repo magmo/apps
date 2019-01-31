@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Modal, ModalBody } from 'reactstrap';
+import HomePageContainer from '../containers/HomePageContainer';
 
 interface Props {
   updateProfile: (name: string, twitterHandle?: string) => void;
@@ -60,6 +61,8 @@ export default class ProfilePage extends React.PureComponent<Props, State> {
   render() {
     const submitEnabled = this.state.nameErrorMessage === "" && this.state.twitterErrorMessage === "" && this.state.name !== "";
     return (
+      <div>
+      <HomePageContainer />
       <Modal className="cog-container" isOpen={true} centered={true}>
         <div className="modal-content">
           <div className="modal-header rules-header">
@@ -108,6 +111,7 @@ export default class ProfilePage extends React.PureComponent<Props, State> {
           </ModalBody>
         </div>
       </Modal>
+      </div>
     );
   }
 }

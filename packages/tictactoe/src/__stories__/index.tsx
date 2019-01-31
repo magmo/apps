@@ -15,7 +15,6 @@ import HomePage from "../components/HomePage";
 import LoadingPage from "../components/LoadingPage";
 import MetamaskErrorPage from '../components/MetamaskErrorPage';
 import { MetamaskErrorType } from '../redux/metamask/actions';
-import ProfilePage from "../components/ProfilePage";
 import CreatingOpenGameModal from "../components/CreatingOpenGameModal";
 
 const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
@@ -106,6 +105,11 @@ export function siteStateFromGameState<T extends states.GameState>(
   };
 }
 
+const noName = siteStateFromGameState(
+  states.noName({
+    ...shared,
+  })
+);
 
 const waitingRoom = siteStateFromGameState(
   states.waitingRoom({
@@ -322,9 +326,7 @@ storiesOf("Setup", module)
   <MetamaskErrorPage error={ {errorType: MetamaskErrorType.WrongNetwork} }/>))
 .add("Home Page", () => (
   <HomePage login={()=>alert('login')}/>))
-.add("Profile Modal", () => (
-  <ProfilePage updateProfile={() => ('') } logout={() => ('')} />
-));
+.add("Profile Modal", testState(noName));
 
 storiesOf("Lobby", module)
 .add("Open Game Entry", () => (
