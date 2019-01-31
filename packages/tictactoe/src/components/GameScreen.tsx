@@ -22,11 +22,11 @@ export default class GameScreen extends React.PureComponent<Props> {
   render() {
     const { you, noughts, crosses, marksMade } = this.props;
     return (
-      <div className="w-100">
+      <div>
         <NavigationBarContainer />
         <GameBarContainer />
 
-        <div className="container centered-container w-100 game-container">
+        <div className="container centered-container game-container">
           <Board
             noughts={noughts}
             crosses={crosses}
