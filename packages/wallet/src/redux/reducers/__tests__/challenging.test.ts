@@ -118,12 +118,12 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_RESPONSE, updatedState);
   });
 
-  describe('when the challenge times out', () => {
-    const action = actions.challengedTimedOut();
-    const updatedState = walletReducer(state, action);
+  // describe('when the challenge times out', () => {
+  //   const action = actions.challengedTimedOut();
+  //   const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
-  });
+  //   itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+  // });
 });
 
 describe('when in ACKNOWLEDGE_RESPONSE', () => {

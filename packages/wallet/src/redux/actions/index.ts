@@ -1,3 +1,5 @@
+import { Block } from 'ethers/providers';
+
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
   type: LOGGED_IN as typeof LOGGED_IN,
@@ -148,12 +150,6 @@ export const challengeResponseReceived = (data: string) => ({
   data,
 });
 export type ChallengeResponseReceived = ReturnType<typeof challengeResponseReceived>;
-
-export const CHALLENGE_TIMED_OUT = 'WALLET.CHALLENGE_TIMED_OUT';
-export const challengedTimedOut = () => ({
-  type: CHALLENGE_TIMED_OUT as typeof CHALLENGE_TIMED_OUT,
-});
-export type ChallengedTimedOut = ReturnType<typeof challengedTimedOut>;
 
 export const CHALLENGE_TIME_OUT_ACKNOWLEDGED = 'WALLET.CHALLENGE_TIME_OUT_ACKNOWLEDGED';
 export const challengedTimedOutAcknowledged = () => ({
@@ -352,6 +348,13 @@ export const retryTransaction = () => ({
 });
 export type RetryTransaction = ReturnType<typeof retryTransaction>;
 
+export const BLOCK_MINED = 'BLOCK_MINED';
+export const blockMined = (block: Block) => ({
+  type: BLOCK_MINED as typeof BLOCK_MINED,
+  block,
+});
+export type BlockMined = ReturnType<typeof blockMined>;
+
 // TODO: This is getting large, we should probably split this up into separate types for each stage
 export type WalletAction = (
   | LoggedIn
@@ -369,7 +372,6 @@ export type WalletAction = (
   | ChallengeRequested
   | ChallengeCreatedEvent
   | ChallengeResponseReceived
-  | ChallengedTimedOut
   | TakeMoveInAppAcknowledged
   | ChallengeApproved
   | ChallengeRejected
@@ -403,4 +405,5 @@ export type WalletAction = (
   | ConcludeRejected
   | MetamaskLoadError
   | RetryTransaction
+  | BlockMined
 );
