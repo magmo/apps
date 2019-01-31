@@ -8,7 +8,6 @@ import * as actions from '../redux/actions';
 import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import WaitForXInitiation from '../components/WaitForXInitiation';
-// import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
 import TransactionFailed from '../components/TransactionFailed';
 import SelectAddress from '../components/withdrawing/SelectAddress';
