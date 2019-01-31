@@ -1,5 +1,3 @@
-import { Block } from 'ethers/providers';
-
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
   type: LOGGED_IN as typeof LOGGED_IN,
@@ -349,7 +347,7 @@ export const retryTransaction = () => ({
 export type RetryTransaction = ReturnType<typeof retryTransaction>;
 
 export const BLOCK_MINED = 'BLOCK_MINED';
-export const blockMined = (block: Block) => ({
+export const blockMined = (block: { timestamp: number, number: number }) => ({
   type: BLOCK_MINED as typeof BLOCK_MINED,
   block,
 });

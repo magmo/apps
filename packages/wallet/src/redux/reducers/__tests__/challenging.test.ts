@@ -2,7 +2,7 @@ import { walletReducer } from '..';
 import * as scenarios from './test-scenarios';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-import { itSendsATransaction, itTransitionsToStateType } from './helpers';
+import { itSendsATransaction, itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 
 const {
@@ -118,12 +118,18 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_RESPONSE, updatedState);
   });
 
-  // describe('when the challenge times out', () => {
-  //   const action = actions.challengedTimedOut();
-  //   const updatedState = walletReducer(state, action);
+  describe('when the challenge times out', () => {
+    const action = actions.blockMined({ timestamp: 2, number: 2 });
+    const updatedState = walletReducer(state, action);
 
-  //   itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
-  // });
+    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+  });
+
+  describe('when a block is mined but the challenge has not expired', () => {
+    const action = actions.blockMined({ number: 1, timestamp: 1 });
+    const updatedState = walletReducer(state, action);
+    itDoesntTransition(state, updatedState);
+  });
 });
 
 describe('when in ACKNOWLEDGE_RESPONSE', () => {
