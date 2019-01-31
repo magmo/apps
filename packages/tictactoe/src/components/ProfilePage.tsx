@@ -85,7 +85,7 @@ export default class ProfilePage extends React.PureComponent<Props, State> {
                   onChange={e => this.handleNameChange(e)}
                 />
                 <small className="form-text text-muted">
-                  This will displayed to other players.
+                  This will be displayed to other players.
               </small>
                 <small className="form-text text-danger">
                   {this.state.nameErrorMessage}
