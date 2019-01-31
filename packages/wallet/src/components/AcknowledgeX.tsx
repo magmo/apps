@@ -23,11 +23,13 @@ export default class AcknowledgeX extends React.PureComponent<Props> {
           {description}
         </p>
         <div className="challenge-expired-button-container" >
-          <span className={css(styles.button)}>
-            <Button onClick={action} >
-            <img src={magmoFireBall}/>&nbsp;&nbsp;{actionTitle}
-            </Button>
-          </span>
+          <div className={css(styles.buttonContainer)}>
+            <span className={css(styles.button)}>
+              <Button onClick={action} >
+              <img src={magmoFireBall}/>&nbsp;&nbsp;{actionTitle}
+              </Button>
+            </span>
+          </div>
         </div>
       </SidebarLayout>
     );
@@ -35,6 +37,14 @@ export default class AcknowledgeX extends React.PureComponent<Props> {
 }
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '5px',
+    position: "absolute",
+    top: 'auto',
+    bottom: '5%',
+  },
   button: {
     margin: '8px',
   },
