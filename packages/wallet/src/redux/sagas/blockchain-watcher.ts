@@ -8,7 +8,6 @@ export function* blockchainWatcher() {
   const blockchainEventChannel =
     eventChannel(emit => {
       provider.on('block', (blockNumber) => {
-        console.log(blockNumber);
         emit(blockNumber);
       });
 
