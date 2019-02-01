@@ -8,14 +8,16 @@ import * as actions from '../redux/actions';
 import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import WaitForXInitiation from '../components/WaitForXInitiation';
-import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
+import TransactionFailed from '../components/TransactionFailed';
+import SelectAddress from '../components/withdrawing/SelectAddress';
 
 interface Props {
   state: states.WithdrawingState;
   withdrawalApproved: (destinationAddress: string) => void;
   withdrawalRejected: () => void;
   withdrawalSuccessAcknowledged: () => void;
+  retryTransaction: () => void;
 }
 
 class WithdrawingContainer extends PureComponent<Props> {
@@ -23,22 +25,17 @@ class WithdrawingContainer extends PureComponent<Props> {
     const {
       state,
       withdrawalApproved,
-      withdrawalRejected,
       withdrawalSuccessAcknowledged,
+      withdrawalRejected,
+      retryTransaction,
     } = this.props;
 
     switch (state.type) {
       case states.APPROVE_WITHDRAWAL:
-
         return (
-          <ApproveX
-            title="Withdraw your funds"
-            description="Do you wish to withdraw your funds from this channel?"
-            approvalAction={() => withdrawalApproved('todo address')}
-            rejectionAction={withdrawalRejected}
-            yesMessage="Withdraw"
-            noMessage="Cancel"
-          />
+          <SelectAddress
+            approveWithdrawal={withdrawalApproved}
+            declineWithdrawal={withdrawalRejected} />
         );
       case states.WAIT_FOR_WITHDRAWAL_INITIATION:
         return <WaitForXInitiation name="withdrawal" />;
@@ -53,6 +50,8 @@ class WithdrawingContainer extends PureComponent<Props> {
             actionTitle="Return to app"
           />
         );
+      case states.WITHDRAW_TRANSACTION_FAILED:
+        return <TransactionFailed name='withdraw' retryAction={retryTransaction} />;
       default:
         return unreachable(state);
     }
@@ -63,6 +62,7 @@ const mapDispatchToProps = {
   withdrawalApproved: actions.withdrawalApproved,
   withdrawalRejected: actions.withdrawalRejected,
   withdrawalSuccessAcknowledged: actions.withdrawalSuccessAcknowledged,
+  retryTransaction: actions.retryTransaction,
 };
 
 // why does it think that mapStateToProps can return undefined??

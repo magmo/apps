@@ -67,7 +67,7 @@ const resolveModule = (resolveFn, filePath) => {
 
 // config after eject: we're in ./config/
 module.exports = {
-  appContractArtifacts: resolveApp('contracts/artifacts'),
+  appPreBuiltContractArtifacts: resolveApp('contracts/pre_built_artifacts'),
   appContracts: resolveApp('contracts'),
   buildContracts: resolveApp('build/contracts'),
   dotenv: resolveApp('.env'),
@@ -83,9 +83,6 @@ module.exports = {
   testsSetup: resolveModule(resolveApp, 'src/setupTests'),
   proxySetup: resolveApp('src/setupProxy.js'),
   appNodeModules: resolveApp('node_modules'),
-  appTsConfig: resolveApp('tsconfig.json'),
-  appTsProdConfig: resolveApp('tsconfig.json'),
-  appTsLint: resolveApp('tslint.json'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
 };

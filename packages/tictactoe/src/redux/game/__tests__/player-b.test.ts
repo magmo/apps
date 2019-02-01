@@ -69,6 +69,7 @@ const base = {
 
 const messageState = {};
 const fiveFive = scenarios.fiveFive;
+const noughtsabsolutevictory = scenarios.noughtsVictory.absolutevictory;
 
 describe("player B's app", () => {
   const bProps = {
@@ -106,6 +107,13 @@ describe("player B's app", () => {
 
   describe("when in waitForFunding", () => {
     const gameState = state.waitForFunding({ ...bProps, ...preFundSetupB });
+    describe('when a position is received', () => {
+      const action = actions.positionReceived(playing1);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+      it('stores the action in actionToRetry', () => {
+        expect(updatedState.messageState.actionToRetry).toEqual(action);
+      });
+  });
 
     describe("when funding is successful", () => {
       const action = actions.fundingSuccess(postFundSetupB);
@@ -248,7 +256,7 @@ describe("player B's app", () => {
         });
         const updatedState = gameReducer({ messageState, gameState }, action2);
 
-        itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
+        itTransitionsTo(state.StateName.GameOver, updatedState);
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         itFullySwingsTheBalancesToA(
           roundBuyIn,
@@ -303,6 +311,22 @@ describe("player B's app", () => {
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         itTransitionsTo(state.StateName.XsPickMove, updatedState);
       }
+    });
+  });
+
+  describe('when in GameOver', () => {
+    const gameState = state.gameOver({ ...bProps, ...noughtsabsolutevictory, result: Result.YouLose });
+
+    describe('when the player wants to finish the game', () => {
+      const action = actions.resign();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.WaitForWithdrawal, updatedState);
+      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
+
+      it('requests a conclude from the wallet', () => {
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'CONCLUDE_REQUESTED' });
+      });
     });
   });
 

@@ -20,19 +20,32 @@ export const withdrawingReducer = (state: states.WithdrawingState, action: actio
       return waitForWithdrawalConfirmationReducer(state, action);
     case states.ACKNOWLEDGE_WITHDRAWAL_SUCCESS:
       return acknowledgeWithdrawalSuccessReducer(state, action);
-
+    case states.WITHDRAW_TRANSACTION_FAILED:
+      return withdrawTransactionFailedReducer(state, action);
     default:
       return unreachable(state);
   }
+};
+
+const withdrawTransactionFailedReducer = (state: states.WithdrawTransactionFailed, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.RETRY_TRANSACTION:
+      const myAddress = state.participants[state.ourIndex];
+      const signature = signVerificationData(myAddress, state.userAddress, state.channelId, state.privateKey);
+      const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, state.userAddress, state.channelId, signature);
+      return states.waitForWithdrawalInitiation({ ...state, transactionOutbox });
+  }
+  return state;
 };
 
 const approveWithdrawalReducer = (state: states.ApproveWithdrawal, action: actions.WalletAction): states.WalletState => {
   switch (action.type) {
     case actions.WITHDRAWAL_APPROVED:
       const myAddress = state.participants[state.ourIndex];
-      const signature = signVerificationData(myAddress, myAddress, state.channelId, state.privateKey);
-      const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, myAddress, state.channelId, signature);
-      return states.waitForWithdrawalInitiation({ ...state, transactionOutbox });
+      console.log('addresses ', myAddress, action.destinationAddress);
+      const signature = signVerificationData(myAddress, action.destinationAddress, state.channelId, state.privateKey);
+      const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, action.destinationAddress, state.channelId, signature);
+      return states.waitForWithdrawalInitiation({ ...state, transactionOutbox, userAddress: action.destinationAddress });
     case actions.WITHDRAWAL_REJECTED:
       return states.acknowledgeCloseSuccess(state);
     default:
@@ -44,6 +57,8 @@ const waitForWithdrawalInitiationReducer = (state: states.WaitForWithdrawalIniti
   switch (action.type) {
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForWithdrawalConfirmation({ ...state, transactionHash: action.transactionHash });
+    case actions.TRANSACTION_SUBMISSION_FAILED:
+      return states.withdrawTransactionFailed(state);
     default:
       return state;
   }
