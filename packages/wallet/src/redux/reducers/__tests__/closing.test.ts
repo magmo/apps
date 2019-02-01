@@ -127,7 +127,7 @@ describe('start in ApproveCloseOnChain', () => {
   describe('action taken: approve close on chain', () => {
     // TODO: Mock out Signature contructor so we don't have to pass a valid signature string in 
     const createConcludeTxMock = jest.fn();
-    Object.defineProperty(TransactionGenerator, 'createConcludeTransaction', { value: createConcludeTxMock });
+    Object.defineProperty(TransactionGenerator, 'createConcludeAndWithdrawTransaction', { value: createConcludeTxMock });
     const action = actions.approveClose('0x0');
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
@@ -137,7 +137,7 @@ describe('start in ApproveCloseOnChain', () => {
   describe('action taken: game concluded event', () => {
     const action = actions.gameConcludedEvent();
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
   });
 
   describe('action taken: opponent started close message', () => {

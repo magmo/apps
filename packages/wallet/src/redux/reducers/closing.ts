@@ -144,7 +144,7 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
       const transactionOutbox = createConcludeAndWithdrawTransaction(concludeAndWithdrawArgs);
       const signature = signPositionHex('CloseStarted', state.privateKey);
       const messageOutbox = messageRequest(state.participants[1 - state.ourIndex], 'CloseStarted', signature);
-      return states.waitForCloseInitiation({ ...state, transactionOutbox, messageOutbox });
+      return states.waitForCloseInitiation({ ...state, userAddress: action.withdrawAddress, transactionOutbox, messageOutbox });
     case actions.MESSAGE_RECEIVED:
       const opponentAddress = state.participants[1 - state.ourIndex];
       if (action.data === 'CloseStarted' && validSignature(action.data, action.signature || '0x0', opponentAddress)) {
