@@ -80,7 +80,7 @@ This will fire up the Storybook panel inside a browser.
 
 #### To update dependencies:
 
-`yarn install`
+`npx lerna bootstrap`
 
 #### To add a dependency:
 
