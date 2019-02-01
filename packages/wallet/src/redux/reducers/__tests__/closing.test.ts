@@ -128,7 +128,7 @@ describe('start in ApproveCloseOnChain', () => {
     // TODO: Mock out Signature contructor so we don't have to pass a valid signature string in 
     const createConcludeTxMock = jest.fn();
     Object.defineProperty(TransactionGenerator, 'createConcludeTransaction', { value: createConcludeTxMock });
-    const action = actions.approveClose();
+    const action = actions.approveClose('0x0');
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
     expect((updatedState.messageOutbox!).type).toEqual(outgoing.MESSAGE_REQUEST);
