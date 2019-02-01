@@ -31,7 +31,7 @@ const defaults = {
   address: 'address',
   privateKey: asPrivateKey,
   networkId: 2323,
-  challengeExpiry: 12321,
+  challengeExpiry: 1,
   transactionHash: '0x0',
 
 };
@@ -126,7 +126,7 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
-    const action = actions.blockMined({ number: 1, timestamp: 1 });
+    const action = actions.blockMined({ number: 1, timestamp: 0 });
     const updatedState = walletReducer(state, action);
     itDoesntTransition(state, updatedState);
   });
