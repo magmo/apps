@@ -12,7 +12,7 @@ out our apps, or get involved more deeply we would love to hear your thoughts. D
 * [Tic Tac Toe](https://ttt.magmo.com) (TTT)
 
 ## Setting up development environment and running a game application
-You will need `yarn` installed (see [here](https://yarnpkg.com/lang/en/docs/install/) for instructions).
+You will need `yarn` installed (see [here](https://yarnpkg.com/lang/en/docs/install/) for instructions). After cloning the code, 
 1. In the top directory, run `yarn install`.
 2. In the top directory, run `npx lerna bootstrap`.
 3. Add `.env` files to the root directory of the `wallet` package, and to the root directory of the relevant app directory. Refer to `.env.example` which includes an example of the required variables.
@@ -24,7 +24,10 @@ You will need `yarn` installed (see [here](https://yarnpkg.com/lang/en/docs/inst
     1. Open the metamask browser extension
     2. Click on the account icon (circle in the top right)
     3. Select "Import"
-    4. Paste in the secret key from [`scripts/start.js`](./scripts/start.js)
+    4. Paste in one of the secret keys below.
+
+You may point two different browsers to the app to play against yourself.
+
 
 #### Seed accounts
 These are not real ethereum accounts!
@@ -55,7 +58,8 @@ This will fire up the Storybook panel inside a browser.
     yarn deployContracts
     ``` 
 
-### Running Tests
+### Running Tests specific to a certain app
+From the relevant subdirectory...
 * To run application tests in watch mode:
 
 `yarn test:app`
@@ -64,7 +68,7 @@ This will fire up the Storybook panel inside a browser.
 
 `yarn test:contracts`
 
-* To run all tests (before submitting a PR):
+* To run all tests relating (before submitting a PR):
 
 `yarn test`
 

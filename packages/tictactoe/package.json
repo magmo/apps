@@ -106,7 +106,7 @@
     "build": "node --max-old-space-size=4076 scripts/build.js",
     "test": "run-s test:truffle 'test:app --all'",
     "test:app": "node scripts/test.js --env=jsdom",
-    "test:truffle": "node scripts/test_truffle.js",
+    "test:contracts": "node scripts/test_truffle.js",
     "deployContracts": "npx deploy-contracts",
     "test:ci": "DEV_GANACHE_PORT=8503 run-s build 'test:truffle --all --ci' 'test:app --all --ci --runInBand'",
     "storybook": "start-storybook -p 9001 -c .storybook",
