@@ -17,7 +17,7 @@ You will need `yarn` installed (see [here](https://yarnpkg.com/lang/en/docs/inst
 2. In the top directory, run `npx lerna bootstrap`.
 3. Add `.env` files to the root directory of the `wallet` package, and to the root directory of the relevant app directory. Refer to `.env.example` which includes an example of the required variables.
 
-4. Start ganache by running `yarn ganache:start` .
+4. Start [ganache](https://truffleframework.com/ganache) by running `yarn ganache:start` .
 5. (In a new tab) Run the wallet via `yarn start` in the `wallet` package directory
 6. (In a new tab) Run a game (either RPS or TTT) via `yarn start` in the relevant package directory.
 7. Add [MetaMask](https://metamask.io/) to your browser, and point it to `localhost:3001` to view the application. You will need to import one of the seed accounts (below) into metamask to have funds to transact.
@@ -30,7 +30,7 @@ You may visit the app in two different browsers in order to play against yoursel
 
 
 #### Seed accounts
-These are not real ethereum accounts!
+Please refer to [this file](https://github.com/magmo/devtools/blob/master/utils/startGanache.js).
 
 #### To run storybook
 
@@ -58,7 +58,7 @@ This will fire up the Storybook panel inside a browser.
     yarn deployContracts
     ``` 
 
-### Running Tests specific to a certain app
+#### Running Tests specific to a certain app
 From the relevant subdirectory...
 * To run application tests in watch mode:
 
@@ -94,7 +94,7 @@ Please use the Sublime/VS Code package _JsPrettier_ for formatting. Add the foll
   "singleQuote": true,
   "trailingComma": "all",
 ```
-### Documentation
+## Documentation
 We are working hard to produce documenation for our applications. In the interm, please see our [Developer Handbook](https://magmo.gitbook.io/developer-handbook/), which as some of the hints and tips
 for developing on ethereum that we have used to develop our apps. You will also find some information in the `/notes/` subdirectory of each app. 
 
