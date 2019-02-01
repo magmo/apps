@@ -46,7 +46,7 @@ export default class SelectAddress extends React.PureComponent<Props, State> {
     }
   }
   render() {
-    const { approveButtonTitle: yesMessage, title, description } = this.props;
+    const { approveButtonTitle, title, description } = this.props;
     return (
       <SidebarLayout>
         <h1>{title}</h1>
@@ -61,7 +61,7 @@ export default class SelectAddress extends React.PureComponent<Props, State> {
           <div className={css(styles.buttonContainer)}>
             <span className={css(styles.button)}>
               <Button onClick={this.handleSubmitAddress} >
-                <img src={magmoFireBall} />&nbsp;&nbsp;{yesMessage}
+                <img src={magmoFireBall} />&nbsp;&nbsp;{approveButtonTitle}
               </Button>
             </span>
           </div>
