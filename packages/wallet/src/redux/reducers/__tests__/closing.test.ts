@@ -210,11 +210,6 @@ describe('start in WaitForCloseSubmission', () => {
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.CLOSE_TRANSACTION_FAILED, updatedState);
   });
-  describe('action taken: game concluded event', () => {
-    const action = actions.gameConcludedEvent();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
-  });
 });
 
 describe('start in closeTransactionFailed', () => {
@@ -227,12 +222,15 @@ describe('start in closeTransactionFailed', () => {
   });
 
   describe('action taken: retry transaction', () => {
-    const createCloseTxMock = jest.fn();
-    Object.defineProperty(TransactionGenerator, 'createConcludeTransaction', { value: createCloseTxMock });
+    const createConcludeTxMock = jest.fn();
+    Object.defineProperty(TransactionGenerator, 'createConcludeAndWithdrawTransaction', { value: createConcludeTxMock });
+    const signVerMock = jest.fn();
+    signVerMock.mockReturnValue('0x0');
+    Object.defineProperty(SigningUtils, 'signVerificationData', { value: signVerMock });
     const action = actions.retryTransaction();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
-    expect(createCloseTxMock.mock.calls.length).toBe(1);
+    expect(createConcludeTxMock.mock.calls.length).toBe(1);
   });
 });
 
@@ -246,11 +244,6 @@ describe('start in WaitForCloseConfirmed', () => {
   describe('action taken: transaction confirmed', () => {
 
     const action = actions.transactionConfirmed();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
-  });
-  describe('action taken: game concluded event', () => {
-    const action = actions.gameConcludedEvent();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
   });

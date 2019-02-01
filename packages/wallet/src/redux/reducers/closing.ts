@@ -8,7 +8,7 @@ import { State, Channel } from 'fmg-core';
 import decode from '../../utils/decode-utils';
 import { signPositionHex, validSignature, signVerificationData } from '../../utils/signing-utils';
 import { messageRequest, closeSuccess, concludeSuccess, concludeFailure, hideWallet } from 'wallet-client/lib/wallet-events';
-import { createConcludeTransaction, createConcludeAndWithdrawTransaction } from '../../utils/transaction-generator';
+import { createConcludeAndWithdrawTransaction } from '../../utils/transaction-generator';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -43,12 +43,21 @@ const closeTransactionFailedReducer = (state: states.CloseTransactionFailed, act
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const { penultimatePosition: from, lastPosition: to } = state;
-      const transactionOutbox = createConcludeTransaction(
-        state.adjudicator,
-        from.data,
-        to.data,
-        from.signature,
-        to.signature);
+      const myAddress = state.participants[state.ourIndex];
+      const verificationSignature = signVerificationData(myAddress, state.userAddress, state.channelId, state.privateKey);
+
+      const concludeAndWithdrawArgs = {
+        contractAddress: state.adjudicator,
+        fromState: from.data,
+        toState: to.data,
+        participant: state.participants[state.ourIndex],
+        destination: state.userAddress,
+        channelId: state.channelId,
+        fromSignature: from.signature,
+        toSignature: to.signature,
+        verificationSignature,
+      };
+      const transactionOutbox = createConcludeAndWithdrawTransaction(concludeAndWithdrawArgs);
       return states.waitForCloseSubmission({ ...state, transactionOutbox });
   }
   return state;
@@ -94,7 +103,6 @@ const waitForOpponentCloseReducer = (state: states.WaitForOpponentClose, action:
 const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-    case actions.GAME_CONCLUDED_EVENT:
       return states.waitForChannel({ ...state, messageOutbox: closeSuccess(), displayOutbox: hideWallet() });
   }
   return state;
@@ -116,8 +124,6 @@ const waitForCloseSubmissionReducer = (state: states.WaitForCloseSubmission, act
       return states.closeTransactionFailed(state);
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForCloseConfirmed({ ...state, transactionHash: action.transactionHash });
-    case actions.GAME_CONCLUDED_EVENT:
-      return states.approveWithdrawal(state);
   }
   return state;
 };
