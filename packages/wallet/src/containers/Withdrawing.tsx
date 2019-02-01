@@ -26,7 +26,6 @@ class WithdrawingContainer extends PureComponent<Props> {
       state,
       withdrawalApproved,
       withdrawalSuccessAcknowledged,
-      withdrawalRejected,
       retryTransaction,
     } = this.props;
 
@@ -35,10 +34,9 @@ class WithdrawingContainer extends PureComponent<Props> {
         return (
           <SelectAddress
             approveAction={withdrawalApproved}
-            declineAction={withdrawalRejected}
             title="Withdraw"
             description="Do you wish to withdraw your funds from this channel?"
-            yesMessage="Withdraw" />
+            approveButtonTitle="Withdraw" />
         );
       case states.WAIT_FOR_WITHDRAWAL_INITIATION:
         return <WaitForXInitiation name="withdrawal" />;

@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import { StyleSheet, css } from 'aphrodite';
 import SidebarLayout from '../SidebarLayout';
-import magmoFireBall from '../images/white_fireball.svg';
+import magmoFireBall from '../../images/white_fireball.svg';
 
 interface Props {
   approveAction: (address: string) => void;
@@ -46,7 +46,7 @@ export default class SelectAddress extends React.PureComponent<Props, State> {
     }
   }
   render() {
-    const { approveAction, approveButtonTitle: yesMessage, title, description } = this.props;
+    const { approveButtonTitle: yesMessage, title, description } = this.props;
     return (
       <SidebarLayout>
         <h1>{title}</h1>
@@ -86,4 +86,5 @@ const styles = StyleSheet.create({
   button: {
     margin: '8px',
   },
+});
 

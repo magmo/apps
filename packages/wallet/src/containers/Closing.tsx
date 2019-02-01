@@ -18,7 +18,7 @@ interface Props {
   state: states.ClosingState;
   concludeApproved: () => void;
   concludeRejected: () => void;
-  closeOnChain: () => void;
+  closeOnChain: (withdrawAddress: string) => void;
   closeSuccessAcknowledged: () => void;
   closedOnChainAcknowledged: () => void;
   retryTransaction: () => void;
@@ -57,7 +57,7 @@ class ClosingContainer extends PureComponent<Props> {
             approveAction={closeOnChain}
             title="Close and Withdraw"
             description="The game has been concluded! You can now close the channel and withdraw your funds."
-            yesMessage="Close and Withdraw" />
+            approveButtonTitle="Close and Withdraw" />
         );
       case states.ACKNOWLEDGE_CLOSE_SUCCESS:
         return (
