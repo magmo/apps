@@ -65,7 +65,6 @@ This will fire up the Storybook panel inside a browser.
     yarn deployContracts
     ``` 
 
-NOTE: The wallet also has to deploy the simple adjudicator on the same network.
 
 #### To run application tests in watch mode:
 
