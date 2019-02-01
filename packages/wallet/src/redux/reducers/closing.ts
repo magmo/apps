@@ -149,8 +149,9 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
       const opponentAddress = state.participants[1 - state.ourIndex];
       if (action.data === 'CloseStarted' && validSignature(action.data, action.signature || '0x0', opponentAddress)) {
         return states.waitForOpponentClose(state);
-
       }
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
   }
   return state;
 };

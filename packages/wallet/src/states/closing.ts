@@ -56,7 +56,7 @@ export interface AcknowledgeClosedOnChain extends AdjudicatorExists {
   type: typeof ACKNOWLEDGE_CLOSED_ON_CHAIN;
   stage: typeof CLOSING;
 }
-export interface ApproveCloseOnChain extends UserAddressExists {
+export interface ApproveCloseOnChain extends AdjudicatorExists {
   type: typeof APPROVE_CLOSE_ON_CHAIN;
   stage: typeof CLOSING;
 }
