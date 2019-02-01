@@ -1,7 +1,6 @@
 <h1 align="center">
 <div><img src="./orange_fireball.svg"> </div>
 Magmo Apps
-<!-- <hr> -->
 </h1>
 Welcome to the Magmo mono-repo, home of several proof-of-concept applications built on our state channel protocols.
 
