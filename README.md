@@ -26,7 +26,7 @@ You will need `yarn` installed (see [here](https://yarnpkg.com/lang/en/docs/inst
     3. Select "Import"
     4. Paste in one of the secret keys below.
 
-You may point two different browsers to the app to play against yourself.
+You may visit the app in two different browsers in order to play against yourself. We use [Redux DevTools](https://github.com/reduxjs/redux-devtools) to develop and test our apps.
 
 
 #### Seed accounts
@@ -52,7 +52,7 @@ This will fire up the Storybook panel inside a browser.
 #### To deploy smart contracts
 
 1. Add test eth to your account for the deployment using an eth faucet: https://faucet.ropsten.be/ or https://faucet.metamask.io.
-2. Set `TARGET_NETWORK` in your `.env` file to the network  you want to deploy to.
+2. Set `TARGET_NETWORK` in your `.env` file to the network you want to deploy to: either `'development'`, `'ropsten'`, `'kovan'` or `'rinkeby'`.
 3. Deploy the contracts to the network:
     ```
     yarn deployContracts
@@ -99,8 +99,13 @@ We are working hard to produce documenation for our applications. In the interm,
 for developing on ethereum that we have used to develop our apps. You will also find some information in the `/notes/` subdirectory of each app. 
 
 ## Problems?
+Frequently, problems can be sorted by one or more of the following steps:
+- Resetting your MetaMask account (i.e. deleting transaction history), or simply switching to a different network and back again.
+- Restarting ganache 
+- Running `npx lerna bootstrap` if you changed any dependencies
 
-Please check [issues](https://github.com/magmo/rps/issues), someone else may have had the same experience. You may find a solution -- if not, please add to or create an issue.
+
+Otherwise, please check [issues](https://github.com/magmo/rps/issues), someone else may have had the same experience. You may find a solution -- if not, please add to or create an issue.
 
 
 
