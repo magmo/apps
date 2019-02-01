@@ -84,7 +84,7 @@ This will fire up the Storybook panel inside a browser.
 
 #### To add a dependency:
 
-`npx lerna add [package name] --scope=rps --dev` - installs the latest version of the package to the rps package
+`npx lerna add [package name] --scope=rps` - installs the latest version of the package to the rps package. Use `--dev` flag to add the new package to `devDependencies` instead of `dependencies`.
 
 #### To update the version of a dependency:
 
