@@ -10,10 +10,10 @@ export const itSends = (position, jointState) => {
 export const itIncreasesTurnNumBy = (increase: number, oldState: JointState, newState: JointState) => {
   it(`increases the turnNum by ${increase}`, () => {
     if (!('turnNum' in newState.gameState) || !('turnNum' in oldState.gameState)) {
-      return fail('turnNum does not exist on one of the states');
+      fail('turnNum does not exist on one of the states');
+    } else {
+      expect(newState.gameState.turnNum).toEqual(oldState.gameState.turnNum + increase);
     }
-    expect(newState.gameState.turnNum).toEqual(oldState.gameState.turnNum + increase);
-
   });
 };
 

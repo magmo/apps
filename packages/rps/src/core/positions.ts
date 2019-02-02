@@ -137,7 +137,7 @@ export function propose(obj: ProposeParams): Propose {
 
 export function hashCommitment(play: Move, salt: string) {
   return soliditySha3(
-    { type: 'uint256', value: play },
+    { type: 'uint256', value: play.toString() },
     { type: 'bytes32', value: padBytes32(salt) },
   );
 }

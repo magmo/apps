@@ -97,7 +97,7 @@ export function packRevealAttributes(position: positions.Reveal) {
 
 export function hashCommitment(move: Move, salt: string) {
   return soliditySha3(
-    { type: 'uint256', value: move },
+    { type: 'uint256', value: move.toString() },
     { type: 'bytes32', value: padBytes32(salt) },
   );
 }

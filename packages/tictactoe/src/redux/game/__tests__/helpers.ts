@@ -21,11 +21,12 @@ export const itIncreasesTurnNumBy = (
       !("turnNum" in newState.gameState) ||
       !("turnNum" in oldState.gameState)
     ) {
-      return fail("turnNum does not exist on one of the states");
+      fail("turnNum does not exist on one of the states");
+    } else {
+      expect(newState.gameState.turnNum).toEqual(
+        oldState.gameState.turnNum + increase
+      );
     }
-    expect(newState.gameState.turnNum).toEqual(
-      oldState.gameState.turnNum + increase
-    );
   });
 };
 
@@ -89,14 +90,15 @@ export const itFullySwingsTheBalancesToA = (
       !("balances" in newState.gameState) ||
       !("balances" in oldState.gameState)
     ) {
-      return fail("balances does not exist on one of the states");
+      fail("balances does not exist on one of the states");
+    } else {
+      expect(Number(newState.gameState.balances[0])).toEqual(
+        Number(oldState.gameState.balances[0]) + 2 * Number(stake)
+      );
+      expect(Number(newState.gameState.balances[1])).toEqual(
+        Number(oldState.gameState.balances[1]) - 2 * Number(stake)
+      );
     }
-    expect(Number(newState.gameState.balances[0])).toEqual(
-      Number(oldState.gameState.balances[0]) + 2 * Number(stake)
-    );
-    expect(Number(newState.gameState.balances[1])).toEqual(
-      Number(oldState.gameState.balances[1]) - 2 * Number(stake)
-    );
   });
 };
 
@@ -136,15 +138,17 @@ export const itPreservesOnScreenBalances = (
       !("onScreenBalances" in newState.gameState) ||
       !("onScreenBalances" in oldState.gameState)
     ) {
-      return fail("balances does not exist on one of the states");
+      fail("balances does not exist on one of the states");
+    } else {
+      expect(Number(newState.gameState.onScreenBalances[0])).toEqual(
+        Number(oldState.gameState.onScreenBalances[0])
+      );
+      expect(Number(newState.gameState.onScreenBalances[1])).toEqual(
+        Number(oldState.gameState.onScreenBalances[1])
+      );
     }
-    expect(Number(newState.gameState.onScreenBalances[0])).toEqual(
-      Number(oldState.gameState.onScreenBalances[0])
-    );
-    expect(Number(newState.gameState.onScreenBalances[1])).toEqual(
-      Number(oldState.gameState.onScreenBalances[1])
-    );
   });
+
 };
 
 export const itCanHandleTheOpponentResigning = ({
