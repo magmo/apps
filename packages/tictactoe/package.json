@@ -107,7 +107,7 @@
     "start": "node scripts/start.js",
     "build": "node --max-old-space-size=4076 scripts/build.js",
     "test": "run-s test:integration 'test:app --all'",
-    "test:app": "node scripts/test.js --env=jsdom",
+    "test:app": "npx run-jest -c ./config/jest/jest.config.js",
     "test:integration": "npx ganache-then-jest -c ./config/jest/jest.integration.config.js --runInBand",
     "deployContracts": "npx deploy-contracts",
     "test:ci": "DEV_GANACHE_PORT=8504 run-s build 'test:integration --all --ci' 'test:app --all --ci --runInBand'",
