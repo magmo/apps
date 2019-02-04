@@ -34,12 +34,12 @@ We use [Storybook](https://storybook.js.org/) to view our react components durin
 ```
 yarn storybook
 ```
-This will fire up the Storybook panel inside a browser.
+in the relevant package directory. This will fire up the Storybook panel inside a browser.
 
 
-#### To build:
+#### To create an optimized production build:
 
-1. Update your  `TARGET_NETWORK` in all relevant `.env` files to a named network from `truffle.js` (default is `ropsten`)
+1. Update your `TARGET_NETWORK` in all relevant `.env` files to a named network from `truffle.js` (default is `ropsten`)
 2. Build the application:
 
     ```
@@ -67,7 +67,7 @@ yarn test:app
 * To run smart contract tests:
 
 ```
-yarn test:integration
+yarn test:contracts
 ```
 
 * To run all tests relating (before submitting a PR):
@@ -88,7 +88,7 @@ npx lerna bootstrap
 npx lerna add [dependency name] --scope=[target package]
 ```
 
- This installs the latest version of the package to the rps package. Use `--dev` flag to add the new package to `devDependencies` instead of `dependencies`.
+ This installs the latest version of the dependency to the target package (ttt, rps or wallet). Use `--dev` flag to add the new package to `devDependencies` instead of `dependencies`.
 
 * To update the version of a dependency:
 
