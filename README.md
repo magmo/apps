@@ -14,23 +14,19 @@ out our apps, or get involved more deeply we would love to hear your thoughts. D
 ## Setting up development environment and running a game application
 You will need `yarn` installed (see [here](https://yarnpkg.com/lang/en/docs/install/) for instructions). After cloning the code, 
 1. In the top directory, run `yarn install`.
-2. In the top directory, run `npx lerna bootstrap`.
+2. Run `npx lerna bootstrap`.
 3. Add `.env` files to the root directory of the `wallet` package, and to the root directory of the relevant app directory. Refer to `.env.example` which includes an example of the required variables.
 
 4. Start [ganache](https://truffleframework.com/ganache) by running `yarn ganache:start` .
-5. (In a new tab) Run the wallet via `yarn start` in the `wallet` package directory
-6. (In a new tab) Run a game (either RPS or TTT) via `yarn start` in the relevant package directory.
-7. Add [MetaMask](https://metamask.io/) to your browser, and point it to `localhost:3001` to view the application. You will need to import one of the seed accounts (below) into metamask to have funds to transact.
+5. (In a new shell) Run the wallet via `yarn start` in the `wallet` package directory
+6. (In a new shell) Run a game (either RPS or TTT) via `yarn start` in the relevant package directory.
+7. Add [MetaMask](https://metamask.io/) to your browser, and point it to `localhost:3001` to view the application. You will need to import one of our (testnet-only) seed accounts into metamask to have funds to transact.
     1. Open the metamask browser extension
     2. Click on the account icon (circle in the top right)
     3. Select "Import"
-    4. Paste in one of the secret keys below.
+    4. Paste in one of [these secret keys](https://github.com/magmo/devtools/blob/master/utils/startGanache.js).
 
 You may visit the app in two different browsers in order to play against yourself. We use [Redux DevTools](https://github.com/reduxjs/redux-devtools) to develop and test our apps.
-
-
-#### Seed accounts
-Please refer to [this file](https://github.com/magmo/devtools/blob/master/utils/startGanache.js).
 
 #### To run storybook
 
@@ -45,6 +41,7 @@ This will fire up the Storybook panel inside a browser.
 
 1. Update your  `TARGET_NETWORK` in all relevant `.env` files to a named network from `truffle.js` (default is `ropsten`)
 2. Build the application:
+
     ```
     yarn run build
     ```
@@ -57,33 +54,47 @@ This will fire up the Storybook panel inside a browser.
     ```
     yarn deployContracts
     ``` 
+Alternatively, simply run, e.g. `TARGET_NETWORK=ropsten yarn deployContracts`.
 
 #### Running Tests specific to a certain app
 From the relevant subdirectory...
 * To run application tests in watch mode:
 
-`yarn test:app`
+```
+yarn test:app
+```
 
 * To run smart contract tests:
 
-`yarn test:contracts`
+```
+yarn test:contracts
+```
 
 * To run all tests relating (before submitting a PR):
 
-`yarn test`
+```
+yarn test
+```
 
 * To update dependencies:
 
-`npx lerna bootstrap`
+```
+npx lerna bootstrap
+```
 
 * To add a dependency:
 
-`npx lerna add [package name] --scope=rps`
+```
+npx lerna add [dependency name] --scope=[target package]
+```
+
  This installs the latest version of the package to the rps package. Use `--dev` flag to add the new package to `devDependencies` instead of `dependencies`.
 
 * To update the version of a dependency:
 
-`yarn upgrade [package-name@version-number]`
+```
+yarn upgrade [package-name@version-number]
+```
 
 #### Project style
 
