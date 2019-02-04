@@ -67,7 +67,7 @@ yarn test:app
 * To run smart contract tests:
 
 ```
-yarn test:contracts
+yarn test:integration
 ```
 
 * To run all tests relating (before submitting a PR):
