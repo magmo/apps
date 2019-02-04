@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Button } from 'reactstrap';
-import { StyleSheet, css } from 'aphrodite';
 import SidebarLayout from '../SidebarLayout';
 import magmoFireBall from '../../images/white_fireball.svg';
 
@@ -57,14 +56,12 @@ export default class SelectAddress extends React.PureComponent<Props, State> {
           The funds will be sent to your current metamask account:
         </p>
         <input disabled={true} style={{ width: '95%' }} type="text" readOnly={true} defaultValue={this.state.withdrawAddress} />
-        <div className="challenge-expired-button-container" >
-          <div className={css(styles.buttonContainer)}>
-            <span className={css(styles.button)}>
-              <Button onClick={this.handleSubmitAddress} >
-                <img src={magmoFireBall} />&nbsp;&nbsp;{approveButtonTitle}
-              </Button>
-            </span>
-          </div>
+        <div className="select-address-button-container" >
+          <span className='select-address-button'>
+            <Button onClick={this.handleSubmitAddress} >
+              <img src={magmoFireBall} />&nbsp;&nbsp;{approveButtonTitle}
+            </Button>
+          </span>
         </div>
       </SidebarLayout>
     );
@@ -72,19 +69,6 @@ export default class SelectAddress extends React.PureComponent<Props, State> {
   handleSubmitAddress() {
     this.props.approveAction(this.state.withdrawAddress);
   }
-
 }
-const styles = StyleSheet.create({
-  buttonContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '5px',
-    position: "absolute",
-    top: 'auto',
-    bottom: '5%',
-  },
-  button: {
-    margin: '8px',
-  },
-});
+
 
