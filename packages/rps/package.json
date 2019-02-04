@@ -73,7 +73,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "run-s test:truffle 'test:app --all'",
+    "test": "run-s test:integration 'test:app --all'",
     "test:ci": "DEV_GANACHE_PORT=8502 run-s build 'test:integration --all --ci' 'test:app --all --ci --runInBand'",
     "test:app": "npx run-jest -c ./config/jest/jest.config.js",
     "test:integration": "npx ganache-then-jest -c ./config/jest/jest.integration.config.js --runInBand",
