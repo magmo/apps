@@ -10,9 +10,10 @@ export const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
 export const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
 export const OPLAYING = 'OPLAYING';
 export const XPLAYING = 'XPLAYING';
-export const RESTING = 'RESTING';
 export const VICTORY = 'VICTORY';
 export const DRAW = 'DRAW';
+export const PLAY_AGAIN_ME_FIRST = 'PLAY_AGAIN_ME_FIRST';
+export const PLAY_AGAIN_ME_SECOND = 'PLAY_AGAIN_ME_SECOND';
 export const CONCLUDE = 'CONCLUDE';
 
 // Positions
@@ -59,8 +60,12 @@ interface BaseWithBuyIn extends Base {
   }
   
 
-  export interface Resting extends BaseWithBuyIn {
-    name: typeof RESTING;
+  export interface PlayAgainMeFirst extends BaseWithBuyIn {
+    name: typeof PLAY_AGAIN_ME_FIRST;
+  }
+
+  export interface PlayAgainMeSecond extends BaseWithBuyIn {
+    name: typeof PLAY_AGAIN_ME_SECOND;
   }
 
   export interface Oplaying extends BaseWithBuyIn {
@@ -94,9 +99,10 @@ interface BaseWithBuyIn extends Base {
     | PostFundSetupB
     | Xplaying
     | Oplaying
-    | Resting
     | Victory
     | Draw
+    | PlayAgainMeFirst
+    | PlayAgainMeSecond
     | Conclude
   );
 
@@ -150,9 +156,12 @@ export function postFundSetupB(obj: BaseWithBuyInParams): PostFundSetupB {
   return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_B, stateCount: 1 };
 }
 
+export function playAgainMeFirst(obj: BaseWithBuyInParams): PlayAgainMeFirst {
+  return { ...baseWithBuyIn(obj), name: PLAY_AGAIN_ME_FIRST };
+}
 
-export function resting(obj: BaseWithBuyInParams): Resting {
-  return { ...baseWithBuyIn(obj), name: RESTING };
+export function playAgainMeSecond(obj: BaseWithBuyInParams): PlayAgainMeSecond {
+  return { ...baseWithBuyIn(obj), name: PLAY_AGAIN_ME_SECOND };
 }
 
 export function Oplaying(obj: PlayingParams): Oplaying {

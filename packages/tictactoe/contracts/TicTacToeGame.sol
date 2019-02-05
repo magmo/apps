@@ -13,8 +13,6 @@ contract TicTacToeGame {
     
     // The following transitions are allowed:
     //
-    // Rest    -> Xplaying
-    // Rest    -> Conclude but Conclude is an FMG position -- does it belong here?
     //
     // Xplaying -> Oplaying
     // Xplaying -> Victory
@@ -26,12 +24,13 @@ contract TicTacToeGame {
     // Oplaying -> Draw
 
     //
-    // Victory -> Rest
-    // Victory -> Xplaying
+    // Victory -> PlayAgainMeFirst
     //
-    // Draw    -> Rest
-    // Draw    -> Xplaying
+    // Draw    -> PlayAgainMeFirst
     //
+    // PlayAgainMeFirst -> PlayAgainMeSecond
+    //
+    // PlauAgainMeSecond -> Xplaying
 
     function validTransition(bytes _old, bytes _new) public pure returns (bool) {
 
