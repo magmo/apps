@@ -2,7 +2,7 @@
 Rock Paper Scissors
 </h1>
 
-This app is an example of a game built on our [ForceMove](https://magmo.com/force-move-games.pdf) protocol. You can [play](https://demo.magmo.com) against a friend or against our bots on the ropsten testnet.
+This app is an example of a game built on our [ForceMove](https://magmo.com/force-move-games.pdf) protocol. You can [play](https://rps.magmo.com) against a friend or against our bots on the ropsten testnet.
 
 ![splash](./screens.png 'screens')
 
