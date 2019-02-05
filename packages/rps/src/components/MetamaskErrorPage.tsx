@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { MetamaskError } from '../redux/metamask/actions';
-import { ApplicationLayout } from './ApplicationLayout';
 
 interface MetamaskErrorProps {
   error: MetamaskError;
@@ -35,15 +34,15 @@ export default function MetamaskErrorPage(props: MetamaskErrorProps) {
     );
   }
   return (
-    <ApplicationLayout>
-    <div className="waiting-room-container">
-      <h1 className="w-100 text-center waiting-room-title">
-      Metamask Error
-      </h1>
-      <div className="w-100">
-      <p className="lead text-center waiting-room-title" >{message}</p>
+    <div className="container centered-container w-100 mb-5">
+      <div className="w-100 text-center mb-5">
+        <h1 className="text-center waiting-room-title">
+        Metamask Error
+        </h1>
+        <div>
+          <p>{message}</p>
+        </div>
       </div>
     </div>
-  </ApplicationLayout>
   );
 }
