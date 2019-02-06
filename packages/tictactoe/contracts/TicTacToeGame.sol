@@ -73,7 +73,7 @@ contract TicTacToeGame {
 
             if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validateVictoryTOPlayAgainMeFirst(_old, _new);
+                validateVictoryToOPlayAgainMeFirst(_old, _new);
 
                 return true;
 
@@ -84,7 +84,7 @@ contract TicTacToeGame {
 
             if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validateDrawTOPlayAgainMeFirst(_old, _new);
+                validateDrawToOPlayAgainMeFirst(_old, _new);
 
                 return true;
 
@@ -93,7 +93,7 @@ contract TicTacToeGame {
 
             if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validatePlayAgainMeFirstTOPlayAgainMeSecond(_old, _new);
+                validatePlayAgainMeFirstToOPlayAgainMeSecond(_old, _new);
 
                 return true;
 
@@ -179,7 +179,7 @@ contract TicTacToeGame {
         require((_new.noughts() == _old.noughts()));
     }
 
-    function validateVictoryTOPlayAgainMeFirst(bytes _old, bytes _new) private pure {
+    function validateVictoryToOPlayAgainMeFirst(bytes _old, bytes _new) private pure {
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
         require(_new.noughts() == 0);
