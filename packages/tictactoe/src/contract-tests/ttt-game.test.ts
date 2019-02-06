@@ -21,7 +21,7 @@ describe('TicTacToeGame', () => {
   let networkId;
   const provider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     networkId = (await provider.getNetwork()).chainId;
     const libraryAddress = TTTGameArtifact.networks[networkId].address;
 
@@ -44,7 +44,6 @@ describe('TicTacToeGame', () => {
 
   const validTransition = async (state1, state2) => {
     const returnValue = await tttContract.validTransition(encode(state1), encode(state2));
-    console.log(returnValue);
     return returnValue;
   };
 
@@ -52,39 +51,39 @@ describe('TicTacToeGame', () => {
   // ========================
 
   it("allows XPLAYING -> OPLAYING", async () => {
-    expect(validTransition(playing1, playing2)).toBeTruthy();
+    expect(await validTransition(playing1, playing2)).toBe(true);
   });
 
   it("allows XPLAYING -> OPLAYING", async () => {
-    expect(validTransition(playing3, playing4)).toBeTruthy();
+    expect(await validTransition(playing3, playing4)).toBe(true);
   });
   it("allows XPLAYING -> OPLAYING", async () => {
-    expect(validTransition(playing5, playing6)).toBeTruthy();
+    expect(await validTransition(playing5, playing6)).toBe(true);
   });
   it("allows XPLAYING -> OPLAYING", async () => {
-    expect(validTransition(playing7, playing8)).toBeTruthy();
+    expect(await validTransition(playing7, playing8)).toBe(true);
   });
   it("allows OPLAYING -> XPLAYING", async () => {
-    expect(validTransition(playing2, playing3)).toBeTruthy();
+    expect(await validTransition(playing2, playing3)).toBe(true);
 
   });
   it("allows OPLAYING -> XPLAYING", async () => {
-    expect(validTransition(playing4, playing5)).toBeTruthy();
+    expect(await validTransition(playing4, playing5)).toBe(true);
   });
   it("allows OPLAYING -> XPLAYING", async () => {
-    expect(validTransition(playing6, playing7)).toBeTruthy();
+    expect(await validTransition(playing6, playing7)).toBe(true);
   });
 
   it("allows OPLAYING -> DRAW", async () => {
-    expect(validTransition(playing8, draw)).toBeTruthy();
+    expect(await validTransition(playing8, draw)).toBe(true);
   });
 
   it("allows PLAY_AGAIN_ME_FIRST -> PLAY_AGAIN_ME_SECOND", async () => {
-    expect(validTransition(againMF, againMS)).toBeTruthy();
+    expect(await validTransition(againMF, againMS)).toBe(true);
   });
 
-  // it("disallows PLAY_AGAIN_ME_SECOND -> PLAY_AGAIN_ME_FIRST ", async () => {
-  //   // expect.assertions(1);
-  //   await expect(tttContract.validTransition(encode(againMS), encode(againMF))).rejects.toThrowError("Could not match to a valid transition.");
-  // });
+  it("disallows PLAY_AGAIN_ME_SECOND -> PLAY_AGAIN_ME_FIRST ", async () => {
+    expect.assertions(1);
+    await expect(tttContract.validTransition(encode(againMS), encode(againMF))).rejects.toThrowError("Could not match to a valid transition.");
+  });
 });

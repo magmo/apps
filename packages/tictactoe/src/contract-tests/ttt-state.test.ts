@@ -19,7 +19,7 @@ describe('TicTacToeState', () => {
   let stateContract;
   let networkId;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     networkId = (await provider.getNetwork()).chainId;
     const libraryAddress = TTTStateArtifact.networks[networkId].address;
     stateContract = new ethers.Contract(libraryAddress, TTTStateArtifact.abi, provider);

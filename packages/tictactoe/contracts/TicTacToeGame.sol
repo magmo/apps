@@ -91,7 +91,7 @@ contract TicTacToeGame {
             }
         } else if (_old.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-            if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
+            if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeSecond) {
 
                 validatePlayAgainMeFirstToPlayAgainMeSecond(_old, _new);
 
@@ -169,11 +169,11 @@ contract TicTacToeGame {
         require(TicTacToeHelpers.isDraw(_new.noughts(), _new.crosses())); // check if board full. 
         // crosses always plays first move and always plays the move that completes the board
         if (State.indexOfMover(_new) == 0) {
-            require(_new.aResolution() == _old.aResolution() + 2 * _new.stake()); // no extra factor of 2, restoring to parity
-            require(_new.bResolution() == _old.bResolution() - 2 * _new.stake());
+            require(_new.aResolution() == _old.aResolution() + 1 * _new.stake()); // no extra factor of 2, restoring to parity
+            require(_new.bResolution() == _old.bResolution() - 1 * _new.stake());
         } else if (State.indexOfMover(_new) == 1) {
-            require(_new.aResolution() == _old.aResolution() - 2 * _new.stake());
-            require(_new.bResolution() == _old.bResolution() + 2 * _new.stake());
+            require(_new.aResolution() == _old.aResolution() - 1 * _new.stake());
+            require(_new.bResolution() == _old.bResolution() + 1 * _new.stake());
         } // mover gets to restore parity to the winnings
         require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(), _old.crosses()));
         require((_new.noughts() == _old.noughts()));
@@ -182,7 +182,6 @@ contract TicTacToeGame {
     function validateVictoryToPlayAgainMeFirst(bytes _old, bytes _new) private pure {
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
-        require(_new.noughts() == 0);
     }
 
     function validateDrawToPlayAgainMeFirst(bytes _old, bytes _new) private pure {
