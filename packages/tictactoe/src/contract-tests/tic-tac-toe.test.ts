@@ -44,7 +44,7 @@ describe('TicTacToeGame', () => {
 
   const validTransition = async (state1, state2) => {
     const returnValue = await tttContract.validTransition(encode(state1), encode(state2));
-    // console.log(returnValue);
+    console.log(returnValue);
     return returnValue;
   };
 
@@ -53,14 +53,25 @@ describe('TicTacToeGame', () => {
 
   it("allows XPLAYING -> OPLAYING", async () => {
     expect(validTransition(playing1, playing2)).toBeTruthy();
-    expect(validTransition(playing3, playing4)).toBeTruthy();
-    expect(validTransition(playing5, playing6)).toBeTruthy();
-    expect(validTransition(playing7, playing8)).toBeTruthy();
   });
 
+  it("allows XPLAYING -> OPLAYING", async () => {
+    expect(validTransition(playing3, playing4)).toBeTruthy();
+  });
+  it("allows XPLAYING -> OPLAYING", async () => {
+    expect(validTransition(playing5, playing6)).toBeTruthy();
+  });
+  it("allows XPLAYING -> OPLAYING", async () => {
+    expect(validTransition(playing7, playing8)).toBeTruthy();
+  });
   it("allows OPLAYING -> XPLAYING", async () => {
     expect(validTransition(playing2, playing3)).toBeTruthy();
+
+  });
+  it("allows OPLAYING -> XPLAYING", async () => {
     expect(validTransition(playing4, playing5)).toBeTruthy();
+  });
+  it("allows OPLAYING -> XPLAYING", async () => {
     expect(validTransition(playing6, playing7)).toBeTruthy();
   });
 
