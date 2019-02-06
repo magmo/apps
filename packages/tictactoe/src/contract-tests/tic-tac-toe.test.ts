@@ -74,6 +74,6 @@ describe('TicTacToeGame', () => {
 
   // it("disallows PLAY_AGAIN_ME_SECOND -> PLAY_AGAIN_ME_FIRST ", async () => {
   //   // expect.assertions(1);
-  //   await expect(tttContract.validTransition(encode(againMS), encode(againMF))).rejects.toThrowError();
+  //   await expect(tttContract.validTransition(encode(againMS), encode(againMF))).rejects.toThrowError("Could not match to a valid transition.");
   // });
 });
