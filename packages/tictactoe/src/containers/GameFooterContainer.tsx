@@ -4,7 +4,6 @@ import GameFooter from "../components/GameFooter";
 import * as gameActions from "../redux/game/actions";
 import { SiteState } from "../redux/reducer";
 import {
-  StateName,
   XsPickMove,
   OsPickMove,
   XsPickChallengeMove,
@@ -33,9 +32,7 @@ function mapStateToProps(state: SiteState) {
   const isNotOurTurn =
     player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;
   const canChallenge =
-    gameState.name === StateName.OsWaitForOpponentToPickMove ||
-    gameState.name === StateName.XsWaitForOpponentToPickMove ||
-    gameState.name === StateName.WaitToPlayAgain;
+    isNotOurTurn;
   const challengeOngoing =
     gameState.name === "OS_PICK_CHALLENGE_MOVE" ||
     gameState.name === "XS_PICK_CHALLENGE_MOVE";
