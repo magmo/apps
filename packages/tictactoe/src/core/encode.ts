@@ -112,17 +112,13 @@ export function packDrawAttributes(position: positions.Draw) {
 export function packPlayAgainMeFirstAttributes(stake: string) {
   return (
     toHex32(GamePositionType.PlayAgainMeFirst).substr(2) +
-    padBytes32(stake).substr(2) +
-    toHex32(0).substr(2) + // blank noughts
-    toHex32(0).substr(2) // blank crosses
+    padBytes32(stake).substr(2)
   );
 }
 
 export function packPlayAgainMeSecondAttributes(stake: string) {
   return (
     toHex32(GamePositionType.PlayAgainMeSecond).substr(2) +
-    padBytes32(stake).substr(2) +
-    toHex32(0).substr(2) + // blank noughts
-    toHex32(0).substr(2) // blank crosses
+    padBytes32(stake).substr(2)
   );
 }
