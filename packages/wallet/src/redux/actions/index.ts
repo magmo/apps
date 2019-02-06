@@ -149,12 +149,6 @@ export const challengeResponseReceived = (data: string) => ({
 });
 export type ChallengeResponseReceived = ReturnType<typeof challengeResponseReceived>;
 
-export const CHALLENGE_TIMED_OUT = 'WALLET.CHALLENGE_TIMED_OUT';
-export const challengedTimedOut = () => ({
-  type: CHALLENGE_TIMED_OUT as typeof CHALLENGE_TIMED_OUT,
-});
-export type ChallengedTimedOut = ReturnType<typeof challengedTimedOut>;
-
 export const CHALLENGE_TIME_OUT_ACKNOWLEDGED = 'WALLET.CHALLENGE_TIME_OUT_ACKNOWLEDGED';
 export const challengedTimedOutAcknowledged = () => ({
   type: CHALLENGE_TIME_OUT_ACKNOWLEDGED as typeof CHALLENGE_TIME_OUT_ACKNOWLEDGED,
@@ -335,8 +329,9 @@ export const closedOnChainAcknowledged = () => ({
 export type ClosedOnChainAcknowledged = ReturnType<typeof closedOnChainAcknowledged>;
 
 export const APPROVE_CLOSE = 'APPROVE_CLOSE';
-export const approveClose = () => ({
+export const approveClose = (withdrawAddress: string) => ({
   type: APPROVE_CLOSE as typeof APPROVE_CLOSE,
+  withdrawAddress,
 });
 export type ApproveClose = ReturnType<typeof approveClose>;
 
@@ -351,6 +346,13 @@ export const retryTransaction = () => ({
   type: RETRY_TRANSACTION as typeof RETRY_TRANSACTION,
 });
 export type RetryTransaction = ReturnType<typeof retryTransaction>;
+
+export const BLOCK_MINED = 'BLOCK_MINED';
+export const blockMined = (block: { timestamp: number, number: number }) => ({
+  type: BLOCK_MINED as typeof BLOCK_MINED,
+  block,
+});
+export type BlockMined = ReturnType<typeof blockMined>;
 
 // TODO: This is getting large, we should probably split this up into separate types for each stage
 export type WalletAction = (
@@ -369,7 +371,6 @@ export type WalletAction = (
   | ChallengeRequested
   | ChallengeCreatedEvent
   | ChallengeResponseReceived
-  | ChallengedTimedOut
   | TakeMoveInAppAcknowledged
   | ChallengeApproved
   | ChallengeRejected
@@ -403,4 +404,5 @@ export type WalletAction = (
   | ConcludeRejected
   | MetamaskLoadError
   | RetryTransaction
+  | BlockMined
 );
