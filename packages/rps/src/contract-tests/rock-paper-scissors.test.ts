@@ -53,19 +53,19 @@ describe("Rock paper Scissors", () => {
   // ========================
 
   it("allows START -> ROUNDPROPOSED", async () => {
-    expect(validTransition(postFundSetupB, propose)).toBeTruthy();
+    expect(await validTransition(postFundSetupB, propose)).toBe(true);
   });
 
   it("allows ROUNDPROPOSED -> ROUNDACCEPTED", async () => {
-    expect(await validTransition(propose, accept)).toBeTruthy();
+    expect(await validTransition(propose, accept)).toBe(true);
   });
 
   it("allows ROUNDACCEPTED -> REVEAL", async () => {
-    expect(await validTransition(accept, reveal)).toBeTruthy();
+    expect(await validTransition(accept, reveal)).toBe(true);
   });
 
   it("allows REVEAL -> (updated) START", async () => {
-    expect(await validTransition(reveal, resting)).toBeTruthy();
+    expect(await validTransition(reveal, resting)).toBe(true);
   });
 
   it("disallows transitions where the stake changes", async () => {
