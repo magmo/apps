@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { expectRevert } from 'magmo-devtools';
 import {
   scenarios,
   encode
@@ -69,6 +70,10 @@ describe("Rock paper Scissors", () => {
 
   it("disallows transitions where the stake changes", async () => {
     reveal.roundBuyIn = bnToHex(hexToBN(reveal.roundBuyIn).add(new BN(1)));
-    await expect(rpsContract.validTransition(encode(reveal), encode(resting))).rejects.toThrowError();
+    expect.assertions(1);
+    await expectRevert(
+      () => rpsContract.validTransition(encode(reveal), encode(resting)),
+      "The stake should be the same between states"
+    );
   });
 });
