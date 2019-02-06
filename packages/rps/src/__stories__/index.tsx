@@ -17,9 +17,6 @@ import MetamaskErrorPage from '../components/MetamaskErrorPage';
 import { MetamaskErrorType } from '../redux/metamask/actions';
 import CreatingOpenGameModal from "../components/CreatingOpenGameModal";
 
-// const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
-//   bnToHex
-// ) as [string, string]; // in wei
 const finneyFiveFive = [new BN(5000000000000000), new BN(5000000000000000)].map(
   bnToHex
 ) as [string, string];
