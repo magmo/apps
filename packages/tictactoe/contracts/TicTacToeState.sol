@@ -6,7 +6,7 @@ library TicTacToeState {
     enum PositionType { XPlaying, OPlaying, Victory, Draw, PlayAgainMeFirst, PlayAgainMeSecond } 
     
     // TicTacToe State Fields
-    // (relative to gamestate offset) <- this is because the gamestate is appended to the full state of the channel, which has // things like turnNum in it
+    // (relative to gamestate offset) <- this is because the gamestate is appended to the full state of the channel, which has things like turnNum in it
     // ==============================
     // [  0 -  31] enum positionType
     // [ 32 -  63] uint256 stake
