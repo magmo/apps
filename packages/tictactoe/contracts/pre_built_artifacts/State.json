@@ -1,21 +1,16 @@
 {
   "contractName": "State",
-  "abi": [
-    {
+  "abi": [{
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "channelType",
-      "outputs": [
-        {
-          "name": "_channelType",
-          "type": "address"
-        }
-      ],
+      "outputs": [{
+        "name": "_channelType",
+        "type": "address"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -23,39 +18,25 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "channelNonce",
-      "outputs": [
-        {
-          "name": "_channelNonce",
-          "type": "uint256"
-        }
-      ],
+      "outputs": [{
+        "name": "_channelNonce",
+        "type": "uint256"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
       "signature": "0xdcf58e2c"
     },
     {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
-      "name": "numberOfParticipants",
-      "outputs": [
-        {
-          "name": "_numberOfParticipants",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -63,19 +44,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "participants",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address[]"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "address[]"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -83,8 +60,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_state",
           "type": "bytes"
         },
@@ -94,12 +70,10 @@
         }
       ],
       "name": "participant",
-      "outputs": [
-        {
-          "name": "_participant",
-          "type": "address"
-        }
-      ],
+      "outputs": [{
+        "name": "_participant",
+        "type": "address"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -107,19 +81,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "stateType",
-      "outputs": [
-        {
-          "name": "_stateType",
-          "type": "State.StateType"
-        }
-      ],
+      "outputs": [{
+        "name": "_stateType",
+        "type": "State.StateType"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -127,19 +97,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "turnNum",
-      "outputs": [
-        {
-          "name": "_turnNum",
-          "type": "uint256"
-        }
-      ],
+      "outputs": [{
+        "name": "_turnNum",
+        "type": "uint256"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -147,19 +113,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "stateCount",
-      "outputs": [
-        {
-          "name": "_stateCount",
-          "type": "uint256"
-        }
-      ],
+      "outputs": [{
+        "name": "_stateCount",
+        "type": "uint256"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -167,19 +129,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "resolution",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "uint256[]"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -187,19 +145,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "channelId",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bytes32"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -207,19 +161,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "mover",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "address"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -227,19 +177,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "indexOfMover",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "uint256"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -247,8 +193,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_state",
           "type": "bytes"
         },
@@ -274,8 +219,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_state",
           "type": "bytes"
         },
@@ -301,19 +245,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_state",
-          "type": "bytes"
-        }
-      ],
+      "inputs": [{
+        "name": "_state",
+        "type": "bytes"
+      }],
       "name": "gameStateOffset",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "uint256"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -321,8 +261,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_state",
           "type": "bytes"
         },
@@ -332,12 +271,10 @@
         }
       ],
       "name": "gameAttributesEqual",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bool"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -345,8 +282,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_state",
           "type": "bytes"
         },
@@ -356,12 +292,10 @@
         }
       ],
       "name": "resolutionsEqual",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bool"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",

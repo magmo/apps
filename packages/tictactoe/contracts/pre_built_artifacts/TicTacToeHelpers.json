@@ -1,21 +1,16 @@
 {
   "contractName": "TicTacToeHelpers",
-  "abi": [
-    {
+  "abi": [{
       "constant": true,
-      "inputs": [
-        {
-          "name": "_marks",
-          "type": "uint16"
-        }
-      ],
+      "inputs": [{
+        "name": "_marks",
+        "type": "uint16"
+      }],
       "name": "hasWon",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bool"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -23,8 +18,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_noughts",
           "type": "uint16"
         },
@@ -34,12 +28,10 @@
         }
       ],
       "name": "isDraw",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bool"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -47,8 +39,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_new_marks",
           "type": "uint16"
         },
@@ -58,12 +49,10 @@
         }
       ],
       "name": "madeStrictlyOneMark",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bool"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -71,8 +60,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
+      "inputs": [{
           "name": "_noughts",
           "type": "uint16"
         },
@@ -82,12 +70,10 @@
         }
       ],
       "name": "areDisjoint",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "bool"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
@@ -95,19 +81,15 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_marks",
-          "type": "uint16"
-        }
-      ],
+      "inputs": [{
+        "name": "_marks",
+        "type": "uint16"
+      }],
       "name": "popCount",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint8"
-        }
-      ],
+      "outputs": [{
+        "name": "",
+        "type": "uint8"
+      }],
       "payable": false,
       "stateMutability": "pure",
       "type": "function",
