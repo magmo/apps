@@ -15,14 +15,14 @@ contract TicTacToeGame {
     
     // The following transitions are allowed:
     
-    // xPlaying -> oPlaying
-    // xPlaying -> Victory
+    // XPlaying -> OPlaying
+    // XPlaying -> Victory
 
-    // NB: We cannot transition from xPlaying to Draw (X is always completing the board because X goes first) remember we are transitioning *from* Xplay, so noughts are making the new marks
+    // NB: We cannot transition from XPlaying to Draw (X is always completing the board because X goes first) remember we are transitioning *from* Xplay, so noughts are making the new marks
     
-    // oPlaying -> xPlaying
-    // oPlaying -> Victory
-    // oPlaying -> Draw
+    // OPlaying -> XPlaying
+    // OPlaying -> Victory
+    // OPlaying -> Draw
     
     // Victory -> PlayAgainMeFirst
     //
@@ -30,7 +30,7 @@ contract TicTacToeGame {
     //
     // PlayAgainMeFirst -> PlayAgainMeSecond
     //
-    // PlayAgainMeSecond -> xPlaying
+    // PlayAgainMeSecond -> XPlaying
 
     function validTransition(bytes _old, bytes _new) public pure returns (bool) {
         if (_old.positionType() == TicTacToeState.PositionType.XPlaying) {
@@ -73,7 +73,7 @@ contract TicTacToeGame {
 
             if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validateVictoryToPlayAgainMeFirst(_old, _new);
+                validateVictoryTOPlayAgainMeFirst(_old, _new);
 
                 return true;
 
@@ -84,7 +84,7 @@ contract TicTacToeGame {
 
             if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validateDrawToPlayAgainMeFirst(_old, _new);
+                validateDrawTOPlayAgainMeFirst(_old, _new);
 
                 return true;
 
@@ -93,7 +93,7 @@ contract TicTacToeGame {
 
             if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validatePlayAgainMeFirstToPlayAgainMeSecond(_old, _new);
+                validatePlayAgainMeFirstTOPlayAgainMeSecond(_old, _new);
 
                 return true;
 
@@ -179,18 +179,18 @@ contract TicTacToeGame {
         require((_new.noughts() == _old.noughts()));
     }
 
-    function validateVictoryToPlayAgainMeFirst(bytes _old, bytes _new) private pure {
+    function validateVictoryTOPlayAgainMeFirst(bytes _old, bytes _new) private pure {
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
         require(_new.noughts() == 0);
     }
 
-    function validateDrawToPlayAgainMeFirst(bytes _old, bytes _new) private pure {
+    function validateDrawTOPlayAgainMeFirst(bytes _old, bytes _new) private pure {
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
     }
 
-    function validatePlayAgainMeFirstToPlayAgainMeSecond(bytes _old, bytes _new) private pure {
+    function validatePlayAgainMeFirstTOPlayAgainMeSecond(bytes _old, bytes _new) private pure {
         require(_new.stake() == _old.stake());
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
