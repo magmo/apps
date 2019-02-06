@@ -564,7 +564,7 @@ function xsPickMoveReducer(
       result: Imperative.Wait,
       balances: newBalances,
     });
-    pos = positions.Xplaying({ ...newGameState });
+    pos = positions.xPlaying({ ...newGameState });
   }
 
   // if winning move
@@ -698,7 +698,7 @@ function osPickMoveReducer(
       result: Imperative.Wait,
       balances: newBalances,
     });
-    pos = positions.Oplaying({ ...newGameState, noughts: newNoughts });
+    pos = positions.oPlaying({ ...newGameState, noughts: newNoughts });
   }
 
   // if winning move

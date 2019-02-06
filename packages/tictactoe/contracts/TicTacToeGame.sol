@@ -7,108 +7,102 @@ import { TicTacToeHelpers } from "./TicTacToeHelpers.sol";
 contract TicTacToeGame {
     using TicTacToeState for bytes;
 
+    // NOTE ON ERROR MESSAGES:
     // require() messages we will incur n * 20,000 gas for each error message used, where n is the number of 32 byte slots it takes up
     // https://github.com/ethereum/solidity/issues/4588
-
+    // This gas cost of deploying this contract is close the typical block gas limit, implying that it should be deployed in
+    // several smaller stages if we want to have require() messages.
     
     // The following transitions are allowed:
-    //
-    //
-    // Xplaying -> Oplaying
-    // Xplaying -> Victory
-    // cannot get to draw (X is always completing the board because X goes first) remember we are transitioning *from* Xplay, so noughts are making the new marks
-    // Xplaying -> Resting ("noughts" player rejects game)
-    //
-    // Oplaying -> Xplaying
-    // Oplaying -> Victory
-    // Oplaying -> Draw
+    
+    // xPlaying -> oPlaying
+    // xPlaying -> Victory
 
-    //
+    // NB: We cannot transition from xPlaying to Draw (X is always completing the board because X goes first) remember we are transitioning *from* Xplay, so noughts are making the new marks
+    
+    // oPlaying -> xPlaying
+    // oPlaying -> Victory
+    // oPlaying -> Draw
+    
     // Victory -> PlayAgainMeFirst
     //
     // Draw    -> PlayAgainMeFirst
     //
     // PlayAgainMeFirst -> PlayAgainMeSecond
     //
-    // PlauAgainMeSecond -> Xplaying
+    // PlayAgainMeSecond -> xPlaying
 
     function validTransition(bytes _old, bytes _new) public pure returns (bool) {
+        if (_old.positionType() == TicTacToeState.PositionType.XPlaying) {
 
-        if (_old.positionType() == TicTacToeState.PositionType.Rest) {
-            if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
+            if (_new.positionType() == TicTacToeState.PositionType.OPlaying) {
 
-                validateRestToXplaying(_old, _new);
-
-                return true;
-
-            } 
-        } else if (_old.positionType() == TicTacToeState.PositionType.Xplaying) {
-
-            if (_new.positionType() == TicTacToeState.PositionType.Oplaying) {
-
-                validateXplayingToOplaying(_old, _new);
+                validateXPlayingToOPlaying(_old, _new);
 
                 return true;
 
             } else if (_new.positionType() == TicTacToeState.PositionType.Victory) {
 
-                validateXplayingToVictory(_old, _new);
+                validateXPlayingToVictory(_old, _new);
 
                 return true;
 
-            } else if (_new.positionType() == TicTacToeState.PositionType.Rest) {
+            }
+        } else if (_old.positionType() == TicTacToeState.PositionType.OPlaying) {
 
-                validateXplayingToRest(_old, _new);
+            if (_new.positionType() == TicTacToeState.PositionType.XPlaying) {
 
-                return true;
-              }
-        } else if (_old.positionType() == TicTacToeState.PositionType.Oplaying) {
-
-            if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
-
-                validateOplayingToXplaying(_old, _new);
+                validateOPlayingToXPlaying(_old, _new);
 
                 return true;
 
             } else if (_new.positionType() == TicTacToeState.PositionType.Victory) {
 
-                validateOplayingToVictory(_old, _new);
+                validateOPlayingToVictory(_old, _new);
 
                 return true;
 
             } else if (_new.positionType() == TicTacToeState.PositionType.Draw) {
 
-                validateOplayingToDraw(_old, _new);
+                validateOPlayingToDraw(_old, _new);
 
                 return true;
             
             }
         } else if (_old.positionType() == TicTacToeState.PositionType.Victory) {
 
-            if (_new.positionType() == TicTacToeState.PositionType.Rest) {
+            if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validateVictoryToRest(_old, _new);
+                validateVictoryToPlayAgainMeFirst(_old, _new);
 
                 return true;
 
-            } else if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
+            } 
+            // TODO consider allowing a transition to PlayAgainMeSecond, to allow the loser to forfeit their right to go first
+            
+        } else if (_old.positionType() == TicTacToeState.PositionType.Draw) {
 
-                validateVictoryToXplaying(_old, _new);
+            if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
+
+                validateDrawToPlayAgainMeFirst(_old, _new);
 
                 return true;
 
             }
-        } else if (_old.positionType() == TicTacToeState.PositionType.Draw) {
+        } else if (_old.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-            if (_new.positionType() == TicTacToeState.PositionType.Rest) {
+            if (_new.positionType() == TicTacToeState.PositionType.PlayAgainMeFirst) {
 
-                validateDrawToRest(_old, _new);
+                validatePlayAgainMeFirstToPlayAgainMeSecond(_old, _new);
 
                 return true;
 
-            } else if (_new.positionType() == TicTacToeState.PositionType.Xplaying) {
+            } 
+        } else if (_old.positionType() == TicTacToeState.PositionType.PlayAgainMeSecond) {
 
-                validateDrawToXplaying(_old, _new);
+            if (_new.positionType() == TicTacToeState.PositionType.XPlaying) {
+
+                validatePlayAgainMeSecondToXPlaying(_old, _new);
 
                 return true;
 
@@ -119,26 +113,7 @@ contract TicTacToeGame {
     }
 
     // transition validations
-
-    function validateRestToXplaying(bytes _old, bytes _new) private pure {
-        require(_new.noughts() == 0);
-        require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(),0)); // Xs moves first
-        require(_new.stake() == _old.stake());
-        if (State.indexOfMover(_new) == 0) { // mover is A
-            require(_new.aResolution() == _old.aResolution() + _new.stake());
-            require(_new.bResolution() == _old.bResolution() - _new.stake());
-        } else if (State.indexOfMover(_new) == 1) { // mover is B
-            require(_new.aResolution() == _old.aResolution() - _new.stake());
-            require(_new.bResolution() == _old.bResolution() + _new.stake());
-        }
-    }
-
-    function validateRestToConcluded(bytes _old, bytes _new) private pure {
-        require(_new.aResolution() == _old.aResolution());
-        require(_new.bResolution() == _old.bResolution());
-    }
-
-    function validateXplayingToOplaying(bytes _old, bytes _new) private pure {
+    function validateXPlayingToOPlaying(bytes _old, bytes _new) private pure {
         require(_new.stake() == _old.stake());
         require(TicTacToeHelpers.madeStrictlyOneMark(_new.noughts(), _old.noughts()));
         require((_new.crosses() == _old.crosses()));   
@@ -152,7 +127,7 @@ contract TicTacToeGame {
         } 
     }
     
-    function validateXplayingToVictory(bytes _old, bytes _new) private pure {
+    function validateXPlayingToVictory(bytes _old, bytes _new) private pure {
         require(TicTacToeHelpers.hasWon(_new.noughts()));
         require(TicTacToeHelpers.madeStrictlyOneMark(_new.noughts(), _old.noughts()));
         require((_new.crosses() == _old.crosses()));   
@@ -165,20 +140,7 @@ contract TicTacToeGame {
         } // mover gets to claim stakes
     } 
 
-    function validateXplayingToRest(bytes _old, bytes _new) private pure {
-        require(_old.noughts() == 0); // don't allow this transition unless noughts has yet to make any marks
-        if (State.indexOfMover(_new) == 0) { // Mover is A
-            // revert balances
-            require(_new.aResolution() == _old.aResolution() + _old.stake());
-            require(_new.bResolution() == _old.bResolution() - _old.stake());
-        } else if (State.indexOfMover(_new) == 1) { // Mover is B
-            // revert balances
-            require(_new.aResolution() == _old.aResolution() - _old.stake());
-            require(_new.bResolution() == _old.bResolution() + _old.stake());
-        } 
-    }
-
-    function validateOplayingToXplaying(bytes _old, bytes _new) private pure {
+    function validateOPlayingToXPlaying(bytes _old, bytes _new) private pure {
         require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(), _old.crosses()));
         require((_new.noughts() == _old.noughts()));
         if (State.indexOfMover(_new) == 0) { // mover is A
@@ -190,7 +152,7 @@ contract TicTacToeGame {
         } // mover gets to claim stakes: note factor of 2 to swing fully to other player
     }
 
-    function validateOplayingToVictory(bytes _old, bytes _new) private pure {
+    function validateOPlayingToVictory(bytes _old, bytes _new) private pure {
         require(TicTacToeHelpers.hasWon(_new.crosses()));
         require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(), _old.crosses()));
         require((_new.noughts() == _old.noughts()));   
@@ -203,7 +165,7 @@ contract TicTacToeGame {
         } // mover gets to claim stakes: note factor of 2 to swing fully to other player
     }
 
-    function validateOplayingToDraw(bytes _old, bytes _new) private pure {
+    function validateOPlayingToDraw(bytes _old, bytes _new) private pure {
         require(TicTacToeHelpers.isDraw(_new.noughts(), _new.crosses())); // check if board full. 
         // crosses always plays first move and always plays the move that completes the board
         if (State.indexOfMover(_new) == 0) {
@@ -217,30 +179,33 @@ contract TicTacToeGame {
         require((_new.noughts() == _old.noughts()));
     }
 
-    function validateVictoryToRest(bytes _old, bytes _new) private pure {
-        require(_new.aResolution() == _old.aResolution());
-        require(_new.bResolution() == _old.bResolution());
-    }
-
-    function validateDrawToRest(bytes _old, bytes _new) private pure {
-        require(_new.aResolution() == _old.aResolution());
-        require(_new.bResolution() == _old.bResolution());
-    }
-
-    function validateVictoryToXplaying(bytes _old, bytes _new) private pure {
+    function validateVictoryToPlayAgainMeFirst(bytes _old, bytes _new) private pure {
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
         require(_new.noughts() == 0);
-        require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(),0));
-         // crosses always goes first. there is no _old.crosses, so set to zero here
     }
 
-    function validateDrawToXplaying(bytes _old, bytes _new) private pure {
+    function validateDrawToPlayAgainMeFirst(bytes _old, bytes _new) private pure {
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
-        require(_new.noughts() == 0);
-        require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(),0));
-         // crosses always goes first. there is no _old.crosses, so set to zero here
     }
 
+    function validatePlayAgainMeFirstToPlayAgainMeSecond(bytes _old, bytes _new) private pure {
+        require(_new.stake() == _old.stake());
+        require(_new.aResolution() == _old.aResolution());
+        require(_new.bResolution() == _old.bResolution());
+    }
+    
+    function validatePlayAgainMeSecondToXPlaying(bytes _old, bytes _new) private pure {
+        require(_new.noughts() == 0);
+        require(TicTacToeHelpers.madeStrictlyOneMark(_new.crosses(),0)); // Xs moves first
+        require(_new.stake() == _old.stake());
+        if (State.indexOfMover(_new) == 0) { // mover is A
+            require(_new.aResolution() == _old.aResolution() + _new.stake());
+            require(_new.bResolution() == _old.bResolution() - _new.stake());
+        } else if (State.indexOfMover(_new) == 1) { // mover is B
+            require(_new.aResolution() == _old.aResolution() - _new.stake());
+            require(_new.bResolution() == _old.bResolution() + _new.stake());
+        }
+    }
 }

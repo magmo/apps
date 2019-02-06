@@ -1,6 +1,3 @@
-// import { soliditySha3 } from 'web3-utils';
-// import { padBytes32 } from 'fmg-core';
-// import { positions } from '.';
 import {Marks} from './marks';
 // Position names
 // ==============
@@ -68,16 +65,12 @@ interface BaseWithBuyIn extends Base {
     name: typeof PLAY_AGAIN_ME_SECOND;
   }
 
-  export interface Oplaying extends BaseWithBuyIn {
+  export interface OPlaying extends BaseWitNoughtsAndCrossesAndBuyIn {
     name: typeof OPLAYING;
-    noughts: Marks;
-    crosses: Marks;
   }
 
-  export interface Xplaying extends BaseWithBuyIn {
+  export interface XPlaying extends BaseWitNoughtsAndCrossesAndBuyIn {
     name: typeof XPLAYING;
-    noughts: Marks;
-    crosses: Marks;
   }
   
   export interface Victory extends BaseWitNoughtsAndCrossesAndBuyIn {
@@ -97,8 +90,8 @@ interface BaseWithBuyIn extends Base {
     | PreFundSetupB
     | PostFundSetupA
     | PostFundSetupB
-    | Xplaying
-    | Oplaying
+    | XPlaying
+    | OPlaying
     | Victory
     | Draw
     | PlayAgainMeFirst
@@ -164,11 +157,11 @@ export function playAgainMeSecond(obj: BaseWithBuyInParams): PlayAgainMeSecond {
   return { ...baseWithBuyIn(obj), name: PLAY_AGAIN_ME_SECOND };
 }
 
-export function Oplaying(obj: PlayingParams): Oplaying {
+export function oPlaying(obj: PlayingParams): OPlaying {
   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: OPLAYING};
 }
 
-export function Xplaying(obj: PlayingParams): Xplaying {
+export function xPlaying(obj: PlayingParams): XPlaying {
   return { ...baseWithNoughtsAndCrossesAndBuyIn(obj), name: XPLAYING };
 }
 
