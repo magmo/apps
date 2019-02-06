@@ -26,7 +26,7 @@ describe("Rock paper Scissors", () => {
   let reveal;
   let resting;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
 
     networkId = (await provider.getNetwork()).chainId;
     const libraryAddress = RPSGameArtifact.networks[networkId].address;
