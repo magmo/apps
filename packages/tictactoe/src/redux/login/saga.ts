@@ -35,7 +35,6 @@ function* loginStatusWatcherSaga() {
     const { user } = yield take(channel);
 
     if (user) {
-      // TODO: pass uid to wallet
       const libraryAddress = yield getLibraryAddress();
       if (!libraryAddress) {
         yield put(loginActions.loginFailure(`Could not find the deployed game library for the ${process.env.TARGET_NETWORK} network.`));
