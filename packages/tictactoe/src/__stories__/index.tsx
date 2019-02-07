@@ -335,7 +335,7 @@ storiesOf("Game Screens / Crosses", module)
   .add("Waiting", testState(xsWaiting))
   .add("Winning", testState(xsVictory))
   .add("Losing", testState(xsDefeat))
-  .add("Drawing", testState(xsTie))
+  .add("Drawing", testState(xsTie));
 
 storiesOf("Game Screens / Noughts", module)
   .add("Choosing", testState(osChoosing))

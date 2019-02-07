@@ -147,7 +147,7 @@ describe("player B's app", () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PlayAgain, updatedState);
+      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
       itSends(scenarios.noughtsVictory.victory, updatedState);
       itFullySwingsTheBalancesToB(
         bProps.roundBuyIn,
@@ -273,11 +273,12 @@ describe("player B's app", () => {
       if (!youWentLast(gameState)) {
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         itSends(againMF, updatedState);
+        itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
       }
       else {
         itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       }
-      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
+      
     });
 
   });

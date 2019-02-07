@@ -1,5 +1,5 @@
 
-import { gameReducer, youWentLast } from "../reducer";
+import { gameReducer } from "../reducer";
 import {
   Player,
   scenarios,
@@ -174,7 +174,7 @@ describe("player A's app", () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PlayAgain, updatedState);
+      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
       itSends(scenarios.crossesVictory.victory, updatedState);
       itFullySwingsTheBalancesToA(
         aProps.roundBuyIn,
@@ -270,17 +270,14 @@ describe("player A's app", () => {
       result: Result.Tie,
     });
 
+    gameState.turnNum = gameState.turnNum + 1;
+
     describe("if the player decides to continue", () => {
       const action = actions.playAgain();
       const updatedState = gameReducer({ messageState, gameState }, action);
-      if (!youWentLast(gameState)) {
-        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-        itSends(againMF, updatedState);
-      }
-      else {
-        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-      }
-      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+      itSends(againMS, updatedState);
+      itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
     });
 
   });
@@ -294,15 +291,8 @@ describe("player A's app", () => {
     describe("when PlayAgainMeFirst arrives", () => {
       const action = actions.positionReceived(againMF);
       const updatedState = gameReducer({ messageState, gameState }, action);
-      if (youWentLast(gameState)) {
-        itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
-        itSends(againMS, updatedState);
-        itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
-      }
-      else {
-        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-        itTransitionsTo(state.StateName.XsPickMove, updatedState);
-      }
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+      itTransitionsTo(state.StateName.PlayAgain, updatedState);
     });
   });
 
