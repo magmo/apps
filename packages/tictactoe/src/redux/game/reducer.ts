@@ -914,6 +914,8 @@ function playAgainReducer(
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
+  console.log(youWentLast(gameState)); // why does this evaluate to true? is 'you' set incorrectly?
+
   if (action.type === actions.RESIGN) {
     return resignationReducer(gameState, messageState);
   }
@@ -922,7 +924,13 @@ function playAgainReducer(
   let newGameState: states.GameState;
   if (action.type === actions.PLAY_AGAIN && youWentLast(gameState)) {
     newGameState = states.osWaitForOpponentToPickMove({
-       ...gameState, turnNum: gameState.turnNum + 1, noughts: 0, crosses: 0, result:Imperative.Wait });
+       ...gameState,
+      turnNum: gameState.turnNum + 1,
+      noughts: 0,
+      crosses: 0,
+      result:Imperative.Wait,
+      you: Marker.noughts,
+         });
     const pos = playAgainMeSecond({...gameState, turnNum: gameState.turnNum + 1});
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
