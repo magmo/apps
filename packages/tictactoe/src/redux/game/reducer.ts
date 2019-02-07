@@ -921,7 +921,8 @@ function playAgainReducer(
   const opponentAddress = states.getOpponentAddress(gameState);
   let newGameState: states.GameState;
   if (action.type === actions.PLAY_AGAIN && youWentLast(gameState)) {
-    newGameState = states.osWaitForOpponentToPickMove({ ...gameState, turnNum: gameState.turnNum + 1, noughts: 0, crosses: 0 });
+    newGameState = states.osWaitForOpponentToPickMove({
+       ...gameState, turnNum: gameState.turnNum + 1, noughts: 0, crosses: 0, result:Imperative.Wait });
     const pos = playAgainMeSecond({...gameState, turnNum: gameState.turnNum + 1});
     messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
@@ -954,9 +955,7 @@ function waitToPlayAgainReducer(
        
     newGameState = states.playAgain({
       ...gameState,
-      turnNum: turnNum + 1, // because we recieve and immediately send
-      result: Imperative.Wait,
-      you: Marker.noughts,
+      turnNum: turnNum + 1,
     });
     return {
       gameState: newGameState,
