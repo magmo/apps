@@ -156,7 +156,7 @@ const xsWaiting = siteStateFromGameState(
 );
 
 const xsVictory = siteStateFromGameState(
-  states.playAgain({
+  states.waitToPlayAgain({
     ...shared,
     noughts: 0b000010010,
     crosses: 0b001001001,
@@ -178,26 +178,12 @@ const xsDefeat = siteStateFromGameState(
     player: Player.PlayerA,
     result: Result.YouLose,
     onScreenBalances: finneyFourSix,
-    turnNum: 6,
+    turnNum: 7,
     balances: finneyFourSix,
   })
 );
 
 const xsTie = siteStateFromGameState(
-  states.playAgain({
-    ...shared,
-    noughts: 0b010011100,
-    crosses: 0b101100011,
-    you: Marker.crosses,
-    player: Player.PlayerA,
-    result: Result.Tie,
-    onScreenBalances: finneyFiveFive,
-    turnNum: 6,
-    balances: finneyFiveFive,
-  })
-);
-
-const xsWaitToPlayAgain = siteStateFromGameState(
   states.waitToPlayAgain({
     ...shared,
     noughts: 0b010011100,
@@ -240,7 +226,7 @@ const osWaiting = siteStateFromGameState(
 );
 
 const osVictory = siteStateFromGameState(
-  states.playAgain({
+  states.waitToPlayAgain({
     ...shared,
     noughts: 0b001001001,
     crosses: 0b000010010,
@@ -248,7 +234,7 @@ const osVictory = siteStateFromGameState(
     player: Player.PlayerB,
     result: Result.YouWin,
     onScreenBalances: finneySixFour,
-    turnNum: 6,
+    turnNum: 7,
     balances: finneySixFour,
   })
 );
@@ -350,7 +336,6 @@ storiesOf("Game Screens / Crosses", module)
   .add("Winning", testState(xsVictory))
   .add("Losing", testState(xsDefeat))
   .add("Drawing", testState(xsTie))
-  .add("Wait to Play Again", testState(xsWaitToPlayAgain));
 
 storiesOf("Game Screens / Noughts", module)
   .add("Choosing", testState(osChoosing))

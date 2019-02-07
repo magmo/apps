@@ -22,6 +22,7 @@ import {
   POST_FUND_SETUP_B,
   PLAY_AGAIN_ME_FIRST,
   PLAY_AGAIN_ME_SECOND,
+  playAgainMeSecond,
 } from "../../core/positions";
 
 export interface JointState {
@@ -495,7 +496,7 @@ function xsPickMoveReducer(
     balances: newBalances,
     turnNum: turnNum + 1,
   }); // default
-  let newGameState: states.GameState = states.playAgain({
+  let newGameState: states.GameState = states.waitToPlayAgain({
     ...gameState,
     turnNum: turnNum + 1,
     result: Result.Tie,
@@ -571,7 +572,7 @@ function xsPickMoveReducer(
   // if winning move
   if (isWinningMarks(newCrosses)) {
     if (newBalances[0] >= roundBuyIn && newBalances[1] >= roundBuyIn) {
-      newGameState = states.playAgain({
+      newGameState = states.waitToPlayAgain({
         ...gameState,
         turnNum: turnNum + 1,
         crosses: newCrosses,
@@ -621,7 +622,7 @@ function osPickMoveReducer(
     noughts: newNoughts,
     balances: newBalances,
   }); // default
-  let newGameState: states.GameState = states.playAgain({
+  let newGameState: states.GameState = states.waitToPlayAgain({
     ...gameState,
     turnNum: turnNum + 1,
     noughts: newNoughts,
@@ -640,7 +641,7 @@ function osPickMoveReducer(
         break;
       }
     }
-    newGameState = states.playAgain({
+    newGameState = states.waitToPlayAgain({
       ...gameState,
       turnNum: turnNum + 1,
       noughts: newNoughts,
@@ -705,7 +706,7 @@ function osPickMoveReducer(
   // if winning move
   if (isWinningMarks(newNoughts)) {
     if (newBalances[0] >= roundBuyIn && newBalances[1] >= roundBuyIn) {
-      newGameState = states.playAgain({
+      newGameState = states.waitToPlayAgain({
         ...gameState,
         turnNum: turnNum + 1,
         noughts: newNoughts,
@@ -919,16 +920,10 @@ function playAgainReducer(
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
   const opponentAddress = states.getOpponentAddress(gameState);
   let newGameState: states.GameState;
-  if (action.type === actions.POSITION_RECEIVED) {
-    const position = action.position;
-    if (position.name !== (positions.PLAY_AGAIN_ME_FIRST || positions.PLAY_AGAIN_ME_SECOND)) {
-      return { gameState, messageState };
-    }
-    messageState = { ...messageState, actionToRetry: action };
-    return { gameState, messageState };
-  }
   if (action.type === actions.PLAY_AGAIN && youWentLast(gameState)) {
-    newGameState = states.waitToPlayAgain({ ...gameState });
+    newGameState = states.osWaitForOpponentToPickMove({ ...gameState });
+    const pos = playAgainMeSecond({...gameState, turnNum: gameState.turnNum + 1});
+    messageState = sendMessage(pos, opponentAddress, messageState);
     return { gameState: newGameState, messageState };
   }
   if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
@@ -950,7 +945,6 @@ function waitToPlayAgainReducer(
     return resignationReducer(gameState, messageState);
   }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
-  const opponentAddress = states.getOpponentAddress(gameState);
   let newGameState: states.GameState;
   if (
     action.type === actions.POSITION_RECEIVED &&
@@ -958,16 +952,12 @@ function waitToPlayAgainReducer(
     youWentLast(gameState)
   ) {
        
-    newGameState = states.osWaitForOpponentToPickMove({
+    newGameState = states.playAgain({
       ...gameState,
-      noughts: 0,
-      crosses: 0,
-      turnNum: turnNum + 2, // because we recieve and immediately send
+      turnNum: turnNum + 1, // because we recieve and immediately send
       result: Imperative.Wait,
       you: Marker.noughts,
     });
-    const pos = positions.playAgainMeSecond({ ...newGameState });
-    messageState = sendMessage(pos, opponentAddress, messageState);
     return {
       gameState: newGameState,
       messageState,
