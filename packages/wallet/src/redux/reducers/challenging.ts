@@ -55,7 +55,7 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
       const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, fromSignature, toSignature);
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
-      return runningStates.waitForUpdate({ ...state });
+      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete(), displayOutbox: hideWallet() });
     default:
       return state;
   }
@@ -111,9 +111,10 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
         messageOutbox: message,
       });
 
-
-    case actions.CHALLENGE_TIMED_OUT:
-      return states.acknowledgeChallengeTimeout({ ...state });
+    case actions.BLOCK_MINED:
+      if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
+        return states.acknowledgeChallengeTimeout({ ...state });
+      }
     default:
       return state;
   }

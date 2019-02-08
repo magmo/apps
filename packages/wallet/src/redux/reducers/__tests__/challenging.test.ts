@@ -2,8 +2,9 @@ import { walletReducer } from '..';
 import * as scenarios from './test-scenarios';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-import { itSendsATransaction, itTransitionsToStateType } from './helpers';
+import { itSendsATransaction, itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
+import { hideWallet, challengeComplete } from 'wallet-client';
 
 const {
   asPrivateKey,
@@ -31,7 +32,7 @@ const defaults = {
   address: 'address',
   privateKey: asPrivateKey,
   networkId: 2323,
-  challengeExpiry: 12321,
+  challengeExpiry: 1,
   transactionHash: '0x0',
 
 };
@@ -49,6 +50,8 @@ describe('when in APPROVE_CHALLENGE', () => {
   describe('when a challenge is declined', () => {
     const action = actions.challengeRejected();
     const updatedState = walletReducer(state, action);
+    expect(updatedState.displayOutbox).toEqual(hideWallet());
+    expect(updatedState.messageOutbox).toEqual(challengeComplete());
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
 });
@@ -119,10 +122,16 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
   });
 
   describe('when the challenge times out', () => {
-    const action = actions.challengedTimedOut();
+    const action = actions.blockMined({ timestamp: 2, number: 2 });
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+  });
+
+  describe('when a block is mined but the challenge has not expired', () => {
+    const action = actions.blockMined({ number: 1, timestamp: 0 });
+    const updatedState = walletReducer(state, action);
+    itDoesntTransition(state, updatedState);
   });
 });
 
