@@ -1,4 +1,4 @@
-import { gameReducer, youWentLast } from "../reducer";
+import { gameReducer } from "../reducer";
 import {
   Player,
   scenarios,
@@ -264,21 +264,15 @@ describe("player B's app", () => {
     const gameState = state.playAgain({
       ...bProps,
       ...draw,
-      result: Result.Tie,
+      result: Result.Tie,  // here we set Player A is Xs and finalized the board
     });
 
     describe("if the player decides to continue", () => {
       const action = actions.playAgain();
       const updatedState = gameReducer({ messageState, gameState }, action);
-      if (!youWentLast(gameState)) {
-        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-        itSends(againMF, updatedState);
-        itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);
-      }
-      else {
-        itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-      }
-      
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+      itSends(againMF, updatedState);
+      itTransitionsTo(state.StateName.WaitToPlayAgain, updatedState);      
     });
 
   });
@@ -287,19 +281,13 @@ describe("player B's app", () => {
     const gameState = state.waitToPlayAgain({
       ...bProps,
       ...draw,
-      result: Result.Tie,
+      result: Result.Tie, // here we set Player A is Xs and finalized the board
     });
     describe("when PlayAgainMeSecond arrives", () => {
       const action = actions.positionReceived(againMS);
       const updatedState = gameReducer({ messageState, gameState }, action);
-      if (youWentLast(gameState)) {
-        itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
-        itTransitionsTo(state.StateName.OsWaitForOpponentToPickMove, updatedState);
-      }
-      else {
-        itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-        itTransitionsTo(state.StateName.XsPickMove, updatedState);
-      }
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+      itTransitionsTo(state.StateName.XsPickMove, updatedState);
     });
   });
 

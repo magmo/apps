@@ -263,11 +263,11 @@ describe("player A's app", () => {
     });
   });
 
-  describe("when in PlayAgain", () => {
+  describe("when in PlayAgain", () => { 
     const gameState = state.playAgain({
       ...aProps,
       ...draw,
-      result: Result.Tie,
+      result: Result.Tie, // here we set Player A is Xs and finalized the board
     });
 
     gameState.turnNum = gameState.turnNum + 1;
@@ -286,7 +286,7 @@ describe("player A's app", () => {
     const gameState = state.waitToPlayAgain({
       ...aProps,
       ...draw,
-      result: Result.Tie,
+      result: Result.Tie, // here we set Player A is Xs and finalized the board
     });
     describe("when PlayAgainMeFirst arrives", () => {
       const action = actions.positionReceived(againMF);

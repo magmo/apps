@@ -914,8 +914,6 @@ function playAgainReducer(
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
-  console.log(youWentLast(gameState)); // why does this evaluate to true? is 'you' set incorrectly?
-
   if (action.type === actions.RESIGN) {
     return resignationReducer(gameState, messageState);
   }

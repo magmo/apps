@@ -259,7 +259,7 @@ These incentives should are encoded into the `validTransition` function. Some re
 
 ```
 
-Note that moving into `XPlaying` from `PlayAgainMeSecond` is accompanied by assigning the stake to the moving player; during inconclusive play, the signing player takes twice the stake from the previous player, thereby assiging the stake to themselves; a penalty-free exit is possible from `PlayAgainMeFirst`, in the sense that the resolutions have not yet changed from the previous round..
+Note that moving into `XPlaying` from `PlayAgainMeSecond` is accompanied by assigning the stake to the moving player; during inconclusive play, the signing player takes twice the stake from the previous player, thereby assiging the stake to themselves; a penalty-free exit is possible from `PlayAgainMeFirst` or `PlayAgainMeSecond`, in the sense that the resolutions have not yet changed from the previous round..
 
 
 ## Core TypeScript
@@ -566,5 +566,5 @@ A switch of perspective is useful here; we will now consider the app from the us
 
 Notice how Player A begins as Xs, but the players may switch depending on the result of the previous game. Note the assymetry in that Draw can only be sent by Xs and only be received by Os. Combining this diagram with storybook (which previews the react components), will give a pretty good idea of how the app should function. 
 
-Not shown here: wallet states; transition into or out of the game; the case of insufficient funds. 
+Not shown here: wallet states; transition into or out of the game; the case of insufficient funds. Also not shown: **which** positions should be sent.
 
