@@ -220,7 +220,7 @@ const osWaiting = siteStateFromGameState(
     player: Player.PlayerB,
     result: Imperative.Wait,
     onScreenBalances: finneyFiveFive,
-    turnNum: 6,
+    turnNum: 7,
     balances: finneySixFour,
   })
 );
