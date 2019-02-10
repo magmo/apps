@@ -87,6 +87,12 @@ export const gameReducer: Reducer<JointState> = (
         messageState,
       };
     }
+    if (gameState.name === states.StateName.PlayAgain) {
+      return {
+        gameState: states.playAgainChallengeMove(gameState),
+        messageState,
+      };
+    }
   }
   // // apply the current action to the state
   state = singleActionReducer(state, action);
@@ -165,6 +171,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
         return state;
       }
     case states.StateName.PlayAgain:
+    case states.StateName.PlayAgainChallengeMove:
       return playAgainReducer(gameState, messageState, action);
     case states.StateName.WaitToPlayAgain:
       return waitToPlayAgainReducer(gameState, messageState, action);
@@ -910,7 +917,7 @@ function popCount(marks) {
 }
 
 function playAgainReducer(
-  gameState: states.PlayAgain,
+  gameState: states.PlayAgain | states.PlayAgainChallengeMove,
   messageState: MessageState,
   action: actions.GameAction
 ): JointState {
@@ -930,12 +937,26 @@ function playAgainReducer(
       you: Marker.noughts,
          });
     const pos = playAgainMeSecond({...gameState, turnNum: gameState.turnNum + 1});
-    messageState = sendMessage(pos, opponentAddress, messageState);
+    if (gameState.name === states.StateName.PlayAgainChallengeMove) {
+      messageState = {
+        walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
+      };
+    }
+    if (gameState.name === states.StateName.PlayAgain) {
+      messageState = sendMessage(pos, opponentAddress, messageState);
+    }
     return { gameState: newGameState, messageState };
   }
   if (action.type === actions.PLAY_AGAIN && !youWentLast(gameState)) {
     const pos = positions.playAgainMeFirst({ ...gameState, turnNum: gameState.turnNum + 1 });
-    messageState = sendMessage(pos, opponentAddress, messageState);
+    if (gameState.name === states.StateName.PlayAgainChallengeMove) {
+      messageState = {
+        walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
+      };
+    }
+    if (gameState.name === states.StateName.PlayAgain) {
+      messageState = sendMessage(pos, opponentAddress, messageState);
+    }
     newGameState = states.waitToPlayAgain({ ...gameState, turnNum: gameState.turnNum + 1 });
     return { gameState: newGameState, messageState };
   }
