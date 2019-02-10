@@ -16,6 +16,7 @@ import LoadingPage from "../components/LoadingPage";
 import MetamaskErrorPage from '../components/MetamaskErrorPage';
 import { MetamaskErrorType } from '../redux/metamask/actions';
 import CreatingOpenGameModal from "../components/CreatingOpenGameModal";
+import LoginErrorPage from '../components/LoginErrorPage';
 
 const finneyFourSix = [new BN(4000000000000000), new BN(6000000000000000)].map(
   bnToHex
@@ -59,6 +60,7 @@ const lobbyState: SiteState = {
     loading: false,
     loggedIn: true,
     user: null,
+    error: undefined,
   },
   metamask: {
     loading: false,
@@ -154,7 +156,7 @@ const xsWaiting = siteStateFromGameState(
 );
 
 const xsVictory = siteStateFromGameState(
-  states.playAgain({
+  states.waitToPlayAgain({
     ...shared,
     noughts: 0b000010010,
     crosses: 0b001001001,
@@ -176,26 +178,12 @@ const xsDefeat = siteStateFromGameState(
     player: Player.PlayerA,
     result: Result.YouLose,
     onScreenBalances: finneyFourSix,
-    turnNum: 6,
+    turnNum: 7,
     balances: finneyFourSix,
   })
 );
 
 const xsTie = siteStateFromGameState(
-  states.playAgain({
-    ...shared,
-    noughts: 0b010011100,
-    crosses: 0b101100011,
-    you: Marker.crosses,
-    player: Player.PlayerA,
-    result: Result.Tie,
-    onScreenBalances: finneyFiveFive,
-    turnNum: 6,
-    balances: finneyFiveFive,
-  })
-);
-
-const xsWaitToPlayAgain = siteStateFromGameState(
   states.waitToPlayAgain({
     ...shared,
     noughts: 0b010011100,
@@ -232,13 +220,13 @@ const osWaiting = siteStateFromGameState(
     player: Player.PlayerB,
     result: Imperative.Wait,
     onScreenBalances: finneyFiveFive,
-    turnNum: 6,
+    turnNum: 7,
     balances: finneySixFour,
   })
 );
 
 const osVictory = siteStateFromGameState(
-  states.playAgain({
+  states.waitToPlayAgain({
     ...shared,
     noughts: 0b001001001,
     crosses: 0b000010010,
@@ -246,7 +234,7 @@ const osVictory = siteStateFromGameState(
     player: Player.PlayerB,
     result: Result.YouWin,
     onScreenBalances: finneySixFour,
-    turnNum: 6,
+    turnNum: 7,
     balances: finneySixFour,
   })
 );
@@ -322,6 +310,8 @@ const openGame: OpenGame = {
 storiesOf("Setup", module)
 .add("Loading Page", () => (
   <LoadingPage />))
+  .add("Login Error Page", () => (
+    <LoginErrorPage error='Login error message' />))
 .add("MetaMask Error Page", () => (
   <MetamaskErrorPage error={ {errorType: MetamaskErrorType.WrongNetwork} }/>))
 .add("Home Page", () => (
@@ -345,8 +335,7 @@ storiesOf("Game Screens / Crosses", module)
   .add("Waiting", testState(xsWaiting))
   .add("Winning", testState(xsVictory))
   .add("Losing", testState(xsDefeat))
-  .add("Drawing", testState(xsTie))
-  .add("Wait to Play Again", testState(xsWaitToPlayAgain));
+  .add("Drawing", testState(xsTie));
 
 storiesOf("Game Screens / Noughts", module)
   .add("Choosing", testState(osChoosing))

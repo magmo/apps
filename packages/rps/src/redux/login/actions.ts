@@ -6,6 +6,12 @@ export const LOGIN_SUCCESS = 'LOGIN.SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN.FAILURE';
 
 
+export const WALLET_IFRAME_LOADED = 'LOGIN.WALLET_IFRAME_LOADED';
+export const walletIframeLoaded = () => ({
+  type: WALLET_IFRAME_LOADED as typeof WALLET_IFRAME_LOADED,
+});
+export type WalletIframeLoaded = ReturnType<typeof walletIframeLoaded>;
+
 export const INITIALIZE_WALLET_SUCCESS = 'LOGIN.INITIALIZE_WALLET_SUCCESS';
 export const initializeWalletSuccess = (address: string) => ({
   type: INITIALIZE_WALLET_SUCCESS as typeof INITIALIZE_WALLET_SUCCESS,
@@ -24,7 +30,7 @@ export const loginSuccess = (user: any, libraryAddress: string) => ({
   libraryAddress,
 });
 
-export const loginFailure = (error: Error) => ({
+export const loginFailure = (error: string) => ({
   type: LOGIN_FAILURE as typeof LOGIN_FAILURE,
   error,
 });
@@ -49,7 +55,7 @@ export const logoutSuccess = () => ({
   type: LOGOUT_SUCCESS as typeof LOGOUT_SUCCESS,
 });
 
-export const logoutFailure = (error: Error) => ({
+export const logoutFailure = (error: string) => ({
   type: LOGOUT_FAILURE as typeof LOGOUT_FAILURE,
   error,
 });
