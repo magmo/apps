@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { connect } from "react-redux";
 
 import { SiteState } from "../redux/reducer";
-import { Marker, Player } from "../core";
+import { Marker } from "../core";
 import GameScreen from "../components/GameScreen";
 import ProfileContainer from "./ProfileContainer";
 import WaitingRoomPage from "../components/WaitingRoomPage";
@@ -17,7 +17,7 @@ import GameOverPage from "../components/GameOverPage";
 import WaitForWallet from "../components/WaitForWallet"; // WaitForFunding, maybe others?
 
 import { Marks } from "../core";
-import { GameState, StateName, PlayingState } from '../redux/game/state';
+import { GameState, StateName } from '../redux/game/state';
 import * as actions from "../redux/game/actions";
 
 interface GameProps {
@@ -50,8 +50,6 @@ function RenderGame(props: GameProps) {
     resign,
     conclude,
   } = props;
-  const { player, turnNum } = (state as PlayingState);
-  const ourTurn = player === Player.PlayerA ? turnNum % 2 !== 0 : turnNum % 2 === 0;
   switch (state.name) {
     case StateName.NoName:
       return <ProfileContainer />;
@@ -175,7 +173,6 @@ function RenderGame(props: GameProps) {
             state.name === StateName.GameOver
           }
           conclude={conclude}
-          ourTurn={ourTurn}
         />
       );
     case StateName.WaitForFunding:
