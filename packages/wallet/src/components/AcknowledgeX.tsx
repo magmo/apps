@@ -2,7 +2,6 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import { StyleSheet, css } from 'aphrodite';
 import SidebarLayout from './SidebarLayout';
-import magmoFireBall from '../images/white_fireball.svg';
 
 interface Props {
   title: string;
@@ -16,17 +15,15 @@ export default class AcknowledgeX extends React.PureComponent<Props> {
     const { title, action, actionTitle, description } = this.props;
     return (
       <SidebarLayout>
-        <h1>
-          {title}
-        </h1>
-        <p>
-          {description}
-        </p>
+        <div className="alert alert-success" role="alert">
+          <h4 className="alert-heading">{title}</h4>
+          <p>{description}</p>
+        </div>
         <div className="challenge-expired-button-container" >
           <div className={css(styles.buttonContainer)}>
             <span className={css(styles.button)}>
               <Button onClick={action} >
-              <img src={magmoFireBall}/>&nbsp;&nbsp;{actionTitle}
+                {actionTitle}
               </Button>
             </span>
           </div>

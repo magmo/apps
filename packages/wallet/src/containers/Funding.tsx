@@ -11,10 +11,10 @@ import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForXInitiation from '../components/WaitForXInitiation';
 import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import SubmitX from '../components/SubmitX';
-import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
 import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
 import TransactionFailed from '../components/TransactionFailed';
+import ApproveFunding from '../components/funding/ApproveFunding';
 
 interface Props {
   state: states.FundingState;
@@ -41,13 +41,9 @@ class FundingContainer extends PureComponent<Props> {
         return null;
       case states.APPROVE_FUNDING:
         return (
-          <ApproveX
-            title="Funding requested"
-            description="Do you wish to open this state channel?"
-            yesMessage="Fund Channel"
-            noMessage="Cancel"
-            approvalAction={fundingApproved}
-            rejectionAction={fundingRejected}
+          <ApproveFunding
+            fundingApproved={fundingApproved}
+            fundingRejected={fundingRejected}
           />
         );
       case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
