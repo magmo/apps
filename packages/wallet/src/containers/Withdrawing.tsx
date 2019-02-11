@@ -46,8 +46,7 @@ class WithdrawingContainer extends PureComponent<Props> {
         return <WithdrawingStep step={1}/>;
       case states.WAIT_FOR_WITHDRAWAL_CONFIRMATION:
         // return <WaitForXConfirmation name="withdrawal" transactionID={state.transactionHash} networkId={state.networkId} />;
-        return <WithdrawingStep step={2}>
-                    Check the progress on&nbsp;
+        return <WithdrawingStep step={2}>Check the progress on&nbsp;
             <EtherscanLink
               transactionID={state.transactionHash}
               networkId={state.networkId}

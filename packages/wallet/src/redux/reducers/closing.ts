@@ -103,7 +103,8 @@ const waitForOpponentCloseReducer = (state: states.WaitForOpponentClose, action:
 const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-      return states.waitForChannel({ ...state, messageOutbox: closeSuccess(), displayOutbox: hideWallet() });
+      // return states.waitForChannel({ ...state, messageOutbox: closeSuccess(), displayOutbox: hideWallet() });
+      return states.acknowledgeCloseSuccess({ ...state, messageOutbox: closeSuccess() });
   }
   return state;
 };
@@ -251,6 +252,7 @@ const acknowledgeCloseSuccessReducer = (state: states.AcknowledgeCloseSuccess, a
       return states.waitForChannel({
         ...state,
         messageOutbox: closeSuccess(),
+        displayOutbox: hideWallet(),
       });
     default:
       return state;
