@@ -95,7 +95,7 @@ storiesOf('Wallet Screens / Withdrawing', module)
   .add('WaitForWithdrawalInitiation', testState(states.waitForWithdrawalInitiation(playerADefaults)))
   .add('WaitForWithdrawalConfirmation', testState(states.waitForWithdrawalConfirmation(playerADefaults)))
   .add('AcknowledgeWithdrawalSuccess', testState(states.acknowledgeWithdrawalSuccess(playerADefaults)));
-
+  
 storiesOf('Wallet Screens / Challenging', module)
   .add('ApproveChallenge', testState(states.approveChallenge(playerADefaults)))
   .add('WaitForChallengeInitiation', testState(states.waitForChallengeInitiation({}, playerADefaults)))
