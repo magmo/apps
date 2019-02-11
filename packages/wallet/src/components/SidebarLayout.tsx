@@ -1,12 +1,12 @@
 import React from 'react';
 import { PureComponent } from 'react';
-
+import NetworkStatus from './NetworkStatus';
 import Modal from 'react-modal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
+
 
 // todo: style to appear from the left as per:
 // https://github.com/DimitryDushkin/sliding-pane/blob/master/src/index.styl
+
 
 const customStyles = {
   content: {
@@ -30,10 +30,7 @@ export default class SidebarLayout extends PureComponent {
       <Modal isOpen={true} style={customStyles} ariaHideApp={false}>
         <div className="d-flex flex-column h-100">
 
-          <div style={{borderBottom: "1px solid rgba(0, 0, 0, 0.1)"}}>
-            <FontAwesomeIcon icon={faDotCircle} style={{ color: "green" }} />&nbsp;&nbsp;
-            Ropsten Test Network
-          </div>
+          <NetworkStatus />
 
           <div
             className="wallet-body"
