@@ -4,7 +4,7 @@ import * as states from '../../../states';
 import * as actions from '../../actions';
 import { itSendsATransaction, itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
-import { hideWallet, challengeComplete } from 'wallet-client';
+import { hideWallet, challengeComplete } from 'magmo-wallet-client';
 
 const {
   asPrivateKey,

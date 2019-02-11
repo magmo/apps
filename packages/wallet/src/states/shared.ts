@@ -1,5 +1,5 @@
 import { TransactionRequest } from "ethers/providers";
-import { WalletEvent, DisplayAction } from 'wallet-client';
+import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { Action } from 'redux';
 
 export interface Base {

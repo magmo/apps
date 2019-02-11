@@ -2,7 +2,7 @@ import { State } from 'fmg-core';
 
 import * as states from '../../states';
 import * as actions from '../actions';
-import { signatureSuccess, validationSuccess, signatureFailure, validationFailure } from 'wallet-client/lib/wallet-events';
+import { signatureSuccess, validationSuccess, signatureFailure, validationFailure } from 'magmo-wallet-client/lib/wallet-events';
 
 import decode from '../../utils/decode-utils';
 import { unreachable } from '../../utils/reducer-utils';
