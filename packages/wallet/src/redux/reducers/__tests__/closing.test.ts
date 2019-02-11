@@ -258,7 +258,7 @@ describe('start in WaitForCloseConfirmed', () => {
 
     const action = actions.transactionConfirmed();
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
+    itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
   });
 });
 
