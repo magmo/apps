@@ -15,6 +15,8 @@ import { unreachable } from '../utils/reducer-utils';
 import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
 import TransactionFailed from '../components/TransactionFailed';
 import ApproveFunding from '../components/funding/ApproveFunding';
+import FundingStep from '../components/funding/FundingStep';
+import EtherscanLink from '../components/EtherscanLink';
 
 interface Props {
   state: states.FundingState;
@@ -47,13 +49,22 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
-        return <WaitForXInitiation name="deploy" />;
+        return <FundingStep step={1}>Please confirm the transaction in MetaMask!</FundingStep>;
       case states.A_SUBMIT_DEPLOY_IN_METAMASK:
-        return <SubmitX name="deploy" />;
+        return <FundingStep step={1}>Please confirm the transaction in MetaMask!</FundingStep>;
       case states.WAIT_FOR_DEPLOY_CONFIRMATION:
-        return <WaitForXConfirmation name="deploy" transactionID={state.transactionHash} networkId={state.networkId} />;
+        return (
+          <FundingStep step={2}>
+            Check the progress on&nbsp;
+            <EtherscanLink
+              transactionID={state.transactionHash}
+              networkId={state.networkId}
+              title="Etherscan"
+             />!
+          </FundingStep>
+        );
       case states.A_WAIT_FOR_DEPOSIT:
-        return <WaitForOtherPlayer name="deposit" />;
+        return <FundingStep step={3}/>;
       case states.A_WAIT_FOR_POST_FUND_SETUP:
         return <AWaitForPostFundSetup />;
       case states.B_WAIT_FOR_DEPLOY_ADDRESS:
@@ -64,7 +75,7 @@ class FundingContainer extends PureComponent<Props> {
         return <WaitForXInitiation name="deposit" />;
       case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
         if (state.ourIndex === 0) {
-          return <WaitForOtherPlayer name="deposit" />;
+          return <FundingStep step={3}/>;
         } else {
           return <WaitForXConfirmation name="deposit" transactionID={state.transactionHash} networkId={state.networkId} />;
         }

@@ -28,19 +28,22 @@ export default class SidebarLayout extends PureComponent {
   render() {
     return (
       <Modal isOpen={true} style={customStyles} ariaHideApp={false}>
-        <div className="d-flex flex-column h-100 justify-content-between">
+        <div className="d-flex flex-column h-100">
 
           <div style={{borderBottom: "1px solid rgba(0, 0, 0, 0.1)"}}>
             <FontAwesomeIcon icon={faDotCircle} style={{ color: "green" }} />&nbsp;&nbsp;
             Ropsten Test Network
           </div>
 
-          <div>
+          <div
+            className="flex-grow-1 d-flex flex-column justify-content-between"
+            style={{paddingTop: "1em"}}
+          >
             {this.props.children}
           </div>
 
           <div className="d-flex flex-row justify-content-end" style={{borderTop: "1px solid rgba(0, 0, 0, 0.1)"}}>
-            <div>Magmo wallet v0.0.1</div>
+            <div style={{color: "rgba(0, 0, 0, 0.3)"}}>Magmo wallet v0.0.1</div>
           </div>
         </div>
       </Modal>

@@ -15,10 +15,8 @@ export default class AcknowledgeX extends React.PureComponent<Props> {
     const { title, action, actionTitle, description } = this.props;
     return (
       <SidebarLayout>
-        <div className="alert alert-success" role="alert">
-          <h4 className="alert-heading">{title}</h4>
+          <h2>{title}</h2>
           <p>{description}</p>
-        </div>
         <div className="challenge-expired-button-container" >
           <div className={css(styles.buttonContainer)}>
             <span className={css(styles.button)}>
