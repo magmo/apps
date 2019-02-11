@@ -7,6 +7,8 @@ import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as SigningUtils from '../../../utils/signing-utils';
 import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType, itDoesntTransition } from './helpers';
+import BN from "bn.js";
+import bnToHex from "../../../utils/bnToHex";
 
 const {
   asAddress,
@@ -30,6 +32,7 @@ const defaults = {
   participants,
   uid: 'uid',
   transactionHash: '0x0',
+  requestedTotalFunds: bnToHex(new BN(1000000000000000)),
 };
 
 const defaultsA = {
@@ -37,6 +40,7 @@ const defaultsA = {
   ourIndex: 0,
   address: asAddress,
   privateKey: asPrivateKey,
+  requestedYourDeposit: bnToHex(new BN(500000000000000)),
 };
 
 describe('start in AcknowledgeConclude', () => {

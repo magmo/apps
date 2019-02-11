@@ -46,6 +46,8 @@ class FundingContainer extends PureComponent<Props> {
           <ApproveFunding
             fundingApproved={fundingApproved}
             fundingRejected={fundingRejected}
+            requestedTotalFunds={state.requestedTotalFunds}
+            requestedYourDeposit={state.requestedYourDeposit}
           />
         );
       case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:

@@ -1,14 +1,17 @@
 import React from 'react';
 import ApproveX from '../ApproveX';
+import web3Utils from "web3-utils";
 
 interface Props {
   fundingApproved: () => void;
   fundingRejected: () => void;
+  requestedTotalFunds: string;
+  requestedYourDeposit: string;
 }
 
 export default class ApproveFunding extends React.PureComponent<Props> {
   render() {
-    const { fundingApproved, fundingRejected } = this.props;
+    const { fundingApproved, fundingRejected, requestedTotalFunds, requestedYourDeposit } = this.props;
     return (
       <ApproveX
         title="Opening Channel"
@@ -24,11 +27,11 @@ export default class ApproveFunding extends React.PureComponent<Props> {
           <br />
           <div className='row'>
             <div className='col-sm-6'>
-              <h3>0.1 ETH</h3>
+              <h3>{web3Utils.fromWei(requestedTotalFunds, "ether")} ETH</h3>
               <div>Total</div>
             </div>
             <div className='col-sm-6'>
-              <h3>0.05 ETH</h3>
+              <h3>{web3Utils.fromWei(requestedYourDeposit, "ether")} ETH</h3>
               <div>Your deposit</div>
             </div>
           </div>
