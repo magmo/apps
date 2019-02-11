@@ -34,11 +34,7 @@ export default class AcknowledgeX extends React.PureComponent<Props> {
 const styles = StyleSheet.create({
   buttonContainer: {
     display: 'flex',
-    justifyContent: 'center',
     padding: '5px',
-    position: "absolute",
-    top: 'auto',
-    bottom: '5%',
   },
   button: {
     margin: '8px',
