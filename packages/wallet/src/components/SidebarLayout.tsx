@@ -36,8 +36,7 @@ export default class SidebarLayout extends PureComponent {
           </div>
 
           <div
-            className="flex-grow-1 d-flex flex-column justify-content-between"
-            style={{paddingTop: "1em"}}
+            className="wallet-body"
           >
             {this.props.children}
           </div>

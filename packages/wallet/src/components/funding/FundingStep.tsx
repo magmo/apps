@@ -30,7 +30,7 @@ const icon = (iconStep:number, currentStep:number) => {
 };
 
 
-export default class FundingStep extends React.PureComponent<Props> {
+export class AFundingStep extends React.PureComponent<Props> {
   render() {
     const currentStep = this.props.step;
     const children = this.props.children;
@@ -52,7 +52,41 @@ export default class FundingStep extends React.PureComponent<Props> {
             Wait for opponent to send deposit
           </li>
           <li style={{ padding: "0.7em 1em" }}>
-            {icon(3.5, currentStep)}
+            {icon(4, currentStep)}
+            Channel open!
+          </li>
+        </ul>
+        <div className="pb-2">
+          {children}
+        </div>
+      </SidebarLayout>
+    );
+  }
+}
+
+export class BFundingStep extends React.PureComponent<Props> {
+  render() {
+    const currentStep = this.props.step;
+    const children = this.props.children;
+
+    return (
+      <SidebarLayout>
+        <h2 className="bp-2">Opening channel</h2>
+        <ul className="fa-ul">
+          <li style={{ padding: "0.7em 1em" }}>
+            {icon(1, currentStep)}
+            Wait for opponent to deploy contract(s) and complete their deposit
+          </li>
+          <li style={{ padding: "0.7em 1em" }}>
+            {icon(2, currentStep)}
+            Send your deposit
+          </li>
+          <li style={{ padding: "0.7em 1em" }}>
+            {icon(3, currentStep)}
+            Wait for confirmation
+          </li>
+          <li style={{ padding: "0.7em 1em" }}>
+            {icon(4, currentStep)}
             Channel open!
           </li>
         </ul>

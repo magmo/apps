@@ -14,7 +14,7 @@ export default class ApproveFunding extends React.PureComponent<Props> {
     const { fundingApproved, fundingRejected, requestedTotalFunds, requestedYourDeposit } = this.props;
     return (
       <ApproveX
-        title="Opening Channel"
+        title="Opening channel"
         description="Do you want to open this state channel?"
         yesMessage="Open Channel"
         noMessage="Cancel"
