@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 
 import { itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as scenarios from './test-scenarios';
-import { validationFailure, SIGNATURE_FAILURE } from 'wallet-client';
+import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
 
 const {
   preFundSetupAHex,
@@ -31,6 +31,13 @@ const defaults = {
 };
 
 describe('when in WaitForChannel', () => {
+  describe("when another user logs in ", () => {
+    const state = states.waitForChannel(defaults);
+    const action = actions.loggedIn(defaults.uid);
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.WAIT_FOR_ADDRESS, updatedState);
+  });
+
   describe('when we send in a PreFundSetupA', () => { // preFundSetupA is A's move, so in this case we need to be player A
     const state = states.waitForChannel(defaults);
     const action = actions.ownPositionReceived(preFundSetupAHex);
