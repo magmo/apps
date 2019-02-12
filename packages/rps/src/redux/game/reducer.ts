@@ -74,26 +74,16 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState,
 };
 
 function attemptRetry(state: JointState): JointState {
-  let newState = state;
   const { gameState } = state;
-  const { messageState } = state;
+  let { messageState } = state;
 
   const actionToRetry = messageState.actionToRetry;
   if (actionToRetry) {
-    newState = singleActionReducer({ messageState, gameState }, actionToRetry);
 
-    // if dispatching actionToRetry caused a distinct state to be returned, discard actionToRetry
-    // else keep it 
-    // if (newState !== state) {
-    //   console.log('action to retry caused nontrivial state change');
-    //   console.log(state);
-    //   messageState.actionToRetry = undefined;
-    //   // run through reducer one more time, in case actionToRetry deliberately being persisted
-    //   newState = singleActionReducer({ messageState, gameState }, actionToRetry);
-    // }
+    messageState = { ...messageState, actionToRetry: undefined };
+    state = singleActionReducer({ messageState, gameState }, actionToRetry);
   }
-    
-  return newState;
+  return state;
 }
 
 function singleActionReducer(state: JointState, action: actions.GameAction) {
