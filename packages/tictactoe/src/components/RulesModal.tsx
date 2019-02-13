@@ -12,7 +12,7 @@ export const RulesModal = (props: Props) => {
       <ModalHeader className="rules-header">
         Here are the rules:
       </ModalHeader>
-      <ModalBody>
+      <ModalBody className="rules-body">
         <ul>
           <li>Each player must contribute their buy-in amount to enter a game.</li>
           <li>Each player must have enough funds to cover the buy-in for each round.</li>
