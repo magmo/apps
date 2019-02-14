@@ -299,7 +299,7 @@ The next thing to consider is the app itself, which will present an interface to
 
 A switch of perspective is useful here; we will now consider the app from the user's perspective. Shown below are the various screens the user can transition between, along with an indication of whether they must send positions (black tips) or listen for them (white tips). 
 
-![Tic Tac Toe Gamestate transitions](./TTT-user-workflow-simplified.png)
+![Tic Tac Toe Gamestate transitions](./ttt_user_flow.png)
 
 Notice how Player A begins as Xs, but the players may switch depending on the result of the previous game. Note the assymetry in that Draw can only be sent by Xs and only be received by Os. Combining this diagram with storybook (which previews the react components), will give a pretty good idea of how the app should function. 
 
