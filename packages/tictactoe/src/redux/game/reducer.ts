@@ -584,8 +584,8 @@ function xsPickMoveReducer(
       balances: newBalances,
       onScreenBalances: newBalances,
     });
-  }
     pos = positions.victory({ ...newGameState });
+  }
   if (gameState.name === states.StateName.XsPickChallengeMove) {
     messageState = {
       walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },

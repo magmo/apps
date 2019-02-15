@@ -291,14 +291,14 @@ describe("player B's app", () => {
     });
   });
 
-  describe('when in GameOver', () => {
+  describe('when in Play Again, and without sufficient funds', () => {
     const gameState = state.playAgain({ ...bProps, ...noughtsabsolutevictory, result: Result.YouLose });
 
     describe('when the player wants to finish the game', () => {
       const action = actions.resign();
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itTransitionsTo(state.StateName.WaitForWithdrawal, updatedState);
+      // itTransitionsTo(state.StateName.WaitForWithdrawal, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
 
       it('requests a conclude from the wallet', () => {
