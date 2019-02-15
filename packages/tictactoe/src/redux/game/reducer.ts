@@ -22,7 +22,6 @@ import {
   POST_FUND_SETUP_B,
   PLAY_AGAIN_ME_FIRST,
   PLAY_AGAIN_ME_SECOND,
-  playAgainMeSecond,
 } from "../../core/positions";
 
 export interface JointState {
@@ -883,7 +882,7 @@ function playAgainReducer(
       result:Imperative.Wait,
       you: Marker.noughts,
          });
-    const pos = playAgainMeSecond({...gameState, turnNum: gameState.turnNum + 1});
+    const pos = positions.playAgainMeSecond({...gameState, turnNum: gameState.turnNum + 1});
     if (gameState.name === states.StateName.PlayAgainChallengeMove) {
       messageState = {
         walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: pos },
