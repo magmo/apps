@@ -299,8 +299,29 @@ const loserGameOver = siteStateFromGameState(
   })
 );
 
-const osChoosingWithRules: SiteState = osChoosing;
-osChoosingWithRules.overlay.rulesVisible = true;
+const xsPickgWithRules: SiteState = {
+  ...lobbyState,
+    overlay: {
+      rulesVisible: true,
+      walletVisible: false,
+    },
+    game: {
+      messageState: {},
+      gameState: states.xsPickMove({
+        ...shared,
+        noughts: 0b000000000,
+        crosses: 0b000000000,
+        you: Marker.crosses,
+        player: Player.PlayerA,
+        result: Imperative.Choose,
+        onScreenBalances: finneyFourSix,
+        turnNum: 5,
+        balances: finneyFiveFive,
+      }),
+    },
+  };
+
+
 
 
 const joinOpenGame = () => console.log("join open game");
@@ -355,4 +376,4 @@ storiesOf("Game Over", module)
   .add("Loser", testState(loserGameOver));
 
 storiesOf("Rules", module)
-  .add("Choosing With Rules", testState(osChoosingWithRules));
+  .add("Xs Picking With Rules", testState(xsPickgWithRules));
