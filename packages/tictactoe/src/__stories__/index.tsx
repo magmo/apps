@@ -302,6 +302,7 @@ const loserGameOver = siteStateFromGameState(
 const osChoosingWithRules: SiteState = osChoosing;
 osChoosingWithRules.overlay.rulesVisible = true;
 
+
 const joinOpenGame = () => console.log("join open game");
 
 const openGame: OpenGame = {

@@ -4,11 +4,11 @@ With these resources in hand, the first step is to think about the core logic of
 ### RPS logic
 RPS is a 2 player game based on a simultanous reveal of both player's choice of weapon; the winner is determined by a fixed cyclic ordering of the three weapons. 
 
-(RPS1) : ...-> Rock -> Scissors -> Paper -...
+...-> Rock -> Scissors -> Paper -...
 
 The game requires some slight modifications to be run asynchronously and trustlessely. Instead of a simultaneous reveal, the first player commits to a move by broadcasting an encrypted version of it to the second. The second player must then be incentivized to choose a weapon, before the first broadcasts their unencrypted choice along with proof that it matches the encrypted version that was committed to in the earlier step. 
 
-Both RPS and TTT are multi-round games; players 'stake' a certain portion of their channel balance on a round, and can continue to play multiple rounds until one player runs out of funds. For simplicity, we specify this stake to be 20% of each player's starting balance, which in turn for simplicity is the same for both players. Note that these choices are *not restrictions of the ForceMove protocol*, but merely simplifications made in our applications, tentatively tying us to a special case.
+Both RPS and TTT are multi-round games; players 'stake' a certain portion of their channel balance on a round, and can continue to play multiple rounds until one player runs out of funds. For simplicity, we specify this stake to be 20% of each player's starting balance, which in turn for simplicity is the same for both players. Note that these choices are *not restrictions of the ForceMove protocol*, but merely simplifications made in our applications, tentatively tying us to a special case for the purpose of demonstration. 
 
 The *gamestate* of RPS is composed of 7 concatenated 32-byte variables, stored in the last 224 elements of a byte array that represents the full state of the channel. 
 
@@ -27,8 +27,6 @@ The first variable has an `enum` type, and can take values from the set  `{ Star
 
  > TODO: `Concluded` almost certainly *does not belong* in the `positionType`, since the latter is a subset of the `gameState`. In RPS, in accordance with the ForceMove protocol, when a conclude state is constructed it does not have a `gameState` at all.
 
-The applications are written in [TypeScipt](https://www.typescriptlang.org) a) because it compiles to JavaScript and b) it is a typed language. The first property is important, since JavaScript code can run in the clients browser, and a state channel is designed to be a peer-to-peer protocol in the spirit of the decentralized web. The second property helps the application code follow the solidity code more closely, and provides all of the development benefits of a typed language (autocompletion and date type protection in your IDE, compile-time rejection of errors) with almost no performance cost (with respect to JavaScript).
-
 >   NB in the whitepaper, `Start` is called `Resting`, `RoundProposed` is called `ProposeRound`, and so on.
 
 The second variable is the stake of of the game -- the amount transferred from the loser to the winner after a single round. `preCommit` is the salted hash of the first player's weapon. `bPlay` and `aPlay` are the second and first player's unencrypted weapon choices: again, in a custom type that can take variables from the set `{ Rock, Paper, Scissors }`. `salt` is the salt (used for increased security), and `roundNum` is a counter for the number of rounds that have been played. 
@@ -40,7 +38,7 @@ This library is imported in the file `RockPaperScissorsGame.sol`, where the `val
 ![RPS validTransition state machine diagram](./FM_fig1.png)
 **Fig1: Rock Paper Scissors Channel-State-Machine Diagram:** Each player may sign the position at the tip of an arrow emanating from any state signed by the previous player.
 
-> The App-State-Machine diagrams work quite differently, and relate to a *single* player.
+> The App-State-Machine diagram (introduced below) will wwork quite differently, and describes the transitions of a *single* player.
 
  Explicitly: 
 

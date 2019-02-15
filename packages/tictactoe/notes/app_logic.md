@@ -1,15 +1,15 @@
-
 # App logic for TTT and RPS
-Having the `validTransition` contract coded in solidity, along with the contracts imported from `fmg-core`, completes the necessary smart contracts for the state channel. Users could certainly play TTT off-chain and enjoy all the benefits of state channels (trustless, low cost, low latency and instant finality). The app itself, which the remainder of this document focusses on, is **simply a convenient way of visualising, sending and receiving appropriately encoded state channel positions**. Nevertheless, it arguably represents a much larger chunk of work for the state channel application developer han does authoring the smart contracts.
-
+Having the `validTransition` contract coded in solidity, along with the contracts imported from `fmg-core`, completes the necessary smart contracts for the state channel. Users could certainly play TTT off-chain and enjoy all the benefits of state channels (trustless, low cost, low latency and instant finality). The app itself, which the remainder of this document focusses on, is **simply a convenient way of visualising, sending and receiving appropriately encoded state channel positions**. Nevertheless, it arguably represents a much larger chunk of work for the state channel application developer than does authoring the smart contracts.
 
 The application needs to achieve multiple taks:
 
 * Present a front-end interface to users so that they can propose and accept games, make moves, and launch and respond to challenges.
-* Sign, post and retrieve messages to instances of the app running on other player's clients (browsers). The messaging protocol could be almost anything: carrier-pigeon, SMS, semaphore. We are going to use a cloud-based database (firebase) for the purposes of this proof of concept. 
+* Sign, post and retrieve messages to instances of the app running on other player's clients (browsers). The messaging protocol could be almost anything: carrier-pigeon, SMS, semaphore. We are going to use a cloud-based database (firebase) for the purposes of these proofs of concept. 
 * Interact with the blockchain when necessary.
 
 > A *channel wallet* can do much of the heavy-lifting of veryifying, signing and storing states, as well as interfacing with the blockchain in the case of setup and teardown of channels, as well as challenges. Our open-source implementation, the [Magmo wallet](https://github.com/magmo/apps/tree/master/packages/wallet) is ready for you to use!
+
+The applications are written in [TypeScipt](https://www.typescriptlang.org) a) because it compiles to JavaScript and b) it is a typed language. The first property is important, since JavaScript code can run in the clients browser, and a state channel is designed to be a peer-to-peer protocol in the spirit of the decentralized web. The second property helps the application code follow the solidity code more closely, and provides all of the development benefits of a typed language (autocompletion and date type protection in your IDE, compile-time rejection of errors) with almost no performance cost (with respect to JavaScript).
 
 We need to write some TypeScript to encode and decode the channel state. This allows the very rigid and minimal formatting of the channel state in solidity to be cast into a more flexible and verbose expression of state that is much more amenable to app development.
 
@@ -64,12 +64,12 @@ the `any` type enables us to opt out of type checking (allowing data of any type
 
 > There is a more elegant way of doing this. See https://github.com/magmo/rps-poc/commit/77a5b112434a197f19a416d36cf7c0d26641de34 . 
 
-The pattern of defining nested interfaces, along with constructor functions that allow one to 'project out' the required paramters from a larger collection, is one that we will be havily relying on. 
+The pattern of defining nested interfaces, along with constructor functions that allow one to 'project out' the required parameters from a larger collection, is one that we will be havily relying on. 
 
 
 ### Example correspondence beetween solidity and typescript
 
-In `results.ts` we have 
+In `rps/src/core/results.ts` we have 
 
 ```typescript
 export function calculateResult(yourMove: Move, theirMove: Move): Result {
@@ -84,9 +84,11 @@ export function calculateResult(yourMove: Move, theirMove: Move): Result {
   }
 }
 ```
-which is an expression of the core game logic of RPS. 
+which is an expression of the core game logic of RPS, and reproduces (essentially) the corresponding function written into the smart contract.
 
-To infer which player has won in TTT, me must keep track of which player is crosses, since as discussed above this is not fixed in any given channel (or though it is of course fixed for the duration of a round). 
+> The app and/or wallet obviously need to be aware of (or perhaps even *precisely mirror*) the functions enshrined in the smart contracts. There are several possibilities for achieving this, including emulating solidity from within javascript or by making a read-only call to a contract that has been deployed to a blockchain. 
+
+In the front end TTT app, me must keep track of which player is crosses, since as discussed above this is not fixed in any given channel (or though it is of course fixed for the duration of a round). It is not necessary to include this information in the state of the channel itself. 
 
 To get into the draw position, we will require the board to be full. Only Xs can do this, since they always move first. 
 
@@ -215,7 +217,7 @@ In `/src/core/test-scenarios.ts` we will define a sequence of states, to be sign
 
 
 ### Front end (React)
-Let us create some view components for the board, the balances and so on. We shall arrange these in an attractive way, using some html and css to help. The code needs to translate the 'human readable' TypeScript description of the board and render something beautiful and instantly recognizable as a game. It also must allow a move to be made with a simple click, and make the appropriate changes to the state of the app. In `playing4Hex` above, note that `noughts` is 18 and `crosses` is 101. The react component `Board.tsx` displays this on screen. The following snippet gives you the flavour of how this is achieved:
+Let us create some view components for the board, the balances and so on. We shall try to arrange these in an attractive way, using some html and css to help. The code needs to translate the TypeScript description of the board and render something beautiful and instantly recognizable as a game. It also must allow a move to be made with a simple click, and make the appropriate changes to the state of the app. In `playing4Hex` above, note that `noughts` is 18 and `crosses` is 101. The react component `Board.tsx` displays this on screen. The following snippet gives you the flavour of how this is achieved:
 
 ```typescript
 renderMark(noughts: Marks, crosses: Marks, position: Marks) {
@@ -230,16 +232,13 @@ renderMark(noughts: Marks, crosses: Marks, position: Marks) {
 
   noWinRenderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if ((crosses & position) === position) {
-      if (this.crucialMark(crosses, position)) {
-        return (<span className="xs tile">×</span>);
-      } else { return (<span className="xs tile">×</span>); }
+      return (<span className="xs tile">×</span>);
     }
     if ((noughts & position) === position) {
-      if (this.crucialMark(noughts, position)) {
-        return (<span className="os tile">○</span>);
-      } else { return (<span className="os tile">○</span >); }
+      return (<span className="os tile">○</span >); 
     } else { return this.blankRenderMark(this.props.you); }
   }
+
 
   render() {
     const { noughts, crosses } = this.props;
@@ -294,14 +293,12 @@ Our apps use [Redux](https://redux.js.org/introduction/getting-started) to maint
 
 What this means in practice is that the app developer must codify the app logic (see next section below) in a *reducer*. The role of the reducer is to specify the properties of a new application state, generated when the user dispatches an action (for example clicking on the board or recieving a message).
 
-# App Logic
-The next thing to consider is the app itself, which will present an interface to the user, and allow them to propose, reject and accept games and, of course, choose moves.
-
 A switch of perspective is useful here; we will now consider the app from the user's perspective. Shown below are the various screens the user can transition between, along with an indication of whether they must send positions (black tips) or listen for them (white tips). 
 
 ![Tic Tac Toe Gamestate transitions](./ttt_user_flow.png)
 
 Notice how Player A begins as Xs, but the players may switch depending on the result of the previous game. Note the assymetry in that Draw can only be sent by Xs and only be received by Os. Combining this diagram with storybook (which previews the react components), will give a pretty good idea of how the app should function. 
 
-Not shown here: wallet states; transition into or out of the game; the case of insufficient funds. Also not shown: **which** positions should be sent.
+Not shown here: wallet states; transition into or out of the game; the case of insufficient funds.
 
+The numbers correspond to the position types shown in [the article on channel logic](./channel_logic.md).
