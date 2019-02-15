@@ -219,7 +219,7 @@ In `/src/core/test-scenarios.ts` we will define a sequence of states, to be sign
 ### Front end (React)
 Let us create some view components for the board, the balances and so on. We shall try to arrange these in an attractive way, using some html and css to help. The code needs to translate the TypeScript description of the board and render something beautiful and instantly recognizable as a game. It also must allow a move to be made with a simple click, and make the appropriate changes to the state of the app. In `playing4Hex` above, note that `noughts` is 18 and `crosses` is 101. The react component `Board.tsx` displays this on screen. The following snippet gives you the flavour of how this is achieved:
 
-```typescript
+```tsx
 renderMark(noughts: Marks, crosses: Marks, position: Marks) {
     if (isWinningMarks(noughts) || isWinningMarks(crosses)) {
       return this.winRenderMark(noughts, crosses, position);
