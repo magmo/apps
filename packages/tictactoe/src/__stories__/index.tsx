@@ -270,7 +270,7 @@ const osTie = siteStateFromGameState(
 );
 
 const winnerGameOver = siteStateFromGameState(
-  states.gameOver({
+  states.waitToPlayAgain({
     ...shared,
     noughts: 0b000011000,
     crosses: 0b111000000,
@@ -285,7 +285,7 @@ const winnerGameOver = siteStateFromGameState(
 );
 
 const loserGameOver = siteStateFromGameState(
-  states.gameOver({
+  states.playAgain({
     ...shared,
     noughts: 0b000011000,
     crosses: 0b111000000,

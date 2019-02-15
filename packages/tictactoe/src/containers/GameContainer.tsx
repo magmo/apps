@@ -129,7 +129,6 @@ function RenderGame(props: GameProps) {
       case StateName.PlayAgainChallengeMove:
       case StateName.PlayAgain:
       case StateName.WaitToPlayAgain:
-      case StateName.GameOver:
       return (
         <PlayAgain
           noughts={state.noughts}

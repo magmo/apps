@@ -248,7 +248,7 @@ describe("player A's app", () => {
         });
         const updatedState = gameReducer({ messageState, gameState }, action1);
 
-        itTransitionsTo(state.StateName.GameOver, updatedState);
+        itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
         itFullySwingsTheBalancesToB(
           roundBuyIn,
@@ -297,7 +297,7 @@ describe("player A's app", () => {
   });
 
   describe('when in GameOver', () => {
-    const gameState = state.gameOver({ ...aProps, ...noughtsabsolutevictory, result: Result.YouLose });
+    const gameState = state.playAgain({ ...aProps, ...noughtsabsolutevictory, result: Result.YouLose });
 
     describe('when the player wants to finish the game', () => {
       const action = actions.resign();
