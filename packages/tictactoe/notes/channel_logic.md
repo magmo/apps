@@ -249,4 +249,6 @@ These incentives should are encoded into the `validTransition` function. Some re
 
 ```
 
-Note that moving into `XPlaying` from `PlayAgainMeSecond` is accompanied by assigning the stake to the moving player; during inconclusive play, the signing player takes twice the stake from the previous player, thereby assiging the stake to themselves; a penalty-free exit is possible from `PlayAgainMeFirst` or `PlayAgainMeSecond`, in the sense that the resolutions have not yet changed from the previous round..
+Note that moving into `XPlaying` from `PlayAgainMeSecond` is accompanied by assigning the stake to the moving player; during inconclusive play, the signing player takes twice the stake from the previous player, thereby assiging the stake to themselves; a penalty-free exit is possible from `PlayAgainMeFirst` or `PlayAgainMeSecond`, in the sense that the resolutions have not yet changed from the previous round.
+
+Next, take a look at the document on [application logic](./app_logic.md).
