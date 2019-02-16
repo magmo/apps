@@ -216,7 +216,7 @@ const osChoosing = siteStateFromGameState(
 const osWaiting = siteStateFromGameState(
   states.osWaitForOpponentToPickMove({
     ...shared,
-    noughts: 0b000000000,
+    noughts: 0b010000000,
     crosses: 0b000000001,
     you: Marker.noughts,
     player: Player.PlayerB,
@@ -231,7 +231,7 @@ const osVictory = siteStateFromGameState(
   states.waitToPlayAgain({
     ...shared,
     noughts: 0b001001001,
-    crosses: 0b000010010,
+    crosses: 0b100010010,
     you: Marker.noughts,
     player: Player.PlayerB,
     result: Result.YouWin,
@@ -244,7 +244,7 @@ const osVictory = siteStateFromGameState(
 const osDefeat = siteStateFromGameState(
   states.playAgain({
     ...shared,
-    noughts: 0b000001011,
+    noughts: 0b000001001,
     crosses: 0b111010000,
     you: Marker.noughts,
     player: Player.PlayerB,
