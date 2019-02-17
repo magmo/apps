@@ -68,6 +68,7 @@ export default function* loginRootSaga() {
 }
 
 function* getLibraryAddress() {
+  ethereum.enable();
   const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10);
   if (!TTTGameArtifact.networks || !TTTGameArtifact.networks[selectedNetworkId]) {
     return undefined;
