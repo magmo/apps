@@ -1,21 +1,15 @@
 import { ethers } from 'ethers';
-import { Channel, padBytes32, State } from 'fmg-core';
+import { Channel, State, toHex } from 'fmg-core';
 import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction, createRespondWithMoveTransaction, } from '../utils/transaction-generator';
-import { signPositionHex } from '../utils/signing-utils';
+import { signCommitment } from '../utils/signing-utils';
 import testGameArtifact from '../../build/contracts/TestGame.json';
-
-import BN from 'bn.js';
-
-function bnToHex(bn: BN) {
-  return padBytes32('0x' + bn.toString(16));
-}
-
+import { bigNumberify, StateType } from 'fmg-core';
 export function getLibraryAddress(networkId) {
   return testGameArtifact.networks[networkId].address;
 
 }
-export const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
-export const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
+export const fiveFive = [bigNumberify(5).toHexString(), bigNumberify(5).toHexString()] as [string, string];
+export const fourSix = [bigNumberify(4).toHexString(), bigNumberify(6).toHexString()] as [string, string];
 
 export async function deployContract(provider: ethers.providers.JsonRpcProvider, channelNonce, participantA, participantB) {
 
@@ -47,23 +41,29 @@ export async function createChallenge(provider: ethers.providers.JsonRpcProvider
   const libraryAddress = getLibraryAddress(networkId);
   const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const fromState = new State({
+  const fromState: State = {
     channel,
-    resolution: [new BN(5), new BN(5)],
-    turnNum: 5,
-    stateType: State.StateType.Game,
-  }).toHex();
+    allocation: [],
+    destination: [],
+    turnNum: bigNumberify(5),
+    stateType: StateType.Game,
+    gameAttributes: '0x0',
+    stateCount: bigNumberify(0),
+  };
 
-  const toState = new State({
+  const toState: State = {
     channel,
-    resolution: [new BN(6), new BN(4)],
-    turnNum: 6,
-    stateType: State.StateType.Game,
-  }).toHex();
+    allocation: [],
+    destination: [],
+    turnNum: bigNumberify(6),
+    stateType: StateType.Game,
+    gameAttributes: '0x0',
+    stateCount: bigNumberify(1),
+  };
 
-  const fromSig = signPositionHex(fromState, participantB.privateKey);
-  const toSig = signPositionHex(toState, participantA.privateKey);
-  const challengeTransaction = createForceMoveTransaction(address, fromState, toState, fromSig, toSig);
+  const fromSig = signCommitment(fromState, participantB.privateKey);
+  const toSig = signCommitment(toState, participantA.privateKey);
+  const challengeTransaction = createForceMoveTransaction(address, toHex(fromState), toHex(toState), fromSig, toSig);
   const transactionReceipt = await signer.sendTransaction(challengeTransaction);
   await transactionReceipt.wait();
   return toState;
@@ -75,25 +75,30 @@ export async function concludeGame(provider: ethers.providers.JsonRpcProvider, a
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
   const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
-
-  const fromState = new State({
+  const fromState: State = {
     channel,
-    resolution: [new BN(5), new BN(5)],
-    turnNum: 50,
-    stateType: State.StateType.Conclude,
-  }).toHex();
+    allocation: [],
+    destination: [],
+    turnNum: bigNumberify(5),
+    stateType: StateType.Conclude,
+    gameAttributes: '0x0',
+    stateCount: bigNumberify(0),
+  };
 
-  const toState = new State({
+  const toState: State = {
     channel,
-    resolution: [new BN(5), new BN(5)],
-    turnNum: 51,
-    stateType: State.StateType.Conclude,
-  }).toHex();
+    allocation: [],
+    destination: [],
+    turnNum: bigNumberify(6),
+    stateType: StateType.Conclude,
+    gameAttributes: '0x0',
+    stateCount: bigNumberify(1),
+  };
 
-  const fromSignature = signPositionHex(fromState, participantA.privateKey);
-  const toSignature = signPositionHex(toState, participantB.privateKey);
+  const fromSignature = signCommitment(fromState, participantA.privateKey);
+  const toSignature = signCommitment(toState, participantB.privateKey);
 
-  const concludeTransaction = createConcludeTransaction(address, fromState, toState, fromSignature, toSignature);
+  const concludeTransaction = createConcludeTransaction(address, toHex(fromState),toHex(toState), fromSignature, toSignature);
   const transactionReceipt = await signer.sendTransaction(concludeTransaction);
   await transactionReceipt.wait();
 }
@@ -106,15 +111,19 @@ export async function respondWithMove(provider: ethers.providers.JsonRpcProvider
   const libraryAddress = getLibraryAddress(networkId);
   const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const toState = new State({
+  const toState: State = {
     channel,
-    resolution: [new BN(6), new BN(4)],
-    turnNum: 7,
-    stateType: State.StateType.Game,
-  }).toHex();
-  const toSig = signPositionHex(toState, participantB.privateKey);
+    allocation: [],
+    destination: [],
+    turnNum: bigNumberify(6),
+    stateType: StateType.Game,
+    gameAttributes: '0x0',
+    stateCount: bigNumberify(1),
+  };
 
-  const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toState, toSig);
+  const toSig = signCommitment(toState, participantB.privateKey);
+
+  const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toHex(toState), toSig);
   const transactionReceipt = await signer.sendTransaction(respondWithMoveTransaction);
   await transactionReceipt.wait();
   return toState;
@@ -128,14 +137,18 @@ export async function refuteChallenge(provider: ethers.providers.JsonRpcProvider
   const libraryAddress = getLibraryAddress(networkId);
   const channel = new Channel(libraryAddress, channelNonce, [participantA.address, participantB.address]);
 
-  const toState = new State({
+  const toState: State = {
     channel,
-    resolution: [new BN(5), new BN(5)],
-    turnNum: 100,
-    stateType: State.StateType.Game,
-  }).toHex();
-  const toSig = signPositionHex(toState, participantA.privateKey);
-  const refuteTransaction = createRefuteTransaction(address, toState, toSig);
+    allocation: [],
+    destination: [],
+    turnNum: bigNumberify(6),
+    stateType: StateType.Game,
+    gameAttributes: '0x0',
+    stateCount: bigNumberify(1),
+  };
+
+  const toSig = signCommitment(toState, participantA.privateKey);
+  const refuteTransaction = createRefuteTransaction(address, toHex(toState), toSig);
   const transactionReceipt = await signer.sendTransaction(refuteTransaction);
   await transactionReceipt.wait();
   return toState;

@@ -8,7 +8,7 @@ import { closeSuccess, hideWallet } from 'magmo-wallet-client/lib/wallet-events'
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
-  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+  if (action.type === actions.OWN_COMMITMENT_RECEIVED || action.type === actions.OPPONENT_COMMITMENT_RECEIVED) {
     return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
   }
   switch (state.type) {

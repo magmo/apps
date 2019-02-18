@@ -1,6 +1,7 @@
 import { TransactionRequest } from "ethers/providers";
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { Action } from 'redux';
+import { State as Commitment, BigNumber } from 'fmg-core';
 
 export interface Base {
   displayOutbox?: DisplayAction;
@@ -18,8 +19,8 @@ export interface AddressExists extends LoggedIn {
   networkId: number;
 }
 
-export interface SignedPosition {
-  data: string;
+export interface SignedCommitment {
+  commitment: Commitment;
   signature: string;
 }
 
@@ -28,13 +29,13 @@ export interface ChannelPartiallyOpen extends AddressExists {
   libraryAddress: string;
   ourIndex: number;
   participants: [string, string];
-  channelNonce: number;
-  turnNum: number;
-  lastPosition: SignedPosition;
+  channelNonce: BigNumber;
+  turnNum: BigNumber;
+  lastCommitment: SignedCommitment;
 }
 
 export interface ChannelOpen extends ChannelPartiallyOpen {
-  penultimatePosition: SignedPosition;
+  penultimateCommitment: SignedCommitment;
   unhandledAction?: Action;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
@@ -78,13 +79,13 @@ export function addressExists<T extends AddressExists>(params: T): AddressExists
 }
 
 export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T): ChannelPartiallyOpen {
-  const { channelId, ourIndex, participants, channelNonce, turnNum, lastPosition, libraryAddress } = params;
-  return { ...addressExists(params), channelId, ourIndex, participants, channelNonce, turnNum, lastPosition, libraryAddress };
+  const { channelId, ourIndex, participants, channelNonce, turnNum, lastCommitment: lastPosition, libraryAddress } = params;
+  return { ...addressExists(params), channelId, ourIndex, participants, channelNonce, turnNum, lastCommitment: lastPosition, libraryAddress };
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  const { penultimatePosition, unhandledAction, requestedTotalFunds, requestedYourDeposit } = params;
-  return { ...channelPartiallyOpen(params), penultimatePosition, unhandledAction, requestedTotalFunds, requestedYourDeposit };
+  const { penultimateCommitment: penultimatePosition, unhandledAction, requestedTotalFunds, requestedYourDeposit } = params;
+  return { ...channelPartiallyOpen(params), penultimateCommitment: penultimatePosition, unhandledAction, requestedTotalFunds, requestedYourDeposit };
 }
 
 

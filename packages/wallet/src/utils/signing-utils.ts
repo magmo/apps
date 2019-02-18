@@ -1,6 +1,11 @@
 import { splitSignature, getAddress } from 'ethers/utils';
-import { recover, sign, SolidityType } from 'fmg-core';
+import { recover, sign, SolidityType, State as Commitment } from 'fmg-core';
+import { toHex } from 'fmg-core/lib/state';
 
+
+export const validCommitmentSignature = (commitment: Commitment, signature: string, address: string) => {
+  return validSignature(toHex(commitment), signature, address);
+};
 
 export const validSignature = (data: string, signature: string, address: string) => {
   try {
@@ -16,8 +21,12 @@ export const validSignature = (data: string, signature: string, address: string)
   }
 };
 
-export const signPositionHex = (positionHex: string, privateKey: string) => {
-  const signature = sign(positionHex, privateKey) as any;
+export const signCommitment = (commitment: Commitment, privateKey: string) => {
+  return signData(toHex(commitment), privateKey);
+};
+
+export const signData = (data: string, privateKey: string) => {
+  const signature = sign(data, privateKey) as any;
   return signature.signature;
 };
 
