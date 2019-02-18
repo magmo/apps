@@ -5,16 +5,16 @@ import * as runningStates from '../../states/running';
 import { WalletAction } from '../actions';
 import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
-import { signPositionHex } from '../../utils/signing-utils';
+import { signCommitment } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
 import { challengeResponseRequested, challengeComplete, hideWallet, showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import decode from '../../utils/decode-utils';
+import { toHex } from 'fmg-core/lib/state';
 
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
-  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+  if (action.type === actions.OWN_COMMITMENT_RECEIVED || action.type === actions.OPPONENT_COMMITMENT_RECEIVED) {
     return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
   }
 
@@ -44,8 +44,7 @@ export const respondingReducer = (state: RespondingState, action: WalletAction):
 const responseTransactionFailedReducer = (state: states.ResponseTransactionFailed, action: WalletAction) => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
-      const { data, signature } = state.lastPosition;
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, signature);
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(state.lastCommitment.commitment), state.lastCommitment.signature);
       return states.initiateResponse({
         ...state,
         transactionOutbox: transaction,
@@ -62,7 +61,7 @@ export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, 
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
         return challengeStates.acknowledgeChallengeTimeout({ ...state });
-      }else{
+      } else {
         return state;
       }
     default:
@@ -75,8 +74,8 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
     case actions.RESPOND_WITH_MOVE_CHOSEN:
       return states.takeMoveInApp({ ...state, messageOutbox: challengeResponseRequested(), displayOutbox: hideWallet() });
     case actions.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
-      const { data, signature } = state.lastPosition;
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, signature);
+
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(state.lastCommitment.commitment), state.lastCommitment.signature);
       return states.initiateResponse({
         ...state,
         transactionOutbox: transaction,
@@ -86,7 +85,7 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
         return challengeStates.acknowledgeChallengeTimeout({ ...state });
-      }else{
+      } else {
         return state;
       }
     default:
@@ -96,22 +95,20 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
 
 export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.CHALLENGE_POSITION_RECEIVED:
-      const data = action.data;
-      const position = decode(data);
+    case actions.CHALLENGE_COMMITMENT_RECEIVED:
       // check it's our turn
       if (!ourTurn(state)) { return state; }
 
       // check transition
-      if (!validTransition(state, position)) { return state; }
+      if (!validTransition(state, action.commitment)) { return state; }
 
-      const signature = signPositionHex(data, state.privateKey);
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, signature);
+      const signature = signCommitment(action.commitment, state.privateKey);
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(action.commitment), signature);
       return states.initiateResponse({
         ...state,
-        turnNum: state.turnNum + 1,
-        lastPosition: { data, signature },
-        penultimatePosition: state.lastPosition,
+        turnNum: state.turnNum.add(1),
+        lastState: { state: action.commitment, signature },
+        penultimateState: state.lastCommitment,
         transactionOutbox: transaction,
         displayOutbox: showWallet(),
       });
@@ -119,7 +116,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
         return challengeStates.acknowledgeChallengeTimeout({ ...state });
-      }else{
+      } else {
         return state;
       }
     default:

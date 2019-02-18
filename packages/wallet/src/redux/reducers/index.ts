@@ -25,10 +25,9 @@ import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
 import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, MESSAGE_SENT, TRANSACTION_SENT_TO_METAMASK, DISPLAY_MESSAGE_SENT } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
-import decode from '../../utils/decode-utils';
-import { validSignature } from '../../utils/signing-utils';
-import { State } from 'fmg-core';
+import { validCommitmentSignature } from '../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
+import { StateType, fromHex } from 'fmg-core/lib/state';
 
 const initialState = waitForLogin();
 
@@ -84,27 +83,27 @@ const receivedValidOpponentConclusionRequest = (state: WalletState, action: Wall
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== MESSAGE_RECEIVED) { return null; }
 
-  let position;
+  let messageState;
   try {
-    position = decode(action.data);
+    messageState = fromHex(action.data);
   } catch (error) {
     return null;
   }
 
-  if (position.stateType !== State.StateType.Conclude) {
+  if (messageState.stateType !== StateType.Conclude) {
     return null;
   }
   // check signature
   const opponentAddress = state.participants[1 - state.ourIndex];
   if (!action.signature) { return null; }
-  if (!validSignature(action.data, action.signature, opponentAddress)) { return null; }
-  if (!validTransition(state, position)) { return null; }
+  if (!validCommitmentSignature(messageState, action.signature, opponentAddress)) { return null; }
+  if (!validTransition(state, messageState)) { return null; }
 
   return acknowledgeConclude({
     ...state,
-    turnNum: position.turnNum,
-    lastPosition: { data: action.data, signature: action.signature },
-    penultimatePosition: state.lastPosition,
+    turnNum: messageState.turnNum,
+    lastState: { state: messageState, signature: action.signature },
+    penultimateState: state.lastCommitment,
     displayOutbox: showWallet(),
   });
 };

@@ -1,7 +1,10 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.5.0;
+pragma experimental ABIEncoderV2;
+import "fmg-core/contracts/State.sol";
+
 
 contract TestGame {
-    function validTransition(bytes _old, bytes _new) public pure returns (bool) {
-      return true;
+    function validTransition(State.StateStruct memory _old, State.StateStruct memory _new) public pure returns (bool) {
+       return true;
     }
 }

@@ -1,11 +1,10 @@
-import BN from 'bn.js';
 import { ethers } from "ethers";
-import { Channel, State } from "fmg-core";
+import { Channel, State, StateType } from "fmg-core";
 import { put } from "redux-saga/effects";
 
 import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
 import { transactionSender } from "../redux/sagas/transaction-sender";
-import { signPositionHex, signVerificationData } from '../utils/signing-utils';
+import { signCommitment, signVerificationData } from '../utils/signing-utils';
 import { getLibraryAddress } from './test-utils';
 import {
   createDeployTransaction,
@@ -20,6 +19,7 @@ import {
 } from '../utils/transaction-generator';
 
 import { deployContract, depositContract, createChallenge, concludeGame } from './test-utils';
+import { bigNumberify, toHex } from 'fmg-core';
 
 jest.setTimeout(20000);
 
@@ -80,24 +80,30 @@ describe('transactions', () => {
     const { channelNonce } = channel;
     const contractAddress = await deployContract(provider, channelNonce, participantA, participantB) as string;
     await depositContract(provider, contractAddress);
-    const fromState = new State({
+
+    const fromState: State = {
       channel,
-      resolution: [new BN(5), new BN(5)],
-      turnNum: 5,
-      stateType: State.StateType.Game,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(5),
+      stateType: StateType.Game,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(0),
+    };
 
-    const toState = new State({
+    const toState: State = {
       channel,
-      resolution: [new BN(6), new BN(4)],
-      turnNum: 6,
-      stateType: State.StateType.Game,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(6),
+      stateType: StateType.Game,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(1),
+    };
+    const fromSig = signCommitment(fromState, participantB.privateKey);
+    const toSig = signCommitment(toState, participantA.privateKey);
 
-    const fromSig = signPositionHex(fromState, participantB.privateKey);
-    const toSig = signPositionHex(toState, participantA.privateKey);
-
-    const forceMoveTransaction = createForceMoveTransaction(contractAddress, fromState, toState, fromSig, toSig);
+    const forceMoveTransaction = createForceMoveTransaction(contractAddress, toHex(fromState), toHex(toState), fromSig, toSig);
     await testTransactionSender(forceMoveTransaction);
 
   });
@@ -108,16 +114,19 @@ describe('transactions', () => {
     const contractAddress = await deployContract(provider, channelNonce, participantA, participantB) as string;
     await depositContract(provider, contractAddress);
     await createChallenge(provider, contractAddress, channelNonce, participantA, participantB);
-    const toState = new State({
+    const toState: State = {
       channel,
-      resolution: [new BN(6), new BN(4)],
-      turnNum: 7,
-      stateType: State.StateType.Game,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(6),
+      stateType: StateType.Game,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(1),
+    };
 
-    const toSig = signPositionHex(toState, participantB.privateKey);
+    const toSig = signCommitment(toState, participantB.privateKey);
 
-    const respondWithMoveTransaction = createRespondWithMoveTransaction(contractAddress, toState, toSig);
+    const respondWithMoveTransaction = createRespondWithMoveTransaction(contractAddress, toHex(toState), toSig);
     await testTransactionSender(respondWithMoveTransaction);
   });
 
@@ -127,16 +136,19 @@ describe('transactions', () => {
     const contractAddress = await deployContract(provider, channelNonce, participantA, participantB) as string;
     await depositContract(provider, contractAddress);
     await createChallenge(provider, contractAddress, channelNonce, participantA, participantB);
-    const toState = new State({
+    const toState: State = {
       channel,
-      resolution: [new BN(5), new BN(5)],
-      turnNum: 100,
-      stateType: State.StateType.Game,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(6),
+      stateType: StateType.Game,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(1),
+    };
 
-    const toSig = signPositionHex(toState, participantA.privateKey);
+    const toSig = signCommitment(toState, participantA.privateKey);
 
-    const refuteTransaction = createRefuteTransaction(contractAddress, toState, toSig);
+    const refuteTransaction = createRefuteTransaction(contractAddress, toHex(toState), toSig);
     await testTransactionSender(refuteTransaction);
   });
 
@@ -146,28 +158,33 @@ describe('transactions', () => {
     const contractAddress = await deployContract(provider, channelNonce, participantA, participantB) as string;
     await depositContract(provider, contractAddress);
 
-    const fromState = new State({
+    const fromState: State = {
       channel,
-      resolution: [new BN(5), new BN(5)],
-      turnNum: 50,
-      stateType: State.StateType.Conclude,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(5),
+      stateType: StateType.Conclude,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(0),
+    };
 
-    const toState = new State({
+    const toState: State = {
       channel,
-      resolution: [new BN(5), new BN(5)],
-      turnNum: 51,
-      stateType: State.StateType.Conclude,
-    }).toHex();
-
-    const fromSignature = signPositionHex(fromState, participantA.privateKey);
-    const toSignature = signPositionHex(toState, participantB.privateKey);
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(6),
+      stateType: StateType.Conclude,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(1),
+    };
+    const fromSignature = signCommitment(fromState, participantA.privateKey);
+    const toSignature = signCommitment(toState, participantB.privateKey);
     const verificationSignature = signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey);
     const concludeAndWithdrawArgs: ConcludeAndWithdrawArgs = {
       contractAddress,
       channelId: channel.id,
-      fromState,
-      toState,
+      fromState: toHex(fromState),
+      toState: toHex(toState),
       fromSignature,
       toSignature,
       participant: participantA.address,
@@ -184,24 +201,29 @@ describe('transactions', () => {
     const contractAddress = await deployContract(provider, channelNonce, participantA, participantB) as string;
     await depositContract(provider, contractAddress);
 
-    const fromState = new State({
+    const fromState: State = {
       channel,
-      resolution: [new BN(5), new BN(5)],
-      turnNum: 50,
-      stateType: State.StateType.Conclude,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(5),
+      stateType: StateType.Conclude,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(0),
+    };
 
-    const toState = new State({
+    const toState: State = {
       channel,
-      resolution: [new BN(5), new BN(5)],
-      turnNum: 51,
-      stateType: State.StateType.Conclude,
-    }).toHex();
+      allocation: [],
+      destination: [],
+      turnNum: bigNumberify(6),
+      stateType: StateType.Conclude,
+      gameAttributes: '0x0',
+      stateCount: bigNumberify(1),
+    };
+    const fromSignature = signCommitment(fromState, participantA.privateKey);
+    const toSignature = signCommitment(toState, participantB.privateKey);
 
-    const fromSignature = signPositionHex(fromState, participantA.privateKey);
-    const toSignature = signPositionHex(toState, participantB.privateKey);
-
-    const concludeTransaction = createConcludeTransaction(contractAddress, fromState, toState, fromSignature, toSignature);
+    const concludeTransaction = createConcludeTransaction(contractAddress, toHex(fromState), toHex(toState), fromSignature, toSignature);
     await testTransactionSender(concludeTransaction);
   });
 

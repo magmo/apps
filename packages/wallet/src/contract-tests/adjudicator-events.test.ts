@@ -43,7 +43,7 @@ describe('adjudicator listener', () => {
     const action = sagaTester.getLatestCalledAction();
     expect(action.type === action.CHALLENGE_CREATED_EVENT);
     expect(action.expirationTime * 1000).toBeGreaterThan(Date.now());
-    expect(action.state.toUpperCase()).toEqual(challengeState.toUpperCase());
+    expect(action.state).toEqual(challengeState);
   });
 
   it("should handle a concluded event", async () => {
@@ -70,7 +70,7 @@ describe('adjudicator listener', () => {
     await sagaTester.waitFor(actions.REFUTED_EVENT);
     const action = sagaTester.getLatestCalledAction();
     expect(action.type === actions.REFUTED_EVENT);
-    expect(action.refuteState.toUpperCase()).toEqual(refuteState.toUpperCase());
+    expect(action.refuteState).toEqual(refuteState);
   });
 
 
@@ -86,7 +86,7 @@ describe('adjudicator listener', () => {
     await sagaTester.waitFor(actions.RESPOND_WITH_MOVE_EVENT);
     const action: actions.RespondWithMoveEvent = sagaTester.getLatestCalledAction();
     expect(action.type === actions.RESPOND_WITH_MOVE_EVENT);
-    expect(action.responseState.toUpperCase()).toEqual(responseState.toUpperCase());
+    expect(action.responseCommitment).toEqual(responseState);
   });
 
 

@@ -27,16 +27,16 @@ export function* messageListener() {
         yield put(actions.loggedIn(action.userId));
         break;
       case incoming.SIGNATURE_REQUEST:
-        yield put(actions.ownPositionReceived(action.data));
+        yield put(actions.ownCommitmentReceived(action.data));
         break;
       case incoming.VALIDATION_REQUEST:
-        yield put(actions.opponentPositionReceived(action.data, action.signature));
+        yield put(actions.opponentCommitmentReceived(action.data, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(actions.messageReceived(action.data, action.signature));
         break;
       case incoming.RESPOND_TO_CHALLENGE:
-        yield put(actions.challengePositionReceived(action.position));
+        yield put(actions.challengeCommitmentReceived(action.data));
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.concludeRequested());

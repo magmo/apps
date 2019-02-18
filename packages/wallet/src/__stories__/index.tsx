@@ -5,19 +5,18 @@ import { Provider } from 'react-redux';
 import * as states from '../states';
 import '../index.scss';
 import * as scenarios from '../redux/reducers/__tests__/test-scenarios';
-import BN from "bn.js";
-import bnToHex from "../utils/bnToHex";
+import {bigNumberify} from 'fmg-core';
 
 const {
   asAddress,
   channelId,
   asPrivateKey,
-  preFundSetupAHex,
-  preFundSetupBHex,
   channelNonce,
   libraryAddress,
   participants,
-} = scenarios.standard;
+  preFundCommitment1,
+  preFundCommitment2,
+} = scenarios;
 
 const defaults = {
   address: asAddress,
@@ -28,24 +27,24 @@ const defaults = {
   participants,
   privateKey: asPrivateKey,
   uid: 'uid',
-  penultimatePosition: { data: preFundSetupAHex, signature: 'fake-sig' },
-  lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
-  turnNum: 1,
+  lastCommitment: { commitment: preFundCommitment2, signature: 'fake-sig' },
+  penultimateCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
+  turnNum: preFundCommitment2.turnNum,
   networkId: 3,
   challengeExpiry: 0,
   transactionHash: '0x0',
   userAddress: '0x0',
-  requestedTotalFunds: bnToHex(new BN(1000000000000000)),
+  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
 };
 const playerADefaults = {
   ...defaults,
   ourIndex: 0,
-  requestedYourDeposit: bnToHex(new BN(500000000000000)),
+  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
 };
 const playerBDefaults = {
   ...defaults,
   ourIndex: 1,
-  requestedYourDeposit: bnToHex(new BN(500000000000000)),
+  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
 };
 
 const fakeStore = (state) => ({

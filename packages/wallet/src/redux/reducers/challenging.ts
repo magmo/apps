@@ -8,10 +8,11 @@ import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
 import { challengePositionReceived, challengeComplete, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
+import { toHex } from 'fmg-core/lib/state';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
-  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+  if (action.type === actions.OWN_COMMITMENT_RECEIVED || action.type === actions.OPPONENT_COMMITMENT_RECEIVED) {
     return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
   }
   switch (state.type) {
@@ -39,9 +40,9 @@ export const challengingReducer = (state: states.ChallengingState, action: Walle
 const challengeTransactionFailedReducer = (state: states.ChallengeTransactionFailed, action: WalletAction) => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
-      const { data: fromPosition, signature: fromSignature } = state.penultimatePosition;
-      const { data: toPosition, signature: toSignature } = state.lastPosition;
-      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, fromSignature, toSignature);
+      const { commitment: fromPosition, signature: fromSignature } = state.penultimateCommitment;
+      const { commitment: toPosition, signature: toSignature } = state.lastCommitment;
+      const transaction = createForceMoveTransaction(state.adjudicator, toHex(fromPosition), toHex(toPosition), fromSignature, toSignature);
       return states.waitForChallengeInitiation(transaction, state);
   }
   return state;
@@ -50,9 +51,9 @@ const challengeTransactionFailedReducer = (state: states.ChallengeTransactionFai
 const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_APPROVED:
-      const { data: fromPosition, signature: fromSignature } = state.penultimatePosition;
-      const { data: toPosition, signature: toSignature } = state.lastPosition;
-      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, fromSignature, toSignature);
+      const { commitment: fromPosition, signature: fromSignature } = state.penultimateCommitment;
+      const { commitment: toPosition, signature: toSignature } = state.lastCommitment;
+      const transaction = createForceMoveTransaction(state.adjudicator, toHex(fromPosition), toHex(toPosition), fromSignature, toSignature);
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
       return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete(), displayOutbox: hideWallet() });
@@ -100,14 +101,14 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
     case actions.CHALLENGE_CREATED_EVENT:
       return states.waitForResponseOrTimeout({ ...state, challengeExpiry: action.expirationTime });
     case actions.RESPOND_WITH_MOVE_EVENT:
-      const message = challengePositionReceived(action.responseState);
+      const message = challengePositionReceived(action.responseCommitment);
       // TODO: Right now we're just storing a dummy signature since we don't get one 
       // from the challenge. 
       return states.acknowledgeChallengeResponse({
         ...state,
-        turnNum: state.turnNum + 1,
-        lastPosition: { data: action.responseState, signature: '0x0' },
-        penultimatePosition: state.lastPosition,
+        turnNum: state.turnNum.add(1),
+        lastCommitment: { commitment: action.responseCommitment, signature: '0x0' },
+        penultimatePosition: state.lastCommitment,
         messageOutbox: message,
       });
 

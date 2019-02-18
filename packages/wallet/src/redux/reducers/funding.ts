@@ -2,19 +2,18 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import { messageRequest, fundingSuccess, fundingFailure, showWallet, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 
-import decode, { extractGameAttributes } from '../../utils/decode-utils';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
-import { validSignature, signPositionHex } from '../../utils/signing-utils';
+import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
 
-import BN from 'bn.js';
-import { State, Channel } from 'fmg-core';
+import { Channel, State as Commitment, bigNumberify, } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
+import { StateType, fromHex, toHex } from 'fmg-core';
 
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
-  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+  if (action.type === actions.OWN_COMMITMENT_RECEIVED || action.type === actions.OPPONENT_COMMITMENT_RECEIVED) {
     return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
   }
   switch (state.type) {
@@ -152,7 +151,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
             ...state,
             adjudicator: action.data,
           });
-        }else{
+        } else {
           return state;
         }
       }
@@ -236,19 +235,19 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
       }
       break;
     case actions.FUNDING_RECEIVED_EVENT:
-      const resolutions = decode(state.lastPosition.data).resolution;
-      const totalFunds = resolutions[state.ourIndex].add(resolutions[1 - state.ourIndex]);
-      const adjudicatorBalance = new BN(action.adjudicatorBalance.substring(2), 16);
-      if (adjudicatorBalance.cmp(totalFunds)) {
+      const { allocation } = state.lastCommitment.commitment;
+      const totalFunds = allocation[state.ourIndex].add(allocation[1 - state.ourIndex]);
+      const adjudicatorBalance = bigNumberify(action.adjudicatorBalance);
+      if (!adjudicatorBalance.eq(totalFunds)) {
         return state;
       }
 
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
+      const { postFundSetupState, positionSignature, sendMessageAction } = composePostFundState(state);
       return states.aWaitForPostFundSetup({
         ...state,
-        turnNum: decode(positionData).turnNum,
-        penultimatePosition: state.lastPosition,
-        lastPosition: { data: positionData, signature: positionSignature },
+        turnNum: postFundSetupState.turnNum,
+        penultimateState: state.lastCommitment,
+        lastState: { state: postFundSetupState, signature: positionSignature },
         messageOutbox: sendMessageAction,
       });
     default:
@@ -260,14 +259,15 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      if (!validTransitionToPostFundState(state, action.data, action.signature)) { return state; }
+      const messageState = fromHex(action.data);
+      if (!validTransitionToPostFundState(state, messageState, action.signature)) { return state; }
 
-      const postFundPosition = decode(action.data);
+      const postFundState = fromHex(action.data);
       return states.acknowledgeFundingSuccess({
         ...state,
-        turnNum: postFundPosition.turnNum,
-        lastPosition: { data: action.data, signature: action.signature! },
-        penultimatePosition: state.lastPosition,
+        turnNum: postFundState.turnNum,
+        lastState: { state: messageState, signature: action.signature! },
+        penultimateState: state.lastCommitment,
       });
     default:
       return state;
@@ -342,18 +342,18 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      if (!validTransitionToPostFundState(state, action.data, action.signature)) {
+      const messageState = fromHex(action.data);
+      if (!validTransitionToPostFundState(state, messageState, action.signature)) {
         return state;
       }
 
-      const newState = { ...state, turnNum: decode(action.data).turnNum };
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(newState);
-      const postFundPosition = decode(positionData);
+      const newState = { ...state, turnNum: messageState.turnNum };
+      const { postFundSetupState, positionSignature, sendMessageAction } = composePostFundState(newState);
       return states.acknowledgeFundingSuccess({
         ...newState,
-        turnNum: postFundPosition.turnNum,
-        lastPosition: { data: positionData, signature: positionSignature },
-        penultimatePosition: { data: action.data, signature: action.signature! },
+        turnNum: postFundSetupState.turnNum,
+        lastState: { state: postFundSetupState, signature: positionSignature },
+        penultimateState: { state: messageState, signature: action.signature! },
         messageOutbox: sendMessageAction,
       });
     default:
@@ -367,46 +367,45 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
       return states.waitForUpdate({
         ...state,
         displayOutbox: hideWallet(),
-        messageOutbox: fundingSuccess(state.channelId, state.lastPosition.data),
+        messageOutbox: fundingSuccess(state.channelId, toHex(state.lastCommitment.commitment)),
       });
     default:
       return state;
   }
 };
 
-const validTransitionToPostFundState = (state: states.FundingState, data: string, signature: string | undefined) => {
+const validTransitionToPostFundState = (state: states.FundingState, data: Commitment, signature: string | undefined) => {
   if (!signature) { return false; }
-  const postFundPosition = decode(data);
+
   const opponentAddress = state.participants[1 - state.ourIndex];
 
-  if (!validSignature(data, signature, opponentAddress)) { return false; }
+  if (!validCommitmentSignature(data, signature, opponentAddress)) { return false; }
   // check transition
-  if (!validTransition(state, postFundPosition)) { return false; }
-  if (postFundPosition.stateType !== 1) { return false; }
+  if (!validTransition(state, data)) { return false; }
+  if (data.stateType !== 1) { return false; }
   return true;
 };
 
 const composePostFundState = (state: states.AWaitForDeposit | states.BWaitForPostFundSetup) => {
-  const lastState = decode(state.lastPosition.data);
-  const { libraryAddress, channelNonce, participants, turnNum } = state;
+  const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
 
-  const channelState = new State({
+  const postFundSetupState: Commitment = {
     channel,
-    stateType: State.StateType.PostFundSetup,
-    turnNum: turnNum + 1,
-    stateCount: state.ourIndex,
-    resolution: lastState.resolution,
-  });
+    stateType: StateType.PostFundSetup,
+    turnNum: turnNum.add(1),
+    stateCount: bigNumberify(state.ourIndex),
+    allocation: lastCommitment.commitment.allocation,
+    destination: lastCommitment.commitment.destination,
+    gameAttributes: state.lastCommitment.commitment.gameAttributes,
+  };
+  const stateSignature = signCommitment(postFundSetupState, state.privateKey);
 
-  const positionData = channelState.toHex() + extractGameAttributes(state.lastPosition.data);
-  const positionSignature = signPositionHex(positionData, state.privateKey);
-
-  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], positionData, positionSignature);
-  return { positionData, positionSignature, sendMessageAction };
+  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], toHex(postFundSetupState), stateSignature);
+  return { postFundSetupState, positionSignature: stateSignature, sendMessageAction };
 };
 
 const getFundingAmount = (state: states.FundingState, index: number): string => {
-  const decodedPosition = decode(state.lastPosition.data);
-  return "0x" + decodedPosition.resolution[index].toString("hex");
+  const lastState = state.lastCommitment.commitment;
+  return "0x" + lastState.allocation[index].toHexString();
 };

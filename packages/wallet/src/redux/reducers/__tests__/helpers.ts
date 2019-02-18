@@ -29,7 +29,7 @@ export const itIncreasesTurnNumBy = (increase: number, oldState: WalletState, ne
     if (!('turnNum' in newState) || !('turnNum' in oldState)) {
       fail('turnNum does not exist on one of the states');
     } else {
-      expect(newState.turnNum).toEqual(oldState.turnNum + increase);
+      expect(newState.turnNum).toEqual(oldState.turnNum.add(increase));
     }
   });
 };
