@@ -6,9 +6,10 @@ import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
 import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
 
-import { Channel, State as Commitment, bigNumberify, } from 'fmg-core';
+import { Channel, Commitment, CommitmentType, } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { StateType, fromHex, toHex } from 'fmg-core';
+import { fromHex, toHex } from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
 
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
@@ -236,7 +237,7 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
       break;
     case actions.FUNDING_RECEIVED_EVENT:
       const { allocation } = state.lastCommitment.commitment;
-      const totalFunds = allocation[state.ourIndex].add(allocation[1 - state.ourIndex]);
+      const totalFunds = bigNumberify(allocation[state.ourIndex]).add(allocation[1 - state.ourIndex]);
       const adjudicatorBalance = bigNumberify(action.adjudicatorBalance);
       if (!adjudicatorBalance.eq(totalFunds)) {
         return state;
@@ -382,22 +383,22 @@ const validTransitionToPostFundState = (state: states.FundingState, data: Commit
   if (!validCommitmentSignature(data, signature, opponentAddress)) { return false; }
   // check transition
   if (!validTransition(state, data)) { return false; }
-  if (data.stateType !== 1) { return false; }
+  if (data.commitmentType !== 1) { return false; }
   return true;
 };
 
 const composePostFundState = (state: states.AWaitForDeposit | states.BWaitForPostFundSetup) => {
   const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
-  const channel = new Channel(libraryAddress, channelNonce, participants);
+  const channel: Channel = { channelType: libraryAddress, channelNonce, participants };
 
   const postFundSetupState: Commitment = {
     channel,
-    stateType: StateType.PostFundSetup,
-    turnNum: turnNum.add(1),
-    stateCount: bigNumberify(state.ourIndex),
+    commitmentType: CommitmentType.PostFundSetup,
+    turnNum: turnNum + 1,
+    commitmentCount: state.ourIndex,
     allocation: lastCommitment.commitment.allocation,
     destination: lastCommitment.commitment.destination,
-    gameAttributes: state.lastCommitment.commitment.gameAttributes,
+    appAttributes: state.lastCommitment.commitment.appAttributes,
   };
   const stateSignature = signCommitment(postFundSetupState, state.privateKey);
 
@@ -407,5 +408,5 @@ const composePostFundState = (state: states.AWaitForDeposit | states.BWaitForPos
 
 const getFundingAmount = (state: states.FundingState, index: number): string => {
   const lastState = state.lastCommitment.commitment;
-  return "0x" + lastState.allocation[index].toHexString();
+  return "0x" + lastState.allocation[index];
 };

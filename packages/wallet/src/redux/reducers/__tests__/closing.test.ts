@@ -5,10 +5,11 @@ import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType, itDoesntTransition } from './helpers';
-import { bigNumberify, BigNumber } from 'fmg-core';
+
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
+import { bigNumberify } from 'ethers/utils';
 
 const {
   asAddress,
@@ -18,12 +19,13 @@ const {
   gameCommitment2,
   concludeCommitment1,
   concludeCommitment2,
+  channelId,
 
 } = scenarios;
 const defaults = {
   adjudicator: 'adj-address',
-  channelId: channel.id,
-  channelNonce: bigNumberify(channel.channelNonce),
+  channelId,
+  channelNonce: channel.channelNonce,
   libraryAddress: channel.channelType,
   networkId: 3,
   participants: channel.participants as [string, string],
@@ -49,7 +51,7 @@ describe('start in AcknowledgeConclude', () => {
       ...defaultsA,
       penultimateCommitment: { commitment: gameCommitment2, signature: 'sig' },
       lastCommitment: { commitment: concludeCommitment1, signature: 'sig' },
-      turnNum: new BigNumber(9),
+      turnNum: 9,
     });
 
     const action = actions.concludeApproved();
@@ -74,7 +76,7 @@ describe('start in ApproveConclude', () => {
       ...defaultsA,
       penultimateCommitment: { commitment: gameCommitment1, signature: 'sig' },
       lastCommitment: { commitment: gameCommitment2, signature: 'sig' },
-      turnNum: bigNumberify(1),
+      turnNum: 1,
     });
     const action = actions.concludeRejected();
     const updatedState = walletReducer(state, action);
@@ -86,7 +88,7 @@ describe('start in ApproveConclude', () => {
       ...defaultsA,
       penultimateCommitment: { commitment: gameCommitment1, signature: 'sig' },
       lastCommitment: { commitment: gameCommitment2, signature: 'sig' },
-      turnNum: bigNumberify(1),
+      turnNum: 1,
     });
 
     const action = actions.concludeApproved();

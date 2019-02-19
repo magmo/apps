@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { Channel, sign as coreSign, recover as coreRecover, decodeSignature, SolidityParameter } from 'fmg-core';
+import { channelID } from 'fmg-core/lib/channel';
 
 export type SignableData = string | SolidityParameter | SolidityParameter[];
 export default class ChannelWallet {
@@ -13,7 +14,7 @@ export default class ChannelWallet {
 
   get channelId(): string {
     if (this.channel) {
-      return this.channel.id;
+      return channelID(this.channel);
     } else {
       throw new Error("Channel must be opened");
     }

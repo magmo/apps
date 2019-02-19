@@ -3,8 +3,8 @@ import * as scenarios from './test-scenarios';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType, itSendsAMessage } from './helpers';
-import { bigNumberify } from 'fmg-core';
 import * as SigningUtil from '../../../utils/signing-utils';
+import { bigNumberify } from 'ethers/utils';
 
 
 const {

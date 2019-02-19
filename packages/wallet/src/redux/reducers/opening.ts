@@ -4,8 +4,9 @@ import { signatureSuccess, validationSuccess, signatureFailure, validationFailur
 
 import { unreachable } from '../../utils/reducer-utils';
 import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
-import { StateType } from 'fmg-core/lib/state';
-import { bigNumberify } from 'fmg-core';
+import { CommitmentType } from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
+import { channelID } from 'fmg-core/lib/channel';
 
 
 export const openingReducer = (state: states.OpeningState, action: actions.WalletAction): states.WalletState => {
@@ -28,11 +29,11 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       const ownCommitment = action.commitment;
 
       // check it's a PreFundSetupA
-      if (ownCommitment.stateType !== StateType.PreFundSetup) {
+      if (ownCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         // Since these checks are happening during a signature request we'll return a sig failure
         return { ...state, messageOutbox: signatureFailure('Other', 'Expected a pre fund setup position.') };
       }
-      if (ownCommitment.stateCount.gt(0)) {
+      if (ownCommitment.commitmentCount !== 0) {
         return { ...state, messageOutbox: signatureFailure('Other', 'Expected state count to 0.') };
       }
 
@@ -49,11 +50,11 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       return states.waitForPreFundSetup({
         ...state,
         libraryAddress: ownCommitment.channel.channelType,
-        channelId: ownCommitment.channel.id,
+        channelId: channelID(ownCommitment.channel),
         ourIndex: ownCommitment.channel.participants.indexOf(state.address),
         participants: ownCommitment.channel.participants as [string, string],
-        channelNonce: bigNumberify(ownCommitment.channel.channelNonce),
-        turnNum: bigNumberify(0),
+        channelNonce: ownCommitment.channel.channelNonce,
+        turnNum: 0,
         lastCommitment: { commitment: ownCommitment, signature },
         messageOutbox: signatureSuccess(signature),
       });
@@ -63,10 +64,10 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
 
       // all these checks will fail silently for the time being
       // check it's a PreFundSetupA
-      if (opponentCommitment.stateType !== StateType.PreFundSetup) {
+      if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         return { ...state, messageOutbox: validationFailure('Other', 'Expected a prefund setup position') };
       }
-      if (opponentCommitment.stateCount.gt(0)) {
+      if (opponentCommitment.commitmentCount !== 0) {
         return { ...state, messageOutbox: validationFailure('Other', 'Expected state count to be 0') };
       }
 
@@ -86,11 +87,11 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       return states.waitForPreFundSetup({
         ...state,
         libraryAddress: opponentCommitment.channel.channelType,
-        channelId: opponentCommitment.channel.id,
+        channelId: channelID(opponentCommitment.channel),
         ourIndex: opponentCommitment.channel.participants.indexOf(state.address),
         participants: opponentCommitment.channel.participants as [string, string],
-        channelNonce: bigNumberify(opponentCommitment.channel.channelNonce),
-        turnNum: bigNumberify(0),
+        channelNonce: opponentCommitment.channel.channelNonce,
+        turnNum: 0,
         lastCommitment: { commitment: action.commitment, signature: action.signature },
         messageOutbox: validationSuccess(),
       });
@@ -106,11 +107,11 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       const ownCommitment = action.commitment;
 
       // check it's a PreFundSetupB
-      if (ownCommitment.stateType !== StateType.PreFundSetup) {
+      if (ownCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         return { ...state, messageOutbox: signatureFailure('Other', 'Expected a prefund setup position.') };
 
       }
-      if (!ownCommitment.stateCount.eq(1)) {
+      if (ownCommitment.commitmentCount !== 1) {
         return { ...state, messageOutbox: signatureFailure('Other', 'Expected state count to be 1.') };
       }
 
@@ -119,23 +120,23 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       // if so, unpack its contents into the state
       return states.waitForFundingRequest({
         ...state,
-        turnNum: bigNumberify(1),
+        turnNum: 1,
         lastCommitment: { commitment: ownCommitment, signature },
         penultimateCommitment: state.lastCommitment,
         messageOutbox: signatureSuccess(signature),
-        requestedTotalFunds: ownCommitment.allocation[0].add(ownCommitment.allocation[1]).toHexString(),
-        requestedYourDeposit: ownCommitment.allocation[state.ourIndex].toHexString(),
+        requestedTotalFunds: bigNumberify(ownCommitment.allocation[0]).add(ownCommitment.allocation[1]).toHexString(),
+        requestedYourDeposit: ownCommitment.allocation[state.ourIndex],
       });
 
     case actions.OPPONENT_COMMITMENT_RECEIVED:
       const opponentCommitment = action.commitment;
 
       // check it's a PreFundSetupB
-      if (opponentCommitment.stateType !== StateType.PreFundSetup) {
+      if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         return { ...state, messageOutbox: validationFailure('Other', 'Expected a prefund setup position.') };
       }
 
-      if (!opponentCommitment.stateCount.eq(1)) {
+      if (opponentCommitment.commitmentCount !== 1) {
         return { ...state, messageOutbox: validationFailure('Other', 'Expected state count to be 1.') };
       }
       const opponentAddress2 = state.participants[1 - state.ourIndex];
@@ -147,12 +148,12 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       // if so, unpack its contents into the state
       return states.waitForFundingRequest({
         ...state,
-        turnNum: bigNumberify(1),
+        turnNum: 1,
         lastCommitment: { commitment: action.commitment, signature: action.signature },
         penultimateCommitment: state.lastCommitment,
         messageOutbox: validationSuccess(),
-        requestedTotalFunds: opponentCommitment.allocation[0].add(opponentCommitment.allocation[1]).toHexString(),
-        requestedYourDeposit: opponentCommitment.allocation[state.ourIndex].toHexString(),
+        requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0]).add(opponentCommitment.allocation[1]).toHexString(),
+        requestedYourDeposit: opponentCommitment.allocation[state.ourIndex],
       });
 
     default:

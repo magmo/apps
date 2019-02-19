@@ -8,7 +8,7 @@ import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
 import { challengePositionReceived, challengeComplete, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { toHex } from 'fmg-core/lib/state';
+import { toHex } from 'fmg-core';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
@@ -106,7 +106,7 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
       // from the challenge. 
       return states.acknowledgeChallengeResponse({
         ...state,
-        turnNum: state.turnNum.add(1),
+        turnNum: state.turnNum + 1,
         lastCommitment: { commitment: action.responseCommitment, signature: '0x0' },
         penultimatePosition: state.lastCommitment,
         messageOutbox: message,

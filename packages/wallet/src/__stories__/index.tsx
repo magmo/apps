@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import * as states from '../states';
 import '../index.scss';
 import * as scenarios from '../redux/reducers/__tests__/test-scenarios';
-import {bigNumberify} from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
 
 const {
   asAddress,
@@ -66,11 +66,11 @@ const testState = (state) => (
 );
 
 storiesOf('Network Status', module)
-.add('Mainnet', testState(states.approveFunding({ ...playerADefaults, networkId: 1})))
-.add('Kovan', testState(states.approveFunding({ ...playerADefaults, networkId: 4})))
-.add('Ropsten', testState(states.approveFunding({ ...playerADefaults, networkId: 3})))
-.add('Rinkeby', testState(states.approveFunding({ ...playerADefaults, networkId: 42})))
-.add('Ganache', testState(states.approveFunding({ ...playerADefaults, networkId: 5777})));
+  .add('Mainnet', testState(states.approveFunding({ ...playerADefaults, networkId: 1 })))
+  .add('Kovan', testState(states.approveFunding({ ...playerADefaults, networkId: 4 })))
+  .add('Ropsten', testState(states.approveFunding({ ...playerADefaults, networkId: 3 })))
+  .add('Rinkeby', testState(states.approveFunding({ ...playerADefaults, networkId: 42 })))
+  .add('Ganache', testState(states.approveFunding({ ...playerADefaults, networkId: 5777 })));
 storiesOf('Wallet Screens / Funding / Player A', module)
   .add('ApproveFunding', testState(states.approveFunding(playerADefaults)))
   .add('AWaitForDeployToBeSentToMetaMask', testState(states.aWaitForDeployToBeSentToMetaMask(playerADefaults)))
@@ -94,7 +94,7 @@ storiesOf('Wallet Screens / Withdrawing', module)
   .add('WaitForWithdrawalInitiation', testState(states.waitForWithdrawalInitiation(playerADefaults)))
   .add('WaitForWithdrawalConfirmation', testState(states.waitForWithdrawalConfirmation(playerADefaults)))
   .add('AcknowledgeWithdrawalSuccess', testState(states.acknowledgeWithdrawalSuccess(playerADefaults)));
-  
+
 storiesOf('Wallet Screens / Challenging', module)
   .add('ApproveChallenge', testState(states.approveChallenge(playerADefaults)))
   .add('WaitForChallengeInitiation', testState(states.waitForChallengeInitiation({}, playerADefaults)))

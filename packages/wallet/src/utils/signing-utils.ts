@@ -1,6 +1,5 @@
 import { splitSignature, getAddress } from 'ethers/utils';
-import { recover, sign, SolidityType, State as Commitment } from 'fmg-core';
-import { toHex } from 'fmg-core/lib/state';
+import { recover, sign, SolidityType, Commitment, toHex } from 'fmg-core';
 
 
 export const validCommitmentSignature = (commitment: Commitment, signature: string, address: string) => {
