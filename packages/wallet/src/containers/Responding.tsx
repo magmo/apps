@@ -44,7 +44,7 @@ class RespondingContainer extends PureComponent<Props> {
         );
       case states.CHOOSE_RESPONSE:
         const { ourIndex, turnNum } = state;
-        const moveSelected = ourIndex === 0 ? turnNum.mod(2).eq(0) : !turnNum.mod(2).eq(0);
+        const moveSelected = ourIndex === 0 ? turnNum % 2 === 0 : turnNum % 2 !== 0;
         let challengeOptions = [ChallengeOptions.RespondWithMove];
         if (moveSelected) {
           // TODO: We need to update the game to allow the user to choose a move even after they've selected an existing move.

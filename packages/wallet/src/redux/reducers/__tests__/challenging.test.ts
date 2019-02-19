@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 import { itSendsATransaction, itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { hideWallet, challengeComplete } from 'magmo-wallet-client';
-import { bigNumberify } from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
 
 
 const {

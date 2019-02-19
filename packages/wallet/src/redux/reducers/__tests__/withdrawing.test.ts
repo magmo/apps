@@ -7,7 +7,7 @@ import { itTransitionsToStateType } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as SigningUtil from '../../../utils/signing-utils';
-import { bigNumberify } from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
 
 
 const {

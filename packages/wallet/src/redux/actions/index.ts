@@ -1,4 +1,4 @@
-import { State as Commitment } from 'fmg-core';
+import { Commitment } from 'fmg-core';
 
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({

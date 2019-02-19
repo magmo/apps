@@ -6,9 +6,9 @@ import * as actions from '../../actions';
 import { itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
-import { bigNumberify } from 'fmg-core';
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as FmgCore from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
 
 
 const {

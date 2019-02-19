@@ -1,7 +1,7 @@
 import { TransactionRequest } from "ethers/providers";
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { Action } from 'redux';
-import { State as Commitment, BigNumber } from 'fmg-core';
+import { Commitment } from 'fmg-core';
 
 export interface Base {
   displayOutbox?: DisplayAction;
@@ -29,8 +29,8 @@ export interface ChannelPartiallyOpen extends AddressExists {
   libraryAddress: string;
   ourIndex: number;
   participants: [string, string];
-  channelNonce: BigNumber;
-  turnNum: BigNumber;
+  channelNonce: number;
+  turnNum: number;
   lastCommitment: SignedCommitment;
 }
 

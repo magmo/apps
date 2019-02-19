@@ -9,8 +9,7 @@ import { signCommitment } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
 import { challengeResponseRequested, challengeComplete, hideWallet, showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { toHex } from 'fmg-core/lib/state';
-
+import { toHex } from 'fmg-core';
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
@@ -112,7 +111,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
       const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(action.commitment), signature);
       return states.initiateResponse({
         ...state,
-        turnNum: state.turnNum.add(1),
+        turnNum: state.turnNum + 1,
         lastState: { state: action.commitment, signature },
         penultimateState: state.lastCommitment,
         transactionOutbox: transaction,

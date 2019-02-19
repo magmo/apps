@@ -7,7 +7,6 @@ import { itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
-import { bigNumberify } from 'fmg-core';
 
 const {
   asAddress,
@@ -86,10 +85,10 @@ describe('when in WaitForChannel', () => {
 describe('when in WaitForPreFundSetup', () => {
   const defaults2 = {
     ...defaults,
-    channelId: scenarios.channel.id,
-    channelNonce: bigNumberify(scenarios.channel.channelNonce),
+    channelId: scenarios.channelId,
+    channelNonce: scenarios.channelNonce,
     participants: scenarios.channel.participants as [string, string],
-    turnNum: bigNumberify(0),
+    turnNum: 0,
     lastCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
   };
 

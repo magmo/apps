@@ -5,18 +5,18 @@ import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType, itIncreasesTurnNumBy } from './helpers';
-import { bigNumberify } from 'fmg-core';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { ApproveFunding, WaitForDepositConfirmation } from '../../../states';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
+import { bigNumberify } from 'ethers/utils';
 
 const {
   asAddress,
   asPrivateKey,
   bsPrivateKey,
-  channel,
+
   channelNonce,
   libraryAddress,
   participants,
@@ -25,12 +25,13 @@ const {
   postFundCommitment1,
   postFundCommitment2,
   bsAddress,
+  channelId,
 } = scenarios;
 
 const defaults = {
   address: asAddress,
   adjudicator: 'adj-address',
-  channelId: channel.id,
+  channelId,
   channelNonce,
   libraryAddress,
   networkId: 3,
@@ -57,19 +58,19 @@ const defaultsB = {
 const justReceivedPreFundSetupB = {
   penultimateCommitment: { commitment: preFundCommitment1, signature: 'sig' },
   lastCommitment: { commitment: preFundCommitment2, signature: 'sig' },
-  turnNum: bigNumberify(1),
+  turnNum: 1,
 };
 
 const justReceivedPostFundSetupA = {
   penultimateCommitment: { commitment: preFundCommitment2, signature: 'sig' },
   lastCommitment: { commitment: postFundCommitment1, signature: 'sig' },
-  turnNum: bigNumberify(2),
+  turnNum: 2,
 };
 
 const justReceivedPostFundSetupB = {
   penultimateCommitment: { commitment: postFundCommitment1, signature: 'sig' },
   lastCommitment: { commitment: postFundCommitment2, signature: 'sig' },
-  turnNum: bigNumberify(3),
+  turnNum: 3,
 };
 
 

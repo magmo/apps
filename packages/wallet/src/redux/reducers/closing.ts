@@ -4,11 +4,10 @@ import * as actions from '../actions';
 import { WalletState, ClosingState } from '../../states';
 import { WalletAction } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
-import { State } from 'fmg-core';
 import { signCommitment, validSignature, signVerificationData, signData } from '../../utils/signing-utils';
 import { messageRequest, closeSuccess, concludeSuccess, concludeFailure, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { createConcludeAndWithdrawTransaction } from '../../utils/transaction-generator';
-import { bigNumberify, fromHex, toHex, StateType } from 'fmg-core';
+import { fromHex, toHex, CommitmentType, Commitment } from 'fmg-core';
 
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
@@ -70,7 +69,7 @@ const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: a
       if (!ourTurn(state)) { return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'It is not the current user\'s turn') }; }
       const { positionSignature, sendMessageAction, concludeState } = composeConcludePosition(state);
       const lastState = state.lastCommitment.commitment;
-      if (lastState.stateType === StateType.Conclude) {
+      if (lastState.commitmentType === CommitmentType.Conclude) {
         if (state.adjudicator) {
           return states.approveCloseOnChain({
             ...state,
@@ -172,7 +171,7 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
 
       const { concludeState, positionSignature, sendMessageAction } = composeConcludePosition(state);
       const { lastCommitment: lastState } = state;
-      if (lastState.commitment.stateType === StateType.Conclude) {
+      if (lastState.commitment.commitmentType === CommitmentType.Conclude) {
         if (state.adjudicator) {
           return states.approveCloseOnChain({
             ...state,
@@ -274,12 +273,12 @@ const acknowledgeClosedOnChainReducer = (state: states.AcknowledgeClosedOnChain,
 };
 
 const composeConcludePosition = (state: states.ClosingState) => {
-  const stateCount = bigNumberify((state.lastCommitment.commitment.stateType === StateType.Conclude) ? 1 : 0);
-  const concludeState: State = {
+  const commitmentCount = state.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
+  const concludeState: Commitment = {
     ...state.lastCommitment.commitment,
-    stateType: StateType.Conclude,
-    turnNum: state.turnNum.add(1),
-    stateCount,
+    commitmentType: CommitmentType.Conclude,
+    turnNum: state.turnNum + 1,
+    commitmentCount,
   };
 
   const positionSignature = signCommitment(concludeState, state.privateKey);
