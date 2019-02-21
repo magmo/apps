@@ -127,9 +127,9 @@ export async function refuteChallenge(provider: ethers.providers.JsonRpcProvider
 
   const toCommitment: Commitment = {
     channel,
-    allocation: [],
-    destination: [],
-    turnNum: 6,
+    allocation: ['0x05', '0x05'],
+    destination: [participantA.address, participantB.address],
+    turnNum: 8,
     commitmentType: CommitmentType.App,
     appAttributes: '0x00',
     commitmentCount: 1,
