@@ -45,8 +45,8 @@ function* createEventChannel(provider) {
     simpleAdjudicator.on(gameConcludedFilter, (channelId) => {
       emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
     });
-    simpleAdjudicator.on(refutedFilter, (channelId, refuteCommitment) => {
-      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refuteCommitment } });
+    simpleAdjudicator.on(refutedFilter, (channelId, refutation) => {
+      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
     });
     simpleAdjudicator.on(respondWithMoveFilter, (channelId, response) => {
       emitter({ eventType: AdjudicatorEventType.RespondWithMove, eventArgs: { channelId, response } });
@@ -75,7 +75,7 @@ export function* adjudicatorWatcher(provider) {
         yield put(actions.concludedEvent(event.eventArgs.channelId));
         break;
       case AdjudicatorEventType.Refuted:
-        yield put(actions.refutedEvent(event.eventArgs.channelId, event.eventArgs.refuteState));
+        yield put(actions.refutedEvent(event.eventArgs.channelId, fromParameters(event.eventArgs.refutation)));
         break;
       case AdjudicatorEventType.RespondWithMove:
         yield put(actions.respondWithMoveEvent(event.eventArgs.channelId, fromParameters(event.eventArgs.response)));

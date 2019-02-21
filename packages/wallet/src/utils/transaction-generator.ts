@@ -30,7 +30,7 @@ export function createRespondWithMoveTransaction(contractAddress: string, nextSt
 
 export function createRefuteTransaction(contractAddress: string, refuteState: Commitment, signature: string): TransactionRequest {
   const adjudicatorInterface = getAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.refute.encode([refuteState, splitSignature(signature)]);
+  const data = adjudicatorInterface.functions.refute.encode([asEthersObject(refuteState), splitSignature(signature)]);
   return {
     to: contractAddress,
     data,

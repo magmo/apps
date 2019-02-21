@@ -54,10 +54,10 @@ describe('adjudicator listener', () => {
     await createChallenge(provider, contractAddress, channelNonce, participantA, participantB);
 
     const sagaTester = new SagaTester({});
-    sagaTester.start(adjudicatorWatcher, contractAddress, provider);
+    sagaTester.start(adjudicatorWatcher, provider);
     const refuteCommitment = await refuteChallenge(provider, contractAddress, channelNonce, participantA, participantB);
     await sagaTester.waitFor(actions.REFUTED_EVENT);
-    const action = sagaTester.getLatestCalledAction();
+    const action: actions.RefutedEvent = sagaTester.getLatestCalledAction();
     expect(action.type === actions.REFUTED_EVENT);
     expect(action.refuteCommitment).toEqual(refuteCommitment);
   });
