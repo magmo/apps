@@ -4,6 +4,7 @@ import { createDepositTransaction, createForceMoveTransaction, createConcludeTra
 import { signCommitment } from '../utils/signing-utils';
 import testGameArtifact from '../../build/contracts/TestGame.json';
 import { bigNumberify } from 'ethers/utils';
+import { channelID } from 'fmg-core/lib/channel';
 export function getLibraryAddress(networkId) {
   return testGameArtifact.networks[networkId].address;
 
@@ -11,6 +12,13 @@ export function getLibraryAddress(networkId) {
 export const fiveFive = [bigNumberify(5).toHexString(), bigNumberify(5).toHexString()] as [string, string];
 export const fourSix = [bigNumberify(4).toHexString(), bigNumberify(6).toHexString()] as [string, string];
 
+export async function getChannelId(provider, channelNonce, participantA, participantB) {
+  const network = await provider.getNetwork();
+  const networkId = network.chainId;
+  const libraryAddress = getLibraryAddress(networkId);
+  return channelID({ channelType: libraryAddress, channelNonce, participants: [participantA.address, participantB.address] });
+
+}
 
 export async function depositContract(provider: ethers.providers.JsonRpcProvider, contractAddress: string, participant: string) {
 

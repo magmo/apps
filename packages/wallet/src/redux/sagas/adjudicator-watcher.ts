@@ -11,6 +11,7 @@ enum AdjudicatorEventType {
   Concluded,
   Refuted,
   RespondWithMove,
+  Deposited,
 }
 
 interface AdjudicatorEvent {
@@ -27,7 +28,7 @@ interface AdjudicatorEvent {
 // event RespondedWithMove(address channelId, Commitment.CommitmentStruct response);
 // event RespondedWithAlternativeMove(Commitment.CommitmentStruct alternativeResponse);
 
-function* createEventChannel(provider) {
+function* createEventChannel(provider, channelId: string, participants: string[]) {
   console.log(provider);
   const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
 
@@ -37,19 +38,33 @@ function* createEventChannel(provider) {
     const gameConcludedFilter = simpleAdjudicator.filters.Concluded();
     const refutedFilter = simpleAdjudicator.filters.Refuted();
     const respondWithMoveFilter = simpleAdjudicator.filters.RespondedWithMove();
+    const depositedFilter = simpleAdjudicator.filters.Deposited();
 
+    simpleAdjudicator.on(challengeCreatedFilter, (cId, commitment, finalizedAt) => {
+      if (channelId === cId) {
+        emitter({ eventType: AdjudicatorEventType.ChallengeCreated, eventArgs: { channelId, commitment, finalizedAt } });
+      }
+    });
+    simpleAdjudicator.on(gameConcludedFilter, (cId) => {
+      if (channelId === cId) {
+        emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
+      }
+    });
+    simpleAdjudicator.on(refutedFilter, (cId, refutation) => {
+      if (channelId === cId) {
+        emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
+      }
+    });
+    simpleAdjudicator.on(respondWithMoveFilter, (cId, response) => {
+      if (channelId === cId) {
+        emitter({ eventType: AdjudicatorEventType.RespondWithMove, eventArgs: { channelId, response } });
+      }
+    });
+    simpleAdjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
+      if (participants.indexOf(destination) > -1) {
+        emitter({ eventType: AdjudicatorEventType.Deposited, eventArgs: { destination, amountDeposited, destinationHoldings } });
 
-    simpleAdjudicator.on(challengeCreatedFilter, (channelId, commitment, finalizedAt) => {
-      emitter({ eventType: AdjudicatorEventType.ChallengeCreated, eventArgs: { channelId, commitment, finalizedAt } });
-    });
-    simpleAdjudicator.on(gameConcludedFilter, (channelId) => {
-      emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
-    });
-    simpleAdjudicator.on(refutedFilter, (channelId, refutation) => {
-      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
-    });
-    simpleAdjudicator.on(respondWithMoveFilter, (channelId, response) => {
-      emitter({ eventType: AdjudicatorEventType.RespondWithMove, eventArgs: { channelId, response } });
+      }
     });
     return () => {
       // This function is called when the channel gets closed
@@ -60,15 +75,14 @@ function* createEventChannel(provider) {
     };
   });
 }
-export function* adjudicatorWatcher(provider) {
-
-  const channel = yield call(createEventChannel, provider);
+export function* adjudicatorWatcher(channelId, participants, provider) {
+  const channel = yield call(createEventChannel, provider, channelId, participants);
   while (true) {
     const event: AdjudicatorEvent = yield take(channel);
     switch (event.eventType) {
       case AdjudicatorEventType.ChallengeCreated:
-        const { channelId, commitment, finalizedAt, } = event.eventArgs;
-        yield put(actions.challengeCreatedEvent(channelId, fromParameters(commitment), finalizedAt));
+        const { channelId: eventChannelId, commitment, finalizedAt, } = event.eventArgs;
+        yield put(actions.challengeCreatedEvent(eventChannelId, fromParameters(commitment), finalizedAt));
         break;
       case AdjudicatorEventType.Concluded:
 
@@ -79,6 +93,9 @@ export function* adjudicatorWatcher(provider) {
         break;
       case AdjudicatorEventType.RespondWithMove:
         yield put(actions.respondWithMoveEvent(event.eventArgs.channelId, fromParameters(event.eventArgs.response)));
+        break;
+      case AdjudicatorEventType.Deposited:
+        yield put(actions.fundingReceivedEvent(event.eventArgs.destination, event.eventArgs.amountDeposited.toHexString(), event.eventArgs.destinationHoldings.toHexString()));
         break;
       default:
         unreachable(event.eventType);
