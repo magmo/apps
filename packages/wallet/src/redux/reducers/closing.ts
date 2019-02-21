@@ -93,7 +93,7 @@ const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: a
 
 const waitForOpponentCloseReducer = (state: states.WaitForOpponentClose, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.GAME_CONCLUDED_EVENT:
+    case actions.CONCLUDED_EVENT:
       return states.approveWithdrawal(state);
   }
   return state;
@@ -113,7 +113,7 @@ const waitForCloseInitiatorReducer = (state: states.WaitForCloseInitiation, acti
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.waitForCloseSubmission(state);
-    case actions.GAME_CONCLUDED_EVENT:
+    case actions.CONCLUDED_EVENT:
       return states.approveWithdrawal(state);
   }
   return state;
@@ -158,7 +158,7 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
         return states.waitForOpponentClose(state);
       }
       break;
-    case actions.GAME_CONCLUDED_EVENT:
+    case actions.CONCLUDED_EVENT:
       return states.approveWithdrawal(state);
   }
   return state;

@@ -34,7 +34,7 @@ export async function createChallenge(provider: ethers.providers.JsonRpcProvider
     destination: [participantA.address, participantB.address],
     turnNum: 5,
     commitmentType: CommitmentType.App,
-    appAttributes: '0x0',
+    appAttributes: '0x00',
     commitmentCount: 0,
   };
 
@@ -44,7 +44,7 @@ export async function createChallenge(provider: ethers.providers.JsonRpcProvider
     destination: [participantA.address, participantB.address],
     turnNum: 6,
     commitmentType: CommitmentType.App,
-    appAttributes: '0x0',
+    appAttributes: '0x00',
     commitmentCount: 0,
   };
 
@@ -69,7 +69,7 @@ export async function concludeGame(provider: ethers.providers.JsonRpcProvider, a
     destination: [participantA.address, participantB.address],
     turnNum: 5,
     commitmentType: CommitmentType.Conclude,
-    appAttributes: '0x0',
+    appAttributes: '0x00',
     commitmentCount: 0,
   };
 
@@ -79,7 +79,7 @@ export async function concludeGame(provider: ethers.providers.JsonRpcProvider, a
     destination: [participantA.address, participantB.address],
     turnNum: 6,
     commitmentType: CommitmentType.Conclude,
-    appAttributes: '0x0',
+    appAttributes: '0x00',
     commitmentCount: 0,
   };
 
@@ -101,12 +101,12 @@ export async function respondWithMove(provider: ethers.providers.JsonRpcProvider
 
   const toCommitment: Commitment = {
     channel,
-    allocation: [],
-    destination: [],
-    turnNum: 5,
+    allocation: ['0x05', '0x05'],
+    destination: [participantA.address, participantB.address],
+    turnNum: 7,
     commitmentType: CommitmentType.App,
-    appAttributes: '0x0',
-    commitmentCount: 0,
+    appAttributes: '0x00',
+    commitmentCount: 1,
   };
 
   const toSig = signCommitment(toCommitment, participantB.privateKey);
@@ -131,7 +131,7 @@ export async function refuteChallenge(provider: ethers.providers.JsonRpcProvider
     destination: [],
     turnNum: 6,
     commitmentType: CommitmentType.App,
-    appAttributes: '0x0',
+    appAttributes: '0x00',
     commitmentCount: 1,
   };
 

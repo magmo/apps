@@ -148,7 +148,7 @@ describe('start in ApproveCloseOnChain', () => {
   });
 
   describe('action taken: game concluded event', () => {
-    const action = actions.gameConcludedEvent();
+    const action = actions.concludedEvent();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });
@@ -181,7 +181,7 @@ describe('start in WaitForOpponentClose', () => {
     turnNum: concludeCommitment2.turnNum,
   });
   describe('action take: game concluded event', () => {
-    const action = actions.gameConcludedEvent();
+    const action = actions.concludedEvent();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });
@@ -202,7 +202,7 @@ describe('start in WaitForCloseInitiation', () => {
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
   });
   describe('action taken: game concluded event', () => {
-    const action = actions.gameConcludedEvent();
+    const action = actions.concludedEvent();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });

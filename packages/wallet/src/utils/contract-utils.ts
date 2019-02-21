@@ -7,7 +7,7 @@ export async function getProvider(): Promise<ethers.providers.Web3Provider> {
 }
 
 export async function getAdjudicatorContract(provider) {
-
+  await provider.ready;
   const networkId = (await provider.getNetwork()).chainId;
   const contractAddress = NitroAdjudicatorArtifact.networks[networkId].address;
   return new ethers.Contract(contractAddress, getAdjudicatorInterface(), provider);
@@ -18,8 +18,8 @@ export function getAdjudicatorInterface(): ethers.utils.Interface {
 }
 
 export async function getAdjudicatorContractAddress(provider) {
+  await provider.ready;
   console.log(provider);
-  console.log(await provider.getNetwork());
   const networkId = (await provider.getNetwork()).chainId;
   return NitroAdjudicatorArtifact.networks[networkId].address;
 }

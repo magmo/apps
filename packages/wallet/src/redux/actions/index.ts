@@ -271,30 +271,32 @@ export const fundingReceivedEvent = (amountReceived, sender, adjudicatorBalance)
 export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
 
 export const CHALLENGE_CREATED_EVENT = 'CHALLENGE_CREATED_EVENT';
-export const challengeCreatedEvent = (channelId, state, expirationTime, payouts) => ({
+export const challengeCreatedEvent = (channelId, commitment, finalizedAt) => ({
   channelId,
-  state,
-  expirationTime,
-  payouts,
+  commitment,
+  finalizedAt,
   type: CHALLENGE_CREATED_EVENT as typeof CHALLENGE_CREATED_EVENT,
 });
 export type ChallengeCreatedEvent = ReturnType<typeof challengeCreatedEvent>;
 
-export const GAME_CONCLUDED_EVENT = 'GAME_CONCLUDED_EVENT';
-export const gameConcludedEvent = () => ({
-  type: GAME_CONCLUDED_EVENT as typeof GAME_CONCLUDED_EVENT,
+export const CONCLUDED_EVENT = 'CONCLUDED_EVENT';
+export const concludedEvent = (channelId) => ({
+  channelId,
+  type: CONCLUDED_EVENT as typeof CONCLUDED_EVENT,
 });
-export type GameConcludedEvent = ReturnType<typeof gameConcludedEvent>;
+export type concludedEvent = ReturnType<typeof concludedEvent>;
 
 export const REFUTED_EVENT = 'REFUTED_EVENT';
-export const refutedEvent = (refuteState) => ({
-  refuteState,
+export const refutedEvent = (channelId, refuteCommitment) => ({
+  channelId,
+  refuteCommitment,
   type: REFUTED_EVENT as typeof REFUTED_EVENT,
 });
 export type RefutedEvent = ReturnType<typeof refutedEvent>;
 
 export const RESPOND_WITH_MOVE_EVENT = 'RESPOND_WITH_MOVE_EVENT';
-export const respondWithMoveEvent = (responseCommitment) => ({
+export const respondWithMoveEvent = (channelId, responseCommitment) => ({
+  channelId,
   responseCommitment,
   type: RESPOND_WITH_MOVE_EVENT as typeof RESPOND_WITH_MOVE_EVENT,
 });
@@ -394,7 +396,7 @@ export type WalletAction = (
   | MessageReceived
   | MessageSent
   | DisplayMessageSent
-  | GameConcludedEvent
+  | concludedEvent
   | ConcludeRequested
   | ConcludeApproved
   | CloseSuccessAcknowledged
