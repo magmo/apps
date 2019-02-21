@@ -1,5 +1,6 @@
 import { splitSignature, getAddress } from 'ethers/utils';
-import { recover, sign, SolidityType, Commitment, toHex } from 'fmg-core';
+import { recover, sign, Commitment, toHex } from 'fmg-core';
+import { ethers } from 'ethers';
 
 
 export const validCommitmentSignature = (commitment: Commitment, signature: string, address: string) => {
@@ -29,12 +30,10 @@ export const signData = (data: string, privateKey: string) => {
   return signature.signature;
 };
 
-export const signVerificationData = (playerAddress: string, destination: string, channelId: string, privateKey) => {
-  const data = [
-    { type: SolidityType.address, value: playerAddress },
-    { type: SolidityType.address, value: destination },
-    { type: SolidityType.bytes32, value: channelId },
-  ];
-  const signature = sign(data, privateKey) as any;
+export const signVerificationData = (playerAddress: string, destination: string, amount: string, sender: string, privateKey) => {
+  const AUTH_TYPES = ['address', 'address', 'uint256', 'address'];
+  const abiCoder = new ethers.utils.AbiCoder();
+  const authorization = abiCoder.encode(AUTH_TYPES, [playerAddress, destination, amount, sender]);
+  const signature = sign(authorization, privateKey) as any;
   return signature.signature;
 };
