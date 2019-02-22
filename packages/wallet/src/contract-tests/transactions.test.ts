@@ -95,8 +95,7 @@ describe('transactions', () => {
 
   });
 
-  it.only("should send a respondWithMove transaction", async () => {
-    console.log(provider);
+  it("should send a respondWithMove transaction", async () => {
     const channel: Channel = { channelType: libraryAddress, channelNonce: getNextNonce(), participants };
     const { channelNonce } = channel;
     const contractAddress = await getAdjudicatorContractAddress(provider);
