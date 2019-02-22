@@ -28,7 +28,7 @@ interface AdjudicatorEvent {
 // event RespondedWithMove(address channelId, Commitment.CommitmentStruct response);
 // event RespondedWithAlternativeMove(Commitment.CommitmentStruct alternativeResponse);
 
-function* createEventChannel(provider, channelId: string, participants: string[]) {
+function* createEventChannel(provider, channelId: string, ) {
   console.log(provider);
   const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
 
@@ -61,7 +61,7 @@ function* createEventChannel(provider, channelId: string, participants: string[]
       }
     });
     simpleAdjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
-      if (participants.indexOf(destination) > -1) {
+      if (destination === channelId) {
         emitter({ eventType: AdjudicatorEventType.Deposited, eventArgs: { destination, amountDeposited, destinationHoldings } });
 
       }
@@ -75,8 +75,8 @@ function* createEventChannel(provider, channelId: string, participants: string[]
     };
   });
 }
-export function* adjudicatorWatcher(channelId, participants, provider) {
-  const channel = yield call(createEventChannel, provider, channelId, participants);
+export function* adjudicatorWatcher(channelId, provider) {
+  const channel = yield call(createEventChannel, provider, channelId);
   while (true) {
     const event: AdjudicatorEvent = yield take(channel);
     switch (event.eventType) {
