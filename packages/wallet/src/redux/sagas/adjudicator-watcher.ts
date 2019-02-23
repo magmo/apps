@@ -18,16 +18,6 @@ interface AdjudicatorEvent {
   eventArgs: any;
   eventType: AdjudicatorEventType;
 }
-// event ChallengeCreated(
-//   address channelId,
-//   Commitment.CommitmentStruct commitment,
-//   uint256 finalizedAt
-// );
-// event Concluded(address channelId);
-// event Refuted(address channelId, Commitment.CommitmentStruct refutation);
-// event RespondedWithMove(address channelId, Commitment.CommitmentStruct response);
-// event RespondedWithAlternativeMove(Commitment.CommitmentStruct alternativeResponse);
-
 function* createEventChannel(provider, channelId: string, ) {
   console.log(provider);
   const adjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
