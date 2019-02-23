@@ -12,7 +12,7 @@ export const validSignature = (data: string, signature: string, address: string)
     const { v: vNum, r, s } = splitSignature(signature);
     const v = '0x' + (vNum as number).toString(16);
 
-    const recovered = recover(data, v, r, s);
+    const recovered = recover(data, { v, r, s });
 
     return recovered === getAddress(address);
   } catch (err) {

@@ -24,6 +24,7 @@ const defaults = {
   address: asAddress,
   privateKey: asPrivateKey,
   libraryAddress,
+  adjudicator: '0x0',
 };
 
 describe('when in WaitForChannel', () => {
@@ -90,6 +91,9 @@ describe('when in WaitForPreFundSetup', () => {
     participants: scenarios.channel.participants as [string, string],
     turnNum: 0,
     lastCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
+    adjudicator: '0x0',
+    requestedTotalFunds: '0x0',
+    requestedYourDeposit: '0x0',
   };
 
   describe('when we send a PreFundSetupB', () => {

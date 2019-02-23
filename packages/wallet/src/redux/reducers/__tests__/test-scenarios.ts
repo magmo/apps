@@ -56,7 +56,7 @@ export const gameCommitment1: Commitment = {
   commitmentType: CommitmentType.App,
   appAttributes: '0x0',
   turnNum: 19,
-  allocation: [],
+  allocation: ['0x05', '0x05'],
   destination: [],
 };
 export const gameCommitment2: Commitment = {

@@ -17,6 +17,7 @@ export interface AddressExists extends LoggedIn {
   address: string;
   privateKey: string;
   networkId: number;
+  adjudicator: string;
 }
 
 export interface SignedCommitment {
@@ -24,7 +25,7 @@ export interface SignedCommitment {
   signature: string;
 }
 
-export interface ChannelPartiallyOpen extends AddressExists {
+export interface FirstMoveSent extends AddressExists {
   channelId: string;
   libraryAddress: string;
   ourIndex: number;
@@ -32,40 +33,31 @@ export interface ChannelPartiallyOpen extends AddressExists {
   channelNonce: number;
   turnNum: number;
   lastCommitment: SignedCommitment;
-}
-
-export interface ChannelOpen extends ChannelPartiallyOpen {
-  penultimateCommitment: SignedCommitment;
   unhandledAction?: Action;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
 }
+export interface ChannelOpen extends FirstMoveSent {
+  penultimateCommitment: SignedCommitment;
+}
+
 export interface ChannelOpenAndTransactionExists extends ChannelOpen {
   transactionHash: string;
 }
-
-export interface AdjudicatorMightExist extends ChannelOpen {
-  adjudicator?: string;
-}
-
-export interface AdjudicatorExists extends ChannelOpen {
-  adjudicator: string;
-}
-
 export interface TransactionExists {
   transactionHash: string;
 }
-export interface ChallengeExists extends AdjudicatorExists {
+export interface ChallengeExists extends ChannelOpen {
   challengeExpiry?: number;
 }
 
-export interface UserAddressExists extends AdjudicatorExists {
+export interface UserAddressExists extends ChannelOpen {
   userAddress: string;
 }
 
 // creators
 export function base<T extends Base>(params: T): Base {
-  const { messageOutbox, transactionOutbox, displayOutbox } = params;
+  const { messageOutbox, transactionOutbox, displayOutbox, } = params;
   return { messageOutbox, transactionOutbox, displayOutbox };
 }
 
@@ -74,33 +66,25 @@ export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {
 }
 
 export function addressExists<T extends AddressExists>(params: T): AddressExists {
-  const { address, privateKey, networkId } = params;
-  return { ...loggedIn(params), address, privateKey, networkId };
+  const { address, privateKey, networkId, adjudicator } = params;
+  return { ...loggedIn(params), address, privateKey, networkId, adjudicator };
 }
 
-export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T): ChannelPartiallyOpen {
-  const { channelId, ourIndex, participants, channelNonce, turnNum, lastCommitment: lastPosition, libraryAddress } = params;
-  return { ...addressExists(params), channelId, ourIndex, participants, channelNonce, turnNum, lastCommitment: lastPosition, libraryAddress };
+export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent {
+  const { channelId, ourIndex, participants, channelNonce, turnNum, lastCommitment: lastPosition, libraryAddress, unhandledAction, requestedTotalFunds, requestedYourDeposit } = params;
+  return { ...addressExists(params), channelId, ourIndex, participants, channelNonce, turnNum, lastCommitment: lastPosition, libraryAddress, unhandledAction, requestedTotalFunds, requestedYourDeposit };
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  const { penultimateCommitment: penultimatePosition, unhandledAction, requestedTotalFunds, requestedYourDeposit } = params;
-  return { ...channelPartiallyOpen(params), penultimateCommitment: penultimatePosition, unhandledAction, requestedTotalFunds, requestedYourDeposit };
+  const { penultimateCommitment, } = params;
+  return { ...firstMoveSent(params), penultimateCommitment, };
 }
 
-
-export function adjudicatorMightExist<T extends AdjudicatorMightExist>(params: T): AdjudicatorMightExist {
-  return { ...channelOpen(params), adjudicator: params.adjudicator };
-}
-
-export function adjudicatorExists<T extends AdjudicatorExists>(params: T): AdjudicatorExists {
-  return { ...channelOpen(params), adjudicator: params.adjudicator };
-}
 
 export function challengeExists<T extends ChallengeExists>(params: T): ChallengeExists {
-  return { ...adjudicatorExists(params), challengeExpiry: params.challengeExpiry };
+  return { ...channelOpen(params), challengeExpiry: params.challengeExpiry };
 }
 
 export function userAddressExists<T extends UserAddressExists>(params: T): UserAddressExists {
-  return { ...adjudicatorExists(params), userAddress: params.userAddress };
+  return { ...channelOpen(params), userAddress: params.userAddress };
 }

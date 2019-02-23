@@ -73,18 +73,14 @@ storiesOf('Network Status', module)
   .add('Ganache', testState(states.approveFunding({ ...playerADefaults, networkId: 5777 })));
 storiesOf('Wallet Screens / Funding / Player A', module)
   .add('ApproveFunding', testState(states.approveFunding(playerADefaults)))
-  .add('AWaitForDeployToBeSentToMetaMask', testState(states.aWaitForDeployToBeSentToMetaMask(playerADefaults)))
-  .add('ASubmitDeployInMetaMask', testState(states.aSubmitDeployInMetaMask(playerADefaults)))
-  .add('WaitForDeployConfirmation', testState(states.waitForDeployConfirmation(playerADefaults)))
   .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(playerADefaults)))
   .add('AWaitForPostFundSetup', testState(states.aWaitForPostFundSetup(playerADefaults)))
   .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerADefaults)));
 
 storiesOf('Wallet Screens / Funding / Player B', module)
   .add('ApproveFunding', testState(states.approveFunding(playerBDefaults)))
-  .add('BWaitForDeployAddress', testState(states.bWaitForDeployAddress(playerBDefaults)))
-  .add('BWaitForDepositToBeSentToMetaMask', testState(states.bWaitForDepositToBeSentToMetaMask(playerBDefaults)))
-  .add('BSubmitDepositInMetaMask', testState(states.bSubmitDepositInMetaMask(playerBDefaults)))
+  .add('BWaitForDepositToBeSentToMetaMask', testState(states.waitForDepositToBeSentToMetaMask(playerBDefaults)))
+  .add('BSubmitDepositInMetaMask', testState(states.submitDepositInMetaMask(playerBDefaults)))
   .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(playerBDefaults)))
   .add('BWaitForPostFundSetup', testState(states.bWaitForPostFundSetup(playerBDefaults)))
   .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerBDefaults)));

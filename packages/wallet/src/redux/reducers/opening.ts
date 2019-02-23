@@ -57,6 +57,8 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         turnNum: 0,
         lastCommitment: { commitment: ownCommitment, signature },
         messageOutbox: signatureSuccess(signature),
+        requestedTotalFunds: '0x0',
+        requestedYourDeposit: '0x0',
       });
 
     case actions.OPPONENT_COMMITMENT_RECEIVED:
@@ -94,6 +96,8 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         turnNum: 0,
         lastCommitment: { commitment: action.commitment, signature: action.signature },
         messageOutbox: validationSuccess(),
+        requestedTotalFunds: '0x0',
+        requestedYourDeposit: '0x0',
       });
 
     default:
