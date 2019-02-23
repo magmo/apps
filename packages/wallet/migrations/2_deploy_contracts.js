@@ -1,7 +1,7 @@
 var Commitment = artifacts.require("fmg-core/contracts/Commitment.sol");
 var Rules = artifacts.require("fmg-core/contracts/Rules.sol");
 var TestGame = artifacts.require('../contracts/TestGame.sol')
-var NitroAdjudicator = artifacts.require("NitroAdjudicator/contracts/NitroAdjudicator");
+var NitroAdjudicator = artifacts.require("fmg-nitro-adjudicator/contracts/NitroAdjudicator");
 
 module.exports = function (deployer) {
   deployer.deploy(Commitment);
