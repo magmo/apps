@@ -37,6 +37,37 @@ export function createRefuteTransaction(contractAddress: string, refuteState: Co
   };
 }
 
+export interface ConcludeAndWithdrawArgs {
+  fromCommitment: Commitment;
+  toCommitment: Commitment;
+  fromSignature: string;
+  toSignature: string;
+  participant: string;
+  destination: string;
+  amount: string;
+  verificationSignature: string;
+}
+export function createConcludeAndWithdrawTransaction(contractAddress: string, args: ConcludeAndWithdrawArgs): TransactionRequest {
+  const adjudicatorInterface = getAdjudicatorInterface();
+  const splitFromSignature = splitSignature(args.fromSignature);
+  const splitToSignature = splitSignature(args.toSignature);
+  const conclusionProof = {
+    penultimateCommitment: asEthersObject(args.fromCommitment),
+    ultimateCommitment: asEthersObject(args.toCommitment),
+    penultimateSignature: splitFromSignature,
+    ultimateSignature: splitToSignature,
+  };
+  const { v, r, s } = splitSignature(args.verificationSignature);
+  const { participant, destination, amount } = args;
+  const data = adjudicatorInterface.functions.concludeAndWithdraw.encode([conclusionProof, participant, destination, amount, v, r, s]);
+
+  return {
+    to: contractAddress,
+    data,
+    gasLimit: 3000000,
+  };
+}
+
 export function createConcludeTransaction(contractAddress: string, fromState: Commitment, toState: Commitment, fromSignature: string, toSignature: string): TransactionRequest {
   const adjudicatorInterface = getAdjudicatorInterface();
   const splitFromSignature = splitSignature(fromSignature);
