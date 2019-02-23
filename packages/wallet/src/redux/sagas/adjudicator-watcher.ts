@@ -30,37 +30,37 @@ interface AdjudicatorEvent {
 
 function* createEventChannel(provider, channelId: string, ) {
   console.log(provider);
-  const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
+  const adjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
 
   return eventChannel((emitter) => {
 
-    const challengeCreatedFilter = simpleAdjudicator.filters.ChallengeCreated();
-    const gameConcludedFilter = simpleAdjudicator.filters.Concluded();
-    const refutedFilter = simpleAdjudicator.filters.Refuted();
-    const respondWithMoveFilter = simpleAdjudicator.filters.RespondedWithMove();
-    const depositedFilter = simpleAdjudicator.filters.Deposited();
+    const challengeCreatedFilter = adjudicator.filters.ChallengeCreated();
+    const gameConcludedFilter = adjudicator.filters.Concluded();
+    const refutedFilter = adjudicator.filters.Refuted();
+    const respondWithMoveFilter = adjudicator.filters.RespondedWithMove();
+    const depositedFilter = adjudicator.filters.Deposited();
 
-    simpleAdjudicator.on(challengeCreatedFilter, (cId, commitment, finalizedAt) => {
+    adjudicator.on(challengeCreatedFilter, (cId, commitment, finalizedAt) => {
       if (channelId === cId) {
         emitter({ eventType: AdjudicatorEventType.ChallengeCreated, eventArgs: { channelId, commitment, finalizedAt } });
       }
     });
-    simpleAdjudicator.on(gameConcludedFilter, (cId) => {
+    adjudicator.on(gameConcludedFilter, (cId) => {
       if (channelId === cId) {
         emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
       }
     });
-    simpleAdjudicator.on(refutedFilter, (cId, refutation) => {
+    adjudicator.on(refutedFilter, (cId, refutation) => {
       if (channelId === cId) {
         emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
       }
     });
-    simpleAdjudicator.on(respondWithMoveFilter, (cId, response) => {
+    adjudicator.on(respondWithMoveFilter, (cId, response) => {
       if (channelId === cId) {
         emitter({ eventType: AdjudicatorEventType.RespondWithMove, eventArgs: { channelId, response } });
       }
     });
-    simpleAdjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
+    adjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
       if (destination === channelId) {
         emitter({ eventType: AdjudicatorEventType.Deposited, eventArgs: { destination, amountDeposited, destinationHoldings } });
 
@@ -68,10 +68,10 @@ function* createEventChannel(provider, channelId: string, ) {
     });
     return () => {
       // This function is called when the channel gets closed
-      simpleAdjudicator.removeAllListeners(challengeCreatedFilter);
-      simpleAdjudicator.removeAllListeners(gameConcludedFilter);
-      simpleAdjudicator.removeAllListeners(refutedFilter);
-      simpleAdjudicator.removeAllListeners(respondWithMoveFilter);
+      adjudicator.removeAllListeners(challengeCreatedFilter);
+      adjudicator.removeAllListeners(gameConcludedFilter);
+      adjudicator.removeAllListeners(refutedFilter);
+      adjudicator.removeAllListeners(respondWithMoveFilter);
     };
   });
 }
