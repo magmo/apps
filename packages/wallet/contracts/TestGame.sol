@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
-import "nitro-adjudicator/contracts/NitroAdjudicator.sol";
+import "fmg-nitro-adjudicator/contracts/NitroAdjudicator.sol";
 
 
 contract TestGame {
