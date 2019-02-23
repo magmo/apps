@@ -31,7 +31,8 @@ const withdrawTransactionFailedReducer = (state: states.WithdrawTransactionFaile
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const myAddress = state.participants[state.ourIndex];
-      const signature = signVerificationData(myAddress, state.userAddress, state.channelId, state.privateKey);
+      // TODO: The sender could of changed since the transaction failed. We'll need to check for the updated address.
+      const signature = signVerificationData(myAddress, state.userAddress, state.channelId, state.userAddress, state.privateKey);
       const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, state.userAddress, state.channelId, signature);
       return states.waitForWithdrawalInitiation({ ...state, transactionOutbox });
   }
@@ -41,8 +42,10 @@ const withdrawTransactionFailedReducer = (state: states.WithdrawTransactionFaile
 const approveWithdrawalReducer = (state: states.ApproveWithdrawal, action: actions.WalletAction): states.WalletState => {
   switch (action.type) {
     case actions.WITHDRAWAL_APPROVED:
+
       const myAddress = state.participants[state.ourIndex];
-      const signature = signVerificationData(myAddress, action.destinationAddress, state.channelId, state.privateKey);
+
+      const signature = signVerificationData(myAddress, action.destinationAddress, state.channelId, action.destinationAddress, state.privateKey);
       const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, action.destinationAddress, state.channelId, signature);
       return states.waitForWithdrawalInitiation({ ...state, transactionOutbox, userAddress: action.destinationAddress });
     case actions.WITHDRAWAL_REJECTED:

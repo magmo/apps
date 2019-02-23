@@ -9,7 +9,6 @@ import { signCommitment } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
 import { challengeResponseRequested, challengeComplete, hideWallet, showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { toHex } from 'fmg-core';
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
@@ -43,7 +42,7 @@ export const respondingReducer = (state: RespondingState, action: WalletAction):
 const responseTransactionFailedReducer = (state: states.ResponseTransactionFailed, action: WalletAction) => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(state.lastCommitment.commitment), state.lastCommitment.signature);
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, state.lastCommitment.commitment, state.lastCommitment.signature);
       return states.initiateResponse({
         ...state,
         transactionOutbox: transaction,
@@ -80,7 +79,7 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
       return states.takeMoveInApp({ ...state, messageOutbox: challengeResponseRequested(), displayOutbox: hideWallet() });
     case actions.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
 
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(state.lastCommitment.commitment), state.lastCommitment.signature);
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, state.lastCommitment.commitment, state.lastCommitment.signature);
       return states.initiateResponse({
         ...state,
         transactionOutbox: transaction,
@@ -108,7 +107,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
       if (!validTransition(state, action.commitment)) { return state; }
 
       const signature = signCommitment(action.commitment, state.privateKey);
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, toHex(action.commitment), signature);
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, action.commitment, signature);
       return states.initiateResponse({
         ...state,
         turnNum: state.turnNum + 1,

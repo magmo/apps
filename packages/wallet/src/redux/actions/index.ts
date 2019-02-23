@@ -8,12 +8,13 @@ export const loggedIn = (uid: string) => ({
 export type LoggedIn = ReturnType<typeof loggedIn>;
 
 export const KEYS_LOADED = 'WALLET.KEYS_LOADED';
-export const keysLoaded = (address: string, privateKey: string, networkId: string) => ({
+export const keysLoaded = (address: string, privateKey: string, networkId: string, adjudicator: string) => ({
   type: KEYS_LOADED as typeof KEYS_LOADED,
   address,
   privateKey,
   // TODO: This should be separated off into its own action
   networkId,
+  adjudicator,
 });
 export type KeysLoaded = ReturnType<typeof keysLoaded>;
 
@@ -262,10 +263,10 @@ export const withdrawalSuccessAcknowledged = () => ({
 export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
 
 export const FUNDING_RECEIVED_EVENT = 'FUNDING_RECEIVED_EVENT';
-export const fundingReceivedEvent = (amountReceived, sender, adjudicatorBalance) => ({
-  amountReceived,
-  sender,
-  adjudicatorBalance,
+export const fundingReceivedEvent = (destination, amount, totalForDestination) => ({
+  destination,
+  amount,
+  totalForDestination,
   type: FUNDING_RECEIVED_EVENT as typeof FUNDING_RECEIVED_EVENT,
 });
 export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;

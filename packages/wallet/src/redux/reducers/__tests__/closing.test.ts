@@ -4,7 +4,7 @@ import * as states from '../../../states';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
-import { itTransitionsToStateType, itDoesntTransition } from './helpers';
+import { itTransitionsToStateType } from './helpers';
 
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
@@ -55,17 +55,10 @@ describe('start in AcknowledgeConclude', () => {
     });
 
     const action = actions.concludeApproved();
-    describe(' where the adjudicator exists', () => {
-      const updatedState = walletReducer(state, action);
-      itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
-      expect((updatedState.messageOutbox!).type).toEqual(outgoing.MESSAGE_REQUEST);
-    });
-    describe(' where the adjudicator does not exist', () => {
-      state.adjudicator = undefined;
-      const updatedState = walletReducer(state, action);
-      itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
-      expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
-    });
+
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
+    expect((updatedState.messageOutbox!).type).toEqual(outgoing.MESSAGE_REQUEST);
   });
 
 });
@@ -117,12 +110,6 @@ describe('start in WaitForOpponentConclude', () => {
       itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
       expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
     });
-    describe(' where the adjudicator does not exist', () => {
-      state.adjudicator = undefined;
-      const updatedState = walletReducer(state, action);
-      itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
-      expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
-    });
   });
 });
 
@@ -144,47 +131,10 @@ describe('start in ApproveCloseOnChain', () => {
     const action = actions.approveClose('0x0');
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
-    expect((updatedState.messageOutbox!).type).toEqual(outgoing.MESSAGE_REQUEST);
+
   });
 
-  describe('action taken: game concluded event', () => {
-    const action = actions.concludedEvent();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
-  });
 
-  describe('action taken: opponent started close message', () => {
-    const validateSignatureMock = jest.fn();
-    validateSignatureMock.mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validSignature', { value: validateSignatureMock });
-    const action = actions.messageReceived('CloseStarted', '0x0');
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_OPPONENT_CLOSE, updatedState);
-  });
-
-  describe('action taken: opponent sends incorrect message', () => {
-    const validateSignatureMock = jest.fn();
-    validateSignatureMock.mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validSignature', { value: validateSignatureMock });
-    const action = actions.messageReceived('WRONG MESSAGE', '0x0');
-    const updatedState = walletReducer(state, action);
-    itDoesntTransition(state, updatedState);
-  });
-
-});
-
-describe('start in WaitForOpponentClose', () => {
-  const state = states.waitForOpponentClose({
-    ...defaultsA,
-    penultimateCommitment: { commitment: concludeCommitment1, signature: 'sig' },
-    lastCommitment: { commitment: concludeCommitment2, signature: 'sig' },
-    turnNum: concludeCommitment2.turnNum,
-  });
-  describe('action take: game concluded event', () => {
-    const action = actions.concludedEvent();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
-  });
 });
 
 describe('start in WaitForCloseInitiation', () => {
@@ -200,11 +150,6 @@ describe('start in WaitForCloseInitiation', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
-  });
-  describe('action taken: game concluded event', () => {
-    const action = actions.concludedEvent();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });
 });
 
