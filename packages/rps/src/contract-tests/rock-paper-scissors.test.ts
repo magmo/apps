@@ -11,6 +11,7 @@ import * as ethers from 'ethers';
 
 import RPSGameArtifact from '../../build/contracts/RockPaperScissorsGame.json';
 import { asEthersObject, Commitment } from 'fmg-core';
+import { bytesFromAppAttributes } from 'src/core/positions';
 
 jest.setTimeout(20000);
 
@@ -45,14 +46,27 @@ describe("Rock paper Scissors", () => {
   });
 
 
-  const validTransition = async (commitment1: Commitment, commitment2: Commitment) => {
+  function positionToCommitment(position: Position): Commitment {
+    const {
+      commitmentType,
+    } = position;
+    return {
+      commitmentType,
+      appAttributes: bytesFromAppAttributes(position.appAttributes);
+    }
+  }
+
+  const validTransition = async (position1: Position, position2: Position) => {
+    const commitment1 = positionToCommitment(position1);
     return await rpsContract.validTransition(asEthersObject(commitment1), asEthersObject(commitment2));
   };
 
   // Transition function tests
   // ========================
 
-  it("allows START -> ROUNDPROPOSED", async () => {
+  it.only("allows START -> ROUNDPROPOSED", async () => {
+    console.log(postFundSetupB)
+    console.log(propose)
     expect(await validTransition(postFundSetupB, propose)).toBe(true);
   });
 
