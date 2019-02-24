@@ -16,7 +16,7 @@ import { unreachable } from '../utils/reducer-utils';
 // import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
 import TransactionFailed from '../components/TransactionFailed';
 import ApproveFunding from '../components/funding/ApproveFunding';
-import { AFundingStep, BFundingStep } from '../components/funding/FundingStep';
+import { FundingStep } from '../components/funding/FundingStep';
 import EtherscanLink from '../components/EtherscanLink';
 
 interface Props {
@@ -57,54 +57,46 @@ class FundingContainer extends PureComponent<Props> {
       case states.B_WAIT_FOR_POST_FUND_SETUP:
       case states.WAIT_FOR_DEPOSIT_EVENTS:
         // return <AWaitForPostFundSetup />;
-        return <AFundingStep step={4}>Waiting for the other player
-        </AFundingStep>;
-        return <BFundingStep step={1} />;
+        return <FundingStep step={4}>Waiting for the other player
+        </FundingStep>;
+        return <FundingStep step={1} />;
       case states.WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
         // return <SubmitX name="deposit" />;
-        return <BFundingStep step={2} />;
+        return <FundingStep step={2} />;
       case states.SUBMIT_DEPOSIT_IN_METAMASK:
         // return <WaitForXInitiation name="deposit" />;
-        return <BFundingStep step={2} />;
+        return <FundingStep step={2} />;
       case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
 
-        return <AFundingStep step={3}>
+        return <FundingStep step={3}>
           Check the progress on&nbsp;
             <EtherscanLink
             transactionID={state.transactionHash}
             networkId={state.networkId}
             title="Etherscan"
           />!
-          </AFundingStep>;
+          </FundingStep>;
 
       case states.B_WAIT_FOR_POST_FUND_SETUP:
         // return <BWaitForPostFundSetup />;
-        return <BFundingStep step={4}>Waiting for the other player
-        </BFundingStep>;
+        return <FundingStep step={4}>Waiting for the other player
+        </FundingStep>;
 
       case states.ACKNOWLEDGE_FUNDING_SUCCESS:
         if (state.ourIndex === 0) {
-          return <AFundingStep step={5}>
+          return <FundingStep step={5}>
             <Button onClick={fundingSuccessAcknowledged} >
               {"Return to game"}
             </Button>
-          </AFundingStep>;
+          </FundingStep>;
         }
         else {
-          return <BFundingStep step={5}>
+          return <FundingStep step={5}>
             <Button onClick={fundingSuccessAcknowledged} >
               {"Return to game"}
             </Button>
-          </BFundingStep>;
+          </FundingStep>;
         }
-      // return (
-      // <AcknowledgeX
-      //   title="Funding successful"
-      //   action={fundingSuccessAcknowledged}
-      //   description="You have successfully deposited funds into your channel"
-      //   actionTitle="Return to game"
-      // />
-      // );
       case states.ACKNOWLEDGE_FUNDING_DECLINED:
         return (<AcknowledgeX
           title="Funding declined!"
