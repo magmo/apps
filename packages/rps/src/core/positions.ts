@@ -1,6 +1,6 @@
 import { Move } from './moves';
 import { soliditySha3 } from 'web3-utils';
-import { padBytes32 } from 'fmg-core';
+import { padBytes32, Commitment, BaseCommitment, CommitmentType } from 'fmg-core';
 
 // Position names
 // ==============
@@ -27,27 +27,27 @@ interface Base {
 }
 
 // All positions apart from Conclude also have the buyIn
-interface BaseWithBuyIn extends Base {
+interface BaseWithBuyIn extends BaseCommitment {
   roundBuyIn: string;
 }
 
 export interface PreFundSetupA extends BaseWithBuyIn {
-  stateCount: 0;
+  commitmentCount: 0;
   name: typeof PRE_FUND_SETUP_A;
 }
 
 export interface PreFundSetupB extends BaseWithBuyIn {
-  stateCount: 1;
+  commitmentCount: 1;
   name: typeof PRE_FUND_SETUP_B;
 }
 
 export interface PostFundSetupA extends BaseWithBuyIn {
-  stateCount: 0;
+  commitmentCount: 0;
   name: typeof POST_FUND_SETUP_A;
 }
 
 export interface PostFundSetupB extends BaseWithBuyIn {
-  stateCount: 1;
+  commitmentCount: 1;
   name: typeof POST_FUND_SETUP_B;
 }
 
@@ -102,9 +102,27 @@ interface BaseWithBuyInParams extends BaseParams {
   roundBuyIn: string;
 }
 
-function base(obj: BaseParams): Base {
-  const { libraryAddress, channelNonce, participants, turnNum, balances } = obj;
-  return { libraryAddress, channelNonce, participants, turnNum, balances };
+function base(obj: BaseParams): BaseCommitment {
+  const {
+    libraryAddress,
+    channelNonce,
+    participants,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+  } = obj;
+  return {
+    channel: {
+      channelType: libraryAddress,
+      nonce: channelNonce,
+      participants,
+    },
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+  };
 }
 
 function baseWithBuyIn(obj: BaseWithBuyInParams): BaseWithBuyIn {
@@ -112,19 +130,19 @@ function baseWithBuyIn(obj: BaseWithBuyInParams): BaseWithBuyIn {
 }
 
 export function preFundSetupA(obj: BaseWithBuyInParams): PreFundSetupA {
-  return { ...baseWithBuyIn(obj), name: PRE_FUND_SETUP_A, stateCount: 0 };
+  return { ...baseWithBuyIn(obj), name: PRE_FUND_SETUP_A, commitmentCount: 0 };
 }
 
 export function preFundSetupB(obj: BaseWithBuyInParams): PreFundSetupB {
-  return { ...baseWithBuyIn(obj), name: PRE_FUND_SETUP_B, stateCount: 1 };
+  return { ...baseWithBuyIn(obj), name: PRE_FUND_SETUP_B, commitmentCount: 1 };
 }
 
 export function postFundSetupA(obj: BaseWithBuyInParams): PostFundSetupA {
-  return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_A, stateCount: 0 };
+  return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_A, commitmentCount: 0 };
 }
 
 export function postFundSetupB(obj: BaseWithBuyInParams): PostFundSetupB {
-  return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_B, stateCount: 1 };
+  return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_B, commitmentCount: 1 };
 }
 
 interface ProposeParams extends BaseWithBuyInParams {

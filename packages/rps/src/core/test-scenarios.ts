@@ -4,7 +4,7 @@ import { Result } from './results';
 import * as positions from './positions';
 import { randomHex } from "../utils/randomHex";
 import bnToHex from "../utils/bnToHex";
-import { Channel } from "fmg-core";
+import { channelID } from "fmg-core/lib/channel";
 
 const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = 4;
@@ -25,7 +25,7 @@ const salt = randomHex(64);
 const preCommit = positions.hashCommitment(asMove, salt);
 const bsMove = Move.Scissors;
 
-const channelId = new Channel(libraryAddress, channelNonce, participants).id;
+const channelId = channelID({channelType: libraryAddress, nonce: channelNonce, participants});
 
 const base = {
   channelId,
@@ -48,10 +48,10 @@ export const shared = {
 
 export const standard = {
   ...shared,
-  preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, stateCount: 0 }),
-  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, stateCount: 1 }),
-  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, stateCount: 0 }),
-  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, stateCount: 1 }),
+  preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, commitmentCount: 0 }),
+  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, commitmentCount: 1 }),
+  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, commitmentCount: 0 }),
+  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, commitmentCount: 1 }),
   asMove,
   salt,
   preCommit,
@@ -99,10 +99,10 @@ export const bResignsAfterOneRound = {
 };
 
 export const insufficientFunds = {
-  preFundSetupA: positions.preFundSetupB({ ...base, turnNum: 0, balances: nineOne, stateCount: 0 }),
-  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: nineOne, stateCount: 1 }),
-  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: nineOne, stateCount: 0 }),
-  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: nineOne, stateCount: 1 }),
+  preFundSetupA: positions.preFundSetupB({ ...base, turnNum: 0, balances: nineOne, commitmentCount: 0 }),
+  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: nineOne, commitmentCount: 1 }),
+  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: nineOne, commitmentCount: 0 }),
+  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: nineOne, commitmentCount: 1 }),
   asMove,
   bsMove,
   propose: positions.proposeFromSalt({ ...base, turnNum: 4, balances: nineOne, asMove, salt }),
@@ -131,10 +131,10 @@ export function build(customLibraryAddress: string, customAsAddress: string, cus
 
   return {
     ...customShared,
-    preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, stateCount: 0 }),
-    preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, stateCount: 1 }),
-    postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, stateCount: 0 }),
-    postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, stateCount: 1 }),
+    preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, commitmentCount: 0 }),
+    preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, commitmentCount: 1 }),
+    postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, commitmentCount: 0 }),
+    postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, commitmentCount: 1 }),
     asMove,
     salt,
     preCommit,
