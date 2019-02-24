@@ -71,18 +71,14 @@ storiesOf('Network Status', module)
   .add('Ropsten', testState(states.approveFunding({ ...playerADefaults, networkId: 3 })))
   .add('Rinkeby', testState(states.approveFunding({ ...playerADefaults, networkId: 42 })))
   .add('Ganache', testState(states.approveFunding({ ...playerADefaults, networkId: 5777 })));
-storiesOf('Wallet Screens / Funding / Player A', module)
-  .add('ApproveFunding', testState(states.approveFunding(playerADefaults)))
-  .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(playerADefaults)))
-  .add('AWaitForPostFundSetup', testState(states.aWaitForPostFundSetup(playerADefaults)))
-  .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerADefaults)));
 
-storiesOf('Wallet Screens / Funding / Player B', module)
+storiesOf('Wallet Screens / Funding ', module)
   .add('ApproveFunding', testState(states.approveFunding(playerBDefaults)))
-  .add('BWaitForDepositToBeSentToMetaMask', testState(states.waitForDepositToBeSentToMetaMask(playerBDefaults)))
-  .add('BSubmitDepositInMetaMask', testState(states.submitDepositInMetaMask(playerBDefaults)))
+  .add('WaitForDepositToBeSentToMetaMask', testState(states.waitForDepositToBeSentToMetaMask(playerBDefaults)))
+  .add('SubmitDepositInMetaMask', testState(states.submitDepositInMetaMask(playerBDefaults)))
   .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(playerBDefaults)))
-  .add('BWaitForPostFundSetup', testState(states.bWaitForPostFundSetup(playerBDefaults)))
+  .add('Wait for Deposit Events', testState(states.waitForDepositEvents(playerBDefaults)))
+  .add('WaitForPostFundSetup', testState(states.bWaitForPostFundSetup(playerBDefaults)))
   .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerBDefaults)));
 
 storiesOf('Wallet Screens / Withdrawing', module)
