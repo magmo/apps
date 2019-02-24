@@ -2,7 +2,6 @@ import BN from 'bn.js';
 import { expectRevert } from 'magmo-devtools';
 import {
   scenarios,
-  encode
 } from '../core';
 
 import hexToBN from '../utils/hexToBN';
@@ -11,6 +10,7 @@ import * as ethers from 'ethers';
 
 
 import RPSGameArtifact from '../../build/contracts/RockPaperScissorsGame.json';
+import { asEthersObject, Commitment } from 'fmg-core';
 
 jest.setTimeout(20000);
 
@@ -45,8 +45,8 @@ describe("Rock paper Scissors", () => {
   });
 
 
-  const validTransition = async (state1, state2) => {
-    return await rpsContract.validTransition(encode(state1), encode(state2));
+  const validTransition = async (commitment1: Commitment, commitment2: Commitment) => {
+    return await rpsContract.validTransition(asEthersObject(commitment1), asEthersObject(commitment2));
   };
 
   // Transition function tests
@@ -72,8 +72,8 @@ describe("Rock paper Scissors", () => {
     reveal.roundBuyIn = bnToHex(hexToBN(reveal.roundBuyIn).add(new BN(1)));
     expect.assertions(1);
     await expectRevert(
-      () => rpsContract.validTransition(encode(reveal), encode(resting)),
-      "The stake should be the same between states"
+      () => rpsContract.validTransition(asEthersObject(reveal), asEthersObject(resting)),
+      "The stake should be the same between commitments"
     );
   });
 });
