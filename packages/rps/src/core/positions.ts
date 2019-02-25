@@ -1,6 +1,8 @@
 import { Move } from './moves';
 import { soliditySha3 } from 'web3-utils';
-import { padBytes32 } from 'fmg-core';
+import { padBytes32, Commitment, BaseCommitment, CommitmentType, Bytes, Uint256, Uint8, Bytes32, Uint32 } from 'fmg-core';
+import abi from 'web3-eth-abi';
+import { defaultPath } from 'ethers/utils/hdnode';
 
 // Position names
 // ==============
@@ -14,67 +16,99 @@ export const REVEAL = 'REVEAL';
 export const RESTING = 'RESTING';
 export const CONCLUDE = 'CONCLUDE';
 
+interface AppAttributes {
+  positionType: Uint8;
+  stake: Uint256;
+  preCommit: Bytes32;
+  bPlay: Uint8;
+  aPlay: Uint8;
+  salt: Bytes32;
+  roundNum: Uint32;
+}
+
+const SolidityRPSCommitmentType = {
+  "RPSCommitmentStruct": {
+    positionType: "uint8",
+    stake: "uint256",
+    preCommit: "bytes32",
+    bPlay: "uint8",
+    aPlay: "uint8",
+    salt: "bytes32",
+    roundNum: "uint32",
+  },
+};
+
+export function bytesFromAppAttributes(appAttrs: AppAttributes): Bytes {
+  const { positionType, stake, preCommit, bPlay, aPlay, salt, roundNum, } = appAttrs;
+  return abi.encodeParameter(SolidityRPSCommitmentType, [
+    positionType, stake, preCommit, bPlay, aPlay, salt, roundNum, 
+  ]);
+}
+
 // Positions
 // =========
 
 // Properties shared by every position
-interface Base {
-  libraryAddress: string;
-  channelNonce: number;
-  participants: [string, string];
-  turnNum: number;
-  balances: [string, string];
-}
+// interface Base {
+//   libraryAddress: string;
+//   channelNonce: number;
+//   participants: [string, string];
+//   turnNum: number;
+//   balances: [string, string];
+// }
 
 // All positions apart from Conclude also have the buyIn
-interface BaseWithBuyIn extends Base {
-  roundBuyIn: string;
+interface BaseWithAppAttributes extends BaseCommitment {
+  appAttributes: AppAttributes;
 }
 
-export interface PreFundSetupA extends BaseWithBuyIn {
-  stateCount: 0;
+export interface PreFundSetupA extends BaseWithAppAttributes {
+  commitmentCount: 0;
+  commitmentType: CommitmentType.PreFundSetup;
   name: typeof PRE_FUND_SETUP_A;
 }
 
-export interface PreFundSetupB extends BaseWithBuyIn {
-  stateCount: 1;
+export interface PreFundSetupB extends BaseWithAppAttributes {
+  commitmentCount: 1;
+  commitmentType: CommitmentType.PreFundSetup;
   name: typeof PRE_FUND_SETUP_B;
 }
 
-export interface PostFundSetupA extends BaseWithBuyIn {
-  stateCount: 0;
+export interface PostFundSetupA extends BaseWithAppAttributes {
+  commitmentCount: 0;
+  commitmentType: CommitmentType.PostFundSetup;
   name: typeof POST_FUND_SETUP_A;
 }
 
-export interface PostFundSetupB extends BaseWithBuyIn {
-  stateCount: 1;
+export interface PostFundSetupB extends BaseWithAppAttributes {
+  commitmentCount: 1;
+  commitmentType: CommitmentType.PostFundSetup;
   name: typeof POST_FUND_SETUP_B;
 }
 
-export interface Propose extends BaseWithBuyIn {
+export interface Propose extends BaseWithAppAttributes {
   name: typeof PROPOSE;
-  preCommit: string;
+  commitmentType: CommitmentType.App;
 }
 
-export interface Accept extends BaseWithBuyIn {
+export interface Accept extends BaseWithAppAttributes {
   name: typeof ACCEPT;
-  preCommit: string;
-  bsMove: Move;
+  commitmentType: CommitmentType.App;
 }
 
-export interface Reveal extends BaseWithBuyIn {
+export interface Reveal extends BaseWithAppAttributes {
   name: typeof REVEAL;
-  bsMove: Move;
-  asMove: Move;
-  salt: string;
+  commitmentType: CommitmentType.App;
 }
 
-export interface Resting extends BaseWithBuyIn {
+export interface Resting extends BaseWithAppAttributes {
   name: typeof RESTING;
+  commitmentType: CommitmentType.App;
 }
 
-export interface Conclude extends Base {
+export interface Conclude extends BaseWithAppAttributes {
   name: typeof CONCLUDE;
+  commitmentType: CommitmentType.Conclude;
 }
 
 export type Position = (
@@ -92,39 +126,78 @@ export type Position = (
 // Position Constructors
 // =====================
 
-// Will be useful to be able to construct these positions from any object
-// that includes the right properties
-interface BaseParams extends Base {
-  [x: string]: any;
-}
-
-interface BaseWithBuyInParams extends BaseParams {
+interface BaseWithBuyInParams extends BaseCommitment {
   roundBuyIn: string;
 }
 
-function base(obj: BaseParams): Base {
-  const { libraryAddress, channelNonce, participants, turnNum, balances } = obj;
-  return { libraryAddress, channelNonce, participants, turnNum, balances };
+function base(obj: BaseCommitment): BaseCommitment {
+  const {
+    channel,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+  } = obj;
+  return {
+    channel,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+  };
 }
 
-function baseWithBuyIn(obj: BaseWithBuyInParams): BaseWithBuyIn {
-  return { ...base(obj), roundBuyIn: obj.roundBuyIn };
+const zeroBytes32: Bytes32 = "0x" + "0".repeat(64);
+function defaultAppAttrs (roundBuyin: Uint256): AppAttributes {
+  return {
+    stake: zeroBytes32,
+    positionType: 0,
+    preCommit: zeroBytes32,
+    bPlay: 0,
+    aPlay: 0,
+    salt: zeroBytes32,
+    roundNum: 0,
+  };
 }
 
 export function preFundSetupA(obj: BaseWithBuyInParams): PreFundSetupA {
-  return { ...baseWithBuyIn(obj), name: PRE_FUND_SETUP_A, stateCount: 0 };
+  return {
+    ...base(obj),
+    name: PRE_FUND_SETUP_A,
+    commitmentCount: 0,
+    commitmentType: CommitmentType.PreFundSetup,
+    appAttributes: defaultAppAttrs(obj.roundBuyIn),
+  };
 }
 
 export function preFundSetupB(obj: BaseWithBuyInParams): PreFundSetupB {
-  return { ...baseWithBuyIn(obj), name: PRE_FUND_SETUP_B, stateCount: 1 };
+  return {
+    ...base(obj),
+    name: PRE_FUND_SETUP_B,
+    commitmentCount: 1,
+    commitmentType: CommitmentType.PreFundSetup,
+    appAttributes: defaultAppAttrs(obj.roundBuyIn),
+  };
 }
 
 export function postFundSetupA(obj: BaseWithBuyInParams): PostFundSetupA {
-  return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_A, stateCount: 0 };
+  return {
+    ...base(obj),
+    name: POST_FUND_SETUP_A,
+    commitmentCount: 0,
+    commitmentType: CommitmentType.PostFundSetup,
+    appAttributes: defaultAppAttrs(obj.roundBuyIn),
+  };
 }
 
 export function postFundSetupB(obj: BaseWithBuyInParams): PostFundSetupB {
-  return { ...baseWithBuyIn(obj), name: POST_FUND_SETUP_B, stateCount: 1 };
+  return {
+    ...base(obj),
+    name: POST_FUND_SETUP_B,
+    commitmentCount: 1,
+    commitmentType: CommitmentType.PostFundSetup,
+    appAttributes: defaultAppAttrs(obj.roundBuyIn),
+  };
 }
 
 interface ProposeParams extends BaseWithBuyInParams {
@@ -132,7 +205,16 @@ interface ProposeParams extends BaseWithBuyInParams {
 }
 
 export function propose(obj: ProposeParams): Propose {
-  return { ...baseWithBuyIn(obj), name: PROPOSE, preCommit: obj.preCommit };
+  const appAttributes: AppAttributes = {
+    ...defaultAppAttrs(obj.roundBuyIn),
+    preCommit: obj.preCommit,
+  };
+  return {
+    ...base(obj),
+    name: PROPOSE,
+    commitmentType: CommitmentType.App,
+    appAttributes,
+  };
 }
 
 export function hashCommitment(play: Move, salt: string) {
@@ -144,39 +226,81 @@ export function hashCommitment(play: Move, salt: string) {
 
 interface ProposeWithMoveAndSaltParams extends BaseWithBuyInParams {
   salt: string;
-  asMove: Move;
+  aPlay: Move;
 }
 export function proposeFromSalt(obj: ProposeWithMoveAndSaltParams): Propose {
-  const { salt, asMove } = obj;
-  const preCommit = hashCommitment(asMove, salt);
-  return { ...baseWithBuyIn(obj), name: PROPOSE, preCommit };
+  const { salt, aPlay } = obj;
+  const preCommit = hashCommitment(aPlay, salt);
+  const appAttributes = {
+    ...defaultAppAttrs(obj.roundBuyIn),
+    preCommit,
+    salt,
+    aPlay,
+  };
+  return {
+    ...base(obj),
+    name: PROPOSE,
+    commitmentType: CommitmentType.App,
+    appAttributes,
+  };
 }
 
 interface AcceptParams extends BaseWithBuyInParams {
   preCommit: string;
-  bsMove: Move;
+  bPlay: Move;
 }
 
 export function accept(obj: AcceptParams): Accept {
-  const { preCommit, bsMove } = obj;
-  return { ...baseWithBuyIn(obj), name: ACCEPT, preCommit, bsMove };
+  const { preCommit, bPlay } = obj;
+  return {
+    ...base(obj),
+    name: ACCEPT,
+    commitmentType: CommitmentType.App,
+    appAttributes: {
+      ...defaultAppAttrs(obj.roundBuyIn),
+      preCommit,
+      bPlay,
+    },
+  };
 }
 
 interface RevealParams extends BaseWithBuyInParams {
-  bsMove: Move;
-  asMove: Move;
+  bPlay: Move;
+  aPlay: Move;
   salt: string;
 }
 
 export function reveal(obj: RevealParams): Reveal {
-  const { asMove, bsMove, salt } = obj;
-  return { ...baseWithBuyIn(obj), name: REVEAL, asMove, bsMove, salt };
+  const { aPlay, bPlay, salt } = obj;
+  return {
+    ...base(obj),
+    name: REVEAL,
+    commitmentType: CommitmentType.App,
+    appAttributes: {
+      ...defaultAppAttrs(obj.roundBuyIn),
+      aPlay,
+      bPlay,
+      salt,
+    },
+  };
 }
 
 export function resting(obj: BaseWithBuyInParams): Resting {
-  return { ...baseWithBuyIn(obj), name: RESTING };
+  return {
+    ...base(obj),
+    name: RESTING,
+    commitmentType: CommitmentType.App,
+    appAttributes: {
+      ...defaultAppAttrs(obj.roundBuyIn),
+    },
+  };
 }
 
-export function conclude(obj: BaseParams): Conclude {
-  return { ...base(obj), name: CONCLUDE };
+export function conclude(obj: BaseCommitment): Conclude {
+  return {
+    ...base(obj),
+    name: CONCLUDE,
+    commitmentType: CommitmentType.Conclude,
+    appAttributes: defaultAppAttrs(zeroBytes32),
+  };
 }
