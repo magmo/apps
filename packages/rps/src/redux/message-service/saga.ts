@@ -1,6 +1,5 @@
 import { fork, take, call, put, select, actionChannel } from 'redux-saga/effects';
 import { buffers, eventChannel } from 'redux-saga';
-import * as commitmentHelper from '../../core/rps-commitment-helper';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
 import { Player, } from '../../core';
@@ -133,7 +132,7 @@ function* receiveFromFirebaseSaga(address) {
         // TODO: Handle this
       }
       const commitment = data;
-      if (commitment.name === commitmentHelper.PRE_FUND_SETUP_A) {
+      if (commitment.name === commitment.PRE_FUND_SETUP_A) {
         yield put(gameActions.initialCommitmentReceived(commitment, userName ? userName : 'Opponent'));
       } else {
         yield put(gameActions.commitmentReceived(commitment));

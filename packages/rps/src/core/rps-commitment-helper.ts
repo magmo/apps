@@ -1,18 +1,9 @@
 
 import { soliditySha3 } from 'web3-utils';
 import { padBytes32, BaseCommitment, CommitmentType, Bytes32 } from 'fmg-core';
-import { AppAttributes, RPSCommitment, Weapon, PositionType } from './rps-commitment';
+import { AppAttributes, RPSCommitment, Weapon, PositionType, PRE_FUND_SETUP_A, PRE_FUND_SETUP_B, POST_FUND_SETUP_A, POST_FUND_SETUP_B, APP_PROPOSE, APP_ACCEPT, APP_REVEAL, APP_RESTING, CONCLUDE } from './rps-commitment';
 
-// Commitment names
-export const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
-export const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
-export const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
-export const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
-export const APP_PROPOSE = 'APP:PROPOSE';
-export const APP_ACCEPT = 'APP:ACCEPT';
-export const APP_REVEAL = 'APP:REVEAL';
-export const APP_RESTING = 'APP:RESTING';
-export const CONCLUDE = 'CONCLUDE';
+
 
 // Commitment Constructors
 // =====================
