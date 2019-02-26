@@ -10,9 +10,10 @@ import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
 import { getMessageState, getGameState } from '../store';
 import * as Wallet from 'magmo-wallet-client';
-import hexToBN from '../../utils/hexToBN';
 import { WALLET_IFRAME_ID } from '../../constants';
 import { channelID } from 'fmg-core/lib/channel';
+import { RPSCommitment, asCoreCommitment, fromCoreCommitment } from '../../core/rps-commitment';
+import { ChallengeCommitmentReceived, FundingResponse } from 'magmo-wallet-client';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -187,12 +188,10 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
 
       const opponentAddress = participants[1 - myIndex];
       const myAddress = participants[myIndex];
-      const myBalance = hexToBN(balances[myIndex]);
-      const opponentBalance = hexToBN(balances[1 - myIndex]);
       const fundingChannel = createWalletEventChannel([Wallet.FUNDING_SUCCESS, Wallet.FUNDING_FAILURE]);
 
-      Wallet.startFunding(WALLET_IFRAME_ID, channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex);
-      const fundingResponse = yield take(fundingChannel);
+      Wallet.startFunding(WALLET_IFRAME_ID, channelId, myAddress, opponentAddress, balances[myIndex], balances[1 - myIndex], myIndex);
+      const fundingResponse: FundingResponse = yield take(fundingChannel);
       if (fundingResponse.type === Wallet.FUNDING_FAILURE) {
         if (fundingResponse.reason === 'FundingDeclined') {
           yield put(gameActions.exitToLobby());
@@ -201,7 +200,7 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
         }
       } else {
         yield put(gameActions.messageSent());
-        const commitment = fundingResponse.commitment;
+        const commitment = fromCoreCommitment(fundingResponse.commitment);
         yield put(gameActions.fundingSuccess(commitment));
       }
       break;
@@ -260,37 +259,37 @@ function* recieveDisplayEventFromWalletSaga() {
 }
 
 function* receiveChallengePositionFromWalletSaga() {
-  const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_POSITION_RECEIVED]); // TODO change to CHALLENGE_COMMITMENT_RECEIVED
+  const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMMITMENT_RECEIVED]); // TODO change to CHALLENGE_COMMITMENT_RECEIVED
   while (true) {
-    const { commitmentData } = yield take(challengeChannel);
-    const commitment = commitmentData;
+    const challengeCommitmentReceived: ChallengeCommitmentReceived = yield take(challengeChannel);
+    const commitment = fromCoreCommitment(challengeCommitmentReceived.commitment);
     yield put(gameActions.commitmentReceived(commitment));
   }
 }
 
 
-function* validateMessage(data, signature) {
+function* validateMessage(commitment: RPSCommitment, signature) {
   try {
-    return yield Wallet.validateSignature(WALLET_IFRAME_ID, data, signature);
+    return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, asCoreCommitment(commitment), signature);
   } catch (err) {
     if (err.reason === 'WalletBusy') {
       const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
       yield take(challengeChannel);
-      return yield Wallet.validateSignature(WALLET_IFRAME_ID, data, signature);
+      return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, asCoreCommitment(commitment), signature);
     } else {
       throw new Error(err.error);
     }
   }
 }
 
-function* signMessage(data) {
+function* signMessage(commitment: RPSCommitment) {
   try {
-    return yield Wallet.signData(WALLET_IFRAME_ID, data);
+    return yield Wallet.signCommitment(WALLET_IFRAME_ID, asCoreCommitment(commitment));
   } catch (err) {
     if (err.reason === 'WalletBusy') {
       const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
       yield take(challengeChannel);
-      return yield Wallet.signData(WALLET_IFRAME_ID, data);
+      return yield Wallet.signCommitment(WALLET_IFRAME_ID, asCoreCommitment(commitment));
     } else {
       throw new Error(err.error);
     }

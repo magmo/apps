@@ -275,7 +275,7 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
       return states.waitForUpdate({
         ...state,
         displayOutbox: hideWallet(),
-        messageOutbox: fundingSuccess(state.channelId, toHex(state.lastCommitment.commitment)),
+        messageOutbox: fundingSuccess(state.channelId, state.lastCommitment.commitment),
       });
     default:
       return state;

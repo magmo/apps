@@ -38,7 +38,7 @@ export function* sagaManager(): IterableIterator<any> {
     if ('channelId' in state && state.adjudicator) {
       if (!adjudicatorWatcherProcess) {
         const provider = yield getProvider();
-        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.channelId, state.participants, provider);
+        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.channelId, provider);
       }
       if (!blockchainWatcherProcess) {
         blockchainWatcherProcess = yield fork(blockchainWatcher);
