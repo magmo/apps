@@ -1,5 +1,5 @@
 import { gameReducer } from '../reducer';
-import { scenarios } from '../../../core';
+import * as scenarios from '../../../core/test-scenarios';
 import * as actions from '../actions';
 import * as state from '../state';
 
@@ -59,7 +59,7 @@ describe('when in waiting room', () => {
   const gameState = state.waitingRoom(params);
 
   describe('when PreFundSetupA arrives', () => {
-    const action = actions.initialPositionReceived(preFundSetupA, 'Tom');
+    const action = actions.initialCommitmentReceived(preFundSetupA, 'Tom');
     const updatedState = gameReducer({ gameState, messageState }, action);
 
     itTransitionsTo(state.StateName.ConfirmGameB, updatedState);

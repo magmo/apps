@@ -1,5 +1,5 @@
 import React from "react";
-import { State } from "fmg-core";
+import { Commitment } from "fmg-core";
 import { Button } from "reactstrap";
 
 import BN from 'bn.js';
@@ -18,7 +18,7 @@ interface Props {
   ) => void;
 }
 
-export class OpenGameEntry extends React.PureComponent<Props, State> {
+export class OpenGameEntry extends React.PureComponent<Props, Commitment> {
   render() {
     const { openGame, joinOpenGame } = this.props;
     const joinThisGame = () => joinOpenGame(

@@ -1,7 +1,7 @@
 
 import { Player } from './players';
-import BN from 'bn.js';
-import { Play } from './rps-commitment';
+import { BigNumber } from 'ethers/utils';
+import { Weapon }  from './rps-commitment';
 
 export enum Result {
   Tie,
@@ -9,8 +9,8 @@ export enum Result {
   YouLose,
 }
 
-export function calculateResult(yourMove: Play, theirMove: Play): Result {
-  const x = (yourMove - theirMove + 2) % 3;
+export function calculateResult(yourWeapon: Weapon, theirWeapon: Weapon): Result {
+  const x = (yourWeapon - theirWeapon + 2) % 3;
   switch (x) {
     case 0:
       return Result.YouWin;
@@ -21,8 +21,8 @@ export function calculateResult(yourMove: Play, theirMove: Play): Result {
   }
 }
 
-export function calculateAbsoluteResult(asMove: Play, bsMove: Play): AbsoluteResult {
-  const x = (asMove - bsMove + 2) % 3;
+export function calculateAbsoluteResult(asWeapon: Weapon, bsWeapon: Weapon): AbsoluteResult {
+  const x = (asWeapon - bsWeapon + 2) % 3;
   switch (x) {
     case 0:
       return AbsoluteResult.AWins;
@@ -66,13 +66,13 @@ export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: 
 
 }
 
-export function balancesAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
+export function allocationAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BigNumber, balances: BigNumber[]): BigNumber[] {
   switch (absoluteResult) {
     case AbsoluteResult.AWins:
-      return [balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2))];
+      return [balances[0].add(roundBuyIn.mul(2)), balances[1].sub(roundBuyIn.mul(2))];
     case AbsoluteResult.BWins:
       return balances;
     case AbsoluteResult.Tie:
-      return [balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1))];
+      return [balances[0].add(roundBuyIn.mul(1)), balances[1].sub(roundBuyIn.mul(1))];
   }
 }

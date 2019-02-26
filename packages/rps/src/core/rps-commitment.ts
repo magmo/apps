@@ -5,8 +5,8 @@ export interface AppAttributes {
   positionType: Uint8;
   stake: Uint256;
   preCommit: Bytes32;
-  bPlay: Uint8;
-  aPlay: Uint8;
+  bWeapon: Uint8;
+  aWeapon: Uint8;
   salt: Bytes32;
 }
 
@@ -15,66 +15,67 @@ const SolidityRPSCommitmentType = {
     positionType: "uint8",
     stake: "uint256",
     preCommit: "bytes32",
-    bPlay: "uint8",
-    aPlay: "uint8",
+    bWeapon: "uint8",
+    aWeapon: "uint8",
     salt: "bytes32",
   },
 };
 export enum PositionType { Resting, Proposed, Accepted, Reveal }
-export enum Play { Rock, Paper, Scissors }
+export enum Weapon { Rock, Paper, Scissors }
 export interface RPSBaseCommitment extends BaseCommitment {
   positionType: PositionType;
   stake: Uint256;
   preCommit: Bytes32;
-  bPlay: Play;
-  aPlay: Play;
+  bWeapon: Weapon;
+  aWeapon: Weapon;
   salt: Bytes32;
 }
 
 export interface RPSCommitment extends RPSBaseCommitment {
   commitmentType: CommitmentType;
+  commitmentName: string;
 }
 
 
 function encodeAppAttributes(appAttrs: AppAttributes): string {
   console.log(appAttrs);
-  const { positionType, stake, preCommit, bPlay, aPlay, salt, } = appAttrs;
-  console.log([positionType, stake, preCommit, bPlay, aPlay, salt,]);
+  const { positionType, stake, preCommit, bWeapon, aWeapon, salt, } = appAttrs;
+  console.log([positionType, stake, preCommit, bWeapon, aWeapon, salt,]);
   return abi.encodeParameter(SolidityRPSCommitmentType,
-    [positionType, stake, preCommit, bPlay, aPlay, salt,]);
+    [positionType, stake, preCommit, bWeapon, aWeapon, salt,]);
 }
 
-function decodeAppAttributes(appAttrs: string): AppAttributes {
-  const parameters = abi.decodeParameter(SolidityRPSCommitmentType, appAttrs);
-  return {
-    positionType: parameters[0] as PositionType,
-    stake: parameters[1],
-    preCommit: parameters[2],
-    bPlay: parameters[3] as Play,
-    aPlay: parameters[4] as Play,
-    salt: parameters[5],
-  };
-}
+// function decodeAppAttributes(appAttrs: string): AppAttributes {
+//   const parameters = abi.decodeParameter(SolidityRPSCommitmentType, appAttrs);
+//   return {
+//     positionType: parameters[0] as PositionType,
+//     stake: parameters[1],
+//     preCommit: parameters[2],
+//     bWeapon: parameters[3] as Play,
+//     aWeapon: parameters[4] as Play,
+//     salt: parameters[5],
+//   };
+// }
 
-export function fromCoreCommitment(commitment: Commitment): RPSCommitment {
-  const {
-    channel,
-    commitmentType,
-    turnNum,
-    allocation,
-    destination,
-    commitmentCount,
-  } = commitment;
-  return {
-    channel,
-    commitmentType,
-    turnNum,
-    allocation,
-    destination,
-    commitmentCount,
-    ...decodeAppAttributes(commitment.appAttributes),
-  };
-}
+// export function fromCoreCommitment(commitment: Commitment): RPSCommitment {
+//   const {
+//     channel,
+//     commitmentType,
+//     turnNum,
+//     allocation,
+//     destination,
+//     commitmentCount,
+//   } = commitment;
+//   return {
+//     channel,
+//     commitmentType,
+//     turnNum,
+//     allocation,
+//     destination,
+//     commitmentCount,
+//     ...decodeAppAttributes(commitment.appAttributes),
+//   };
+// }
 
 
 export function asCoreCommitment(rpsCommitment: RPSCommitment): Commitment {
@@ -88,8 +89,8 @@ export function asCoreCommitment(rpsCommitment: RPSCommitment): Commitment {
     positionType,
     stake,
     preCommit,
-    bPlay,
-    aPlay,
+    bWeapon,
+    aWeapon,
     salt,
   } = rpsCommitment;
 
@@ -100,6 +101,6 @@ export function asCoreCommitment(rpsCommitment: RPSCommitment): Commitment {
     allocation,
     destination,
     commitmentCount,
-    appAttributes: encodeAppAttributes({ positionType, stake, preCommit, bPlay, aPlay, salt }),
+    appAttributes: encodeAppAttributes({ positionType, stake, preCommit, bWeapon, aWeapon, salt }),
   };
 }
