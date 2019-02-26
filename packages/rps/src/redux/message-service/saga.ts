@@ -11,7 +11,7 @@ import { getMessageState, getGameState } from '../store';
 import * as Wallet from 'magmo-wallet-client';
 import { WALLET_IFRAME_ID } from '../../constants';
 import { channelID } from 'fmg-core/lib/channel';
-import { RPSCommitment, asCoreCommitment, fromCoreCommitment } from '../../core/rps-commitment';
+import { RPSCommitment, asCoreCommitment, fromCoreCommitment, PRE_FUND_SETUP_A } from '../../core/rps-commitment';
 import { ChallengeCommitmentReceived, FundingResponse } from 'magmo-wallet-client';
 
 export enum Queue {
@@ -131,8 +131,9 @@ function* receiveFromFirebaseSaga(address) {
       if (!validMessage) {
         // TODO: Handle this
       }
+
       const commitment = data;
-      if (commitment.name === commitment.PRE_FUND_SETUP_A) {
+      if (commitment.commitmentName === PRE_FUND_SETUP_A) {
         yield put(gameActions.initialCommitmentReceived(commitment, userName ? userName : 'Opponent'));
       } else {
         yield put(gameActions.commitmentReceived(commitment));
