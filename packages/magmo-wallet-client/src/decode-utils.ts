@@ -2,7 +2,7 @@
 // TODO: This is a copy of decode from the wallet
 // This functionality should be pulled out to fmg-core so it can be properly shared
 import { Channel, State, } from 'fmg-core';
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 
 // TODO: The decode function should really be part of FMG-Core
 // Eventually it would be pulled out there
