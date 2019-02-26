@@ -1,5 +1,6 @@
 import { gameReducer } from '../reducer';
-import { Player, scenarios } from '../../../core';
+import { Player } from '../../../core';
+import * as scenarios from '../../../core/test-scenarios';
 import * as actions from '../actions';
 import * as state from '../state';
 
@@ -14,8 +15,8 @@ const {
   preFundSetupA,
   preFundSetupB,
   postFundSetupB,
-  aPlay,
-  bPlay,
+  aWeapon,
+  bWeapon,
   salt,
   aResult,
   propose,
@@ -31,8 +32,8 @@ const {
   reveal: revealInsufficientFunds,
 } = scenarios.insufficientFunds;
 
-const { channel, participants, roundBuyIn, myName, opponentName, asAddress: myAddress } = scenarios.standard;
-const base = { libraryAddress: channel.channelType, channelNonce: channel.channelNonce, participants, roundBuyIn, myName, opponentName, myAddress };
+const { channel, destination, roundBuyIn, myName, opponentName, asAddress: myAddress } = scenarios.standard;
+const base = { libraryAddress: channel.channelType, channelNonce: channel.channelNonce, participants: destination, roundBuyIn, myName, opponentName, myAddress };
 
 const messageState = {};
 
@@ -41,10 +42,11 @@ describe('player A\'s app', () => {
     ...base,
     commitmentCount: 0,
     player: Player.PlayerA as Player.PlayerA,
-    myMove: aPlay,
-    theirMove: bPlay,
+    myWeapon: aWeapon,
+    theirWeapon: bWeapon,
     result: aResult,
     twitterHandle: 'tweet',
+    destination,
   };
 
   describe('when in waitForGameConfirmationA', () => {
@@ -70,34 +72,34 @@ describe('player A\'s app', () => {
       const action = actions.fundingSuccess(postFundSetupB);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itTransitionsTo(state.StateName.PickMove, updatedState);
+      itTransitionsTo(state.StateName.PickWeapon, updatedState);
       itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
     });
   });
 
-  describe('when in PickMove', () => {
-    const gameState = state.pickMove({ ...aProps, ...postFundSetupB });
+  describe('when in PickWeapon', () => {
+    const gameState = state.pickWeapon({ ...aProps, ...postFundSetupB });
 
     describe('when a move is chosen', () => {
-      const action = actions.chooseMove(aPlay);
+      const action = actions.chooseWeapon(aWeapon);
       // todo: will need to stub out the randomness in the salt somehow
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itSends(propose, updatedState);
-      itTransitionsTo(state.StateName.WaitForOpponentToPickMoveA, updatedState);
+      itTransitionsTo(state.StateName.WaitForOpponentToPickWeaponA, updatedState);
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
 
       it('stores the move and salt', () => {
-        const newGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(newGameState.myMove).toEqual(aPlay);
+        const newGameState = updatedState.gameState as state.WaitForOpponentToPickWeaponA;
+        expect(newGameState.myWeapon).toEqual(aWeapon);
         expect(newGameState.salt).toEqual(salt);
       });
 
     });
   });
 
-  describe('when in WaitForOpponentToPickMoveA', () => {
-    const gameState = state.waitForOpponentToPickMoveA({ ...aProps, ...propose, salt });
+  describe('when in WaitForOpponentToPickWeaponA', () => {
+    const gameState = state.waitForOpponentToPickWeaponA({ ...aProps, ...propose, salt });
 
     describe('when Accept arrives', () => {
       describe('when enough funds to continue', () => {
@@ -108,9 +110,9 @@ describe('player A\'s app', () => {
         itSends(reveal, updatedState);
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
-        it('sets theirMove and the result', () => {
+        it('sets theirWeapon and the result', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.theirMove).toEqual(bPlay);
+          expect(newGameState.theirWeapon).toEqual(bWeapon);
           expect(newGameState.result).toEqual(aResult);
         });
       });
@@ -154,7 +156,7 @@ describe('player A\'s app', () => {
         const updatedState2 = gameReducer(updatedState, playAction);
 
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState2);
-        itTransitionsTo(state.StateName.PickMove, updatedState2);
+        itTransitionsTo(state.StateName.PickWeapon, updatedState2);
       });
     });
   });
@@ -167,7 +169,7 @@ describe('player A\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PickMove, updatedState);
+      itTransitionsTo(state.StateName.PickWeapon, updatedState);
     });
   });
 

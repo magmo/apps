@@ -1,7 +1,7 @@
 
 import { Player } from './players';
 import { BigNumber } from 'ethers/utils';
-import { Play } from './rps-commitment';
+import { Weapon }  from './rps-commitment';
 
 export enum Result {
   Tie,
@@ -9,8 +9,8 @@ export enum Result {
   YouLose,
 }
 
-export function calculateResult(yourMove: Play, theirMove: Play): Result {
-  const x = (yourMove - theirMove + 2) % 3;
+export function calculateResult(yourWeapon: Weapon, theirWeapon: Weapon): Result {
+  const x = (yourWeapon - theirWeapon + 2) % 3;
   switch (x) {
     case 0:
       return Result.YouWin;
@@ -21,8 +21,8 @@ export function calculateResult(yourMove: Play, theirMove: Play): Result {
   }
 }
 
-export function calculateAbsoluteResult(asMove: Play, bsMove: Play): AbsoluteResult {
-  const x = (asMove - bsMove + 2) % 3;
+export function calculateAbsoluteResult(asWeapon: Weapon, bsWeapon: Weapon): AbsoluteResult {
+  const x = (asWeapon - bsWeapon + 2) % 3;
   switch (x) {
     case 0:
       return AbsoluteResult.AWins;

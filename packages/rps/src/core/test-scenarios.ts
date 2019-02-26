@@ -2,11 +2,10 @@
 import { Result } from './results';
 import * as commitmentHelper from './rps-commitment-helper';
 import { randomHex } from "../utils/randomHex";
-import { channelID } from "fmg-core/lib/channel";
-import { Play } from './rps-commitment';
+import { Weapon }  from './rps-commitment';
 import { bigNumberify } from 'ethers/utils';
 
-const libraryAddress = '0x' + '1'.repeat(40);
+export const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = 4;
 const asPrivateKey = '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d';
 const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
@@ -20,24 +19,26 @@ const fourSix = [bigNumberify(4).toHexString(), bigNumberify(6).toHexString()] a
 const nineOne = [bigNumberify(9).toHexString(), bigNumberify(1).toHexString()] as [string, string];
 const eightTwo = [bigNumberify(8).toHexString(), bigNumberify(2).toHexString()] as [string, string];
 const tenZero = [bigNumberify(10).toHexString(), bigNumberify(0).toHexString()] as [string, string];
-const aPlay = Play.Rock;
+const aWeapon = Weapon.Rock;
 const salt = randomHex(64);
-const preCommit = commitmentHelper.hashCommitment(aPlay, salt);
-const bPlay = Play.Scissors;
+const preCommit = commitmentHelper.hashCommitment(aWeapon, salt);
+const bWeapon = Weapon.Scissors;
 
 const channel = { channelType: libraryAddress, channelNonce, participants };
-const channelId = channelID(channel);
 
 const base = {
   channel,
-  participants,
   destination: participants,
-  roundBuyIn,
   commitmentCount: 0,
 };
 
-export const shared = {
+const baseWithBuyIn = {
   ...base,
+  roundBuyIn,
+};
+
+export const shared = {
+  ...baseWithBuyIn,
   asAddress,
   twitterHandle: "twtr",
   bsAddress,
@@ -49,19 +50,19 @@ export const shared = {
 
 export const standard = {
   ...shared,
-  preFundSetupA: commitmentHelper.preFundSetupA({ ...base, turnNum: 0, allocation: fiveFive, commitmentCount: 0 }),
-  preFundSetupB: commitmentHelper.preFundSetupB({ ...base, turnNum: 1, allocation: fiveFive, commitmentCount: 1 }),
-  postFundSetupA: commitmentHelper.postFundSetupA({ ...base, turnNum: 2, allocation: fiveFive, commitmentCount: 0 }),
-  postFundSetupB: commitmentHelper.postFundSetupB({ ...base, turnNum: 3, allocation: fiveFive, commitmentCount: 1 }),
-  aPlay,
+  preFundSetupA: commitmentHelper.preFundSetupA({ ...baseWithBuyIn, turnNum: 0, allocation: fiveFive, commitmentCount: 0 }),
+  preFundSetupB: commitmentHelper.preFundSetupB({ ...baseWithBuyIn, turnNum: 1, allocation: fiveFive, commitmentCount: 1 }),
+  postFundSetupA: commitmentHelper.postFundSetupA({ ...baseWithBuyIn, turnNum: 2, allocation: fiveFive, commitmentCount: 0 }),
+  postFundSetupB: commitmentHelper.postFundSetupB({ ...baseWithBuyIn, turnNum: 3, allocation: fiveFive, commitmentCount: 1 }),
+  aWeapon,
   salt,
   preCommit,
-  bPlay,
+  bWeapon,
   aResult: Result.YouWin,
   bResult: Result.YouLose,
-  propose: commitmentHelper.proposeFromSalt({ ...base, turnNum: 4, allocation: fiveFive, aPlay, salt }),
-  accept: commitmentHelper.accept({ ...base, turnNum: 5, allocation: fourSix, preCommit, bPlay }),
-  reveal: commitmentHelper.reveal({ ...base, turnNum: 6, allocation: sixFour, bPlay, aPlay, salt }),
+  propose: commitmentHelper.proposeFromSalt({ ...baseWithBuyIn, turnNum: 4, allocation: fiveFive, aWeapon, salt }),
+  accept: commitmentHelper.accept({ ...baseWithBuyIn, turnNum: 5, allocation: fourSix, preCommit, bWeapon }),
+  reveal: commitmentHelper.reveal({ ...baseWithBuyIn, turnNum: 6, allocation: sixFour, bWeapon, aWeapon, salt }),
 
   preFundSetupAHex: '0x0000000000000000000000001111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000020000000000000000000000005409ED021D9299bf6814279A6A1411A7e866A6310000000000000000000000006Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
   preFundSetupASig: '0xe08144da0aa0a49be55e6ace7143702be8f4929559af6f3f7e7530912785c1aa173f9bb2c013e86c2a5a40b225adbb07891ccb613a921396a2f2478741dbf3611c',
@@ -81,7 +82,7 @@ export const standard = {
 
 export const aResignsAfterOneRound = {
   ...standard,
-  resting: commitmentHelper.resting({ ...base, turnNum: 7, allocation: sixFour }),
+  resting: commitmentHelper.resting({ ...baseWithBuyIn, turnNum: 7, allocation: sixFour }),
   conclude: commitmentHelper.conclude({ ...base, turnNum: 8, allocation: sixFour }),
   conclude2: commitmentHelper.conclude({ ...base, turnNum: 9, allocation: sixFour }),
   restingHex: '0x0000000000000000000000001111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000020000000000000000000000005409ED021D9299bf6814279A6A1411A7e866A6310000000000000000000000006Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
@@ -100,15 +101,15 @@ export const bResignsAfterOneRound = {
 };
 
 export const insufficientFunds = {
-  preFundSetupA: commitmentHelper.preFundSetupB({ ...base, turnNum: 0, allocation: nineOne, commitmentCount: 0 }),
-  preFundSetupB: commitmentHelper.preFundSetupB({ ...base, turnNum: 1, allocation: nineOne, commitmentCount: 1 }),
-  postFundSetupA: commitmentHelper.postFundSetupA({ ...base, turnNum: 2, allocation: nineOne, commitmentCount: 0 }),
-  postFundSetupB: commitmentHelper.postFundSetupB({ ...base, turnNum: 3, allocation: nineOne, commitmentCount: 1 }),
-  aPlay,
-  bPlay,
-  propose: commitmentHelper.proposeFromSalt({ ...base, turnNum: 4, allocation: nineOne, aPlay, salt }),
-  accept: commitmentHelper.accept({ ...base, turnNum: 5, allocation: eightTwo, preCommit, bPlay }),
-  reveal: commitmentHelper.reveal({ ...base, turnNum: 6, allocation: tenZero, bPlay, aPlay, salt }),
+  preFundSetupA: commitmentHelper.preFundSetupB({ ...baseWithBuyIn, turnNum: 0, allocation: nineOne, commitmentCount: 0 }),
+  preFundSetupB: commitmentHelper.preFundSetupB({ ...baseWithBuyIn, turnNum: 1, allocation: nineOne, commitmentCount: 1 }),
+  postFundSetupA: commitmentHelper.postFundSetupA({ ...baseWithBuyIn, turnNum: 2, allocation: nineOne, commitmentCount: 0 }),
+  postFundSetupB: commitmentHelper.postFundSetupB({ ...baseWithBuyIn, turnNum: 3, allocation: nineOne, commitmentCount: 1 }),
+  aWeapon,
+  bWeapon,
+  propose: commitmentHelper.proposeFromSalt({ ...baseWithBuyIn, turnNum: 4, allocation: nineOne, aWeapon, salt }),
+  accept: commitmentHelper.accept({ ...baseWithBuyIn, turnNum: 5, allocation: eightTwo, preCommit, bWeapon }),
+  reveal: commitmentHelper.reveal({ ...baseWithBuyIn, turnNum: 6, allocation: tenZero, bWeapon, aWeapon, salt }),
   conclude: commitmentHelper.conclude({ ...base, turnNum: 7, allocation: tenZero }),
   conclude2: commitmentHelper.conclude({ ...base, turnNum: 8, allocation: tenZero }),
 };
@@ -132,19 +133,19 @@ export function build(customLibraryAddress: string, customAsAddress: string, cus
 
   return {
     ...customShared,
-    preFundSetupA: commitmentHelper.preFundSetupA({ ...base, turnNum: 0, allocation: fiveFive, commitmentCount: 0 }),
-    preFundSetupB: commitmentHelper.preFundSetupB({ ...base, turnNum: 1, allocation: fiveFive, commitmentCount: 1 }),
-    postFundSetupA: commitmentHelper.postFundSetupA({ ...base, turnNum: 2, allocation: fiveFive, commitmentCount: 0 }),
-    postFundSetupB: commitmentHelper.postFundSetupB({ ...base, turnNum: 3, allocation: fiveFive, commitmentCount: 1 }),
-    aPlay,
+    preFundSetupA: commitmentHelper.preFundSetupA({ ...baseWithBuyIn, turnNum: 0, allocation: fiveFive, commitmentCount: 0 }),
+    preFundSetupB: commitmentHelper.preFundSetupB({ ...baseWithBuyIn, turnNum: 1, allocation: fiveFive, commitmentCount: 1 }),
+    postFundSetupA: commitmentHelper.postFundSetupA({ ...baseWithBuyIn, turnNum: 2, allocation: fiveFive, commitmentCount: 0 }),
+    postFundSetupB: commitmentHelper.postFundSetupB({ ...baseWithBuyIn, turnNum: 3, allocation: fiveFive, commitmentCount: 1 }),
+    aWeapon,
     salt,
     preCommit,
-    bPlay,
+    bWeapon,
     aResult: Result.YouWin,
     bResult: Result.YouLose,
-    propose: commitmentHelper.proposeFromSalt({ ...base, turnNum: 4, allocation: fiveFive, aPlay, salt }),
-    accept: commitmentHelper.accept({ ...base, turnNum: 5, allocation: fourSix, preCommit, bPlay }),
-    reveal: commitmentHelper.reveal({ ...base, turnNum: 6, allocation: sixFour, bPlay, aPlay, salt }),
-    resting: commitmentHelper.resting({ ...base, turnNum: 7, allocation: sixFour }),
+    propose: commitmentHelper.proposeFromSalt({ ...baseWithBuyIn, turnNum: 4, allocation: fiveFive, aWeapon, salt }),
+    accept: commitmentHelper.accept({ ...baseWithBuyIn, turnNum: 5, allocation: fourSix, preCommit, bWeapon }),
+    reveal: commitmentHelper.reveal({ ...baseWithBuyIn, turnNum: 6, allocation: sixFour, bWeapon, aWeapon, salt }),
+    resting: commitmentHelper.resting({ ...baseWithBuyIn, turnNum: 7, allocation: sixFour }),
   };
 }

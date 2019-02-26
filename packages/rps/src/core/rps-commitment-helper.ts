@@ -1,23 +1,27 @@
 
 import { soliditySha3 } from 'web3-utils';
 import { padBytes32, BaseCommitment, CommitmentType, Bytes32 } from 'fmg-core';
-import { AppAttributes, RPSCommitment, Play, PositionType } from './rps-commitment';
+import { AppAttributes, RPSCommitment, Weapon, PositionType } from './rps-commitment';
 
 // Commitment names
-const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
-const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
-const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
-const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
-const APP_PROPOSE = 'APP:PROPOSE';
-const APP_ACCEPT = 'APP:ACCEPT';
-const APP_REVEAL = 'APP:REVEAL';
-const APP_RESTING = 'APP:RESTING';
-const CONCLUDE = 'CONCLUDE';
+export const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
+export const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
+export const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
+export const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
+export const APP_PROPOSE = 'APP:PROPOSE';
+export const APP_ACCEPT = 'APP:ACCEPT';
+export const APP_REVEAL = 'APP:REVEAL';
+export const APP_RESTING = 'APP:RESTING';
+export const CONCLUDE = 'CONCLUDE';
 
 // Commitment Constructors
 // =====================
 
-interface BaseWithBuyInParams extends BaseCommitment {
+interface BaseParams extends BaseCommitment {
+  [x: string]: any;
+}
+
+interface BaseWithBuyInParams extends BaseParams {
   roundBuyIn: string;
 }
 
@@ -44,8 +48,8 @@ function defaultAppAttrs(roundBuyIn): AppAttributes {
     stake: roundBuyIn,
     positionType: 0,
     preCommit: zeroBytes32,
-    bPlay: 0,
-    aPlay: 0,
+    bWeapon: 0,
+    aWeapon: 0,
     salt: zeroBytes32,
   };
 }
@@ -108,25 +112,25 @@ export function propose(obj: ProposeParams): RPSCommitment {
   };
 }
 
-export function hashCommitment(play: Play, salt: string) {
+export function hashCommitment(play: Weapon, salt: string) {
   return soliditySha3(
     { type: 'uint256', value: play },
     { type: 'bytes32', value: padBytes32(salt) },
   );
 }
 
-interface ProposeWithMoveAndSaltParams extends BaseWithBuyInParams {
+interface ProposeWithWeaponAndSaltParams extends BaseWithBuyInParams {
   salt: string;
-  aPlay: Play;
+  aWeapon: Weapon;
 }
-export function proposeFromSalt(obj: ProposeWithMoveAndSaltParams): RPSCommitment {
-  const { salt, aPlay } = obj;
-  const preCommit = hashCommitment(aPlay, salt);
+export function proposeFromSalt(obj: ProposeWithWeaponAndSaltParams): RPSCommitment {
+  const { salt, aWeapon } = obj;
+  const preCommit = hashCommitment(aWeapon, salt);
   const appAttributes = {
     ...defaultAppAttrs(obj.roundBuyIn),
     preCommit,
     salt,
-    aPlay,
+    aWeapon,
     positionType: PositionType.Proposed,
   };
   return {
@@ -139,36 +143,36 @@ export function proposeFromSalt(obj: ProposeWithMoveAndSaltParams): RPSCommitmen
 
 interface AcceptParams extends BaseWithBuyInParams {
   preCommit: string;
-  bPlay: Play;
+  bWeapon: Weapon;
 }
 
 export function accept(obj: AcceptParams): RPSCommitment {
-  const { preCommit, bPlay } = obj;
+  const { preCommit, bWeapon } = obj;
   return {
     ...base(obj),
     commitmentType: CommitmentType.App,
     ...defaultAppAttrs(obj.roundBuyIn),
     preCommit,
-    bPlay,
+    bWeapon,
     positionType: PositionType.Accepted,
     commitmentName: APP_ACCEPT,
   };
 }
 
 interface RevealParams extends BaseWithBuyInParams {
-  bPlay: Play;
-  aPlay: Play;
+  bWeapon: Weapon;
+  aWeapon: Weapon;
   salt: string;
 }
 
 export function reveal(obj: RevealParams): RPSCommitment {
-  const { aPlay, bPlay, salt } = obj;
+  const { aWeapon, bWeapon, salt } = obj;
   return {
     ...base(obj),
     commitmentType: CommitmentType.App,
     ...defaultAppAttrs(obj.roundBuyIn),
-    aPlay,
-    bPlay,
+    aWeapon,
+    bWeapon,
     salt,
     positionType: PositionType.Reveal,
     commitmentName: APP_REVEAL,

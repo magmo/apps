@@ -1,5 +1,5 @@
 import { gameReducer } from '../reducer';
-import { scenarios } from '../../../core';
+import * as scenarios from '../../../core/test-scenarios';
 import * as actions from '../actions';
 import * as state from '../state';
 

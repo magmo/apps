@@ -1,7 +1,5 @@
 import { expectRevert } from 'magmo-devtools';
-import {
-  scenarios,
-} from '../core';
+import * as scenarios from '../core/test-scenarios';
 
 import * as ethers from 'ethers';
 

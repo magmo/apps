@@ -1,5 +1,6 @@
 import { gameReducer } from '../reducer';
-import { Player, scenarios } from '../../../core';
+import { Player } from '../../../core';
+import * as scenarios from '../../../core/test-scenarios';
 import * as actions from '../actions';
 import * as state from '../state';
 
@@ -14,8 +15,8 @@ const {
   preFundSetupA,
   preFundSetupB,
   postFundSetupB,
-  aPlay,
-  bPlay,
+  aWeapon,
+  bWeapon,
   bResult,
   propose,
   accept,
@@ -32,8 +33,8 @@ const {
   reveal: revealInsufficientFunds,
 } = scenarios.insufficientFunds;
 
-const { channel, participants, roundBuyIn, myName, opponentName, bsAddress: myAddress } = scenarios.standard;
-const base = { libraryAddress: channel.channelType, channelNonce: channel.channelNonce, channel, participants, roundBuyIn, myName, opponentName, myAddress };
+const { channel, destination, roundBuyIn, myName, opponentName, bsAddress: myAddress } = scenarios.standard;
+const base = { libraryAddress: channel.channelType, channelNonce: channel.channelNonce, channel, participants: destination, roundBuyIn, myName, opponentName, myAddress };
 
 const messageState = {};
 
@@ -45,11 +46,11 @@ describe('player B\'s app', () => {
     allocation: preFundSetupA.allocation,
     commitmentCount: 0,
     latestcommitment: preFundSetupA,
-    myMove: bPlay,
-    theirMove: aPlay,
+    myWeapon: bWeapon,
+    theirWeapon: aWeapon,
     result: bResult,
-    destination: participants,
     twitterHandle: "tweet",
+    destination,
   };
   describe('when in confirmGameB', () => {
     const gameState = state.confirmGameB({ ...bProps });
@@ -84,23 +85,23 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PickMove, updatedState);
+      itTransitionsTo(state.StateName.PickWeapon, updatedState);
     });
   });
 
-  describe('when in PickMove', () => {
-    const gameState = state.pickMove({ ...bProps, ...postFundSetupB });
+  describe('when in PickWeapon', () => {
+    const gameState = state.pickWeapon({ ...bProps, ...postFundSetupB });
 
-    describe('when a move is chosen', () => {
-      const action = actions.chooseMove(bPlay);
+    describe('when a weapon is chosen', () => {
+      const action = actions.chooseWeapon(bWeapon);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itTransitionsTo(state.StateName.WaitForOpponentToPickMoveB, updatedState);
+      itTransitionsTo(state.StateName.WaitForOpponentToPickWeaponB, updatedState);
 
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-      it('stores the move', () => {
-        const updatedGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(updatedGameState.myMove).toEqual(bPlay);
+      it('stores the weapon', () => {
+        const updatedGameState = updatedState.gameState as state.WaitForOpponentToPickWeaponA;
+        expect(updatedGameState.myWeapon).toEqual(bWeapon);
       });
       it('doesn\'t send anything', () => {
         expect(updatedState.messageState).toEqual(messageState);
@@ -114,8 +115,8 @@ describe('player B\'s app', () => {
       itStoresAction(action, updatedState);
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
 
-      describe('when a move is chosen', () => {
-        const action2 = actions.chooseMove(bPlay);
+      describe('when a weapon is chosen', () => {
+        const action2 = actions.chooseWeapon(bWeapon);
         const updatedState2 = gameReducer(updatedState, action2);
 
         itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState2);
@@ -128,8 +129,8 @@ describe('player B\'s app', () => {
     });
   });
 
-  describe('when in WaitForOpponentToPickMoveB', () => {
-    const gameState = state.waitForOpponentToPickMoveB({ ...bProps, ...postFundSetupB });
+  describe('when in WaitForOpponentToPickWeaponB', () => {
+    const gameState = state.waitForOpponentToPickWeaponB({ ...bProps, ...postFundSetupB });
 
     describe('when Propose arrives', () => {
       const action = actions.commitmentReceived(propose);
@@ -175,7 +176,7 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itSends(resting, updatedState);
       // is this right?
-      itTransitionsTo(state.StateName.PickMove, updatedState);
+      itTransitionsTo(state.StateName.PickWeapon, updatedState);
     });
   });
 

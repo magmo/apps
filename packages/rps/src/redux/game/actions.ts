@@ -1,5 +1,5 @@
 
-import { Play, RPSCommitment } from '../../core/rps-commitment';
+import { Weapon, RPSCommitment } from '../../core/rps-commitment';
 
 export const UPDATE_PROFILE = 'LOGIN.UPDATE_PROFILE';
 export const JOIN_OPEN_GAME = 'GAME.JOIN_OPEN_GAME';
@@ -9,7 +9,7 @@ export const CANCEL_OPEN_GAME = 'GAME.CANCEL_OPEN_GAME';
 export const INITIAL_COMMITMENT_RECEIVED = 'GAME.INITIAL_COMMITMENT_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
 export const DECLINE_GAME = 'GAME.DECLINE_GAME';
-export const CHOOSE_MOVE = 'GAME.CHOOSE_MOVE';
+export const CHOOSE_WEAPON = 'GAME.CHOOSE_WEAPON';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
 export const COMMITMENT_RECEIVED = 'GAME.COMMITMENT_RECEIVED';
@@ -62,9 +62,9 @@ export const declineGame = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
-export const chooseMove = (move: Play) => ({
-  type: CHOOSE_MOVE as typeof CHOOSE_MOVE,
-  move,
+export const chooseWeapon = (weapon: Weapon) => ({
+  type: CHOOSE_WEAPON as typeof CHOOSE_WEAPON,
+  weapon,
 });
 
 export const playAgain = () => ({
@@ -121,7 +121,7 @@ export type CancelOpenGame = ReturnType<typeof cancelOpenGame>;
 export type JoinOpenGame = ReturnType<typeof joinOpenGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
 export type DeclineGame = ReturnType<typeof declineGame>;
-export type ChooseMove = ReturnType<typeof chooseMove>;
+export type ChooseWeapon = ReturnType<typeof chooseWeapon>;
 export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
 export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
@@ -143,7 +143,7 @@ export type GameAction = (
   | ConfirmGame
   | DeclineGame
   | JoinOpenGame
-  | ChooseMove
+  | ChooseWeapon
   | PlayAgain
   | CommitmentReceived
   | FundingSuccess
