@@ -1,16 +1,13 @@
 import { Reducer } from 'redux';
-import BN from 'bn.js';
 
 import * as actions from './actions';
 import * as states from './state';
 import { randomHex } from '../../utils/randomHex';
-import { calculateResult, balancesAfterResult, calculateAbsoluteResult, Player } from '../../core';
+import { calculateResult, allocationAfterResult, calculateAbsoluteResult, Player } from '../../core';
 
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS, InitializeWalletSuccess, INITIALIZE_WALLET_SUCCESS } from '../login/actions';
 import * as rpsCommitmentHelper from '../../core/rps-commitment-helper';
-import hexToBN from '../../utils/hexToBN';
-import bnToHex from '../../utils/bnToHex';
 import { PositionType } from '../../core/rps-commitment';
 import { Channel, CommitmentType } from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
@@ -108,8 +105,6 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return creatingOpenGameReducer(gameState, messageState, action);
     case states.StateName.WaitingRoom:
       return waitingRoomReducer(gameState, messageState, action);
-    case states.StateName.WaitForGameConfirmationA:
-      return waitForGameConfirmationAReducer(gameState, messageState, action);
     case states.StateName.WaitForGameConfirmationA:
       return waitForGameConfirmationAReducer(gameState, messageState, action);
     case states.StateName.ConfirmGameB:
@@ -222,16 +217,16 @@ function waitingRoomReducer(
   action: actions.GameAction
 ): JointState {
   switch (action.type) {
-    case actions.INITIAL_POSITION_RECEIVED:
-      const { position, opponentName } = action;
+    case actions.INITIAL_COMMITMENT_RECEIVED:
+      const { commitment, opponentName } = action;
       const { myName, twitterHandle, myAddress } = gameState;
 
-      if (position.commitmentType !== CommitmentType.PreFundSetup ||
-        position.commitmentCount !== 0) {
+      if (commitment.commitmentType !== CommitmentType.PreFundSetup ||
+        commitment.commitmentCount !== 0) {
         return { gameState, messageState };
       }
 
-      const newGameState = states.confirmGameB({ ...position, roundBuyIn: position.stake, myName, opponentName, twitterHandle, myAddress });
+      const newGameState = states.confirmGameB({ ...commitment, roundBuyIn: commitment.stake, myName, opponentName, twitterHandle, myAddress });
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
@@ -271,11 +266,11 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
   // only action we need to handle in this state is to receiving a PreFundSetupB
-  if (action.type !== actions.POSITION_RECEIVED) {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
     return { gameState, messageState };
   }
-  if (action.position.commitmentType !== CommitmentType.PreFundSetup ||
-    action.position.commitmentCount !== 1) {
+  if (action.commitment.commitmentType !== CommitmentType.PreFundSetup ||
+    action.commitment.commitmentCount !== 1) {
     return { gameState, messageState };
   }
 
@@ -306,10 +301,10 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
       ...gameState,
       turnNum: turnNum + 1,
     });
-    const newPosition = rpsCommitmentHelper.preFundSetupB(newGameState);
+    const newCommitment = rpsCommitmentHelper.preFundSetupB(newGameState);
 
     const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(newPosition, opponentAddress, messageState);
+    messageState = sendMessage(newCommitment, opponentAddress, messageState);
     messageState = {
       ...messageState,
       walletOutbox: { type: "FUNDING_REQUESTED" },
@@ -354,16 +349,16 @@ function waitForFundingReducer(
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
   if (action.type === actions.FUNDING_SUCCESS) {
-    if (action.position.commitmentType !== CommitmentType.PostFundSetup ||
-      action.position.commitmentCount !== 1) {
+    if (action.commitment.commitmentType !== CommitmentType.PostFundSetup ||
+      action.commitment.commitmentCount !== 1) {
       throw new Error(
         "Game reducer expected PostFundSetupB on FUNDING_SUCCESS"
       );
     }
-    const postFundPositionB = action.position;
-    const turnNum = postFundPositionB.turnNum;
-    const allocation = postFundPositionB.allocation;
-    const commitmentCount = postFundPositionB.commitmentCount;
+    const postFundCommitmentB = action.commitment;
+    const turnNum = postFundCommitmentB.turnNum;
+    const allocation = postFundCommitmentB.allocation;
+    const commitmentCount = postFundCommitmentB.commitmentCount;
     const newGameState = states.pickMove({
       ...gameState,
       turnNum,
@@ -372,7 +367,7 @@ function waitForFundingReducer(
     });
     return { gameState: newGameState, messageState };
   }
-  if (action.type === actions.POSITION_RECEIVED) {
+  if (action.type === actions.COMMITMENT_RECEIVED) {
     messageState = { ...messageState, actionToRetry: action };
   }
 
@@ -413,30 +408,30 @@ function pickChallengeMoveReducer(
       },
     };
   } else {
-    // We received a challenge so we need to take the position that the opponent sent us
+    // We received a challenge so we need to take the commitment that the opponent sent us
     // This will be on the actionToRetry that we haven't handled yet
     if (messageState.actionToRetry) {
-      const opponentPosition = messageState.actionToRetry.position;
+      const opponentCommitment = messageState.actionToRetry.commitment;
 
-      if (opponentPosition.positionType !== PositionType.Proposed) { return { gameState, messageState }; }
-      const { preCommit } = opponentPosition;
-      const { allocation: balances, roundBuyIn } = gameState;
-      const aBal = bnToHex(hexToBN(balances[0]).sub(hexToBN(roundBuyIn)));
-      const bBal = bnToHex(hexToBN(balances[1]).add(hexToBN(roundBuyIn)));
-      const newBalances = [aBal, bBal] as [string, string];
+      if (opponentCommitment.positionType !== PositionType.Proposed) { return { gameState, messageState }; }
+      const { preCommit } = opponentCommitment;
+      const { allocation: allocation, roundBuyIn } = gameState;
+      const aBal = (bigNumberify(allocation[0]).sub(bigNumberify(roundBuyIn))).toHexString();
+      const bBal = (bigNumberify(allocation[1]).add(bigNumberify(roundBuyIn))).toHexString();
+      const newAllocation = [aBal, bBal] as [string, string];
 
 
       const newGameStateB = states.waitForRevealB({ ...gameState, preCommit, myMove: action.move, player: Player.PlayerB });
-      const challengePosition = rpsCommitmentHelper.accept({
+      const challengeCommitment = rpsCommitmentHelper.accept({
         ...gameState,
         preCommit,
-        allocation: newBalances,
+        allocation: newAllocation,
         bPlay: newGameStateB.myMove,
         turnNum: turnNum + 2,
       });
 
 
-      return { gameState: newGameStateB, messageState: { walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: challengePosition } } };
+      return { gameState: newGameStateB, messageState: { walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: challengeCommitment } } };
 
 
     }
@@ -460,6 +455,7 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
       ...gameState,
       aPlay: asMove,
       salt,
+      commitmentCount: 0, // we are transitioning from a consensus game, so need to reset this
       turnNum: turnNum + 1,
     });
     const newGameStateA = states.waitForOpponentToPickMoveA({
@@ -479,8 +475,8 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
     return { gameState: newGameStateA, messageState };
   } else {
     if (
-      action.type === actions.POSITION_RECEIVED &&
-      action.position.positionType === PositionType.Proposed
+      action.type === actions.COMMITMENT_RECEIVED &&
+      action.commitment.positionType === PositionType.Proposed
     ) {
       messageState = { ...messageState, actionToRetry: action };
       return { gameState, messageState };
@@ -498,12 +494,12 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
 }
 
 function insufficientFunds(
-  balances: string[],
+  allocation: string[],
   roundBuyIn: string
 ): boolean {
-  const aBal = hexToBN(balances[0]);
-  const bBal = hexToBN(balances[1]);
-  const buyIn = hexToBN(roundBuyIn);
+  const aBal = bigNumberify(allocation[0]);
+  const bBal = bigNumberify(allocation[1]);
+  const buyIn = bigNumberify(roundBuyIn);
 
   return aBal.lt(buyIn) || bBal.lt(buyIn);
 }
@@ -511,36 +507,36 @@ function insufficientFunds(
 function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+  if (action.type !== actions.COMMITMENT_RECEIVED) { return { gameState, messageState }; }
 
   const { roundBuyIn, myMove, salt } = gameState;
-  const { position: theirPosition } = action;
+  const { commitment: theirCommitment } = action;
 
-  if (theirPosition.positionType !== PositionType.Accepted) {
+  if (theirCommitment.positionType !== PositionType.Accepted) {
     return { gameState, messageState };
   }
 
-  const { bPlay: theirMove, allocation, turnNum } = theirPosition;
+  const { bPlay: theirMove, allocation, turnNum } = theirCommitment;
   const result = calculateResult(myMove, theirMove);
   const absoluteResult = calculateAbsoluteResult(myMove, theirMove);
-  const bnRoundBuyIn = hexToBN(roundBuyIn);
-  const bnBalances = allocation.map(hexToBN) as [BN, BN];
-  const newBalances = balancesAfterResult(
+  const bnRoundBuyIn = bigNumberify(roundBuyIn);
+  const bnAllocation = allocation.map(bigNumberify);
+  const newAllocation = allocationAfterResult(
     absoluteResult,
     bnRoundBuyIn,
-    bnBalances
-  ).map(bnToHex) as [string, string];
-
+    bnAllocation
+  ).map(item => item.toHexString());
+  
   const newProperties = {
     myMove,
     theirMove,
     result,
-    allocation: newBalances,
+    allocation: newAllocation,
     turnNum: turnNum + 1,
   };
 
   let newGameState;
-  if (insufficientFunds(newBalances, roundBuyIn)) {
+  if (insufficientFunds(newAllocation, roundBuyIn)) {
     newGameState = states.gameOver({ ...gameState, ...newProperties, messageState: { walletOutbox: {} } });
 
   } else {
@@ -562,33 +558,34 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
 function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+  if (action.type !== actions.COMMITMENT_RECEIVED) { return { gameState, messageState }; }
 
-  const position = action.position;
-  if (position.positionType !== PositionType.Proposed) {
+  const commitment = action.commitment;
+  if (commitment.positionType !== PositionType.Proposed) {
     return { gameState, messageState };
   }
 
-  const preCommit = position.preCommit;
-  const { allocation: balances, turnNum, roundBuyIn } = gameState;
-  const aBal = bnToHex(hexToBN(balances[0]).sub(hexToBN(roundBuyIn)));
-  const bBal = bnToHex(hexToBN(balances[1]).add(hexToBN(roundBuyIn)));
-  const newBalances = [aBal, bBal] as [string, string];
+  const preCommit = commitment.preCommit;
+  const { allocation: allocation, turnNum, roundBuyIn } = gameState;
+  const aBal = (bigNumberify(allocation[0]).sub(bigNumberify(roundBuyIn))).toHexString();
+  const bBal = (bigNumberify(allocation[1]).add(bigNumberify(roundBuyIn))).toHexString();
+  const newAllocation = [aBal, bBal] as [string, string];
 
   const newGameState = states.waitForRevealB({
     ...gameState,
-    allocation: newBalances,
+    allocation: newAllocation,
     preCommit,
     turnNum: turnNum + 2,
   });
 
-  const newPosition = rpsCommitmentHelper.accept({
+  const newCommitment = rpsCommitmentHelper.accept({
     ...newGameState,
     bPlay: newGameState.myMove,
+    commitmentCount: 0, // we are transitioning from a consensus game, so need to reset this
   });
 
   const opponentAddress = states.getOpponentAddress(gameState);
-  messageState = sendMessage(newPosition, opponentAddress, messageState);
+  messageState = sendMessage(newCommitment, opponentAddress, messageState);
 
   return { gameState: newGameState, messageState };
 }
@@ -596,22 +593,22 @@ function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPi
 function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+  if (action.type !== actions.COMMITMENT_RECEIVED) { return { gameState, messageState }; }
 
-  if (action.position.positionType !== PositionType.Reveal) {
+  if (action.commitment.positionType !== PositionType.Reveal) {
     return { gameState, messageState };
   }
-  const position = action.position;
-  const theirMove = position.aPlay;
-  const balances = position.allocation; // wallet will catch if they updated wrong
-  const turnNum = position.turnNum;
+  const commitment = action.commitment;
+  const theirMove = commitment.aPlay;
+  const allocation = commitment.allocation; // wallet will catch if they updated wrong
+  const turnNum = commitment.turnNum;
 
   const myMove = gameState.myMove;
   const roundBuyIn = gameState.roundBuyIn;
 
   const result = calculateResult(myMove, theirMove);
-  const newProperties = { theirMove, result, balances, turnNum };
-  if (insufficientFunds(balances, roundBuyIn)) {
+  const newProperties = { theirMove, result, allocation, turnNum };
+  if (insufficientFunds(allocation, roundBuyIn)) {
     const newGameState1 = states.gameOver({
       ...gameState,
       ...newProperties,
@@ -684,9 +681,9 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
         return { gameState: newGameState1, messageState };
       }
 
-    case actions.POSITION_RECEIVED:
-      const position = action.position;
-      if (position.positionType !== PositionType.Resting) {
+    case actions.COMMITMENT_RECEIVED:
+      const commitment = action.commitment;
+      if (commitment.positionType !== PositionType.Resting) {
         return { gameState, messageState };
       }
 
@@ -701,10 +698,10 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
 function waitForRestingAReducer(gameState: states.WaitForRestingA, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.CREATE_CHALLENGE) { return challengeReducer(gameState, messageState); }
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+  if (action.type !== actions.COMMITMENT_RECEIVED) { return { gameState, messageState }; }
 
-  const position = action.position;
-  if (position.positionType !== PositionType.Resting) {
+  const commitment = action.commitment;
+  if (commitment.positionType !== PositionType.Resting) {
     return { gameState, messageState };
   }
 

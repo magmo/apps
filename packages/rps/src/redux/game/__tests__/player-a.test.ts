@@ -51,7 +51,7 @@ describe('player A\'s app', () => {
     const gameState = state.waitForGameConfirmationA({ ...aProps, ...preFundSetupA });
 
     describe('when receiving preFundSetupB', () => {
-      const action = actions.positionReceived(preFundSetupB);
+      const action = actions.commitmentReceived(preFundSetupB);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       it('requests funding from the wallet', () => {
@@ -101,7 +101,7 @@ describe('player A\'s app', () => {
 
     describe('when Accept arrives', () => {
       describe('when enough funds to continue', () => {
-        const action = actions.positionReceived(accept);
+        const action = actions.commitmentReceived(accept);
 
         const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -116,7 +116,7 @@ describe('player A\'s app', () => {
       });
 
       describe('when not enough funds to continue', () => {
-        const action = actions.positionReceived(acceptInsufficientFunds);
+        const action = actions.commitmentReceived(acceptInsufficientFunds);
         const gameState2 = {
           ...gameState,
           balances: proposeInsufficientFunds.allocation,
@@ -143,7 +143,7 @@ describe('player A\'s app', () => {
     });
 
     describe('if Resting arrives', () => {
-      const action = actions.positionReceived(resting);
+      const action = actions.commitmentReceived(resting);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itStoresAction(action, updatedState);
@@ -163,7 +163,7 @@ describe('player A\'s app', () => {
     const gameState = state.waitForRestingA({ ...aProps, ...reveal });
 
     describe('when resting arrives', () => {
-      const action = actions.positionReceived(resting);
+      const action = actions.commitmentReceived(resting);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
