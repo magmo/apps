@@ -17,7 +17,6 @@ contract RockPaperScissorsGame {
     // RoundProposed -> RoundAccepted
     // RoundAccepted -> Reveal
     // Reveal -> Start
-    // Start -> Concluded
     //
     function validTransition(Commitment.CommitmentStruct memory _old, Commitment.CommitmentStruct memory _new) public pure returns (bool) {
         RockPaperScissorsCommitment.RPSCommitmentStruct memory oldCommitment = RockPaperScissorsCommitment.fromFrameworkCommitment(_old);
@@ -26,10 +25,6 @@ contract RockPaperScissorsGame {
         if (oldCommitment.positionType == RockPaperScissorsCommitment.PositionType.Start) {
             if (newCommitment.positionType == RockPaperScissorsCommitment.PositionType.RoundProposed) {
                 validateStartToRoundProposed(oldCommitment, newCommitment);
-
-                return true;
-            } else if (newCommitment.positionType == RockPaperScissorsCommitment.PositionType.Concluded) {
-                validateStartToConcluded(oldCommitment, newCommitment);
 
                 return true;
             }

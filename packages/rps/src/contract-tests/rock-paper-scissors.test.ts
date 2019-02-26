@@ -1,18 +1,15 @@
-import BN from 'bn.js';
 import { expectRevert } from 'magmo-devtools';
 import {
   scenarios,
 } from '../core';
 
-import hexToBN from '../utils/hexToBN';
-import bnToHex from '../utils/bnToHex';
 import * as ethers from 'ethers';
 
 
 import RPSGameArtifact from '../../build/contracts/RockPaperScissorsGame.json';
-import { asEthersObject, Commitment } from 'fmg-core';
-import { bytesFromAppAttributes } from 'src/core/positions';
-
+import { asEthersObject } from 'fmg-core';
+import { RPSCommitment, asCoreCommitment } from '../core/rps-commitment';
+import { bigNumberify } from 'ethers/utils';
 jest.setTimeout(20000);
 
 
@@ -21,11 +18,11 @@ describe("Rock paper Scissors", () => {
   const provider = new ethers.providers.JsonRpcProvider(`http://localhost:${process.env.DEV_GANACHE_PORT}`);
   let rpsContract;
 
-  let postFundSetupB;
-  let propose;
-  let accept;
-  let reveal;
-  let resting;
+  let postFundSetupB: RPSCommitment;
+  let propose: RPSCommitment;
+  let accept: RPSCommitment;
+  let reveal: RPSCommitment;
+  let resting: RPSCommitment;
 
   beforeAll(async () => {
 
@@ -46,27 +43,19 @@ describe("Rock paper Scissors", () => {
   });
 
 
-  function positionToCommitment(position: Position): Commitment {
-    const {
-      commitmentType,
-    } = position;
-    return {
-      commitmentType,
-      appAttributes: bytesFromAppAttributes(position.appAttributes);
-    }
-  }
 
-  const validTransition = async (position1: Position, position2: Position) => {
-    const commitment1 = positionToCommitment(position1);
-    return await rpsContract.validTransition(asEthersObject(commitment1), asEthersObject(commitment2));
+  const validTransition = async (commitment1: RPSCommitment, commitment2: RPSCommitment) => {
+    const coreCommitment1 = asCoreCommitment(commitment1);
+    const coreCommitment2 = asCoreCommitment(commitment2);
+
+    return await rpsContract.validTransition(asEthersObject(coreCommitment1), asEthersObject(coreCommitment2));
   };
 
   // Transition function tests
   // ========================
 
-  it.only("allows START -> ROUNDPROPOSED", async () => {
-    console.log(postFundSetupB)
-    console.log(propose)
+  it("allows START -> ROUNDPROPOSED", async () => {
+
     expect(await validTransition(postFundSetupB, propose)).toBe(true);
   });
 
@@ -83,10 +72,12 @@ describe("Rock paper Scissors", () => {
   });
 
   it("disallows transitions where the stake changes", async () => {
-    reveal.roundBuyIn = bnToHex(hexToBN(reveal.roundBuyIn).add(new BN(1)));
+    reveal.stake = bigNumberify(88).toHexString();
+    const coreCommitment1 = asCoreCommitment(reveal);
+    const coreCommitment2 = asCoreCommitment(resting);
     expect.assertions(1);
     await expectRevert(
-      () => rpsContract.validTransition(asEthersObject(reveal), asEthersObject(resting)),
+      () => rpsContract.validTransition(asEthersObject(coreCommitment1), asEthersObject(coreCommitment2)),
       "The stake should be the same between commitments"
     );
   });

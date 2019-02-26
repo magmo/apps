@@ -5,7 +5,7 @@ import "fmg-core/contracts/Commitment.sol";
 
 library RockPaperScissorsCommitment {
     using Commitment for Commitment.CommitmentStruct;
-    enum PositionType { Start, RoundProposed, RoundAccepted, Reveal, Concluded }
+    enum PositionType { Start, RoundProposed, RoundAccepted, Reveal }
     enum Play { Rock, Paper, Scissors }
 
     struct AppAttributes {
@@ -15,7 +15,6 @@ library RockPaperScissorsCommitment {
         Play bPlay;
         Play aPlay;
         bytes32 salt;
-        uint32 roundNum;
     }
 
     struct RPSCommitmentStruct {
@@ -25,7 +24,6 @@ library RockPaperScissorsCommitment {
         Play bPlay;
         Play aPlay;
         bytes32 salt;
-        uint32 roundNum;
         uint256[] allocation;
     }
 
@@ -39,7 +37,6 @@ library RockPaperScissorsCommitment {
             appAttributes.bPlay,
             appAttributes.aPlay,
             appAttributes.salt,
-            appAttributes.roundNum,
             frameworkCommitment.allocation
         );
     }
