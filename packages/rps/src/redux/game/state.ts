@@ -1,5 +1,5 @@
 import { Result, Player } from '../../core';
-import { Play } from '../../core/rps-commitment';
+import { Weapon } from '../../core/rps-commitment';
 import { Channel } from 'fmg-core';
 
 // States of the form *A are player A only
@@ -14,9 +14,9 @@ export enum StateName {
   ConfirmGameB = 'CONFIRM_GAME_B',
   DeclineGame = 'DECLINE_GAME_B',
   WaitForFunding = 'WAIT_FOR_FUNDING',
-  PickMove = 'PICK_MOVE',
-  WaitForOpponentToPickMoveA = 'WAIT_FOR_OPPONENT_TO_PICK_MOVE_A',
-  WaitForOpponentToPickMoveB = 'WAIT_FOR_OPPONENT_TO_PICK_MOVE_B',
+  PickWeapon = 'PICK_WEAPON',
+  WaitForOpponentToPickWeaponA = 'WAIT_FOR_OPPONENT_TO_PICK_WEAPON_A',
+  WaitForOpponentToPickWeaponB = 'WAIT_FOR_OPPONENT_TO_PICK_WEAPON_B',
   WaitForRevealB = 'WAIT_FOR_REVEAL_B',
   WaitForRestingA = 'WAIT_FOR_RESTING_A',
   PlayAgain = 'PLAY_AGAIN',
@@ -24,7 +24,7 @@ export enum StateName {
   WaitForResignationAcknowledgement = 'WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT',
   GameOver = 'GAME_OVER',
   WaitForWithdrawal = 'WAIT_FOR_WITHDRAWAL',
-  PickChallengeMove = 'PICK_CHALLENGE_MOVE',
+  PickChallengeWeapon = 'PICK_CHALLENGE_WEAPON',
   ChallengePlayAgain = 'CHALLENGE_PLAY_AGAIN',
 }
 
@@ -187,101 +187,101 @@ export function waitForFunding(state: IncludesBase): WaitForFunding {
   return { ...base(state), name: StateName.WaitForFunding };
 }
 
-export interface PickMove extends Base {
-  name: StateName.PickMove;
+export interface PickWeapon extends Base {
+  name: StateName.PickWeapon;
   player: Player;
 }
-export function pickMove(state: IncludesBase): PickMove {
-  return { ...base(state), name: StateName.PickMove };
+export function pickWeapon(state: IncludesBase): PickWeapon {
+  return { ...base(state), name: StateName.PickWeapon };
 }
 
-export interface PickChallengeMove extends Base {
-  name: StateName.PickChallengeMove;
+export interface PickChallengeWeapon extends Base {
+  name: StateName.PickChallengeWeapon;
   player: Player;
 }
-export function pickChallengeMove(state: IncludesBase): PickChallengeMove {
-  return { ...base(state), name: StateName.PickChallengeMove };
+export function pickChallengeWeapon(state: IncludesBase): PickChallengeWeapon {
+  return { ...base(state), name: StateName.PickChallengeWeapon };
 }
 
-export interface WaitForOpponentToPickMoveA extends Base {
-  name: StateName.WaitForOpponentToPickMoveA;
-  myMove: Play;
+export interface WaitForOpponentToPickWeaponA extends Base {
+  name: StateName.WaitForOpponentToPickWeaponA;
+  myWeapon: Weapon;
   salt: string;
   player: Player.PlayerA;
 }
-interface IncludesMove extends IncludesBase {
-  myMove: Play;
+interface IncludesWeapon extends IncludesBase {
+  myWeapon: Weapon;
 }
 
-interface IncludesMoveAndSalt extends IncludesMove {
+interface IncludesWeaponAndSalt extends IncludesWeapon {
   salt: string;
 }
-export function waitForOpponentToPickMoveA(state: IncludesMoveAndSalt): WaitForOpponentToPickMoveA {
+export function waitForOpponentToPickWeaponA(state: IncludesWeaponAndSalt): WaitForOpponentToPickWeaponA {
   return {
     ...base(state),
-    name: StateName.WaitForOpponentToPickMoveA,
-    myMove: state.myMove,
+    name: StateName.WaitForOpponentToPickWeaponA,
+    myWeapon: state.myWeapon,
     salt: state.salt,
   };
 }
 
-export interface WaitForOpponentToPickMoveB extends Base {
-  name: StateName.WaitForOpponentToPickMoveB;
-  myMove: Play;
+export interface WaitForOpponentToPickWeaponB extends Base {
+  name: StateName.WaitForOpponentToPickWeaponB;
+  myWeapon: Weapon;
   player: Player.PlayerB;
 }
-export function waitForOpponentToPickMoveB(state: IncludesMove): WaitForOpponentToPickMoveB {
+export function waitForOpponentToPickWeaponB(state: IncludesWeapon): WaitForOpponentToPickWeaponB {
   return {
     ...base(state),
-    name: StateName.WaitForOpponentToPickMoveB,
-    myMove: state.myMove,
+    name: StateName.WaitForOpponentToPickWeaponB,
+    myWeapon: state.myWeapon,
   };
 }
 
 export interface WaitForRevealB extends Base {
   name: StateName.WaitForRevealB;
-  myMove: Play;
+  myWeapon: Weapon;
   player: Player.PlayerB;
   preCommit: string;
 }
 interface WaitForRevealBParams extends IncludesBase {
-  myMove: Play;
+  myWeapon: Weapon;
   player: Player.PlayerB;
   preCommit: string;
 }
 export function waitForRevealB(state: WaitForRevealBParams): WaitForRevealB {
-  const { myMove, preCommit } = state;
-  return { ...base(state), name: StateName.WaitForRevealB, myMove, preCommit };
+  const { myWeapon, preCommit } = state;
+  return { ...base(state), name: StateName.WaitForRevealB, myWeapon, preCommit };
 }
 
 interface IncludesResult extends IncludesBase {
-  myMove: Play;
-  theirMove: Play;
+  myWeapon: Weapon;
+  theirWeapon: Weapon;
   result: Result;
 }
 
 export interface PlayAgain extends Base {
   name: StateName.PlayAgain;
-  myMove: Play;
-  theirMove: Play;
+  myWeapon: Weapon;
+  theirWeapon: Weapon;
   result: Result;
   player: Player;
 }
 export function playAgain(state: IncludesResult): PlayAgain {
-  const { myMove, theirMove, result } = state;
-  return { ...base(state), name: StateName.PlayAgain, myMove, theirMove, result };
+  const { myWeapon, theirWeapon, result } = state;
+  return { ...base(state), name: StateName.PlayAgain, myWeapon, theirWeapon, result };
 }
 
 export interface WaitForRestingA extends Base {
   name: StateName.WaitForRestingA;
-  myMove: Play;
-  theirMove: Play;
+  myWeapon: Weapon;
+  theirWeapon: Weapon;
   result: Result;
   player: Player.PlayerA;
 }
 export function waitForRestingA(state: IncludesResult): WaitForRestingA {
-  const { myMove, theirMove, result } = state;
-  return { ...base(state), name: StateName.WaitForRestingA, myMove, theirMove, result };
+  const { myWeapon, theirWeapon, result } = state;
+  return { ...base(state), name: StateName.WaitForRestingA, myWeapon, theirWeapon, result };
 }
 
 export interface OpponentResigned extends Base {
@@ -319,14 +319,14 @@ export function waitForWithdrawal(state: IncludesBase): WaitForWithdrawal {
 
 export interface ChallengePlayAgain extends Base {
   name: StateName.ChallengePlayAgain;
-  myMove: Play;
-  theirMove: Play;
+  myWeapon: Weapon;
+  theirWeapon: Weapon;
   result: Result;
   player: Player;
 }
 export function challengePlayAgain(state: IncludesResult): ChallengePlayAgain {
-  const { myMove, theirMove, result } = state;
-  return { ...base(state), name: StateName.ChallengePlayAgain, myMove, theirMove, result };
+  const { myWeapon, theirWeapon, result } = state;
+  return { ...base(state), name: StateName.ChallengePlayAgain, myWeapon, theirWeapon, result };
 }
 
 
@@ -335,9 +335,9 @@ export type PlayingState = (
   | ConfirmGameB
   | DeclineGameB
   | WaitForFunding
-  | PickMove
-  | WaitForOpponentToPickMoveA
-  | WaitForOpponentToPickMoveB
+  | PickWeapon
+  | WaitForOpponentToPickWeaponA
+  | WaitForOpponentToPickWeaponB
   | WaitForRevealB
   | PlayAgain
   | WaitForRestingA
@@ -345,7 +345,7 @@ export type PlayingState = (
   | WaitForResignationAcknowledgement
   | GameOver
   | WaitForWithdrawal
-  | PickChallengeMove
+  | PickChallengeWeapon
   | ChallengePlayAgain
 );
 

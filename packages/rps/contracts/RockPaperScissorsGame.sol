@@ -103,15 +103,15 @@ contract RockPaperScissorsGame {
         uint256 bWinnings;
 
         require(newCommitment.stake == oldCommitment.stake,SAME_STAKE);
-        require(newCommitment.bPlay == oldCommitment.bPlay,"Player Bs play should be the same between commitments.");
+        require(newCommitment.bWeapon == oldCommitment.bWeapon,"Player Bs play should be the same between commitments.");
 
         // check hash matches
         // need to convert Play -> uint256 to get hash to work
-        bytes32 hashed = keccak256(abi.encodePacked(uint256(newCommitment.aPlay), newCommitment.salt));
+        bytes32 hashed = keccak256(abi.encodePacked(uint256(newCommitment.aWeapon), newCommitment.salt));
         require(hashed == oldCommitment.preCommit,"The hash needs to match the precommit");
 
         // calculate winnings
-        (aWinnings, bWinnings) = winnings(newCommitment.aPlay, newCommitment.bPlay, newCommitment.stake);
+        (aWinnings, bWinnings) = winnings(newCommitment.aWeapon, newCommitment.bWeapon, newCommitment.stake);
 
         require(newCommitment.allocation[0] == oldCommitment.allocation[0] + aWinnings,"Player A's resolution should be updated with the winning");
         require(newCommitment.allocation[1] == oldCommitment.allocation[1] - 2 * oldCommitment.stake + bWinnings,"Player B's resolution should be updated with the winning");

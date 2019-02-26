@@ -12,8 +12,8 @@ library RockPaperScissorsCommitment {
         PositionType positionType;
         uint256 stake;
         bytes32 preCommit;
-        Play bPlay;
-        Play aPlay;
+        Play bWeapon;
+        Play aWeapon;
         bytes32 salt;
     }
 
@@ -21,8 +21,8 @@ library RockPaperScissorsCommitment {
         PositionType positionType;
         uint256 stake;
         bytes32 preCommit;
-        Play bPlay;
-        Play aPlay;
+        Play bWeapon;
+        Play aWeapon;
         bytes32 salt;
         uint256[] allocation;
     }
@@ -34,8 +34,8 @@ library RockPaperScissorsCommitment {
             appAttributes.positionType,
             appAttributes.stake,
             appAttributes.preCommit,
-            appAttributes.bPlay,
-            appAttributes.aPlay,
+            appAttributes.bWeapon,
+            appAttributes.aWeapon,
             appAttributes.salt,
             frameworkCommitment.allocation
         );
