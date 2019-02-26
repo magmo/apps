@@ -20,7 +20,7 @@ const SolidityRPSCommitmentType = {
     salt: "bytes32",
   },
 };
-export enum PositionType { Resting, Proposed, Accepted, Reveal };
+export enum PositionType { Resting, Proposed, Accepted, Reveal }
 export enum Play { Rock, Paper, Scissors }
 export interface RPSBaseCommitment extends BaseCommitment {
   positionType: PositionType;

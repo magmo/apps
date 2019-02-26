@@ -14,8 +14,8 @@ const {
   preFundSetupA,
   preFundSetupB,
   postFundSetupB,
-  asMove,
-  bsMove,
+  aPlay,
+  bPlay,
   salt,
   aResult,
   propose,
@@ -31,18 +31,18 @@ const {
   reveal: revealInsufficientFunds,
 } = scenarios.insufficientFunds;
 
-const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, asAddress: myAddress } = scenarios.standard;
-const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, myAddress };
+const { channel, participants, roundBuyIn, myName, opponentName, asAddress: myAddress } = scenarios.standard;
+const base = { libraryAddress: channel.channelType, channelNonce: channel.channelNonce, participants, roundBuyIn, myName, opponentName, myAddress };
 
 const messageState = {};
 
 describe('player A\'s app', () => {
   const aProps = {
     ...base,
-    stateCount: 0,
+    commitmentCount: 0,
     player: Player.PlayerA as Player.PlayerA,
-    myMove: asMove,
-    theirMove: bsMove,
+    myMove: aPlay,
+    theirMove: bPlay,
     result: aResult,
     twitterHandle: 'tweet',
   };
@@ -79,7 +79,7 @@ describe('player A\'s app', () => {
     const gameState = state.pickMove({ ...aProps, ...postFundSetupB });
 
     describe('when a move is chosen', () => {
-      const action = actions.chooseMove(asMove);
+      const action = actions.chooseMove(aPlay);
       // todo: will need to stub out the randomness in the salt somehow
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -89,7 +89,7 @@ describe('player A\'s app', () => {
 
       it('stores the move and salt', () => {
         const newGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(newGameState.myMove).toEqual(asMove);
+        expect(newGameState.myMove).toEqual(aPlay);
         expect(newGameState.salt).toEqual(salt);
       });
 
@@ -110,7 +110,7 @@ describe('player A\'s app', () => {
         itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
         it('sets theirMove and the result', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.theirMove).toEqual(bsMove);
+          expect(newGameState.theirMove).toEqual(bPlay);
           expect(newGameState.result).toEqual(aResult);
         });
       });
@@ -119,7 +119,7 @@ describe('player A\'s app', () => {
         const action = actions.positionReceived(acceptInsufficientFunds);
         const gameState2 = {
           ...gameState,
-          balances: proposeInsufficientFunds.balances,
+          balances: proposeInsufficientFunds.allocation,
           latestPosition: proposeInsufficientFunds,
         };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);

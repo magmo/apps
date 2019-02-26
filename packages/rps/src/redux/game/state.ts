@@ -1,4 +1,6 @@
-import { Result, Move, Player } from '../../core';
+import { Result, Player } from '../../core';
+import { Play } from '../../core/rps-commitment';
+import { Channel } from 'fmg-core';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -99,16 +101,15 @@ export function waitingRoom(obj: WaitingRoomParams): WaitingRoom {
 }
 
 interface TwoChannel {
-  libraryAddress: string;
   myAddress: string;
-  channelNonce: number;
-  participants: [string, string];
+  channel: Channel;
+  destination: string[];
 }
 
 interface Base extends TwoChannel {
   turnNum: number;
-  balances: [string, string];
-  stateCount: number;
+  allocation: string[];
+  commitmentCount: number;
   twitterHandle: string;
   roundBuyIn: string;
   myName: string;
@@ -121,27 +122,25 @@ interface IncludesBase extends Base {
 
 export function base(state: IncludesBase) {
   const {
-    libraryAddress,
-    channelNonce,
-    participants,
+    destination,
     turnNum,
-    balances,
-    stateCount,
+    allocation,
+    commitmentCount,
     roundBuyIn,
     myName,
     opponentName,
     twitterHandle,
     player,
     myAddress,
+    channel,
   } = state;
 
   return {
-    libraryAddress,
-    channelNonce,
-    participants,
+    channel,
+    destination,
     turnNum,
-    balances,
-    stateCount,
+    allocation,
+    commitmentCount,
     roundBuyIn,
     myName,
     twitterHandle,
@@ -152,7 +151,7 @@ export function base(state: IncludesBase) {
 }
 
 export function getOpponentAddress(state: IncludesBase) {
-  return state.participants[1 - state.player];
+  return state.destination[1 - state.player];
 }
 
 export interface WaitForGameConfirmationA extends Base {
@@ -206,12 +205,12 @@ export function pickChallengeMove(state: IncludesBase): PickChallengeMove {
 
 export interface WaitForOpponentToPickMoveA extends Base {
   name: StateName.WaitForOpponentToPickMoveA;
-  myMove: Move;
+  myMove: Play;
   salt: string;
   player: Player.PlayerA;
 }
 interface IncludesMove extends IncludesBase {
-  myMove: Move;
+  myMove: Play;
 }
 
 interface IncludesMoveAndSalt extends IncludesMove {
@@ -228,7 +227,7 @@ export function waitForOpponentToPickMoveA(state: IncludesMoveAndSalt): WaitForO
 
 export interface WaitForOpponentToPickMoveB extends Base {
   name: StateName.WaitForOpponentToPickMoveB;
-  myMove: Move;
+  myMove: Play;
   player: Player.PlayerB;
 }
 export function waitForOpponentToPickMoveB(state: IncludesMove): WaitForOpponentToPickMoveB {
@@ -241,12 +240,12 @@ export function waitForOpponentToPickMoveB(state: IncludesMove): WaitForOpponent
 
 export interface WaitForRevealB extends Base {
   name: StateName.WaitForRevealB;
-  myMove: Move;
+  myMove: Play;
   player: Player.PlayerB;
   preCommit: string;
 }
 interface WaitForRevealBParams extends IncludesBase {
-  myMove: Move;
+  myMove: Play;
   player: Player.PlayerB;
   preCommit: string;
 }
@@ -256,15 +255,15 @@ export function waitForRevealB(state: WaitForRevealBParams): WaitForRevealB {
 }
 
 interface IncludesResult extends IncludesBase {
-  myMove: Move;
-  theirMove: Move;
+  myMove: Play;
+  theirMove: Play;
   result: Result;
 }
 
 export interface PlayAgain extends Base {
   name: StateName.PlayAgain;
-  myMove: Move;
-  theirMove: Move;
+  myMove: Play;
+  theirMove: Play;
   result: Result;
   player: Player;
 }
@@ -275,8 +274,8 @@ export function playAgain(state: IncludesResult): PlayAgain {
 
 export interface WaitForRestingA extends Base {
   name: StateName.WaitForRestingA;
-  myMove: Move;
-  theirMove: Move;
+  myMove: Play;
+  theirMove: Play;
   result: Result;
   player: Player.PlayerA;
 }
@@ -320,8 +319,8 @@ export function waitForWithdrawal(state: IncludesBase): WaitForWithdrawal {
 
 export interface ChallengePlayAgain extends Base {
   name: StateName.ChallengePlayAgain;
-  myMove: Move;
-  theirMove: Move;
+  myMove: Play;
+  theirMove: Play;
   result: Result;
   player: Player;
 }
