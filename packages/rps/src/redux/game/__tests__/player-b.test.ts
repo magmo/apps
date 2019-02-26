@@ -44,7 +44,7 @@ describe('player B\'s app', () => {
     turnNum: 0,
     allocation: preFundSetupA.allocation,
     commitmentCount: 0,
-    latestPosition: preFundSetupA,
+    latestcommitment: preFundSetupA,
     myMove: bPlay,
     theirMove: aPlay,
     result: bResult,
@@ -71,8 +71,8 @@ describe('player B\'s app', () => {
 
   describe('when in waitForFunding', () => {
     const gameState = state.waitForFunding({ ...bProps, ...preFundSetupB });
-    describe('when a position is received', () => {
-      const action = actions.positionReceived(propose);
+    describe('when a commitment is received', () => {
+      const action = actions.commitmentReceived(propose);
       const updatedState = gameReducer({ messageState, gameState }, action);
       it('stores the action in actionToRetry', () => {
         expect(updatedState.messageState.actionToRetry).toEqual(action);
@@ -108,7 +108,7 @@ describe('player B\'s app', () => {
     });
 
     describe('if Propose arrives', () => {
-      const action = actions.positionReceived(propose);
+      const action = actions.commitmentReceived(propose);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itStoresAction(action, updatedState);
@@ -132,7 +132,7 @@ describe('player B\'s app', () => {
     const gameState = state.waitForOpponentToPickMoveB({ ...bProps, ...postFundSetupB });
 
     describe('when Propose arrives', () => {
-      const action = actions.positionReceived(propose);
+      const action = actions.commitmentReceived(propose);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
@@ -146,7 +146,7 @@ describe('player B\'s app', () => {
 
     describe('when Reveal arrives', () => {
       describe('if there are sufficient funds', () => {
-        const action = actions.positionReceived(reveal);
+        const action = actions.commitmentReceived(reveal);
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
@@ -154,7 +154,7 @@ describe('player B\'s app', () => {
       });
 
       describe('if there are not sufficient funds', () => {
-        const action = actions.positionReceived(revealInsufficientFunds);
+        const action = actions.commitmentReceived(revealInsufficientFunds);
         const gameState2 = {
           ...gameState,
           balances: acceptInsufficientFunds.allocation,

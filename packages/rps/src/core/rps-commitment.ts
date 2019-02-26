@@ -33,6 +33,7 @@ export interface RPSBaseCommitment extends BaseCommitment {
 
 export interface RPSCommitment extends RPSBaseCommitment {
   commitmentType: CommitmentType;
+  commitmentName: string;
 }
 
 

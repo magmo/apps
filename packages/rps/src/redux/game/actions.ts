@@ -6,13 +6,13 @@ export const JOIN_OPEN_GAME = 'GAME.JOIN_OPEN_GAME';
 export const NEW_OPEN_GAME = 'GAME.NEW_OPEN_GAME';
 export const CREATE_OPEN_GAME = 'GAME.CREATE_OPEN_GAME';
 export const CANCEL_OPEN_GAME = 'GAME.CANCEL_OPEN_GAME';
-export const INITIAL_POSITION_RECEIVED = 'GAME.INITIAL_POSITION_RECEIVED';
+export const INITIAL_COMMITMENT_RECEIVED = 'GAME.INITIAL_COMMITMENT_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
 export const DECLINE_GAME = 'GAME.DECLINE_GAME';
 export const CHOOSE_MOVE = 'GAME.CHOOSE_MOVE';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
-export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
+export const COMMITMENT_RECEIVED = 'GAME.COMMITMENT_RECEIVED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const FUNDING_FAILURE = 'GAME.FUNDING_FAILURE';
 export const EXIT_TO_LOBBY = 'GAME.EXIT_TO_LOBBY';
@@ -49,9 +49,9 @@ export const joinOpenGame = (
   roundBuyIn,
 });
 
-export const initialPositionReceived = (position: RPSCommitment, opponentName: string) => ({
-  type: INITIAL_POSITION_RECEIVED as typeof INITIAL_POSITION_RECEIVED,
-  position,
+export const initialPositionReceived = (commitment: RPSCommitment, opponentName: string) => ({
+  type: INITIAL_COMMITMENT_RECEIVED as typeof INITIAL_COMMITMENT_RECEIVED,
+  commitment,
   opponentName,
 });
 
@@ -87,14 +87,14 @@ export const challengeCompleted = () => ({
   type: CHALLENGE_COMPLETED as typeof CHALLENGE_COMPLETED,
 });
 
-export const positionReceived = (position: RPSCommitment) => ({
-  type: POSITION_RECEIVED as typeof POSITION_RECEIVED,
-  position,
+export const commitmentReceived = (commitment: RPSCommitment) => ({
+  type: COMMITMENT_RECEIVED as typeof COMMITMENT_RECEIVED,
+  commitment,
 });
 
-export const fundingSuccess = (position: RPSCommitment) => ({
+export const fundingSuccess = (commitment: RPSCommitment) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
-  position,
+  commitment,
 });
 
 export const fundingFailure = () => ({
@@ -124,7 +124,7 @@ export type DeclineGame = ReturnType<typeof declineGame>;
 export type ChooseMove = ReturnType<typeof chooseMove>;
 export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
-export type PositionReceived = ReturnType<typeof positionReceived>;
+export type PositionReceived = ReturnType<typeof commitmentReceived>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type FundingFailure = ReturnType<typeof fundingFailure>;
 export type CreateOpenGame = ReturnType<typeof createOpenGame>;

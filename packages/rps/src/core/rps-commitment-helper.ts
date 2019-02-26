@@ -3,12 +3,18 @@ import { soliditySha3 } from 'web3-utils';
 import { padBytes32, BaseCommitment, CommitmentType, Bytes32 } from 'fmg-core';
 import { AppAttributes, RPSCommitment, Play, PositionType } from './rps-commitment';
 
-// Position names
+// Commitment names
+const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
+const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
+const POST_FUND_SETUP_A = 'POST_FUND_SETUP_A';
+const POST_FUND_SETUP_B = 'POST_FUND_SETUP_B';
+const APP_PROPOSE = 'APP:PROPOSE';
+const APP_ACCEPT = 'APP:ACCEPT';
+const APP_REVEAL = 'APP:REVEAL';
+const APP_RESTING = 'APP:RESTING';
+const CONCLUDE = 'CONCLUDE';
 
-
-
-
-// Position Constructors
+// Commitment Constructors
 // =====================
 
 interface BaseWithBuyInParams extends BaseCommitment {
@@ -50,6 +56,7 @@ export function preFundSetupA(obj: BaseWithBuyInParams): RPSCommitment {
     commitmentCount: 0,
     commitmentType: CommitmentType.PreFundSetup,
     ...defaultAppAttrs(obj.roundBuyIn),
+    commitmentName: PRE_FUND_SETUP_A,
   };
 }
 
@@ -59,6 +66,7 @@ export function preFundSetupB(obj: BaseWithBuyInParams): RPSCommitment {
     commitmentCount: 1,
     commitmentType: CommitmentType.PreFundSetup,
     ...defaultAppAttrs(obj.roundBuyIn),
+    commitmentName: PRE_FUND_SETUP_B,
   };
 }
 
@@ -68,6 +76,7 @@ export function postFundSetupA(obj: BaseWithBuyInParams): RPSCommitment {
     commitmentCount: 0,
     commitmentType: CommitmentType.PostFundSetup,
     ...defaultAppAttrs(obj.roundBuyIn),
+    commitmentName: POST_FUND_SETUP_A,
   };
 }
 
@@ -77,6 +86,7 @@ export function postFundSetupB(obj: BaseWithBuyInParams): RPSCommitment {
     commitmentCount: 1,
     commitmentType: CommitmentType.PostFundSetup,
     ...defaultAppAttrs(obj.roundBuyIn),
+    commitmentName: POST_FUND_SETUP_B,
   };
 }
 
@@ -94,6 +104,7 @@ export function propose(obj: ProposeParams): RPSCommitment {
     ...base(obj),
     commitmentType: CommitmentType.App,
     ...appAttributes,
+    commitmentName: APP_PROPOSE,
   };
 }
 
@@ -122,6 +133,7 @@ export function proposeFromSalt(obj: ProposeWithMoveAndSaltParams): RPSCommitmen
     ...base(obj),
     commitmentType: CommitmentType.App,
     ...appAttributes,
+    commitmentName: APP_PROPOSE,
   };
 }
 
@@ -139,6 +151,7 @@ export function accept(obj: AcceptParams): RPSCommitment {
     preCommit,
     bPlay,
     positionType: PositionType.Accepted,
+    commitmentName: APP_ACCEPT,
   };
 }
 
@@ -158,6 +171,7 @@ export function reveal(obj: RevealParams): RPSCommitment {
     bPlay,
     salt,
     positionType: PositionType.Reveal,
+    commitmentName: APP_REVEAL,
   };
 }
 
@@ -167,7 +181,7 @@ export function resting(obj: BaseWithBuyInParams): RPSCommitment {
     commitmentType: CommitmentType.App,
     ...defaultAppAttrs(obj.roundBuyIn),
     positionType: PositionType.Resting,
-
+    commitmentName: APP_RESTING,
   };
 }
 
@@ -176,5 +190,6 @@ export function conclude(obj: BaseCommitment): RPSCommitment {
     ...base(obj),
     commitmentType: CommitmentType.Conclude,
     ...defaultAppAttrs(zeroBytes32),
+    commitmentName: CONCLUDE,
   };
 }
