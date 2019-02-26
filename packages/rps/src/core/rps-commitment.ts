@@ -45,37 +45,38 @@ function encodeAppAttributes(appAttrs: AppAttributes): string {
     [positionType, stake, preCommit, bWeapon, aWeapon, salt,]);
 }
 
-// function decodeAppAttributes(appAttrs: string): AppAttributes {
-//   const parameters = abi.decodeParameter(SolidityRPSCommitmentType, appAttrs);
-//   return {
-//     positionType: parameters[0] as PositionType,
-//     stake: parameters[1],
-//     preCommit: parameters[2],
-//     bWeapon: parameters[3] as Play,
-//     aWeapon: parameters[4] as Play,
-//     salt: parameters[5],
-//   };
-// }
+function decodeAppAttributes(appAttrs: string): AppAttributes {
+  const parameters = abi.decodeParameter(SolidityRPSCommitmentType, appAttrs);
+  return {
+    positionType: parameters[0] as PositionType,
+    stake: parameters[1],
+    preCommit: parameters[2],
+    bWeapon: parameters[3] as Weapon,
+    aWeapon: parameters[4] as Weapon,
+    salt: parameters[5],
+  };
+}
 
-// export function fromCoreCommitment(commitment: Commitment): RPSCommitment {
-//   const {
-//     channel,
-//     commitmentType,
-//     turnNum,
-//     allocation,
-//     destination,
-//     commitmentCount,
-//   } = commitment;
-//   return {
-//     channel,
-//     commitmentType,
-//     turnNum,
-//     allocation,
-//     destination,
-//     commitmentCount,
-//     ...decodeAppAttributes(commitment.appAttributes),
-//   };
-// }
+export function fromCoreCommitment(commitment: Commitment): RPSCommitment {
+  const {
+    channel,
+    commitmentType,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+  } = commitment;
+  return {
+    channel,
+    commitmentType,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+    commitmentName: "", // TODO: Determine this based on commitment attribs
+    ...decodeAppAttributes(commitment.appAttributes),
+  };
+}
 
 
 export function asCoreCommitment(rpsCommitment: RPSCommitment): Commitment {

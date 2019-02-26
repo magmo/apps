@@ -6,7 +6,7 @@ import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
-import { challengePositionReceived, challengeComplete, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
+import { challengeCommitmentReceived, challengeComplete, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
@@ -100,7 +100,7 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
     case actions.CHALLENGE_CREATED_EVENT:
       return states.waitForResponseOrTimeout({ ...state, challengeExpiry: action.finalizedAt });
     case actions.RESPOND_WITH_MOVE_EVENT:
-      const message = challengePositionReceived(action.responseCommitment);
+      const message = challengeCommitmentReceived(action.responseCommitment);
       // TODO: Right now we're just storing a dummy signature since we don't get one 
       // from the challenge. 
       return states.acknowledgeChallengeResponse({
