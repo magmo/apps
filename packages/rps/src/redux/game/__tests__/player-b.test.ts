@@ -14,8 +14,8 @@ const {
   preFundSetupA,
   preFundSetupB,
   postFundSetupB,
-  asMove,
-  bsMove,
+  aPlay,
+  bPlay,
   bResult,
   propose,
   accept,
@@ -32,8 +32,8 @@ const {
   reveal: revealInsufficientFunds,
 } = scenarios.insufficientFunds;
 
-const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, bsAddress: myAddress } = scenarios.standard;
-const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, myAddress };
+const { channel, participants, roundBuyIn, myName, opponentName, bsAddress: myAddress } = scenarios.standard;
+const base = { libraryAddress: channel.channelType, channelNonce: channel.channelNonce, channel, participants, roundBuyIn, myName, opponentName, myAddress };
 
 const messageState = {};
 
@@ -42,12 +42,13 @@ describe('player B\'s app', () => {
     ...base,
     player: Player.PlayerB as Player.PlayerB,
     turnNum: 0,
-    balances: preFundSetupA.balances,
-    stateCount: 0,
+    allocation: preFundSetupA.allocation,
+    commitmentCount: 0,
     latestPosition: preFundSetupA,
-    myMove: bsMove,
-    theirMove: asMove,
+    myMove: bPlay,
+    theirMove: aPlay,
     result: bResult,
+    destination: participants,
     twitterHandle: "tweet",
   };
   describe('when in confirmGameB', () => {
@@ -91,7 +92,7 @@ describe('player B\'s app', () => {
     const gameState = state.pickMove({ ...bProps, ...postFundSetupB });
 
     describe('when a move is chosen', () => {
-      const action = actions.chooseMove(bsMove);
+      const action = actions.chooseMove(bPlay);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.WaitForOpponentToPickMoveB, updatedState);
@@ -99,7 +100,7 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('stores the move', () => {
         const updatedGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(updatedGameState.myMove).toEqual(bsMove);
+        expect(updatedGameState.myMove).toEqual(bPlay);
       });
       it('doesn\'t send anything', () => {
         expect(updatedState.messageState).toEqual(messageState);
@@ -114,7 +115,7 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
 
       describe('when a move is chosen', () => {
-        const action2 = actions.chooseMove(bsMove);
+        const action2 = actions.chooseMove(bPlay);
         const updatedState2 = gameReducer(updatedState, action2);
 
         itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState2);
@@ -156,7 +157,7 @@ describe('player B\'s app', () => {
         const action = actions.positionReceived(revealInsufficientFunds);
         const gameState2 = {
           ...gameState,
-          balances: acceptInsufficientFunds.balances,
+          balances: acceptInsufficientFunds.allocation,
         };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
         itTransitionsTo(state.StateName.GameOver, updatedState);

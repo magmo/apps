@@ -3,7 +3,7 @@ import { buffers, eventChannel } from 'redux-saga';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
-import { encode, decode, Player, positions } from '../../core';
+import { Player, } from '../../core';
 import * as gameActions from '../game/actions';
 import * as appActions from '../global/actions';
 import { MessageState, WalletMessage } from './state';
@@ -13,6 +13,7 @@ import { getMessageState, getGameState } from '../store';
 import * as Wallet from 'magmo-wallet-client';
 import hexToBN from '../../utils/hexToBN';
 import { WALLET_IFRAME_ID } from '../../constants';
+import { channelID } from 'fmg-core/lib/channel';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -165,9 +166,9 @@ function createWalletEventChannel(walletEventTypes: Wallet.WalletEventType[]) {
 
 function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.PlayingState) {
 
-  const { libraryAddress, channelNonce, player, balances, participants } = state;
-  const channel = new Channel(libraryAddress, channelNonce, participants);
-  const channelId = channel.id;
+  const { channel, player, allocation: balances, destination: participants } = state;
+
+  const channelId = channelID(channel);
 
   switch (walletMessage.type) {
     case "RESPOND_TO_CHALLENGE":

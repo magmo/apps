@@ -1,6 +1,7 @@
-import { Move } from './moves';
+
 import { Player } from './players';
 import BN from 'bn.js';
+import { Play } from './rps-commitment';
 
 export enum Result {
   Tie,
@@ -8,7 +9,7 @@ export enum Result {
   YouLose,
 }
 
-export function calculateResult(yourMove: Move, theirMove: Move): Result {
+export function calculateResult(yourMove: Play, theirMove: Play): Result {
   const x = (yourMove - theirMove + 2) % 3;
   switch (x) {
     case 0:
@@ -20,7 +21,7 @@ export function calculateResult(yourMove: Move, theirMove: Move): Result {
   }
 }
 
-export function calculateAbsoluteResult(asMove: Move, bsMove: Move): AbsoluteResult {
+export function calculateAbsoluteResult(asMove: Play, bsMove: Play): AbsoluteResult {
   const x = (asMove - bsMove + 2) % 3;
   switch (x) {
     case 0:
@@ -41,7 +42,7 @@ export enum AbsoluteResult {
 export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) {
   const youArePlayerA = youAre === Player.PlayerA;
 
-  switch(relativeResult) {
+  switch (relativeResult) {
     case Result.Tie:
       return AbsoluteResult.Tie;
     case Result.YouWin:
@@ -54,7 +55,7 @@ export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) 
 export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
   const youArePlayerA = youAre === Player.PlayerA;
 
-  switch(absoluteResult) {
+  switch (absoluteResult) {
     case AbsoluteResult.Tie:
       return Result.Tie;
     case AbsoluteResult.AWins:
@@ -66,12 +67,12 @@ export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: 
 }
 
 export function balancesAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
-  switch(absoluteResult) {
+  switch (absoluteResult) {
     case AbsoluteResult.AWins:
-      return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      return [balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2))];
     case AbsoluteResult.BWins:
       return balances;
     case AbsoluteResult.Tie:
-      return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
+      return [balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1))];
   }
 }

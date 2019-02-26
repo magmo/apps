@@ -1,10 +1,10 @@
-import BN from "bn.js";
+
 import { Result } from './results';
 import * as commitmentHelper from './rps-commitment-helper';
 import { randomHex } from "../utils/randomHex";
-import bnToHex from "../utils/bnToHex";
 import { channelID } from "fmg-core/lib/channel";
 import { Play } from './rps-commitment';
+import { bigNumberify } from 'ethers/utils';
 
 const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = 4;
@@ -13,13 +13,13 @@ const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
 const bsPrivateKey = '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72';
 const bsAddress = '0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb';
 const participants: [string, string] = [asAddress, bsAddress];
-const roundBuyIn = bnToHex(new BN(1));
-const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
-const sixFour = [new BN(6), new BN(4)].map(bnToHex) as [string, string];
-const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
-const nineOne = [new BN(9), new BN(1)].map(bnToHex) as [string, string];
-const eightTwo = [new BN(8), new BN(2)].map(bnToHex) as [string, string];
-const tenZero = [new BN(10), new BN(0)].map(bnToHex) as [string, string];
+const roundBuyIn = bigNumberify(1).toHexString();
+const fiveFive = [bigNumberify(5).toHexString(), bigNumberify(5).toHexString()] as [string, string];
+const sixFour = [bigNumberify(6).toHexString(), bigNumberify(4).toHexString()] as [string, string];
+const fourSix = [bigNumberify(4).toHexString(), bigNumberify(6).toHexString()] as [string, string];
+const nineOne = [bigNumberify(9).toHexString(), bigNumberify(1).toHexString()] as [string, string];
+const eightTwo = [bigNumberify(8).toHexString(), bigNumberify(2).toHexString()] as [string, string];
+const tenZero = [bigNumberify(10).toHexString(), bigNumberify(0).toHexString()] as [string, string];
 const aPlay = Play.Rock;
 const salt = randomHex(64);
 const preCommit = commitmentHelper.hashCommitment(aPlay, salt);

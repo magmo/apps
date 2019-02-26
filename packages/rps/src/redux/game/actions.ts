@@ -1,4 +1,5 @@
-import { Move, Position, positions } from '../../core';
+
+import { Play, RPSCommitment } from '../../core/rps-commitment';
 
 export const UPDATE_PROFILE = 'LOGIN.UPDATE_PROFILE';
 export const JOIN_OPEN_GAME = 'GAME.JOIN_OPEN_GAME';
@@ -48,7 +49,7 @@ export const joinOpenGame = (
   roundBuyIn,
 });
 
-export const initialPositionReceived = (position: positions.PreFundSetupA, opponentName: string) => ({
+export const initialPositionReceived = (position: RPSCommitment, opponentName: string) => ({
   type: INITIAL_POSITION_RECEIVED as typeof INITIAL_POSITION_RECEIVED,
   position,
   opponentName,
@@ -61,7 +62,7 @@ export const declineGame = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
-export const chooseMove = (move: Move) => ({
+export const chooseMove = (move: Play) => ({
   type: CHOOSE_MOVE as typeof CHOOSE_MOVE,
   move,
 });
@@ -86,12 +87,12 @@ export const challengeCompleted = () => ({
   type: CHALLENGE_COMPLETED as typeof CHALLENGE_COMPLETED,
 });
 
-export const positionReceived = (position: Position) => ({
+export const positionReceived = (position: RPSCommitment) => ({
   type: POSITION_RECEIVED as typeof POSITION_RECEIVED,
   position,
 });
 
-export const fundingSuccess = (position: Position) => ({
+export const fundingSuccess = (position: RPSCommitment) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
   position,
 });
