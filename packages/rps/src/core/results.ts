@@ -1,6 +1,6 @@
 
 import { Player } from './players';
-import BN from 'bn.js';
+import { BigNumber } from 'ethers/utils';
 import { Play } from './rps-commitment';
 
 export enum Result {
@@ -66,13 +66,13 @@ export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: 
 
 }
 
-export function balancesAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
+export function allocationAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BigNumber, balances: BigNumber[]): BigNumber[] {
   switch (absoluteResult) {
     case AbsoluteResult.AWins:
-      return [balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2))];
+      return [balances[0].add(roundBuyIn.mul(2)), balances[1].sub(roundBuyIn.mul(2))];
     case AbsoluteResult.BWins:
       return balances;
     case AbsoluteResult.Tie:
-      return [balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1))];
+      return [balances[0].add(roundBuyIn.mul(1)), balances[1].sub(roundBuyIn.mul(1))];
   }
 }

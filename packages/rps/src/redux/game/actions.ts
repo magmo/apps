@@ -49,7 +49,7 @@ export const joinOpenGame = (
   roundBuyIn,
 });
 
-export const initialPositionReceived = (commitment: RPSCommitment, opponentName: string) => ({
+export const initialCommitmentReceived = (commitment: RPSCommitment, opponentName: string) => ({
   type: INITIAL_COMMITMENT_RECEIVED as typeof INITIAL_COMMITMENT_RECEIVED,
   commitment,
   opponentName,
@@ -115,7 +115,7 @@ export const messageSent = () => ({
   type: MESSAGE_SENT as typeof MESSAGE_SENT,
 });
 
-export type InitialPositionReceived = ReturnType<typeof initialPositionReceived>;
+export type InitialCommitmentReceived = ReturnType<typeof initialCommitmentReceived>;
 export type NewOpenGame = ReturnType<typeof newOpenGame>;
 export type CancelOpenGame = ReturnType<typeof cancelOpenGame>;
 export type JoinOpenGame = ReturnType<typeof joinOpenGame>;
@@ -124,7 +124,7 @@ export type DeclineGame = ReturnType<typeof declineGame>;
 export type ChooseMove = ReturnType<typeof chooseMove>;
 export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
-export type PositionReceived = ReturnType<typeof commitmentReceived>;
+export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type FundingFailure = ReturnType<typeof fundingFailure>;
 export type CreateOpenGame = ReturnType<typeof createOpenGame>;
@@ -145,11 +145,11 @@ export type GameAction = (
   | JoinOpenGame
   | ChooseMove
   | PlayAgain
-  | PositionReceived
+  | CommitmentReceived
   | FundingSuccess
   | FundingFailure
   | Resign
-  | InitialPositionReceived
+  | InitialCommitmentReceived
   | ExitToLobby
   | MessageSent
   | CreateChallenge
