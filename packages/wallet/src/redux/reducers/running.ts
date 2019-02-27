@@ -36,8 +36,8 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       return states.waitForUpdate({
         ...state,
         turnNum: state.turnNum + 1,
-        lastState: { state: action.commitment, signature },
-        penultimateState: state.lastCommitment,
+        lastCommitment: { commitment: action.commitment, signature },
+        penultimateCommitment: state.lastCommitment,
         messageOutbox,
       });
 
@@ -57,8 +57,8 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       return states.waitForUpdate({
         ...state,
         turnNum: state.turnNum + 1,
-        lastState: { state: action.commitment, signature: messageSignature },
-        penultimateState: state.lastCommitment,
+        lastCommitment: { commitment: action.commitment, signature: messageSignature },
+        penultimateCommitment: state.lastCommitment,
         messageOutbox: handleSignatureAndValidationMessages(state, action),
       });
 

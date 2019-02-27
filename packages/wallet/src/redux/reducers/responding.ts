@@ -105,8 +105,8 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
       return states.initiateResponse({
         ...state,
         turnNum: state.turnNum + 1,
-        lastState: { state: action.commitment, signature },
-        penultimateState: state.lastCommitment,
+        lastCommitment: { commitment: action.commitment, signature },
+        penultimateCommitment: state.lastCommitment,
         transactionOutbox: transaction,
         displayOutbox: showWallet(),
       });
