@@ -146,13 +146,13 @@ const waitForDepositEventsReducer = (state: states.WaitForDepositEvents, action:
         return state;
       }
 
-      const { postFundSetupState, positionSignature, sendMessageAction } = composePostFundState(state);
+      const { postFundSetupCommitment, commitmentSignature, sendMessageAction } = composePostFundCommitment(state);
       if (state.ourIndex === 0) {
         const updatedState = states.aWaitForPostFundSetup({
           ...state,
-          turnNum: postFundSetupState.turnNum,
-          penultimateState: state.lastCommitment,
-          lastState: { state: postFundSetupState, signature: positionSignature },
+          turnNum: postFundSetupCommitment.turnNum,
+          penultimateCommitment: state.lastCommitment,
+          lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
           messageOutbox: sendMessageAction,
         });
         if (state.unhandledAction) {
@@ -183,8 +183,8 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
       return states.acknowledgeFundingSuccess({
         ...state,
         turnNum: postFundState.turnNum,
-        lastState: { state: messageState, signature: action.signature! },
-        penultimateState: state.lastCommitment,
+        lastCommitment: { commitment: messageState, signature: action.signature! },
+        penultimateCommitment: state.lastCommitment,
       });
     default:
       return state;
@@ -250,18 +250,18 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      const messageState = fromHex(action.data);
-      if (!validTransitionToPostFundState(state, messageState, action.signature)) {
+      const messageCommitment = fromHex(action.data);
+      if (!validTransitionToPostFundState(state, messageCommitment, action.signature)) {
         return state;
       }
 
-      const newState = { ...state, turnNum: messageState.turnNum };
-      const { postFundSetupState, positionSignature, sendMessageAction } = composePostFundState(newState);
+      const newState = { ...state, turnNum: messageCommitment.turnNum };
+      const { postFundSetupCommitment, commitmentSignature, sendMessageAction } = composePostFundCommitment(newState);
       return states.acknowledgeFundingSuccess({
         ...newState,
-        turnNum: postFundSetupState.turnNum,
-        lastState: { state: postFundSetupState, signature: positionSignature },
-        penultimateState: { state: messageState, signature: action.signature! },
+        turnNum: postFundSetupCommitment.turnNum,
+        lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
+        penultimateCommitment: { commitment: messageCommitment, signature: action.signature! },
         messageOutbox: sendMessageAction,
       });
     default:
@@ -294,11 +294,11 @@ const validTransitionToPostFundState = (state: states.FundingState, data: Commit
   return true;
 };
 
-const composePostFundState = (state: states.WaitForDepositEvents | states.BWaitForPostFundSetup) => {
+const composePostFundCommitment = (state: states.WaitForDepositEvents | states.BWaitForPostFundSetup) => {
   const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
   const channel: Channel = { channelType: libraryAddress, channelNonce, participants };
 
-  const postFundSetupState: Commitment = {
+  const postFundSetupCommitment: Commitment = {
     channel,
     commitmentType: CommitmentType.PostFundSetup,
     turnNum: turnNum + 1,
@@ -307,13 +307,13 @@ const composePostFundState = (state: states.WaitForDepositEvents | states.BWaitF
     destination: lastCommitment.commitment.destination,
     appAttributes: state.lastCommitment.commitment.appAttributes,
   };
-  const stateSignature = signCommitment(postFundSetupState, state.privateKey);
+  const commitmentSignature = signCommitment(postFundSetupCommitment, state.privateKey);
 
-  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], toHex(postFundSetupState), stateSignature);
-  return { postFundSetupState, positionSignature: stateSignature, sendMessageAction };
+  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], toHex(postFundSetupCommitment), commitmentSignature);
+  return { postFundSetupCommitment, commitmentSignature, sendMessageAction };
 };
 
 const getFundingAmount = (state: states.FundingState, index: number): string => {
-  const lastState = state.lastCommitment.commitment;
-  return "0x" + lastState.allocation[index];
+  const lastCommitment = state.lastCommitment.commitment;
+  return lastCommitment.allocation[index];
 };

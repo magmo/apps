@@ -10,7 +10,8 @@ import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
-import { WaitForDepositEvents, SubmitDepositInMetaMask, WaitForDepositConfirmation } from '../../../states';
+import { WaitForDepositEvents, SubmitDepositInMetaMask, WaitForDepositConfirmation, AcknowledgeFundingSuccess } from '../../../states';
+import { CommitmentType } from 'fmg-core/lib/commitment';
 
 const {
   asAddress,
@@ -304,7 +305,13 @@ describe('incoming action: deposit confirmed, funding event already received for
   const state = states.waitForDepositConfirmation(testDefaults);
   const action = actions.transactionConfirmed();
   const updatedState = walletReducer(state, action);
-
+  it("sets the lastCommitment to the PostFundSetupA", () => {
+    expect((updatedState as AcknowledgeFundingSuccess).lastCommitment.commitment.commitmentType).toEqual(CommitmentType.PostFundSetup);
+    expect((updatedState as AcknowledgeFundingSuccess).lastCommitment.commitment.commitmentCount).toEqual(0);
+  });
+  it("sends a message request", () => {
+    expect((updatedState.messageOutbox as outgoing.MessageRequest).type).toEqual(outgoing.MESSAGE_REQUEST);
+  });
   itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
   itIncreasesTurnNumBy(1, state, updatedState);
 });
@@ -329,17 +336,19 @@ describe('start in BWaitForPostFundSetup', () => {
   describe('incoming action: message received', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.bWaitForPostFundSetup(testDefaults);
-
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validSignature', { value: validateMock });
     const fromHexMock = jest.fn().mockReturnValue(postFundCommitment1);
     Object.defineProperty(fmgCore, "fromHex", { value: fromHexMock });
-
     const action = actions.messageReceived('0x0', 'sig');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
+    it("sets the lastCommitment to the PostFundSetupB", () => {
+      expect((updatedState as AcknowledgeFundingSuccess).lastCommitment.commitment.commitmentType).toEqual(CommitmentType.PostFundSetup);
+      expect((updatedState as AcknowledgeFundingSuccess).lastCommitment.commitment.commitmentCount).toEqual(1);
+    });
     expect((updatedState.messageOutbox as outgoing.MessageRequest).type).toEqual(outgoing.MESSAGE_REQUEST);
   });
 });
@@ -352,6 +361,10 @@ describe('start in AcknowledgeFundingSuccess', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    it("sends PostFundSetupB", () => {
+      expect((updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentType).toEqual(CommitmentType.PostFundSetup);
+      expect((updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentCount).toEqual(1);
+    });
   });
 
   describe('incoming action: FundingSuccessAcknowledged', () => { // player B scenario
@@ -362,5 +375,9 @@ describe('start in AcknowledgeFundingSuccess', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     expect((updatedState.messageOutbox as outgoing.FundingSuccess).type).toEqual(outgoing.FUNDING_SUCCESS);
+    it("sends PostFundSetupB", () => {
+      expect((updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentType).toEqual(CommitmentType.PostFundSetup);
+      expect((updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentCount).toEqual(1);
+    });
   });
 });
