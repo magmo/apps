@@ -382,7 +382,7 @@ const validTransitionToPostFundState = (state: states.FundingState, data: Commit
 
 const composePostFundCommitment = (state: states.AWaitForOpponentDeposit | states.BWaitForPostFundSetup) => {
   const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
-  const channel: Channel = { channelType: libraryAddress, channelNonce, participants };
+  const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
 
   const postFundSetupCommitment: Commitment = {
     channel,
