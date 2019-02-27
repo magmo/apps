@@ -27,7 +27,9 @@ import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, MESSAGE_SENT, TRANS
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { validCommitmentSignature } from '../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
-import { StateType, fromHex } from 'fmg-core/lib/state';
+import { fromHex, CommitmentType } from 'fmg-core';
+import { Commitment } from 'fmg-core/lib/commitment';
+
 
 const initialState = waitForLogin();
 
@@ -83,27 +85,27 @@ const receivedValidOpponentConclusionRequest = (state: WalletState, action: Wall
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== MESSAGE_RECEIVED) { return null; }
 
-  let messageState;
+  let messageCommitment: Commitment;
   try {
-    messageState = fromHex(action.data);
+    messageCommitment = fromHex(action.data);
   } catch (error) {
     return null;
   }
 
-  if (messageState.stateType !== StateType.Conclude) {
+  if (messageCommitment.commitmentType !== CommitmentType.Conclude) {
     return null;
   }
   // check signature
   const opponentAddress = state.participants[1 - state.ourIndex];
   if (!action.signature) { return null; }
-  if (!validCommitmentSignature(messageState, action.signature, opponentAddress)) { return null; }
-  if (!validTransition(state, messageState)) { return null; }
+  if (!validCommitmentSignature(messageCommitment, action.signature, opponentAddress)) { return null; }
+  if (!validTransition(state, messageCommitment)) { return null; }
 
   return acknowledgeConclude({
     ...state,
-    turnNum: messageState.turnNum,
-    lastState: { state: messageState, signature: action.signature },
-    penultimateState: state.lastCommitment,
+    turnNum: messageCommitment.turnNum,
+    lastCommitment: { commitment: messageCommitment, signature: action.signature },
+    penultimateCommitment: state.lastCommitment,
     displayOutbox: showWallet(),
   });
 };

@@ -66,16 +66,16 @@ const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: a
   switch (action.type) {
     case actions.CONCLUDE_APPROVED:
       if (!ourTurn(state)) { return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'It is not the current user\'s turn') }; }
-      const { positionSignature, sendMessageAction, concludeState } = composeConcludePosition(state);
+      const { positionSignature, sendMessageAction, concludeCommitment } = composeConcludePosition(state);
       const lastState = state.lastCommitment.commitment;
       if (lastState.commitmentType === CommitmentType.Conclude) {
         if (state.adjudicator) {
           return states.approveCloseOnChain({
             ...state,
             adjudicator: state.adjudicator,
-            turnNum: concludeState.turnNum,
-            penultimateState: state.lastCommitment,
-            lastState: { state: concludeState, signature: positionSignature },
+            turnNum: concludeCommitment.turnNum,
+            penultimateCommitment: state.lastCommitment,
+            lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
             messageOutbox: sendMessageAction,
           });
         } else {
@@ -137,6 +137,7 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
         destination: action.withdrawAddress,
 
       };
+      console.log(args);
       const transactionOutbox = createConcludeAndWithdrawTransaction(state.adjudicator, args);
       return states.waitForCloseInitiation({ ...state, userAddress: action.withdrawAddress, transactionOutbox });
 
@@ -152,24 +153,24 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
     case actions.CONCLUDE_APPROVED:
       if (!ourTurn(state)) { return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'It is not the current user\'s turn') }; }
 
-      const { concludeState, positionSignature, sendMessageAction } = composeConcludePosition(state);
-      const { lastCommitment: lastState } = state;
-      if (lastState.commitment.commitmentType === CommitmentType.Conclude) {
+      const { concludeCommitment, positionSignature, sendMessageAction } = composeConcludePosition(state);
+      const { lastCommitment } = state;
+      if (lastCommitment.commitment.commitmentType === CommitmentType.Conclude) {
         return states.approveCloseOnChain({
           ...state,
           adjudicator: state.adjudicator,
-          turnNum: concludeState.turnNum,
-          penultimateState: state.lastCommitment,
-          lastState: { state: concludeState, signature: positionSignature },
+          turnNum: concludeCommitment.turnNum,
+          penultimateCommitment: state.lastCommitment,
+          lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
           messageOutbox: sendMessageAction,
         });
 
       } else {
         return states.waitForOpponentConclude({
           ...state,
-          turnNum: concludeState.turnNum,
-          penultimateState: state.lastCommitment,
-          lastState: { state: concludeState, signature: positionSignature },
+          turnNum: concludeCommitment.turnNum,
+          penultimateCommitment: state.lastCommitment,
+          lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
           messageOutbox: sendMessageAction,
         });
       }
@@ -202,8 +203,8 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
           ...state,
           adjudicator: state.adjudicator,
           turnNum: concludeCommitment.turnNum,
-          penultimateState: state.lastCommitment,
-          lastState: { state: concludeCommitment, signature: action.signature },
+          penultimateCommitment: state.lastCommitment,
+          lastCommitment: { commitment: concludeCommitment, signature: action.signature },
           messageOutbox: concludeSuccess(),
         });
       } else {
@@ -247,14 +248,14 @@ const acknowledgeClosedOnChainReducer = (state: states.AcknowledgeClosedOnChain,
 
 const composeConcludePosition = (state: states.ClosingState) => {
   const commitmentCount = state.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
-  const concludeState: Commitment = {
+  const concludeCommitment: Commitment = {
     ...state.lastCommitment.commitment,
     commitmentType: CommitmentType.Conclude,
     turnNum: state.turnNum + 1,
     commitmentCount,
   };
 
-  const positionSignature = signCommitment(concludeState, state.privateKey);
-  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], toHex(concludeState), positionSignature);
-  return { concludeState, positionSignature, sendMessageAction };
+  const commitmentSignature = signCommitment(concludeCommitment, state.privateKey);
+  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], toHex(concludeCommitment), commitmentSignature);
+  return { concludeCommitment, positionSignature: commitmentSignature, sendMessageAction };
 };
