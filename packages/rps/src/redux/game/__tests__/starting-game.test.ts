@@ -12,7 +12,7 @@ const {
   asAddress, bsAddress, channel, roundBuyIn, preFundSetupA,
 } = scenarios.standard;
 
-const params = { myName: 'Tom', roundBuyIn, myAddress: asAddress, channelNonce: channel.channelNonce, libraryAddress: channel.channelType, twitterHandle: "Tweet" };
+const params = { myName: 'Tom', roundBuyIn, myAddress: asAddress, channelNonce: channel.nonce, libraryAddress: channel.channelType, twitterHandle: "Tweet" };
 const messageState = {};
 
 describe('when in lobby', () => {
@@ -20,7 +20,7 @@ describe('when in lobby', () => {
 
   describe('when the player joins a open game', () => {
     const action = actions.joinOpenGame(
-      'Andrew', bsAddress, channel.channelNonce, roundBuyIn
+      'Andrew', bsAddress, channel.nonce, roundBuyIn
     );
     const updatedState = gameReducer({ gameState, messageState }, action);
 

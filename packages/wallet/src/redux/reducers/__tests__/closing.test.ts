@@ -25,7 +25,7 @@ const {
 const defaults = {
   adjudicator: 'adj-address',
   channelId,
-  channelNonce: channel.channelNonce,
+  channelNonce: channel.nonce,
   libraryAddress: channel.channelType,
   networkId: 3,
   participants: channel.participants as [string, string],

@@ -11,7 +11,7 @@ export const validTransition = (fromState: WalletState, toCommitment: Commitment
   if (!('libraryAddress' in fromState)) { return false; }
 
   return (toCommitment.turnNum === fromState.turnNum + 1) &&
-    (toCommitment.channel.channelNonce === fromState.channelNonce) &&
+    (toCommitment.channel.nonce === fromState.channelNonce) &&
     (toCommitment.channel.participants[0] === fromState.participants[0]) &&
     (toCommitment.channel.participants[1] === fromState.participants[1]) &&
     (toCommitment.channel.channelType === fromState.libraryAddress) &&

@@ -1,6 +1,7 @@
 import { splitSignature, getAddress } from 'ethers/utils';
 import { recover, sign, Commitment, toHex } from 'fmg-core';
 import { ethers } from 'ethers';
+import { MessageSignature } from 'web3/eth/accounts';
 
 
 export const validCommitmentSignature = (commitment: Commitment, signature: string, address: string) => {
@@ -12,7 +13,7 @@ export const validSignature = (data: string, signature: string, address: string)
     const { v: vNum, r, s } = splitSignature(signature);
     const v = '0x' + (vNum as number).toString(16);
 
-    const recovered = recover(data, { v, r, s });
+    const recovered = recover(data, { v, r, s } as MessageSignature);
 
     return recovered === getAddress(address);
   } catch (err) {

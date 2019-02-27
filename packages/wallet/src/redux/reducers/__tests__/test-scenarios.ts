@@ -9,7 +9,7 @@ export const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
 export const bsPrivateKey = '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72';
 export const bsAddress = '0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb';
 export const participants: [string, string] = [asAddress, bsAddress];
-export const channel: Channel = { channelType: libraryAddress, channelNonce, participants };
+export const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
 
 export const channelId = channelID(channel);
 
