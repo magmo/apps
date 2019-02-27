@@ -28,7 +28,7 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
     case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
       return aSubmitDepositToMetaMaskReducer(state, action);
     case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
-      return aWaitForDeployConfirmationReducer(state, action);
+      return aWaitForDepositConfirmationReducer(state, action);
     case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
       return aWaitForDepositReducer(state, action);
     case states.A_WAIT_FOR_POST_FUND_SETUP:
@@ -191,7 +191,7 @@ const aSubmitDepositToMetaMaskReducer = (state: states.ASubmitDepositInMetaMask,
   return state;
 };
 
-const aWaitForDeployConfirmationReducer = (state: states.AWaitForDepositConfirmation, action: actions.WalletAction) => {
+const aWaitForDepositConfirmationReducer = (state: states.AWaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
@@ -199,15 +199,9 @@ const aWaitForDeployConfirmationReducer = (state: states.AWaitForDepositConfirma
       }
       break;
     case actions.FUNDING_RECEIVED_EVENT:
-      return states.aSubmitDepositInMetaMask({ ...state, unhandledAction: action });
+      return states.aWaitForDepositConfirmation({ ...state, unhandledAction: action });
     case actions.TRANSACTION_CONFIRMED:
-      if (!action.contractAddress) { return state; }
-      const sendAdjudicatorAddressAction = messageRequest(state.participants[1 - state.ourIndex], action.contractAddress, "");
-      const updatedState = states.aWaitForOpponentDeposit({
-        ...state,
-        adjudicator: action.contractAddress,
-        messageOutbox: sendAdjudicatorAddressAction,
-      });
+      const updatedState = states.aWaitForOpponentDeposit(state);
       if (state.unhandledAction) {
         // Now that  we're in a correct state to handle the funding received event 
         // we recursively call the reducer to handle the funding received event
@@ -275,8 +269,7 @@ const bWaitForOpponentDepositReducer = (state: states.BWaitForOpponentDeposit, a
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       const { allocation } = state.lastCommitment.commitment;
-      const totalFunds = bigNumberify(allocation[state.ourIndex]).add(allocation[1 - state.ourIndex]);
-      if (bigNumberify(action.totalForDestination).gte(totalFunds)) {
+      if (bigNumberify(action.totalForDestination).gte(allocation[1 - state.ourIndex])) {
         return states.bWaitForDepositToBeSentToMetaMask({
           ...state,
           transactionOutbox: createDepositTransaction(state.adjudicator, state.channelId, allocation[state.ourIndex]),

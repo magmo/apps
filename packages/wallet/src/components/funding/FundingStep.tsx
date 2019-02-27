@@ -4,9 +4,9 @@ import { faCheckCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import SidebarLayout from '../SidebarLayout';
 
-interface Props { 
+interface Props {
   step: number;
- }
+}
 
 
 const completeIcon = (
@@ -19,7 +19,7 @@ const todoIcon = (
   <span className="fa-li" ><FontAwesomeIcon icon={faCircle} size="lg" /></span>
 );
 
-const icon = (iconStep:number, currentStep:number) => {
+const icon = (iconStep: number, currentStep: number) => {
   if (currentStep < iconStep) {
     return todoIcon;
   } else if (currentStep === iconStep) {
@@ -75,7 +75,7 @@ export class BFundingStep extends React.PureComponent<Props> {
         <ul className="fa-ul">
           <li style={{ padding: "0.7em 1em" }}>
             {icon(1, currentStep)}
-            Wait for opponent to deploy contract(s) and complete their deposit
+            Wait for opponent to complete their deposit
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(2, currentStep)}
