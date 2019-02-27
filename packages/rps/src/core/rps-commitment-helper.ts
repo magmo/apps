@@ -1,6 +1,6 @@
 
 import { soliditySha3 } from 'web3-utils';
-import { padBytes32, BaseCommitment, CommitmentType, Bytes32 } from 'fmg-core';
+import { BaseCommitment, CommitmentType, Bytes32 } from 'fmg-core';
 import { AppAttributes, RPSCommitment, Weapon, PositionType, PRE_FUND_SETUP_A, PRE_FUND_SETUP_B, POST_FUND_SETUP_A, POST_FUND_SETUP_B, APP_PROPOSE, APP_ACCEPT, APP_REVEAL, APP_RESTING, CONCLUDE } from './rps-commitment';
 
 
@@ -106,7 +106,7 @@ export function propose(obj: ProposeParams): RPSCommitment {
 export function hashCommitment(play: Weapon, salt: string) {
   return soliditySha3(
     { type: 'uint256', value: play },
-    { type: 'bytes32', value: padBytes32(salt) },
+    { type: 'bytes32', value: salt },
   );
 }
 
