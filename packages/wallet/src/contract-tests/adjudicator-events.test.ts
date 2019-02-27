@@ -16,7 +16,14 @@ describe('adjudicator listener', () => {
   function getNextNonce() {
     return ++nonce;
   }
-
+  beforeAll(async () => {
+    // This is a work around for https://github.com/ethers-io/ethers.js/issues/393
+    // We manually create a transaction to force a block to be mined in ganache so that events get properly caught
+    // otherwise the first event is always missed since ethers won't listen for events until a block has been mined
+    const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
+    const contractAddress = await getAdjudicatorContractAddress(provider);
+    await depositContract(provider, contractAddress, channelId);
+  });
   it("should handle a funds received event", async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
     const contractAddress = await getAdjudicatorContractAddress(provider);
