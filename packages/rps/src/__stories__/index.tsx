@@ -7,7 +7,7 @@ import * as states from "../redux/game/state";
 import { Player } from "../core/players";
 import BN from "bn.js";
 // import { OpenGame } from "../redux/open-games/state";
-import "../index.sc ss";
+import "../index.scss";
 import { SiteState } from "../redux/reducer";
 import HomePage from "../components/HomePage";
 import LoadingPage from "../components/LoadingPage";
