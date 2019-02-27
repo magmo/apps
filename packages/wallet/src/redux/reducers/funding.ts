@@ -23,14 +23,22 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return waitForFundingRequestReducer(state, action);
     case states.APPROVE_FUNDING:
       return approveFundingReducer(state, action);
-    case states.WAIT_FOR_DEPOSIT_EVENTS:
-      return waitForDepositEventsReducer(state, action);
+    case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
+      return aWaitForDeployToBeSentToMetaMaskReducer(state, action);
+    case states.A_SUBMIT_DEPLOY_IN_METAMASK:
+      return aSubmitDeployToMetaMaskReducer(state, action);
+    case states.WAIT_FOR_DEPLOY_CONFIRMATION:
+      return waitForDeployConfirmationReducer(state, action);
+    case states.A_WAIT_FOR_DEPOSIT:
+      return aWaitForDepositReducer(state, action);
     case states.A_WAIT_FOR_POST_FUND_SETUP:
       return aWaitForPostFundSetupReducer(state, action);
-    case states.WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
-      return waitForDepositToBeSentToMetaMaskReducer(state, action);
-    case states.SUBMIT_DEPOSIT_IN_METAMASK:
-      return submitDepositInMetaMaskReducer(state, action);
+    case states.B_WAIT_FOR_DEPLOY_ADDRESS:
+      return bWaitForDeployAddressReducer(state, action);
+    case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
+      return bWaitForDepositToBeSentToMetaMaskReducer(state, action);
+    case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
+      return bSubmitDepositInMetaMaskReducer(state, action);
     case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
       return waitForDepositConfirmationReducer(state, action);
     case states.B_WAIT_FOR_POST_FUND_SETUP:
@@ -41,6 +49,8 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return sendFundingDeclinedMessageReducer(state, action);
     case states.ACKNOWLEDGE_FUNDING_DECLINED:
       return acknowledgeFundingDeclinedReducer(state, action);
+    case states.DEPLOY_TRANSACTION_FAILED:
+      return deployTransactionFailedReducer(state, action);
     case states.DEPOSIT_TRANSACTION_FAILED:
       return depositTransactionFailedReducer(state, action);
     default:
@@ -48,12 +58,23 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
   }
 };
 
+const deployTransactionFailedReducer = (state: states.DeployTransactionFailed, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.RETRY_TRANSACTION:
+      const fundingAmount = getFundingAmount(state, state.ourIndex);
+      return states.aWaitForDeployToBeSentToMetaMask({
+        ...state,
+        transactionOutbox: createDepositTransaction(state.adjudicator, state.channelId, fundingAmount),
+      });
+  }
+  return state;
+};
 
 const depositTransactionFailedReducer = (state: states.DepositTransactionFailed, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const fundingAmount = getFundingAmount(state, state.ourIndex);
-      return states.waitForDepositToBeSentToMetaMask({
+      return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
         adjudicator: state.adjudicator,
         transactionOutbox: createDepositTransaction(state.adjudicator, state.channelId, fundingAmount),
@@ -99,13 +120,21 @@ const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, actio
 const approveFundingReducer = (state: states.ApproveFunding, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_APPROVED:
+      if (state.ourIndex === 0) {
+        const fundingAmount = getFundingAmount(state, state.ourIndex);
+        return states.aWaitForDeployToBeSentToMetaMask({
+          ...state,
+          transactionOutbox: createDepositTransaction(state.adjudicator, state.channelId, fundingAmount),
+        });
+      } else {
+        const updatedState = states.bWaitForDeployAddress(state);
+        if (state.unhandledAction) {
+          return fundingReducer({ ...updatedState, unhandledAction: undefined }, state.unhandledAction);
+        } else {
+          return updatedState;
+        }
 
-      const fundingAmount = getFundingAmount(state, state.ourIndex);
-      return states.waitForDepositToBeSentToMetaMask({
-        ...state,
-        transactionOutbox: createDepositTransaction(state.adjudicator, state.channelId, fundingAmount),
-      });
-
+      }
     case actions.FUNDING_REJECTED:
       const sendFundingDeclinedAction = messageRequest(state.participants[1 - state.ourIndex], 'FundingDeclined', "");
       return states.sendFundingDeclinedMessage({
@@ -117,60 +146,109 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
       if (action.data && action.data === 'FundingDeclined') {
         return states.acknowledgeFundingDeclined(state);
       } else {
-        if (state.ourIndex === 1) {
-          return states.approveFunding({
-            ...state,
-            adjudicator: action.data,
-          });
-        } else {
-          return state;
-        }
+        return state;
       }
+    case actions.FUNDING_DECLINED_ACKNOWLEDGED:
+      return states.approveFunding({ ...state, unhandledAction: action });
     default:
       return state;
   }
 };
 
-const waitForDepositEventsReducer = (state: states.WaitForDepositEvents, action: actions.WalletAction) => {
+const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToBeSentToMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_SENT_TO_METAMASK:
+      return states.aSubmitDeployInMetaMask(state);
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.aWaitForDeployToBeSentToMetaMask({ ...state, unhandledAdjudicatorEvent: action });
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
+    default:
+      return state;
+  }
+  return state;
+};
+
+const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.aSubmitDeployInMetaMask({ ...state, unhandledAction: action });
+    case actions.TRANSACTION_SUBMITTED:
+      return states.waitForDeployConfirmation({ ...state, transactionHash: action.transactionHash });
+    case actions.TRANSACTION_SUBMISSION_FAILED:
+      return states.deployTransactionFailed(state);
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
+    default:
+      return state;
+  }
+  return state;
+};
+
+const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
         return states.acknowledgeFundingDeclined(state);
-      } else {
-        return states.waitForDepositEvents({ ...state, unhandledAction: action });
       }
+      break;
     case actions.FUNDING_RECEIVED_EVENT:
-      const { allocation } = state.lastCommitment.commitment;
-      const total = bigNumberify(allocation[0]).add(allocation[1]);
-      if (bigNumberify(action.totalForDestination).lt(total)) {
-        return state;
+      return states.aSubmitDeployInMetaMask({ ...state, unhandledAction: action });
+    case actions.TRANSACTION_CONFIRMED:
+      if (!action.contractAddress) { return state; }
+      const sendAdjudicatorAddressAction = messageRequest(state.participants[1 - state.ourIndex], action.contractAddress, "");
+      const updatedState = states.aWaitForDeposit({
+        ...state,
+        adjudicator: action.contractAddress,
+        messageOutbox: sendAdjudicatorAddressAction,
+      });
+      if (state.unhandledAction) {
+        // Now that  we're in a correct state to handle the funding received event 
+        // we recursively call the reducer to handle the funding received event
+        return fundingReducer({ ...updatedState, unhandledAction: undefined }, state.unhandledAction);
       }
-
-      const { postFundSetupCommitment, commitmentSignature, sendMessageAction } = composePostFundCommitment(state);
-      if (state.ourIndex === 0) {
-        const updatedState = states.aWaitForPostFundSetup({
-          ...state,
-          turnNum: postFundSetupCommitment.turnNum,
-          penultimateCommitment: state.lastCommitment,
-          lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
-          messageOutbox: sendMessageAction,
-        });
-        if (state.unhandledAction) {
-          return fundingReducer(updatedState, state.unhandledAction);
-        } else {
-          return updatedState;
-        }
-      } else {
-        const updatedState = states.bWaitForPostFundSetup(state);
-        if (state.unhandledAction) {
-          return fundingReducer(updatedState, state.unhandledAction);
-        } else {
-          return updatedState;
-        }
+      else {
+        return updatedState;
       }
     default:
       return state;
   }
+  return state;
+};
+
+const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return states.acknowledgeFundingDeclined(state);
+      }
+      break;
+    case actions.FUNDING_RECEIVED_EVENT:
+      const { allocation } = state.lastCommitment.commitment;
+      const totalFunds = bigNumberify(allocation[state.ourIndex]).add(allocation[1 - state.ourIndex]);
+
+      if (bigNumberify(action.totalForDestination).lt(totalFunds)) {
+        return state;
+      }
+
+      const { postFundSetupCommitment, commitmentSignature, sendMessageAction } = composePostFundCommitment(state);
+      return states.aWaitForPostFundSetup({
+        ...state,
+        turnNum: postFundSetupCommitment.turnNum,
+        penultimateCommitment: state.lastCommitment,
+        lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
+        messageOutbox: sendMessageAction,
+      });
+    default:
+      return state;
+  }
+  return state;
 };
 
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
@@ -193,25 +271,40 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 
 
 
-const waitForDepositToBeSentToMetaMaskReducer = (state: states.WaitForDepositToBeSentToMetaMask, action: actions.WalletAction) => {
+const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
-      return states.submitDepositInMetaMask({
-        ...state,
-        unhandledAction: action,
-      });
-
-    case actions.TRANSACTION_SENT_TO_METAMASK:
-      return states.submitDepositInMetaMask(state);
+      const { allocation } = state.lastCommitment.commitment;
+      const totalFunds = bigNumberify(allocation[state.ourIndex]).add(allocation[1 - state.ourIndex]);
+      if (bigNumberify(action.totalForDestination).gte(totalFunds)) {
+        return states.bWaitForDepositToBeSentToMetaMask({
+          ...state,
+          transactionOutbox: createDepositTransaction(state.adjudicator, state.channelId, allocation[state.ourIndex]),
+        });
+      } else {
+        return state;
+      }
     default:
       return state;
   }
 };
 
-const submitDepositInMetaMaskReducer = (state: states.SubmitDepositInMetaMask, action: actions.WalletAction) => {
+const bWaitForDepositToBeSentToMetaMaskReducer = (state: states.BWaitForDepositToBeSentToMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
-      return states.submitDepositInMetaMask({
+    case actions.TRANSACTION_SENT_TO_METAMASK:
+      return states.bSubmitDepositInMetaMask(state);
+    default:
+      return state;
+  }
+};
+
+const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    // This case should not happen in theory, but it does in practice.
+    // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
+    // All of the above happens before B receives transaction submitted
+    case actions.MESSAGE_RECEIVED:
+      return states.bSubmitDepositInMetaMask({
         ...state,
         unhandledAction: action,
       });
@@ -226,22 +319,22 @@ const submitDepositInMetaMaskReducer = (state: states.SubmitDepositInMetaMask, a
 
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
+    case actions.MESSAGE_RECEIVED:
+      if (!action.signature) { return state; }
       return states.waitForDepositConfirmation({
         ...state,
         unhandledAction: action,
+        transactionHash: state.transactionHash,
       });
     case actions.TRANSACTION_CONFIRMED:
-
       if (state.unhandledAction) {
-        const updatedState = states.waitForDepositEvents({ ...state, unhandledAction: undefined });
+        const updatedState = states.bWaitForPostFundSetup({ ...state, unhandledAction: undefined });
         // Now that  we're in a correct state to handle the message
         // we recursively call the reducer to handle the message received action
         return fundingReducer(updatedState, state.unhandledAction);
       } else {
-        return states.waitForDepositEvents(state);
+        return states.bWaitForPostFundSetup(state);
       }
-
     default:
       return state;
   }
@@ -294,7 +387,7 @@ const validTransitionToPostFundState = (state: states.FundingState, data: Commit
   return true;
 };
 
-const composePostFundCommitment = (state: states.WaitForDepositEvents | states.BWaitForPostFundSetup) => {
+const composePostFundCommitment = (state: states.AWaitForDeposit | states.BWaitForPostFundSetup) => {
   const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
   const channel: Channel = { channelType: libraryAddress, channelNonce, participants };
 
