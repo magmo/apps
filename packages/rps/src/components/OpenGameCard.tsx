@@ -18,11 +18,13 @@ interface Props {
 
 export class OpenGameEntry extends React.PureComponent<Props, Commitment> {
   render() {
+    // Generate a random number from 0 to MaxInt
+    const randomChannelNonce = Math.floor(Math.random() * 2147483647) + 1;
     const { openGame, joinOpenGame } = this.props;
     const joinThisGame = () => joinOpenGame(
       openGame.name,
       openGame.address,
-      5,
+      randomChannelNonce,
       openGame.stake);
 
     const stake = openGame.stake;
