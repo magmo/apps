@@ -1,0 +1,581 @@
+{
+  "contractName": "RouletteGame",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "components": [
+            {
+              "name": "channelType",
+              "type": "address"
+            },
+            {
+              "name": "nonce",
+              "type": "uint32"
+            },
+            {
+              "name": "participants",
+              "type": "address[]"
+            },
+            {
+              "name": "commitmentType",
+              "type": "uint8"
+            },
+            {
+              "name": "turnNum",
+              "type": "uint32"
+            },
+            {
+              "name": "commitmentCount",
+              "type": "uint32"
+            },
+            {
+              "name": "destination",
+              "type": "address[]"
+            },
+            {
+              "name": "allocation",
+              "type": "uint256[]"
+            },
+            {
+              "name": "appAttributes",
+              "type": "bytes"
+            }
+          ],
+          "name": "_old",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "name": "channelType",
+              "type": "address"
+            },
+            {
+              "name": "nonce",
+              "type": "uint32"
+            },
+            {
+              "name": "participants",
+              "type": "address[]"
+            },
+            {
+              "name": "commitmentType",
+              "type": "uint8"
+            },
+            {
+              "name": "turnNum",
+              "type": "uint32"
+            },
+            {
+              "name": "commitmentCount",
+              "type": "uint32"
+            },
+            {
+              "name": "destination",
+              "type": "address[]"
+            },
+            {
+              "name": "allocation",
+              "type": "uint256[]"
+            },
+            {
+              "name": "appAttributes",
+              "type": "bytes"
+            }
+          ],
+          "name": "_new",
+          "type": "tuple"
+        }
+      ],
+      "name": "validTransition",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0x40853790"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b50610562806100206000396000f3fe608060405234801561001057600080fd5b5060043610610048576000357c010000000000000000000000000000000000000000000000000000000090048063408537901461004d575b600080fd5b61006760048036036100629190810190610375565b61007d565b60405161007491906103f0565b60405180910390f35b60006001905092915050565b600061009582356104e0565b905092915050565b600082601f83011215156100b057600080fd5b81356100c36100be82610438565b61040b565b915081818352602084019350602081019050838560208402820111156100e857600080fd5b60005b8381101561011857816100fe8882610089565b8452602084019350602083019250506001810190506100eb565b5050505092915050565b600082601f830112151561013557600080fd5b813561014861014382610460565b61040b565b9150818183526020840193506020810190508385602084028201111561016d57600080fd5b60005b8381101561019d57816101838882610339565b845260208401935060208301925050600181019050610170565b5050505092915050565b600082601f83011215156101ba57600080fd5b81356101cd6101c882610488565b61040b565b915080825260208301602083018583830111156101e957600080fd5b6101f4838284610519565b50505092915050565b6000610120828403121561021057600080fd5b61021b61012061040b565b9050600061022b84828501610089565b600083015250602061023f8482850161034d565b602083015250604082013567ffffffffffffffff81111561025f57600080fd5b61026b8482850161009d565b604083015250606061027f84828501610361565b60608301525060806102938482850161034d565b60808301525060a06102a78482850161034d565b60a08301525060c082013567ffffffffffffffff8111156102c757600080fd5b6102d38482850161009d565b60c08301525060e082013567ffffffffffffffff8111156102f357600080fd5b6102ff84828501610122565b60e08301525061010082013567ffffffffffffffff81111561032057600080fd5b61032c848285016101a7565b6101008301525092915050565b600061034582356104f2565b905092915050565b600061035982356104fc565b905092915050565b600061036d823561050c565b905092915050565b6000806040838503121561038857600080fd5b600083013567ffffffffffffffff8111156103a257600080fd5b6103ae858286016101fd565b925050602083013567ffffffffffffffff8111156103cb57600080fd5b6103d7858286016101fd565b9150509250929050565b6103ea816104b4565b82525050565b600060208201905061040560008301846103e1565b92915050565b6000604051905081810181811067ffffffffffffffff8211171561042e57600080fd5b8060405250919050565b600067ffffffffffffffff82111561044f57600080fd5b602082029050602081019050919050565b600067ffffffffffffffff82111561047757600080fd5b602082029050602081019050919050565b600067ffffffffffffffff82111561049f57600080fd5b601f19601f8301169050602081019050919050565b60008115159050919050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006104eb826104c0565b9050919050565b6000819050919050565b600063ffffffff82169050919050565b600060ff82169050919050565b8281833760008383015250505056fea265627a7a723058201fe2abc189571c3409bda059e6688dbc4f0b71c0890a3e376cf14e2736ee06b16c6578706572696d656e74616cf50037",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b5060043610610048576000357c010000000000000000000000000000000000000000000000000000000090048063408537901461004d575b600080fd5b61006760048036036100629190810190610375565b61007d565b60405161007491906103f0565b60405180910390f35b60006001905092915050565b600061009582356104e0565b905092915050565b600082601f83011215156100b057600080fd5b81356100c36100be82610438565b61040b565b915081818352602084019350602081019050838560208402820111156100e857600080fd5b60005b8381101561011857816100fe8882610089565b8452602084019350602083019250506001810190506100eb565b5050505092915050565b600082601f830112151561013557600080fd5b813561014861014382610460565b61040b565b9150818183526020840193506020810190508385602084028201111561016d57600080fd5b60005b8381101561019d57816101838882610339565b845260208401935060208301925050600181019050610170565b5050505092915050565b600082601f83011215156101ba57600080fd5b81356101cd6101c882610488565b61040b565b915080825260208301602083018583830111156101e957600080fd5b6101f4838284610519565b50505092915050565b6000610120828403121561021057600080fd5b61021b61012061040b565b9050600061022b84828501610089565b600083015250602061023f8482850161034d565b602083015250604082013567ffffffffffffffff81111561025f57600080fd5b61026b8482850161009d565b604083015250606061027f84828501610361565b60608301525060806102938482850161034d565b60808301525060a06102a78482850161034d565b60a08301525060c082013567ffffffffffffffff8111156102c757600080fd5b6102d38482850161009d565b60c08301525060e082013567ffffffffffffffff8111156102f357600080fd5b6102ff84828501610122565b60e08301525061010082013567ffffffffffffffff81111561032057600080fd5b61032c848285016101a7565b6101008301525092915050565b600061034582356104f2565b905092915050565b600061035982356104fc565b905092915050565b600061036d823561050c565b905092915050565b6000806040838503121561038857600080fd5b600083013567ffffffffffffffff8111156103a257600080fd5b6103ae858286016101fd565b925050602083013567ffffffffffffffff8111156103cb57600080fd5b6103d7858286016101fd565b9150509250929050565b6103ea816104b4565b82525050565b600060208201905061040560008301846103e1565b92915050565b6000604051905081810181811067ffffffffffffffff8211171561042e57600080fd5b8060405250919050565b600067ffffffffffffffff82111561044f57600080fd5b602082029050602081019050919050565b600067ffffffffffffffff82111561047757600080fd5b602082029050602081019050919050565b600067ffffffffffffffff82111561049f57600080fd5b601f19601f8301169050602081019050919050565b60008115159050919050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006104eb826104c0565b9050919050565b6000819050919050565b600063ffffffff82169050919050565b600060ff82169050919050565b8281833760008383015250505056fea265627a7a723058201fe2abc189571c3409bda059e6688dbc4f0b71c0890a3e376cf14e2736ee06b16c6578706572696d656e74616cf50037",
+  "sourceMap": "139:225:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;139:225:2;;;;;;;",
+  "deployedSourceMap": "139:225:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;139:225:2;;;;;;;;;;;;;;;;;;;;168:194;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;296:4;347;340:11;;168:194;;;;:::o;5:118:-1:-;;72:46;110:6;97:20;72:46;;;63:55;;57:66;;;;;148:699;;261:3;254:4;246:6;242:17;238:27;231:35;228:2;;;279:1;276;269:12;228:2;316:6;303:20;338:76;353:60;406:6;353:60;;;338:76;;;329:85;;431:5;456:6;449:5;442:21;486:4;478:6;474:17;464:27;;508:4;503:3;499:14;492:21;;561:6;608:3;600:4;592:6;588:17;583:3;579:27;576:36;573:2;;;625:1;622;615:12;573:2;650:1;635:206;660:6;657:1;654:13;635:206;;;718:3;740:37;773:3;761:10;740:37;;;735:3;728:50;801:4;796:3;792:14;785:21;;829:4;824:3;820:14;813:21;;692:149;682:1;679;675:9;670:14;;635:206;;;639:14;221:626;;;;;;;;873:699;;986:3;979:4;971:6;967:17;963:27;956:35;953:2;;;1004:1;1001;994:12;953:2;1041:6;1028:20;1063:76;1078:60;1131:6;1078:60;;;1063:76;;;1054:85;;1156:5;1181:6;1174:5;1167:21;1211:4;1203:6;1199:17;1189:27;;1233:4;1228:3;1224:14;1217:21;;1286:6;1333:3;1325:4;1317:6;1313:17;1308:3;1304:27;1301:36;1298:2;;;1350:1;1347;1340:12;1298:2;1375:1;1360:206;1385:6;1382:1;1379:13;1360:206;;;1443:3;1465:37;1498:3;1486:10;1465:37;;;1460:3;1453:50;1526:4;1521:3;1517:14;1510:21;;1554:4;1549:3;1545:14;1538:21;;1417:149;1407:1;1404;1400:9;1395:14;;1360:206;;;1364:14;946:626;;;;;;;;1581:432;;1678:3;1671:4;1663:6;1659:17;1655:27;1648:35;1645:2;;;1696:1;1693;1686:12;1645:2;1733:6;1720:20;1755:60;1770:44;1807:6;1770:44;;;1755:60;;;1746:69;;1835:6;1828:5;1821:21;1871:4;1863:6;1859:17;1904:4;1897:5;1893:16;1939:3;1930:6;1925:3;1921:16;1918:25;1915:2;;;1956:1;1953;1946:12;1915:2;1966:41;2000:6;1995:3;1990;1966:41;;;1638:375;;;;;;;;2062:1959;;2184:5;2172:9;2167:3;2163:19;2159:31;2156:2;;;2203:1;2200;2193:12;2156:2;2221:21;2236:5;2221:21;;;2212:30;;2299:1;2330:49;2375:3;2366:6;2355:9;2351:22;2330:49;;;2324:3;2317:5;2313:15;2306:74;2252:139;2442:2;2475:48;2519:3;2510:6;2499:9;2495:22;2475:48;;;2468:4;2461:5;2457:16;2450:74;2401:134;2621:2;2610:9;2606:18;2593:32;2645:18;2637:6;2634:30;2631:2;;;2677:1;2674;2667:12;2631:2;2712:70;2778:3;2769:6;2758:9;2754:22;2712:70;;;2705:4;2698:5;2694:16;2687:96;2545:249;2854:2;2887:47;2930:3;2921:6;2910:9;2906:22;2887:47;;;2880:4;2873:5;2869:16;2862:73;2804:142;2999:3;3033:48;3077:3;3068:6;3057:9;3053:22;3033:48;;;3026:4;3019:5;3015:16;3008:74;2956:137;3154:3;3188:48;3232:3;3223:6;3212:9;3208:22;3188:48;;;3181:4;3174:5;3170:16;3163:74;3103:145;3333:3;3322:9;3318:19;3305:33;3358:18;3350:6;3347:30;3344:2;;;3390:1;3387;3380:12;3344:2;3425:70;3491:3;3482:6;3471:9;3467:22;3425:70;;;3418:4;3411:5;3407:16;3400:96;3258:249;3591:3;3580:9;3576:19;3563:33;3616:18;3608:6;3605:30;3602:2;;;3648:1;3645;3638:12;3602:2;3683:70;3749:3;3740:6;3729:9;3725:22;3683:70;;;3676:4;3669:5;3665:16;3658:96;3517:248;3852:3;3841:9;3837:19;3824:33;3877:18;3869:6;3866:30;3863:2;;;3909:1;3906;3899:12;3863:2;3945:54;3995:3;3986:6;3975:9;3971:22;3945:54;;;3937:5;3930;3926:17;3919:81;3775:236;2150:1871;;;;;4028:118;;4095:46;4133:6;4120:20;4095:46;;;4086:55;;4080:66;;;;;4153:116;;4219:45;4256:6;4243:20;4219:45;;;4210:54;;4204:65;;;;;4276:114;;4341:44;4377:6;4364:20;4341:44;;;4332:53;;4326:64;;;;;4397:670;;;4584:2;4572:9;4563:7;4559:23;4555:32;4552:2;;;4600:1;4597;4590:12;4552:2;4663:1;4652:9;4648:17;4635:31;4686:18;4678:6;4675:30;4672:2;;;4718:1;4715;4708:12;4672:2;4738:86;4816:7;4807:6;4796:9;4792:22;4738:86;;;4728:96;;4614:216;4889:2;4878:9;4874:18;4861:32;4913:18;4905:6;4902:30;4899:2;;;4945:1;4942;4935:12;4899:2;4965:86;5043:7;5034:6;5023:9;5019:22;4965:86;;;4955:96;;4840:217;4546:521;;;;;;5074:101;5141:28;5163:5;5141:28;;;5136:3;5129:41;5123:52;;;5182:181;;5284:2;5273:9;5269:18;5261:26;;5298:55;5350:1;5339:9;5335:17;5326:6;5298:55;;;5255:108;;;;;5370:256;;5432:2;5426:9;5416:19;;5470:4;5462:6;5458:17;5569:6;5557:10;5554:22;5533:18;5521:10;5518:34;5515:62;5512:2;;;5590:1;5587;5580:12;5512:2;5610:10;5606:2;5599:22;5410:216;;;;;5633:254;;5788:18;5780:6;5777:30;5774:2;;;5820:1;5817;5810:12;5774:2;5849:4;5841:6;5837:17;5829:25;;5877:4;5871;5867:15;5859:23;;5711:176;;;;5894:254;;6049:18;6041:6;6038:30;6035:2;;;6081:1;6078;6071:12;6035:2;6110:4;6102:6;6098:17;6090:25;;6138:4;6132;6128:15;6120:23;;5972:176;;;;6155:254;;6294:18;6286:6;6283:30;6280:2;;;6326:1;6323;6316:12;6280:2;6370:4;6366:9;6359:4;6351:6;6347:17;6343:33;6335:41;;6399:4;6393;6389:15;6381:23;;6217:192;;;;6416:92;;6496:5;6489:13;6482:21;6471:32;;6465:43;;;;6515:128;;6595:42;6588:5;6584:54;6573:65;;6567:76;;;;6650:105;;6719:31;6744:5;6719:31;;;6708:42;;6702:53;;;;6762:79;;6831:5;6820:16;;6814:27;;;;6848:95;;6927:10;6920:5;6916:22;6905:33;;6899:44;;;;6950:88;;7028:4;7021:5;7017:16;7006:27;;7000:38;;;;7046:145;7127:6;7122:3;7117;7104:30;7183:1;7174:6;7169:3;7165:16;7158:27;7097:94;;;",
+  "source": "pragma solidity ^0.5.0;\npragma experimental ABIEncoderV2;\n\nimport \"fmg-core/contracts/Commitment.sol\";\nimport \"./RouletteCommitment.sol\";\n\ncontract RouletteGame {\n\n    function validTransition(Commitment.CommitmentStruct memory _old, Commitment.CommitmentStruct memory _new) public pure returns (bool) {\n\t// TODO: Validate app transitions\n\treturn true;    \n    }\n}",
+  "sourcePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteGame.sol",
+  "ast": {
+    "absolutePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteGame.sol",
+    "exportedSymbols": {
+      "RouletteGame": [
+        82
+      ]
+    },
+    "id": 83,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 66,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:2"
+      },
+      {
+        "id": 67,
+        "literals": [
+          "experimental",
+          "ABIEncoderV2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "24:33:2"
+      },
+      {
+        "absolutePath": "fmg-core/contracts/Commitment.sol",
+        "file": "fmg-core/contracts/Commitment.sol",
+        "id": 68,
+        "nodeType": "ImportDirective",
+        "scope": 83,
+        "sourceUnit": 424,
+        "src": "59:43:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteCommitment.sol",
+        "file": "./RouletteCommitment.sol",
+        "id": 69,
+        "nodeType": "ImportDirective",
+        "scope": 83,
+        "sourceUnit": 65,
+        "src": "103:34:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 82,
+        "linearizedBaseContracts": [
+          82
+        ],
+        "name": "RouletteGame",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 80,
+              "nodeType": "Block",
+              "src": "302:60:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 78,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "347:4:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 77,
+                  "id": 79,
+                  "nodeType": "Return",
+                  "src": "340:11:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 81,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validTransition",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 74,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 71,
+                  "name": "_old",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 81,
+                  "src": "193:39:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_CommitmentStruct_$112_memory_ptr",
+                    "typeString": "struct Commitment.CommitmentStruct"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 70,
+                    "name": "Commitment.CommitmentStruct",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 112,
+                    "src": "193:27:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_CommitmentStruct_$112_storage_ptr",
+                      "typeString": "struct Commitment.CommitmentStruct"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 73,
+                  "name": "_new",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 81,
+                  "src": "234:39:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_CommitmentStruct_$112_memory_ptr",
+                    "typeString": "struct Commitment.CommitmentStruct"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 72,
+                    "name": "Commitment.CommitmentStruct",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 112,
+                    "src": "234:27:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_CommitmentStruct_$112_storage_ptr",
+                      "typeString": "struct Commitment.CommitmentStruct"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "192:82:2"
+            },
+            "returnParameters": {
+              "id": 77,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 76,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 81,
+                  "src": "296:4:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 75,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "296:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "295:6:2"
+            },
+            "scope": 82,
+            "src": "168:194:2",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 83,
+        "src": "139:225:2"
+      }
+    ],
+    "src": "0:364:2"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteGame.sol",
+    "exportedSymbols": {
+      "RouletteGame": [
+        82
+      ]
+    },
+    "id": 83,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 66,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:2"
+      },
+      {
+        "id": 67,
+        "literals": [
+          "experimental",
+          "ABIEncoderV2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "24:33:2"
+      },
+      {
+        "absolutePath": "fmg-core/contracts/Commitment.sol",
+        "file": "fmg-core/contracts/Commitment.sol",
+        "id": 68,
+        "nodeType": "ImportDirective",
+        "scope": 83,
+        "sourceUnit": 424,
+        "src": "59:43:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteCommitment.sol",
+        "file": "./RouletteCommitment.sol",
+        "id": 69,
+        "nodeType": "ImportDirective",
+        "scope": 83,
+        "sourceUnit": 65,
+        "src": "103:34:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 82,
+        "linearizedBaseContracts": [
+          82
+        ],
+        "name": "RouletteGame",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 80,
+              "nodeType": "Block",
+              "src": "302:60:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 78,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "347:4:2",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 77,
+                  "id": 79,
+                  "nodeType": "Return",
+                  "src": "340:11:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 81,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validTransition",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 74,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 71,
+                  "name": "_old",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 81,
+                  "src": "193:39:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_CommitmentStruct_$112_memory_ptr",
+                    "typeString": "struct Commitment.CommitmentStruct"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 70,
+                    "name": "Commitment.CommitmentStruct",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 112,
+                    "src": "193:27:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_CommitmentStruct_$112_storage_ptr",
+                      "typeString": "struct Commitment.CommitmentStruct"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 73,
+                  "name": "_new",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 81,
+                  "src": "234:39:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_CommitmentStruct_$112_memory_ptr",
+                    "typeString": "struct Commitment.CommitmentStruct"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 72,
+                    "name": "Commitment.CommitmentStruct",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 112,
+                    "src": "234:27:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_CommitmentStruct_$112_storage_ptr",
+                      "typeString": "struct Commitment.CommitmentStruct"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "192:82:2"
+            },
+            "returnParameters": {
+              "id": 77,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 76,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 81,
+                  "src": "296:4:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 75,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "296:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "295:6:2"
+            },
+            "scope": 82,
+            "src": "168:194:2",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 83,
+        "src": "139:225:2"
+      }
+    ],
+    "src": "0:364:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.2+commit.1df8f40c.Emscripten.clang"
+  },
+  "networks": {
+    "1551319474897": {
+      "events": {},
+      "links": {},
+      "address": "0x607b7f301FB708466dd1276F9ADc4fD4A5600707",
+      "transactionHash": "0xd667d0eb8e15405a991ea6383a661a32c21579b23ae37618fa02acb5521518f9"
+    },
+    "1551325857846": {
+      "events": {},
+      "links": {},
+      "address": "0x9Dd20F9307895bE13727E1634b5Fb3C196220e7E",
+      "transactionHash": "0xa00a235164712168d1ecdfe7209fca90f67d5818a839c0ccf1af0fa7d24205e9"
+    },
+    "1551326436294": {
+      "events": {},
+      "links": {},
+      "address": "0x48BaCB9266a570d521063EF5dD96e61686DbE788",
+      "transactionHash": "0x3c4e84b8e084baf8cdc1617a9157d15f790cfb9ab485ae543d3d6875e62bc1f8"
+    },
+    "1551326762423": {
+      "events": {},
+      "links": {},
+      "address": "0x48BaCB9266a570d521063EF5dD96e61686DbE788",
+      "transactionHash": "0x3c4e84b8e084baf8cdc1617a9157d15f790cfb9ab485ae543d3d6875e62bc1f8"
+    },
+    "1551326901907": {
+      "events": {},
+      "links": {},
+      "address": "0x48BaCB9266a570d521063EF5dD96e61686DbE788",
+      "transactionHash": "0x3c4e84b8e084baf8cdc1617a9157d15f790cfb9ab485ae543d3d6875e62bc1f8"
+    }
+  },
+  "schemaVersion": "3.0.2",
+  "updatedAt": "2019-02-28T04:08:33.704Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

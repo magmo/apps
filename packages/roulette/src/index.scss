@@ -1,0 +1,5 @@
+// these files contain bootstrap sass variable overrides and must go in before bootsratrap
+@import "./styles/_colors";
+@import "./styles/_fonts";
+
+@import "~bootstrap/scss/bootstrap";

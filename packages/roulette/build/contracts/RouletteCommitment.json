@@ -1,0 +1,234 @@
+{
+  "contractName": "RouletteCommitment",
+  "abi": [],
+  "bytecode": "0x605a602c600b82828239805160001a60731460008114601c57601e565bfe5b5030600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a7230582028f83f72c211d9564fe6b5cc6c1de21446002e04cf5ff67b76de8ca2700f9e936c6578706572696d656e74616cf50037",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a7230582028f83f72c211d9564fe6b5cc6c1de21446002e04cf5ff67b76de8ca2700f9e936c6578706572696d656e74616cf50037",
+  "sourceMap": "104:530:1:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
+  "deployedSourceMap": "104:530:1:-;;;;;;;;",
+  "source": "pragma solidity ^0.5.0;\npragma experimental ABIEncoderV2;\n\nimport \"fmg-core/contracts/Commitment.sol\";\n\nlibrary RouletteCommitment {\n    using Commitment for Commitment.CommitmentStruct;\n  \n    // struct AppAttributes {\n\n\n    // }\n\n    // struct RouletteCommitmentStruct {\n     \n    // }\n\n    // function fromFrameworkCommitment(Commitment.CommitmentStruct memory frameworkCommitment) public pure returns (RouletteCommitmentStruct memory) {\n    //     AppAttributes memory appAttributes = abi.decode(frameworkCommitment.appAttributes, (AppAttributes));\n\n    //     return RouletteCommitmentStruct(\n           \n    //     );\n    // }\n}\n",
+  "sourcePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteCommitment.sol",
+  "ast": {
+    "absolutePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteCommitment.sol",
+    "exportedSymbols": {
+      "RouletteCommitment": [
+        64
+      ]
+    },
+    "id": 65,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 58,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "id": 59,
+        "literals": [
+          "experimental",
+          "ABIEncoderV2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "24:33:1"
+      },
+      {
+        "absolutePath": "fmg-core/contracts/Commitment.sol",
+        "file": "fmg-core/contracts/Commitment.sol",
+        "id": 60,
+        "nodeType": "ImportDirective",
+        "scope": 65,
+        "sourceUnit": 424,
+        "src": "59:43:1",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 64,
+        "linearizedBaseContracts": [
+          64
+        ],
+        "name": "RouletteCommitment",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "id": 63,
+            "libraryName": {
+              "contractScope": null,
+              "id": 61,
+              "name": "Commitment",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 423,
+              "src": "143:10:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Commitment_$423",
+                "typeString": "library Commitment"
+              }
+            },
+            "nodeType": "UsingForDirective",
+            "src": "137:49:1",
+            "typeName": {
+              "contractScope": null,
+              "id": 62,
+              "name": "Commitment.CommitmentStruct",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 112,
+              "src": "158:27:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_CommitmentStruct_$112_storage_ptr",
+                "typeString": "struct Commitment.CommitmentStruct"
+              }
+            }
+          }
+        ],
+        "scope": 65,
+        "src": "104:530:1"
+      }
+    ],
+    "src": "0:635:1"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/alexgap/code/apps/packages/roulette/contracts/RouletteCommitment.sol",
+    "exportedSymbols": {
+      "RouletteCommitment": [
+        64
+      ]
+    },
+    "id": 65,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 58,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "id": 59,
+        "literals": [
+          "experimental",
+          "ABIEncoderV2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "24:33:1"
+      },
+      {
+        "absolutePath": "fmg-core/contracts/Commitment.sol",
+        "file": "fmg-core/contracts/Commitment.sol",
+        "id": 60,
+        "nodeType": "ImportDirective",
+        "scope": 65,
+        "sourceUnit": 424,
+        "src": "59:43:1",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 64,
+        "linearizedBaseContracts": [
+          64
+        ],
+        "name": "RouletteCommitment",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "id": 63,
+            "libraryName": {
+              "contractScope": null,
+              "id": 61,
+              "name": "Commitment",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 423,
+              "src": "143:10:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Commitment_$423",
+                "typeString": "library Commitment"
+              }
+            },
+            "nodeType": "UsingForDirective",
+            "src": "137:49:1",
+            "typeName": {
+              "contractScope": null,
+              "id": 62,
+              "name": "Commitment.CommitmentStruct",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 112,
+              "src": "158:27:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_CommitmentStruct_$112_storage_ptr",
+                "typeString": "struct Commitment.CommitmentStruct"
+              }
+            }
+          }
+        ],
+        "scope": 65,
+        "src": "104:530:1"
+      }
+    ],
+    "src": "0:635:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.2+commit.1df8f40c.Emscripten.clang"
+  },
+  "networks": {
+    "1551319474897": {
+      "events": {},
+      "links": {},
+      "address": "0xFfB7b6A39294fa9fce3e1BFFd42da0750D102E2c",
+      "transactionHash": "0x578214ec6a5d8a20d9f811cfd3725c24c66e52585b5180bde67e5c39f95cc70c"
+    },
+    "1551325857846": {
+      "events": {},
+      "links": {},
+      "address": "0xe7e13B2458A1E76a2B036FC201d60100642816a3",
+      "transactionHash": "0xbc2a5e63e3abae6b764548e530980dad1ea7e9d013a00a17be3ba03174897b78"
+    },
+    "1551326436294": {
+      "events": {},
+      "links": {},
+      "address": "0x0B1ba0af832d7C05fD64161E0Db78E85978E8082",
+      "transactionHash": "0xd5388e6fc959f58f50fcc0cc766a8758d684b8455a5e035d13c7c9a96af51b0c"
+    },
+    "1551326762423": {
+      "events": {},
+      "links": {},
+      "address": "0x0B1ba0af832d7C05fD64161E0Db78E85978E8082",
+      "transactionHash": "0xd5388e6fc959f58f50fcc0cc766a8758d684b8455a5e035d13c7c9a96af51b0c"
+    },
+    "1551326901907": {
+      "events": {},
+      "links": {},
+      "address": "0x0B1ba0af832d7C05fD64161E0Db78E85978E8082",
+      "transactionHash": "0xd5388e6fc959f58f50fcc0cc766a8758d684b8455a5e035d13c7c9a96af51b0c"
+    }
+  },
+  "schemaVersion": "3.0.2",
+  "updatedAt": "2019-02-28T04:08:33.703Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
