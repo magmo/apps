@@ -142,8 +142,6 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
       return states.waitForCloseInitiation({ ...state, userAddress: action.withdrawAddress, transactionOutbox });
 
       break;
-    case actions.CONCLUDED_EVENT:
-      return states.approveWithdrawal(state);
   }
   return state;
 };
