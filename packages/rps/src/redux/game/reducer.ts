@@ -176,7 +176,7 @@ function lobbyReducer(
       const participants: [string, string] = [myAddress, opponentAddress];
       const turnNum = 0;
       const commitmentCount = 1;
-      const channel: Channel = { channelType: libraryAddress, participants, channelNonce };
+      const channel: Channel = { channelType: libraryAddress, participants, nonce: channelNonce };
       const waitForConfirmationState = states.waitForGameConfirmationA({
         channel, roundBuyIn, opponentName, myName, allocation, destination: participants, turnNum, commitmentCount, libraryAddress, twitterHandle, myAddress,
       });
@@ -526,7 +526,7 @@ function waitForOpponentToPickWeaponAReducer(gameState: states.WaitForOpponentTo
     bnRoundBuyIn,
     bnAllocation
   ).map(item => item.toHexString());
-  
+
   const newProperties = {
     myWeapon,
     theirWeapon,

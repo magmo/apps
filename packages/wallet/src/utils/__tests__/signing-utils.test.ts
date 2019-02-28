@@ -32,6 +32,7 @@ describe("signing and validating arbitrary data", () => {
 });
 
 it('should sign verification data', () => {
-  const signature = signVerificationData(scenarios.asAddress, scenarios.asAddress, scenarios.channelId, scenarios.asAddress, scenarios.asPrivateKey);
-  expect(signature).toEqual('0x8f8bde1b2f879911e36747ebd652c14a177f9a66d5c93b3daad8f9f8896773df49016adf604f2bed17eb8b0deba581d5ab56c77c964367a50e7f96bd47ca0bbe1b');
+  const signature = signVerificationData('0x5409ED021D9299bf6814279A6A1411A7e866A631', '0x5409ED021D9299bf6814279A6A1411A7e866A631', '0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb', '0x5409ED021D9299bf6814279A6A1411A7e866A631', '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d');
+  // TODO: This isn't a great test since we can't really validate the signature 
+  expect(signature).toEqual('0xe302f47c6405ed3675f218d9e8af355822555b61755da582f478cb689e6c89e40e83a14205696217a25f4935dfaa52218a02050d99b560ddaa23426a4af6a0461c');
 });

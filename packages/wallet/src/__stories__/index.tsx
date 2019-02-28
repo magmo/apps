@@ -71,14 +71,22 @@ storiesOf('Network Status', module)
   .add('Ropsten', testState(states.approveFunding({ ...playerADefaults, networkId: 3 })))
   .add('Rinkeby', testState(states.approveFunding({ ...playerADefaults, networkId: 42 })))
   .add('Ganache', testState(states.approveFunding({ ...playerADefaults, networkId: 5777 })));
+storiesOf('Wallet Screens / Funding / Player A', module)
+  .add('ApproveFunding', testState(states.approveFunding(playerADefaults)))
+  .add('AWaitForDepositToBeSentToMetaMask', testState(states.aWaitForDepositToBeSentToMetaMask(playerADefaults)))
+  .add('ASubmitDepositInMetaMask', testState(states.aSubmitDepositInMetaMask(playerADefaults)))
+  .add('AWaitForDepositConfirmation', testState(states.aWaitForDepositConfirmation(playerADefaults)))
+  .add('AWaitForOpponentDeposit', testState(states.aWaitForOpponentDeposit(playerADefaults)))
+  .add('AWaitForPostFundSetup', testState(states.aWaitForPostFundSetup(playerADefaults)))
+  .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerADefaults)));
 
-storiesOf('Wallet Screens / Funding ', module)
+storiesOf('Wallet Screens / Funding / Player B', module)
   .add('ApproveFunding', testState(states.approveFunding(playerBDefaults)))
-  .add('WaitForDepositToBeSentToMetaMask', testState(states.waitForDepositToBeSentToMetaMask(playerBDefaults)))
-  .add('SubmitDepositInMetaMask', testState(states.submitDepositInMetaMask(playerBDefaults)))
-  .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(playerBDefaults)))
-  .add('Wait for Deposit Events', testState(states.waitForDepositEvents(playerBDefaults)))
-  .add('WaitForPostFundSetup', testState(states.bWaitForPostFundSetup(playerBDefaults)))
+  .add('BWaitForOpponentDeposit', testState(states.bWaitForOpponentDeposit(playerBDefaults)))
+  .add('BWaitForDepositToBeSentToMetaMask', testState(states.bWaitForDepositToBeSentToMetaMask(playerBDefaults)))
+  .add('BSubmitDepositInMetaMask', testState(states.bSubmitDepositInMetaMask(playerBDefaults)))
+  .add('BWaitForDepositConfirmation', testState(states.aWaitForDepositConfirmation(playerBDefaults)))
+  .add('BWaitForPostFundSetup', testState(states.bWaitForPostFundSetup(playerBDefaults)))
   .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerBDefaults)));
 
 storiesOf('Wallet Screens / Withdrawing', module)

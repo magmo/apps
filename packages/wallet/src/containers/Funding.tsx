@@ -16,7 +16,7 @@ import { unreachable } from '../utils/reducer-utils';
 // import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
 import TransactionFailed from '../components/TransactionFailed';
 import ApproveFunding from '../components/funding/ApproveFunding';
-import { FundingStep } from '../components/funding/FundingStep';
+import { AFundingStep, BFundingStep } from '../components/funding/FundingStep';
 import EtherscanLink from '../components/EtherscanLink';
 
 interface Props {
@@ -51,52 +51,91 @@ class FundingContainer extends PureComponent<Props> {
             requestedYourDeposit={state.requestedYourDeposit}
           />
         );
-
-
+      case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
+        return <AFundingStep step={1}>Please confirm the transaction in MetaMask!</AFundingStep>;
+      case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
+        return <AFundingStep step={1}>Please confirm the transaction in MetaMask!</AFundingStep>;
+      case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
+        if (state.ourIndex === 0) {
+          return (
+            <AFundingStep step={2}>
+              Check the progress on&nbsp;
+              <EtherscanLink
+                transactionID={state.transactionHash}
+                networkId={state.networkId}
+                title="Etherscan"
+              />!
+            </AFundingStep>
+          );
+        } else {
+          return (
+            <BFundingStep step={1}>
+              Check the progress on&nbsp;
+              <EtherscanLink
+                transactionID={state.transactionHash}
+                networkId={state.networkId}
+                title="Etherscan"
+              />!
+            </BFundingStep>
+          );
+        }
+      case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
+        return <AFundingStep step={3} />;
       case states.A_WAIT_FOR_POST_FUND_SETUP:
-      case states.B_WAIT_FOR_POST_FUND_SETUP:
-      case states.WAIT_FOR_DEPOSIT_EVENTS:
         // return <AWaitForPostFundSetup />;
-        return <FundingStep step={4}>Waiting for the other player
-        </FundingStep>;
-        return <FundingStep step={1} />;
-      case states.WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
+        return <AFundingStep step={4}>Waiting for the other player
+        </AFundingStep>;
+      case states.B_WAIT_FOR_OPPONENT_DEPOSIT:
+        // return <WaitForOtherPlayer name="deployment" />;
+        return <BFundingStep step={1} />;
+      case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
         // return <SubmitX name="deposit" />;
-        return <FundingStep step={2} />;
-      case states.SUBMIT_DEPOSIT_IN_METAMASK:
+        return <BFundingStep step={2} />;
+      case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
         // return <WaitForXInitiation name="deposit" />;
-        return <FundingStep step={2} />;
-      case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
-
-        return <FundingStep step={3}>
-          Check the progress on&nbsp;
+        return <BFundingStep step={2} />;
+      case states.B_WAIT_FOR_DEPOSIT_CONFIRMATION:
+        if (state.ourIndex === 0) {
+          return <AFundingStep step={3} />;
+        } else {
+          // return <WaitForXConfirmation name="deposit" transactionID={state.transactionHash} networkId={state.networkId} />;
+          return <BFundingStep step={3}>
+            Check the progress on&nbsp;
             <EtherscanLink
-            transactionID={state.transactionHash}
-            networkId={state.networkId}
-            title="Etherscan"
-          />!
-          </FundingStep>;
-
+              transactionID={state.transactionHash}
+              networkId={state.networkId}
+              title="Etherscan"
+            />!
+          </BFundingStep>;
+        }
       case states.B_WAIT_FOR_POST_FUND_SETUP:
         // return <BWaitForPostFundSetup />;
-        return <FundingStep step={4}>Waiting for the other player
-        </FundingStep>;
+        return <BFundingStep step={4}>Waiting for the other player
+        </BFundingStep>;
 
       case states.ACKNOWLEDGE_FUNDING_SUCCESS:
         if (state.ourIndex === 0) {
-          return <FundingStep step={5}>
+          return <AFundingStep step={5}>
             <Button onClick={fundingSuccessAcknowledged} >
               {"Return to game"}
             </Button>
-          </FundingStep>;
+          </AFundingStep>;
         }
         else {
-          return <FundingStep step={5}>
+          return <BFundingStep step={5}>
             <Button onClick={fundingSuccessAcknowledged} >
               {"Return to game"}
             </Button>
-          </FundingStep>;
+          </BFundingStep>;
         }
+      // return (
+      // <AcknowledgeX
+      //   title="Funding successful"
+      //   action={fundingSuccessAcknowledged}
+      //   description="You have successfully deposited funds into your channel"
+      //   actionTitle="Return to game"
+      // />
+      // );
       case states.ACKNOWLEDGE_FUNDING_DECLINED:
         return (<AcknowledgeX
           title="Funding declined!"
@@ -106,7 +145,9 @@ class FundingContainer extends PureComponent<Props> {
         />);
       case states.SEND_FUNDING_DECLINED_MESSAGE:
         return null;
-      case states.DEPOSIT_TRANSACTION_FAILED:
+      case states.A_DEPOSIT_TRANSACTION_FAILED:
+        return <TransactionFailed name="deposit" retryAction={retryTransactionAction} />;
+      case states.B_DEPOSIT_TRANSACTION_FAILED:
         return <TransactionFailed name="deposit" retryAction={retryTransactionAction} />;
       default:
         return unreachable(state);

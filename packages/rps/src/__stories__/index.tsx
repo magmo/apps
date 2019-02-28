@@ -15,6 +15,7 @@ import MetamaskErrorPage from '../components/MetamaskErrorPage';
 import { MetamaskErrorType } from '../redux/metamask/actions';
 // import CreatingOpenGameModal from "../components/CreatingOpenGameModal";
 import LoginErrorPage from '../components/LoginErrorPage';
+import { Channel } from 'fmg-core';
 
 
 const finneyFiveFive = ['0x' + new BN(5).toString(16), '0x' + new BN(5).toString(16)] as [string, string];
@@ -51,7 +52,7 @@ const bsAddress = '0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb';
 const participants: [string, string] = [asAddress, bsAddress];
 const roundBuyIn = '0x' + new BN(1).toString(16);
 
-const channel = { channelType: libraryAddress, channelNonce, participants };
+const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
 
 const base = {
   channel,

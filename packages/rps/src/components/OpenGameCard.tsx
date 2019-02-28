@@ -2,11 +2,9 @@ import React from "react";
 import { Commitment } from "fmg-core";
 import { Button } from "reactstrap";
 
-import BN from 'bn.js';
 import web3Utils from 'web3-utils';
 import { OpenGame } from "../redux/open-games/state";
-import hexToBN from "../utils/hexToBN";
-import bnToHex from "../utils/bnToHex";
+import { bigNumberify } from 'ethers/utils';
 
 interface Props {
   openGame: OpenGame;
@@ -28,7 +26,8 @@ export class OpenGameEntry extends React.PureComponent<Props, Commitment> {
       openGame.stake);
 
     const stake = openGame.stake;
-    const buyin = bnToHex(hexToBN(openGame.stake).mul(new BN(5)));
+    console.log(stake);
+    const buyin = bigNumberify(openGame.stake).mul(5).toHexString();
     return (
       <div className="ogc-container m-1">
         <div className="ogc-header">
@@ -41,7 +40,7 @@ export class OpenGameEntry extends React.PureComponent<Props, Commitment> {
             <div className="ogc-stake-currency">ETH</div>
           </div>
           <svg className="ogc-divider">
-            <line x1="0" y1="0" x2="0" y2="14"/>
+            <line x1="0" y1="0" x2="0" y2="14" />
           </svg>
           <div className="ogc-round-buyin pl-3">
             <div className="ogc-stake-header">Round Buy In:</div>

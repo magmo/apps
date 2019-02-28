@@ -16,7 +16,7 @@ export async function getChannelId(provider, channelNonce, participantA, partici
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  return channelID({ channelType: libraryAddress, channelNonce, participants: [participantA.address, participantB.address] });
+  return channelID({ channelType: libraryAddress, nonce:channelNonce, participants: [participantA.address, participantB.address] });
 
 }
 
@@ -34,7 +34,7 @@ export async function createChallenge(provider: ethers.providers.JsonRpcProvider
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = { channelType: libraryAddress, channelNonce, participants: [participantA.address, participantB.address] };
+  const channel: Channel = { channelType: libraryAddress, nonce:channelNonce, participants: [participantA.address, participantB.address] };
 
   const fromCommitment: Commitment = {
     channel,
@@ -69,7 +69,7 @@ export async function concludeGame(provider: ethers.providers.JsonRpcProvider, a
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = { channelType: libraryAddress, channelNonce, participants: [participantA.address, participantB.address] };
+  const channel: Channel = { channelType: libraryAddress,nonce: channelNonce, participants: [participantA.address, participantB.address] };
 
   const fromCommitment: Commitment = {
     channel,
@@ -105,7 +105,7 @@ export async function respondWithMove(provider: ethers.providers.JsonRpcProvider
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = { channelType: libraryAddress, channelNonce, participants: [participantA.address, participantB.address] };
+  const channel: Channel = { channelType: libraryAddress, nonce:channelNonce, participants: [participantA.address, participantB.address] };
 
   const toCommitment: Commitment = {
     channel,
@@ -131,7 +131,7 @@ export async function refuteChallenge(provider: ethers.providers.JsonRpcProvider
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = { channelType: libraryAddress, channelNonce, participants: [participantA.address, participantB.address] };
+  const channel: Channel = { channelType: libraryAddress, nonce:channelNonce, participants: [participantA.address, participantB.address] };
 
   const toCommitment: Commitment = {
     channel,

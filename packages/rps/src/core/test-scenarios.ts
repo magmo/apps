@@ -2,8 +2,9 @@
 import { Result } from './results';
 import * as commitmentHelper from './rps-commitment-helper';
 import { randomHex } from "../utils/randomHex";
-import { Weapon }  from './rps-commitment';
+import { Weapon } from './rps-commitment';
 import { bigNumberify } from 'ethers/utils';
+import { Channel } from 'fmg-core';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = 4;
@@ -24,7 +25,7 @@ const salt = randomHex(64);
 const preCommit = commitmentHelper.hashCommitment(aWeapon, salt);
 const bWeapon = Weapon.Scissors;
 
-const channel = { channelType: libraryAddress, channelNonce, participants };
+const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
 
 const base = {
   channel,

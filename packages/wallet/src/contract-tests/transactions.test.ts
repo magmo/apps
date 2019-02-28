@@ -64,7 +64,7 @@ describe('transactions', () => {
   });
 
   it("should send a forceMove transaction", async () => {
-    const channel: Channel = { channelType: libraryAddress, channelNonce: getNextNonce(), participants };
+    const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
     const contractAddress = await getAdjudicatorContractAddress(provider);
     await depositContract(provider, contractAddress, participantA.address);
     await depositContract(provider, contractAddress, participantB.address);
@@ -97,8 +97,8 @@ describe('transactions', () => {
   });
 
   it("should send a respondWithMove transaction", async () => {
-    const channel: Channel = { channelType: libraryAddress, channelNonce: getNextNonce(), participants };
-    const { channelNonce } = channel;
+    const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
+    const { nonce: channelNonce } = channel;
     const contractAddress = await getAdjudicatorContractAddress(provider);
     await depositContract(provider, contractAddress, participantA.address);
     await depositContract(provider, contractAddress, participantB.address);
@@ -120,8 +120,8 @@ describe('transactions', () => {
   });
 
   it("should send a refute transaction", async () => {
-    const channel: Channel = { channelType: libraryAddress, channelNonce: getNextNonce(), participants };
-    const { channelNonce } = channel;
+    const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
+    const { nonce: channelNonce } = channel;
     const contractAddress = await getAdjudicatorContractAddress(provider);
     await depositContract(provider, contractAddress, participantA.address);
     await depositContract(provider, contractAddress, participantB.address);
@@ -143,7 +143,7 @@ describe('transactions', () => {
   });
 
   it("should send a conclude transaction", async () => {
-    const channel: Channel = { channelType: libraryAddress, channelNonce: getNextNonce(), participants };
+    const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
     const contractAddress = await getAdjudicatorContractAddress(provider);
     await depositContract(provider, contractAddress, participantA.address);
     await depositContract(provider, contractAddress, participantB.address);
@@ -183,7 +183,7 @@ describe('transactions', () => {
   });
 
   it("should send a conclude and withdraw transaction", async () => {
-    const channel: Channel = { channelType: libraryAddress, channelNonce: getNextNonce(), participants };
+    const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
     const channelId = channelID(channel);
     const contractAddress = await getAdjudicatorContractAddress(provider);
     await depositContract(provider, contractAddress, channelId);
