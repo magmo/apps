@@ -175,7 +175,7 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
       if (state.name === gameStates.StateName.WaitForOpponentToPickWeaponA ||
         state.name === gameStates.StateName.WaitForRevealB ||
         state.name === gameStates.StateName.PickWeapon) {
-        Wallet.respondToOngoingChallenge(WALLET_IFRAME_ID, walletMessage.data);
+        Wallet.respondToOngoingChallenge(WALLET_IFRAME_ID, asCoreCommitment(walletMessage.data));
         yield put(gameActions.messageSent());
         const challengeCompleteChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
         yield take(challengeCompleteChannel);
