@@ -35,7 +35,7 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState,
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
-    const libraryAddress = ('channel' in state.gameState) ? state.gameState.channel.channelType : "";
+    const libraryAddress = ('libraryAddress' in state.gameState) ? state.gameState.libraryAddress : "";
     const newGameState = states.lobby({ ...state.gameState, libraryAddress, myAddress, myName });
     return { gameState: newGameState, messageState: {} };
   }
@@ -219,14 +219,14 @@ function waitingRoomReducer(
   switch (action.type) {
     case actions.INITIAL_COMMITMENT_RECEIVED:
       const { commitment, opponentName } = action;
-      const { myName, twitterHandle, myAddress } = gameState;
+      const { myName, twitterHandle, myAddress, libraryAddress } = gameState;
 
       if (commitment.commitmentType !== CommitmentType.PreFundSetup ||
         commitment.commitmentCount !== 0) {
         return { gameState, messageState };
       }
 
-      const newGameState = states.confirmGameB({ ...commitment, roundBuyIn: commitment.stake, myName, opponentName, twitterHandle, myAddress });
+      const newGameState = states.confirmGameB({ ...commitment, roundBuyIn: commitment.stake, myName, opponentName, twitterHandle, myAddress, libraryAddress });
       return { gameState: newGameState, messageState };
     case actions.CANCEL_OPEN_GAME:
       const newGameState1 = states.lobby(gameState);
