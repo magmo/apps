@@ -23,3 +23,15 @@ export async function getAdjudicatorContractAddress(provider) {
   const networkId = (await provider.getNetwork()).chainId;
   return NitroAdjudicatorArtifact.networks[networkId].address;
 }
+
+export async function getAdjudicatorHoldings(provider, channelId) {
+  const contract = await getAdjudicatorContract(provider);
+  const holdingForChannel = await contract.holdings(channelId);
+  return holdingForChannel;
+}
+
+export async function getAdjudicatorOutcome(provider, channelId) {
+  const contract = await getAdjudicatorContract(provider);
+  const outcomeForChannel = await contract.outcomes(channelId);
+  return outcomeForChannel;
+}
