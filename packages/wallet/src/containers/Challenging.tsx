@@ -6,12 +6,7 @@ import { Button } from 'reactstrap';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
-import AcknowledgeX from '../components/AcknowledgeX';
-// import WaitForResponseOrTimeout from '../components/challenging/WaitForResponseOrTimeout';
 import ApproveX from '../components/ApproveX';
-// import WaitForXConfirmation from '../components/WaitForXConfirmation';
-// import WaitForXInitiation from '../components/WaitForXInitiation';
-// import SubmitX from '../components/SubmitX';
 import { unreachable } from '../utils/reducer-utils';
 import TransactionFailed from '../components/TransactionFailed';
 import { ChallengingStep } from '../components/challenging/ChallengingStep';
@@ -51,9 +46,7 @@ class ChallengingContainer extends PureComponent<Props> {
         );
       case states.WAIT_FOR_CHALLENGE_INITIATION:
         return <ChallengingStep step={0} expirationTime={0} />;
-        // return <WaitForXInitiation name="challenge" />;
       case states.WAIT_FOR_CHALLENGE_SUBMISSION:
-        // return <SubmitX name="challenge" />;
         return <ChallengingStep step={1} expirationTime={0}/>;
       case states.WAIT_FOR_CHALLENGE_CONFIRMATION:
         return <ChallengingStep step={2} expirationTime={0}>Check the progress on&nbsp;
@@ -63,24 +56,14 @@ class ChallengingContainer extends PureComponent<Props> {
           title="Etherscan"
           />!
         </ChallengingStep>;
-        // return <WaitForXConfirmation name="challenge" transactionID={state.transactionHash} networkId={state.networkId} />;
       case states.WAIT_FOR_RESPONSE_OR_TIMEOUT:
         return <ChallengingStep step={3} expirationTime={state.challengeExpiry ? state.challengeExpiry : 0} />;
-        // return <WaitForResponseOrTimeout expirationTime={state.challengeExpiry ? state.challengeExpiry : 0} />;
       case states.ACKNOWLEDGE_CHALLENGE_RESPONSE:
         return <ChallengingStep step={777} expirationTime={0}>
           <Button onClick={challengeResponseAcknowledged} >
           {"Return to game"}
           </Button>
           </ChallengingStep>;
-        // return (
-        //   <AcknowledgeX
-        //     title="Challenge over!"
-        //     action={challengeResponseAcknowledged}
-        //     description="Your opponent responded to the challenge."
-        //     actionTitle="Return to game"
-        //   />
-        // );
       case states.ACKNOWLEDGE_CHALLENGE_TIMEOUT:
       const parsedExpiryDate = new Date(state.challengeExpiry ? state.challengeExpiry * 1000 : 0).toLocaleTimeString().replace(/:\d\d /, ' ');
       const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;
@@ -91,15 +74,6 @@ class ChallengingContainer extends PureComponent<Props> {
           {"Withdraw your funds"}
           </Button>
           </ChallengingStep>;
-
-        return (
-          <AcknowledgeX
-            title="A challenge has expired"
-            description={description}
-            action={timeoutAcknowledged}
-            actionTitle="Withdraw your funds"
-          />
-        );
       case states.CHALLENGE_TRANSACTION_FAILED:
         return <TransactionFailed name='challenge' retryAction={retryTransaction} />;
 
