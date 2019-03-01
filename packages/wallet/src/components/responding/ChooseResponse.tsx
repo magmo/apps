@@ -23,9 +23,9 @@ export default class ChooseResponse extends React.PureComponent<Props> {
     // TODO: We should add hover text or an icon to these options to fully explain what they mean to the user.
     return (
       <SidebarLayout>
-        <h1>
+        <h2>
           A challenge has been issued
-      </h1>
+      </h2>
         <p>
           The other player has challenged you! The game will expire at {expiryDate} if you do not respond.
           Select how you would like to respond:
