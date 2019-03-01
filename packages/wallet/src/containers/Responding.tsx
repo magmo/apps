@@ -26,7 +26,6 @@ class RespondingContainer extends PureComponent<Props> {
   render() {
     const {
       state,
-      challengeAcknowledged,
       challengeResponseAcknowledged,
       selectRespondWithMove,
       selectRespondWithExistingMove,
@@ -35,15 +34,6 @@ class RespondingContainer extends PureComponent<Props> {
     } = this.props;
 
     switch (state.type) {
-      case states.ACKNOWLEDGE_CHALLENGE:
-        return (
-          <AcknowledgeX
-            title="Challenge detected!"
-            description="Your opponent has challenged you on-chain."
-            action={challengeAcknowledged}
-            actionTitle="Proceed"
-          />
-        );
       case states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT:
         const parsedExpiryDate = new Date(state.challengeExpiry ? state.challengeExpiry * 1000 : 0).toLocaleTimeString().replace(/:\d\d /, ' ');
         const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;

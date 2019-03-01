@@ -105,9 +105,8 @@ storiesOf('Wallet Screens / Challenging', module)
   .add('AcknowledgeChallengeTimeout', testState(states.acknowledgeChallengeTimeout(playerADefaults)));
 
 storiesOf('Wallet Screens / Responding', module)
-  .add('AcknowledgeChallenge', testState(states.acknowledgeChallenge(playerADefaults)))
-  .add('AcknowledgeChallengeTimeout', testState(states.challengeeAcknowledgeChallengeTimeOut(playerADefaults)))
   .add('ChooseResponse', testState(states.chooseResponse(playerADefaults)))
+  .add('AcknowledgeChallengeTimeout', testState(states.challengeeAcknowledgeChallengeTimeOut(playerADefaults)))
   .add('TakeMoveInApp', testState(states.takeMoveInApp(playerADefaults)))
   .add('InitiateResponse', testState(states.initiateResponse(playerADefaults)))
   .add('WaitForResponseSubmission', testState(states.waitForResponseSubmission(playerADefaults)))

@@ -44,28 +44,6 @@ const defaults = {
   requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
 };
 
-describe('when in ACKNOWLEDGE_CHALLENGE', () => {
-  const state = states.acknowledgeChallenge(defaults);
-
-  describe('when a challenge is acknowledged', () => {
-    const action = actions.challengeAcknowledged();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
-  });
-
-  describe('when the challenge times out', () => {
-    const action = actions.blockMined({ number: 1, timestamp: 2 });
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
-  });
-
-  describe('when a block is mined but the challenge has not expired', () => {
-    const action = actions.blockMined({ number: 1, timestamp: 0 });
-    const updatedState = walletReducer(state, action);
-    itDoesntTransition(state, updatedState);
-  });
-});
-
 describe('when in CHOOSE_RESPONSE', () => {
   const state = states.chooseResponse(defaults);
 

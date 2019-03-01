@@ -64,7 +64,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
 
     case actions.CHALLENGE_CREATED_EVENT:
       // transition to responding
-      return states.acknowledgeChallenge({ ...state, challengeExpiry: action.finalizedAt, displayOutbox: showWallet() });
+      return states.chooseResponse({ ...state, challengeExpiry: action.finalizedAt, displayOutbox: showWallet() });
 
     case actions.CHALLENGE_REQUESTED:
       // The application should validate this but just in case we check as well
