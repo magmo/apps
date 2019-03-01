@@ -21,7 +21,7 @@ const todoIcon = (
 
 const timeReadyIcon = (
   <span className="fa-li" ><FontAwesomeIcon icon={faHourglassStart} size="lg" /></span>
-)
+);
 
 const timeRunningIcon = (
   <span className="fa-li" ><FontAwesomeIcon icon={faHourglassHalf} size="lg" pulse={true} /></span>
