@@ -71,7 +71,7 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry);
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
+    itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
@@ -126,7 +126,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry);
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
+    itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 

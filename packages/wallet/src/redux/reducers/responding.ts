@@ -18,8 +18,6 @@ export const respondingReducer = (state: RespondingState, action: WalletAction):
   }
 
   switch (state.type) {
-    case states.ACKNOWLEDGE_CHALLENGE:
-      return acknowledgeChallengeReducer(state, action);
     case states.CHOOSE_RESPONSE:
       return chooseResponseReducer(state, action);
     case states.TAKE_MOVE_IN_APP:
@@ -52,22 +50,6 @@ const responseTransactionFailedReducer = (state: states.ResponseTransactionFaile
       });
   }
   return state;
-};
-
-export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, action: WalletAction): WalletState => {
-  switch (action.type) {
-
-    case actions.CHALLENGE_ACKNOWLEDGED:
-      return states.chooseResponse(state);
-    case actions.BLOCK_MINED:
-      if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
-      } else {
-        return state;
-      }
-    default:
-      return state;
-  }
 };
 
 export const chooseResponseReducer = (state: states.ChooseResponse, action: WalletAction): WalletState => {
