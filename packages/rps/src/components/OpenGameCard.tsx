@@ -28,7 +28,6 @@ export class OpenGameEntry extends React.PureComponent<Props, Commitment> {
       openGame.stake);
 
     const stake = openGame.stake;
-    console.log(stake);
     const buyin = bigNumberify(openGame.stake).mul(5).toHexString();
     return (
       <div className="ogc-container m-1">

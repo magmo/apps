@@ -19,7 +19,6 @@ export function getAdjudicatorInterface(): ethers.utils.Interface {
 
 export async function getAdjudicatorContractAddress(provider) {
   await provider.ready;
-  console.log(provider);
   const networkId = (await provider.getNetwork()).chainId;
   return NitroAdjudicatorArtifact.networks[networkId].address;
 }

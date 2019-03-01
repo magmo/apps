@@ -19,7 +19,6 @@ interface AdjudicatorEvent {
   eventType: AdjudicatorEventType;
 }
 function* createEventChannel(provider, channelId: string, ) {
-  console.log(provider);
   const adjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
 
   return eventChannel((emitter) => {
