@@ -114,6 +114,7 @@ interface Base extends TwoChannel {
   roundBuyIn: string;
   myName: string;
   opponentName: string;
+  libraryAddress: string;
 }
 
 interface IncludesBase extends Base {
@@ -133,6 +134,7 @@ export function base(state: IncludesBase) {
     player,
     myAddress,
     channel,
+    libraryAddress,
   } = state;
 
   return {
@@ -147,6 +149,7 @@ export function base(state: IncludesBase) {
     opponentName,
     player,
     myAddress,
+    libraryAddress,
   };
 }
 
