@@ -29,6 +29,85 @@ const icon = (iconStep: number, currentStep: number) => {
   }
 };
 
+// NOTE: the appearance of this modal is largely influenced by the amount of text in each message. Until a more robust front-end comes along, try to keep messages of the same length within each case block below.
+const aMessage = (iconStep: number, currentStep: number) => {
+  switch (iconStep){
+    case 1:
+      if (currentStep < iconStep) {
+        return "Send your deposit";
+      } else if (currentStep === iconStep) {
+        return "Sending your deposit...";
+      } else {
+        return "Deposit sent";
+      }
+    case 2:
+      if (currentStep < iconStep) {
+        return "Your deposit will be confirmed";
+      } else if (currentStep === iconStep) {
+        return "Waiting for confirmation...";
+      } else {
+        return "Deposit confirmed";
+      }
+    case 3:
+      if (currentStep < iconStep) {
+        return "Opponent's deposit will be confirmed";
+      } else if (currentStep === iconStep) {
+        return "Waiting for opponent's deposit...";
+      } else {
+        return "Opponent deposit has been confirmed";
+      }
+    case 4:
+      if (currentStep < iconStep) {
+        return "The channel will be opened";
+      } else if (currentStep === iconStep) {
+        return "Opening channel...";
+      } else {
+        return "Channel open!";
+      }
+    default:
+      return "";
+  }
+};
+
+const bMessage = (iconStep: number, currentStep: number) => {
+  switch (iconStep){
+    case 1:
+      if (currentStep < iconStep) {
+        return "Opponent's deposit will be confirmed";
+      } else if (currentStep === iconStep) {
+        return "Waiting for opponent's deposit...";
+      } else {
+        return "Opponent deposit has been confirmed";
+      }
+    case 2:
+      if (currentStep < iconStep) {
+        return "Send your deposit";
+      } else if (currentStep === iconStep) {
+        return "Sending your deposit...";
+      } else {
+        return "Deposit sent";
+      }
+    case 3:
+      if (currentStep < iconStep) {
+        return "Your deposit will be confirmed";
+      } else if (currentStep === iconStep) {
+        return "Waiting for confirmation...";
+      } else {
+        return "Deposit confirmed";
+      }
+    case 4:
+      if (currentStep < iconStep) {
+        return "The channel will be opened";
+      } else if (currentStep === iconStep) {
+        return "Opening channel...";
+      } else {
+        return "Channel open!";
+      }
+    default:
+      return "";
+  }
+};
+
 
 export class AFundingStep extends React.PureComponent<Props> {
   render() {
@@ -41,19 +120,19 @@ export class AFundingStep extends React.PureComponent<Props> {
         <ul className="fa-ul">
           <li style={{ padding: "0.7em 1em" }}>
             {icon(1, currentStep)}
-            Send your deposit
+            {aMessage(1,currentStep)}
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(2, currentStep)}
-            Wait for confirmation
+            {aMessage(2,currentStep)}
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(3, currentStep)}
-            Wait for opponent to send deposit
+            {aMessage(3,currentStep)}
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(4, currentStep)}
-            Channel open!
+            {aMessage(4,currentStep)}
           </li>
         </ul>
         <div className="pb-2">
@@ -75,19 +154,19 @@ export class BFundingStep extends React.PureComponent<Props> {
         <ul className="fa-ul">
           <li style={{ padding: "0.7em 1em" }}>
             {icon(1, currentStep)}
-            Wait for opponent to complete their deposit
+            {bMessage(1,currentStep)}
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(2, currentStep)}
-            Send your deposit
+            {bMessage(2,currentStep)}
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(3, currentStep)}
-            Wait for confirmation
+            {bMessage(3,currentStep)}
           </li>
           <li style={{ padding: "0.7em 1em" }}>
             {icon(4, currentStep)}
-            Channel open!
+            {bMessage(4,currentStep)}
           </li>
         </ul>
         <div className="pb-2">
