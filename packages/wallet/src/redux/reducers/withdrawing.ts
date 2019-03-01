@@ -2,7 +2,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { createWithdrawTransaction } from '../../utils/transaction-generator';
+import { createTransferAndWithdrawTransaction } from '../../utils/transaction-generator';
 import { signVerificationData } from '../../utils/signing-utils';
 import { closeSuccess, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 
@@ -31,9 +31,10 @@ const withdrawTransactionFailedReducer = (state: states.WithdrawTransactionFaile
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const myAddress = state.participants[state.ourIndex];
+      const myAmount = state.lastCommitment.commitment.allocation[state.ourIndex];
       // TODO: The sender could of changed since the transaction failed. We'll need to check for the updated address.
-      const signature = signVerificationData(myAddress, state.userAddress, state.channelId, state.userAddress, state.privateKey);
-      const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, state.userAddress, state.channelId, signature);
+      const signature = signVerificationData(myAddress, state.userAddress, myAmount, state.userAddress, state.privateKey);
+      const transactionOutbox = createTransferAndWithdrawTransaction(state.adjudicator, state.channelId, myAddress, state.userAddress, myAmount, signature);
       return states.waitForWithdrawalInitiation({ ...state, transactionOutbox });
   }
   return state;
@@ -44,9 +45,9 @@ const approveWithdrawalReducer = (state: states.ApproveWithdrawal, action: actio
     case actions.WITHDRAWAL_APPROVED:
 
       const myAddress = state.participants[state.ourIndex];
-
-      const signature = signVerificationData(myAddress, action.destinationAddress, state.channelId, action.destinationAddress, state.privateKey);
-      const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, action.destinationAddress, state.channelId, signature);
+      const myAmount = state.lastCommitment.commitment.allocation[state.ourIndex];
+      const signature = signVerificationData(myAddress, action.destinationAddress, myAmount, action.destinationAddress, state.privateKey);
+      const transactionOutbox = createTransferAndWithdrawTransaction(state.adjudicator, state.channelId, myAddress, action.destinationAddress, myAmount, signature);
       return states.waitForWithdrawalInitiation({ ...state, transactionOutbox, userAddress: action.destinationAddress });
     case actions.WITHDRAWAL_REJECTED:
       return states.acknowledgeCloseSuccess(state);

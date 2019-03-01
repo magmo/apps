@@ -5869,10 +5869,10 @@ fmg-core@^0.1.5:
     web3 "^1.0.0-beta.36"
     websocket "^1.0.28"
 
-fmg-nitro-adjudicator@0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/fmg-nitro-adjudicator/-/fmg-nitro-adjudicator-0.0.11.tgz#37c5600c209a53523d4665e9a394a11e9b84b75b"
-  integrity sha512-4SqDRQ7BnxgEROp9wjdVJChLCx88chI7AHFg+Xkks+xhJ/IqtTFd753kHcqsCkT3IHVD04ApzkYFe8l6VgYjBg==
+fmg-nitro-adjudicator@0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/fmg-nitro-adjudicator/-/fmg-nitro-adjudicator-0.0.12.tgz#d6e7c269e42e6fce41308f0b4d1ba0ff4f61398e"
+  integrity sha512-RREAhKTWrQH0dMo4HuFpc2U+5kHNRZRmBDAIY1ROj0H74eMLWUfNWQBwU/Vh5+QQ1EdOFB6AUG6HeifH+HppNw==
   dependencies:
     ethers "^4.0.26"
     fmg-core "^0.5.6"
