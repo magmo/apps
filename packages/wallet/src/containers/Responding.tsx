@@ -7,7 +7,7 @@ import * as states from '../states';
 import * as actions from '../redux/actions';
 
 import { RespondingStep } from '../components/responding/RespondingStep';
-import AcknowledgeX from '../components/AcknowledgeX';
+import AcknowledgeTimeout from '../components/responding/AcknowledgeTimeout';
 import { unreachable } from '../utils/reducer-utils';
 import ChooseResponse, { ChallengeOptions } from '../components/responding/ChooseResponse';
 import TransactionFailed from '../components/TransactionFailed';
@@ -35,14 +35,9 @@ class RespondingContainer extends PureComponent<Props> {
 
     switch (state.type) {
       case states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT:
-        const parsedExpiryDate = new Date(state.challengeExpiry ? state.challengeExpiry * 1000 : 0).toLocaleTimeString().replace(/:\d\d /, ' ');
-        const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;
-        return <AcknowledgeX 
-            title="You failed to respond!"
-            description={description}
-            action={timeoutAcknowledged}
-            actionTitle="Withdraw your funds"
-            />;
+
+        return <AcknowledgeTimeout expiryTime={state.challengeExpiry ? state.challengeExpiry : 0} timeoutAcknowledged={timeoutAcknowledged} />;
+      
       case states.CHOOSE_RESPONSE:
         const { ourIndex, turnNum } = state;
         const moveSelected = ourIndex === 0 ? turnNum % 2 === 0 : turnNum % 2 !== 0;
