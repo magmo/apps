@@ -52,7 +52,7 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
-        return <AFundingStep step={0}>Please confirm the transaction in MetaMask!</AFundingStep>;
+        return <AFundingStep step={0} />;
       case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
         return <AFundingStep step={1}>Please confirm the transaction in MetaMask!</AFundingStep>;
       case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
