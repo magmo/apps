@@ -47,7 +47,7 @@ class ChallengingContainer extends PureComponent<Props> {
       case states.WAIT_FOR_CHALLENGE_INITIATION:
         return <ChallengingStep step={0} expirationTime={0} />;
       case states.WAIT_FOR_CHALLENGE_SUBMISSION:
-        return <ChallengingStep step={1} expirationTime={0}/>;
+        return <ChallengingStep step={1} expirationTime={0}>Please confirm the transaction in MetaMask!</ChallengingStep>;
       case states.WAIT_FOR_CHALLENGE_CONFIRMATION:
         return <ChallengingStep step={2} expirationTime={0}>Check the progress on&nbsp;
           <EtherscanLink

@@ -78,7 +78,7 @@ class FundingContainer extends PureComponent<Props> {
         return <BFundingStep step={2} />;
       case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
         // return <WaitForXInitiation name="deposit" />;
-        return <BFundingStep step={2} />;
+        return <BFundingStep step={2}> Please confirm the transaction in MetaMask!</BFundingStep>;
       case states.B_WAIT_FOR_DEPOSIT_CONFIRMATION:
         if (state.ourIndex === 0) {
           return <AFundingStep step={3} />;
