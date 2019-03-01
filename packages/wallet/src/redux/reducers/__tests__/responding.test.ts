@@ -56,7 +56,7 @@ describe('when in ACKNOWLEDGE_CHALLENGE', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
@@ -84,7 +84,7 @@ describe('when in CHOOSE_RESPONSE', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
@@ -111,7 +111,7 @@ describe('when in TAKE_MOVE_IN_APP', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
