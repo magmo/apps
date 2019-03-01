@@ -68,20 +68,18 @@ class RespondingContainer extends PureComponent<Props> {
       case states.TAKE_MOVE_IN_APP:
         // The game knows about the challenge so we don't need the wallet to display anything
         return null;
+      case states.INITIATE_RESPONSE:
+        return <RespondingStep step={0}/>;
+      case states.WAIT_FOR_RESPONSE_SUBMISSION:
+        return <RespondingStep step={1}/>;
       case states.WAIT_FOR_RESPONSE_CONFIRMATION:
         return <RespondingStep step={2}/>;
-        // return <WaitForXConfirmation name='response' transactionID={state.transactionHash} networkId={state.networkId} />;
-      case states.INITIATE_RESPONSE:
-      return <RespondingStep step={0}/>;
-      case states.WAIT_FOR_RESPONSE_SUBMISSION:
-      return <RespondingStep step={1}/>;
-        // return <SubmitX name='response' />;
       case states.ACKNOWLEDGE_CHALLENGE_COMPLETE:
-      return <RespondingStep step={4}> 
-            <Button onClick={challengeResponseAcknowledged} >
-              {"Return to game"}
-            </Button>
-            </RespondingStep>;
+        return <RespondingStep step={4}> 
+              <Button onClick={challengeResponseAcknowledged} >
+                {"Return to game"}
+              </Button>
+              </RespondingStep>;
       case states.RESPONSE_TRANSACTION_FAILED:
         return <TransactionFailed name='challenge response' retryAction={retryTransaction} />;
       default:
