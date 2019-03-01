@@ -32,22 +32,22 @@ export default class AcknowledgeTimeout extends React.PureComponent<Props> {
         <h2>
           You failed to respond!
       </h2>
-        <p>
+        <div>
           The game expired at
           <ul className="fa-ul">
-          <li style={{ padding: "0.7em 1em" }}>
-            {timeOutIcon}
-            {expiryDate}
-          </li>
+            <li style={{ padding: "0.7em 1em" }}>
+              {timeOutIcon}
+              {expiryDate}
+            </li>
           </ul>
-          <br/> 
-      </p>
-      <div className="challenge-expired-button-container" >
-            <span className={css(styles.button)}>
-              <Button onClick={timeoutAcknowledged} >
-                Withdraw your funds
+          <br />
+        </div>
+        <div className="challenge-expired-button-container" >
+          <span className={css(styles.button)}>
+            <Button onClick={timeoutAcknowledged} >
+              Withdraw your funds
               </Button>
-            </span>
+          </span>
         </div>
       </SidebarLayout>
     );

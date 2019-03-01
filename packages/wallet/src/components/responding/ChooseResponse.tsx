@@ -7,7 +7,7 @@ import { faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 
 
 const timeRunningIcon = (
-<span className="fa-li" ><FontAwesomeIcon icon={faHourglassHalf} size="lg" pulse={true} margin-left="auto" margin-right="auto"/></span>
+  <span className="fa-li" ><FontAwesomeIcon icon={faHourglassHalf} size="lg" pulse={true} margin-left="auto" margin-right="auto" /></span>
 );
 
 
@@ -34,17 +34,17 @@ export default class ChooseResponse extends React.PureComponent<Props> {
         <h2>
           A challenge has been issued
       </h2>
-        <p>
+        <div style={{ paddingBottom: "1em" }}>
           The game will expire at
           <ul className="fa-ul">
-          <li style={{ padding: "0.7em 1em" }}>
-            {timeRunningIcon}
-            {expiryDate}
-          </li>
+            <li style={{ padding: "0.7em 1em" }}>
+              {timeRunningIcon}
+              {expiryDate}
+            </li>
           </ul>
-          if you do not respond!<br/> 
-          </p>
-          <p>
+          if you do not respond!<br />
+        </div>
+        <p>
           Select how you would like to respond:
       </p>
         <div className="challenge-expired-button-container" >
