@@ -10,6 +10,7 @@ export const TAKE_MOVE_IN_APP = 'TAKE_MOVE_IN_APP';
 export const INITIATE_RESPONSE = 'INITIATE_RESPONSE';
 export const WAIT_FOR_RESPONSE_CONFIRMATION = 'WAIT_FOR_RESPONSE_CONFIRMATION';
 export const WAIT_FOR_RESPONSE_SUBMISSION = 'WAIT_FOR_RESPONSE_SUBMISSION';
+export const CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT = 'CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT';
 export const ACKNOWLEDGE_CHALLENGE_COMPLETE = 'ACKNOWLEDGE_CHALLENGE_COMPLETE';
 export const RESPONSE_TRANSACTION_FAILED = 'RESPONSE_TRANSACTION_FAILED';
 
@@ -69,6 +70,14 @@ export function waitForResponseConfirmation<T extends ChallengeExists & Transact
   return { type: WAIT_FOR_RESPONSE_CONFIRMATION, stage: RESPONDING, ...challengeExists(params), transactionHash: params.transactionHash };
 }
 
+export interface ChallengeeAcknowledgeChallengeTimeout extends ChallengeExists {
+  type: typeof CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT;
+  stage: typeof RESPONDING;
+}
+export function challengeeAcknowledgeChallengeTimeOut<T extends ChallengeExists>(params: T): ChallengeeAcknowledgeChallengeTimeout {
+  return { type: CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, stage: RESPONDING, ...challengeExists(params) };
+}
+
 export interface AcknowledgeChallengeComplete extends ChallengeExists {
   type: typeof ACKNOWLEDGE_CHALLENGE_COMPLETE;
   stage: typeof RESPONDING;
@@ -84,6 +93,7 @@ export type RespondingState = (
   | InitiateResponse
   | WaitForResponseSubmission
   | WaitForResponseConfirmation
+  | ChallengeeAcknowledgeChallengeTimeout
   | AcknowledgeChallengeComplete
   | ResponseTransactionFailed
 );

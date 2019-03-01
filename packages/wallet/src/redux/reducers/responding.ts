@@ -1,7 +1,8 @@
 import { WalletState, RespondingState } from '../../states';
 import * as states from '../../states/responding';
-import * as challengeStates from '../../states/challenging';
 import * as runningStates from '../../states/running';
+import * as withdrawalStates from '../../states/withdrawing';
+
 import { WalletAction } from '../actions';
 import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
@@ -29,6 +30,8 @@ export const respondingReducer = (state: RespondingState, action: WalletAction):
       return waitForResponseSubmissionReducer(state, action);
     case states.WAIT_FOR_RESPONSE_CONFIRMATION:
       return waitForResponseConfirmationReducer(state, action);
+    case states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT:
+      return challengeeAcknowledgeChallengeTimeoutReducer(state, action);
     case states.ACKNOWLEDGE_CHALLENGE_COMPLETE:
       return acknowledgeChallengeCompleteReducer(state, action);
     case states.RESPONSE_TRANSACTION_FAILED:
@@ -64,7 +67,7 @@ export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, 
       return states.chooseResponse(state);
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
@@ -88,7 +91,7 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
       return states.initiateResponse(state);
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
@@ -119,7 +122,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
 
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
@@ -180,6 +183,15 @@ export const acknowledgeChallengeCompleteReducer = (state: states.AcknowledgeCha
   switch (action.type) {
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete(), displayOutbox: hideWallet() });
+    default:
+      return state;
+  }
+};
+
+const challengeeAcknowledgeChallengeTimeoutReducer = (state: states.ChallengeeAcknowledgeChallengeTimeout, action: WalletAction): WalletState => {
+  switch (action.type) {
+    case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
+      return withdrawalStates.approveWithdrawal({ ...state, messageOutbox: challengeComplete() });
     default:
       return state;
   }
