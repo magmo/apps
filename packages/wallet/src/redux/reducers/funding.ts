@@ -123,6 +123,8 @@ const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, actio
 
 const approveFundingReducer = (state: states.ApproveFunding, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.approveFunding({ ...state, unhandledAction: action });
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
         const fundingAmount = getFundingAmount(state, state.ourIndex);
