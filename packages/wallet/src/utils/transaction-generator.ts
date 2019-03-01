@@ -98,6 +98,17 @@ export function createWithdrawTransaction(contractAddress: string, amount: strin
   };
 }
 
+export function createTransferAndWithdrawTransaction(contractAddress: string, channelId: string, participant: string, destination: string, amount: string, verificationSignature: string) {
+  const adjudicatorInterface = getAdjudicatorInterface();
+  const { v, r, s } = splitSignature(verificationSignature);
+  const data = adjudicatorInterface.functions.transferAndWithdraw.encode([channelId, participant, destination, amount, v, r, s]);
+
+  return {
+    to: contractAddress,
+    data,
+    gasLimit: 3000000,
+  };
+}
 
 export function createDepositTransaction(contractAddress: string, destination: string, depositAmount: string) {
   const adjudicatorInterface = getAdjudicatorInterface();

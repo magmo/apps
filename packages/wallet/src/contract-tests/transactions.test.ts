@@ -5,9 +5,9 @@ import { put } from "redux-saga/effects";
 import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
 import { transactionSender } from "../redux/sagas/transaction-sender";
 import { signCommitment, signVerificationData } from '../utils/signing-utils';
-import { getLibraryAddress, createChallenge } from './test-utils';
+import { getLibraryAddress, createChallenge, concludeGame } from './test-utils';
 import {
-  createForceMoveTransaction, createDepositTransaction, createRespondWithMoveTransaction, createRefuteTransaction, createConcludeTransaction, createWithdrawTransaction, ConcludeAndWithdrawArgs, createConcludeAndWithdrawTransaction
+  createForceMoveTransaction, createDepositTransaction, createRespondWithMoveTransaction, createRefuteTransaction, createConcludeTransaction, createWithdrawTransaction, ConcludeAndWithdrawArgs, createConcludeAndWithdrawTransaction, createTransferAndWithdrawTransaction
 } from '../utils/transaction-generator';
 
 import { depositContract } from './test-utils';
@@ -171,6 +171,19 @@ describe('transactions', () => {
 
     const concludeTransaction = createConcludeTransaction(contractAddress, fromCommitment, toCommitment, fromSignature, toSignature);
     await testTransactionSender(concludeTransaction);
+  });
+
+  it.only("should send a transferAndWithdraw transaction", async () => {
+    const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
+    const channelId = channelID(channel);
+    const contractAddress = await getAdjudicatorContractAddress(provider);
+    await depositContract(provider, contractAddress, channelId);
+    await depositContract(provider, contractAddress, channelId);
+    await concludeGame(provider, contractAddress, channel.nonce, participantA, participantB);
+    const senderAddress = await provider.getSigner().getAddress();
+    const verificationSignature = signVerificationData(participantA.address, participantA.address, '0x01', senderAddress, participantA.privateKey);
+    const transferAndWithdraw = createTransferAndWithdrawTransaction(contractAddress, channelId, participantA.address, participantA.address, '0x01', verificationSignature);
+    await testTransactionSender(transferAndWithdraw);
   });
 
   it("should send a withdraw transaction", async () => {

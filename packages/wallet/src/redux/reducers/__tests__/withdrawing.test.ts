@@ -47,7 +47,7 @@ describe('when in ApproveWithdrawal', () => {
   describe('and the user approves the withdrawal', () => {
     const destinationAddress = '0x123';
     const createWithdrawTxMock = jest.fn();
-    Object.defineProperty(TransactionGenerator, 'createWithdrawTransaction', { value: createWithdrawTxMock });
+    Object.defineProperty(TransactionGenerator, 'createTransferAndWithdrawTransaction', { value: createWithdrawTxMock });
     const signMock = jest.fn().mockReturnValue('0x0');
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signMock });
 
@@ -86,7 +86,7 @@ describe('when in WaitForWithdrawalInitiation', () => {
 describe('when in withdrawTransactionFailed', () => {
   describe('and the transaction is retried', () => {
     const createWithdrawTxMock = jest.fn();
-    Object.defineProperty(TransactionGenerator, 'createWithdrawTransaction', { value: createWithdrawTxMock });
+    Object.defineProperty(TransactionGenerator, 'createTransferAndWithdrawTransaction', { value: createWithdrawTxMock });
     const signMock = jest.fn().mockReturnValue('0x0');
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signMock });
 
