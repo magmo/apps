@@ -85,7 +85,7 @@ storiesOf('Wallet Screens / Funding / Player B', module)
   .add('BWaitForOpponentDeposit', testState(states.bWaitForOpponentDeposit(playerBDefaults)))
   .add('BWaitForDepositToBeSentToMetaMask', testState(states.bWaitForDepositToBeSentToMetaMask(playerBDefaults)))
   .add('BSubmitDepositInMetaMask', testState(states.bSubmitDepositInMetaMask(playerBDefaults)))
-  .add('BWaitForDepositConfirmation', testState(states.aWaitForDepositConfirmation(playerBDefaults)))
+  .add('BWaitForDepositConfirmation', testState(states.bWaitForDepositConfirmation(playerBDefaults)))
   .add('BWaitForPostFundSetup', testState(states.bWaitForPostFundSetup(playerBDefaults)))
   .add('AcknowledgeFundingSuccess', testState(states.acknowledgeFundingSuccess(playerBDefaults)));
 
