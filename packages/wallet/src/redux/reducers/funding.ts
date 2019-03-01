@@ -23,6 +23,7 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return waitForFundingRequestReducer(state, action);
     case states.APPROVE_FUNDING:
       return approveFundingReducer(state, action);
+      //
     case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return aWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -30,9 +31,10 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
     case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
       return aWaitForDepositConfirmationReducer(state, action);
     case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
-      return aWaitForDepositReducer(state, action);
+      return aWaitForOpponentDepositReducer(state, action);
     case states.A_WAIT_FOR_POST_FUND_SETUP:
       return aWaitForPostFundSetupReducer(state, action);
+      //
     case states.B_WAIT_FOR_OPPONENT_DEPOSIT:
       return bWaitForOpponentDepositReducer(state, action);
     case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
@@ -43,12 +45,14 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return bWaitForDepositConfirmationReducer(state, action);
     case states.B_WAIT_FOR_POST_FUND_SETUP:
       return bWaitForPostFundSetupReducer(state, action);
+      //
     case states.ACKNOWLEDGE_FUNDING_SUCCESS:
       return acknowledgeFundingSuccessReducer(state, action);
     case states.SEND_FUNDING_DECLINED_MESSAGE:
       return sendFundingDeclinedMessageReducer(state, action);
     case states.ACKNOWLEDGE_FUNDING_DECLINED:
       return acknowledgeFundingDeclinedReducer(state, action);
+      //
     case states.A_DEPOSIT_TRANSACTION_FAILED:
       return aDepositTransactionFailedReducer(state, action);
     case states.B_DEPOSIT_TRANSACTION_FAILED:
@@ -119,6 +123,8 @@ const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, actio
 
 const approveFundingReducer = (state: states.ApproveFunding, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.approveFunding({ ...state, unhandledAction: action });
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
         const fundingAmount = getFundingAmount(state, state.ourIndex);
@@ -216,7 +222,7 @@ const aWaitForDepositConfirmationReducer = (state: states.AWaitForDepositConfirm
   return state;
 };
 
-const aWaitForDepositReducer = (state: states.AWaitForOpponentDeposit, action: actions.WalletAction) => {
+const aWaitForOpponentDepositReducer = (state: states.AWaitForOpponentDeposit, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
@@ -265,7 +271,7 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 
 
 
-const bWaitForOpponentDepositReducer = (state: states.BWaitForOpponentDeposit, action: actions.WalletAction) => {
+const bWaitForOpponentDepositReducer =  (state: states.BWaitForOpponentDeposit, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       const { allocation } = state.lastCommitment.commitment;

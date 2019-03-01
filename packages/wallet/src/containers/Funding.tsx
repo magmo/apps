@@ -52,33 +52,18 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
-        return <AFundingStep step={1}>Please confirm the transaction in MetaMask!</AFundingStep>;
+        return <AFundingStep step={0} />;
       case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
         return <AFundingStep step={1}>Please confirm the transaction in MetaMask!</AFundingStep>;
       case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
-        if (state.ourIndex === 0) {
-          return (
-            <AFundingStep step={2}>
-              Check the progress on&nbsp;
-              <EtherscanLink
-                transactionID={state.transactionHash}
-                networkId={state.networkId}
-                title="Etherscan"
-              />!
-            </AFundingStep>
-          );
-        } else {
-          return (
-            <BFundingStep step={1}>
-              Check the progress on&nbsp;
-              <EtherscanLink
-                transactionID={state.transactionHash}
-                networkId={state.networkId}
-                title="Etherscan"
-              />!
-            </BFundingStep>
-          );
-        }
+          return <AFundingStep step={2}>
+            Check the progress on&nbsp;
+            <EtherscanLink
+              transactionID={state.transactionHash}
+              networkId={state.networkId}
+              title="Etherscan"
+            />!
+          </AFundingStep>;
       case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
         return <AFundingStep step={3} />;
       case states.A_WAIT_FOR_POST_FUND_SETUP:
@@ -93,7 +78,7 @@ class FundingContainer extends PureComponent<Props> {
         return <BFundingStep step={2} />;
       case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
         // return <WaitForXInitiation name="deposit" />;
-        return <BFundingStep step={2} />;
+        return <BFundingStep step={2}> Please confirm the transaction in MetaMask!</BFundingStep>;
       case states.B_WAIT_FOR_DEPOSIT_CONFIRMATION:
         if (state.ourIndex === 0) {
           return <AFundingStep step={3} />;

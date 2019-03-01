@@ -37,23 +37,23 @@ const message = (iconStep: number, currentStep: number) => {
       } else if (currentStep === iconStep) {
         return "Preparing your transaction...";
       } else {
-        return "Withdrawal transaction sent";
+        return "Response transaction sent";
       }
     case 2:
       if (currentStep < iconStep) {
-        return "Transaction will be confirmed";
+        return "Response will be registered on chain ";
       } else if (currentStep === iconStep) {
-        return "Waiting for confirmation...";
+        return "Waiting for confirmation of response being registered...";
       } else {
-        return "Transaction confirmed";
+        return "Your response was successfully registered on chain";
       }
     case 3:
       if (currentStep < iconStep) {
-        return "Withdrawal will be confirmed";
+        return "Challenge will end";
       } else if (currentStep === iconStep) {
         return "Waiting for confirmation...";
       } else {
-        return "Withdrawal successful!";
+        return "Challenge Over!";
       }
     default:
       return "";
@@ -61,14 +61,14 @@ const message = (iconStep: number, currentStep: number) => {
 };
 
 
-export class WithdrawingStep extends React.PureComponent<Props> {
+export class RespondingStep extends React.PureComponent<Props> {
   render() {
     const currentStep = this.props.step;
     const children = this.props.children;
 
     return (
       <SidebarLayout>
-        <h2 className="bp-2">Closing channel</h2>
+        <h2 className="bp-2">Responding</h2>
         <ul className="fa-ul">
           <li style={{ padding: "0.7em 1em" }}>
             {icon(1, currentStep)}
