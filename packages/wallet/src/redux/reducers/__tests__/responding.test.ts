@@ -110,7 +110,7 @@ describe('when in INITIATE_RESPONSE', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
 
@@ -129,7 +129,7 @@ describe('when in WAIT_FOR_RESPONSE_SUBMISSION', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
 
@@ -143,7 +143,7 @@ describe('when in WAIT_FOR_RESPONSE_CONFIRMED', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
 
@@ -171,6 +171,6 @@ describe('when in RESPONSE_TRANSACTION_FAILED', () => {
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
