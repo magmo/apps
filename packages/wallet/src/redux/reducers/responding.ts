@@ -50,7 +50,7 @@ const responseTransactionFailedReducer = (state: states.ResponseTransactionFaile
       });
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
@@ -119,7 +119,7 @@ export const initiateResponseReducer = (state: states.InitiateResponse, action: 
       return states.waitForResponseSubmission(state);
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
@@ -137,7 +137,7 @@ export const waitForResponseSubmissionReducer = (state: states.WaitForResponseSu
       return states.responseTransactionFailed(state);
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
@@ -150,7 +150,7 @@ export const waitForResponseConfirmationReducer = (state: states.WaitForResponse
   switch (action.type) {
     case actions.BLOCK_MINED:
       if (typeof state.challengeExpiry !== 'undefined' && action.block.timestamp >= state.challengeExpiry) {
-        return challengeStates.acknowledgeChallengeTimeout({ ...state });
+        return states.challengeeAcknowledgeChallengeTimeOut({ ...state });
       } else {
         return state;
       }
