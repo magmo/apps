@@ -11,8 +11,9 @@ import { getMessageState, getGameState } from '../store';
 import * as Wallet from 'magmo-wallet-client';
 import { WALLET_IFRAME_ID } from '../../constants';
 import { channelID } from 'fmg-core/lib/channel';
-import { RPSCommitment, asCoreCommitment, fromCoreCommitment, PRE_FUND_SETUP_A } from '../../core/rps-commitment';
+import { asCoreCommitment, fromCoreCommitment, } from '../../core/rps-commitment';
 import { ChallengeCommitmentReceived, FundingResponse } from 'magmo-wallet-client';
+import { Commitment, } from 'fmg-core';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -25,10 +26,17 @@ export default function* messageSaga() {
   yield fork(sendMessagesSaga);
   yield fork(waitForWalletThenReceiveFromFirebaseSaga);
   yield fork(sendWalletMessageSaga);
-  yield fork(exitGameSaga);
   yield fork(receiveChallengePositionFromWalletSaga);
   yield fork(receiveChallengeFromWalletSaga);
   yield fork(recieveDisplayEventFromWalletSaga);
+  yield fork(exitGameSaga);
+}
+
+interface Message {
+  data: Commitment;
+  signature: string;
+  queue: Queue;
+  userName?: string;
 }
 
 export function* sendWalletMessageSaga() {
@@ -123,28 +131,32 @@ function* receiveFromFirebaseSaga(address) {
     const message = yield take(channel);
 
     const key = message.snapshot.key;
-    const { data, queue, userName } = message.value;
-
+    const { queue } = message.value;
     if (queue === Queue.GAME_ENGINE) {
-      const { signature } = message.value;
-      const validMessage = yield validateMessage(data, signature);
-      if (!validMessage) {
-        // TODO: Handle this
-      }
-
-      const commitment = data;
-      if (commitment.commitmentName === PRE_FUND_SETUP_A) {
-        yield put(gameActions.initialCommitmentReceived(commitment, userName ? userName : 'Opponent'));
-      } else {
-        yield put(gameActions.commitmentReceived(commitment));
-      }
+      yield receiveCommitmentSaga(message.value);
     } else {
-
-      const { signature } = message.value;
-      Wallet.messageWallet(WALLET_IFRAME_ID, data, signature);
-
+      const { data, signature } = message.value;
+      relayCommitmentToWallet(data, signature);
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
+  }
+}
+
+function relayCommitmentToWallet(c: Commitment, s: string) {
+    Wallet.messageWallet(WALLET_IFRAME_ID, c, s);
+}
+
+function* receiveCommitmentSaga(message: Message) {
+  const { data, signature, userName } = message;
+  const validMessage = yield validateMessage(data, signature);
+  if (!validMessage) {
+    // TODO: Handle this
+  }
+
+  if (data.turnNum === 0) {
+    yield put(gameActions.initialCommitmentReceived(fromCoreCommitment(data), userName ? userName : 'Opponent'));
+  } else {
+    yield put(gameActions.commitmentReceived(fromCoreCommitment(data)));
   }
 }
 
@@ -167,7 +179,6 @@ function createWalletEventChannel(walletEventTypes: Wallet.WalletEventType[]) {
 function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.PlayingState) {
 
   const { channel, player, allocation: balances, destination: participants } = state;
-
   const channelId = channelID(channel);
 
   switch (walletMessage.type) {
@@ -234,8 +245,6 @@ function* receiveChallengeFromWalletSaga() {
   while (true) {
     yield take(challengeChannel);
     yield put(gameActions.challengeResponseRequested());
-
-
   }
 }
 
@@ -268,28 +277,29 @@ function* receiveChallengePositionFromWalletSaga() {
 }
 
 
-function* validateMessage(commitment: RPSCommitment, signature) {
+function* validateMessage(commitment: Commitment, signature) {
   try {
-    return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, asCoreCommitment(commitment), signature);
+    return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, commitment, signature);
   } catch (err) {
     if (err.reason === 'WalletBusy') {
+      // Why do you create this event channel? What does 'WalletBusy' really mean?
       const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
       yield take(challengeChannel);
-      return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, asCoreCommitment(commitment), signature);
+      return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, commitment, signature);
     } else {
       throw new Error(err.error);
     }
   }
 }
 
-function* signMessage(commitment: RPSCommitment) {
+function* signMessage(commitment: Commitment) {
   try {
-    return yield Wallet.signCommitment(WALLET_IFRAME_ID, asCoreCommitment(commitment));
+    return yield Wallet.signCommitment(WALLET_IFRAME_ID, commitment);
   } catch (err) {
     if (err.reason === 'WalletBusy') {
       const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
       yield take(challengeChannel);
-      return yield Wallet.signCommitment(WALLET_IFRAME_ID, asCoreCommitment(commitment));
+      return yield Wallet.signCommitment(WALLET_IFRAME_ID, commitment);
     } else {
       throw new Error(err.error);
     }
