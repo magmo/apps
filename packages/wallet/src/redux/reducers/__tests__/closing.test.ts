@@ -10,6 +10,7 @@ import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
+import { Commitment } from 'fmg-core/lib/commitment';
 
 const {
   asAddress,
@@ -104,7 +105,7 @@ describe('start in WaitForOpponentConclude', () => {
     const fromHexMock = jest.fn().mockReturnValue(concludeCommitment2);
     Object.defineProperty(fmgCore, "fromHex", { value: fromHexMock });
 
-    const action = actions.messageReceived('0x0', '0x0');
+    const action = actions.messageReceived('commitment' as unknown as Commitment, '0x0');
     describe(' where the adjudicator exists', () => {
       const updatedState = walletReducer(state, action);
       itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
