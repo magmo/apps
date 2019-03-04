@@ -40,13 +40,22 @@ interface Message {
 }
 
 export function* sendWalletMessageSaga() {
+  const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_REQUEST]);
   while (true) {
-    const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_REQUEST]);
     const messageRequest = yield take(sendMessageChannel);
     const queue = Queue.WALLET;
     const { data, to, signature } = messageRequest;
-    const message = { data, queue, signature };
-    yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
+    const message: Message = { data, queue, signature };
+
+    if (process.env.NODE_ENV === 'development' && data.channel.participants[1] === process.env.REACT_APP_SERVER_WALLET_ADDRESS){
+      const response = yield call(postData, { ...message, commitment: data });
+      const { commitment: theirCommitment, signature: theirSignature } = response;
+
+      // Since the response is returned straight away, we have to relay the commitment immediately
+      relayCommitmentToWallet(theirCommitment, theirSignature);
+    } else {
+      yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
+    }
   }
 }
 
@@ -80,14 +89,24 @@ export function* sendMessagesSaga() {
     const gameState: gameStates.GameState = yield select(getGameState);
     if (messageState.opponentOutbox) {
       const queue = Queue.GAME_ENGINE;
-      const data = messageState.opponentOutbox.commitment;
-      const signature = yield signMessage(data);
+      const commitment = messageState.opponentOutbox.commitment;
+      const signature = yield signMessage(commitment);
       const userName = gameState.name !== gameStates.StateName.NoName ? gameState.myName : "";
-      const message = { data, queue, signature, userName };
+      const message = { data: commitment, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
 
-      yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
-      yield put(gameActions.messageSent());
+      if (process.env.NODE_ENV === 'development' && commitment.channel.participants[1] === process.env.REACT_APP_SERVER_WALLET_ADDRESS){
+        // To ease local development, we bypass firebase and make http requests directly against the local server
+        const response = yield call(postData, { ...message, commitment: message.data});
+        yield put(gameActions.messageSent());
+        
+        // Since the response is returned straight away, we have to receive the commitment immediately
+        const { commitment: theirCommitment, signature: theirSignature } = response;
+        yield receiveCommitmentSaga({ data: theirCommitment, signature: theirSignature, queue: Queue.GAME_ENGINE, userName: "Neo Bot"});
+      } else {
+        yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
+        yield put(gameActions.messageSent());
+      }
     }
     if (messageState.walletOutbox) {
       if (
@@ -139,24 +158,6 @@ function* receiveFromFirebaseSaga(address) {
       relayCommitmentToWallet(data, signature);
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
-  }
-}
-
-function relayCommitmentToWallet(c: Commitment, s: string) {
-    Wallet.messageWallet(WALLET_IFRAME_ID, c, s);
-}
-
-function* receiveCommitmentSaga(message: Message) {
-  const { data, signature, userName } = message;
-  const validMessage = yield validateMessage(data, signature);
-  if (!validMessage) {
-    // TODO: Handle this
-  }
-
-  if (data.turnNum === 0) {
-    yield put(gameActions.initialCommitmentReceived(fromCoreCommitment(data), userName ? userName : 'Opponent'));
-  } else {
-    yield put(gameActions.commitmentReceived(fromCoreCommitment(data)));
   }
 }
 
@@ -276,6 +277,34 @@ function* receiveChallengePositionFromWalletSaga() {
   }
 }
 
+function relayCommitmentToWallet(c: Commitment, s: string) {
+    Wallet.messageWallet(WALLET_IFRAME_ID, c, s);
+}
+
+function* receiveCommitmentSaga(message: Message) {
+  const { data, signature, userName } = message;
+  const validMessage = yield validateMessage(data, signature);
+  if (!validMessage) {
+    // TODO: Handle this
+  }
+
+  if (data.turnNum === 0) {
+    yield put(gameActions.initialCommitmentReceived(fromCoreCommitment(data), userName ? userName : 'Opponent'));
+  } else {
+    yield put(gameActions.commitmentReceived(fromCoreCommitment(data)));
+  }
+}
+
+async function postData(data = {}) {
+  const response = await fetch(`${process.env.REACT_APP_BOT_URL}/api/v1/rps_channels`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  return await response.json(); // parses response to JSON
+}
 
 function* validateMessage(commitment: Commitment, signature) {
   try {
