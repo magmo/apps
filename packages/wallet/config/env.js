@@ -65,7 +65,7 @@ const MAGMO_VALUES = ['TARGET_NETWORK', 'FIREBASE_PROJECT', 'FIREBASE_API_KEY'];
 function getClientEnvironment(publicUrl) {
   const raw = Object.keys(process.env)
     .filter(key => {
-      REACT_APP.test(key) || MAGMO_VALUES.indexOf(key) > -1
+      return REACT_APP.test(key) || MAGMO_VALUES.indexOf(key) > -1
     })
     .reduce(
       (env, key) => {
