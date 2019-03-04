@@ -14,5 +14,10 @@
 */npm-debug.log*
 */yarn-debug.log*
 */yarn-error.log*
-*/.env
 */lerna-debug.log*
+*/*/debug.log
+*/*/error.log
+*/*/info.log
+
+*/.env
+
