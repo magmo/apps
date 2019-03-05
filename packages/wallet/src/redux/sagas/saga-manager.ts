@@ -59,7 +59,7 @@ export function* sagaManager(): IterableIterator<any> {
         blockMiningWatcherProcess = yield fork(blockMiningWatcher);
       }
       if (process.env.TARGET_NETWORK === 'development' && !ganacheMinerProcess) {
-        yield fork(ganacheMiner);
+        ganacheMinerProcess = yield fork(ganacheMiner);
       }
     } else {
       if (blockMiningWatcherProcess) {
