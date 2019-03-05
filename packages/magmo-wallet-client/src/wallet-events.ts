@@ -241,26 +241,48 @@ export const hideWallet = () => ({
  */
 export type HideWallet = ReturnType<typeof hideWallet>;
 
-// MESSAGING
+// WALLET-TO-WALLET COMMUNICATION
 // =========
 /**
- * The type of event when a message to the opponent's wallet is requested.
+ * The type of event when a message relay to the opponent's wallet is requested.
  */
-export const MESSAGE_REQUEST = 'WALLET.MESSAGING.MESSAGE_REQUEST';
+export const MESSAGE_RELAY_REQUESTED = 'WALLET.MESSAGING.MESSAGE_REQUEST';
 /**
  * @ignore
  */
-export const messageRequest = (to: string, data: Commitment | string, signature: string) => ({
-  type: MESSAGE_REQUEST as typeof MESSAGE_REQUEST,
+export const messageRelayRequested = (to: string, data: string) => ({
+  type: MESSAGE_RELAY_REQUESTED as typeof MESSAGE_RELAY_REQUESTED,
   to,
   data,
+});
+
+/**
+ * The event thrown when the wallet requests a message be relayed to the opponent's wallet.
+ */
+export type MessageRelayRequested = ReturnType<typeof messageRelayRequested>;
+
+/**
+ * The type of event when a commitment relay to the opponent's wallet is requested.
+ */
+export const COMMITMENT_RELAY_REQUESTED = 'WALLET.MESSAGING.COMMITMENT_REQUEST';
+/**
+ * @ignore
+ */
+export const commitmentRelayRequested = (
+  to: string,
+  commitment: Commitment,
+  signature: string,
+) => ({
+  type: COMMITMENT_RELAY_REQUESTED as typeof COMMITMENT_RELAY_REQUESTED,
+  to,
+  commitment,
   signature,
 });
 
 /**
- * The event thrown when the wallet requests a message be sent to the opponent's wallet.
+ * The event thrown when the wallet requests a commitment be relayed to the opponent's wallet.
  */
-export type MessageRequest = ReturnType<typeof messageRequest>;
+export type CommitmentRelayRequested = ReturnType<typeof commitmentRelayRequested>;
 
 /**
  * The type for events where a challenge position is received from the wallet.
@@ -330,7 +352,7 @@ export type WalletEventType =
   | typeof CHALLENGE_RESPONSE_REQUESTED
   | typeof CHALLENGE_REJECTED
   | typeof CHALLENGE_COMMITMENT_RECEIVED
-  | typeof MESSAGE_REQUEST
+  | typeof MESSAGE_RELAY_REQUESTED
   | typeof CLOSE_SUCCESS
   | typeof CONCLUDE_FAILURE
   | typeof CONCLUDE_SUCCESS
@@ -364,4 +386,4 @@ export type WalletEvent =
   | ChallengeRejected
   | ChallengeResponseRequested
   | ChallengeComplete
-  | MessageRequest;
+  | MessageRelayRequested;
