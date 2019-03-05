@@ -18,7 +18,7 @@ import {
   createChallenge,
   respondToChallenge,
   receiveCommitment,
-} from './messages-to-wallet';
+} from './wallet-instructions';
 import { Commitment } from 'fmg-core';
 
 /**

@@ -1,7 +1,7 @@
-import { take, put } from "redux-saga/effects";
-import * as incoming from 'magmo-wallet-client/lib/messages-to-wallet';
+import { take, put } from 'redux-saga/effects';
+import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
 
-import * as actions from "../actions";
+import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
 
 export function* messageListener() {
@@ -11,7 +11,9 @@ export function* messageListener() {
         emitter(event);
       }
     });
-    return () => { /* End channel here*/ };
+    return () => {
+      /* End channel here*/
+    };
   });
   while (true) {
     const messageEvent = yield take(postMessageEventChannel);
@@ -43,10 +45,5 @@ export function* messageListener() {
         break;
       default:
     }
-
   }
-
 }
-
-
-
