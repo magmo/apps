@@ -378,7 +378,6 @@ const validTransitionToPostFundState = (state: states.FundingState, data: Commit
   const opponentAddress = state.participants[1 - state.ourIndex];
 
   if (!validCommitmentSignature(data, signature, opponentAddress)) { return false; }
-  // check transition
   if (!validTransition(state, data)) { return false; }
   if (data.commitmentType !== 1) { return false; }
   return true;

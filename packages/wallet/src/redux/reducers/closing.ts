@@ -139,8 +139,6 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
       };
       const transactionOutbox = createConcludeAndWithdrawTransaction(state.adjudicator, args);
       return states.waitForCloseInitiation({ ...state, userAddress: action.withdrawAddress, transactionOutbox });
-
-      break;
   }
   return state;
 };
