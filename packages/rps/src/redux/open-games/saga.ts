@@ -101,11 +101,11 @@ const openGameTransformer = dict => {
 };
 
 function* openGameSyncer() {
-  if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_BOT_URL) {
+  if (process.env.NODE_ENV === 'development' && process.env.BOT_URL) {
     try {
       // If the bot url is configured, try to fetch from the local server wallet
       // Assumes the server is running locally at the configured url
-      const response = yield fetch(`${process.env.REACT_APP_BOT_URL}/api/v1/rps_games`).then(
+      const response = yield fetch(`${process.env.BOT_URL}/api/v1/rps_games`).then(
         r => r.json(),
       );
       yield put(
@@ -115,7 +115,7 @@ function* openGameSyncer() {
       );
     } catch (err) {
       if (err.message === 'Failed to fetch') {
-        console.log(`WARNING: server wallet not running at ${process.env.REACT_APP_BOT_URL}`);
+        console.log(`WARNING: server wallet not running at ${process.env.BOT_URL}`);
       } else {
         throw err;
       }

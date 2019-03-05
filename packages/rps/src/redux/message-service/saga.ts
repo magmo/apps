@@ -47,7 +47,7 @@ export function* sendWalletMessageSaga() {
     const { data, to, signature } = messageRequest;
     const message: Message = { data, queue, signature };
 
-    if (process.env.NODE_ENV === 'development' && data.channel.participants[1] === process.env.REACT_APP_SERVER_WALLET_ADDRESS){
+    if (process.env.NODE_ENV === 'development' && data.channel.participants[1] === process.env.SERVER_WALLET_ADDRESS){
       const response = yield call(postData, { ...message, commitment: data });
       const { commitment: theirCommitment, signature: theirSignature } = response;
 
@@ -95,7 +95,7 @@ export function* sendMessagesSaga() {
       const message = { data: commitment, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
 
-      if (process.env.NODE_ENV === 'development' && commitment.channel.participants[1] === process.env.REACT_APP_SERVER_WALLET_ADDRESS){
+      if (process.env.NODE_ENV === 'development' && commitment.channel.participants[1] === process.env.SERVER_WALLET_ADDRESS){
         // To ease local development, we bypass firebase and make http requests directly against the local server
         const response = yield call(postData, { ...message, commitment: message.data});
         yield put(gameActions.messageSent());
@@ -296,7 +296,7 @@ function* receiveCommitmentSaga(message: Message) {
 }
 
 async function postData(data = {}) {
-  const response = await fetch(`${process.env.REACT_APP_BOT_URL}/api/v1/rps_channels`, {
+  const response = await fetch(`${process.env.BOT_URL}/api/v1/rps_channels`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
