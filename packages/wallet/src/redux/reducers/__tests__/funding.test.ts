@@ -11,9 +11,6 @@ import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { BWaitForDepositConfirmation, } from '../../../states';
-import { Commitment } from 'fmg-core/lib/commitment';
-
-const mockCommitment = 'commitment' as unknown as Commitment;
 
 const {
   asAddress,
@@ -257,14 +254,12 @@ describe('start in AWaitForOpponentDeposit', () => {
 
 describe('start in AWaitForPostFundSetup', () => {
   describe('incoming action: message received', () => { // player A scenario
-    const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
-    const state = states.aWaitForPostFundSetup(testDefaults);
-    const action = actions.messageReceived(mockCommitment, 'sig');
-
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-    const fromHexMock = jest.fn().mockReturnValue(postFundCommitment2);
-    Object.defineProperty(fmgCore, "fromHex", { value: fromHexMock });
+
+    const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
+    const state = states.aWaitForPostFundSetup(testDefaults);
+    const action = actions.messageReceived(postFundCommitment2, 'sig');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
@@ -276,6 +271,7 @@ describe('start in BWaitForDeployAddress', () => {
   describe('incoming action: funding received event', () => { // player B scenario
     const createDepositTxMock = jest.fn();
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', { value: createDepositTxMock });
+
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.bWaitForOpponentDeposit(testDefaults);
     const action = actions.fundingReceivedEvent(channelId, '0x2', '0x02');
@@ -332,15 +328,14 @@ describe('start in WaitForDepositConfirmation', () => {
   });
 
   describe('incoming action: deposit confirmed, postFundA already received', () => { // player B scenario
+    const validateMock = jest.fn().mockReturnValue(true);
+    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
+
     const testDefaults = {
       ...defaultsB,
       ...justReceivedPreFundSetupB,
-      unhandledAction: actions.messageReceived(mockCommitment, '0x0'),
+      unhandledAction: actions.messageReceived(postFundCommitment1, '0x0'),
     };
-    const validateMock = jest.fn().mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-    const fromHexMock = jest.fn().mockReturnValue(postFundCommitment1);
-    Object.defineProperty(fmgCore, "fromHex", { value: fromHexMock });
     const state = states.bWaitForDepositConfirmation(testDefaults);
     const action = actions.transactionConfirmed();
     const updatedState = walletReducer(state, action);
@@ -351,13 +346,12 @@ describe('start in WaitForDepositConfirmation', () => {
 
 
   describe('incoming action: message received', () => { // player B scenario
-    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
-    const state = states.bWaitForDepositConfirmation(testDefaults);
-    const action = actions.messageReceived(mockCommitment, '0x0');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-    const fromHexMock = jest.fn().mockReturnValue(postFundCommitment2);
-    Object.defineProperty(fmgCore, "fromHex", { value: fromHexMock });
+
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
+    const state = states.bWaitForDepositConfirmation(testDefaults);
+    const action = actions.messageReceived(postFundCommitment2, '0x0');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
@@ -400,9 +394,7 @@ describe('start in BWaitForPostFundSetup', () => {
     const state = states.bWaitForPostFundSetup(testDefaults);
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validSignature', { value: validateMock });
-    const fromHexMock = jest.fn().mockReturnValue(postFundCommitment1);
-    Object.defineProperty(fmgCore, "fromHex", { value: fromHexMock });
-    const action = actions.messageReceived(mockCommitment, 'sig'); const updatedState = walletReducer(state, action);
+    const action = actions.messageReceived(postFundCommitment1, 'sig'); const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
