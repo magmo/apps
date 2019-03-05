@@ -311,7 +311,6 @@ function* validateMessage(commitment: Commitment, signature) {
     return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, commitment, signature);
   } catch (err) {
     if (err.reason === 'WalletBusy') {
-      // Why do you create this event channel? What does 'WalletBusy' really mean?
       const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
       yield take(challengeChannel);
       return yield Wallet.validateCommitmentSignature(WALLET_IFRAME_ID, commitment, signature);
