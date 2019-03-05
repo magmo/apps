@@ -25,8 +25,8 @@
     "prepare": "run-s prettier:check lint build",
     "build": "npx tsc",
     "lint": "npx tslint -c tslint.json 'src/**/*.ts'",
-		"prettier:check": "npx prettier --check src/**/*.ts",
-		"prettier:write": "npx prettier --write src/**/*.ts",
+    "prettier:check": "npx prettier --check src/**/*.ts",
+    "prettier:write": "npx prettier --write src/**/*.ts",
     "generateDocs": "npx typedoc --out ./docs --exclude '**/+(decode-utils|wallet-messages).ts'"
   },
   "dependencies": {
@@ -35,11 +35,11 @@
     "fmg-core": "0.5.6"
   },
   "devDependencies": {
-		"prettier": "^1.16.4",
+    "prettier": "^1.16.4",
     "tslint": "5.12.1",
     "tslint-config-prettier": "1.17.0",
     "tslint-react": "3.6.0",
-		"npm-run-all": "4.1.5",
+    "npm-run-all": "4.1.5",
     "typescript": "3.2.2"
   }
 }
