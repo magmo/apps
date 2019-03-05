@@ -348,22 +348,23 @@ export type ChallengeComplete = ReturnType<typeof challengeComplete>;
  * The various types of wallet events that can occur.
  */
 export type WalletEventType =
-  | typeof CHALLENGE_COMPLETE
-  | typeof CHALLENGE_RESPONSE_REQUESTED
-  | typeof CHALLENGE_REJECTED
   | typeof CHALLENGE_COMMITMENT_RECEIVED
-  | typeof MESSAGE_RELAY_REQUESTED
+  | typeof CHALLENGE_COMPLETE
+  | typeof CHALLENGE_REJECTED
+  | typeof CHALLENGE_RESPONSE_REQUESTED
   | typeof CLOSE_SUCCESS
+  | typeof COMMITMENT_RELAY_REQUESTED
   | typeof CONCLUDE_FAILURE
   | typeof CONCLUDE_SUCCESS
+  | typeof FUNDING_FAILURE
+  | typeof FUNDING_SUCCESS
+  | typeof HIDE_WALLET
+  | typeof MESSAGE_RELAY_REQUESTED
+  | typeof SHOW_WALLET
   | typeof SIGNATURE_FAILURE
   | typeof SIGNATURE_SUCCESS
   | typeof VALIDATION_FAILURE
-  | typeof VALIDATION_SUCCESS
-  | typeof FUNDING_FAILURE
-  | typeof FUNDING_SUCCESS
-  | typeof SHOW_WALLET
-  | typeof HIDE_WALLET;
+  | typeof VALIDATION_SUCCESS;
 
 /**
  * @ignore
@@ -372,18 +373,19 @@ export type DisplayAction = ShowWallet | HideWallet;
 
 // TODO: This could live exclusively in the wallet
 export type WalletEvent =
-  | InitializationSuccess
-  | ConcludeSuccess
-  | ConcludeFailure
-  | CloseSuccess
-  | ValidationSuccess
-  | ValidationFailure
-  | FundingSuccess
-  | FundingFailure
-  | SignatureSuccess
-  | SignatureFailure
   | ChallengeCommitmentReceived
+  | ChallengeComplete
   | ChallengeRejected
   | ChallengeResponseRequested
-  | ChallengeComplete
-  | MessageRelayRequested;
+  | CloseSuccess
+  | CommitmentRelayRequested
+  | ConcludeFailure
+  | ConcludeSuccess
+  | FundingFailure
+  | FundingSuccess
+  | InitializationSuccess
+  | MessageRelayRequested
+  | SignatureFailure
+  | SignatureSuccess
+  | ValidationFailure
+  | ValidationSuccess;
