@@ -40,17 +40,17 @@ export const fundingFailure = (
 });
 
 /**
- * The event that is thrown on funding success.
+ * The event that is emitted on funding success.
  */
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 
 /**
- * The event that is thrown on funding failure.
+ * The event that is emitted on funding failure.
  */
 export type FundingFailure = ReturnType<typeof fundingFailure>;
 
 /**
- * The events that will be thrown for funding.
+ * The events that will be emitted for funding.
  */
 export type FundingResponse = FundingSuccess | FundingFailure;
 
@@ -187,11 +187,11 @@ export const concludeFailure = (reason: 'UserDeclined' | 'Other', error?: string
   error,
 });
 /**
- * The event thrown when a conclude succeeds.
+ * The event emitted when a conclude succeeds.
  */
 export type ConcludeSuccess = ReturnType<typeof concludeSuccess>;
 /**
- * The event thrown when a conclude fails.
+ * The event emitted when a conclude fails.
  */
 export type ConcludeFailure = ReturnType<typeof concludeFailure>;
 /**
@@ -206,7 +206,7 @@ export const closeSuccess = () => ({
 });
 
 /**
- * The event thrown when the game has been successfully closed.
+ * The event emitted when the game has been successfully closed.
  */
 export type CloseSuccess = ReturnType<typeof closeSuccess>;
 
@@ -257,7 +257,7 @@ export const messageRelayRequested = (to: string, data: string) => ({
 });
 
 /**
- * The event thrown when the wallet requests a message be relayed to the opponent's wallet.
+ * The event emitted when the wallet requests a message be relayed to the opponent's wallet.
  */
 export type MessageRelayRequested = ReturnType<typeof messageRelayRequested>;
 
@@ -280,7 +280,7 @@ export const commitmentRelayRequested = (
 });
 
 /**
- * The event thrown when the wallet requests a commitment be relayed to the opponent's wallet.
+ * The event emitted when the wallet requests a commitment be relayed to the opponent's wallet.
  */
 export type CommitmentRelayRequested = ReturnType<typeof commitmentRelayRequested>;
 
@@ -296,7 +296,7 @@ export const challengeCommitmentReceived = (commitment: Commitment) => ({
   commitment,
 });
 /**
- * The event thrown when the wallet has received a challenge position.
+ * The event emitted when the wallet has received a challenge position.
  */
 export type ChallengeCommitmentReceived = ReturnType<typeof challengeCommitmentReceived>;
 
@@ -312,7 +312,7 @@ export const challengeRejected = reason => ({
   reason,
 });
 /**
- * The event thrown when a user rejects a challenge.
+ * The event emitted when a user rejects a challenge.
  */
 export type ChallengeRejected = ReturnType<typeof challengeRejected>;
 /**
@@ -326,7 +326,7 @@ export const challengeResponseRequested = () => ({
   type: CHALLENGE_RESPONSE_REQUESTED as typeof CHALLENGE_RESPONSE_REQUESTED,
 });
 /**
- * The event thrown when a response to a challenge is requested from the application.
+ * The event emitted when a response to a challenge is requested from the application.
  */
 export type ChallengeResponseRequested = ReturnType<typeof challengeResponseRequested>;
 /**
@@ -340,7 +340,7 @@ export const challengeComplete = () => ({
   type: CHALLENGE_COMPLETE as typeof CHALLENGE_COMPLETE,
 });
 /**
- * The event thrown when the challenge is over.
+ * The event emitted when the challenge is over.
  */
 export type ChallengeComplete = ReturnType<typeof challengeComplete>;
 
