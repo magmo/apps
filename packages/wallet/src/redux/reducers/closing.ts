@@ -1,14 +1,26 @@
-import * as states from '../../states';
+import * as states from '../states';
 import * as actions from '../actions';
 
-import { WalletState, ClosingState } from '../../states';
+import { WalletState, ClosingState } from '../states';
 import { WalletAction } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
-import { signCommitment, signVerificationData, validCommitmentSignature } from '../../utils/signing-utils';
-import { messageRequest, closeSuccess, concludeSuccess, concludeFailure, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
+import {
+  signCommitment,
+  signVerificationData,
+  validCommitmentSignature,
+} from '../../utils/signing-utils';
+import {
+  messageRequest,
+  closeSuccess,
+  concludeSuccess,
+  concludeFailure,
+  hideWallet,
+} from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType, Commitment } from 'fmg-core';
-import { createConcludeAndWithdrawTransaction, ConcludeAndWithdrawArgs } from '../../utils/transaction-generator';
-
+import {
+  createConcludeAndWithdrawTransaction,
+  ConcludeAndWithdrawArgs,
+} from '../../utils/transaction-generator';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -37,14 +49,23 @@ export const closingReducer = (state: ClosingState, action: WalletAction): Walle
   }
 };
 
-const closeTransactionFailedReducer = (state: states.CloseTransactionFailed, action: actions.WalletAction) => {
+const closeTransactionFailedReducer = (
+  state: states.CloseTransactionFailed,
+  action: actions.WalletAction,
+) => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const { penultimateCommitment: from, lastCommitment: to } = state;
       const myAddress = state.participants[state.ourIndex];
       const amount = to.commitment.allocation[state.ourIndex];
       // TODO: The sender could of changed since the transaction failed. We'll need to check for the updated address.
-      const verificationSignature = signVerificationData(myAddress, state.userAddress, amount, state.userAddress, state.privateKey);
+      const verificationSignature = signVerificationData(
+        myAddress,
+        state.userAddress,
+        amount,
+        state.userAddress,
+        state.privateKey,
+      );
       const args: ConcludeAndWithdrawArgs = {
         fromCommitment: from.commitment,
         toCommitment: to.commitment,
@@ -54,7 +75,6 @@ const closeTransactionFailedReducer = (state: states.CloseTransactionFailed, act
         amount,
         participant: myAddress,
         destination: state.userAddress,
-
       };
       const transactionOutbox = createConcludeAndWithdrawTransaction(state.adjudicator, args);
       return states.waitForCloseSubmission({ ...state, transactionOutbox });
@@ -62,11 +82,22 @@ const closeTransactionFailedReducer = (state: states.CloseTransactionFailed, act
   return state;
 };
 
-const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: actions.WalletAction) => {
+const acknowledgeConcludeReducer = (
+  state: states.AcknowledgeConclude,
+  action: actions.WalletAction,
+) => {
   switch (action.type) {
     case actions.CONCLUDE_APPROVED:
-      if (!ourTurn(state)) { return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'It is not the current user\'s turn') }; }
-      const { positionSignature, sendMessageAction, concludeCommitment } = composeConcludePosition(state);
+      if (!ourTurn(state)) {
+        return {
+          ...state,
+          displayOutbox: hideWallet(),
+          messageOutbox: concludeFailure('Other', "It is not the current user's turn"),
+        };
+      }
+      const { positionSignature, sendMessageAction, concludeCommitment } = composeConcludePosition(
+        state,
+      );
       const lastState = state.lastCommitment.commitment;
       if (lastState.commitmentType === CommitmentType.Conclude) {
         if (state.adjudicator) {
@@ -89,8 +120,10 @@ const acknowledgeConcludeReducer = (state: states.AcknowledgeConclude, action: a
   return state;
 };
 
-
-const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, action: actions.WalletAction) => {
+const waitForCloseConfirmedReducer = (
+  state: states.WaitForCloseConfirmed,
+  action: actions.WalletAction,
+) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
       // return states.waitForChannel({ ...state, messageOutbox: closeSuccess(), displayOutbox: hideWallet() });
@@ -99,7 +132,10 @@ const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, actio
   return state;
 };
 
-const waitForCloseInitiatorReducer = (state: states.WaitForCloseInitiation, action: actions.WalletAction) => {
+const waitForCloseInitiatorReducer = (
+  state: states.WaitForCloseInitiation,
+  action: actions.WalletAction,
+) => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.waitForCloseSubmission(state);
@@ -107,7 +143,10 @@ const waitForCloseInitiatorReducer = (state: states.WaitForCloseInitiation, acti
   return state;
 };
 
-const waitForCloseSubmissionReducer = (state: states.WaitForCloseSubmission, action: actions.WalletAction) => {
+const waitForCloseSubmissionReducer = (
+  state: states.WaitForCloseSubmission,
+  action: actions.WalletAction,
+) => {
   switch (action.type) {
     case actions.TRANSACTION_SUBMISSION_FAILED:
       return states.closeTransactionFailed(state);
@@ -117,15 +156,23 @@ const waitForCloseSubmissionReducer = (state: states.WaitForCloseSubmission, act
   return state;
 };
 
-const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: actions.WalletAction) => {
+const approveCloseOnChainReducer = (
+  state: states.ApproveCloseOnChain,
+  action: actions.WalletAction,
+) => {
   switch (action.type) {
     case actions.APPROVE_CLOSE:
-
       const { penultimateCommitment: from, lastCommitment: to } = state;
       const myAddress = state.participants[state.ourIndex];
       const amount = to.commitment.allocation[state.ourIndex];
       // TODO: The sender could of changed since the transaction failed. We'll need to check for the updated address.
-      const verificationSignature = signVerificationData(myAddress, action.withdrawAddress, amount, action.withdrawAddress, state.privateKey);
+      const verificationSignature = signVerificationData(
+        myAddress,
+        action.withdrawAddress,
+        amount,
+        action.withdrawAddress,
+        state.privateKey,
+      );
       const args: ConcludeAndWithdrawArgs = {
         fromCommitment: from.commitment,
         toCommitment: to.commitment,
@@ -135,10 +182,13 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
         amount,
         participant: myAddress,
         destination: action.withdrawAddress,
-
       };
       const transactionOutbox = createConcludeAndWithdrawTransaction(state.adjudicator, args);
-      return states.waitForCloseInitiation({ ...state, userAddress: action.withdrawAddress, transactionOutbox });
+      return states.waitForCloseInitiation({
+        ...state,
+        userAddress: action.withdrawAddress,
+        transactionOutbox,
+      });
   }
   return state;
 };
@@ -146,9 +196,17 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
 const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAction) => {
   switch (action.type) {
     case actions.CONCLUDE_APPROVED:
-      if (!ourTurn(state)) { return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'It is not the current user\'s turn') }; }
+      if (!ourTurn(state)) {
+        return {
+          ...state,
+          displayOutbox: hideWallet(),
+          messageOutbox: concludeFailure('Other', "It is not the current user's turn"),
+        };
+      }
 
-      const { concludeCommitment, positionSignature, sendMessageAction } = composeConcludePosition(state);
+      const { concludeCommitment, positionSignature, sendMessageAction } = composeConcludePosition(
+        state,
+      );
       const { lastCommitment } = state;
       if (lastCommitment.commitment.commitmentType === CommitmentType.Conclude) {
         return states.approveCloseOnChain({
@@ -159,7 +217,6 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
           lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
           messageOutbox: sendMessageAction,
         });
-
       } else {
         return states.waitForOpponentConclude({
           ...state,
@@ -171,7 +228,12 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
       }
       break;
     case actions.CONCLUDE_REJECTED:
-      return states.waitForUpdate({ ...state, adjudicator: state.adjudicator, displayOutbox: hideWallet(), messageOutbox: concludeFailure('UserDeclined') });
+      return states.waitForUpdate({
+        ...state,
+        adjudicator: state.adjudicator,
+        displayOutbox: hideWallet(),
+        messageOutbox: concludeFailure('UserDeclined'),
+      });
     default:
       return state;
   }
@@ -180,17 +242,32 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
 const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-
-      if (!action.signature) { return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'Signature is missing from the message.') }; }
+      if (!action.signature) {
+        return {
+          ...state,
+          displayOutbox: hideWallet(),
+          messageOutbox: concludeFailure('Other', 'Signature is missing from the message.'),
+        };
+      }
       const commitment = action.data as Commitment;
 
       const opponentAddress = state.participants[1 - state.ourIndex];
       if (!validCommitmentSignature(commitment, action.signature, opponentAddress)) {
-
-        return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', 'The signature provided is not valid.') };
+        return {
+          ...state,
+          displayOutbox: hideWallet(),
+          messageOutbox: concludeFailure('Other', 'The signature provided is not valid.'),
+        };
       }
       if (!validTransition(state, commitment)) {
-        return { ...state, displayOutbox: hideWallet(), messageOutbox: concludeFailure('Other', `The transition from ${state.type} to conclude is not valid.`) };
+        return {
+          ...state,
+          displayOutbox: hideWallet(),
+          messageOutbox: concludeFailure(
+            'Other',
+            `The transition from ${state.type} to conclude is not valid.`,
+          ),
+        };
       }
       if (state.adjudicator !== undefined) {
         return states.approveCloseOnChain({
@@ -213,7 +290,10 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
   }
 };
 
-const acknowledgeCloseSuccessReducer = (state: states.AcknowledgeCloseSuccess, action: WalletAction) => {
+const acknowledgeCloseSuccessReducer = (
+  state: states.AcknowledgeCloseSuccess,
+  action: WalletAction,
+) => {
   switch (action.type) {
     case actions.CLOSE_SUCCESS_ACKNOWLEDGED:
       return states.waitForChannel({
@@ -226,7 +306,10 @@ const acknowledgeCloseSuccessReducer = (state: states.AcknowledgeCloseSuccess, a
   }
 };
 
-const acknowledgeClosedOnChainReducer = (state: states.AcknowledgeClosedOnChain, action: WalletAction) => {
+const acknowledgeClosedOnChainReducer = (
+  state: states.AcknowledgeClosedOnChain,
+  action: WalletAction,
+) => {
   switch (action.type) {
     case actions.CLOSED_ON_CHAIN_ACKNOWLEDGED:
       return states.waitForChannel({
@@ -239,7 +322,8 @@ const acknowledgeClosedOnChainReducer = (state: states.AcknowledgeClosedOnChain,
 };
 
 const composeConcludePosition = (state: states.ClosingState) => {
-  const commitmentCount = state.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
+  const commitmentCount =
+    state.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
   const concludeCommitment: Commitment = {
     ...state.lastCommitment.commitment,
     commitmentType: CommitmentType.Conclude,
@@ -248,6 +332,10 @@ const composeConcludePosition = (state: states.ClosingState) => {
   };
 
   const commitmentSignature = signCommitment(concludeCommitment, state.privateKey);
-  const sendMessageAction = messageRequest(state.participants[1 - state.ourIndex], concludeCommitment, commitmentSignature);
+  const sendMessageAction = messageRequest(
+    state.participants[1 - state.ourIndex],
+    concludeCommitment,
+    commitmentSignature,
+  );
   return { concludeCommitment, positionSignature: commitmentSignature, sendMessageAction };
 };

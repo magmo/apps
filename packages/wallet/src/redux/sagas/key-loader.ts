@@ -5,7 +5,7 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { keysLoaded, metamaskLoadError } from '../actions';
 import { getProvider, getAdjudicatorContractAddress } from '../../utils/contract-utils';
 import { ethers } from 'ethers';
-import { WAIT_FOR_ADDRESS, WalletState } from '../../states';
+import { WAIT_FOR_ADDRESS, WalletState } from '../states';
 
 interface WalletParams {
   uid: string;
@@ -15,7 +15,9 @@ interface WalletParams {
 
 export function* keyLoader() {
   const state: WalletState = yield select((walletState: WalletState) => walletState);
-  if (state.type !== WAIT_FOR_ADDRESS) { return; }
+  if (state.type !== WAIT_FOR_ADDRESS) {
+    return;
+  }
   const { uid } = state;
   let wallet = yield* fetchWallet(uid);
 
