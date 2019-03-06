@@ -83,6 +83,24 @@ export function* sendWalletMessageSaga() {
         const { data, to } = messageRequest;
         const message: NonCommitmentMessage = { data, queue };
 
+        if (process.env.NODE_ENV === 'development' && to === process.env.SERVER_WALLET_ADDRESS) {
+          try {
+            const response = yield call(postData, { ...message });
+            const { commitment: theirCommitment, signature: theirSignature } = response;
+
+            // Since the response is returned straight away, we have to relay the commitment
+            // immediately
+            relayToWallet({
+              commitment: theirCommitment,
+              signature: theirSignature,
+              type: 'Commitment',
+            });
+          } catch (err) {
+            console.error(err);
+          }
+        } else {
+          yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
+        }
         yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
         break;
       }
