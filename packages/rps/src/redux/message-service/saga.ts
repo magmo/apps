@@ -12,11 +12,6 @@ import * as Wallet from 'magmo-wallet-client';
 import { WALLET_IFRAME_ID } from '../../constants';
 import { channelID } from 'fmg-core/lib/channel';
 import { asCoreCommitment, fromCoreCommitment } from '../../core/rps-commitment';
-import {
-  ChallengeCommitmentReceived,
-  FundingResponse,
-  MESSAGE_RELAY_REQUESTED,
-} from 'magmo-wallet-client';
 import { Commitment } from 'fmg-core';
 
 export enum Queue {
@@ -43,18 +38,18 @@ interface CommitmentMessage {
   userName?: string;
 }
 
-interface MessageMessage {
+interface NonCommitmentMessage {
   data: string;
   queue: Queue.WALLET;
   userName?: string;
 }
 
-type Message = CommitmentMessage | MessageMessage;
+type Message = CommitmentMessage | NonCommitmentMessage;
 
 export function* sendWalletMessageSaga() {
   const sendMessageChannel = createWalletEventChannel([
     Wallet.COMMITMENT_RELAY_REQUESTED,
-    MESSAGE_RELAY_REQUESTED,
+    Wallet.MESSAGE_RELAY_REQUESTED,
   ]);
   while (true) {
     const messageRequest = yield take(sendMessageChannel);
@@ -86,7 +81,8 @@ export function* sendWalletMessageSaga() {
       }
       case Wallet.MESSAGE_RELAY_REQUESTED: {
         const { data, to } = messageRequest;
-        const message: MessageMessage = { data, queue };
+        const message: NonCommitmentMessage = { data, queue };
+
         yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
         break;
       }
@@ -271,7 +267,7 @@ function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.Pl
         balances[1 - myIndex],
         myIndex,
       );
-      const fundingResponse: FundingResponse = yield take(fundingChannel);
+      const fundingResponse: Wallet.FundingResponse = yield take(fundingChannel);
       if (fundingResponse.type === Wallet.FUNDING_FAILURE) {
         if (fundingResponse.reason === 'FundingDeclined') {
           yield put(gameActions.exitToLobby());
@@ -340,7 +336,9 @@ function* recieveDisplayEventFromWalletSaga() {
 function* receiveChallengePositionFromWalletSaga() {
   const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMMITMENT_RECEIVED]); // TODO change to CHALLENGE_COMMITMENT_RECEIVED
   while (true) {
-    const challengeCommitmentReceived: ChallengeCommitmentReceived = yield take(challengeChannel);
+    const challengeCommitmentReceived: Wallet.ChallengeCommitmentReceived = yield take(
+      challengeChannel,
+    );
     const commitment = fromCoreCommitment(challengeCommitmentReceived.commitment);
     yield put(gameActions.commitmentReceived(commitment));
   }
