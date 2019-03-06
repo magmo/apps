@@ -246,7 +246,7 @@ export type HideWallet = ReturnType<typeof hideWallet>;
 /**
  * The type of event when a message relay to the opponent's wallet is requested.
  */
-export const MESSAGE_RELAY_REQUESTED = 'WALLET.MESSAGING.MESSAGE_REQUEST';
+export const MESSAGE_RELAY_REQUESTED = 'WALLET.MESSAGING.MESSAGE_RELAY_REQUESTED';
 /**
  * @ignore
  */
@@ -264,7 +264,7 @@ export type MessageRelayRequested = ReturnType<typeof messageRelayRequested>;
 /**
  * The type of event when a commitment relay to the opponent's wallet is requested.
  */
-export const COMMITMENT_RELAY_REQUESTED = 'WALLET.MESSAGING.COMMITMENT_REQUEST';
+export const COMMITMENT_RELAY_REQUESTED = 'WALLET.MESSAGING.COMMITMENT_RELAY_REQUESTED';
 /**
  * @ignore
  */
