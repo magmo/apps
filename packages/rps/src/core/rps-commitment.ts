@@ -11,17 +11,26 @@ export interface AppAttributes {
 }
 
 const SolidityRPSCommitmentType = {
-  "RPSCommitmentStruct": {
-    positionType: "uint8",
-    stake: "uint256",
-    preCommit: "bytes32",
-    bWeapon: "uint8",
-    aWeapon: "uint8",
-    salt: "bytes32",
+  RPSCommitmentStruct: {
+    positionType: 'uint8',
+    stake: 'uint256',
+    preCommit: 'bytes32',
+    bWeapon: 'uint8',
+    aWeapon: 'uint8',
+    salt: 'bytes32',
   },
 };
-export enum PositionType { Resting, Proposed, Accepted, Reveal }
-export enum Weapon { Rock, Paper, Scissors }
+export enum PositionType {
+  Resting,
+  Proposed,
+  Accepted,
+  Reveal,
+}
+export enum Weapon {
+  Rock,
+  Paper,
+  Scissors,
+}
 export interface RPSBaseCommitment extends BaseCommitment {
   positionType: PositionType;
   stake: Uint256;
@@ -37,32 +46,31 @@ export interface RPSCommitment extends RPSBaseCommitment {
 }
 
 function encodeAppAttributes(appAttrs: AppAttributes): string {
-  const { positionType, stake, preCommit, bWeapon, aWeapon, salt, } = appAttrs;
-  return abi.encodeParameter(SolidityRPSCommitmentType,
-    [positionType, stake, preCommit, bWeapon, aWeapon, salt,]);
+  const { positionType, stake, preCommit, bWeapon, aWeapon, salt } = appAttrs;
+  return abi.encodeParameter(SolidityRPSCommitmentType, [
+    positionType,
+    stake,
+    preCommit,
+    bWeapon,
+    aWeapon,
+    salt,
+  ]);
 }
 
 function decodeAppAttributes(appAttrs: string): AppAttributes {
-  const parameters = abi.decodeParameter(SolidityRPSCommitmentType, appAttrs);
+  const parameters = abi.decodeParameter(SolidityRPSCommitmentType, appAttrs) as string[];
   return {
-    positionType: Number.parseInt(parameters[0], 10) as PositionType,
+    positionType: Number.parseInt(parameters[0], 10),
     stake: parameters[1],
     preCommit: parameters[2],
-    bWeapon: Number.parseInt(parameters[3], 10) as Weapon,
-    aWeapon: Number.parseInt(parameters[4], 10) as Weapon,
+    bWeapon: Number.parseInt(parameters[3], 10),
+    aWeapon: Number.parseInt(parameters[4], 10),
     salt: parameters[5],
   };
 }
 
 export function fromCoreCommitment(commitment: Commitment): RPSCommitment {
-  const {
-    channel,
-    commitmentType,
-    turnNum,
-    allocation,
-    destination,
-    commitmentCount,
-  } = commitment;
+  const { channel, commitmentType, turnNum, allocation, destination, commitmentCount } = commitment;
   return {
     channel,
     commitmentType,
@@ -102,7 +110,6 @@ export function asCoreCommitment(rpsCommitment: RPSCommitment): Commitment {
   };
 }
 
-
 // Commitment names
 export const PRE_FUND_SETUP_A = 'PRE_FUND_SETUP_A';
 export const PRE_FUND_SETUP_B = 'PRE_FUND_SETUP_B';
@@ -114,7 +121,16 @@ export const APP_REVEAL = 'APP:REVEAL';
 export const APP_RESTING = 'APP:RESTING';
 export const CONCLUDE = 'CONCLUDE';
 
-export type CommitmentName = typeof PRE_FUND_SETUP_A | typeof PRE_FUND_SETUP_B | typeof POST_FUND_SETUP_A | typeof POST_FUND_SETUP_B | typeof APP_PROPOSE | typeof APP_ACCEPT | typeof APP_REVEAL | typeof APP_RESTING | typeof CONCLUDE;
+export type CommitmentName =
+  | typeof PRE_FUND_SETUP_A
+  | typeof PRE_FUND_SETUP_B
+  | typeof POST_FUND_SETUP_A
+  | typeof POST_FUND_SETUP_B
+  | typeof APP_PROPOSE
+  | typeof APP_ACCEPT
+  | typeof APP_REVEAL
+  | typeof APP_RESTING
+  | typeof CONCLUDE;
 
 function getCommitmentName(commitment: Commitment): CommitmentName {
   switch (commitment.commitmentType) {
@@ -137,7 +153,6 @@ function getCommitmentName(commitment: Commitment): CommitmentName {
           return APP_REVEAL;
       }
       break;
-
   }
   return CONCLUDE;
 }
