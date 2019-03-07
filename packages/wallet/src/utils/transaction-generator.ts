@@ -5,7 +5,6 @@ import { Commitment, asEthersObject } from 'fmg-core';
 const ZERO_ADDRESS = '0x' + '0'.repeat(40);
 
 export function createForceMoveTransaction(
-  contractAddress: string,
   fromState: Commitment,
   toState: Commitment,
   fromSignature: string,
@@ -23,7 +22,6 @@ export function createForceMoveTransaction(
     [splitFromSignature, splitToSignature],
   ]);
   return {
-    to: contractAddress,
     data,
   };
 }
