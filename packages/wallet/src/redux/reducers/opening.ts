@@ -17,7 +17,7 @@ import { NextChannelState } from '../states/shared';
 export const openingReducer = (
   state: states.OpeningState,
   action: actions.WalletAction,
-): NextChannelState<states.OpeningState | states.WaitForFundingRequest> => {
+): NextChannelState<states.ChannelState> => {
   switch (state.type) {
     case states.WAIT_FOR_CHANNEL:
       return waitForChannelReducer(state, action);
@@ -31,7 +31,7 @@ export const openingReducer = (
 const waitForChannelReducer = (
   state: states.WaitForChannel,
   action: actions.WalletAction,
-): NextChannelState<states.WaitForChannel | states.WaitForPreFundSetup> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     // case actions.LOGGED_IN:
     //   const { uid } = action;
