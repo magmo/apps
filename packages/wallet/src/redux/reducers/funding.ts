@@ -22,6 +22,7 @@ import { ChannelState } from '../states';
 export const fundingReducer = (
   state: states.FundingState,
   action: actions.WalletAction,
+  unhandledAction?: actions.WalletAction,
 ): NextChannelState<ChannelState> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
   if (
@@ -37,14 +38,14 @@ export const fundingReducer = (
     case states.WAIT_FOR_FUNDING_REQUEST:
       return waitForFundingRequestReducer(state, action);
     case states.APPROVE_FUNDING:
-      return approveFundingReducer(state, action);
+      return approveFundingReducer(state, action, unhandledAction);
     //
     case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return aWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
       return aSubmitDepositToMetaMaskReducer(state, action);
     case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
-      return aWaitForDepositConfirmationReducer(state, action);
+      return aWaitForDepositConfirmationReducer(state, action, unhandledAction);
     case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
       return aWaitForOpponentDepositReducer(state, action);
     case states.A_WAIT_FOR_POST_FUND_SETUP:
@@ -57,7 +58,7 @@ export const fundingReducer = (
     case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
       return bSubmitDepositInMetaMaskReducer(state, action);
     case states.B_WAIT_FOR_DEPOSIT_CONFIRMATION:
-      return bWaitForDepositConfirmationReducer(state, action);
+      return bWaitForDepositConfirmationReducer(state, action, unhandledAction);
     case states.B_WAIT_FOR_POST_FUND_SETUP:
       return bWaitForPostFundSetupReducer(state, action);
     //
@@ -158,7 +159,7 @@ const waitForFundingRequestReducer = (
 const approveFundingReducer = (
   state: states.ApproveFunding,
   action: actions.WalletAction,
-  unhandledAction?: actions.WalletAction,
+  unhandledAction: actions.WalletAction | undefined,
 ): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
@@ -261,7 +262,7 @@ const aSubmitDepositToMetaMaskReducer = (
 const aWaitForDepositConfirmationReducer = (
   state: states.AWaitForDepositConfirmation,
   action: actions.WalletAction,
-  unhandledAction?: actions.WalletAction,
+  unhandledAction: actions.WalletAction | undefined,
 ): NextChannelState<ChannelState> => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
@@ -415,7 +416,7 @@ const bSubmitDepositInMetaMaskReducer = (
 const bWaitForDepositConfirmationReducer = (
   state: states.BWaitForDepositConfirmation,
   action: actions.WalletAction,
-  unhandledAction?: actions.WalletAction,
+  unhandledAction: actions.WalletAction | undefined,
 ): NextChannelState<ChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:

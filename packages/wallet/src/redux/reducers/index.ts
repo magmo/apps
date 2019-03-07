@@ -67,7 +67,7 @@ export const walletReducer = (
     case INITIALIZING:
       return initializingReducer(state, action);
     case OPENING:
-      return openingReducer(state, action);
+      return openingReducer(state.channelState, action);
     case FUNDING:
       return fundingReducer(state, action);
     case RUNNING:
