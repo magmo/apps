@@ -146,9 +146,8 @@ export const INITIALIZATION_FAILURE = 'WALLET.INITIALIZATION.FAILURE';
 /**
  * @ignore
  */
-export const initializationSuccess = address => ({
+export const initializationSuccess = () => ({
   type: INITIALIZATION_SUCCESS as typeof INITIALIZATION_SUCCESS,
-  address,
 });
 /**
  * @ignore
