@@ -24,12 +24,12 @@ export interface LoggedIn extends WalletState {
   uid: string;
 }
 
-export interface AddressExists extends LoggedIn {
+export interface AdjudicatorKnown extends LoggedIn {
   networkId: number;
   adjudicator: string;
 }
 
-export interface HasChannel<T extends BaseChannelState> extends AddressExists {
+export interface HasChannel<T extends FirstCommitmentReceived> extends AdjudicatorKnown {
   channelState: T;
 }
 
@@ -41,6 +41,9 @@ export interface SignedCommitment {
 export interface BaseChannelState {
   address: string;
   privateKey: string;
+}
+
+export interface FirstCommitmentReceived extends BaseChannelState {
   channelId: string;
   libraryAddress: string;
   ourIndex: number;
@@ -51,7 +54,7 @@ export interface BaseChannelState {
   requestedTotalFunds: string;
   requestedYourDeposit: string;
 }
-export interface ChannelOpen extends BaseChannelState {
+export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
 }
 export interface ChannelOpenAndTransactionExists extends ChannelOpen {
@@ -78,15 +81,23 @@ export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {
   return { ...base(params), uid: params.uid };
 }
 
-export function addressExists<T extends AddressExists>(params: T): AddressExists {
+export function adjudicatorKnown<T extends AdjudicatorKnown>(params: T): AdjudicatorKnown {
   const { networkId, adjudicator } = params;
   return { ...loggedIn(params), networkId, adjudicator };
 }
 
 export function baseChannelState<T extends BaseChannelState>(params: T): BaseChannelState {
-  const {
+  const { address, privateKey } = params;
+  return {
     address,
     privateKey,
+  };
+}
+
+export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
+  params: T,
+): FirstCommitmentReceived {
+  const {
     channelId,
     ourIndex,
     participants,
@@ -98,8 +109,7 @@ export function baseChannelState<T extends BaseChannelState>(params: T): BaseCha
     requestedYourDeposit,
   } = params;
   return {
-    address,
-    privateKey,
+    ...baseChannelState(params),
     channelId,
     ourIndex,
     participants,
@@ -113,7 +123,10 @@ export function baseChannelState<T extends BaseChannelState>(params: T): BaseCha
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  return { ...baseChannelState(params), penultimateCommitment: params.penultimateCommitment };
+  return {
+    ...firstCommitmentReceived(params),
+    penultimateCommitment: params.penultimateCommitment,
+  };
 }
 
 export function challengeExists<T extends ChallengeExists>(params: T): ChallengeExists {
