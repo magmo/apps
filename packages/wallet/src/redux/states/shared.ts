@@ -3,10 +3,25 @@ import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { Action } from 'redux';
 import { Commitment } from 'fmg-core';
 
-export interface Base {
+export interface OutboxState {
   displayOutbox?: DisplayAction;
   messageOutbox?: WalletEvent;
   transactionOutbox?: TransactionRequest;
+}
+
+export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
+export interface NextChannelState<T extends ChannelState> extends OutboxState {
+  channelState: T;
+}
+
+export interface ChannelState {
+  address: string;
+  privateKey: string;
+}
+
+export interface Base {
+  channelState?: ChannelState;
+  outboxState?: OutboxState;
 }
 
 export interface LoggedIn extends Base {
@@ -14,10 +29,12 @@ export interface LoggedIn extends Base {
 }
 
 export interface AddressExists extends LoggedIn {
-  address: string;
-  privateKey: string;
   networkId: number;
   adjudicator: string;
+}
+
+export interface HasChannel<T extends ChannelState> extends AddressExists {
+  channelState: T;
 }
 
 export interface SignedCommitment {
@@ -25,7 +42,7 @@ export interface SignedCommitment {
   signature: string;
 }
 
-export interface FirstMoveSent extends AddressExists {
+export interface FirstMoveSent extends ChannelState {
   channelId: string;
   libraryAddress: string;
   ourIndex: number;
@@ -40,7 +57,6 @@ export interface FirstMoveSent extends AddressExists {
 export interface ChannelOpen extends FirstMoveSent {
   penultimateCommitment: SignedCommitment;
 }
-
 export interface ChannelOpenAndTransactionExists extends ChannelOpen {
   transactionHash: string;
 }
@@ -57,8 +73,8 @@ export interface UserAddressExists extends ChannelOpen {
 
 // creators
 export function base<T extends Base>(params: T): Base {
-  const { messageOutbox, transactionOutbox, displayOutbox } = params;
-  return { messageOutbox, transactionOutbox, displayOutbox };
+  const { outboxState, channelState } = params;
+  return { outboxState, channelState };
 }
 
 export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {
@@ -66,8 +82,13 @@ export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {
 }
 
 export function addressExists<T extends AddressExists>(params: T): AddressExists {
-  const { address, privateKey, networkId, adjudicator } = params;
-  return { ...loggedIn(params), address, privateKey, networkId, adjudicator };
+  const { networkId, adjudicator } = params;
+  return { ...loggedIn(params), networkId, adjudicator };
+}
+
+export function baseChannelState<T extends ChannelState>(params: T): ChannelState {
+  const { address, privateKey } = params;
+  return { address, privateKey };
 }
 
 export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent {
@@ -84,7 +105,7 @@ export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent
     requestedYourDeposit,
   } = params;
   return {
-    ...addressExists(params),
+    ...baseChannelState(params),
     channelId,
     ourIndex,
     participants,
@@ -99,14 +120,19 @@ export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  const { penultimateCommitment } = params;
-  return { ...firstMoveSent(params), penultimateCommitment };
+  return { ...firstMoveSent(params), penultimateCommitment: params.penultimateCommitment };
 }
 
 export function challengeExists<T extends ChallengeExists>(params: T): ChallengeExists {
-  return { ...channelOpen(params), challengeExpiry: params.challengeExpiry };
+  return {
+    ...channelOpen(params),
+    challengeExpiry: params.challengeExpiry,
+  };
 }
 
 export function userAddressExists<T extends UserAddressExists>(params: T): UserAddressExists {
-  return { ...channelOpen(params), userAddress: params.userAddress };
+  return {
+    ...challengeExists(params),
+    userAddress: params.userAddress,
+  };
 }
