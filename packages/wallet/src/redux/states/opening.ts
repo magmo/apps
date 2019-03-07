@@ -7,7 +7,7 @@ export const OPENING = 'OPENING';
 export const WAIT_FOR_PRE_FUND_SETUP = 'WAIT_FOR_PRE_FUND_SETUP';
 export const WAIT_FOR_CHANNEL = 'WAIT_FOR_CHANNEL';
 
-export interface WaitForChannel extends BaseChannelState {
+export interface WaitForChannel {
   type: typeof WAIT_FOR_CHANNEL;
   stage: typeof OPENING;
 }
@@ -17,11 +17,11 @@ export interface WaitForPreFundSetup extends BaseChannelState {
   stage: typeof OPENING;
 }
 
-export function waitForChannel<T extends BaseChannelState>(params: T): WaitForChannel {
-  return { type: WAIT_FOR_CHANNEL, stage: OPENING, ...baseChannelState(params) };
+export function waitForChannel(): WaitForChannel {
+  return { type: WAIT_FOR_CHANNEL, stage: OPENING };
 }
 export function waitForPreFundSetup<T extends BaseChannelState>(params: T): WaitForPreFundSetup {
   return { type: WAIT_FOR_PRE_FUND_SETUP, stage: OPENING, ...baseChannelState(params) };
 }
 
-export type OpeningState = WaitForPreFundSetup | WaitForChannel;
+export type OpeningState = WaitForPreFundSetup;

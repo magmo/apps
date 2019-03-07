@@ -12,8 +12,6 @@ const {
   asPrivateKey,
   preFundCommitment1,
   preFundCommitment2,
-  bsAddress,
-  bsPrivateKey,
   libraryAddress,
 } = scenarios;
 
@@ -33,7 +31,7 @@ describe('when in WaitForChannel', () => {
 
   describe('when we send in a PreFundSetupA', () => {
     // preFundSetupA is A's move, so in this case we need to be player A
-    const state = states.waitForChannel(defaults);
+    const state = states.waitForChannel();
     const action = actions.ownCommitmentReceived(preFundCommitment1);
     const updatedState = openingReducer(state, action);
 
@@ -42,11 +40,7 @@ describe('when in WaitForChannel', () => {
 
   describe('when an opponent sends a PreFundSetupA', () => {
     // preFundSetupA is A's move, so in this case we need to be player B
-    const state = states.waitForChannel({
-      ...defaults,
-      address: bsAddress,
-      privateKey: bsPrivateKey,
-    });
+    const state = states.waitForChannel();
     const action = actions.opponentCommitmentReceived(preFundCommitment1, 'sig');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
@@ -57,11 +51,7 @@ describe('when in WaitForChannel', () => {
   });
 
   describe('when an opponent sends a PreFundSetupA but the signature is bad', () => {
-    const state = states.waitForChannel({
-      ...defaults,
-      address: bsAddress,
-      privateKey: bsPrivateKey,
-    });
+    const state = states.waitForChannel();
     const action = actions.opponentCommitmentReceived(preFundCommitment1, 'not-a-signature');
     const validateMock = jest.fn().mockReturnValue(false);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
@@ -75,7 +65,7 @@ describe('when in WaitForChannel', () => {
   });
 
   describe('when we send in a a non-PreFundSetupA', () => {
-    const state = states.waitForChannel(defaults);
+    const state = states.waitForChannel();
     const action = actions.ownCommitmentReceived(preFundCommitment2);
     const updatedState = openingReducer(state, action);
 
