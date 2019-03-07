@@ -54,7 +54,7 @@ export function createWalletIFrame(iframeId: string, walletUrl?: string): HTMLIF
  * @param userId An id that is unique to the user who will be using the wallet.
  * @returns {Promise<null>} A promise that resolves to null.
  */
-export async function initializeWallet(iFrameId: string, userId: string): Promise<string> {
+export async function initializeWallet(iFrameId: string, userId: string): Promise<null> {
   const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = initializeRequest(userId);
 
