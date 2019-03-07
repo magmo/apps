@@ -10,21 +10,16 @@ export interface OutboxState {
 }
 
 export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
-export interface NextChannelState<T extends ChannelState> extends OutboxState {
+export interface NextChannelState<T extends BaseChannelState> extends OutboxState {
   channelState: T;
 }
 
-export interface ChannelState {
-  address: string;
-  privateKey: string;
-}
-
-export interface Base {
-  channelState?: ChannelState;
+export interface WalletState {
+  channelState?: BaseChannelState;
   outboxState?: OutboxState;
 }
 
-export interface LoggedIn extends Base {
+export interface LoggedIn extends WalletState {
   uid: string;
 }
 
@@ -33,7 +28,7 @@ export interface AddressExists extends LoggedIn {
   adjudicator: string;
 }
 
-export interface HasChannel<T extends ChannelState> extends AddressExists {
+export interface HasChannel<T extends BaseChannelState> extends AddressExists {
   channelState: T;
 }
 
@@ -42,7 +37,9 @@ export interface SignedCommitment {
   signature: string;
 }
 
-export interface FirstMoveSent extends ChannelState {
+export interface BaseChannelState {
+  address: string;
+  privateKey: string;
   channelId: string;
   libraryAddress: string;
   ourIndex: number;
@@ -50,11 +47,11 @@ export interface FirstMoveSent extends ChannelState {
   channelNonce: number;
   turnNum: number;
   lastCommitment: SignedCommitment;
-  unhandledAction?: Action;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
+  unhandledAction?: Action;
 }
-export interface ChannelOpen extends FirstMoveSent {
+export interface ChannelOpen extends BaseChannelState {
   penultimateCommitment: SignedCommitment;
 }
 export interface ChannelOpenAndTransactionExists extends ChannelOpen {
@@ -72,7 +69,7 @@ export interface UserAddressExists extends ChannelOpen {
 }
 
 // creators
-export function base<T extends Base>(params: T): Base {
+export function base<T extends WalletState>(params: T): WalletState {
   const { outboxState, channelState } = params;
   return { outboxState, channelState };
 }
@@ -86,13 +83,10 @@ export function addressExists<T extends AddressExists>(params: T): AddressExists
   return { ...loggedIn(params), networkId, adjudicator };
 }
 
-export function baseChannelState<T extends ChannelState>(params: T): ChannelState {
-  const { address, privateKey } = params;
-  return { address, privateKey };
-}
-
-export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent {
+export function baseChannelState<T extends BaseChannelState>(params: T): BaseChannelState {
   const {
+    address,
+    privateKey,
     channelId,
     ourIndex,
     participants,
@@ -105,7 +99,8 @@ export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent
     requestedYourDeposit,
   } = params;
   return {
-    ...baseChannelState(params),
+    address,
+    privateKey,
     channelId,
     ourIndex,
     participants,
@@ -120,7 +115,7 @@ export function firstMoveSent<T extends FirstMoveSent>(params: T): FirstMoveSent
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  return { ...firstMoveSent(params), penultimateCommitment: params.penultimateCommitment };
+  return { ...baseChannelState(params), penultimateCommitment: params.penultimateCommitment };
 }
 
 export function challengeExists<T extends ChallengeExists>(params: T): ChallengeExists {
