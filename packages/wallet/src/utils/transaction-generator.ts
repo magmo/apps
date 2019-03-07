@@ -29,7 +29,6 @@ export function createForceMoveTransaction(
 }
 
 export function createRespondWithMoveTransaction(
-  contractAddress: string,
   nextState: Commitment,
   signature: string,
 ): TransactionRequest {
@@ -39,7 +38,6 @@ export function createRespondWithMoveTransaction(
     splitSignature(signature),
   ]);
   return {
-    to: contractAddress,
     data,
   };
 }

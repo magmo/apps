@@ -15,7 +15,7 @@ import { channelID } from 'fmg-core/lib/channel';
 import { NextChannelState } from '../states/shared';
 
 export const openingReducer = (
-  state: states.OpeningState,
+  state: states.OpeningState | states.WaitForChannel,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
   switch (state.type) {
@@ -56,7 +56,7 @@ const waitForChannelReducer = (
 
       const ourAddress = ownCommitment.channel.participants[0] as string;
 
-      if (ourAddress !== state.address) {
+      if (ourAddress !== action.address) {
         return {
           channelState: state,
           messageOutbox: signatureFailure(
@@ -66,14 +66,16 @@ const waitForChannelReducer = (
         };
       }
 
-      const signature = signCommitment(ownCommitment, state.privateKey);
+      const signature = signCommitment(ownCommitment, action.privateKey);
       // if so, unpack its contents into the state
       return {
         channelState: states.waitForPreFundSetup({
           ...state,
+          address: action.address,
+          privateKey: action.privateKey,
           libraryAddress: ownCommitment.channel.channelType,
           channelId: channelID(ownCommitment.channel),
-          ourIndex: ownCommitment.channel.participants.indexOf(state.address),
+          ourIndex: ownCommitment.channel.participants.indexOf(action.address),
           participants: ownCommitment.channel.participants as [string, string],
           channelNonce: ownCommitment.channel.nonce,
           turnNum: 0,
@@ -102,14 +104,14 @@ const waitForChannelReducer = (
         };
       }
 
-      const ourAddress2 = opponentCommitment.channel.participants[1] as string;
+      const ourAddress2 = opponentCommitment.channel.participants[1];
       const opponentAddress2 = opponentCommitment.channel.participants[0] as string;
 
       if (!validCommitmentSignature(action.commitment, action.signature, opponentAddress2)) {
         return { channelState: state, messageOutbox: validationFailure('InvalidSignature') };
       }
 
-      if (ourAddress2 !== state.address) {
+      if (ourAddress2 !== action.address) {
         return {
           channelState: state,
           messageOutbox: validationFailure(
