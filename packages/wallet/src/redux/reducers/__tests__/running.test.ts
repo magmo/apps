@@ -1,4 +1,4 @@
-import { walletReducer } from '..';
+import { runningReducer } from '../running';
 import * as scenarios from './test-scenarios';
 import * as states from '../../states';
 import * as actions from '../../actions';
@@ -50,7 +50,7 @@ describe('when in WaitForUpdate on our turn', () => {
 
   describe('when we send in a new position', () => {
     const action = actions.ownCommitmentReceived(gameCommitment3);
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
@@ -58,21 +58,21 @@ describe('when in WaitForUpdate on our turn', () => {
 
   describe('when we send in a position with the wrong turnNum', () => {
     const action = actions.ownCommitmentReceived(gameCommitment2);
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itDoesntTransition(state, updatedState);
   });
 
   describe('when an opponent sends a new position', () => {
     const action = actions.opponentCommitmentReceived(gameCommitment3, 'sig');
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itDoesntTransition(state, updatedState); // because it's our turn
   });
 
   describe('when the wallet detects an opponent challenge', () => {
     const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry);
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
@@ -80,7 +80,7 @@ describe('when in WaitForUpdate on our turn', () => {
 
   describe('when we request to launch a challenge', () => {
     const action = actions.challengeRequested();
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
@@ -95,7 +95,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
 
   describe('when we send in a new position', () => {
     const action = actions.ownCommitmentReceived(gameCommitment3);
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
     // it ignores it
     itDoesntTransition(state, updatedState);
   });
@@ -104,7 +104,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     const action = actions.opponentCommitmentReceived(gameCommitment3, 'sig');
     const signMock = jest.fn().mockReturnValue('0x0');
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: signMock });
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
@@ -112,21 +112,21 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
 
   describe('when an opponent sends a new position with the wrong turnNum', () => {
     const action = actions.opponentCommitmentReceived(gameCommitment1, 'sig');
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itDoesntTransition(state, updatedState);
   });
 
   describe('when an opponent sends a new position with the wrong signature', () => {
     const action = actions.opponentCommitmentReceived(gameCommitment3, 'not-a-signature');
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itDoesntTransition(state, updatedState);
   });
 
   describe('when the wallet detects an opponent challenge', () => {
     const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry);
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
@@ -134,7 +134,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
 
   describe('when we request to launch a challenge ', () => {
     const action = actions.challengeRequested();
-    const updatedState = walletReducer(state, action);
+    const updatedState = runningReducer(state, action);
 
     itTransitionsToStateType(states.APPROVE_CHALLENGE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
