@@ -15,7 +15,7 @@ import { channelID } from 'fmg-core/lib/channel';
 import { NextChannelState } from '../states/shared';
 
 export const openingReducer = (
-  state: states.OpeningState | states.WaitForChannel,
+  state: states.OpeningState,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
   switch (state.type) {
@@ -31,11 +31,8 @@ export const openingReducer = (
 const waitForChannelReducer = (
   state: states.WaitForChannel,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.WaitForPreFundSetup> => {
   switch (action.type) {
-    // case actions.LOGGED_IN:
-    //   const { uid } = action;
-    //   return states.waitForAddress({ channelState: state, uid });
     case actions.OWN_COMMITMENT_RECEIVED:
       const ownCommitment = action.commitment;
 
@@ -56,7 +53,7 @@ const waitForChannelReducer = (
 
       const ourAddress = ownCommitment.channel.participants[0] as string;
 
-      if (ourAddress !== action.address) {
+      if (ourAddress !== state.address) {
         return {
           channelState: state,
           messageOutbox: signatureFailure(
@@ -66,16 +63,14 @@ const waitForChannelReducer = (
         };
       }
 
-      const signature = signCommitment(ownCommitment, action.privateKey);
+      const signature = signCommitment(ownCommitment, state.privateKey);
       // if so, unpack its contents into the state
       return {
         channelState: states.waitForPreFundSetup({
           ...state,
-          address: action.address,
-          privateKey: action.privateKey,
           libraryAddress: ownCommitment.channel.channelType,
           channelId: channelID(ownCommitment.channel),
-          ourIndex: ownCommitment.channel.participants.indexOf(action.address),
+          ourIndex: ownCommitment.channel.participants.indexOf(state.address),
           participants: ownCommitment.channel.participants as [string, string],
           channelNonce: ownCommitment.channel.nonce,
           turnNum: 0,
@@ -111,7 +106,7 @@ const waitForChannelReducer = (
         return { channelState: state, messageOutbox: validationFailure('InvalidSignature') };
       }
 
-      if (ourAddress2 !== action.address) {
+      if (ourAddress2 !== state.address) {
         return {
           channelState: state,
           messageOutbox: validationFailure(
@@ -137,7 +132,6 @@ const waitForChannelReducer = (
         }),
         messageOutbox: validationSuccess(),
       };
-
     default:
       return { channelState: state };
   }

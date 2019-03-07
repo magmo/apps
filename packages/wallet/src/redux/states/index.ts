@@ -1,4 +1,3 @@
-import { InitializingChannelState } from './initializingChannel';
 import { OpeningState } from './opening';
 import { RunningState } from './running';
 import { FundingState } from './funding';
@@ -8,14 +7,14 @@ import { FundingState } from './funding';
 // import { ClosingState } from './closing';
 import { WalletState } from './shared';
 
-export type ChannelState = InitializingChannelState | OpeningState | FundingState | RunningState;
+export type ChannelState = OpeningState | FundingState | RunningState;
 // | ChallengingState
 // | RespondingState
 // | WithdrawingState
 // ClosingState;
 
-export * from './initializing';
 export * from './initializingChannel';
+export * from './initializing';
 export * from './opening';
 export * from './running';
 export * from './funding';

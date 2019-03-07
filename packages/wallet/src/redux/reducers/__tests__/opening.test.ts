@@ -13,6 +13,8 @@ const {
   preFundCommitment1,
   preFundCommitment2,
   libraryAddress,
+  bsAddress,
+  bsPrivateKey,
 } = scenarios;
 
 const defaults = {
@@ -22,8 +24,12 @@ const defaults = {
 };
 
 describe('when in WaitForChannel', () => {
-  describe.skip('when another user logs in ', () => {
-    // const state = states.waitForChannel(defaults);
+  describe('when initializeChannel is requested again', () => {
+    it.skip('works', async () => {
+      // TODO: What to do here?
+      expect.assertions(1);
+    });
+    // const state = states.waitForChannel(defaultsdefaults);
     // const action = actions.loggedIn(defaults.uid);
     // const updatedState = openingReducer(state, action);
     // itTransitionsToStateType(states.WAIT_FOR_ADDRESS, updatedState);
@@ -31,7 +37,7 @@ describe('when in WaitForChannel', () => {
 
   describe('when we send in a PreFundSetupA', () => {
     // preFundSetupA is A's move, so in this case we need to be player A
-    const state = states.waitForChannel();
+    const state = states.waitForChannel(defaults);
     const action = actions.ownCommitmentReceived(preFundCommitment1);
     const updatedState = openingReducer(state, action);
 
@@ -40,7 +46,7 @@ describe('when in WaitForChannel', () => {
 
   describe('when an opponent sends a PreFundSetupA', () => {
     // preFundSetupA is A's move, so in this case we need to be player B
-    const state = states.waitForChannel();
+    const state = states.waitForChannel({ address: bsAddress, privateKey: bsPrivateKey });
     const action = actions.opponentCommitmentReceived(preFundCommitment1, 'sig');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
@@ -51,7 +57,7 @@ describe('when in WaitForChannel', () => {
   });
 
   describe('when an opponent sends a PreFundSetupA but the signature is bad', () => {
-    const state = states.waitForChannel();
+    const state = states.waitForChannel(defaults);
     const action = actions.opponentCommitmentReceived(preFundCommitment1, 'not-a-signature');
     const validateMock = jest.fn().mockReturnValue(false);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
@@ -65,7 +71,7 @@ describe('when in WaitForChannel', () => {
   });
 
   describe('when we send in a a non-PreFundSetupA', () => {
-    const state = states.waitForChannel();
+    const state = states.waitForChannel(defaults);
     const action = actions.ownCommitmentReceived(preFundCommitment2);
     const updatedState = openingReducer(state, action);
 

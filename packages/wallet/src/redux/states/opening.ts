@@ -11,8 +11,9 @@ export const OPENING = 'OPENING';
 // state type
 export const WAIT_FOR_PRE_FUND_SETUP = 'WAIT_FOR_PRE_FUND_SETUP';
 export const WAIT_FOR_CHANNEL = 'WAIT_FOR_CHANNEL';
+export const METAMASK_LOAD_ERROR = 'METAMASK_LOAD_ERROR';
 
-export interface WaitForChannel {
+export interface WaitForChannel extends BaseChannelState {
   type: typeof WAIT_FOR_CHANNEL;
   stage: typeof OPENING;
 }
@@ -32,4 +33,4 @@ export function waitForPreFundSetup<T extends FirstCommitmentReceived>(
   return { type: WAIT_FOR_PRE_FUND_SETUP, stage: OPENING, ...firstCommitmentReceived(params) };
 }
 
-export type OpeningState = WaitForPreFundSetup;
+export type OpeningState = WaitForChannel | WaitForPreFundSetup;

@@ -27,15 +27,9 @@ export const JOIN_CHANNEL_REQUEST = '';
 export const ADDRESS_REQUEST = ''; // provide me with an address
 
 export const OWN_COMMITMENT_RECEIVED = 'WALLET.OWN_COMMITMENT_RECEIVED';
-export const ownCommitmentReceived = (
-  commitment: Commitment,
-  address: string,
-  privateKey: string,
-) => ({
+export const ownCommitmentReceived = (commitment: Commitment) => ({
   type: OWN_COMMITMENT_RECEIVED as typeof OWN_COMMITMENT_RECEIVED,
   commitment,
-  privateKey,
-  address,
 });
 export type OwnCommitmentReceived = ReturnType<typeof ownCommitmentReceived>;
 
