@@ -1,7 +1,7 @@
 import { TransactionRequest } from 'ethers/providers';
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
-import { Action } from 'redux';
 import { Commitment } from 'fmg-core';
+import { WalletAction } from '../actions';
 
 export interface OutboxState {
   displayOutbox?: DisplayAction;
@@ -12,6 +12,7 @@ export interface OutboxState {
 export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
 export interface NextChannelState<T extends BaseChannelState> extends OutboxState {
   channelState: T;
+  unhandledAction?: WalletAction;
 }
 
 export interface WalletState {
@@ -49,7 +50,6 @@ export interface BaseChannelState {
   lastCommitment: SignedCommitment;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
-  unhandledAction?: Action;
 }
 export interface ChannelOpen extends BaseChannelState {
   penultimateCommitment: SignedCommitment;
@@ -94,7 +94,6 @@ export function baseChannelState<T extends BaseChannelState>(params: T): BaseCha
     turnNum,
     lastCommitment: lastPosition,
     libraryAddress,
-    unhandledAction,
     requestedTotalFunds,
     requestedYourDeposit,
   } = params;
@@ -108,7 +107,6 @@ export function baseChannelState<T extends BaseChannelState>(params: T): BaseCha
     turnNum,
     lastCommitment: lastPosition,
     libraryAddress,
-    unhandledAction,
     requestedTotalFunds,
     requestedYourDeposit,
   };

@@ -24,4 +24,4 @@ export function waitForPreFundSetup<T extends BaseChannelState>(params: T): Wait
   return { type: WAIT_FOR_PRE_FUND_SETUP, stage: OPENING, ...baseChannelState(params) };
 }
 
-export type OpeningState = WaitForPreFundSetup;
+export type OpeningState = WaitForPreFundSetup | WaitForChannel;
