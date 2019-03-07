@@ -1,5 +1,3 @@
-import { walletReducer } from '..';
-
 import * as states from '../../states';
 import * as actions from '../../actions';
 
@@ -7,39 +5,37 @@ import { itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
+import { openingReducer } from '../opening';
 
 const {
   asAddress,
   asPrivateKey,
-  libraryAddress,
   preFundCommitment1,
   preFundCommitment2,
   bsAddress,
   bsPrivateKey,
+  libraryAddress,
 } = scenarios;
 
 const defaults = {
-  networkId: 123,
-  uid: 'uid',
   address: asAddress,
   privateKey: asPrivateKey,
   libraryAddress,
-  adjudicator: '0x0',
 };
 
 describe('when in WaitForChannel', () => {
-  describe('when another user logs in ', () => {
-    const state = states.waitForChannel(defaults);
-    const action = actions.loggedIn(defaults.uid);
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_ADDRESS, updatedState);
+  describe.skip('when another user logs in ', () => {
+    // const state = states.waitForChannel(defaults);
+    // const action = actions.loggedIn(defaults.uid);
+    // const updatedState = openingReducer(state, action);
+    // itTransitionsToStateType(states.WAIT_FOR_ADDRESS, updatedState);
   });
 
   describe('when we send in a PreFundSetupA', () => {
     // preFundSetupA is A's move, so in this case we need to be player A
     const state = states.waitForChannel(defaults);
     const action = actions.ownCommitmentReceived(preFundCommitment1);
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
   });
@@ -55,7 +51,7 @@ describe('when in WaitForChannel', () => {
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
   });
@@ -70,7 +66,7 @@ describe('when in WaitForChannel', () => {
     const validateMock = jest.fn().mockReturnValue(false);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itDoesntTransition(state, updatedState);
     it(`sends a validation failed message`, () => {
@@ -81,7 +77,7 @@ describe('when in WaitForChannel', () => {
   describe('when we send in a a non-PreFundSetupA', () => {
     const state = states.waitForChannel(defaults);
     const action = actions.ownCommitmentReceived(preFundCommitment2);
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itDoesntTransition(state, updatedState);
     it(`sends a signature failed message`, () => {
@@ -98,7 +94,6 @@ describe('when in WaitForPreFundSetup', () => {
     participants: scenarios.channel.participants as [string, string],
     turnNum: 0,
     lastCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
-    adjudicator: '0x0',
     requestedTotalFunds: '0x0',
     requestedYourDeposit: '0x0',
   };
@@ -107,7 +102,7 @@ describe('when in WaitForPreFundSetup', () => {
     // preFundSetupB is B's move, so in this case we need to be player B
     const state = states.waitForPreFundSetup({ ...defaults2, ourIndex: 1 });
     const action = actions.ownCommitmentReceived(preFundCommitment2);
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
   });
@@ -119,7 +114,7 @@ describe('when in WaitForPreFundSetup', () => {
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
     const action = actions.opponentCommitmentReceived(preFundCommitment2, 'sig');
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
   });
@@ -130,7 +125,7 @@ describe('when in WaitForPreFundSetup', () => {
     const validateMock = jest.fn().mockReturnValue(false);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
     itDoesntTransition(state, updatedState);
     it(`sends a validation failed message`, () => {
       expect(updatedState.messageOutbox).toEqual(validationFailure('InvalidSignature'));
@@ -140,7 +135,7 @@ describe('when in WaitForPreFundSetup', () => {
   describe('when we send in a a non-PreFundSetupB', () => {
     const state = states.waitForPreFundSetup({ ...defaults2, ourIndex: 1 });
     const action = actions.ownCommitmentReceived(preFundCommitment1);
-    const updatedState = walletReducer(state, action);
+    const updatedState = openingReducer(state, action);
 
     itDoesntTransition(state, updatedState);
     it(`sends a signature failed message`, () => {
