@@ -1,10 +1,10 @@
-import { WalletState, LoggedIn, loggedIn, base } from './shared';
+import { WalletState, base, LoggedIn, loggedIn } from './shared';
 
 export const INITIALIZING = 'INITIALIZING';
 
-export const WAIT_FOR_LOGIN = 'WAIT_FOR_LOGIN';
-export const WAIT_FOR_ADDRESS = 'WAIT_FOR_ADDRESS';
-export const METAMASK_ERROR = 'METAMASK_ERROR';
+export const WAIT_FOR_LOGIN = 'INITIALIZING.WAIT_FOR_LOGIN';
+export const METAMASK_ERROR = 'INITIALIZING.METAMASK_ERROR';
+export const WAIT_FOR_ADJUDICATOR = 'INITIALIZING.WAIT_FOR_ADJUDICATOR';
 
 export interface WaitForLogin extends WalletState {
   type: typeof WAIT_FOR_LOGIN;
@@ -14,13 +14,12 @@ export function waitForLogin<T extends WalletState>(params = {} as T): WaitForLo
   return { type: WAIT_FOR_LOGIN, stage: INITIALIZING, ...base(params) };
 }
 
-export interface WaitForAddress extends LoggedIn {
-  type: typeof WAIT_FOR_ADDRESS;
+export interface WaitForAdjudicator extends LoggedIn {
+  type: typeof WAIT_FOR_ADJUDICATOR;
   stage: typeof INITIALIZING;
 }
-
-export function waitForAddress<T extends LoggedIn>(params: T): WaitForAddress {
-  return { ...loggedIn(params), type: WAIT_FOR_ADDRESS, stage: INITIALIZING };
+export function waitForAdjudicator<T extends LoggedIn>(params: T): WaitForAdjudicator {
+  return { ...loggedIn(params), type: WAIT_FOR_ADJUDICATOR, stage: INITIALIZING };
 }
 
 export interface MetaMaskError extends WalletState {
@@ -32,4 +31,4 @@ export function metaMaskError<T extends WalletState>(params: T): MetaMaskError {
   return { type: METAMASK_ERROR, stage: INITIALIZING, ...base(params) };
 }
 
-export type InitializingState = WaitForLogin | WaitForAddress | MetaMaskError;
+export type InitializingState = WaitForLogin | WaitForAdjudicator | MetaMaskError;
