@@ -2,16 +2,19 @@ import { OpeningState } from './opening';
 import { RunningState } from './running';
 import { FundingState } from './funding';
 // import { ChallengingState } from './challenging';
-// import { RespondingState } from './responding';
-// import { WithdrawingState } from './withdrawing';
-// import { ClosingState } from './closing';
+import { RespondingState } from './responding';
+import { WithdrawingState } from './withdrawing';
+import { ClosingState } from './closing';
 import { WalletState } from './shared';
 
-export type ChannelState = OpeningState | FundingState | RunningState;
-// | ChallengingState
-// | RespondingState
-// | WithdrawingState
-// ClosingState;
+export type ChannelState =
+  | OpeningState
+  | FundingState
+  | RunningState
+  // | ChallengingState
+  | RespondingState
+  | WithdrawingState
+  | ClosingState;
 
 export * from './initializingChannel';
 export * from './initializing';
