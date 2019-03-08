@@ -5,7 +5,7 @@ import { ChallengingState } from './challenging';
 import { RespondingState } from './responding';
 import { WithdrawingState } from './withdrawing';
 import { ClosingState } from './closing';
-import { WalletState } from './shared';
+import { SharedWalletState } from './shared';
 
 export type ChannelState =
   | OpeningState
@@ -25,4 +25,4 @@ export * from './challenging';
 export * from './responding';
 export * from './withdrawing';
 export * from './closing';
-export { WalletState };
+export { SharedWalletState };

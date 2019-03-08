@@ -16,12 +16,12 @@ export interface NextChannelState<T extends BaseChannelState> extends OutboxStat
   unhandledAction?: WalletAction;
 }
 
-export interface WalletState {
+export interface SharedWalletState {
   channelState?: BaseChannelState;
   outboxState?: OutboxState;
 }
 
-export interface LoggedIn extends WalletState {
+export interface LoggedIn extends SharedWalletState {
   uid: string;
 }
 
@@ -73,7 +73,7 @@ export interface UserAddressExists extends ChannelOpen {
 }
 
 // creators
-export function base<T extends WalletState>(params: T): WalletState {
+export function base<T extends SharedWalletState>(params: T): SharedWalletState {
   const { outboxState, channelState } = params;
   return { outboxState, channelState };
 }
