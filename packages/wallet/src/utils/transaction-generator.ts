@@ -69,7 +69,6 @@ export interface ConcludeAndWithdrawArgs {
   verificationSignature: string;
 }
 export function createConcludeAndWithdrawTransaction(
-  contractAddress: string,
   args: ConcludeAndWithdrawArgs,
 ): TransactionRequest {
   const adjudicatorInterface = getAdjudicatorInterface();
@@ -94,14 +93,12 @@ export function createConcludeAndWithdrawTransaction(
   ]);
 
   return {
-    to: contractAddress,
     data,
     gasLimit: 3000000,
   };
 }
 
 export function createConcludeTransaction(
-  contractAddress: string,
   fromState: Commitment,
   toState: Commitment,
   fromSignature: string,
@@ -119,13 +116,11 @@ export function createConcludeTransaction(
   const data = adjudicatorInterface.functions.conclude.encode([conclusionProof]);
 
   return {
-    to: contractAddress,
     data,
   };
 }
 
 export function createWithdrawTransaction(
-  contractAddress: string,
   amount: string,
   participant: string,
   destination: string,
@@ -143,14 +138,12 @@ export function createWithdrawTransaction(
   ]);
 
   return {
-    to: contractAddress,
     data,
     gasLimit: 3000000,
   };
 }
 
 export function createTransferAndWithdrawTransaction(
-  contractAddress: string,
   channelId: string,
   participant: string,
   destination: string,
@@ -170,7 +163,6 @@ export function createTransferAndWithdrawTransaction(
   ]);
 
   return {
-    to: contractAddress,
     data,
     gasLimit: 3000000,
   };
