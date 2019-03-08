@@ -1,7 +1,7 @@
 import { TransactionRequest } from 'ethers/providers';
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { WalletAction } from '../actions';
-import { WaitForChannel } from './opening';
+import { WaitForChannel } from './channels/opening';
 import { SharedChannelState } from './channels/shared';
 
 export interface OutboxState {

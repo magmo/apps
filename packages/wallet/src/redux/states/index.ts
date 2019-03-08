@@ -1,10 +1,10 @@
-import { OpeningState } from './opening';
-import { RunningState } from './running';
-import { FundingState } from './funding';
-import { ChallengingState } from './challenging';
-import { RespondingState } from './responding';
-import { WithdrawingState } from './withdrawing';
-import { ClosingState } from './closing';
+import { OpeningState } from './channels/opening';
+import { RunningState } from './channels/running';
+import { FundingState } from './channels/funding';
+import { ChallengingState } from './channels/challenging';
+import { RespondingState } from './channels/responding';
+import { WithdrawingState } from './channels/withdrawing';
+import { ClosingState } from './channels/closing';
 import { SharedWalletState } from './shared';
 
 export type ChannelState =

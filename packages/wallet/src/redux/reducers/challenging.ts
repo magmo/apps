@@ -1,6 +1,6 @@
-import * as states from '../states/challenging';
-import * as runningStates from '../states/running';
-import * as withdrawalStates from '../states/withdrawing';
+import * as states from '../states/channels/challenging';
+import * as runningStates from '../states/channels/running';
+import * as withdrawalStates from '../states/channels/withdrawing';
 import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
