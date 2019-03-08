@@ -11,13 +11,13 @@ export interface OutboxState {
 }
 
 export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
-export interface NextChannelState<T extends BaseChannelState> extends OutboxState {
+export interface NextChannelState<T extends SharedChannelState> extends OutboxState {
   channelState: T | WaitForChannel;
   unhandledAction?: WalletAction;
 }
 
 export interface SharedWalletState {
-  channelState?: BaseChannelState;
+  channelState?: SharedChannelState;
   outboxState?: OutboxState;
 }
 
@@ -30,7 +30,12 @@ export interface AdjudicatorKnown extends LoggedIn {
   adjudicator: string;
 }
 
-export interface HasChannel<T extends FirstCommitmentReceived> extends AdjudicatorKnown {
+export interface SharedChannelState {
+  address: string;
+  privateKey: string;
+}
+
+export interface HasChannel<T extends SharedChannelState> extends AdjudicatorKnown {
   channelState: T;
 }
 
@@ -39,12 +44,7 @@ export interface SignedCommitment {
   signature: string;
 }
 
-export interface BaseChannelState {
-  address: string;
-  privateKey: string;
-}
-
-export interface FirstCommitmentReceived extends BaseChannelState {
+export interface FirstCommitmentReceived extends SharedChannelState {
   channelId: string;
   libraryAddress: string;
   ourIndex: number;
@@ -87,7 +87,7 @@ export function adjudicatorKnown<T extends AdjudicatorKnown>(params: T): Adjudic
   return { ...loggedIn(params), networkId, adjudicator };
 }
 
-export function baseChannelState<T extends BaseChannelState>(params: T): BaseChannelState {
+export function baseChannelState<T extends SharedChannelState>(params: T): SharedChannelState {
   const { address, privateKey } = params;
   return {
     address,
