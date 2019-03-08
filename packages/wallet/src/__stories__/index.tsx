@@ -120,10 +120,7 @@ storiesOf('Wallet Screens / Withdrawing', module)
 
 storiesOf('Wallet Screens / Challenging', module)
   .add('ApproveChallenge', testState(states.approveChallenge(playerADefaults)))
-  .add(
-    'WaitForChallengeInitiation',
-    testState(states.waitForChallengeInitiation({}, playerADefaults)),
-  )
+  .add('WaitForChallengeInitiation', testState(states.waitForChallengeInitiation(playerADefaults)))
   .add('WaitForChallengeSubmission', testState(states.waitForChallengeSubmission(playerADefaults)))
   .add(
     'WaitForChallengeConfirmation',
