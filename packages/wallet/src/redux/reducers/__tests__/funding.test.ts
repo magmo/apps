@@ -1,6 +1,6 @@
 import { fundingReducer } from '../funding';
 
-import * as states from '../../states';
+import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
@@ -10,7 +10,6 @@ import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
-import { BWaitForDepositConfirmation } from '../../states';
 import { NextChannelState } from 'src/redux/states/shared';
 
 const {
@@ -392,7 +391,7 @@ describe('start in WaitForDepositConfirmation', () => {
     itIncreasesTurnNumBy(0, state, updatedState);
     it('works', async () => {
       expect(
-        (updatedState as NextChannelState<BWaitForDepositConfirmation>).unhandledAction,
+        (updatedState as NextChannelState<states.BWaitForDepositConfirmation>).unhandledAction,
       ).toEqual(action);
     });
   });

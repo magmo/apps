@@ -1,4 +1,4 @@
-import * as states from '../states';
+import * as channelStates from '../states/channels';
 import * as actions from '../actions';
 import {
   signatureSuccess,
@@ -15,13 +15,13 @@ import { channelID } from 'fmg-core/lib/channel';
 import { NextChannelState } from '../states/shared';
 
 export const openingReducer = (
-  state: states.OpeningState,
+  state: channelStates.OpeningState,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (state.type) {
-    case states.WAIT_FOR_CHANNEL:
+    case channelStates.WAIT_FOR_CHANNEL:
       return waitForChannelReducer(state, action);
-    case states.WAIT_FOR_PRE_FUND_SETUP:
+    case channelStates.WAIT_FOR_PRE_FUND_SETUP:
       return waitForPreFundSetupReducer(state, action);
     default:
       return unreachable(state);
@@ -29,9 +29,9 @@ export const openingReducer = (
 };
 
 const waitForChannelReducer = (
-  state: states.WaitForChannel,
+  state: channelStates.WaitForChannel,
   action: actions.WalletAction,
-): NextChannelState<states.WaitForPreFundSetup> => {
+): NextChannelState<channelStates.WaitForPreFundSetup> => {
   switch (action.type) {
     case actions.OWN_COMMITMENT_RECEIVED:
       const ownCommitment = action.commitment;
@@ -66,7 +66,7 @@ const waitForChannelReducer = (
       const signature = signCommitment(ownCommitment, state.privateKey);
       // if so, unpack its contents into the state
       return {
-        channelState: states.waitForPreFundSetup({
+        channelState: channelStates.waitForPreFundSetup({
           ...state,
           libraryAddress: ownCommitment.channel.channelType,
           channelId: channelID(ownCommitment.channel),
@@ -118,7 +118,7 @@ const waitForChannelReducer = (
 
       // if so, unpack its contents into the state
       return {
-        channelState: states.waitForPreFundSetup({
+        channelState: channelStates.waitForPreFundSetup({
           ...state,
           libraryAddress: opponentCommitment.channel.channelType,
           channelId: channelID(opponentCommitment.channel),
@@ -138,9 +138,9 @@ const waitForChannelReducer = (
 };
 
 const waitForPreFundSetupReducer = (
-  state: states.WaitForPreFundSetup,
+  state: channelStates.WaitForPreFundSetup,
   action: actions.WalletAction,
-): NextChannelState<states.WaitForPreFundSetup | states.WaitForFundingRequest> => {
+): NextChannelState<channelStates.WaitForPreFundSetup | channelStates.WaitForFundingRequest> => {
   switch (action.type) {
     case actions.OWN_COMMITMENT_RECEIVED:
       const ownCommitment = action.commitment;
@@ -163,7 +163,7 @@ const waitForPreFundSetupReducer = (
 
       // if so, unpack its contents into the state
       return {
-        channelState: states.waitForFundingRequest({
+        channelState: channelStates.waitForFundingRequest({
           ...state,
           turnNum: 1,
           lastCommitment: { commitment: ownCommitment, signature },
@@ -201,7 +201,7 @@ const waitForPreFundSetupReducer = (
 
       // if so, unpack its contents into the state
       return {
-        channelState: states.waitForFundingRequest({
+        channelState: channelStates.waitForFundingRequest({
           ...state,
           turnNum: 1,
           lastCommitment: { commitment: action.commitment, signature: action.signature },

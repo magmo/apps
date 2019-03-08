@@ -1,4 +1,4 @@
-import * as states from '../states';
+import * as states from '../states/channels';
 import * as actions from '../actions';
 import {
   messageRelayRequested,
@@ -17,13 +17,12 @@ import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from '../states/shared';
-import { ChannelState } from '../states';
 
 export const fundingReducer = (
   state: states.FundingState,
   action: actions.WalletAction,
   unhandledAction?: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
   if (
     action.type === actions.OWN_COMMITMENT_RECEIVED ||
@@ -98,7 +97,7 @@ const aDepositTransactionFailedReducer = (
 const bDepositTransactionFailedReducer = (
   state: states.BDepositTransactionFailed,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const fundingAmount = getFundingAmount(state, state.ourIndex);
@@ -113,7 +112,7 @@ const bDepositTransactionFailedReducer = (
 const acknowledgeFundingDeclinedReducer = (
   state: states.AcknowledgeFundingDeclined,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.FUNDING_DECLINED_ACKNOWLEDGED:
       return {
@@ -205,7 +204,7 @@ const approveFundingReducer = (
 const aWaitForDepositToBeSentToMetaMaskReducer = (
   state: states.AWaitForDepositToBeSentToMetaMask,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { channelState: states.aSubmitDepositInMetaMask(state) };
@@ -232,7 +231,7 @@ const aWaitForDepositToBeSentToMetaMaskReducer = (
 const aSubmitDepositToMetaMaskReducer = (
   state: states.ASubmitDepositInMetaMask,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       return {
@@ -263,7 +262,7 @@ const aWaitForDepositConfirmationReducer = (
   state: states.AWaitForDepositConfirmation,
   action: actions.WalletAction,
   unhandledAction: actions.WalletAction | undefined,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
@@ -293,7 +292,7 @@ const aWaitForDepositConfirmationReducer = (
 const aWaitForOpponentDepositReducer = (
   state: states.AWaitForOpponentDeposit,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
@@ -333,7 +332,7 @@ const aWaitForOpponentDepositReducer = (
 const aWaitForPostFundSetupReducer = (
   state: states.AWaitForPostFundSetup,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment: postFundState, signature } = action;
@@ -357,7 +356,7 @@ const aWaitForPostFundSetupReducer = (
 const bWaitForOpponentDepositReducer = (
   state: states.BWaitForOpponentDeposit,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       const { allocation } = state.lastCommitment.commitment;
@@ -377,7 +376,7 @@ const bWaitForOpponentDepositReducer = (
 const bWaitForDepositToBeSentToMetaMaskReducer = (
   state: states.BWaitForDepositToBeSentToMetaMask,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { channelState: states.bSubmitDepositInMetaMask(state) };
@@ -389,7 +388,7 @@ const bWaitForDepositToBeSentToMetaMaskReducer = (
 const bSubmitDepositInMetaMaskReducer = (
   state: states.BSubmitDepositInMetaMask,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     // This case should not happen in theory, but it does in practice.
     // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
@@ -417,7 +416,7 @@ const bWaitForDepositConfirmationReducer = (
   state: states.BWaitForDepositConfirmation,
   action: actions.WalletAction,
   unhandledAction: actions.WalletAction | undefined,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       return {
@@ -444,7 +443,7 @@ const bWaitForDepositConfirmationReducer = (
 const bWaitForPostFundSetupReducer = (
   state: states.BWaitForPostFundSetup,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
@@ -475,7 +474,7 @@ const bWaitForPostFundSetupReducer = (
 const acknowledgeFundingSuccessReducer = (
   state: states.AcknowledgeFundingSuccess,
   action: actions.WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
       return {

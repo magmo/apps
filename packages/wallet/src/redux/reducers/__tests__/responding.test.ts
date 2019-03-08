@@ -1,6 +1,6 @@
 import { respondingReducer } from '../responding';
 
-import * as states from '../../states';
+import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
 import { itTransitionsToStateType, itDoesntTransition } from './helpers';

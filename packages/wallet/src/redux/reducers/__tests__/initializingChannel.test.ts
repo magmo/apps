@@ -2,7 +2,7 @@ import { initializingChannelReducer } from '../initializingChannel';
 
 import * as states from '../../states';
 import * as actions from '../../actions';
-import { WaitForChannel } from '../../states';
+import * as channelStates from '../../states/channels';
 
 const defaults = { uid: 'uid', adjudicator: 'adjudicator', networkId: 1 };
 
@@ -14,7 +14,9 @@ describe('when in WaitForAddress', () => {
     const updatedState = initializingChannelReducer(state, action);
 
     it('transitions to WAIT_FOR_CHANNEL', async () => {
-      expect((updatedState.channelState as WaitForChannel).type).toEqual(states.WAIT_FOR_CHANNEL);
+      expect((updatedState.channelState as channelStates.WaitForChannel).type).toEqual(
+        channelStates.WAIT_FOR_CHANNEL,
+      );
     });
   });
 });

@@ -1,6 +1,6 @@
 import { withdrawingReducer } from '../withdrawing';
 
-import * as states from '../../states';
+import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
 import { itTransitionsToStateType } from './helpers';

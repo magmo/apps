@@ -1,7 +1,6 @@
-import * as states from '../states';
+import * as channelStates from '../states/channels';
 import * as actions from '../actions';
 
-import { ClosingState } from '../states';
 import { WalletAction } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import {
@@ -24,29 +23,29 @@ import {
 import { NextChannelState } from '../states/shared';
 
 export const closingReducer = (
-  state: ClosingState,
+  state: channelStates.ClosingState,
   action: WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (state.type) {
-    case states.APPROVE_CONCLUDE:
+    case channelStates.APPROVE_CONCLUDE:
       return approveConcludeReducer(state, action);
-    case states.WAIT_FOR_OPPONENT_CONCLUDE:
+    case channelStates.WAIT_FOR_OPPONENT_CONCLUDE:
       return waitForOpponentConclude(state, action);
-    case states.APPROVE_CLOSE_ON_CHAIN:
+    case channelStates.APPROVE_CLOSE_ON_CHAIN:
       return approveCloseOnChainReducer(state, action);
-    case states.ACKNOWLEDGE_CLOSE_SUCCESS:
+    case channelStates.ACKNOWLEDGE_CLOSE_SUCCESS:
       return acknowledgeCloseSuccessReducer(state, action);
-    case states.ACKNOWLEDGE_CLOSED_ON_CHAIN:
+    case channelStates.ACKNOWLEDGE_CLOSED_ON_CHAIN:
       return acknowledgeClosedOnChainReducer(state, action);
-    case states.WAIT_FOR_CLOSE_INITIATION:
+    case channelStates.WAIT_FOR_CLOSE_INITIATION:
       return waitForCloseInitiatorReducer(state, action);
-    case states.WAIT_FOR_CLOSE_SUBMISSION:
+    case channelStates.WAIT_FOR_CLOSE_SUBMISSION:
       return waitForCloseSubmissionReducer(state, action);
-    case states.WAIT_FOR_CLOSE_CONFIRMED:
+    case channelStates.WAIT_FOR_CLOSE_CONFIRMED:
       return waitForCloseConfirmedReducer(state, action);
-    case states.ACKNOWLEDGE_CONCLUDE:
+    case channelStates.ACKNOWLEDGE_CONCLUDE:
       return acknowledgeConcludeReducer(state, action);
-    case states.CLOSE_TRANSACTION_FAILED:
+    case channelStates.CLOSE_TRANSACTION_FAILED:
       return closeTransactionFailedReducer(state, action);
     default:
       return unreachable(state);
@@ -54,9 +53,9 @@ export const closingReducer = (
 };
 
 const closeTransactionFailedReducer = (
-  state: states.CloseTransactionFailed,
+  state: channelStates.CloseTransactionFailed,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const { penultimateCommitment: from, lastCommitment: to } = state;
@@ -81,15 +80,17 @@ const closeTransactionFailedReducer = (
         destination: state.userAddress,
       };
       const transactionOutbox = createConcludeAndWithdrawTransaction(args);
-      return { channelState: states.waitForCloseSubmission({ ...state, transactionOutbox }) };
+      return {
+        channelState: channelStates.waitForCloseSubmission({ ...state, transactionOutbox }),
+      };
   }
   return { channelState: state };
 };
 
 const acknowledgeConcludeReducer = (
-  state: states.AcknowledgeConclude,
+  state: channelStates.AcknowledgeConclude,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.CONCLUDE_APPROVED:
       if (!ourTurn(state)) {
@@ -107,7 +108,7 @@ const acknowledgeConcludeReducer = (
       const lastState = state.lastCommitment.commitment;
       if (lastState.commitmentType === CommitmentType.Conclude) {
         return {
-          channelState: states.approveCloseOnChain({
+          channelState: channelStates.approveCloseOnChain({
             ...state,
             turnNum: concludeCommitment.turnNum,
             penultimateCommitment: state.lastCommitment,
@@ -121,13 +122,13 @@ const acknowledgeConcludeReducer = (
 };
 
 const waitForCloseConfirmedReducer = (
-  state: states.WaitForCloseConfirmed,
+  state: channelStates.WaitForCloseConfirmed,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
       return {
-        channelState: states.acknowledgeCloseSuccess({ ...state }),
+        channelState: channelStates.acknowledgeCloseSuccess({ ...state }),
         messageOutbox: closeSuccess(),
       };
   }
@@ -135,26 +136,26 @@ const waitForCloseConfirmedReducer = (
 };
 
 const waitForCloseInitiatorReducer = (
-  state: states.WaitForCloseInitiation,
+  state: channelStates.WaitForCloseInitiation,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
-      return { channelState: states.waitForCloseSubmission(state) };
+      return { channelState: channelStates.waitForCloseSubmission(state) };
   }
   return { channelState: state };
 };
 
 const waitForCloseSubmissionReducer = (
-  state: states.WaitForCloseSubmission,
+  state: channelStates.WaitForCloseSubmission,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SUBMISSION_FAILED:
-      return { channelState: states.closeTransactionFailed(state) };
+      return { channelState: channelStates.closeTransactionFailed(state) };
     case actions.TRANSACTION_SUBMITTED:
       return {
-        channelState: states.waitForCloseConfirmed({
+        channelState: channelStates.waitForCloseConfirmed({
           ...state,
           transactionHash: action.transactionHash,
         }),
@@ -164,9 +165,9 @@ const waitForCloseSubmissionReducer = (
 };
 
 const approveCloseOnChainReducer = (
-  state: states.ApproveCloseOnChain,
+  state: channelStates.ApproveCloseOnChain,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.APPROVE_CLOSE:
       const { penultimateCommitment: from, lastCommitment: to } = state;
@@ -192,7 +193,7 @@ const approveCloseOnChainReducer = (
       };
       const transactionOutbox = createConcludeAndWithdrawTransaction(args);
       return {
-        channelState: states.waitForCloseInitiation({
+        channelState: channelStates.waitForCloseInitiation({
           ...state,
           userAddress: action.withdrawAddress,
           transactionOutbox,
@@ -203,9 +204,9 @@ const approveCloseOnChainReducer = (
 };
 
 const approveConcludeReducer = (
-  state: states.ApproveConclude,
+  state: channelStates.ApproveConclude,
   action: WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.CONCLUDE_APPROVED:
       if (!ourTurn(state)) {
@@ -224,7 +225,7 @@ const approveConcludeReducer = (
       const { lastCommitment } = state;
       if (lastCommitment.commitment.commitmentType === CommitmentType.Conclude) {
         return {
-          channelState: states.approveCloseOnChain({
+          channelState: channelStates.approveCloseOnChain({
             ...state,
             turnNum: concludeCommitment.turnNum,
             penultimateCommitment: state.lastCommitment,
@@ -234,7 +235,7 @@ const approveConcludeReducer = (
         };
       } else {
         return {
-          channelState: states.waitForOpponentConclude({
+          channelState: channelStates.waitForOpponentConclude({
             ...state,
             turnNum: concludeCommitment.turnNum,
             penultimateCommitment: state.lastCommitment,
@@ -246,7 +247,7 @@ const approveConcludeReducer = (
       break;
     case actions.CONCLUDE_REJECTED:
       return {
-        channelState: states.waitForUpdate({
+        channelState: channelStates.waitForUpdate({
           ...state,
         }),
         displayOutbox: hideWallet(),
@@ -258,9 +259,9 @@ const approveConcludeReducer = (
 };
 
 const waitForOpponentConclude = (
-  state: states.WaitForOpponentConclude,
+  state: channelStates.WaitForOpponentConclude,
   action: WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
@@ -284,7 +285,7 @@ const waitForOpponentConclude = (
         };
       }
       return {
-        channelState: states.approveCloseOnChain({
+        channelState: channelStates.approveCloseOnChain({
           ...state,
           turnNum: commitment.turnNum,
           penultimateCommitment: state.lastCommitment,
@@ -298,13 +299,13 @@ const waitForOpponentConclude = (
 };
 
 const acknowledgeCloseSuccessReducer = (
-  state: states.AcknowledgeCloseSuccess,
+  state: channelStates.AcknowledgeCloseSuccess,
   action: WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.CLOSE_SUCCESS_ACKNOWLEDGED:
       return {
-        channelState: states.waitForChannel({
+        channelState: channelStates.waitForChannel({
           ...state,
         }),
         messageOutbox: closeSuccess(),
@@ -316,18 +317,21 @@ const acknowledgeCloseSuccessReducer = (
 };
 
 const acknowledgeClosedOnChainReducer = (
-  state: states.AcknowledgeClosedOnChain,
+  state: channelStates.AcknowledgeClosedOnChain,
   action: WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<channelStates.ChannelState> => {
   switch (action.type) {
     case actions.CLOSED_ON_CHAIN_ACKNOWLEDGED:
-      return { channelState: states.waitForChannel({ ...state }), messageOutbox: closeSuccess() };
+      return {
+        channelState: channelStates.waitForChannel({ ...state }),
+        messageOutbox: closeSuccess(),
+      };
     default:
       return { channelState: state };
   }
 };
 
-const composeConcludePosition = (state: states.ClosingState) => {
+const composeConcludePosition = (state: channelStates.ClosingState) => {
   const commitmentCount =
     state.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
   const concludeCommitment: Commitment = {

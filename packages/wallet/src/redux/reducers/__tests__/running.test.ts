@@ -1,6 +1,6 @@
 import { runningReducer } from '../running';
 import * as scenarios from './test-scenarios';
-import * as states from '../../states';
+import * as states from '../../states/channels';
 import * as actions from '../../actions';
 import {
   itDoesntTransition,

@@ -1,6 +1,4 @@
-import * as states from '../states/channels/challenging';
-import * as runningStates from '../states/channels/running';
-import * as withdrawalStates from '../states/channels/withdrawing';
+import * as states from '../states/channels';
 import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
@@ -13,12 +11,11 @@ import {
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from '../states/shared';
-import { ChannelState } from '../states';
 
 export const challengingReducer = (
   state: states.ChallengingState,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
   if (
     action.type === actions.OWN_COMMITMENT_RECEIVED ||
@@ -54,7 +51,7 @@ export const challengingReducer = (
 const challengeTransactionFailedReducer = (
   state: states.ChallengeTransactionFailed,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const { commitment: fromPosition, signature: fromSignature } = state.penultimateCommitment;
@@ -76,7 +73,7 @@ const challengeTransactionFailedReducer = (
 const approveChallengeReducer = (
   state: states.ApproveChallenge,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_APPROVED:
       const { commitment: fromPosition, signature: fromSignature } = state.penultimateCommitment;
@@ -93,7 +90,7 @@ const approveChallengeReducer = (
       };
     case actions.CHALLENGE_REJECTED:
       return {
-        channelState: runningStates.waitForUpdate(state),
+        channelState: states.waitForUpdate(state),
         messageOutbox: challengeComplete(),
         displayOutbox: hideWallet(),
       };
@@ -105,7 +102,7 @@ const approveChallengeReducer = (
 const initiateChallengeReducer = (
   state: states.WaitForChallengeInitiation,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { channelState: states.waitForChallengeSubmission(state) };
@@ -117,7 +114,7 @@ const initiateChallengeReducer = (
 const waitForChallengeSubmissionReducer = (
   state: states.WaitForChallengeSubmission,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_CREATED_EVENT:
       return {
@@ -143,7 +140,7 @@ const waitForChallengeSubmissionReducer = (
 const waitForChallengeConfirmationReducer = (
   state: states.WaitForChallengeConfirmation,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_CREATED_EVENT:
       return {
@@ -167,7 +164,7 @@ const waitForChallengeConfirmationReducer = (
 const waitForResponseOrTimeoutReducer = (
   state: states.WaitForResponseOrTimeout,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_CREATED_EVENT:
       return {
@@ -208,11 +205,11 @@ const waitForResponseOrTimeoutReducer = (
 const acknowledgeChallengeResponseReducer = (
   state: states.AcknowledgeChallengeResponse,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return {
-        channelState: runningStates.waitForUpdate(state),
+        channelState: states.waitForUpdate(state),
         messageOutbox: challengeComplete(),
         displayOutbox: hideWallet(),
       };
@@ -224,11 +221,11 @@ const acknowledgeChallengeResponseReducer = (
 const acknowledgeChallengeTimeoutReducer = (
   state: states.AcknowledgeChallengeTimeout,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
       return {
-        channelState: withdrawalStates.approveWithdrawal(state),
+        channelState: states.approveWithdrawal(state),
         messageOutbox: challengeComplete(),
       };
     default:

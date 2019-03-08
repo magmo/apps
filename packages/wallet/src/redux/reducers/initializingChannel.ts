@@ -1,4 +1,5 @@
-import { WaitForAddress, ChannelState, waitForChannel } from '../states';
+import { WaitForAddress } from '../states';
+import { ChannelState, waitForChannel } from '../states/channels';
 
 import { WalletAction, CHANNEL_INITIALIZED } from '../actions';
 import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';

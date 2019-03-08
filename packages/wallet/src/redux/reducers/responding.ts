@@ -1,8 +1,4 @@
-import { RespondingState, ChannelState } from '../states';
-import * as states from '../states/channels/responding';
-import * as runningStates from '../states/channels/running';
-import * as withdrawalStates from '../states/channels/withdrawing';
-
+import * as states from '../states/channels';
 import { WalletAction } from '../actions';
 import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
@@ -18,9 +14,9 @@ import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import { NextChannelState } from '../states/shared';
 
 export const respondingReducer = (
-  state: RespondingState,
+  state: states.RespondingState,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
   if (
     action.type === actions.OWN_COMMITMENT_RECEIVED ||
@@ -57,7 +53,7 @@ export const respondingReducer = (
 const responseTransactionFailedReducer = (
   state: states.ResponseTransactionFailed,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       const transaction = createRespondWithMoveTransaction(
@@ -81,7 +77,7 @@ const responseTransactionFailedReducer = (
 export const chooseResponseReducer = (
   state: states.ChooseResponse,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.RESPOND_WITH_MOVE_CHOSEN:
       return {
@@ -114,7 +110,7 @@ export const chooseResponseReducer = (
 export const takeMoveInAppReducer = (
   state: states.TakeMoveInApp,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_COMMITMENT_RECEIVED:
       // check it's our turn
@@ -157,7 +153,7 @@ export const takeMoveInAppReducer = (
 export const initiateResponseReducer = (
   state: states.InitiateResponse,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { channelState: states.waitForResponseSubmission(state) };
@@ -178,7 +174,7 @@ export const initiateResponseReducer = (
 export const waitForResponseSubmissionReducer = (
   state: states.WaitForResponseSubmission,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.TRANSACTION_SUBMITTED:
       return {
@@ -206,7 +202,7 @@ export const waitForResponseSubmissionReducer = (
 export const waitForResponseConfirmationReducer = (
   state: states.WaitForResponseConfirmation,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.BLOCK_MINED:
       if (
@@ -227,11 +223,11 @@ export const waitForResponseConfirmationReducer = (
 export const acknowledgeChallengeCompleteReducer = (
   state: states.AcknowledgeChallengeComplete,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return {
-        channelState: runningStates.waitForUpdate(state),
+        channelState: states.waitForUpdate(state),
         messageOutbox: challengeComplete(),
         displayOutbox: hideWallet(),
       };
@@ -243,11 +239,11 @@ export const acknowledgeChallengeCompleteReducer = (
 const challengeeAcknowledgeChallengeTimeoutReducer = (
   state: states.ChallengeeAcknowledgeChallengeTimeout,
   action: WalletAction,
-): NextChannelState<ChannelState> => {
+): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
       return {
-        channelState: withdrawalStates.approveWithdrawal(state),
+        channelState: states.approveWithdrawal(state),
         messageOutbox: challengeComplete(),
       };
     default:
