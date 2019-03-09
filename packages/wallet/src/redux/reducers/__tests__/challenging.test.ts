@@ -2,7 +2,13 @@ import { challengingReducer } from '../channels/challenging';
 import * as scenarios from './test-scenarios';
 import * as states from '../../states/channels';
 import * as actions from '../../actions';
-import { itSendsATransaction, itTransitionsToStateType, itDoesntTransition } from './helpers';
+import {
+  itSendsATransaction,
+  itTransitionsToStateType,
+  itDoesntTransition,
+  itSendsThisMessage,
+  itSendsThisDisplayEvent,
+} from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { hideWallet, challengeComplete } from 'magmo-wallet-client';
 import { bigNumberify } from 'ethers/utils';
@@ -53,8 +59,8 @@ describe('when in APPROVE_CHALLENGE', () => {
   describe('when a challenge is declined', () => {
     const action = actions.challengeRejected();
     const updatedState = challengingReducer(state, action);
-    expect(updatedState.displayOutbox).toEqual(hideWallet());
-    expect(updatedState.messageOutbox).toEqual(challengeComplete());
+    itSendsThisDisplayEvent(updatedState, hideWallet().type);
+    itSendsThisMessage(updatedState, challengeComplete().type);
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
 });

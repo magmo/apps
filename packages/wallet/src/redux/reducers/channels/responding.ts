@@ -24,7 +24,7 @@ export const respondingReducer = (
   ) {
     return {
       channelState: state,
-      messageOutbox: handleSignatureAndValidationMessages(state, action),
+      outboxState: { messageOutbox: handleSignatureAndValidationMessages(state, action) },
     };
   }
 
@@ -56,11 +56,14 @@ const responseTransactionFailedReducer = (
 ): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
-      const transaction = createRespondWithMoveTransaction(
+      const transactionOutbox = createRespondWithMoveTransaction(
         state.lastCommitment.commitment,
         state.lastCommitment.signature,
       );
-      return { channelState: states.initiateResponse(state), transactionOutbox: transaction };
+      return {
+        channelState: states.initiateResponse(state),
+        outboxState: { transactionOutbox },
+      };
     case actions.BLOCK_MINED:
       if (
         typeof state.challengeExpiry !== 'undefined' &&
@@ -82,15 +85,17 @@ export const chooseResponseReducer = (
     case actions.RESPOND_WITH_MOVE_CHOSEN:
       return {
         channelState: states.takeMoveInApp(state),
-        messageOutbox: challengeResponseRequested(),
-        displayOutbox: hideWallet(),
+        outboxState: { messageOutbox: challengeResponseRequested(), displayOutbox: hideWallet() },
       };
     case actions.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
       const transaction = createRespondWithMoveTransaction(
         state.lastCommitment.commitment,
         state.lastCommitment.signature,
       );
-      return { channelState: states.initiateResponse(state), transactionOutbox: transaction };
+      return {
+        channelState: states.initiateResponse(state),
+        outboxState: { transactionOutbox: transaction },
+      };
     case actions.RESPOND_WITH_REFUTE_CHOSEN:
       return { channelState: states.initiateResponse(state) };
     case actions.BLOCK_MINED:
@@ -132,8 +137,7 @@ export const takeMoveInAppReducer = (
           lastCommitment: { commitment: action.commitment, signature },
           penultimateCommitment: state.lastCommitment,
         }),
-        transactionOutbox: transaction,
-        displayOutbox: showWallet(),
+        outboxState: { transactionOutbox: transaction, displayOutbox: showWallet() },
       };
 
     case actions.BLOCK_MINED:
@@ -228,8 +232,7 @@ export const acknowledgeChallengeCompleteReducer = (
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return {
         channelState: states.waitForUpdate(state),
-        messageOutbox: challengeComplete(),
-        displayOutbox: hideWallet(),
+        outboxState: { messageOutbox: challengeComplete(), displayOutbox: hideWallet() },
       };
     default:
       return { channelState: state };
@@ -244,7 +247,7 @@ const challengeeAcknowledgeChallengeTimeoutReducer = (
     case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
       return {
         channelState: states.approveWithdrawal(state),
-        messageOutbox: challengeComplete(),
+        outboxState: { messageOutbox: challengeComplete() },
       };
     default:
       return { channelState: state };

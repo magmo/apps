@@ -1,15 +1,49 @@
-import { ChannelState } from '../../states';
+import { ChannelState } from '../../states/channels';
 import { NextChannelState } from '../../states/shared';
+import { Commitment } from 'fmg-core';
+import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
+import { WalletState } from 'src/redux/states';
 
 export const itSendsAMessage = (state: NextChannelState<ChannelState>) => {
   it(`sends a message`, () => {
-    expect(state.messageOutbox).toEqual(expect.anything());
+    expect(state.outboxState!.messageOutbox).toEqual(expect.anything());
   });
+};
+
+export const itSendsThisMessage = (
+  state: WalletState | NextChannelState<ChannelState>,
+  message,
+  typeOnly = true,
+) => {
+  if (typeOnly) {
+    it(`sends message ${message.type}`, () => {
+      expect(state.outboxState!.messageOutbox!.type).toEqual(message);
+    });
+  } else {
+    it(`sends a message `, () => {
+      expect(state.outboxState!.messageOutbox!).toMatchObject(message);
+    });
+  }
+};
+
+export const itSendsThisDisplayEvent = (state: NextChannelState<ChannelState>, event) => {
+  it(`sends event ${event.type}`, () => {
+    expect(state.outboxState!.displayOutbox!.type).toEqual(event);
+  });
+};
+
+type CommitmentMessage = outgoing.FundingSuccess;
+
+export const expectThisCommitmentSent = (
+  state: NextChannelState<ChannelState>,
+  c: Partial<Commitment>,
+) => {
+  expect((state.outboxState!.messageOutbox! as CommitmentMessage).commitment).toMatchObject(c);
 };
 
 export const itSendsATransaction = (state: NextChannelState<ChannelState>) => {
   it(`sends a transaction`, () => {
-    expect(state.transactionOutbox).toEqual(expect.anything());
+    expect(state.outboxState!.transactionOutbox).toEqual(expect.anything());
   });
 };
 

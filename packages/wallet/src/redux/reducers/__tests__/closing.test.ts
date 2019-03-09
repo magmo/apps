@@ -4,7 +4,7 @@ import * as states from '../../states/channels';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
-import { itTransitionsToStateType } from './helpers';
+import { itTransitionsToStateType, itSendsThisMessage } from './helpers';
 
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as ReducerUtil from '../../../utils/reducer-utils';
@@ -58,7 +58,7 @@ describe('start in AcknowledgeConclude', () => {
 
     const updatedState = closingReducer(state, action);
     itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
-    expect(updatedState.messageOutbox!.type).toEqual(outgoing.COMMITMENT_RELAY_REQUESTED);
+    itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
 });
 
@@ -105,7 +105,7 @@ describe('start in WaitForOpponentConclude', () => {
     describe(' where the adjudicator exists', () => {
       const updatedState = closingReducer(state, action);
       itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
-      expect(updatedState.messageOutbox!.type).toEqual(outgoing.CONCLUDE_SUCCESS);
+      itSendsThisMessage(updatedState, outgoing.CONCLUDE_SUCCESS);
     });
   });
 });
@@ -218,6 +218,6 @@ describe('start in AcknowledgCloseSuccess', () => {
     const action = actions.closeSuccessAcknowledged();
     const updatedState = closingReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
-    expect(updatedState.messageOutbox!.type).toEqual(outgoing.CLOSE_SUCCESS);
+    itSendsThisMessage(updatedState, outgoing.CLOSE_SUCCESS);
   });
 });

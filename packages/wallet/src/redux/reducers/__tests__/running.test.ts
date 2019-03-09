@@ -2,11 +2,12 @@ import { runningReducer } from '../channels/running';
 import * as scenarios from './test-scenarios';
 import * as states from '../../states/channels';
 import * as actions from '../../actions';
+import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import {
   itDoesntTransition,
   itIncreasesTurnNumBy,
   itTransitionsToStateType,
-  itSendsAMessage,
+  itSendsThisMessage,
 } from './helpers';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { bigNumberify } from 'ethers/utils';
@@ -84,7 +85,7 @@ describe('when in WaitForUpdate on our turn', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
-    itSendsAMessage(updatedState);
+    itSendsThisMessage(updatedState, outgoing.CHALLENGE_REJECTED);
   });
 });
 

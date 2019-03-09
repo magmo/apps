@@ -41,13 +41,15 @@ const waitForChannelReducer = (
         // Since these checks are happening during a signature request we'll return a sig failure
         return {
           channelState: state,
-          messageOutbox: signatureFailure('Other', 'Expected a pre fund setup position.'),
+          outboxState: {
+            messageOutbox: signatureFailure('Other', 'Expected a pre fund setup position.'),
+          },
         };
       }
       if (ownCommitment.commitmentCount !== 0) {
         return {
           channelState: state,
-          messageOutbox: signatureFailure('Other', 'Expected state count to 0.'),
+          outboxState: { messageOutbox: signatureFailure('Other', 'Expected state count to 0.') },
         };
       }
 
@@ -56,10 +58,12 @@ const waitForChannelReducer = (
       if (ourAddress !== state.address) {
         return {
           channelState: state,
-          messageOutbox: signatureFailure(
-            'Other',
-            'Address provided does not match the one stored in the wallet.',
-          ),
+          outboxState: {
+            messageOutbox: signatureFailure(
+              'Other',
+              'Address provided does not match the one stored in the wallet.',
+            ),
+          },
         };
       }
 
@@ -78,7 +82,7 @@ const waitForChannelReducer = (
           requestedTotalFunds: '0x0',
           requestedYourDeposit: '0x0',
         }),
-        messageOutbox: signatureSuccess(signature),
+        outboxState: { messageOutbox: signatureSuccess(signature) },
       };
 
     case actions.OPPONENT_COMMITMENT_RECEIVED:
@@ -89,13 +93,17 @@ const waitForChannelReducer = (
       if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         return {
           channelState: state,
-          messageOutbox: validationFailure('Other', 'Expected a prefund setup position'),
+          outboxState: {
+            messageOutbox: validationFailure('Other', 'Expected a prefund setup position'),
+          },
         };
       }
       if (opponentCommitment.commitmentCount !== 0) {
         return {
           channelState: state,
-          messageOutbox: validationFailure('Other', 'Expected state count to be 0'),
+          outboxState: {
+            messageOutbox: validationFailure('Other', 'Expected state count to be 0'),
+          },
         };
       }
 
@@ -103,16 +111,21 @@ const waitForChannelReducer = (
       const opponentAddress2 = opponentCommitment.channel.participants[0] as string;
 
       if (!validCommitmentSignature(action.commitment, action.signature, opponentAddress2)) {
-        return { channelState: state, messageOutbox: validationFailure('InvalidSignature') };
+        return {
+          channelState: state,
+          outboxState: { messageOutbox: validationFailure('InvalidSignature') },
+        };
       }
 
       if (ourAddress2 !== state.address) {
         return {
           channelState: state,
-          messageOutbox: validationFailure(
-            'Other',
-            'Address provided does not match the one stored in the wallet.',
-          ),
+          outboxState: {
+            messageOutbox: validationFailure(
+              'Other',
+              'Address provided does not match the one stored in the wallet.',
+            ),
+          },
         };
       }
 
@@ -130,7 +143,7 @@ const waitForChannelReducer = (
           requestedTotalFunds: '0x0',
           requestedYourDeposit: '0x0',
         }),
-        messageOutbox: validationSuccess(),
+        outboxState: { messageOutbox: validationSuccess() },
       };
     default:
       return { channelState: state };
@@ -149,13 +162,17 @@ const waitForPreFundSetupReducer = (
       if (ownCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         return {
           channelState: state,
-          messageOutbox: signatureFailure('Other', 'Expected a prefund setup position.'),
+          outboxState: {
+            messageOutbox: signatureFailure('Other', 'Expected a prefund setup position.'),
+          },
         };
       }
       if (ownCommitment.commitmentCount !== 1) {
         return {
           channelState: state,
-          messageOutbox: signatureFailure('Other', 'Expected state count to be 1.'),
+          outboxState: {
+            messageOutbox: signatureFailure('Other', 'Expected state count to be 1.'),
+          },
         };
       }
 
@@ -173,7 +190,7 @@ const waitForPreFundSetupReducer = (
             .toHexString(),
           requestedYourDeposit: ownCommitment.allocation[state.ourIndex],
         }),
-        messageOutbox: signatureSuccess(signature),
+        outboxState: { messageOutbox: signatureSuccess(signature) },
       };
 
     case actions.OPPONENT_COMMITMENT_RECEIVED:
@@ -183,20 +200,27 @@ const waitForPreFundSetupReducer = (
       if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
         return {
           channelState: state,
-          messageOutbox: validationFailure('Other', 'Expected a prefund setup position.'),
+          outboxState: {
+            messageOutbox: validationFailure('Other', 'Expected a prefund setup position.'),
+          },
         };
       }
 
       if (opponentCommitment.commitmentCount !== 1) {
         return {
           channelState: state,
-          messageOutbox: validationFailure('Other', 'Expected state count to be 1.'),
+          outboxState: {
+            messageOutbox: validationFailure('Other', 'Expected state count to be 1.'),
+          },
         };
       }
       const opponentAddress2 = state.participants[1 - state.ourIndex];
 
       if (!validCommitmentSignature(action.commitment, action.signature, opponentAddress2)) {
-        return { channelState: state, messageOutbox: validationFailure('InvalidSignature') };
+        return {
+          channelState: state,
+          outboxState: { messageOutbox: validationFailure('InvalidSignature') },
+        };
       }
 
       // if so, unpack its contents into the state
@@ -211,7 +235,7 @@ const waitForPreFundSetupReducer = (
             .toHexString(),
           requestedYourDeposit: opponentCommitment.allocation[state.ourIndex],
         }),
-        messageOutbox: validationSuccess(),
+        outboxState: { messageOutbox: validationSuccess() },
       };
 
     default:

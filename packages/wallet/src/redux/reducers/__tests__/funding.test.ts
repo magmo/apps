@@ -4,7 +4,12 @@ import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
-import { itTransitionsToStateType, itIncreasesTurnNumBy } from './helpers';
+import {
+  itTransitionsToStateType,
+  itIncreasesTurnNumBy,
+  itSendsThisMessage,
+  expectThisCommitmentSent,
+} from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../utils/signing-utils';
@@ -214,9 +219,7 @@ describe('start in SendFundingDeclinedMessage', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
-    expect((updatedState.messageOutbox as outgoing.MessageRelayRequested).type).toEqual(
-      outgoing.FUNDING_FAILURE,
-    );
+    itSendsThisMessage(updatedState, outgoing.FUNDING_FAILURE);
   });
 });
 
@@ -247,9 +250,7 @@ describe('start in WaitForDepositConfirmation', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
-    expect((updatedState.messageOutbox as outgoing.WalletEvent).type).toEqual(
-      outgoing.COMMITMENT_RELAY_REQUESTED,
-    );
+    itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
 });
 
@@ -270,9 +271,7 @@ describe('start in AWaitForOpponentDeposit', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
-    expect((updatedState.messageOutbox as outgoing.CommitmentRelayRequested).type).toEqual(
-      outgoing.COMMITMENT_RELAY_REQUESTED,
-    );
+    itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
 });
 
@@ -441,9 +440,7 @@ describe('start in BWaitForPostFundSetup', () => {
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
-    expect((updatedState.messageOutbox as outgoing.CommitmentRelayRequested).type).toEqual(
-      outgoing.COMMITMENT_RELAY_REQUESTED,
-    );
+    itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
 });
 
@@ -457,12 +454,10 @@ describe('start in AcknowledgeFundingSuccess', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     it('sends PostFundSetupB', () => {
-      expect(
-        (updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentType,
-      ).toEqual(fmgCore.CommitmentType.PostFundSetup);
-      expect(
-        (updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentCount,
-      ).toEqual(1);
+      expectThisCommitmentSent(updatedState, {
+        commitmentType: fmgCore.CommitmentType.PostFundSetup,
+        commitmentCount: 1,
+      });
     });
   });
 
@@ -474,16 +469,12 @@ describe('start in AcknowledgeFundingSuccess', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
-    expect((updatedState.messageOutbox as outgoing.FundingSuccess).type).toEqual(
-      outgoing.FUNDING_SUCCESS,
-    );
+    itSendsThisMessage(updatedState, outgoing.FUNDING_SUCCESS);
     it('sends PostFundSetupB', () => {
-      expect(
-        (updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentType,
-      ).toEqual(fmgCore.CommitmentType.PostFundSetup);
-      expect(
-        (updatedState.messageOutbox as outgoing.FundingSuccess).commitment.commitmentCount,
-      ).toEqual(1);
+      expectThisCommitmentSent(updatedState, {
+        commitmentType: fmgCore.CommitmentType.PostFundSetup,
+        commitmentCount: 1,
+      });
     });
   });
 });

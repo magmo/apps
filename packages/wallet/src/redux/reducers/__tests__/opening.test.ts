@@ -1,7 +1,7 @@
 import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itDoesntTransition } from './helpers';
+import { itTransitionsToStateType, itDoesntTransition, itSendsThisMessage } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
@@ -65,9 +65,7 @@ describe('when in WaitForChannel', () => {
     const updatedState = openingReducer(state, action);
 
     itDoesntTransition(state, updatedState);
-    it(`sends a validation failed message`, () => {
-      expect(updatedState.messageOutbox).toEqual(validationFailure('InvalidSignature'));
-    });
+    itSendsThisMessage(updatedState, validationFailure('InvalidSignature'), false);
   });
 
   describe('when we send in a a non-PreFundSetupA', () => {
@@ -76,9 +74,7 @@ describe('when in WaitForChannel', () => {
     const updatedState = openingReducer(state, action);
 
     itDoesntTransition(state, updatedState);
-    it(`sends a signature failed message`, () => {
-      expect(updatedState.messageOutbox!.type).toEqual(SIGNATURE_FAILURE);
-    });
+    itSendsThisMessage(updatedState, SIGNATURE_FAILURE);
   });
 });
 
@@ -123,9 +119,7 @@ describe('when in WaitForPreFundSetup', () => {
 
     const updatedState = openingReducer(state, action);
     itDoesntTransition(state, updatedState);
-    it(`sends a validation failed message`, () => {
-      expect(updatedState.messageOutbox).toEqual(validationFailure('InvalidSignature'));
-    });
+    itSendsThisMessage(updatedState, validationFailure('InvalidSignature'), false);
   });
 
   describe('when we send in a a non-PreFundSetupB', () => {
@@ -134,8 +128,6 @@ describe('when in WaitForPreFundSetup', () => {
     const updatedState = openingReducer(state, action);
 
     itDoesntTransition(state, updatedState);
-    it(`sends a signature failed message`, () => {
-      expect(updatedState.messageOutbox!.type).toEqual(SIGNATURE_FAILURE);
-    });
+    itSendsThisMessage(updatedState, SIGNATURE_FAILURE);
   });
 });

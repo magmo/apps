@@ -81,7 +81,8 @@ const closeTransactionFailedReducer = (
       };
       const transactionOutbox = createConcludeAndWithdrawTransaction(args);
       return {
-        channelState: channelStates.waitForCloseSubmission({ ...state, transactionOutbox }),
+        channelState: channelStates.waitForCloseSubmission({ ...state }),
+        outboxState: { transactionOutbox },
       };
   }
   return { channelState: state };
@@ -96,8 +97,10 @@ const acknowledgeConcludeReducer = (
       if (!ourTurn(state)) {
         return {
           channelState: state,
-          displayOutbox: hideWallet(),
-          messageOutbox: concludeFailure('Other', "It is not the current user's turn"),
+          outboxState: {
+            displayOutbox: hideWallet(),
+            messageOutbox: concludeFailure('Other', "It is not the current user's turn"),
+          },
         };
       }
       const {
@@ -114,7 +117,7 @@ const acknowledgeConcludeReducer = (
             penultimateCommitment: state.lastCommitment,
             lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
           }),
-          messageOutbox: sendCommitmentAction,
+          outboxState: { messageOutbox: sendCommitmentAction },
         };
       }
   }
@@ -129,7 +132,7 @@ const waitForCloseConfirmedReducer = (
     case actions.TRANSACTION_CONFIRMED:
       return {
         channelState: channelStates.acknowledgeCloseSuccess({ ...state }),
-        messageOutbox: closeSuccess(),
+        outboxState: { messageOutbox: closeSuccess() },
       };
   }
   return { channelState: state };
@@ -212,8 +215,10 @@ const approveConcludeReducer = (
       if (!ourTurn(state)) {
         return {
           channelState: state,
-          displayOutbox: hideWallet(),
-          messageOutbox: concludeFailure('Other', "It is not the current user's turn"),
+          outboxState: {
+            displayOutbox: hideWallet(),
+            messageOutbox: concludeFailure('Other', "It is not the current user's turn"),
+          },
         };
       }
 
@@ -231,7 +236,7 @@ const approveConcludeReducer = (
             penultimateCommitment: state.lastCommitment,
             lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
           }),
-          messageOutbox: sendCommitmentAction,
+          outboxState: { messageOutbox: sendCommitmentAction },
         };
       } else {
         return {
@@ -241,7 +246,7 @@ const approveConcludeReducer = (
             penultimateCommitment: state.lastCommitment,
             lastCommitment: { commitment: concludeCommitment, signature: positionSignature },
           }),
-          messageOutbox: sendCommitmentAction,
+          outboxState: { messageOutbox: sendCommitmentAction },
         };
       }
       break;
@@ -250,8 +255,10 @@ const approveConcludeReducer = (
         channelState: channelStates.waitForUpdate({
           ...state,
         }),
-        displayOutbox: hideWallet(),
-        messageOutbox: concludeFailure('UserDeclined'),
+        outboxState: {
+          displayOutbox: hideWallet(),
+          messageOutbox: concludeFailure('UserDeclined'),
+        },
       };
     default:
       return { channelState: state };
@@ -270,18 +277,22 @@ const waitForOpponentConclude = (
       if (!validCommitmentSignature(commitment, signature, opponentAddress)) {
         return {
           channelState: state,
-          displayOutbox: hideWallet(),
-          messageOutbox: concludeFailure('Other', 'The signature provided is not valid.'),
+          outboxState: {
+            displayOutbox: hideWallet(),
+            messageOutbox: concludeFailure('Other', 'The signature provided is not valid.'),
+          },
         };
       }
       if (!validTransition(state, commitment)) {
         return {
           channelState: state,
-          displayOutbox: hideWallet(),
-          messageOutbox: concludeFailure(
-            'Other',
-            `The transition from ${state.type} to conclude is not valid.`,
-          ),
+          outboxState: {
+            displayOutbox: hideWallet(),
+            messageOutbox: concludeFailure(
+              'Other',
+              `The transition from ${state.type} to conclude is not valid.`,
+            ),
+          },
         };
       }
       return {
@@ -291,7 +302,7 @@ const waitForOpponentConclude = (
           penultimateCommitment: state.lastCommitment,
           lastCommitment: { commitment, signature },
         }),
-        messageOutbox: concludeSuccess(),
+        outboxState: { messageOutbox: concludeSuccess() },
       };
     default:
       return { channelState: state };
@@ -308,8 +319,7 @@ const acknowledgeCloseSuccessReducer = (
         channelState: channelStates.waitForChannel({
           ...state,
         }),
-        messageOutbox: closeSuccess(),
-        displayOutbox: hideWallet(),
+        outboxState: { messageOutbox: closeSuccess(), displayOutbox: hideWallet() },
       };
     default:
       return { channelState: state };
@@ -324,7 +334,7 @@ const acknowledgeClosedOnChainReducer = (
     case actions.CLOSED_ON_CHAIN_ACKNOWLEDGED:
       return {
         channelState: channelStates.waitForChannel({ ...state }),
-        messageOutbox: closeSuccess(),
+        outboxState: { messageOutbox: closeSuccess() },
       };
     default:
       return { channelState: state };

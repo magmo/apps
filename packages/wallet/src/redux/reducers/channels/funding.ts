@@ -30,7 +30,7 @@ export const fundingReducer = (
   ) {
     return {
       channelState: state,
-      messageOutbox: handleSignatureAndValidationMessages(state, action),
+      outboxState: { messageOutbox: handleSignatureAndValidationMessages(state, action) },
     };
   }
   switch (state.type) {
@@ -88,7 +88,9 @@ const aDepositTransactionFailedReducer = (
         channelState: states.aWaitForDepositToBeSentToMetaMask({
           ...state,
         }),
-        transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
+        outboxState: {
+          transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
+        },
       };
   }
   return { channelState: state };
@@ -103,7 +105,9 @@ const bDepositTransactionFailedReducer = (
       const fundingAmount = getFundingAmount(state, state.ourIndex);
       return {
         channelState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
-        transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
+        outboxState: {
+          transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
+        },
       };
   }
   return { channelState: state };
@@ -119,8 +123,10 @@ const acknowledgeFundingDeclinedReducer = (
         channelState: states.waitForChannel({
           ...state,
         }),
-        messageOutbox: fundingFailure(state.channelId, 'FundingDeclined'),
-        displayOutbox: hideWallet(),
+        outboxState: {
+          messageOutbox: fundingFailure(state.channelId, 'FundingDeclined'),
+          displayOutbox: hideWallet(),
+        },
       };
   }
   return { channelState: state };
@@ -136,8 +142,10 @@ const sendFundingDeclinedMessageReducer = (
         channelState: states.waitForChannel({
           ...state,
         }),
-        messageOutbox: fundingFailure(state.channelId, 'FundingDeclined'),
-        displayOutbox: hideWallet(),
+        outboxState: {
+          messageOutbox: fundingFailure(state.channelId, 'FundingDeclined'),
+          displayOutbox: hideWallet(),
+        },
       };
   }
   return { channelState: state };
@@ -149,7 +157,10 @@ const waitForFundingRequestReducer = (
 ): NextChannelState<states.ChannelState> => {
   switch (action.type) {
     case actions.FUNDING_REQUESTED:
-      return { channelState: states.approveFunding({ ...state }), displayOutbox: showWallet() };
+      return {
+        channelState: states.approveFunding({ ...state }),
+        outboxState: { displayOutbox: showWallet() },
+      };
     default:
       return { channelState: state };
   }
@@ -168,7 +179,9 @@ const approveFundingReducer = (
         const fundingAmount = getFundingAmount(state, state.ourIndex);
         return {
           channelState: states.aWaitForDepositToBeSentToMetaMask({ ...state }),
-          transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
+          outboxState: {
+            transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
+          },
         };
       } else {
         const updatedState = states.bWaitForOpponentDeposit(state);
@@ -185,8 +198,7 @@ const approveFundingReducer = (
       );
       return {
         channelState: states.sendFundingDeclinedMessage({ ...state }),
-        messageOutbox: sendFundingDeclinedAction,
-        displayOutbox: hideWallet(),
+        outboxState: { messageOutbox: sendFundingDeclinedAction, displayOutbox: hideWallet() },
       };
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
@@ -321,7 +333,7 @@ const aWaitForOpponentDepositReducer = (
           penultimateCommitment: state.lastCommitment,
           lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
         }),
-        messageOutbox: sendCommitmentAction,
+        outboxState: { messageOutbox: sendCommitmentAction },
       };
     default:
       return { channelState: state };
@@ -363,7 +375,12 @@ const bWaitForOpponentDepositReducer = (
       if (bigNumberify(action.totalForDestination).gte(allocation[1 - state.ourIndex])) {
         return {
           channelState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
-          transactionOutbox: createDepositTransaction(state.channelId, allocation[state.ourIndex]),
+          outboxState: {
+            transactionOutbox: createDepositTransaction(
+              state.channelId,
+              allocation[state.ourIndex],
+            ),
+          },
         };
       } else {
         return { channelState: state };
@@ -464,7 +481,7 @@ const bWaitForPostFundSetupReducer = (
           lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
           penultimateCommitment: { commitment, signature },
         }),
-        messageOutbox: sendCommitmentAction,
+        outboxState: { messageOutbox: sendCommitmentAction },
       };
     default:
       return { channelState: state };
@@ -481,8 +498,10 @@ const acknowledgeFundingSuccessReducer = (
         channelState: states.waitForUpdate({
           ...state,
         }),
-        displayOutbox: hideWallet(),
-        messageOutbox: fundingSuccess(state.channelId, state.lastCommitment.commitment),
+        outboxState: {
+          displayOutbox: hideWallet(),
+          messageOutbox: fundingSuccess(state.channelId, state.lastCommitment.commitment),
+        },
       };
     default:
       return { channelState: state };

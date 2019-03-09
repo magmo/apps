@@ -11,9 +11,10 @@ export interface OutboxState {
 }
 
 export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
-export interface NextChannelState<T extends SharedChannelState> extends OutboxState {
+export interface NextChannelState<T extends SharedChannelState> {
   channelState: T | WaitForChannel;
   unhandledAction?: WalletAction;
+  outboxState?: OutboxState;
 }
 
 export interface SharedWalletState {
