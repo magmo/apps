@@ -168,11 +168,6 @@ export function createDepositTransaction(destination: string, depositAmount: str
   const adjudicatorInterface = getAdjudicatorInterface();
   const data = adjudicatorInterface.functions.deposit.encode([destination]);
   return {
-    // TODO: Fix this.
-    // The issue is that the network id is only accessible through an async function,
-    // so it either has to live somewhere on the state, or we have to configure the
-    // network id as an env variable
-    to: process.env.NITRO_ADJUDICATOR_ADDRESS,
     value: depositAmount,
     data,
   };
