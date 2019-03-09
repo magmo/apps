@@ -11,6 +11,7 @@ import { signCommitment } from '../utils/signing-utils';
 import testGameArtifact from '../../build/contracts/TestGame.json';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
+import { getAdjudicatorContractAddress } from '../utils/contract-utils';
 export function getLibraryAddress(networkId) {
   return testGameArtifact.networks[networkId].address;
 }
@@ -36,23 +37,19 @@ export async function getChannelId(provider, channelNonce, participantA, partici
 
 export async function depositContract(
   provider: ethers.providers.JsonRpcProvider,
-  contractAddress: string,
   participant: string,
 ) {
-  const signer = provider.getSigner();
   const deployTransaction = createDepositTransaction(participant, '0x5');
-  const transactionReceipt = await signer.sendTransaction(deployTransaction);
+  const transactionReceipt = await sendTransaction(provider, deployTransaction);
   await transactionReceipt.wait();
 }
 
 export async function createChallenge(
   provider: ethers.providers.JsonRpcProvider,
-  address,
   channelNonce,
   participantA,
   participantB,
 ) {
-  const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
@@ -90,19 +87,17 @@ export async function createChallenge(
     fromSig,
     toSig,
   );
-  const transactionReceipt = await signer.sendTransaction(challengeTransaction);
+  const transactionReceipt = await sendTransaction(provider, challengeTransaction);
   await transactionReceipt.wait();
   return toCommitment;
 }
 
 export async function concludeGame(
   provider: ethers.providers.JsonRpcProvider,
-  address,
   channelNonce,
   participantA,
   participantB,
 ) {
-  const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
@@ -141,18 +136,16 @@ export async function concludeGame(
     fromSignature,
     toSignature,
   );
-  const transactionReceipt = await signer.sendTransaction(concludeTransaction);
+  const transactionReceipt = await sendTransaction(provider, concludeTransaction);
   await transactionReceipt.wait();
 }
 
 export async function respondWithMove(
   provider: ethers.providers.JsonRpcProvider,
-  address,
   channelNonce,
   participantA,
   participantB,
 ) {
-  const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
@@ -175,19 +168,17 @@ export async function respondWithMove(
   const toSig = signCommitment(toCommitment, participantB.privateKey);
 
   const respondWithMoveTransaction = createRespondWithMoveTransaction(toCommitment, toSig);
-  const transactionReceipt = await signer.sendTransaction(respondWithMoveTransaction);
+  const transactionReceipt = await sendTransaction(provider, respondWithMoveTransaction);
   await transactionReceipt.wait();
   return toCommitment;
 }
 
 export async function refuteChallenge(
   provider: ethers.providers.JsonRpcProvider,
-  address,
   channelNonce,
   participantA,
   participantB,
 ) {
-  const signer = provider.getSigner();
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
@@ -208,8 +199,14 @@ export async function refuteChallenge(
   };
 
   const toSig = signCommitment(toCommitment, participantA.privateKey);
-  const refuteTransaction = createRefuteTransaction(address, toCommitment, toSig);
-  const transactionReceipt = await signer.sendTransaction(refuteTransaction);
+  const refuteTransaction = createRefuteTransaction(toCommitment, toSig);
+  const transactionReceipt = await sendTransaction(provider, refuteTransaction);
   await transactionReceipt.wait();
   return toCommitment;
+}
+
+async function sendTransaction(provider, tx) {
+  const signer = provider.getSigner();
+  const contractAddress = await getAdjudicatorContractAddress(provider);
+  return await signer.sendTransaction({ ...tx, to: contractAddress });
 }

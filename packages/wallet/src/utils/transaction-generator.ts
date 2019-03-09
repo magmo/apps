@@ -41,7 +41,6 @@ export function createRespondWithMoveTransaction(
 }
 
 export function createRefuteTransaction(
-  contractAddress: string,
   refuteState: Commitment,
   signature: string,
 ): TransactionRequest {
@@ -51,7 +50,6 @@ export function createRefuteTransaction(
     splitSignature(signature),
   ]);
   return {
-    to: contractAddress,
     data,
   };
 }
