@@ -6,11 +6,12 @@ import { transactionSender } from './transaction-sender';
 import { adjudicatorWatcher } from './adjudicator-watcher';
 import { blockMiningWatcher } from './block-mining-watcher';
 
-import { WalletState, CHANNEL_INITIALIZED } from '../states';
+import { WalletState, CHANNEL_INITIALIZED, WAIT_FOR_ADJUDICATOR } from '../states';
 import { getProvider } from '../../utils/contract-utils';
 
 import { displaySender } from './display-sender';
 import { ganacheMiner } from './ganache-miner';
+import { adjudicatorLoader } from './adjudicator-loader';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -27,6 +28,12 @@ export function* sagaManager(): IterableIterator<any> {
     yield take(channel);
 
     const state: WalletState = yield select((walletState: WalletState) => walletState);
+
+    // if we don't have an adjudicator, make sure that the adjudicatorLoader runs once
+    // todo: can we be sure that this won't be called more than once if successful?
+    if (state.type === WAIT_FOR_ADJUDICATOR) {
+      yield adjudicatorLoader();
+    }
 
     // if have adjudicator, make sure that the adjudicator watcher is running
     if (state.type === CHANNEL_INITIALIZED) {
