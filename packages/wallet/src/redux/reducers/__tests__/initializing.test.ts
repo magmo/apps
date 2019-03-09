@@ -3,7 +3,7 @@ import { initializingReducer } from '../initializing';
 import * as states from '../../states';
 import * as actions from '../../actions';
 
-const defaults = { uid: 'uid' };
+const defaults = { uid: 'uid', outboxState: {} };
 
 describe('when in WaitForLogin', () => {
   const state = states.waitForLogin();
@@ -26,7 +26,7 @@ describe('when in WaitForAdjudicator', () => {
     const updatedState = initializingReducer(state, action);
 
     it('transitions to WAIT_FOR_ADJUDICATOR', async () => {
-      expect(updatedState.type).toEqual(states.WAIT_FOR_ADDRESS);
+      expect(updatedState.type).toEqual(states.WAITING_FOR_CHANNEL_INITIALIZATION);
     });
   });
 });

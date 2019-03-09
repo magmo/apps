@@ -2,12 +2,12 @@ import {
   InitializingState,
   WAIT_FOR_LOGIN,
   METAMASK_ERROR,
-  waitForAddress,
   waitForAdjudicator,
   WAIT_FOR_ADJUDICATOR,
   WaitForLogin,
   WaitForAdjudicator,
-  WaitForAddress,
+  waitingForChannelInitialization,
+  InitializedState,
 } from '../states';
 
 import { WalletAction, LOGGED_IN, ADJUDICATOR_KNOWN } from '../actions';
@@ -17,7 +17,7 @@ import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 export const initializingReducer = (
   state: InitializingState,
   action: WalletAction,
-): InitializingState | WaitForAddress => {
+): InitializingState | InitializedState => {
   switch (state.type) {
     case WAIT_FOR_LOGIN:
       return waitForLoginReducer(state, action);
@@ -32,10 +32,7 @@ export const initializingReducer = (
   }
 };
 
-const waitForLoginReducer = (
-  state: WaitForLogin,
-  action: WalletAction,
-): WaitForAdjudicator | WaitForLogin => {
+const waitForLoginReducer = (state: WaitForLogin, action: WalletAction): InitializingState => {
   switch (action.type) {
     case LOGGED_IN:
       return waitForAdjudicator({
@@ -47,13 +44,15 @@ const waitForLoginReducer = (
   }
 };
 
-const waitForAdjudicatorReducer = (state: WaitForAdjudicator, action: any) => {
+const waitForAdjudicatorReducer = (
+  state: WaitForAdjudicator,
+  action: any,
+): InitializingState | InitializedState => {
   switch (action.type) {
     case ADJUDICATOR_KNOWN:
       const { adjudicator, networkId } = action;
-      return waitForAddress({
-        // TODO: should probably rename this
-        uid: state.uid,
+      return waitingForChannelInitialization({
+        ...state,
         outboxState: { messageOutbox: initializationSuccess() },
         adjudicator,
         networkId,

@@ -1,6 +1,4 @@
 import {
-  WalletState,
-  INITIALIZING,
   OPENING,
   FUNDING,
   RUNNING,
@@ -8,12 +6,13 @@ import {
   RESPONDING,
   WITHDRAWING,
   CLOSING,
-  waitForLogin,
   approveConclude,
   ApproveConclude,
   acknowledgeConclude,
   AcknowledgeConclude,
-} from '../states';
+  ChannelState,
+} from '../states/channels';
+import { WalletState, INITIALIZING, waitForLogin } from '../states';
 
 import { initializingReducer } from './initializing';
 import { openingReducer } from './opening';
@@ -35,6 +34,9 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { validCommitmentSignature } from '../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
+import { OutboxState, WALLET_INITIALIZED } from '../states/shared';
+import { initializedReducer } from './initialized';
+import { SharedChannelState } from '../states/channels/shared';
 
 const initialState = waitForLogin();
 
@@ -42,51 +44,69 @@ export const walletReducer = (
   state: WalletState = initialState,
   action: WalletAction,
 ): WalletState => {
+  const nextOutbox: OutboxState = {};
   if (action.type === MESSAGE_SENT) {
-    state = { ...state, messageOutbox: undefined };
+    nextOutbox.messageOutbox = undefined;
   }
   if (action.type === DISPLAY_MESSAGE_SENT) {
-    state = { ...state, displayOutbox: undefined };
+    nextOutbox.displayOutbox = undefined;
   }
-
   if (action.type === TRANSACTION_SENT_TO_METAMASK) {
-    state = { ...state, transactionOutbox: undefined };
+    nextOutbox.transactionOutbox = undefined;
   }
+  state = {
+    ...state,
+    outboxState: outboxReducer(state.outboxState, { messageOutbox: undefined }),
+  };
 
-  const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
-  if (conclusionStateFromOwnRequest) {
-    return conclusionStateFromOwnRequest;
+  if (state.stage === WALLET_INITIALIZED) {
+    const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(
+      state.channelState,
+      action,
+    );
+    if (conclusionStateFromOwnRequest) {
+      return { ...state, channelState: conclusionStateFromOwnRequest };
+    }
   }
 
   const conclusionStateFromOpponentRequest = receivedValidOpponentConclusionRequest(state, action);
   if (conclusionStateFromOpponentRequest) {
-    return conclusionStateFromOpponentRequest;
+    return { ...state, channelState: conclusionStateFromOpponentRequest };
   }
 
   switch (state.stage) {
     case INITIALIZING:
       return initializingReducer(state, action);
-    case OPENING:
-      return openingReducer(state.channelState, action);
-    case FUNDING:
-      return fundingReducer(state, action);
-    case RUNNING:
-      return runningReducer(state, action);
-    case CHALLENGING:
-      return challengingReducer(state, action);
-    case RESPONDING:
-      return respondingReducer(state, action);
-    case WITHDRAWING:
-      return withdrawingReducer(state, action);
-    case CLOSING:
-      return closingReducer(state, action);
+    case WALLET_INITIALIZED:
+      return initializedReducer(state, action);
+    // case OPENING:
+    //   return openingReducer(state.channelState, action);
+    // case FUNDING:
+    //   return fundingReducer(state, action);
+    // case RUNNING:
+    //   return runningReducer(state, action);
+    // case CHALLENGING:
+    //   return challengingReducer(state, action);
+    // case RESPONDING:
+    //   return respondingReducer(state, action);
+    // case WITHDRAWING:
+    //   return withdrawingReducer(state, action);
+    // case CLOSING:
+    //   return closingReducer(state, action);
     default:
       return unreachable(state);
   }
 };
 
+function outboxReducer(state: OutboxState, nextState: OutboxState): OutboxState {
+  // TODO: We need to think about how
+  Object.keys(nextState).map(k => (state[k] = nextState[k]));
+
+  return state;
+}
+
 const receivedValidOwnConclusionRequest = (
-  state: WalletState,
+  state: InitializingChannelState | ChannelState,
   action: WalletAction,
 ): ApproveConclude | null => {
   if (state.stage !== FUNDING && state.stage !== RUNNING) {

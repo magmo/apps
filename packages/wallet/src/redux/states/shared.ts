@@ -18,7 +18,7 @@ export interface NextChannelState<T extends SharedChannelState> extends OutboxSt
 
 export interface SharedWalletState {
   channelState?: SharedChannelState;
-  outboxState?: OutboxState;
+  outboxState: OutboxState;
 }
 
 export interface LoggedIn extends SharedWalletState {
@@ -28,12 +28,6 @@ export interface LoggedIn extends SharedWalletState {
 export interface AdjudicatorKnown extends LoggedIn {
   networkId: number;
   adjudicator: string;
-}
-
-export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
-export interface Initialized<T extends SharedChannelState> extends AdjudicatorKnown {
-  stage: typeof WALLET_INITIALIZED;
-  channelState: T;
 }
 
 // creators
