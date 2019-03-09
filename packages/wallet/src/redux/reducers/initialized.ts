@@ -1,24 +1,49 @@
-import { initializingChannel, InitializedState } from '../states';
+import {
+  initializingChannel,
+  InitializedState,
+  WALLET_INITIALIZED,
+  INITIALIZING_CHANNEL,
+  WAITING_FOR_CHANNEL_INITIALIZATION,
+  channelInitialized,
+} from '../states';
 
 import { WalletAction, CHANNEL_INITIALIZED } from '../actions';
 import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { ethers } from 'ethers';
+import { channelReducer } from './channels';
+import { unreachable } from '../../utils/reducer-utils';
 
 export const initializedReducer = (
   state: InitializedState,
   action: WalletAction,
 ): InitializedState => {
-  if (action.type === CHANNEL_INITIALIZED) {
-    const wallet = ethers.Wallet.createRandom();
-    const { address, privateKey } = wallet;
-
-    return initializingChannel({
-      ...state,
-      outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
-      channelState: { address, privateKey },
-    });
+  if (state.stage !== WALLET_INITIALIZED) {
+    return state;
   }
 
-  // TODO: call the channel reducer
+  switch (state.type) {
+    case WAITING_FOR_CHANNEL_INITIALIZATION:
+      if (action.type === CHANNEL_INITIALIZED) {
+        const wallet = ethers.Wallet.createRandom();
+        const { address, privateKey } = wallet;
+
+        return initializingChannel({
+          ...state,
+          outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
+          channelState: { address, privateKey },
+        });
+      }
+      break;
+    case INITIALIZING_CHANNEL:
+    case CHANNEL_INITIALIZED:
+      const { channelState } = channelReducer(state.channelState, action);
+      return channelInitialized({
+        ...state,
+        channelState,
+      });
+    default:
+      return unreachable(state);
+  }
+
   return state;
 };
