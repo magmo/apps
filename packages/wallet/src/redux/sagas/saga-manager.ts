@@ -1,13 +1,12 @@
 import { select, cancel, take, fork, actionChannel } from 'redux-saga/effects';
 
-import { keyLoader } from './key-loader';
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
 import { transactionSender } from './transaction-sender';
 import { adjudicatorWatcher } from './adjudicator-watcher';
 import { blockMiningWatcher } from './block-mining-watcher';
 
-import { WalletState, WAIT_FOR_ADDRESS } from '../states';
+import { WalletState } from '../states';
 import { getProvider } from '../../utils/contract-utils';
 
 import { displaySender } from './display-sender';
@@ -30,12 +29,6 @@ export function* sagaManager(): IterableIterator<any> {
     yield take(channel);
 
     const state: WalletState = yield select((walletState: WalletState) => walletState);
-
-    // if we don't have an address, make sure that the keyLoader runs once
-    // todo: can we be sure that this won't be called more than once if successful?
-    if (state.type === WAIT_FOR_ADDRESS) {
-      yield keyLoader();
-    }
 
     // if have adjudicator, make sure that the adjudicator watcher is running
     if ('channelId' in state && state.adjudicator) {
