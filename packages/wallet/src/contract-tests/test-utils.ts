@@ -40,7 +40,7 @@ export async function depositContract(
   participant: string,
 ) {
   const signer = provider.getSigner();
-  const deployTransaction = createDepositTransaction(contractAddress, participant, '0x5');
+  const deployTransaction = createDepositTransaction(participant, '0x5');
   const transactionReceipt = await signer.sendTransaction(deployTransaction);
   await transactionReceipt.wait();
 }
@@ -85,7 +85,6 @@ export async function createChallenge(
   const fromSig = signCommitment(fromCommitment, participantB.privateKey);
   const toSig = signCommitment(toCommitment, participantA.privateKey);
   const challengeTransaction = createForceMoveTransaction(
-    address,
     fromCommitment,
     toCommitment,
     fromSig,
@@ -137,7 +136,6 @@ export async function concludeGame(
   const toSignature = signCommitment(toCommitment, participantB.privateKey);
 
   const concludeTransaction = createConcludeTransaction(
-    address,
     fromCommitment,
     toCommitment,
     fromSignature,
@@ -176,7 +174,7 @@ export async function respondWithMove(
 
   const toSig = signCommitment(toCommitment, participantB.privateKey);
 
-  const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toCommitment, toSig);
+  const respondWithMoveTransaction = createRespondWithMoveTransaction(toCommitment, toSig);
   const transactionReceipt = await signer.sendTransaction(respondWithMoveTransaction);
   await transactionReceipt.wait();
   return toCommitment;

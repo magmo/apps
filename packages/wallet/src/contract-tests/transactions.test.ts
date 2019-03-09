@@ -74,12 +74,7 @@ describe('transactions', () => {
   });
 
   it('should deposit into the contract', async () => {
-    const contractAddress = await getAdjudicatorContractAddress(provider);
-    const depositTransaction = createDepositTransaction(
-      contractAddress,
-      participantA.address,
-      '0x5',
-    );
+    const depositTransaction = createDepositTransaction(participantA.address, '0x5');
     await testTransactionSender(depositTransaction);
   });
 
@@ -112,7 +107,6 @@ describe('transactions', () => {
     const toSig = signCommitment(toCommitment, participantA.privateKey);
 
     const forceMoveTransaction = createForceMoveTransaction(
-      contractAddress,
       fromCommitment,
       toCommitment,
       fromSig,
@@ -140,11 +134,7 @@ describe('transactions', () => {
 
     const toSig = signCommitment(toCommitment, participantB.privateKey);
 
-    const respondWithMoveTransaction = createRespondWithMoveTransaction(
-      contractAddress,
-      toCommitment,
-      toSig,
-    );
+    const respondWithMoveTransaction = createRespondWithMoveTransaction(toCommitment, toSig);
     await testTransactionSender(respondWithMoveTransaction);
   });
 
@@ -199,7 +189,6 @@ describe('transactions', () => {
     const toSignature = signCommitment(toCommitment, participantB.privateKey);
 
     const concludeTransaction = createConcludeTransaction(
-      contractAddress,
       fromCommitment,
       toCommitment,
       fromSignature,
@@ -224,7 +213,6 @@ describe('transactions', () => {
       participantA.privateKey,
     );
     const transferAndWithdraw = createTransferAndWithdrawTransaction(
-      contractAddress,
       channelId,
       participantA.address,
       participantA.address,
@@ -246,7 +234,6 @@ describe('transactions', () => {
       participantA.privateKey,
     );
     const withdrawTransaction = createWithdrawTransaction(
-      contractAddress,
       '0x01',
       participantA.address,
       participantA.address,
@@ -300,10 +287,7 @@ describe('transactions', () => {
       destination: participantA.address,
       amount: '0x05',
     };
-    const concludeAndWithdrawTransaction = createConcludeAndWithdrawTransaction(
-      contractAddress,
-      args,
-    );
+    const concludeAndWithdrawTransaction = createConcludeAndWithdrawTransaction(args);
     await testTransactionSender(concludeAndWithdrawTransaction);
   });
 });
