@@ -97,13 +97,6 @@ export const walletReducer = (
   }
 };
 
-function outboxReducer(state: OutboxState, nextState: OutboxState): OutboxState {
-  // TODO: We need to think about how
-  Object.keys(nextState).map(k => (state[k] = nextState[k]));
-
-  return state;
-}
-
 const receivedValidOwnConclusionRequest = (
   state: InitializingChannelState | ChannelState,
   action: WalletAction,
