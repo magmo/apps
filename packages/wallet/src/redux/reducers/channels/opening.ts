@@ -1,5 +1,5 @@
-import * as channelStates from '../states/channels';
-import * as actions from '../actions';
+import * as channelStates from '../../states/channels';
+import * as actions from '../../actions';
 import {
   signatureSuccess,
   validationSuccess,
@@ -7,12 +7,12 @@ import {
   validationFailure,
 } from 'magmo-wallet-client/lib/wallet-events';
 
-import { unreachable } from '../../utils/reducer-utils';
-import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
+import { unreachable } from '../../../utils/reducer-utils';
+import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
 import { CommitmentType } from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
-import { NextChannelState } from '../states/shared';
+import { NextChannelState } from '../../states/shared';
 
 export const openingReducer = (
   state: channelStates.OpeningState,

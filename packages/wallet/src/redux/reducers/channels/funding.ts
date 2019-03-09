@@ -1,5 +1,5 @@
-import * as states from '../states/channels';
-import * as actions from '../actions';
+import * as states from '../../states/channels';
+import * as actions from '../../actions';
 import {
   messageRelayRequested,
   fundingSuccess,
@@ -9,14 +9,14 @@ import {
   commitmentRelayRequested,
 } from 'magmo-wallet-client/lib/wallet-events';
 
-import { unreachable, validTransition } from '../../utils/reducer-utils';
-import { createDepositTransaction } from '../../utils/transaction-generator';
-import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
+import { unreachable, validTransition } from '../../../utils/reducer-utils';
+import { createDepositTransaction } from '../../../utils/transaction-generator';
+import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
 
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
-import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
+import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { bigNumberify } from 'ethers/utils';
-import { NextChannelState } from '../states/shared';
+import { NextChannelState } from '../../states/shared';
 
 export const fundingReducer = (
   state: states.FundingState,

@@ -1,13 +1,13 @@
-import * as runningStates from '../states/channels/running';
-import * as challengingStates from '../states/channels/challenging';
-import * as respondingStates from '../states/channels/responding';
-import * as actions from '../actions';
+import * as runningStates from '../../states/channels/running';
+import * as challengingStates from '../../states/channels/challenging';
+import * as respondingStates from '../../states/channels/responding';
+import * as actions from '../../actions';
 
-import { ourTurn, validTransition } from '../../utils/reducer-utils';
-import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
+import { ourTurn, validTransition } from '../../../utils/reducer-utils';
+import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
 import { challengeRejected, showWallet } from 'magmo-wallet-client/lib/wallet-events';
-import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { NextChannelState } from '../states/shared';
+import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
+import { NextChannelState } from '../../states/shared';
 
 export const runningReducer = (
   state: runningStates.RunningState,

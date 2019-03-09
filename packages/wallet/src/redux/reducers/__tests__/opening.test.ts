@@ -5,7 +5,7 @@ import { itTransitionsToStateType, itDoesntTransition } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
-import { openingReducer } from '../opening';
+import { openingReducer } from '../channels/opening';
 
 const {
   asAddress,

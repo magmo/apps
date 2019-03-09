@@ -12,16 +12,16 @@ import {
   AcknowledgeConclude,
   ChannelState,
 } from '../states/channels';
-import { WalletState, INITIALIZING, waitForLogin } from '../states';
+import { WalletState, INITIALIZING, waitForLogin, WALLET_INITIALIZED } from '../states';
 
 import { initializingReducer } from './initializing';
-import { openingReducer } from './opening';
-import { fundingReducer } from './funding';
-import { runningReducer } from './running';
-import { challengingReducer } from './challenging';
-import { respondingReducer } from './responding';
-import { withdrawingReducer } from './withdrawing';
-import { closingReducer } from './closing';
+import { openingReducer } from './channels/opening';
+import { fundingReducer } from './channels/funding';
+import { runningReducer } from './channels/running';
+import { challengingReducer } from './channels/challenging';
+import { respondingReducer } from './channels/responding';
+import { withdrawingReducer } from './channels/withdrawing';
+import { closingReducer } from './channels/closing';
 import {
   WalletAction,
   CONCLUDE_REQUESTED,
@@ -34,9 +34,8 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { validCommitmentSignature } from '../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
-import { OutboxState, WALLET_INITIALIZED } from '../states/shared';
+import { OutboxState } from '../states/shared';
 import { initializedReducer } from './initialized';
-import { SharedChannelState } from '../states/channels/shared';
 
 const initialState = waitForLogin();
 

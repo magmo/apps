@@ -1,4 +1,4 @@
-import { withdrawingReducer } from '../withdrawing';
+import { withdrawingReducer } from '../channels/withdrawing';
 
 import * as states from '../../states/channels';
 import * as actions from '../../actions';
