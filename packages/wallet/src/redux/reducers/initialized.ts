@@ -12,7 +12,7 @@ import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-eve
 import { ethers } from 'ethers';
 import { channelReducer } from './channels';
 import { unreachable } from '../../utils/reducer-utils';
-import { OutboxState } from '../states/shared';
+import { sideEffectsReducer } from '.';
 
 export const initializedReducer = (
   state: InitializedState,
@@ -49,19 +49,3 @@ export const initializedReducer = (
 
   return state;
 };
-
-function sideEffectsReducer(
-  state: InitializedState,
-  sideEffects: OutboxState | undefined,
-): InitializedState {
-  // TODO: What about unhandled actions?
-
-  if (!sideEffects) {
-    return state;
-  }
-  // TODO: We need to think about whether to overwrite existing outbox items.
-  const newState = { ...state, outboxState: { ...state.outboxState } };
-  Object.keys(sideEffects).map(k => (newState.outboxState[k] = sideEffects[k]));
-
-  return newState;
-}
