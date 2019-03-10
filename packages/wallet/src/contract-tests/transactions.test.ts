@@ -82,11 +82,7 @@ describe('transactions', () => {
 
   it('should send a forceMove transaction', async () => {
     const channel: Channel = { channelType: libraryAddress, nonce: getNextNonce(), participants };
-    try {
-      await depositContract(provider, participantA.address);
-    } catch (err) {
-      console.log(err);
-    }
+    await depositContract(provider, participantA.address);
     await depositContract(provider, participantB.address);
 
     const fromCommitment: Commitment = {
