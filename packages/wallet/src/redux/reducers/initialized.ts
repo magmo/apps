@@ -37,11 +37,16 @@ export const initializedReducer = (
       break;
     case INITIALIZING_CHANNEL:
     case CHANNEL_INITIALIZED:
-      const { channelState, outboxState: sideEffects } = channelReducer(state.channelState, action);
+      const { channelState, outboxState: sideEffects, unhandledAction } = channelReducer(
+        state.channelState,
+        action,
+        state.unhandledAction,
+      );
       state = sideEffectsReducer(state, sideEffects);
       return channelInitialized({
         ...state,
         channelState,
+        unhandledAction,
       });
     default:
       return unreachable(state);

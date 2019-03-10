@@ -30,22 +30,29 @@ import { NextChannelState } from '../../states/shared';
 export const channelReducer = (
   state: ChannelState,
   action: WalletAction,
+  unhandledAction?: WalletAction,
 ): NextChannelState<ChannelState> => {
   const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
   if (conclusionStateFromOwnRequest) {
-    return { channelState: conclusionStateFromOwnRequest };
+    return {
+      channelState: conclusionStateFromOwnRequest,
+      outboxState: { displayOutbox: showWallet() },
+    };
   }
 
   const conclusionStateFromOpponentRequest = receivedValidOpponentConclusionRequest(state, action);
   if (conclusionStateFromOpponentRequest) {
-    return { channelState: conclusionStateFromOpponentRequest };
+    return {
+      channelState: conclusionStateFromOpponentRequest,
+      outboxState: { displayOutbox: showWallet() },
+    };
   }
 
   switch (state.stage) {
     case OPENING:
       return openingReducer(state, action);
     case FUNDING:
-      return fundingReducer(state, action);
+      return fundingReducer(state, action, unhandledAction);
     case RUNNING:
       return runningReducer(state, action);
     case CHALLENGING:
@@ -71,7 +78,7 @@ const receivedValidOwnConclusionRequest = (
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) {
     return null;
   }
-  return approveConclude({ ...state, displayOutbox: showWallet() });
+  return approveConclude({ ...state });
 };
 
 const receivedValidOpponentConclusionRequest = (
@@ -104,6 +111,5 @@ const receivedValidOpponentConclusionRequest = (
     turnNum: commitment.turnNum,
     lastCommitment: { commitment, signature },
     penultimateCommitment: state.lastCommitment,
-    displayOutbox: showWallet(),
   });
 };
