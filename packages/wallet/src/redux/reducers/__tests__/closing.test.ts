@@ -4,7 +4,7 @@ import * as states from '../../states/channels';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
-import { itTransitionsToStateType, itSendsThisMessage } from './helpers';
+import { itTransitionsToStateType, itSendsThisMessage, itSendsThisTransaction } from './helpers';
 
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as ReducerUtil from '../../../utils/reducer-utils';
@@ -119,8 +119,7 @@ describe('start in ApproveCloseOnChain', () => {
     userAddress: '0x0',
   });
   describe('action taken: approve close on chain', () => {
-    // TODO: Mock out Signature contructor so we don't have to pass a valid signature string in
-    const createConcludeTxMock = jest.fn();
+    const createConcludeTxMock = jest.fn(() => 'conclude-tx');
     Object.defineProperty(TransactionGenerator, 'createConcludeAndWithdrawTransaction', {
       value: createConcludeTxMock,
     });
@@ -130,6 +129,7 @@ describe('start in ApproveCloseOnChain', () => {
     const action = actions.approveClose('0x0');
     const updatedState = closingReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
+    itSendsThisTransaction(updatedState, 'conclude-tx');
   });
 });
 

@@ -199,8 +199,8 @@ const approveCloseOnChainReducer = (
         channelState: channelStates.waitForCloseInitiation({
           ...state,
           userAddress: action.withdrawAddress,
-          transactionOutbox,
         }),
+        outboxState: { transactionOutbox },
       };
   }
   return { channelState: state };

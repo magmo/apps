@@ -47,6 +47,12 @@ export const itSendsATransaction = (state: NextChannelState<ChannelState>) => {
   });
 };
 
+export const itSendsThisTransaction = (state: NextChannelState<ChannelState>, tx) => {
+  it(`sends a transaction`, () => {
+    expect(state.outboxState!.transactionOutbox).toEqual(tx);
+  });
+};
+
 export const itTransitionsToStateType = (type, state: NextChannelState<ChannelState>) => {
   it(`transitions to ${type}`, () => {
     expect(state.channelState.type).toEqual(type);
