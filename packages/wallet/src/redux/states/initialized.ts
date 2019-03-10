@@ -67,13 +67,14 @@ export interface ChannelInitialized extends BaseInitializingChannel {
 export function channelInitialized<T extends BaseInitializedChannel>(
   params: T,
 ): ChannelInitialized {
-  const { outboxState, channelState } = params;
+  const { outboxState, channelState, unhandledAction } = params;
   return {
     ...adjudicatorKnown(params),
     type: CHANNEL_INITIALIZED,
     stage: WALLET_INITIALIZED,
     outboxState,
     channelState: channelState as ChannelState,
+    unhandledAction,
   };
 }
 

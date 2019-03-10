@@ -20,6 +20,7 @@ export interface NextChannelState<T extends SharedChannelState> {
 export interface SharedWalletState {
   channelState?: SharedChannelState;
   outboxState: OutboxState;
+  unhandledAction?: WalletAction;
 }
 
 export interface LoggedIn extends SharedWalletState {
