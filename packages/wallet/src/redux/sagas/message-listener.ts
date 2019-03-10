@@ -41,7 +41,7 @@ export function* messageListener() {
         yield put(actions.messageReceived(action.data));
         break;
       case incoming.RECEIVE_COMMITMENT:
-        yield put(actions.commitmentReceived(action.data, action.signature));
+        yield put(actions.commitmentReceived(action.commitment, action.signature));
         break;
       case incoming.RESPOND_TO_CHALLENGE:
         yield put(actions.challengeCommitmentReceived(action.commitment));
