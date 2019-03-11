@@ -13,8 +13,9 @@ export interface SignedCommitment {
 }
 
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
-interface SharedDirectFundingState {
-  // type: typeof DIRECT_FUNDING;
+export interface SharedDirectFundingState {
+  type: typeof DIRECT_FUNDING;
+  stage: any;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
 }
@@ -87,6 +88,7 @@ export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
     ...firstCommitmentReceived(params),
     penultimateCommitment: params.penultimateCommitment,
     funded: params.funded,
+    fundingState: params.fundingState,
   };
 }
 
