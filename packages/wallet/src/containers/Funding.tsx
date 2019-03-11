@@ -14,7 +14,7 @@ import { AFundingStep, BFundingStep } from '../components/funding/FundingStep';
 import EtherscanLink from '../components/EtherscanLink';
 
 interface Props {
-  state: channelStates.FundingChannelState | channelStates.FundingState;
+  state: channelStates.FundingChannelState;
   fundingApproved: () => void;
   fundingRejected: () => void;
   fundingSuccessAcknowledged: () => void;
