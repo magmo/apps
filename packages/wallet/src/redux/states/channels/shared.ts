@@ -12,6 +12,16 @@ export interface SignedCommitment {
   signature: string;
 }
 
+export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
+interface DirectFundingStatus {
+  // type: typeof DIRECT_FUNDING;
+  requestedTotalFunds: string;
+  requestedYourDeposit: string;
+}
+
+// This type alias will eventually become DirectFundingStatus | IndirectFundingStatus
+type FundingStatus = DirectFundingStatus;
+
 export interface FirstCommitmentReceived extends SharedChannelState {
   channelId: string;
   libraryAddress: string;
@@ -20,11 +30,11 @@ export interface FirstCommitmentReceived extends SharedChannelState {
   channelNonce: number;
   turnNum: number;
   lastCommitment: SignedCommitment;
-  requestedTotalFunds: string;
-  requestedYourDeposit: string;
+  fundingStatus: FundingStatus;
 }
 export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
+  funded: boolean; // Though this is computable from fundingStatus, it might be convenient to record this on the top-level of the channel state
 }
 export interface TransactionExists {
   transactionHash: string;
@@ -57,8 +67,7 @@ export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
     turnNum,
     lastCommitment: lastPosition,
     libraryAddress,
-    requestedTotalFunds,
-    requestedYourDeposit,
+    fundingStatus,
   } = params;
   return {
     ...baseChannelState(params),
@@ -69,8 +78,7 @@ export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
     turnNum,
     lastCommitment: lastPosition,
     libraryAddress,
-    requestedTotalFunds,
-    requestedYourDeposit,
+    fundingStatus,
   };
 }
 
@@ -78,6 +86,7 @@ export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
   return {
     ...firstCommitmentReceived(params),
     penultimateCommitment: params.penultimateCommitment,
+    funded: params.funded,
   };
 }
 

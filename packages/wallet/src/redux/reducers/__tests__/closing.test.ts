@@ -31,7 +31,11 @@ const defaults = {
   participants: channel.participants as [string, string],
   uid: 'uid',
   transactionHash: '0x0',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(0).toHexString(),
+  },
+  funded: true,
 };
 
 const defaultsA = {

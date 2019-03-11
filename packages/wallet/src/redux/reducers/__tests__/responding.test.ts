@@ -39,8 +39,11 @@ const defaults = {
   moveSelected: false,
   challengeOptions: [],
   transactionHash: '0x0',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  },
+  funded: false,
 };
 
 describe('when in CHOOSE_RESPONSE', () => {

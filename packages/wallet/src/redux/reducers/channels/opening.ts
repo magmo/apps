@@ -79,8 +79,10 @@ const waitForChannelReducer = (
           channelNonce: ownCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: ownCommitment, signature },
-          requestedTotalFunds: '0x0',
-          requestedYourDeposit: '0x0',
+          fundingStatus: {
+            requestedTotalFunds: '0x0',
+            requestedYourDeposit: '0x0',
+          },
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
       };
@@ -140,8 +142,10 @@ const waitForChannelReducer = (
           channelNonce: opponentCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
-          requestedTotalFunds: '0x0',
-          requestedYourDeposit: '0x0',
+          fundingStatus: {
+            requestedTotalFunds: '0x0',
+            requestedYourDeposit: '0x0',
+          },
         }),
         outboxState: { messageOutbox: validationSuccess() },
       };
@@ -185,10 +189,13 @@ const waitForPreFundSetupReducer = (
           turnNum: 1,
           lastCommitment: { commitment: ownCommitment, signature },
           penultimateCommitment: state.lastCommitment,
-          requestedTotalFunds: bigNumberify(ownCommitment.allocation[0])
-            .add(ownCommitment.allocation[1])
-            .toHexString(),
-          requestedYourDeposit: ownCommitment.allocation[state.ourIndex],
+          fundingStatus: {
+            requestedTotalFunds: bigNumberify(ownCommitment.allocation[0])
+              .add(ownCommitment.allocation[1])
+              .toHexString(),
+            requestedYourDeposit: ownCommitment.allocation[state.ourIndex],
+          },
+          funded: false,
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
       };
@@ -230,10 +237,13 @@ const waitForPreFundSetupReducer = (
           turnNum: 1,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
           penultimateCommitment: state.lastCommitment,
-          requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0])
-            .add(opponentCommitment.allocation[1])
-            .toHexString(),
-          requestedYourDeposit: opponentCommitment.allocation[state.ourIndex],
+          fundingStatus: {
+            requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0])
+              .add(opponentCommitment.allocation[1])
+              .toHexString(),
+            requestedYourDeposit: opponentCommitment.allocation[state.ourIndex],
+          },
+          funded: false,
         }),
         outboxState: { messageOutbox: validationSuccess() },
       };

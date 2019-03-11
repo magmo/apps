@@ -35,8 +35,11 @@ const defaults = {
   networkId: 23213,
   transactionHash: '0x0',
   userAddress: '0x0',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  },
+  funded: false,
 };
 
 describe('when in ApproveWithdrawal', () => {

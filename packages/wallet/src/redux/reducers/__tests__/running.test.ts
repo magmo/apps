@@ -37,8 +37,11 @@ const defaults = {
   adjudicator: 'adj-address',
   challengeExpiry: new Date(),
   networkId: 2132,
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  },
+  funded: false,
 };
 
 const bParams = { address: bsAddress, ourIndex: 1, privateKey: bsPrivateKey };

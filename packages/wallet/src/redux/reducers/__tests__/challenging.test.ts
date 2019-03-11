@@ -39,8 +39,11 @@ const defaults = {
   networkId: 2323,
   challengeExpiry: 1,
   transactionHash: '0x0',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  },
+  funded: true,
 };
 
 describe('when in APPROVE_CHALLENGE', () => {

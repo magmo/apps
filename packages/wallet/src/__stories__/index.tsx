@@ -35,17 +35,19 @@ const defaults = {
   challengeExpiry: 0,
   transactionHash: '0x0',
   userAddress: '0x0',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  },
+  funded: false,
 };
 const playerADefaults = {
   ...defaults,
   ourIndex: 0,
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
 };
 const playerBDefaults = {
   ...defaults,
   ourIndex: 1,
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
 };
 
 const fakeStore = state => ({

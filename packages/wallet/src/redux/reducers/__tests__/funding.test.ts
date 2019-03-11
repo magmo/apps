@@ -42,7 +42,11 @@ const defaults = {
   participants,
   uid: 'uid',
   transactionHash: '0x0',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+  fundingStatus: {
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourDeposit: bigNumberify(0).toHexString(),
+  },
+  funded: false,
 };
 
 const defaultsA = {
@@ -69,12 +73,14 @@ const justReceivedPostFundSetupA = {
   penultimateCommitment: { commitment: preFundCommitment2, signature: 'sig' },
   lastCommitment: { commitment: postFundCommitment1, signature: 'sig' },
   turnNum: 2,
+  funded: true,
 };
 
 const justReceivedPostFundSetupB = {
   penultimateCommitment: { commitment: postFundCommitment1, signature: 'sig' },
   lastCommitment: { commitment: postFundCommitment2, signature: 'sig' },
   turnNum: 3,
+  funded: true,
 };
 
 describe('start in WaitForFundingRequest', () => {

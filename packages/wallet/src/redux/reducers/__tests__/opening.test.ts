@@ -86,8 +86,8 @@ describe('when in WaitForPreFundSetup', () => {
     participants: scenarios.channel.participants as [string, string],
     turnNum: 0,
     lastCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
-    requestedTotalFunds: '0x0',
-    requestedYourDeposit: '0x0',
+    fundingStatus: { requestedTotalFunds: '0x0', requestedYourDeposit: '0x0' },
+    funded: false,
   };
 
   describe('when we send a PreFundSetupB', () => {
