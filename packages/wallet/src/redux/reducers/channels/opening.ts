@@ -79,7 +79,7 @@ const waitForChannelReducer = (
           channelNonce: ownCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: ownCommitment, signature },
-          fundingStatus: {
+          fundingState: {
             requestedTotalFunds: '0x0',
             requestedYourDeposit: '0x0',
           },
@@ -142,7 +142,7 @@ const waitForChannelReducer = (
           channelNonce: opponentCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
-          fundingStatus: {
+          fundingState: {
             requestedTotalFunds: '0x0',
             requestedYourDeposit: '0x0',
           },
@@ -189,7 +189,7 @@ const waitForPreFundSetupReducer = (
           turnNum: 1,
           lastCommitment: { commitment: ownCommitment, signature },
           penultimateCommitment: state.lastCommitment,
-          fundingStatus: {
+          fundingState: {
             requestedTotalFunds: bigNumberify(ownCommitment.allocation[0])
               .add(ownCommitment.allocation[1])
               .toHexString(),
@@ -237,7 +237,7 @@ const waitForPreFundSetupReducer = (
           turnNum: 1,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
           penultimateCommitment: state.lastCommitment,
-          fundingStatus: {
+          fundingState: {
             requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0])
               .add(opponentCommitment.allocation[1])
               .toHexString(),

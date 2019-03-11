@@ -39,7 +39,7 @@ const defaults = {
   networkId: 2323,
   challengeExpiry: 1,
   transactionHash: '0x0',
-  fundingStatus: {
+  fundingState: {
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
     requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
   },

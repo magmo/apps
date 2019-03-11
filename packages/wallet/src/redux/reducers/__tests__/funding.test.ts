@@ -42,7 +42,7 @@ const defaults = {
   participants,
   uid: 'uid',
   transactionHash: '0x0',
-  fundingStatus: {
+  fundingState: {
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
     requestedYourDeposit: bigNumberify(0).toHexString(),
   },

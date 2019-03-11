@@ -76,7 +76,7 @@ describe('When the channel reducer declares a side effect', () => {
     adjudicator: 'adj-address',
     challengeExpiry: new Date(),
     networkId: 2132,
-    fundingStatus: {
+    fundingState: {
       requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
       requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
     },
