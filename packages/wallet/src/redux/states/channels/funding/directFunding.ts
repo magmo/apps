@@ -1,4 +1,5 @@
 import { SharedDirectFundingState, TransactionExists } from '../shared';
+import { OutboxState } from '../../shared';
 
 // state stages
 export const A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
@@ -143,3 +144,8 @@ export type FundingState =
   | ADepositTransactionFailed
   | BDepositTransactionFailed
   | FundingConfirmed;
+
+export interface FundingStateWithSideEffects {
+  fundingState: FundingState;
+  sideEffects?: OutboxState;
+}
