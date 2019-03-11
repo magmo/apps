@@ -106,5 +106,5 @@ export type FundingChannelState =
   | SendFundingDeclinedMessage
   | AcknowledgeFundingDeclined;
 
-export * from './funding';
-export { FundingState } from './funding';
+export * from './directFunding';
+export { FundingState } from './directFunding';
