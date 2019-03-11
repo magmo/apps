@@ -19,7 +19,7 @@ import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from '../../states/shared';
 
 export const fundingReducer = (
-  state: states.FundingChannelState,
+  state: states.FundingChannelState | states.FundingState,
   action: actions.WalletAction,
   unhandledAction?: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
@@ -507,7 +507,7 @@ const acknowledgeFundingSuccessReducer = (
 };
 
 const validTransitionToPostFundState = (
-  state: states.FundingChannelState,
+  state: states.FundingChannelState | states.FundingState,
   data: Commitment,
   signature: string | undefined,
 ) => {
@@ -554,7 +554,10 @@ const composePostFundCommitment = (
   return { postFundSetupCommitment, commitmentSignature, sendCommitmentAction };
 };
 
-const getFundingAmount = (state: states.FundingChannelState, index: number): string => {
+const getFundingAmount = (
+  state: states.FundingChannelState | states.FundingState,
+  index: number,
+): string => {
   const lastCommitment = state.lastCommitment.commitment;
   return lastCommitment.allocation[index];
 };
