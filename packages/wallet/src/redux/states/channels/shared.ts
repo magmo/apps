@@ -20,7 +20,7 @@ interface DirectFundingState {
 }
 
 // This type alias will eventually become DirectFundingState | IndirectFundingState
-type FundingState = DirectFundingState;
+type SharedFundingState = DirectFundingState;
 
 export interface FirstCommitmentReceived extends SharedChannelState {
   channelId: string;
@@ -30,7 +30,7 @@ export interface FirstCommitmentReceived extends SharedChannelState {
   channelNonce: number;
   turnNum: number;
   lastCommitment: SignedCommitment;
-  fundingState: FundingState;
+  fundingState: SharedFundingState;
 }
 export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
