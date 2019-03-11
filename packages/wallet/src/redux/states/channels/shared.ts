@@ -13,14 +13,14 @@ export interface SignedCommitment {
 }
 
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
-interface DirectFundingState {
+interface SharedDirectFundingState {
   // type: typeof DIRECT_FUNDING;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
 }
 
-// This type alias will eventually become DirectFundingState | IndirectFundingState
-type SharedFundingState = DirectFundingState;
+// This type alias will eventually become SharedDirectFundingState | SharedIndirectFundingState
+type SharedFundingState = SharedDirectFundingState;
 
 export interface FirstCommitmentReceived extends SharedChannelState {
   channelId: string;
