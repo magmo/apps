@@ -26,9 +26,6 @@ export interface FirstCommitmentReceived extends SharedChannelState {
 export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
 }
-export interface ChannelOpenAndTransactionExists extends ChannelOpen {
-  transactionHash: string;
-}
 export interface TransactionExists {
   transactionHash: string;
 }
