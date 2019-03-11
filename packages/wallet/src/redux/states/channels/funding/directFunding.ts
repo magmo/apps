@@ -6,12 +6,15 @@ export const A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
 export const A_SUBMIT_DEPOSIT_IN_METAMASK = 'A_SUBMIT_DEPOSIT_IN_METAMASK';
 export const A_WAIT_FOR_DEPOSIT_CONFIRMATION = 'A_WAIT_FOR_DEPOSIT_CONFIRMATION';
 export const A_WAIT_FOR_OPPONENT_DEPOSIT = 'A_WAIT_FOR_OPPONENT_DEPOSIT';
+export const A_DEPOSIT_TRANSACTION_FAILED = 'A_DEPOSIT_TRANSACTION_FAILED';
+
 export const B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
   'B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK';
 export const B_SUBMIT_DEPOSIT_IN_METAMASK = 'B_SUBMIT_DEPOSIT_IN_METAMASK';
 export const B_WAIT_FOR_DEPOSIT_CONFIRMATION = 'B_WAIT_FOR_DEPOSIT_CONFIRMATION';
-export const A_DEPOSIT_TRANSACTION_FAILED = 'A_DEPOSIT_TRANSACTION_FAILED';
 export const B_DEPOSIT_TRANSACTION_FAILED = 'B_DEPOSIT_TRANSACTION_FAILED';
+
+export const FUNDING_CONFIRMED = 'FUNDING_CONFIRMED';
 
 export function directFundingState<T extends SharedDirectFundingState>(
   params: T,
@@ -21,10 +24,6 @@ export function directFundingState<T extends SharedDirectFundingState>(
 }
 export interface ADepositTransactionFailed extends SharedDirectFundingState {
   stage: typeof A_DEPOSIT_TRANSACTION_FAILED;
-}
-
-export interface BDepositTransactionFailed extends SharedDirectFundingState {
-  stage: typeof B_DEPOSIT_TRANSACTION_FAILED;
 }
 
 export interface AWaitForDepositToBeSentToMetaMask extends SharedDirectFundingState {
@@ -38,6 +37,10 @@ export interface AWaitForDepositConfirmation extends SharedDirectFundingState, T
   stage: typeof A_WAIT_FOR_DEPOSIT_CONFIRMATION;
 }
 
+export interface AWaitForOpponentDeposit extends SharedDirectFundingState {
+  stage: typeof A_WAIT_FOR_OPPONENT_DEPOSIT;
+}
+
 export interface BWaitForDepositToBeSentToMetaMask extends SharedDirectFundingState {
   stage: typeof B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK;
 }
@@ -46,12 +49,15 @@ export interface BSubmitDepositInMetaMask extends SharedDirectFundingState {
   stage: typeof B_SUBMIT_DEPOSIT_IN_METAMASK;
 }
 
-export interface AWaitForOpponentDeposit extends SharedDirectFundingState {
-  stage: typeof A_WAIT_FOR_OPPONENT_DEPOSIT;
-}
-
 export interface BWaitForDepositConfirmation extends SharedDirectFundingState, TransactionExists {
   stage: typeof B_WAIT_FOR_DEPOSIT_CONFIRMATION;
+}
+export interface BDepositTransactionFailed extends SharedDirectFundingState {
+  stage: typeof B_DEPOSIT_TRANSACTION_FAILED;
+}
+
+export interface FundingConfirmed extends SharedDirectFundingState {
+  stage: typeof FUNDING_CONFIRMED;
 }
 
 export function aWaitForDepositToBeSentToMetaMask<T extends SharedDirectFundingState>(
@@ -77,6 +83,12 @@ export function aWaitForDepositConfirmation<T extends SharedDirectFundingState &
     ...directFundingState(params),
     transactionHash: params.transactionHash,
   };
+}
+
+export function aDepositTransactionFailed<T extends SharedDirectFundingState>(
+  params: T,
+): ADepositTransactionFailed {
+  return { stage: A_DEPOSIT_TRANSACTION_FAILED, ...directFundingState(params) };
 }
 
 export function aWaitForOpponentDeposit<T extends SharedDirectFundingState>(
@@ -110,15 +122,14 @@ export function bWaitForDepositConfirmation<T extends SharedDirectFundingState &
   };
 }
 
-export function aDepositTransactionFailed<T extends SharedDirectFundingState>(
-  params: T,
-): ADepositTransactionFailed {
-  return { stage: A_DEPOSIT_TRANSACTION_FAILED, ...directFundingState(params) };
-}
 export function bDepositTransactionFailed<T extends SharedDirectFundingState>(
   params: T,
 ): BDepositTransactionFailed {
   return { stage: B_DEPOSIT_TRANSACTION_FAILED, ...directFundingState(params) };
+}
+
+export function fundingConfirmed<T extends SharedDirectFundingState>(params: T): FundingConfirmed {
+  return { stage: FUNDING_CONFIRMED, ...directFundingState(params) };
 }
 
 export type FundingState =
@@ -130,4 +141,5 @@ export type FundingState =
   | AWaitForOpponentDeposit
   | BWaitForDepositConfirmation
   | ADepositTransactionFailed
-  | BDepositTransactionFailed;
+  | BDepositTransactionFailed
+  | FundingConfirmed;
