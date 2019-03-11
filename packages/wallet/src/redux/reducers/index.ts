@@ -39,17 +39,27 @@ export const walletReducer = (
   }
 };
 
+/**
+ *
+ * @param state current global state
+ * @param sideEffects: OutboxState -- side effects that the channel reducer declared should happen
+ *
+ * For each key k in sideEffects, replace state.outboxState[k] with sideEffects[k]
+ */
 export function sideEffectsReducer<T extends SharedWalletState>(
   state: T,
   sideEffects: OutboxState | undefined,
 ): T {
-  // TODO: What about unhandled actions?
+  // TODO: Should the sideEffectsReducer also deal with unhandled actions?
+  //       Or should that be taken care of manually?
 
   if (!sideEffects) {
     return state;
   }
-  // TODO: We need to think about whether to overwrite existing outbox items.
+  // Defensively copy object as to not modify existing state
   const newState = { ...state, outboxState: { ...state.outboxState } };
+
+  // TODO: We need to think about whether to overwrite existing outbox items.
   Object.keys(sideEffects).map(k => (newState.outboxState[k] = sideEffects[k]));
 
   return newState;
