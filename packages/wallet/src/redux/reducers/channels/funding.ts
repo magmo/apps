@@ -221,13 +221,11 @@ const aWaitForDepositToBeSentToMetaMaskReducer = (
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { channelState: states.aSubmitDepositInMetaMask(state) };
     case actions.FUNDING_RECEIVED_EVENT:
-      throw new Error('What?');
       return {
         channelState: states.aWaitForDepositToBeSentToMetaMask({
           ...state,
         }),
-        // TODO: what is going on with this?
-        // unhandledAdjudicatorEvent: action,
+        unhandledAction: action,
       };
     case actions.MESSAGE_RECEIVED:
       if (action.data && action.data === 'FundingDeclined') {
