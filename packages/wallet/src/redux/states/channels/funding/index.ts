@@ -1,4 +1,4 @@
-import { ChannelOpen, channelOpen, TransactionExists } from './shared';
+import { ChannelOpen, channelOpen, TransactionExists } from '../shared';
 
 // stage
 export const FUNDING = 'FUNDING';
