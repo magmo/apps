@@ -50,8 +50,8 @@ export const fundingReducer = (
     case states.A_WAIT_FOR_POST_FUND_SETUP:
       return aWaitForPostFundSetupReducer(state, action);
     //
-    case states.B_WAIT_FOR_OPPONENT_DEPOSIT:
-      return bWaitForOpponentDepositReducer(state, action);
+    case states.WAIT_FOR_FUNDING_CONFIRMATION:
+      return waitForFundingConfirmationReducer(state, action);
     case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return bWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -184,7 +184,7 @@ const approveFundingReducer = (
           },
         };
       } else {
-        const updatedState = states.bWaitForOpponentDeposit(state);
+        const updatedState = states.waitForFundingConfirmation(state);
         if (unhandledAction) {
           return fundingReducer({ ...updatedState }, unhandledAction);
         } else {
@@ -363,8 +363,8 @@ const aWaitForPostFundSetupReducer = (
   }
 };
 
-const bWaitForOpponentDepositReducer = (
-  state: states.BWaitForOpponentDeposit,
+const waitForFundingConfirmationReducer = (
+  state: states.WaitForFundingConfirmation,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
   switch (action.type) {

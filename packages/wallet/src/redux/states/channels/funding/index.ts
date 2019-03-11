@@ -12,7 +12,7 @@ export const FUNDING = 'FUNDING';
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 export const APPROVE_FUNDING = 'APPROVE_FUNDING';
 export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
-export const B_WAIT_FOR_OPPONENT_DEPOSIT = 'B_WAIT_FOR_OPPONENT_DEPOSIT';
+export const WAIT_FOR_FUNDING_CONFIRMATION = 'WAIT_FOR_FUNDING_CONFIRMATION';
 export const B_WAIT_FOR_POST_FUND_SETUP = 'B_WAIT_FOR_POST_FUND_SETUP';
 export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
 export const SEND_FUNDING_DECLINED_MESSAGE = 'SEND_FUNDING_DECLINED_MESSAGE';
@@ -33,8 +33,8 @@ export interface ApproveFunding extends ChannelOpen {
   stage: typeof FUNDING;
 }
 
-export interface BWaitForOpponentDeposit extends ChannelOpen {
-  type: typeof B_WAIT_FOR_OPPONENT_DEPOSIT;
+export interface WaitForFundingConfirmation extends ChannelOpen {
+  type: typeof WAIT_FOR_FUNDING_CONFIRMATION;
   stage: typeof FUNDING;
 }
 
@@ -66,8 +66,10 @@ export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding
   return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function bWaitForOpponentDeposit<T extends ChannelOpen>(params: T): BWaitForOpponentDeposit {
-  return { type: B_WAIT_FOR_OPPONENT_DEPOSIT, stage: FUNDING, ...channelOpen(params) };
+export function waitForFundingConfirmation<T extends ChannelOpen>(
+  params: T,
+): WaitForFundingConfirmation {
+  return { type: WAIT_FOR_FUNDING_CONFIRMATION, stage: FUNDING, ...channelOpen(params) };
 }
 
 export function aWaitForPostFundSetup<T extends ChannelOpen>(params: T): AWaitForPostFundSetup {
@@ -99,7 +101,7 @@ export function acknowledgeFundingDeclined<T extends ChannelOpen>(
 export type FundingChannelState =
   | WaitForFundingRequest
   | ApproveFunding
-  | BWaitForOpponentDeposit
+  | WaitForFundingConfirmation
   | AWaitForPostFundSetup
   | BWaitForPostFundSetup
   | AcknowledgeFundingSuccess

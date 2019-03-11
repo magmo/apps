@@ -99,7 +99,10 @@ storiesOf('Wallet Screens / Funding / Player A', module)
 
 storiesOf('Wallet Screens / Funding / Player B', module)
   .add('ApproveFunding', testState(channelStates.approveFunding(playerBDefaults)))
-  .add('BWaitForOpponentDeposit', testState(channelStates.bWaitForOpponentDeposit(playerBDefaults)))
+  .add(
+    'BWaitForOpponentDeposit',
+    testState(channelStates.waitForFundingConfirmation(playerBDefaults)),
+  )
   .add(
     'BWaitForDepositToBeSentToMetaMask',
     testState(channelStates.bWaitForDepositToBeSentToMetaMask(playerBDefaults)),

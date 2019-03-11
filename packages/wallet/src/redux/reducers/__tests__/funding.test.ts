@@ -139,7 +139,7 @@ describe('start in ApproveFunding', () => {
     const action = actions.fundingApproved();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_OPPONENT_DEPOSIT, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
   });
 
   describe('action taken: funding approved, funding received event already received', () => {
@@ -306,7 +306,7 @@ describe('start in BWaitForDeployAddress', () => {
     });
 
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
-    const state = states.bWaitForOpponentDeposit(testDefaults);
+    const state = states.waitForFundingConfirmation(testDefaults);
     const action = actions.fundingReceivedEvent(channelId, '0x2', '0x02');
     const updatedState = fundingReducer(state, action);
 

@@ -66,9 +66,9 @@ class FundingContainer extends PureComponent<Props> {
       case channelStates.A_WAIT_FOR_POST_FUND_SETUP:
         // return <AWaitForPostFundSetup />;
         return <AFundingStep step={4}>Waiting for the other player</AFundingStep>;
-      case channelStates.B_WAIT_FOR_OPPONENT_DEPOSIT:
+      case channelStates.WAIT_FOR_FUNDING_CONFIRMATION:
         // return <WaitForOtherPlayer name="deployment" />;
-        return <BFundingStep step={1} />;
+        return <BFundingStep step={1} />; // TODO: This will need to change based on direct or indirect funding, right?
       case channelStates.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
         // return <SubmitX name="deposit" />;
         return <BFundingStep step={2} />;
