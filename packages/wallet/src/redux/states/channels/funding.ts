@@ -215,7 +215,7 @@ export function bDepositTransactionFailed<T extends ChannelOpen>(
   return { type: B_DEPOSIT_TRANSACTION_FAILED, stage: FUNDING, ...channelOpen(params) };
 }
 
-export type FundingState =
+export type FundingChannelState =
   | WaitForFundingRequest
   | ApproveFunding
   | AWaitForDepositToBeSentToMetaMask

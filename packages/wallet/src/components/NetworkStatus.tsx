@@ -54,7 +54,7 @@ export class NetworkStatus extends React.PureComponent<NetworkStatusProps> {
 }
 
 interface ChannelInFundingState extends AdjudicatorKnown {
-  channelState: states.FundingState;
+  channelState: states.FundingChannelState;
 }
 
 const mapStateToProps = (state: ChannelInFundingState): NetworkStatusProps => ({
