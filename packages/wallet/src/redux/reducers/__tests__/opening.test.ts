@@ -1,7 +1,7 @@
 import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itDoesntTransition, itSendsThisMessage } from './helpers';
+import { itTransitionsToChannelStateType, itDoesntTransition, itSendsThisMessage } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
@@ -41,7 +41,7 @@ describe('when in WaitForChannel', () => {
     const action = actions.ownCommitmentReceived(preFundCommitment1);
     const updatedState = openingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
   });
 
   describe('when an opponent sends a PreFundSetupA', () => {
@@ -53,7 +53,7 @@ describe('when in WaitForChannel', () => {
 
     const updatedState = openingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
   });
 
   describe('when an opponent sends a PreFundSetupA but the signature is bad', () => {
@@ -96,7 +96,7 @@ describe('when in WaitForPreFundSetup', () => {
     const action = actions.ownCommitmentReceived(preFundCommitment2);
     const updatedState = openingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
   });
 
   describe('when an opponent sends a PreFundSetupB', () => {
@@ -108,7 +108,7 @@ describe('when in WaitForPreFundSetup', () => {
     const action = actions.opponentCommitmentReceived(preFundCommitment2, 'sig');
     const updatedState = openingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
   });
 
   describe('when an opponent sends a PreFundSetupB but the signature is bad', () => {

@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
 import {
-  itTransitionsToStateType,
+  itTransitionsToChannelStateType,
   itIncreasesTurnNumBy,
   itSendsThisMessage,
   expectThisCommitmentSent,
@@ -91,7 +91,7 @@ describe('start in WaitForFundingRequest', () => {
     const action = actions.fundingRequested();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
+    itTransitionsToChannelStateType(states.APPROVE_FUNDING, updatedState);
   });
 
   describe('action taken: funding requested', () => {
@@ -101,7 +101,7 @@ describe('start in WaitForFundingRequest', () => {
     const action = actions.fundingRequested();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
+    itTransitionsToChannelStateType(states.APPROVE_FUNDING, updatedState);
   });
 });
 
@@ -117,7 +117,7 @@ describe('start in ApproveFunding', () => {
     const action = actions.fundingApproved();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDeployTxMock.mock.calls.length).toBe(1);
     // expect(createDeployTxMock.mock.calls[0][2]).toBe(state.lastCommitment.commitment.allocation[0]);
   });
@@ -129,7 +129,7 @@ describe('start in ApproveFunding', () => {
     const action = actions.fundingRejected();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.SEND_FUNDING_DECLINED_MESSAGE, updatedState);
+    itTransitionsToChannelStateType(states.SEND_FUNDING_DECLINED_MESSAGE, updatedState);
   });
 
   describe('action taken: funding approved, funding received event not received', () => {
@@ -139,7 +139,7 @@ describe('start in ApproveFunding', () => {
     const action = actions.fundingApproved();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
   });
 
   describe('action taken: funding approved, funding received event already received', () => {
@@ -159,7 +159,7 @@ describe('start in ApproveFunding', () => {
       actions.fundingReceivedEvent(channelId, '0x2', '0x02'),
     );
 
-    itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
     expect(createDepositTxMock.mock.calls[0][1]).toBe(
       state.lastCommitment.commitment.allocation[1],
@@ -175,14 +175,14 @@ describe('start in aWaitForDepositToBeSentToMetaMask', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_SUBMIT_DEPOSIT_IN_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.A_SUBMIT_DEPOSIT_IN_METAMASK, updatedState);
   });
   describe('incoming action: Funding declined message received', () => {
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.aWaitForDepositToBeSentToMetaMask(testDefaults);
     const action = actions.messageReceived('FundingDeclined');
     const updatedState = fundingReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
   });
 });
 
@@ -194,7 +194,7 @@ describe('start in aSubmitDepositInMetaMask', () => {
     const action = actions.transactionSubmitted('0x0');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
   });
 
   describe('incoming action: transaction submission failed', () => {
@@ -204,7 +204,7 @@ describe('start in aSubmitDepositInMetaMask', () => {
     const action = actions.transactionSubmissionFailed({ code: '1234' });
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_DEPOSIT_TRANSACTION_FAILED, updatedState);
+    itTransitionsToChannelStateType(states.A_DEPOSIT_TRANSACTION_FAILED, updatedState);
   });
 
   describe('incoming action: Funding declined message received', () => {
@@ -212,7 +212,7 @@ describe('start in aSubmitDepositInMetaMask', () => {
     const state = states.aSubmitDepositInMetaMask(testDefaults);
     const action = actions.messageReceived('FundingDeclined');
     const updatedState = fundingReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
   });
 });
 
@@ -224,7 +224,7 @@ describe('start in SendFundingDeclinedMessage', () => {
     const action = actions.messageSent();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHANNEL, updatedState);
     itSendsThisMessage(updatedState, outgoing.FUNDING_FAILURE);
   });
 });
@@ -237,14 +237,14 @@ describe('start in WaitForDepositConfirmation', () => {
     const action = actions.transactionConfirmed('1234');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_WAIT_FOR_OPPONENT_DEPOSIT, updatedState);
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_OPPONENT_DEPOSIT, updatedState);
   });
   describe('incoming action: Funding declined message received', () => {
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.aWaitForDepositConfirmation(testDefaults);
     const action = actions.messageReceived('FundingDeclined');
     const updatedState = fundingReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
   });
   describe('incoming action: transaction confirmed, funding event already received', () => {
     // player A scenario
@@ -254,7 +254,7 @@ describe('start in WaitForDepositConfirmation', () => {
     const action = actions.transactionConfirmed('1234');
     const updatedState = fundingReducer(state, action, unhandledAction);
 
-    itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
     itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
@@ -266,7 +266,7 @@ describe('start in AWaitForOpponentDeposit', () => {
     const state = states.aWaitForOpponentDeposit(testDefaults);
     const action = actions.messageReceived('FundingDeclined');
     const updatedState = fundingReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
   });
   describe('incoming action: funding received event', () => {
     // player A scenario
@@ -275,7 +275,7 @@ describe('start in AWaitForOpponentDeposit', () => {
     const action = actions.fundingReceivedEvent(1000, bsAddress, '0x0a');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
     itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
@@ -292,7 +292,7 @@ describe('start in AWaitForPostFundSetup', () => {
     const action = actions.commitmentReceived(postFundCommitment2, 'sig');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 });
@@ -310,7 +310,7 @@ describe('start in BWaitForDeployAddress', () => {
     const action = actions.fundingReceivedEvent(channelId, '0x2', '0x02');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
     expect(createDepositTxMock.mock.calls[0][1]).toBe(
       state.lastCommitment.commitment.allocation[1],
@@ -326,7 +326,7 @@ describe('start in BWaitForDepositToBeSentToMetaMask', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_SUBMIT_DEPOSIT_IN_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.B_SUBMIT_DEPOSIT_IN_METAMASK, updatedState);
   });
 });
 
@@ -338,7 +338,7 @@ describe('start in BSubmitDepositInMetaMask', () => {
     const action = actions.transactionSubmitted('0x0');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
   });
 
   describe('incoming action: transaction submission failed', () => {
@@ -348,7 +348,7 @@ describe('start in BSubmitDepositInMetaMask', () => {
     const action = actions.transactionSubmissionFailed({ code: '1234' });
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_DEPOSIT_TRANSACTION_FAILED, updatedState);
+    itTransitionsToChannelStateType(states.B_DEPOSIT_TRANSACTION_FAILED, updatedState);
   });
 });
 
@@ -360,7 +360,7 @@ describe('start in WaitForDepositConfirmation', () => {
     const action = actions.transactionConfirmed();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
@@ -378,7 +378,7 @@ describe('start in WaitForDepositConfirmation', () => {
     const action = actions.transactionConfirmed();
     const updatedState = fundingReducer(state, action, unhandledAction);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
   });
 
@@ -392,7 +392,7 @@ describe('start in WaitForDepositConfirmation', () => {
     const action = actions.commitmentReceived(postFundCommitment2, '0x0');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
     it('works', async () => {
       expect(
@@ -413,7 +413,7 @@ describe('start in B DepositTransactionFailed', () => {
     const action = actions.retryTransaction();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
   });
 });
@@ -429,7 +429,7 @@ describe('start in A DepositTransactionFailure', () => {
     const action = actions.retryTransaction();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDeployTxMock.mock.calls.length).toBe(1);
   });
 });
@@ -444,7 +444,7 @@ describe('start in BWaitForPostFundSetup', () => {
     const action = actions.commitmentReceived(postFundCommitment1, 'sig');
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
     itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
@@ -458,7 +458,7 @@ describe('start in AcknowledgeFundingSuccess', () => {
     const action = actions.fundingSuccessAcknowledged();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
     it('sends PostFundSetupB', () => {
       expectThisCommitmentSent(updatedState, {
         commitmentType: fmgCore.CommitmentType.PostFundSetup,
@@ -474,7 +474,7 @@ describe('start in AcknowledgeFundingSuccess', () => {
     const action = actions.fundingSuccessAcknowledged();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
     itSendsThisMessage(updatedState, outgoing.FUNDING_SUCCESS);
     it('sends PostFundSetupB', () => {
       expectThisCommitmentSent(updatedState, {

@@ -4,7 +4,11 @@ import * as states from '../../states/channels';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
-import { itTransitionsToStateType, itSendsThisMessage, itSendsThisTransaction } from './helpers';
+import {
+  itTransitionsToChannelStateType,
+  itSendsThisMessage,
+  itSendsThisTransaction,
+} from './helpers';
 
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as ReducerUtil from '../../../utils/reducer-utils';
@@ -61,7 +65,7 @@ describe('start in AcknowledgeConclude', () => {
     const action = actions.concludeApproved();
 
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
+    itTransitionsToChannelStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
     itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
   });
 });
@@ -76,7 +80,7 @@ describe('start in ApproveConclude', () => {
     });
     const action = actions.concludeRejected();
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
 
   describe('action taken: conclude approved', () => {
@@ -89,7 +93,7 @@ describe('start in ApproveConclude', () => {
 
     const action = actions.concludeApproved();
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_OPPONENT_CONCLUDE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_OPPONENT_CONCLUDE, updatedState);
   });
 });
 
@@ -108,7 +112,7 @@ describe('start in WaitForOpponentConclude', () => {
     const action = actions.commitmentReceived(('commitment' as unknown) as Commitment, '0x0');
     describe(' where the adjudicator exists', () => {
       const updatedState = closingReducer(state, action);
-      itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
+      itTransitionsToChannelStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
       itSendsThisMessage(updatedState, outgoing.CONCLUDE_SUCCESS);
     });
   });
@@ -132,7 +136,7 @@ describe('start in ApproveCloseOnChain', () => {
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signVerMock });
     const action = actions.approveClose('0x0');
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
     itSendsThisTransaction(updatedState, 'conclude-tx');
   });
 });
@@ -148,7 +152,7 @@ describe('start in WaitForCloseInitiation', () => {
   describe('action taken: transaction sent to metamask', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
   });
 });
 
@@ -163,12 +167,12 @@ describe('start in WaitForCloseSubmission', () => {
   describe('action taken: transaction submitted', () => {
     const action = actions.transactionSubmitted('0x0');
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CLOSE_CONFIRMED, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_CONFIRMED, updatedState);
   });
   describe('action taken: transaction submitted', () => {
     const action = actions.transactionSubmissionFailed({ code: 0 });
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.CLOSE_TRANSACTION_FAILED, updatedState);
+    itTransitionsToChannelStateType(states.CLOSE_TRANSACTION_FAILED, updatedState);
   });
 });
 
@@ -191,7 +195,7 @@ describe('start in closeTransactionFailed', () => {
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signVerMock });
     const action = actions.retryTransaction();
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
     expect(createConcludeTxMock.mock.calls.length).toBe(1);
   });
 });
@@ -206,7 +210,7 @@ describe('start in WaitForCloseConfirmed', () => {
   describe('action taken: transaction confirmed', () => {
     const action = actions.transactionConfirmed();
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
   });
 });
 
@@ -221,7 +225,7 @@ describe('start in AcknowledgCloseSuccess', () => {
 
     const action = actions.closeSuccessAcknowledged();
     const updatedState = closingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHANNEL, updatedState);
     itSendsThisMessage(updatedState, outgoing.CLOSE_SUCCESS);
   });
 });

@@ -1,8 +1,7 @@
 import { ChannelState } from '../../states/channels';
-import { NextChannelState } from '../../states/shared';
+import { NextChannelState, OutboxState } from '../../states/shared';
 import { Commitment } from 'fmg-core';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import { WalletState } from 'src/redux/states';
 
 export const itSendsAMessage = (state: NextChannelState<ChannelState>) => {
   it(`sends a message`, () => {
@@ -11,7 +10,7 @@ export const itSendsAMessage = (state: NextChannelState<ChannelState>) => {
 };
 
 export const itSendsThisMessage = (
-  state: WalletState | NextChannelState<ChannelState>,
+  state: { outboxState?: OutboxState },
   message,
   typeOnly = true,
 ) => {
@@ -53,9 +52,15 @@ export const itSendsThisTransaction = (state: NextChannelState<ChannelState>, tx
   });
 };
 
-export const itTransitionsToStateType = (type, state: NextChannelState<ChannelState>) => {
+export const itTransitionsToChannelStateType = (type, state: NextChannelState<ChannelState>) => {
   it(`transitions to ${type}`, () => {
     expect(state.channelState.type).toEqual(type);
+  });
+};
+
+export const itTransitionsToStateType = (type, state: { type: any }) => {
+  it(`transitions to ${type}`, () => {
+    expect(state.type).toEqual(type);
   });
 };
 

@@ -6,7 +6,7 @@ import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import {
   itDoesntTransition,
   itIncreasesTurnNumBy,
-  itTransitionsToStateType,
+  itTransitionsToChannelStateType,
   itSendsThisMessage,
 } from './helpers';
 import * as SigningUtil from '../../../utils/signing-utils';
@@ -56,7 +56,7 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.ownCommitmentReceived(gameCommitment3);
     const updatedState = runningReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 
@@ -78,7 +78,7 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry);
     const updatedState = runningReducer(state, action);
 
-    itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
+    itTransitionsToChannelStateType(states.CHOOSE_RESPONSE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
@@ -86,7 +86,7 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.challengeRequested();
     const updatedState = runningReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
     itSendsThisMessage(updatedState, outgoing.CHALLENGE_REJECTED);
   });
@@ -110,7 +110,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: signMock });
     const updatedState = runningReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 
@@ -132,7 +132,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry);
     const updatedState = runningReducer(state, action);
 
-    itTransitionsToStateType(states.CHOOSE_RESPONSE, updatedState);
+    itTransitionsToChannelStateType(states.CHOOSE_RESPONSE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
@@ -140,7 +140,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     const action = actions.challengeRequested();
     const updatedState = runningReducer(state, action);
 
-    itTransitionsToStateType(states.APPROVE_CHALLENGE, updatedState);
+    itTransitionsToChannelStateType(states.APPROVE_CHALLENGE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 });

@@ -4,7 +4,7 @@ import * as states from '../../states/channels';
 import * as actions from '../../actions';
 import {
   itSendsATransaction,
-  itTransitionsToStateType,
+  itTransitionsToChannelStateType,
   itDoesntTransition,
   itSendsThisMessage,
   itSendsThisDisplayEvent,
@@ -55,7 +55,7 @@ describe('when in APPROVE_CHALLENGE', () => {
     });
     const action = actions.challengeApproved();
     const updatedState = challengingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
     itSendsATransaction(updatedState);
   });
 
@@ -64,7 +64,7 @@ describe('when in APPROVE_CHALLENGE', () => {
     const updatedState = challengingReducer(state, action);
     itSendsThisDisplayEvent(updatedState, hideWallet().type);
     itSendsThisMessage(updatedState, challengeComplete().type);
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
 });
 
@@ -75,7 +75,7 @@ describe('when in INITIATE_CHALLENGE', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = challengingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
   });
 });
 
@@ -86,14 +86,14 @@ describe('when in WAIT_FOR_CHALLENGE_SUBMISSION', () => {
     const action = actions.transactionSubmitted('0x0');
     const updatedState = challengingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_CONFIRMATION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_CONFIRMATION, updatedState);
   });
 
   describe('when a challenge submissions fails', () => {
     const action = actions.transactionSubmissionFailed({ code: 0 });
     const updatedState = challengingReducer(state, action);
 
-    itTransitionsToStateType(states.CHALLENGE_TRANSACTION_FAILED, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGE_TRANSACTION_FAILED, updatedState);
   });
 });
 
@@ -106,7 +106,7 @@ describe('when in CHALLENGE_TRANSACTION_FAILED', () => {
     });
     const action = actions.retryTransaction();
     const updatedState = challengingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
     expect(createChallengeTxMock.mock.calls.length).toBe(1);
   });
 });
@@ -118,7 +118,7 @@ describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
     const action = actions.transactionConfirmed();
     const updatedState = challengingReducer(state, action);
 
-    itTransitionsToStateType(states.WAIT_FOR_RESPONSE_OR_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_OR_TIMEOUT, updatedState);
   });
 });
 
@@ -133,14 +133,14 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
     const action = actions.respondWithMoveEvent('0x0', '0xC1');
     const updatedState = challengingReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_RESPONSE, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_CHALLENGE_RESPONSE, updatedState);
   });
 
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ timestamp: 2, number: 2 });
     const updatedState = challengingReducer(state, action);
 
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
@@ -155,7 +155,7 @@ describe('when in ACKNOWLEDGE_RESPONSE', () => {
   const action = actions.challengeResponseAcknowledged();
   const updatedState = challengingReducer(state, action);
 
-  itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+  itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
 });
 
 describe('when in ACKNOWLEDGE_TIMEOUT', () => {
@@ -163,5 +163,5 @@ describe('when in ACKNOWLEDGE_TIMEOUT', () => {
   const action = actions.challengedTimedOutAcknowledged();
   const updatedState = challengingReducer(state, action);
 
-  itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+  itTransitionsToChannelStateType(states.APPROVE_WITHDRAWAL, updatedState);
 });

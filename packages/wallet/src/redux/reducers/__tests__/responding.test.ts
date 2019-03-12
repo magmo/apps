@@ -3,7 +3,7 @@ import { respondingReducer } from '../channels/responding';
 import * as states from '../../states/channels';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itDoesntTransition } from './helpers';
+import { itTransitionsToChannelStateType, itDoesntTransition } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as SigningUtil from '../../../utils/signing-utils';
@@ -52,19 +52,19 @@ describe('when in CHOOSE_RESPONSE', () => {
   describe('when respond with move is chosen', () => {
     const action = actions.respondWithMoveChosen();
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.TAKE_MOVE_IN_APP, updatedState);
+    itTransitionsToChannelStateType(states.TAKE_MOVE_IN_APP, updatedState);
   });
 
   describe('when respond with refute is chosen', () => {
     const action = actions.respondWithRefuteChosen();
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
+    itTransitionsToChannelStateType(states.INITIATE_RESPONSE, updatedState);
   });
 
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
@@ -88,12 +88,12 @@ describe('when in TAKE_MOVE_IN_APP', () => {
     const signMock = jest.fn().mockReturnValue('0x0');
     Object.defineProperty(SigningUtil, 'signCommitment', { value: signMock });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
+    itTransitionsToChannelStateType(states.INITIATE_RESPONSE, updatedState);
   });
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 
   describe('when a block is mined but the challenge has not expired', () => {
@@ -108,12 +108,12 @@ describe('when in INITIATE_RESPONSE', () => {
   describe('when the challenge response is initiated', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_RESPONSE_SUBMISSION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_SUBMISSION, updatedState);
   });
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
 
@@ -122,17 +122,17 @@ describe('when in WAIT_FOR_RESPONSE_SUBMISSION', () => {
   describe('when the challenge response is submitted', () => {
     const action = actions.transactionSubmitted('0x0');
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_RESPONSE_CONFIRMATION, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_CONFIRMATION, updatedState);
   });
   describe('when an error occurs when submitting a challenge response', () => {
     const action = actions.transactionSubmissionFailed({ code: 0 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.RESPONSE_TRANSACTION_FAILED, updatedState);
+    itTransitionsToChannelStateType(states.RESPONSE_TRANSACTION_FAILED, updatedState);
   });
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
 
@@ -141,12 +141,12 @@ describe('when in WAIT_FOR_RESPONSE_CONFIRMED', () => {
   describe('when the challenge response is confirmed', () => {
     const action = actions.transactionConfirmed();
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_COMPLETE, updatedState);
+    itTransitionsToChannelStateType(states.ACKNOWLEDGE_CHALLENGE_COMPLETE, updatedState);
   });
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
 
@@ -155,7 +155,7 @@ describe('when in ACKNOWLEDGE_CHALLENGE_COMPLETE', () => {
   describe('when the challenge is acknowledged as complete', () => {
     const action = actions.challengeResponseAcknowledged();
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
 });
 
@@ -168,12 +168,12 @@ describe('when in RESPONSE_TRANSACTION_FAILED', () => {
       value: createRespondTxMock,
     });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
+    itTransitionsToChannelStateType(states.INITIATE_RESPONSE, updatedState);
     expect(createRespondTxMock.mock.calls.length).toBe(1);
   });
   describe('when the challenge times out', () => {
     const action = actions.blockMined({ number: 1, timestamp: 2 });
     const updatedState = respondingReducer(state, action);
-    itTransitionsToStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
+    itTransitionsToChannelStateType(states.CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
   });
 });
