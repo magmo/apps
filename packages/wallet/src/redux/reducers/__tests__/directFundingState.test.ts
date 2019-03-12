@@ -4,10 +4,10 @@ import * as states from '../../states/channels/funding/directFunding';
 import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
-import { itTransitionsToStateType, itSendsThisTransaction } from './helpers';
+import { itTransitionsToStateType, itSendsThisTransaction, itSendsNoTransaction } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { SharedDirectFundingState } from 'src/redux/states/channels/shared';
+import { SharedDirectFundingState } from '../../states/channels/shared';
 
 const { channelId } = scenarios;
 
@@ -29,15 +29,64 @@ const defaultsForB: SharedDirectFundingState = {
   requestedYourContribution: YOUR_DEPOSIT_B,
 };
 
-const tx = '1234';
-const defaultsWithTx = { ...defaultsForA, transactionHash: tx };
+const TX = 'TX';
+const defaultsWithTx = { ...defaultsForA, transactionHash: TX };
+
+beforeEach(() => {});
+describe('start in WAIT_FOR_FUNDING_REQUEST', () => {
+  describe('incoming action: FUNDING_REQUESTED', () => {
+    // player A scenario
+    const state = states.waitForFundingRequest(defaultsForA);
+    const action = actions.fundingRequested();
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
+
+    itTransitionsToStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState.fundingState);
+  });
+
+  describe('incoming action: FUNDING_REQUESTED', () => {
+    // player B scenario
+    const state = states.waitForFundingRequest(defaultsForB);
+    const action = actions.fundingRequested();
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
+
+    itTransitionsToStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState.fundingState);
+  });
+});
+
+describe('start in WAIT_FOR_FUNDING_APPROVAL', () => {
+  describe('incoming action: FUNDING_APPROVED', () => {
+    // player A scenario
+    const createDepositTxMock = jest.fn(() => TX);
+    Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
+      value: createDepositTxMock,
+    });
+    const state = states.waitForFundingApproval(defaultsForA);
+    const action = actions.fundingApproved();
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
+
+    itTransitionsToStateType(
+      states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
+      updatedState.fundingState,
+    );
+    itSendsThisTransaction(updatedState, TX);
+  });
+
+  describe('incoming action: FUNDING_APPROVED', () => {
+    // player B scenario
+    const state = states.waitForFundingApproval(defaultsForB);
+    const action = actions.fundingApproved();
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
+
+    itTransitionsToStateType(states.B_WAIT_FOR_OPPONENT_DEPOSIT, updatedState.fundingState);
+  });
+});
 
 describe('start in aWaitForDepositToBeSentToMetaMask', () => {
   describe('incoming action: depositSentToMetamask', () => {
     // player A scenario
     const state = states.aWaitForDepositToBeSentToMetaMask(defaultsForA);
     const action = actions.transactionSentToMetamask();
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_SUBMIT_DEPOSIT_IN_METAMASK, updatedState.fundingState);
   });
@@ -48,7 +97,7 @@ describe('start in aSubmitDepositInMetaMask', () => {
     // player A scenario
     const state = states.aSubmitDepositInMetaMask(defaultsForA);
     const action = actions.transactionSubmitted('0x0');
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState.fundingState);
   });
@@ -57,7 +106,7 @@ describe('start in aSubmitDepositInMetaMask', () => {
     // player A scenario
     const state = states.aSubmitDepositInMetaMask(defaultsForA);
     const action = actions.transactionSubmissionFailed({ code: '1234' });
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_DEPOSIT_TRANSACTION_FAILED, updatedState.fundingState);
   });
@@ -67,17 +116,19 @@ describe('start in AWaitForDepositConfirmation', () => {
   describe('incoming action: transaction confirmed', () => {
     // player A scenario
     const state = states.aWaitForDepositConfirmation(defaultsWithTx);
-    const action = actions.transactionConfirmed(tx);
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const action = actions.transactionConfirmed(TX);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_WAIT_FOR_OPPONENT_DEPOSIT, updatedState.fundingState);
   });
   describe.skip('incoming action: transaction confirmed, funding event already received', () => {
     // TODO: what is the point of this test case?
+    // Ok, I see. The adjudicator watcher might be faster to notice the transaction than metamask is
+    // at relaying it.
     // player A scenario
     const state = states.aWaitForDepositConfirmation(defaultsWithTx);
     const action = actions.transactionConfirmed('1234');
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_WAIT_FOR_OPPONENT_DEPOSIT, updatedState.fundingState);
   });
@@ -88,7 +139,7 @@ describe('start in AWaitForOpponentDeposit', () => {
     // player A scenario
     const state = states.aWaitForOpponentDeposit(defaultsForA);
     const action = actions.fundingReceivedEvent(channelId, YOUR_DEPOSIT_B, TOTAL_REQUIRED);
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.FUNDING_CONFIRMED, updatedState.fundingState);
   });
@@ -97,16 +148,16 @@ describe('start in AWaitForOpponentDeposit', () => {
     // player A scenario
     const state = states.aWaitForOpponentDeposit(defaultsForA);
     const action = actions.fundingReceivedEvent('0xf00', YOUR_DEPOSIT_B, TOTAL_REQUIRED);
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_WAIT_FOR_OPPONENT_DEPOSIT, updatedState.fundingState);
   });
 
-  describe('incoming action: funding received event for correct channelwith too little funds', () => {
+  describe('incoming action: funding received event for correct channel with too little funds', () => {
     // player A scenario
     const state = states.aWaitForOpponentDeposit(defaultsForA);
     const action = actions.fundingReceivedEvent('0xf00', YOUR_DEPOSIT_B, YOUR_DEPOSIT_B);
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
     itTransitionsToStateType(states.A_WAIT_FOR_OPPONENT_DEPOSIT, updatedState.fundingState);
   });
@@ -116,20 +167,20 @@ describe('start in AWaitForOpponentDeposit', () => {
 describe('start in BWaitForOpponentDeposit', () => {
   describe('incoming action: funding received event', () => {
     // player B scenario
-    const createDepositTxMock = jest.fn(() => tx);
+    const createDepositTxMock = jest.fn(() => TX);
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
       value: createDepositTxMock,
     });
 
     const state = states.bWaitForOpponentDeposit(defaultsForB);
     const action = actions.fundingReceivedEvent(channelId, YOUR_DEPOSIT_A, YOUR_DEPOSIT_A);
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(
       states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
       updatedState.fundingState,
     );
-    itSendsThisTransaction(updatedState, tx);
+    itSendsThisTransaction(updatedState, TX);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
     expect(createDepositTxMock.mock.calls[0][1]).toBe(defaultsForB.requestedYourContribution);
   });
@@ -143,9 +194,10 @@ describe('start in BWaitForOpponentDeposit', () => {
 
     const state = states.bWaitForOpponentDeposit(defaultsForB);
     const action = actions.fundingReceivedEvent(channelId, ZERO, ZERO);
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(states.B_WAIT_FOR_OPPONENT_DEPOSIT, updatedState.fundingState);
+    itSendsNoTransaction(updatedState);
   });
 });
 
@@ -154,7 +206,7 @@ describe('start in BWaitForDepositToBeSentToMetaMask', () => {
     // player B scenario
     const state = states.bWaitForDepositToBeSentToMetaMask(defaultsForB);
     const action = actions.transactionSentToMetamask();
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(states.B_SUBMIT_DEPOSIT_IN_METAMASK, updatedState.fundingState);
   });
@@ -165,7 +217,7 @@ describe('start in BSubmitDepositInMetaMask', () => {
     // player B scenario
     const state = states.bSubmitDepositInMetaMask(defaultsForB);
     const action = actions.transactionSubmitted('0x0');
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState.fundingState);
   });
@@ -174,7 +226,7 @@ describe('start in BSubmitDepositInMetaMask', () => {
     // player B scenario
     const state = states.bSubmitDepositInMetaMask(defaultsForB);
     const action = actions.transactionSubmissionFailed({ code: '1234' });
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(states.B_DEPOSIT_TRANSACTION_FAILED, updatedState.fundingState);
   });
@@ -185,7 +237,7 @@ describe('start in BWaitForDepositConfirmation', () => {
     // player B scenario
     const state = states.bWaitForDepositConfirmation(defaultsWithTx);
     const action = actions.transactionConfirmed();
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(states.FUNDING_CONFIRMED, updatedState.fundingState);
   });
@@ -193,36 +245,38 @@ describe('start in BWaitForDepositConfirmation', () => {
 
 describe('start in B DepositTransactionFailed', () => {
   describe('incoming action: retry transaction', () => {
-    const createDepositTxMock = jest.fn();
+    const createDepositTxMock = jest.fn(() => TX);
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
       value: createDepositTxMock,
     });
     const state = states.bDepositTransactionFailed(defaultsForB);
     const action = actions.retryTransaction();
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(
       states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
       updatedState.fundingState,
     );
+    itSendsThisTransaction(updatedState, TX);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
   });
 });
 
 describe('start in A DepositTransactionFailure', () => {
   describe('incoming action: retry transaction', () => {
-    const createDeployTxMock = jest.fn();
+    const createDeployTxMock = jest.fn(() => TX);
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
       value: createDeployTxMock,
     });
     const state = states.aDepositTransactionFailed(defaultsForA);
     const action = actions.retryTransaction();
-    const updatedState = directFundingStateReducer(state, action, channelId);
+    const updatedState = directFundingStateReducer(state, action, channelId, 1);
 
     itTransitionsToStateType(
       states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
       updatedState.fundingState,
     );
+    itSendsThisTransaction(updatedState, TX);
     expect(createDeployTxMock.mock.calls.length).toBe(1);
   });
 });

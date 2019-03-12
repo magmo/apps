@@ -52,6 +52,14 @@ export const itSendsThisTransaction = (state: { outboxState?: OutboxState }, tx)
   });
 };
 
+export const itSendsNoTransaction = (state: { outboxState?: OutboxState }) => {
+  it(`doesn't send a transaction`, () => {
+    if (state.outboxState) {
+      expect(state.outboxState.transactionOutbox).toBeUndefined();
+    }
+  });
+};
+
 export const itTransitionsToChannelStateType = (type, state: NextChannelState<ChannelState>) => {
   it(`transitions to ${type}`, () => {
     expect(state.channelState.type).toEqual(type);
