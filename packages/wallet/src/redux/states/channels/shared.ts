@@ -1,5 +1,5 @@
 import { Commitment } from 'fmg-core';
-import { UnknownFundingState } from './funding/directFunding';
+import { WaitForFundingRequest } from './funding/directFunding';
 import { FundingState } from './funding';
 
 export interface SharedChannelState {
@@ -28,7 +28,7 @@ export interface SharedIndirectFundingState {
 }
 
 type SharedFundingState =
-  | UnknownFundingState
+  | WaitForFundingRequest
   | SharedDirectFundingState
   | SharedIndirectFundingState;
 
