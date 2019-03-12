@@ -11,11 +11,14 @@ export const directFundingStateReducer = (
   state: states.DirectFundingState,
   action: actions.WalletAction,
   channelId: string,
+  ourIndex: number,
 ): states.FundingStateWithSideEffects => {
   switch (state.type) {
     //
-    case states.UNKNOWN_FUNDING:
-      return unknownFundingReducer(state, action);
+    case states.WAIT_FOR_FUNDING_REQUEST:
+      return waitForFundingRequestReducer(state, action);
+    case states.WAIT_FOR_FUNDING_APPROVAL:
+      return waitForFundingApprovalReducer(state, action, ourIndex, channelId);
     case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return aWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -45,17 +48,16 @@ export const directFundingStateReducer = (
   }
 };
 
-const unknownFundingReducer = (
-  state: states.UnknownFundingState,
+const waitForFundingRequestReducer = (
+  state: states.WaitForFundingRequest,
   action: actions.WalletAction,
 ): states.FundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_REQUESTED:
       return {
-        fundingState: states.aWaitForDepositToBeSentToMetaMask({
+        fundingState: states.waitForFundingApproval({
+          ...state,
           fundingType: DIRECT_FUNDING,
-          requestedTotalFunds: '0',
-          requestedYourContribution: '0',
         }),
       };
     default:
@@ -63,6 +65,36 @@ const unknownFundingReducer = (
   }
 };
 
+const waitForFundingApprovalReducer = (
+  state: states.WaitForFundingApproval,
+  action: actions.WalletAction,
+  ourIndex: number,
+  channelId: string,
+): states.FundingStateWithSideEffects => {
+  switch (action.type) {
+    case actions.FUNDING_APPROVED:
+      if (ourIndex === 0) {
+        return {
+          fundingState: states.aWaitForDepositToBeSentToMetaMask({
+            ...state,
+            fundingType: DIRECT_FUNDING,
+          }),
+          outboxState: {
+            transactionOutbox: createDepositTransaction(channelId, state.requestedYourContribution),
+          },
+        };
+      } else {
+        return {
+          fundingState: states.bWaitForOpponentDeposit({
+            ...state,
+            fundingType: DIRECT_FUNDING,
+          }),
+        };
+      }
+    default:
+      return { fundingState: state };
+  }
+};
 const aWaitForDepositToBeSentToMetaMaskReducer = (
   state: states.AWaitForDepositToBeSentToMetaMask,
   action: actions.WalletAction,
