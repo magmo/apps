@@ -34,19 +34,12 @@ function fundingChannelState<T extends BaseFundingChannelState>(
   params: T,
 ): BaseFundingChannelState {
   const { fundingState, funded } = params;
-  return { ...fundingChannelState(params), fundingState, funded };
+  return { ...channelOpen(params), fundingState, funded };
 }
 
-// Since the funding request hasn't come in yet, it doesn't make sense for
-// WaitForFundingRequest to have a fundingState. (What if the application wants
-// to decide the funding mechanism?) Therefore, WaitForFundingRequest should
-// probably extend MaybeFunded. However, so that the funding reducer can always
-// reduce a state with a fundingState, we have to put an empty funding state here.
-// TODO: Perhaps WaitForFundingRequest belongs in the OPENING stage.
 export interface WaitForFundingRequest extends BaseFundingChannelState {
   type: typeof WAIT_FOR_FUNDING_REQUEST;
   stage: typeof FUNDING;
-  // fundingState: UnknownFundingState;
 }
 
 export interface ApproveFunding extends BaseFundingChannelState {
