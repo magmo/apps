@@ -11,7 +11,6 @@ export const directFundingStateReducer = (
   action: actions.WalletAction,
   channelId: string,
 ): states.FundingStateWithSideEffects => {
-  // Handle any signature/validation request centrally to avoid duplicating code for each state
   switch (state.type) {
     //
     case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
@@ -21,10 +20,10 @@ export const directFundingStateReducer = (
     case states.A_WAIT_FOR_DEPOSIT_CONFIRMATION:
       return aWaitForDepositConfirmationReducer(state, action);
     case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
-      return aWaitForOpponentDepositReducer(state, action);
+      return aWaitForOpponentDepositReducer(state, action, channelId);
     //
     case states.B_WAIT_FOR_OPPONENT_DEPOSIT:
-      return bWaitForOpponentDepositReducer(state, action);
+      return bWaitForOpponentDepositReducer(state, action, channelId);
     case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return bWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -125,7 +124,6 @@ const aWaitForDepositConfirmationReducer = (
   action: actions.WalletAction,
 ): states.FundingStateWithSideEffects => {
   switch (action.type) {
-    case actions.MESSAGE_RECEIVED:
     case actions.FUNDING_RECEIVED_EVENT:
       return {
         fundingState: states.aWaitForDepositConfirmation({ ...state }),
@@ -140,9 +138,13 @@ const aWaitForDepositConfirmationReducer = (
 const aWaitForOpponentDepositReducer = (
   state: states.AWaitForOpponentDeposit,
   action: actions.WalletAction,
+  channelId: string,
 ): states.FundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
+      if (channelId !== action.destination) {
+        return { fundingState: state };
+      }
       if (bigNumberify(action.totalForDestination).lt(state.requestedTotalFunds)) {
         return { fundingState: state };
       }
@@ -156,9 +158,13 @@ const aWaitForOpponentDepositReducer = (
 const bWaitForOpponentDepositReducer = (
   state: states.BWaitForOpponentDeposit,
   action: actions.WalletAction,
+  channelId: string,
 ): states.FundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
+      if (channelId !== action.destination) {
+        return { fundingState: state };
+      }
       if (
         bigNumberify(action.totalForDestination).lt(
           bigNumberify(state.requestedTotalFunds).sub(state.requestedYourDeposit),
@@ -167,7 +173,12 @@ const bWaitForOpponentDepositReducer = (
         return { fundingState: state };
       }
 
-      return { fundingState: states.fundingConfirmed({ ...state }) };
+      return {
+        fundingState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
+        outboxState: {
+          transactionOutbox: createDepositTransaction(channelId, state.requestedYourDeposit),
+        },
+      };
     default:
       return { fundingState: state };
   }

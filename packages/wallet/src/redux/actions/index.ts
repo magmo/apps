@@ -266,7 +266,11 @@ export const withdrawalSuccessAcknowledged = () => ({
 export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
 
 export const FUNDING_RECEIVED_EVENT = 'FUNDING_RECEIVED_EVENT';
-export const fundingReceivedEvent = (destination, amount, totalForDestination) => ({
+export const fundingReceivedEvent = (
+  destination: string,
+  amount: string,
+  totalForDestination: string,
+) => ({
   destination,
   amount,
   totalForDestination,
