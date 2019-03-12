@@ -8,7 +8,7 @@ import {
   DISPLAY_MESSAGE_SENT,
 } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
-import { OutboxState, SharedWalletState } from '../states/shared';
+import { OutboxState } from '../states/shared';
 import { initializedReducer } from './initialized';
 
 const initialState = waitForLogin();
@@ -17,17 +17,17 @@ export const walletReducer = (
   state: WalletState = initialState,
   action: WalletAction,
 ): WalletState => {
-  const nextOutbox: OutboxState = {};
+  const sideEffects: OutboxState = {};
   if (action.type === MESSAGE_SENT) {
-    nextOutbox.messageOutbox = undefined;
+    sideEffects.messageOutbox = undefined;
   }
   if (action.type === DISPLAY_MESSAGE_SENT) {
-    nextOutbox.displayOutbox = undefined;
+    sideEffects.displayOutbox = undefined;
   }
   if (action.type === TRANSACTION_SENT_TO_METAMASK) {
-    nextOutbox.transactionOutbox = undefined;
+    sideEffects.transactionOutbox = undefined;
   }
-  state = sideEffectsReducer(state, nextOutbox);
+  state = { ...state, outboxState: outboxStateReducer(state.outboxState, sideEffects) };
 
   switch (state.stage) {
     case INITIALIZING:
@@ -44,23 +44,21 @@ export const walletReducer = (
  * @param state current global state
  * @param sideEffects: OutboxState -- side effects that the channel reducer declared should happen
  *
- * For each key k in sideEffects, replace state.outboxState[k] with sideEffects[k]
+ * For each key k in sideEffects, replace state[k] with sideEffects[k]
  */
-export function sideEffectsReducer<T extends SharedWalletState>(
-  state: T,
+export function outboxStateReducer(
+  state: OutboxState,
   sideEffects: OutboxState | undefined,
-): T {
-  // TODO: Should the sideEffectsReducer also deal with unhandled actions?
-  //       Or should that be taken care of manually?
-
+): OutboxState {
   if (!sideEffects) {
     return state;
   }
   // Defensively copy object as to not modify existing state
-  const newState = { ...state, outboxState: { ...state.outboxState } };
+  const newState = { ...state };
 
-  // TODO: We need to think about whether to overwrite existing outbox items.
-  Object.keys(sideEffects).map(k => (newState.outboxState[k] = sideEffects[k]));
+  // TODO: We need to think about whether we really want to overwrite
+  // existing outbox items
+  Object.keys(sideEffects).map(k => (newState[k] = sideEffects[k]));
 
   return newState;
 }
