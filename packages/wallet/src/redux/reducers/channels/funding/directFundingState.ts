@@ -23,6 +23,8 @@ export const directFundingStateReducer = (
     case states.A_WAIT_FOR_OPPONENT_DEPOSIT:
       return aWaitForOpponentDepositReducer(state, action);
     //
+    case states.B_WAIT_FOR_OPPONENT_DEPOSIT:
+      return bWaitForOpponentDepositReducer(state, action);
     case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return bWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -142,6 +144,26 @@ const aWaitForOpponentDepositReducer = (
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       if (bigNumberify(action.totalForDestination).lt(state.requestedTotalFunds)) {
+        return { fundingState: state };
+      }
+
+      return { fundingState: states.fundingConfirmed({ ...state }) };
+    default:
+      return { fundingState: state };
+  }
+};
+
+const bWaitForOpponentDepositReducer = (
+  state: states.BWaitForOpponentDeposit,
+  action: actions.WalletAction,
+): states.FundingStateWithSideEffects => {
+  switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      if (
+        bigNumberify(action.totalForDestination).lt(
+          bigNumberify(state.requestedTotalFunds).sub(state.requestedYourDeposit),
+        )
+      ) {
         return { fundingState: state };
       }
 
