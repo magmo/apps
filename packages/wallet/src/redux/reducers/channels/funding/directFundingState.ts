@@ -5,7 +5,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../../utils/transaction-generator';
 
 import { bigNumberify } from 'ethers/utils';
-import { DIRECT_FUNDING } from 'src/redux/states/channels/shared';
+import { DIRECT_FUNDING } from '../../../states/channels/shared';
 
 export const directFundingStateReducer = (
   state: states.FundingState,

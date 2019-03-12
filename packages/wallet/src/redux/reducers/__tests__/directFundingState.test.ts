@@ -7,6 +7,7 @@ import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType, itSendsThisTransaction } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
+import { SharedDirectFundingState } from 'src/redux/states/channels/shared';
 
 const { channelId } = scenarios;
 
@@ -17,13 +18,13 @@ const YOUR_DEPOSIT_B = bigNumberify(TOTAL_REQUIRED)
   .toHexString();
 const ZERO = '0x00';
 
-const defaultsForA: states.SharedDirectFundingState = {
+const defaultsForA: SharedDirectFundingState = {
   fundingType: states.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
 };
 
-const defaultsForB: states.SharedDirectFundingState = {
+const defaultsForB: SharedDirectFundingState = {
   ...defaultsForA,
   requestedYourContribution: YOUR_DEPOSIT_B,
 };

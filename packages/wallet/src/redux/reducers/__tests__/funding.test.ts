@@ -1,7 +1,6 @@
 import { fundingReducer } from '../channels/funding';
 
 import * as states from '../../states/channels';
-import * as fundingStates from '../../states/channels/funding';
 import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
