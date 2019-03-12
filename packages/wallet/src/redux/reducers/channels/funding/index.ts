@@ -15,8 +15,7 @@ import { signCommitment, validCommitmentSignature } from '../../../../utils/sign
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../../utils/state-utils';
 import { NextChannelState } from '../../../states/shared';
-import { directFundingStateReducer } from 'src/redux/reducers/channels/funding/directFundingState';
-import { fundingConfirmed } from 'src/redux/states/channels/funding/directFunding';
+import { directFundingStateReducer } from './directFunding';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
@@ -33,9 +32,10 @@ export const fundingReducer = (
     };
   }
 
-  // TODO: Handle side effects
+  // We modify the funding state directly, before applying the rest-of-state reducers.
+  // This lets the rest-of-state reducer decide on what side effects they should have based on
+  // the outcome of funding-related actions on the current funding status.
   const { fundingState } = directFundingStateReducer(state.fundingState, action, state.channelId);
-
   state.fundingState = fundingState;
 
   switch (state.type) {
@@ -72,7 +72,7 @@ export const fundingReducer = (
 const waitForFundingRequestReducer = (
   state: states.WaitForFundingRequest,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_REQUESTED:
       return {
@@ -87,7 +87,7 @@ const waitForFundingRequestReducer = (
 const approveFundingReducer = (
   state: states.ApproveFunding,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_APPROVED:
       return { channelState: states.waitForFundingConfirmation(state) };
@@ -116,7 +116,7 @@ const approveFundingReducer = (
 const aWaitForPostFundSetupReducer = (
   state: states.AWaitForPostFundSetup,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment: postFundState, signature } = action;
@@ -151,18 +151,24 @@ const aWaitForPostFundSetupReducer = (
 const waitForFundingConfirmationReducer = (
   state: states.WaitForFundingConfirmation,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       if (state.funded) {
         // Since we're in the WaitForFundingConfirmation state, we've already received the
-        // opponent's post-fund-setup commitment, so we should send our own.
+        // opponent's post-fund-setup commitment.
+        // However, we haven't sent it yet, so we send it now.
+        // We don't need to update the turnNum on state, as it's already been done.
+        const { sendCommitmentAction } = composePostFundCommitment(state);
         return {
-          channelState: fundingConfirmed(state),
-          outboxState: { messageOutbox: 'SEND THE COMMITMENT' },
+          channelState: states.acknowledgeFundingSuccess({
+            ...state,
+          }),
+          outboxState: { messageOutbox: sendCommitmentAction },
         };
+      } else {
+        return { channelState: state };
       }
-    // tslint:disable-next-line:no-switch-case-fall-through
     default:
       return { channelState: state };
   }
@@ -171,7 +177,7 @@ const waitForFundingConfirmationReducer = (
 const bWaitForPostFundSetupReducer = (
   state: states.BWaitForPostFundSetup,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
@@ -239,7 +245,7 @@ const sendFundingDeclinedMessageReducer = (
 const acknowledgeFundingSuccessReducer = (
   state: states.AcknowledgeFundingSuccess,
   action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
+): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
       return {

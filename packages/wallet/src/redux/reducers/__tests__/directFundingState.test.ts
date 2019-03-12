@@ -1,4 +1,4 @@
-import { directFundingStateReducer } from '../channels/funding/directFundingState';
+import { directFundingStateReducer } from '../channels/funding/directFunding';
 
 import * as states from '../../states/channels/funding/directFunding';
 import * as actions from '../../actions';

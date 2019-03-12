@@ -1,7 +1,6 @@
 import { TransactionRequest } from 'ethers/providers';
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { WalletAction } from '../actions';
-import { WaitForChannel } from './channels/opening';
 import { SharedChannelState } from './channels/shared';
 
 export interface OutboxState {
@@ -12,7 +11,7 @@ export interface OutboxState {
 
 export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
 export interface NextChannelState<T extends SharedChannelState> {
-  channelState: T | WaitForChannel;
+  channelState: T;
   unhandledAction?: WalletAction;
   outboxState?: OutboxState;
 }

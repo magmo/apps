@@ -2,7 +2,7 @@ import {
   ChallengeExists,
   challengeExists,
   TransactionExists,
-  ChannelOpen,
+  MaybeFunded,
   channelOpen,
 } from './shared';
 export const CHALLENGING = 'CHALLENGING';
@@ -17,12 +17,12 @@ export const ACKNOWLEDGE_CHALLENGE_RESPONSE = 'ACKNOWLEDGE_CHALLENGE_RESPONSE';
 export const ACKNOWLEDGE_CHALLENGE_TIMEOUT = 'ACKNOWLEDGE_CHALLENGE_TIMEOUT';
 export const CHALLENGE_TRANSACTION_FAILED = 'CHALLENGE_TRANSACTION_FAILED';
 
-export interface ChallengeTransactionFailed extends ChannelOpen {
+export interface ChallengeTransactionFailed extends MaybeFunded {
   type: typeof CHALLENGE_TRANSACTION_FAILED;
   stage: typeof CHALLENGING;
 }
 
-export function challengeTransactionFailed<T extends ChannelOpen>(
+export function challengeTransactionFailed<T extends MaybeFunded>(
   params: T,
 ): ChallengeTransactionFailed {
   return {
@@ -32,12 +32,12 @@ export function challengeTransactionFailed<T extends ChannelOpen>(
   };
 }
 
-export interface ApproveChallenge extends ChannelOpen {
+export interface ApproveChallenge extends MaybeFunded {
   type: typeof APPROVE_CHALLENGE;
   stage: typeof CHALLENGING;
 }
 
-export function approveChallenge<T extends ChannelOpen>(params: T): ApproveChallenge {
+export function approveChallenge<T extends MaybeFunded>(params: T): ApproveChallenge {
   return {
     type: APPROVE_CHALLENGE,
     stage: CHALLENGING,
@@ -45,11 +45,11 @@ export function approveChallenge<T extends ChannelOpen>(params: T): ApproveChall
   };
 }
 
-export interface WaitForChallengeInitiation extends ChannelOpen {
+export interface WaitForChallengeInitiation extends MaybeFunded {
   type: typeof WAIT_FOR_CHALLENGE_INITIATION;
   stage: typeof CHALLENGING;
 }
-export function waitForChallengeInitiation<T extends ChannelOpen>(
+export function waitForChallengeInitiation<T extends MaybeFunded>(
   params: T,
 ): WaitForChallengeInitiation {
   return {
@@ -59,11 +59,11 @@ export function waitForChallengeInitiation<T extends ChannelOpen>(
   };
 }
 
-export interface WaitForChallengeSubmission extends ChannelOpen {
+export interface WaitForChallengeSubmission extends MaybeFunded {
   type: typeof WAIT_FOR_CHALLENGE_SUBMISSION;
   stage: typeof CHALLENGING;
 }
-export function waitForChallengeSubmission<T extends ChannelOpen>(
+export function waitForChallengeSubmission<T extends MaybeFunded>(
   params: T,
 ): WaitForChallengeSubmission {
   return {

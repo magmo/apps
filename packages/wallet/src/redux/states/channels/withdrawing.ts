@@ -2,7 +2,7 @@ import {
   TransactionExists,
   UserAddressExists,
   userAddressExists,
-  ChannelOpen,
+  MaybeFunded,
   channelOpen,
 } from './shared';
 
@@ -21,7 +21,7 @@ export interface WithdrawTransactionFailed extends UserAddressExists {
   stage: typeof WITHDRAWING;
 }
 
-export interface ApproveWithdrawal extends ChannelOpen {
+export interface ApproveWithdrawal extends MaybeFunded {
   type: typeof APPROVE_WITHDRAWAL;
   stage: typeof WITHDRAWING;
 }
@@ -36,12 +36,12 @@ export interface WaitForWithdrawalConfirmation extends UserAddressExists, Transa
   stage: typeof WITHDRAWING;
 }
 
-export interface AcknowledgeWithdrawalSuccess extends ChannelOpen {
+export interface AcknowledgeWithdrawalSuccess extends MaybeFunded {
   type: typeof ACKNOWLEDGE_WITHDRAWAL_SUCCESS;
   stage: typeof WITHDRAWING;
 }
 
-export function approveWithdrawal<T extends ChannelOpen>(params: T): ApproveWithdrawal {
+export function approveWithdrawal<T extends MaybeFunded>(params: T): ApproveWithdrawal {
   return { ...channelOpen(params), type: APPROVE_WITHDRAWAL, stage: WITHDRAWING };
 }
 
@@ -62,7 +62,7 @@ export function waitForWithdrawalConfirmation<T extends UserAddressExists & Tran
   };
 }
 
-export function acknowledgeWithdrawalSuccess<T extends ChannelOpen>(
+export function acknowledgeWithdrawalSuccess<T extends MaybeFunded>(
   params: T,
 ): AcknowledgeWithdrawalSuccess {
   return { ...channelOpen(params), type: ACKNOWLEDGE_WITHDRAWAL_SUCCESS, stage: WITHDRAWING };

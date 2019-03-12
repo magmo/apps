@@ -6,14 +6,15 @@ import { RespondingState } from './responding';
 import { WithdrawingState } from './withdrawing';
 import { ClosingState } from './closing';
 
-export type ChannelState =
-  | OpeningState
+export type OpenedChannelState =
   | FundingChannelState
   | RunningState
   | ChallengingState
   | RespondingState
   | WithdrawingState
   | ClosingState;
+
+export type ChannelState = OpeningState | OpenedChannelState;
 
 export * from './opening';
 export * from './running';

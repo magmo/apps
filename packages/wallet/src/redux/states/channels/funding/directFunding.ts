@@ -2,7 +2,6 @@ import { TransactionExists, SharedDirectFundingState } from '../shared';
 import { OutboxState } from '../../shared';
 
 // state types
-export const EMPTY = 'EMPTY';
 export const A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
   'A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK';
 export const A_SUBMIT_DEPOSIT_IN_METAMASK = 'A_SUBMIT_DEPOSIT_IN_METAMASK';
@@ -158,7 +157,7 @@ export function fundingConfirmed<T extends SharedDirectFundingState>(params: T):
   return { type: FUNDING_CONFIRMED, ...directFundingState(params) };
 }
 
-export type FundingState =
+export type DirectFundingState =
   | UnknownFundingState
   | AWaitForDepositToBeSentToMetaMask
   | ASubmitDepositInMetaMask
@@ -173,6 +172,6 @@ export type FundingState =
   | FundingConfirmed;
 
 export interface FundingStateWithSideEffects {
-  fundingState: FundingState;
+  fundingState: DirectFundingState;
   outboxState?: OutboxState;
 }

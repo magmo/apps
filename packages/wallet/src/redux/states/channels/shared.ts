@@ -1,9 +1,11 @@
 import { Commitment } from 'fmg-core';
 import { UnknownFundingState } from './funding/directFunding';
+import { FundingState } from './funding';
 
 export interface SharedChannelState {
   address: string;
   privateKey: string;
+  fundingState?: SharedFundingState;
 }
 
 export const CHANNEL_INITIALIZED = 'CHANNEL.INITIALIZED';
@@ -44,14 +46,20 @@ export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
   funded: boolean; // Though this is computable from fundingState, it might be convenient to record this on the top-level of the channel state
 }
+
+// TODO: Find a better name for this
+export interface MaybeFunded extends ChannelOpen {
+  fundingState: FundingState;
+}
+
 export interface TransactionExists {
   transactionHash: string;
 }
-export interface ChallengeExists extends ChannelOpen {
+export interface ChallengeExists extends MaybeFunded {
   challengeExpiry?: number;
 }
 
-export interface UserAddressExists extends ChannelOpen {
+export interface UserAddressExists extends MaybeFunded {
   userAddress: string;
 }
 
@@ -90,7 +98,7 @@ export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
   };
 }
 
-export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
+export function channelOpen<T extends MaybeFunded>(params: T): MaybeFunded {
   return {
     ...firstCommitmentReceived(params),
     penultimateCommitment: params.penultimateCommitment,

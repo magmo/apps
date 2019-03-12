@@ -1,16 +1,16 @@
-import { ChannelOpen, channelOpen } from './shared';
+import { MaybeFunded, channelOpen } from './shared';
 
 // stage
 export const RUNNING = 'RUNNING';
 
 export const WAIT_FOR_UPDATE = 'WAIT_FOR_UPDATE';
 
-export interface WaitForUpdate extends ChannelOpen {
+export interface WaitForUpdate extends MaybeFunded {
   type: typeof WAIT_FOR_UPDATE;
   stage: typeof RUNNING;
 }
 
-export function waitForUpdate<T extends ChannelOpen>(params: T): WaitForUpdate {
+export function waitForUpdate<T extends MaybeFunded>(params: T): WaitForUpdate {
   return { type: WAIT_FOR_UPDATE, stage: RUNNING, ...channelOpen(params) };
 }
 

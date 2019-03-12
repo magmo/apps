@@ -3,8 +3,8 @@
  * the actual funding of the channel.
  */
 
-import { ChannelOpen, channelOpen, UNKNOWN_FUNDING, UnknownFundingState } from '../shared';
-import { FundingState } from './directFunding';
+import { MaybeFunded, channelOpen } from '../shared';
+import { DirectFundingState } from './directFunding';
 
 // stage
 export const FUNDING = 'FUNDING';
@@ -25,8 +25,8 @@ export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
 export const SEND_FUNDING_DECLINED_MESSAGE = 'SEND_FUNDING_DECLINED_MESSAGE';
 export const ACKNOWLEDGE_FUNDING_DECLINED = 'ACKNOWLEDGE_FUNDING_DECLINED';
 
-interface BaseFundingChannelState extends ChannelOpen {
-  fundingState: FundingState;
+interface BaseFundingChannelState extends MaybeFunded {
+  fundingState: DirectFundingState;
   funded: boolean; // Though this is computable from fundingState, it might be convenient to record this on the top-level of the channel state
 }
 
@@ -40,12 +40,13 @@ function fundingChannelState<T extends BaseFundingChannelState>(
 // Since the funding request hasn't come in yet, it doesn't make sense for
 // WaitForFundingRequest to have a fundingState. (What if the application wants
 // to decide the funding mechanism?) Therefore, WaitForFundingRequest should
-// probably extend ChannelOpen. However, so that the funding reducer can always
+// probably extend MaybeFunded. However, so that the funding reducer can always
 // reduce a state with a fundingState, we have to put an empty funding state here.
 // TODO: Perhaps WaitForFundingRequest belongs in the OPENING stage.
 export interface WaitForFundingRequest extends BaseFundingChannelState {
   type: typeof WAIT_FOR_FUNDING_REQUEST;
   stage: typeof FUNDING;
+  // fundingState: UnknownFundingState;
 }
 
 export interface ApproveFunding extends BaseFundingChannelState {
@@ -88,12 +89,14 @@ export interface AcknowledgeFundingDeclined extends BaseFundingChannelState {
   stage: typeof FUNDING;
 }
 
-export function waitForFundingRequest<T extends ChannelOpen>(params: T): WaitForFundingRequest {
+export function waitForFundingRequest<T extends BaseFundingChannelState>(
+  params: T,
+): WaitForFundingRequest {
   return {
     type: WAIT_FOR_FUNDING_REQUEST,
     stage: FUNDING,
     ...channelOpen(params),
-    fundingState: { fundingType: UNKNOWN_FUNDING },
+    fundingState: params.fundingState,
     funded: false,
   };
 }
@@ -158,8 +161,18 @@ export type FundingChannelState =
   | ApproveFunding
   | WaitForFundingAndPostFundSetup
   | WaitForFundingConfirmation
+  // ^^^ PlayerA should never let PlayerB get into this state, as it lets PlayerB move to the application phase with no real value at stake, giving them a chance to take the real value that's backing PlayerA's stake.
   | AWaitForPostFundSetup
   | BWaitForPostFundSetup
-  | AcknowledgeFundingSuccess
+  | AcknowledgeFundingSuccess // <-- at this point, a message might need to be sent
   | SendFundingDeclinedMessage
   | AcknowledgeFundingDeclined;
+
+export type FundingState = DirectFundingState;
+
+/**
+ * Question: Is it true that there is exactly one state S such that player B should send
+ * their post fund setup upon reaching S?
+ *
+ * Answer: Yes, and that is whatever you call AcknowledgeFundingSuccess
+ */
