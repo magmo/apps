@@ -81,7 +81,7 @@ const waitForChannelReducer = (
           lastCommitment: { commitment: ownCommitment, signature },
           fundingState: {
             requestedTotalFunds: '0x0',
-            requestedYourDeposit: '0x0',
+            requestedYourContribution: '0x0',
           },
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
@@ -144,7 +144,7 @@ const waitForChannelReducer = (
           lastCommitment: { commitment: action.commitment, signature: action.signature },
           fundingState: {
             requestedTotalFunds: '0x0',
-            requestedYourDeposit: '0x0',
+            requestedYourContribution: '0x0',
           },
         }),
         outboxState: { messageOutbox: validationSuccess() },
@@ -193,7 +193,7 @@ const waitForPreFundSetupReducer = (
             requestedTotalFunds: bigNumberify(ownCommitment.allocation[0])
               .add(ownCommitment.allocation[1])
               .toHexString(),
-            requestedYourDeposit: ownCommitment.allocation[state.ourIndex],
+            requestedYourContribution: ownCommitment.allocation[state.ourIndex],
           },
           funded: false,
         }),
@@ -241,7 +241,7 @@ const waitForPreFundSetupReducer = (
             requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0])
               .add(opponentCommitment.allocation[1])
               .toHexString(),
-            requestedYourDeposit: opponentCommitment.allocation[state.ourIndex],
+            requestedYourContribution: opponentCommitment.allocation[state.ourIndex],
           },
           funded: false,
         }),

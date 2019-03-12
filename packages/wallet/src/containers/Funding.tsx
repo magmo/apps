@@ -42,7 +42,7 @@ class FundingContainer extends PureComponent<Props> {
             fundingApproved={fundingApproved}
             fundingRejected={fundingRejected}
             requestedTotalFunds={state.fundingState.requestedTotalFunds}
-            requestedYourDeposit={state.fundingState.requestedYourDeposit}
+            requestedYourContribution={state.fundingState.requestedYourContribution}
           />
         );
       case channelStates.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:

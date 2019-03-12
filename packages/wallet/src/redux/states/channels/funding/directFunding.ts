@@ -1,7 +1,8 @@
-import { SharedDirectFundingState, TransactionExists, DIRECT_FUNDING } from '../shared';
+import { TransactionExists, SharedDirectFundingState } from '../shared';
 import { OutboxState } from '../../shared';
 
 // state types
+export const EMPTY = 'EMPTY';
 export const A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
   'A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK';
 export const A_SUBMIT_DEPOSIT_IN_METAMASK = 'A_SUBMIT_DEPOSIT_IN_METAMASK';
@@ -19,14 +20,19 @@ export const B_DEPOSIT_TRANSACTION_FAILED = 'B_DEPOSIT_TRANSACTION_FAILED';
 
 export const FUNDING_CONFIRMED = 'FUNDING_CONFIRMED';
 
+export const UNKNOWN_FUNDING = 'UNKNOWN_FUNDING';
+export interface UnknownFundingState {
+  type: typeof UNKNOWN_FUNDING;
+  fundingType: typeof UNKNOWN_FUNDING;
+  requestedTotalFunds: string;
+  requestedYourContribution: string;
+}
+export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export function directFundingState<T extends SharedDirectFundingState>(
   params: T,
 ): SharedDirectFundingState {
-  const { fundingType, requestedTotalFunds, requestedYourDeposit } = params;
-  return { fundingType, requestedTotalFunds, requestedYourDeposit };
-}
-export interface ADepositTransactionFailed extends SharedDirectFundingState {
-  type: typeof A_DEPOSIT_TRANSACTION_FAILED;
+  const { requestedTotalFunds, requestedYourContribution } = params;
+  return { fundingType: DIRECT_FUNDING, requestedTotalFunds, requestedYourContribution };
 }
 
 export interface AWaitForDepositToBeSentToMetaMask extends SharedDirectFundingState {
@@ -38,6 +44,10 @@ export interface ASubmitDepositInMetaMask extends SharedDirectFundingState {
 
 export interface AWaitForDepositConfirmation extends SharedDirectFundingState, TransactionExists {
   type: typeof A_WAIT_FOR_DEPOSIT_CONFIRMATION;
+}
+
+export interface ADepositTransactionFailed extends SharedDirectFundingState {
+  type: typeof A_DEPOSIT_TRANSACTION_FAILED;
 }
 
 export interface AWaitForOpponentDeposit extends SharedDirectFundingState {
@@ -149,6 +159,7 @@ export function fundingConfirmed<T extends SharedDirectFundingState>(params: T):
 }
 
 export type FundingState =
+  | UnknownFundingState
   | AWaitForDepositToBeSentToMetaMask
   | ASubmitDepositInMetaMask
   | AWaitForDepositConfirmation

@@ -37,7 +37,7 @@ const defaults = {
   transactionHash: '0x0',
   fundingState: {
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourDeposit: bigNumberify(0).toHexString(),
+    requestedYourContribution: bigNumberify(0).toHexString(),
   },
   funded: true,
 };
@@ -47,7 +47,7 @@ const defaultsA = {
   ourIndex: 0,
   address: asAddress,
   privateKey: asPrivateKey,
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  requestedYourContribution: bigNumberify(500000000000000).toHexString(),
 };
 
 describe('start in AcknowledgeConclude', () => {

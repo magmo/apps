@@ -5,6 +5,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../../utils/transaction-generator';
 
 import { bigNumberify } from 'ethers/utils';
+import { DIRECT_FUNDING } from 'src/redux/states/channels/shared';
 
 export const directFundingStateReducer = (
   state: states.FundingState,
@@ -13,6 +14,8 @@ export const directFundingStateReducer = (
 ): states.FundingStateWithSideEffects => {
   switch (state.type) {
     //
+    case states.UNKNOWN_FUNDING:
+      return unknownFundingReducer(state, action);
     case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return aWaitForDepositToBeSentToMetaMaskReducer(state, action);
     case states.A_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -42,40 +45,22 @@ export const directFundingStateReducer = (
   }
 };
 
-const aDepositTransactionFailedReducer = (
-  state: states.ADepositTransactionFailed,
+const unknownFundingReducer = (
+  state: states.UnknownFundingState,
   action: actions.WalletAction,
-  channelId: string,
 ): states.FundingStateWithSideEffects => {
   switch (action.type) {
-    case actions.RETRY_TRANSACTION:
+    case actions.FUNDING_REQUESTED:
       return {
         fundingState: states.aWaitForDepositToBeSentToMetaMask({
-          ...state,
+          fundingType: DIRECT_FUNDING,
+          requestedTotalFunds: '0',
+          requestedYourContribution: '0',
         }),
-        outboxState: {
-          transactionOutbox: createDepositTransaction(channelId, state.requestedYourDeposit),
-        },
       };
+    default:
+      return { fundingState: state };
   }
-  return { fundingState: state };
-};
-
-const bDepositTransactionFailedReducer = (
-  state: states.BDepositTransactionFailed,
-  action: actions.WalletAction,
-  channelId: string,
-): states.FundingStateWithSideEffects => {
-  switch (action.type) {
-    case actions.RETRY_TRANSACTION:
-      return {
-        fundingState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
-        outboxState: {
-          transactionOutbox: createDepositTransaction(channelId, state.requestedYourDeposit),
-        },
-      };
-  }
-  return { fundingState: state };
 };
 
 const aWaitForDepositToBeSentToMetaMaskReducer = (
@@ -167,7 +152,7 @@ const bWaitForOpponentDepositReducer = (
       }
       if (
         bigNumberify(action.totalForDestination).lt(
-          bigNumberify(state.requestedTotalFunds).sub(state.requestedYourDeposit),
+          bigNumberify(state.requestedTotalFunds).sub(state.requestedYourContribution),
         )
       ) {
         return { fundingState: state };
@@ -176,7 +161,7 @@ const bWaitForOpponentDepositReducer = (
       return {
         fundingState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
         outboxState: {
-          transactionOutbox: createDepositTransaction(channelId, state.requestedYourDeposit),
+          transactionOutbox: createDepositTransaction(channelId, state.requestedYourContribution),
         },
       };
     default:
@@ -216,6 +201,42 @@ const bSubmitDepositInMetaMaskReducer = (
     default:
       return { fundingState: state };
   }
+};
+
+const aDepositTransactionFailedReducer = (
+  state: states.ADepositTransactionFailed,
+  action: actions.WalletAction,
+  channelId: string,
+): states.FundingStateWithSideEffects => {
+  switch (action.type) {
+    case actions.RETRY_TRANSACTION:
+      return {
+        fundingState: states.aWaitForDepositToBeSentToMetaMask({
+          ...state,
+        }),
+        outboxState: {
+          transactionOutbox: createDepositTransaction(channelId, state.requestedYourContribution),
+        },
+      };
+  }
+  return { fundingState: state };
+};
+
+const bDepositTransactionFailedReducer = (
+  state: states.BDepositTransactionFailed,
+  action: actions.WalletAction,
+  channelId: string,
+): states.FundingStateWithSideEffects => {
+  switch (action.type) {
+    case actions.RETRY_TRANSACTION:
+      return {
+        fundingState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
+        outboxState: {
+          transactionOutbox: createDepositTransaction(channelId, state.requestedYourContribution),
+        },
+      };
+  }
+  return { fundingState: state };
 };
 
 const bWaitForDepositConfirmationReducer = (

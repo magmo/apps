@@ -78,7 +78,7 @@ describe('When the channel reducer declares a side effect', () => {
     networkId: 2132,
     fundingState: {
       requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-      requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+      requestedYourContribution: bigNumberify(500000000000000).toHexString(),
     },
     funded: false,
   };

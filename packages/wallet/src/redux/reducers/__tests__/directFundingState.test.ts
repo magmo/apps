@@ -7,7 +7,6 @@ import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType, itSendsThisTransaction } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { DIRECT_FUNDING, SharedDirectFundingState } from '../../states/channels/shared';
 
 const { channelId } = scenarios;
 
@@ -18,15 +17,15 @@ const YOUR_DEPOSIT_B = bigNumberify(TOTAL_REQUIRED)
   .toHexString();
 const ZERO = '0x00';
 
-const defaultsForA: SharedDirectFundingState = {
-  fundingType: DIRECT_FUNDING,
+const defaultsForA: states.SharedDirectFundingState = {
+  fundingType: states.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_REQUIRED,
-  requestedYourDeposit: YOUR_DEPOSIT_A,
+  requestedYourContribution: YOUR_DEPOSIT_A,
 };
 
-const defaultsForB: SharedDirectFundingState = {
+const defaultsForB: states.SharedDirectFundingState = {
   ...defaultsForA,
-  requestedYourDeposit: YOUR_DEPOSIT_B,
+  requestedYourContribution: YOUR_DEPOSIT_B,
 };
 
 const tx = '1234';
@@ -131,7 +130,7 @@ describe('start in BWaitForOpponentDeposit', () => {
     );
     itSendsThisTransaction(updatedState, tx);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
-    expect(createDepositTxMock.mock.calls[0][1]).toBe(defaultsForB.requestedYourDeposit);
+    expect(createDepositTxMock.mock.calls[0][1]).toBe(defaultsForB.requestedYourContribution);
   });
 
   describe('incoming action: funding received event, too little funds', () => {

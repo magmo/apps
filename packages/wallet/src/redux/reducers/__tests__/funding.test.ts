@@ -1,6 +1,7 @@
 import { fundingReducer } from '../channels/funding';
 
 import * as states from '../../states/channels';
+import * as fundingStates from '../../states/channels/funding';
 import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
@@ -9,6 +10,7 @@ import {
   itIncreasesTurnNumBy,
   itSendsThisMessage,
   expectThisCommitmentSent,
+  itTransitionsToStateType,
 } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
@@ -16,6 +18,7 @@ import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from 'src/redux/states/shared';
+import { DIRECT_FUNDING } from 'src/redux/states/channels/funding/directFunding';
 
 const {
   asAddress,
@@ -43,8 +46,9 @@ const defaults = {
   uid: 'uid',
   transactionHash: '0x0',
   fundingState: {
+    fundingType: DIRECT_FUNDING,
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourDeposit: bigNumberify(0).toHexString(),
+    requestedYourContribution: bigNumberify(0).toHexString(),
   },
   funded: false,
 };
@@ -53,14 +57,14 @@ const defaultsA = {
   ...defaults,
   ourIndex: 0,
   privateKey: asPrivateKey,
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  requestedYourContribution: bigNumberify(500000000000000).toHexString(),
 };
 
 const defaultsB = {
   ...defaults,
   ourIndex: 1,
   privateKey: bsPrivateKey,
-  requestedYourDeposit: bigNumberify(500000000000000).toHexString(),
+  requestedYourContribution: bigNumberify(500000000000000).toHexString(),
 };
 
 const justReceivedPreFundSetupB = {
@@ -92,6 +96,7 @@ describe('start in WaitForFundingRequest', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.APPROVE_FUNDING, updatedState);
+    itTransitionsToStateType(states.APPROVE_FUNDING, updatedState.fundingState);
   });
 
   describe('action taken: funding requested', () => {

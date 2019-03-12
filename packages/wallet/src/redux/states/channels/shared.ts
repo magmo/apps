@@ -1,4 +1,5 @@
 import { Commitment } from 'fmg-core';
+import { UnknownFundingState } from './funding/directFunding';
 
 export interface SharedChannelState {
   address: string;
@@ -16,11 +17,18 @@ export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface SharedDirectFundingState {
   fundingType: typeof DIRECT_FUNDING;
   requestedTotalFunds: string;
-  requestedYourDeposit: string;
+  requestedYourContribution: string;
 }
 
-// This type alias will eventually become SharedDirectFundingState | SharedIndirectFundingState
-type SharedFundingState = SharedDirectFundingState;
+export const INDIRECT_FUNDING = 'FUNDING_TYPE.INDIRECT';
+export interface SharedIndirectFundingState {
+  fundingType: typeof INDIRECT_FUNDING;
+}
+
+type SharedFundingState =
+  | UnknownFundingState
+  | SharedDirectFundingState
+  | SharedIndirectFundingState;
 
 export interface FirstCommitmentReceived extends SharedChannelState {
   channelId: string;

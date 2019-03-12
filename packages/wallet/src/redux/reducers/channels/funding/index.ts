@@ -1,5 +1,4 @@
 import * as states from '../../../states/channels';
-import * as fundingStates from '../../../states/channels/funding/directFunding';
 import * as actions from '../../../actions';
 import {
   messageRelayRequested,
@@ -11,19 +10,17 @@ import {
 } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable, validTransition } from '../../../../utils/reducer-utils';
-import { createDepositTransaction } from '../../../../utils/transaction-generator';
 import { signCommitment, validCommitmentSignature } from '../../../../utils/signing-utils';
 
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../../utils/state-utils';
-import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from '../../../states/shared';
 import { directFundingStateReducer } from 'src/redux/reducers/channels/funding/directFundingState';
+import { fundingConfirmed } from 'src/redux/states/channels/funding/directFunding';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
   action: actions.WalletAction,
-  unhandledAction?: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
   if (
@@ -46,7 +43,7 @@ export const fundingReducer = (
     case states.WAIT_FOR_FUNDING_REQUEST:
       return waitForFundingRequestReducer(state, action);
     case states.APPROVE_FUNDING:
-      return approveFundingReducer(state, action, unhandledAction);
+      return approveFundingReducer(state, action);
 
     // Funding is ongoing
     case states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
@@ -69,6 +66,136 @@ export const fundingReducer = (
     //
     default:
       return unreachable(state);
+  }
+};
+
+const waitForFundingRequestReducer = (
+  state: states.WaitForFundingRequest,
+  action: actions.WalletAction,
+): NextChannelState<states.ChannelState> => {
+  switch (action.type) {
+    case actions.FUNDING_REQUESTED:
+      return {
+        channelState: states.approveFunding({ ...state }),
+        outboxState: { displayOutbox: showWallet() },
+      };
+    default:
+      return { channelState: state };
+  }
+};
+
+const approveFundingReducer = (
+  state: states.ApproveFunding,
+  action: actions.WalletAction,
+): NextChannelState<states.ChannelState> => {
+  switch (action.type) {
+    case actions.FUNDING_APPROVED:
+      return { channelState: states.waitForFundingConfirmation(state) };
+    case actions.FUNDING_REJECTED:
+      const sendFundingDeclinedAction = messageRelayRequested(
+        state.participants[1 - state.ourIndex],
+        'FundingDeclined',
+      );
+      return {
+        channelState: states.sendFundingDeclinedMessage({ ...state }),
+        outboxState: { messageOutbox: sendFundingDeclinedAction, displayOutbox: hideWallet() },
+      };
+    case actions.MESSAGE_RECEIVED:
+      if (action.data && action.data === 'FundingDeclined') {
+        return { channelState: states.acknowledgeFundingDeclined(state) };
+      } else {
+        return { channelState: state };
+      }
+    case actions.FUNDING_DECLINED_ACKNOWLEDGED:
+      return { channelState: states.approveFunding({ ...state, unhandledAction: action }) };
+    default:
+      return { channelState: state };
+  }
+};
+
+const aWaitForPostFundSetupReducer = (
+  state: states.AWaitForPostFundSetup,
+  action: actions.WalletAction,
+): NextChannelState<states.ChannelState> => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const { commitment: postFundState, signature } = action;
+      if (!validTransitionToPostFundState(state, postFundState, signature)) {
+        return { channelState: state };
+      }
+
+      if (state.funded) {
+        return {
+          channelState: states.acknowledgeFundingSuccess({
+            ...state,
+            turnNum: postFundState.turnNum,
+            lastCommitment: { commitment: postFundState, signature },
+            penultimateCommitment: state.lastCommitment,
+          }),
+        };
+      } else {
+        return {
+          channelState: states.waitForFundingConfirmation({
+            ...state,
+            turnNum: postFundState.turnNum,
+            lastCommitment: { commitment: postFundState, signature },
+            penultimateCommitment: state.lastCommitment,
+          }),
+        };
+      }
+    default:
+      return { channelState: state };
+  }
+};
+
+const waitForFundingConfirmationReducer = (
+  state: states.WaitForFundingConfirmation,
+  action: actions.WalletAction,
+): NextChannelState<states.ChannelState> => {
+  switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      if (state.funded) {
+        // Since we're in the WaitForFundingConfirmation state, we've already received the
+        // opponent's post-fund-setup commitment, so we should send our own.
+        return {
+          channelState: fundingConfirmed(state),
+          outboxState: { messageOutbox: 'SEND THE COMMITMENT' },
+        };
+      }
+    // tslint:disable-next-line:no-switch-case-fall-through
+    default:
+      return { channelState: state };
+  }
+};
+
+const bWaitForPostFundSetupReducer = (
+  state: states.BWaitForPostFundSetup,
+  action: actions.WalletAction,
+): NextChannelState<states.ChannelState> => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const { commitment, signature } = action;
+      if (!validTransitionToPostFundState(state, commitment, signature)) {
+        return { channelState: state };
+      }
+
+      const newState = { ...state, turnNum: commitment.turnNum };
+      const {
+        postFundSetupCommitment,
+        commitmentSignature,
+        sendCommitmentAction,
+      } = composePostFundCommitment(newState);
+      return {
+        channelState: states.acknowledgeFundingSuccess({
+          ...newState,
+          turnNum: postFundSetupCommitment.turnNum,
+          lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
+          penultimateCommitment: { commitment, signature },
+        }),
+        outboxState: { messageOutbox: sendCommitmentAction },
+      };
+    default:
+      return { channelState: state };
   }
 };
 
@@ -109,159 +236,6 @@ const sendFundingDeclinedMessageReducer = (
   }
   return { channelState: state };
 };
-
-const waitForFundingRequestReducer = (
-  state: states.WaitForFundingRequest,
-  action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
-  switch (action.type) {
-    case actions.FUNDING_REQUESTED:
-      return {
-        channelState: states.approveFunding({ ...state }),
-        outboxState: { displayOutbox: showWallet() },
-      };
-    default:
-      return { channelState: state };
-  }
-};
-
-const approveFundingReducer = (
-  state: states.ApproveFunding,
-  action: actions.WalletAction,
-  unhandledAction: actions.WalletAction | undefined,
-): NextChannelState<states.ChannelState> => {
-  switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
-      return { channelState: states.approveFunding({ ...state }), unhandledAction: action };
-    case actions.FUNDING_APPROVED:
-      if (state.ourIndex === 0) {
-        const fundingAmount = getFundingAmount(state, state.ourIndex);
-        return {
-          channelState: {
-            ...state,
-            fundingState: fundingStates.aWaitForDepositToBeSentToMetaMask({
-              ...state.fundingState,
-            }),
-          },
-          outboxState: {
-            transactionOutbox: createDepositTransaction(state.channelId, fundingAmount),
-          },
-        };
-      } else {
-        const updatedState = states.waitForFundingConfirmation(state);
-        if (unhandledAction) {
-          return fundingReducer({ ...updatedState }, unhandledAction);
-        } else {
-          return { channelState: updatedState };
-        }
-      }
-    case actions.FUNDING_REJECTED:
-      const sendFundingDeclinedAction = messageRelayRequested(
-        state.participants[1 - state.ourIndex],
-        'FundingDeclined',
-      );
-      return {
-        channelState: states.sendFundingDeclinedMessage({ ...state }),
-        outboxState: { messageOutbox: sendFundingDeclinedAction, displayOutbox: hideWallet() },
-      };
-    case actions.MESSAGE_RECEIVED:
-      if (action.data && action.data === 'FundingDeclined') {
-        return { channelState: states.acknowledgeFundingDeclined(state) };
-      } else {
-        return { channelState: state };
-      }
-    case actions.FUNDING_DECLINED_ACKNOWLEDGED:
-      return { channelState: states.approveFunding({ ...state, unhandledAction: action }) };
-    default:
-      return { channelState: state };
-  }
-};
-
-const aWaitForPostFundSetupReducer = (
-  state: states.AWaitForPostFundSetup,
-  action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
-  switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
-      const { commitment: postFundState, signature } = action;
-      if (!validTransitionToPostFundState(state, postFundState, signature)) {
-        return { channelState: state };
-      }
-
-      return {
-        channelState: states.acknowledgeFundingSuccess({
-          ...state,
-          turnNum: postFundState.turnNum,
-          lastCommitment: { commitment: postFundState, signature },
-          penultimateCommitment: state.lastCommitment,
-        }),
-      };
-    default:
-      return { channelState: state };
-  }
-};
-
-const waitForFundingConfirmationReducer = (
-  state: states.WaitForFundingConfirmation,
-  action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
-  switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
-      const { allocation } = state.lastCommitment.commitment;
-      if (bigNumberify(action.totalForDestination).gte(allocation[1 - state.ourIndex])) {
-        return {
-          channelState: {
-            ...state,
-            fundingState: fundingStates.bWaitForDepositToBeSentToMetaMask({
-              ...state.fundingState,
-            }),
-          },
-          outboxState: {
-            transactionOutbox: createDepositTransaction(
-              state.channelId,
-              allocation[state.ourIndex],
-            ),
-          },
-        };
-      } else {
-        return { channelState: state };
-      }
-    default:
-      return { channelState: state };
-  }
-};
-
-const bWaitForPostFundSetupReducer = (
-  state: states.BWaitForPostFundSetup,
-  action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
-  switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
-      const { commitment, signature } = action;
-      if (!validTransitionToPostFundState(state, commitment, signature)) {
-        return { channelState: state };
-      }
-
-      const newState = { ...state, turnNum: commitment.turnNum };
-      const {
-        postFundSetupCommitment,
-        commitmentSignature,
-        sendCommitmentAction,
-      } = composePostFundCommitment(newState);
-      return {
-        channelState: states.acknowledgeFundingSuccess({
-          ...newState,
-          turnNum: postFundSetupCommitment.turnNum,
-          lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
-          penultimateCommitment: { commitment, signature },
-        }),
-        outboxState: { messageOutbox: sendCommitmentAction },
-      };
-    default:
-      return { channelState: state };
-  }
-};
-
 const acknowledgeFundingSuccessReducer = (
   state: states.AcknowledgeFundingSuccess,
   action: actions.WalletAction,
@@ -328,9 +302,4 @@ const composePostFundCommitment = (
     commitmentSignature,
   );
   return { postFundSetupCommitment, commitmentSignature, sendCommitmentAction };
-};
-
-const getFundingAmount = (state: states.FundingChannelState, index: number): string => {
-  const lastCommitment = state.lastCommitment.commitment;
-  return lastCommitment.allocation[index];
 };
