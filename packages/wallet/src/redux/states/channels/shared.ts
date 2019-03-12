@@ -15,7 +15,6 @@ export interface SignedCommitment {
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface SharedDirectFundingState {
   fundingType: typeof DIRECT_FUNDING;
-  type: any;
   requestedTotalFunds: string;
   requestedYourDeposit: string;
 }

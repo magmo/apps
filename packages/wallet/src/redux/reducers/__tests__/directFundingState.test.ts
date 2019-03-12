@@ -14,7 +14,6 @@ const { bsAddress, channelId } = scenarios;
 
 const defaults: SharedDirectFundingState = {
   fundingType: DIRECT_FUNDING,
-  type: '',
   requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
   requestedYourDeposit: bigNumberify(0).toHexString(),
 };

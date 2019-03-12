@@ -22,8 +22,8 @@ export const FUNDING_CONFIRMED = 'FUNDING_CONFIRMED';
 export function directFundingState<T extends SharedDirectFundingState>(
   params: T,
 ): SharedDirectFundingState {
-  const { type, fundingType, requestedTotalFunds, requestedYourDeposit } = params;
-  return { type, fundingType, requestedTotalFunds, requestedYourDeposit };
+  const { fundingType, requestedTotalFunds, requestedYourDeposit } = params;
+  return { fundingType, requestedTotalFunds, requestedYourDeposit };
 }
 export interface ADepositTransactionFailed extends SharedDirectFundingState {
   type: typeof A_DEPOSIT_TRANSACTION_FAILED;
