@@ -12,7 +12,7 @@ export const directFundingStateReducer = (
   channelId: string,
 ): states.FundingStateWithSideEffects => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
-  switch (state.stage) {
+  switch (state.type) {
     //
     case states.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
       return aWaitForDepositToBeSentToMetaMaskReducer(state, action);
@@ -52,7 +52,7 @@ const aDepositTransactionFailedReducer = (
         fundingState: states.aWaitForDepositToBeSentToMetaMask({
           ...state,
         }),
-        sideEffects: {
+        outboxState: {
           transactionOutbox: createDepositTransaction(channelId, state.requestedYourDeposit),
         },
       };
@@ -69,7 +69,7 @@ const bDepositTransactionFailedReducer = (
     case actions.RETRY_TRANSACTION:
       return {
         fundingState: states.bWaitForDepositToBeSentToMetaMask({ ...state }),
-        sideEffects: {
+        outboxState: {
           transactionOutbox: createDepositTransaction(channelId, state.requestedYourDeposit),
         },
       };
