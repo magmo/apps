@@ -1,6 +1,6 @@
 import { directFundingStateReducer } from '../directFunding';
 
-import * as states from '../../../../states/channels/funding/';
+import * as states from '../../../../states/channels/funding/index';
 import * as actions from '../../../../actions';
 
 import * as scenarios from '../../../__tests__/test-scenarios';
@@ -45,7 +45,6 @@ const defaultsForB: SharedDirectFundingState = {
 const TX = 'TX';
 const defaultsWithTx = { ...defaultsForA, transactionHash: TX };
 
-beforeEach(() => {});
 describe('start in WAIT_FOR_FUNDING_REQUEST', () => {
   describe('incoming action: FUNDING_REQUESTED', () => {
     // player A scenario

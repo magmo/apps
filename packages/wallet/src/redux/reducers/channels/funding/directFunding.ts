@@ -1,4 +1,4 @@
-import * as states from '../../../states/channels/funding/';
+import * as states from '../../../states/channels/funding/index';
 import * as actions from '../../../actions';
 
 import { unreachable } from '../../../../utils/reducer-utils';
