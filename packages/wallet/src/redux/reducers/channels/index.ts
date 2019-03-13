@@ -52,7 +52,7 @@ export const channelReducer = (
     case OPENING:
       return openingReducer(state, action);
     case FUNDING:
-      return fundingReducer(state, action, unhandledAction);
+      return fundingReducer(state, action);
     case RUNNING:
       return runningReducer(state, action);
     case CHALLENGING:
