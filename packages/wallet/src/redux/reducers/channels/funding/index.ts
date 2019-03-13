@@ -16,6 +16,7 @@ import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../../utils/state-utils';
 import { NextChannelState } from '../../../states/shared';
 import { directFundingStateReducer } from './directFunding';
+import { outboxStateReducer } from '../..';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
@@ -32,17 +33,40 @@ export const fundingReducer = (
     };
   }
 
+  let outboxState = {};
+
   // We modify the funding state directly, before applying the rest-of-state reducers.
   // This lets the rest-of-state reducer decide on what side effects they should have based on
   // the outcome of funding-related actions on the current funding status.
-  const { fundingState } = directFundingStateReducer(state.fundingState, action, state.channelId);
-  state.fundingState = fundingState;
+  const { fundingState, outboxState: fundingSideEffects } = directFundingStateReducer(
+    state.fundingState,
+    action,
+    state.channelId,
+    state.ourIndex,
+  );
+  state = { ...state, fundingState };
 
+  const {
+    channelState: updatedState,
+    outboxState: internalReducerSideEffects,
+  } = internalFundingReducer(state, action);
+
+  // Apply the side effects
+  outboxState = outboxStateReducer(outboxState, fundingSideEffects);
+  outboxState = outboxStateReducer(outboxState, internalReducerSideEffects);
+
+  return { channelState: updatedState, outboxState };
+};
+
+const internalFundingReducer = (
+  state: states.FundingChannelState,
+  action: actions.WalletAction,
+): NextChannelState<states.ChannelState> => {
   switch (state.type) {
     // Setup funding process
     case states.WAIT_FOR_FUNDING_REQUEST:
       return waitForFundingRequestReducer(state, action);
-    case states.APPROVE_FUNDING:
+    case states.WAIT_FOR_FUNDING_APPROVAL:
       return approveFundingReducer(state, action);
 
     // Funding is ongoing
@@ -85,12 +109,14 @@ const waitForFundingRequestReducer = (
 };
 
 const approveFundingReducer = (
-  state: states.ApproveFunding,
+  state: states.WaitForFundingApproval,
   action: actions.WalletAction,
 ): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_APPROVED:
-      return { channelState: states.waitForFundingConfirmation(state) };
+      return {
+        channelState: states.waitForFundingAndPostFundSetup(state),
+      };
     case actions.FUNDING_REJECTED:
       const sendFundingDeclinedAction = messageRelayRequested(
         state.participants[1 - state.ourIndex],
