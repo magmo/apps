@@ -136,12 +136,22 @@ function addStoriesFromCollection(collection, chapter) {
 
 const WalletScreensFundingPlayerA = {
   ApproveFunding: channelStates.approveFunding(playerADefaults),
-  AWaitForDepositToBeSentToMetaMask: fundingStates.aWaitForDepositToBeSentToMetaMask(
-    defaultFundingState,
-  ),
-  ASubmitDepositInMetaMask: fundingStates.aSubmitDepositInMetaMask(defaultFundingState),
-  AWaitForDepositConfirmation: fundingStates.aWaitForDepositConfirmation(fundingStateWithTX),
-  AWaitForOpponentDeposit: fundingStates.aWaitForOpponentDeposit(defaultFundingState),
+  AWaitForDepositToBeSentToMetaMask: channelStates.waitForFundingAndPostFundSetup({
+    ...playerADefaults,
+    fundingState: fundingStates.aWaitForDepositToBeSentToMetaMask(defaultFundingState),
+  }),
+  ASubmitDepositInMetaMask: channelStates.waitForFundingAndPostFundSetup({
+    ...playerADefaults,
+    fundingState: fundingStates.aSubmitDepositInMetaMask(defaultFundingState),
+  }),
+  AWaitForDepositConfirmation: channelStates.waitForFundingAndPostFundSetup({
+    ...playerADefaults,
+    fundingState: fundingStates.aWaitForDepositConfirmation(fundingStateWithTX),
+  }),
+  AWaitForOpponentDeposit: channelStates.waitForFundingAndPostFundSetup({
+    ...playerADefaults,
+    fundingState: fundingStates.aWaitForOpponentDeposit(defaultFundingState),
+  }),
   AWaitForPostFundSetup: channelStates.aWaitForPostFundSetup(playerADefaults),
   AcknowledgeFundingSuccess: channelStates.acknowledgeFundingSuccess(playerADefaults),
 };
@@ -149,12 +159,22 @@ addStoriesFromCollection(WalletScreensFundingPlayerA, 'Wallet Screens / Funding 
 
 const WalletScreensFundingPlayerB = {
   ApproveFunding: channelStates.approveFunding(playerBDefaults),
-  BWaitForOpponentDeposit: fundingStates.bWaitForOpponentDeposit(defaultFundingState),
-  BWaitForDepositToBeSentToMetaMask: fundingStates.bWaitForDepositToBeSentToMetaMask(
-    defaultFundingState,
-  ),
-  BSubmitDepositInMetaMask: fundingStates.bSubmitDepositInMetaMask(defaultFundingState),
-  BWaitForDepositConfirmation: fundingStates.bWaitForDepositConfirmation(fundingStateWithTX),
+  BWaitForOpponentDeposit: channelStates.waitForFundingAndPostFundSetup({
+    ...playerBDefaults,
+    fundingState: fundingStates.bWaitForOpponentDeposit(defaultFundingState),
+  }),
+  BWaitForDepositToBeSentToMetaMask: channelStates.waitForFundingAndPostFundSetup({
+    ...playerBDefaults,
+    fundingState: fundingStates.bWaitForDepositToBeSentToMetaMask(defaultFundingState),
+  }),
+  BSubmitDepositInMetaMask: channelStates.waitForFundingAndPostFundSetup({
+    ...playerBDefaults,
+    fundingState: fundingStates.bSubmitDepositInMetaMask(defaultFundingState),
+  }),
+  BWaitForDepositConfirmation: channelStates.waitForFundingAndPostFundSetup({
+    ...playerBDefaults,
+    fundingState: fundingStates.bWaitForDepositConfirmation(fundingStateWithTX),
+  }),
   BWaitForPostFundSetup: channelStates.bWaitForPostFundSetup(playerBDefaults),
   AcknowledgeFundingSuccess: channelStates.acknowledgeFundingSuccess(playerBDefaults),
 };
