@@ -11,6 +11,7 @@ export const FUNDING = 'FUNDING';
 
 // STATE TYPES
 // Funding setup
+export const WAIT_FOR_FUNDING_REQUEST = 'CHANNEL.WAIT_FOR_FUNDING_REQUEST';
 export const WAIT_FOR_FUNDING_APPROVAL = 'APPROVE_FUNDING';
 
 // Funding ongoing
@@ -34,6 +35,11 @@ function fundingChannelState<T extends BaseFundingChannelState>(
 ): BaseFundingChannelState {
   const { fundingState, funded } = params;
   return { ...channelOpen(params), fundingState, funded };
+}
+
+export interface WaitForFundingRequest extends BaseFundingChannelState {
+  type: typeof WAIT_FOR_FUNDING_REQUEST;
+  stage: typeof FUNDING;
 }
 
 export interface WaitForFundingApproval extends BaseFundingChannelState {
