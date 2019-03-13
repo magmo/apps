@@ -1,8 +1,7 @@
-import { TransactionExists, SharedDirectFundingState } from '../shared';
-import { OutboxState } from '../../shared';
+import { SharedDirectFundingState } from './shared';
+import { TransactionExists } from '../shared';
 
 // state types
-export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 export const WAIT_FOR_FUNDING_APPROVAL = 'WAIT_FOR_FUNDING_APPROVAL';
 
 export const A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
@@ -22,7 +21,6 @@ export const B_DEPOSIT_TRANSACTION_FAILED = 'B_DEPOSIT_TRANSACTION_FAILED';
 
 export const FUNDING_CONFIRMED = 'FUNDING_CONFIRMED';
 
-export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface WaitForFundingApproval extends SharedDirectFundingState {
   type: typeof WAIT_FOR_FUNDING_APPROVAL;
@@ -76,16 +74,6 @@ export function directFundingState<T extends SharedDirectFundingState>(
 ): SharedDirectFundingState {
   const { requestedTotalFunds, requestedYourContribution } = params;
   return { fundingType: DIRECT_FUNDING, requestedTotalFunds, requestedYourContribution };
-}
-
-export function waitForFundingRequest<T extends SharedDirectFundingState>(
-  params: T,
-): WaitForFundingRequest {
-  return {
-    ...directFundingState(params),
-    type: WAIT_FOR_FUNDING_REQUEST,
-    fundingType: UNKNOWN_FUNDING_TYPE,
-  };
 }
 
 export function waitForFundingApproval<T extends SharedDirectFundingState>(
@@ -191,8 +179,3 @@ export type DirectFundingState =
   | ADepositTransactionFailed
   | BDepositTransactionFailed
   | FundingConfirmed;
-
-export interface FundingStateWithSideEffects {
-  fundingState: DirectFundingState;
-  outboxState?: OutboxState;
-}
