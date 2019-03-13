@@ -50,9 +50,6 @@ export function sideEffectsReducer<T extends SharedWalletState>(
   state: T,
   sideEffects: OutboxState | undefined,
 ): T {
-  // TODO: Should the sideEffectsReducer also deal with unhandled actions?
-  //       Or should that be taken care of manually?
-
   if (!sideEffects) {
     return state;
   }
