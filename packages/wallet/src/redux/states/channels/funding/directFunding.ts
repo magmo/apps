@@ -24,12 +24,6 @@ export const FUNDING_CONFIRMED = 'FUNDING_CONFIRMED';
 
 export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
-export interface WaitForFundingRequest {
-  type: typeof WAIT_FOR_FUNDING_REQUEST;
-  fundingType: typeof UNKNOWN_FUNDING_TYPE;
-  requestedTotalFunds: string;
-  requestedYourContribution: string;
-}
 export interface WaitForFundingApproval extends SharedDirectFundingState {
   type: typeof WAIT_FOR_FUNDING_APPROVAL;
 }
@@ -185,7 +179,6 @@ export function fundingConfirmed<T extends SharedDirectFundingState>(params: T):
 }
 
 export type DirectFundingState =
-  | WaitForFundingRequest
   | WaitForFundingApproval
   | AWaitForDepositToBeSentToMetaMask
   | ASubmitDepositInMetaMask
