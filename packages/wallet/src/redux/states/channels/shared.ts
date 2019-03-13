@@ -1,6 +1,5 @@
 import { Commitment } from 'fmg-core';
-import { WaitForFundingRequest } from './funding/directFunding';
-import { FundingState } from './funding';
+import { SharedFundingState, FundingState } from './funding/';
 
 export interface SharedChannelState {
   address: string;
@@ -14,23 +13,6 @@ export interface SignedCommitment {
   commitment: Commitment;
   signature: string;
 }
-
-export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
-export interface SharedDirectFundingState {
-  fundingType: typeof DIRECT_FUNDING;
-  requestedTotalFunds: string;
-  requestedYourContribution: string;
-}
-
-export const INDIRECT_FUNDING = 'FUNDING_TYPE.INDIRECT';
-export interface SharedIndirectFundingState {
-  fundingType: typeof INDIRECT_FUNDING;
-}
-
-type SharedFundingState =
-  | WaitForFundingRequest
-  | SharedDirectFundingState
-  | SharedIndirectFundingState;
 
 export interface FirstCommitmentReceived extends SharedChannelState {
   channelId: string;
