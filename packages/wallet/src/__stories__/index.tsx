@@ -4,6 +4,7 @@ import Wallet from '../containers/Wallet';
 import { Provider } from 'react-redux';
 import * as walletStates from '../redux/states';
 import * as channelStates from '../redux/states/channels';
+import * as fundingStates from '../redux/states/channels/funding/index';
 import '../index.scss';
 import * as scenarios from '../redux/reducers/__tests__/test-scenarios';
 import { bigNumberify } from 'ethers/utils';
@@ -18,6 +19,14 @@ const {
   preFundCommitment1,
   preFundCommitment2,
 } = scenarios;
+
+const defaultFundingState = fundingStates.fundingConfirmed({
+  fundingType: fundingStates.DIRECT_FUNDING,
+  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+  requestedYourContribution: bigNumberify(500000000000000).toHexString(),
+});
+
+const defaultFundingStateWithTx = { ...defaultFundingState, transactionHash: 'tx_hash' };
 
 const defaults = {
   address: asAddress,
@@ -35,10 +44,7 @@ const defaults = {
   challengeExpiry: 0,
   transactionHash: '0x0',
   userAddress: '0x0',
-  fundingState: {
-    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  },
+  fundingState: defaultFundingState,
   funded: false,
 };
 const playerADefaults = {
@@ -65,129 +71,165 @@ const fakeStore = state => ({
 });
 
 const testState = state => () => (
-  <Provider store={fakeStore(state)}>
+  <Provider store={fakeStore({ state })}>
+    <Wallet />
+  </Provider>
+);
+
+const testStateFromChannelState = channelState => () => (
+  <Provider store={fakeStore({ channelState })}>
+    <Wallet />
+  </Provider>
+);
+
+const testStateFromFundingState = fundingState => () => (
+  <Provider store={fakeStore({ channelState: { fundingState } })}>
     <Wallet />
   </Provider>
 );
 
 storiesOf('Network Status', module)
-  .add('Mainnet', testState(channelStates.approveFunding({ ...playerADefaults, networkId: 1 })))
-  .add('Kovan', testState(channelStates.approveFunding({ ...playerADefaults, networkId: 4 })))
-  .add('Ropsten', testState(channelStates.approveFunding({ ...playerADefaults, networkId: 3 })))
-  .add('Rinkeby', testState(channelStates.approveFunding({ ...playerADefaults, networkId: 42 })))
-  .add('Ganache', testState(channelStates.approveFunding({ ...playerADefaults, networkId: 5777 })));
+  .add('Mainnet', testStateFromChannelState(channelStates.approveFunding({ ...playerADefaults })))
+  .add('Kovan', testStateFromChannelState(channelStates.approveFunding({ ...playerADefaults })))
+  .add('Ropsten', testStateFromChannelState(channelStates.approveFunding({ ...playerADefaults })))
+  .add('Rinkeby', testStateFromChannelState(channelStates.approveFunding({ ...playerADefaults })))
+  .add('Ganache', testStateFromChannelState(channelStates.approveFunding({ ...playerADefaults })));
 storiesOf('Wallet Screens / Funding / Player A', module)
-  .add('ApproveFunding', testState(channelStates.approveFunding(playerADefaults)))
+  .add('ApproveFunding', testStateFromChannelState(channelStates.approveFunding(playerADefaults)))
   .add(
     'AWaitForDepositToBeSentToMetaMask',
-    testState(channelStates.aWaitForDepositToBeSentToMetaMask(playerADefaults)),
+    testStateFromFundingState(fundingStates.aWaitForDepositToBeSentToMetaMask(defaultFundingState)),
   )
   .add(
     'ASubmitDepositInMetaMask',
-    testState(channelStates.aSubmitDepositInMetaMask(playerADefaults)),
+    testStateFromFundingState(fundingStates.aSubmitDepositInMetaMask(defaultFundingState)),
   )
   .add(
     'AWaitForDepositConfirmation',
-    testState(channelStates.aWaitForDepositConfirmation(playerADefaults)),
+    testStateFromFundingState(fundingStates.aWaitForDepositConfirmation(defaultFundingStateWithTx)),
   )
-  .add('AWaitForOpponentDeposit', testState(channelStates.aWaitForOpponentDeposit(playerADefaults)))
-  .add('AWaitForPostFundSetup', testState(channelStates.aWaitForPostFundSetup(playerADefaults)))
+  .add(
+    'AWaitForOpponentDeposit',
+    testStateFromFundingState(fundingStates.aWaitForOpponentDeposit(defaultFundingState)),
+  )
+  .add(
+    'AWaitForPostFundSetup',
+    testStateFromChannelState(channelStates.aWaitForPostFundSetup(playerADefaults)),
+  )
   .add(
     'AcknowledgeFundingSuccess',
-    testState(channelStates.acknowledgeFundingSuccess(playerADefaults)),
+    testStateFromChannelState(channelStates.acknowledgeFundingSuccess(playerADefaults)),
   );
 
 storiesOf('Wallet Screens / Funding / Player B', module)
-  .add('ApproveFunding', testState(channelStates.approveFunding(playerBDefaults)))
+  .add('ApproveFunding', testStateFromChannelState(channelStates.approveFunding(playerBDefaults)))
   .add(
     'BWaitForOpponentDeposit',
-    testState(channelStates.waitForFundingConfirmation(playerBDefaults)),
+    testStateFromChannelState(channelStates.waitForFundingConfirmation(playerBDefaults)),
   )
   .add(
     'BWaitForDepositToBeSentToMetaMask',
-    testState(channelStates.bWaitForDepositToBeSentToMetaMask(playerBDefaults)),
+    testStateFromFundingState(fundingStates.bWaitForDepositToBeSentToMetaMask(defaultFundingState)),
   )
   .add(
     'BSubmitDepositInMetaMask',
-    testState(channelStates.bSubmitDepositInMetaMask(playerBDefaults)),
+    testStateFromFundingState(fundingStates.bSubmitDepositInMetaMask(defaultFundingState)),
   )
   .add(
     'BWaitForDepositConfirmation',
-    testState(channelStates.bWaitForDepositConfirmation(playerBDefaults)),
+    testStateFromFundingState(fundingStates.bWaitForDepositConfirmation(defaultFundingStateWithTx)),
   )
-  .add('BWaitForPostFundSetup', testState(channelStates.bWaitForPostFundSetup(playerBDefaults)))
+  .add(
+    'BWaitForPostFundSetup',
+    testStateFromChannelState(channelStates.bWaitForPostFundSetup(playerBDefaults)),
+  )
   .add(
     'AcknowledgeFundingSuccess',
-    testState(channelStates.acknowledgeFundingSuccess(playerBDefaults)),
+    testStateFromChannelState(channelStates.acknowledgeFundingSuccess(playerBDefaults)),
   );
 
 storiesOf('Wallet Screens / Withdrawing', module)
-  .add('ApproveWithdrawal', testState(channelStates.approveWithdrawal(playerADefaults)))
+  .add(
+    'ApproveWithdrawal',
+    testStateFromChannelState(channelStates.approveWithdrawal(playerADefaults)),
+  )
   .add(
     'WaitForWithdrawalInitiation',
-    testState(channelStates.waitForWithdrawalInitiation(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForWithdrawalInitiation(playerADefaults)),
   )
   .add(
     'WaitForWithdrawalConfirmation',
-    testState(channelStates.waitForWithdrawalConfirmation(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForWithdrawalConfirmation(playerADefaults)),
   )
   .add(
     'AcknowledgeWithdrawalSuccess',
-    testState(channelStates.acknowledgeWithdrawalSuccess(playerADefaults)),
+    testStateFromChannelState(channelStates.acknowledgeWithdrawalSuccess(playerADefaults)),
   );
 
 storiesOf('Wallet Screens / Challenging', module)
-  .add('ApproveChallenge', testState(channelStates.approveChallenge(playerADefaults)))
+  .add(
+    'ApproveChallenge',
+    testStateFromChannelState(channelStates.approveChallenge(playerADefaults)),
+  )
   .add(
     'WaitForChallengeInitiation',
-    testState(channelStates.waitForChallengeInitiation(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForChallengeInitiation(playerADefaults)),
   )
   .add(
     'WaitForChallengeSubmission',
-    testState(channelStates.waitForChallengeSubmission(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForChallengeSubmission(playerADefaults)),
   )
   .add(
     'WaitForChallengeConfirmation',
-    testState(channelStates.waitForChallengeConfirmation(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForChallengeConfirmation(playerADefaults)),
   )
   .add(
     'WaitForResponseOrTimeout',
-    testState(channelStates.waitForResponseOrTimeout(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForResponseOrTimeout(playerADefaults)),
   )
   .add(
     'AcknowledgeChallengeResponse',
-    testState(channelStates.acknowledgeChallengeResponse(playerADefaults)),
+    testStateFromChannelState(channelStates.acknowledgeChallengeResponse(playerADefaults)),
   )
   .add(
     'AcknowledgeChallengeTimeout',
-    testState(channelStates.acknowledgeChallengeTimeout(playerADefaults)),
+    testStateFromChannelState(channelStates.acknowledgeChallengeTimeout(playerADefaults)),
   );
 
 storiesOf('Wallet Screens / Responding', module)
-  .add('ChooseResponse', testState(channelStates.chooseResponse(playerADefaults)))
+  .add('ChooseResponse', testStateFromChannelState(channelStates.chooseResponse(playerADefaults)))
   .add(
     'AcknowledgeChallengeTimeout',
-    testState(channelStates.challengeeAcknowledgeChallengeTimeOut(playerADefaults)),
+    testStateFromChannelState(channelStates.challengeeAcknowledgeChallengeTimeOut(playerADefaults)),
   )
-  .add('TakeMoveInApp', testState(channelStates.takeMoveInApp(playerADefaults)))
-  .add('InitiateResponse', testState(channelStates.initiateResponse(playerADefaults)))
+  .add('TakeMoveInApp', testStateFromChannelState(channelStates.takeMoveInApp(playerADefaults)))
+  .add(
+    'InitiateResponse',
+    testStateFromChannelState(channelStates.initiateResponse(playerADefaults)),
+  )
   .add(
     'WaitForResponseSubmission',
-    testState(channelStates.waitForResponseSubmission(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForResponseSubmission(playerADefaults)),
   )
   .add(
     'WaitForResponseConfirmation',
-    testState(channelStates.waitForResponseConfirmation(playerADefaults)),
+    testStateFromChannelState(channelStates.waitForResponseConfirmation(playerADefaults)),
   )
   .add(
     'AcknowledgeChallengeComplete',
-    testState(channelStates.acknowledgeChallengeComplete(playerADefaults)),
+    testStateFromChannelState(channelStates.acknowledgeChallengeComplete(playerADefaults)),
   );
 
 storiesOf('Wallet Screens / Closing', module)
-  .add('ApproveConclude', testState(channelStates.approveConclude(playerADefaults)))
-  .add('WaitForOpponentConclude', testState(channelStates.waitForOpponentConclude(playerADefaults)))
-  .add('AcknowledgeConcludeSuccess', testState(channelStates.approveCloseOnChain(playerADefaults)));
+  .add('ApproveConclude', testStateFromChannelState(channelStates.approveConclude(playerADefaults)))
+  .add(
+    'WaitForOpponentConclude',
+    testStateFromChannelState(channelStates.waitForOpponentConclude(playerADefaults)),
+  )
+  .add(
+    'AcknowledgeConcludeSuccess',
+    testStateFromChannelState(channelStates.approveCloseOnChain(playerADefaults)),
+  );
 
 storiesOf('Wallet Landing Page', module).add(
   'Landing Page',
