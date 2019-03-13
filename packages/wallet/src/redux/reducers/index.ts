@@ -49,7 +49,16 @@ export const walletReducer = (
 export function outboxStateReducer(
   state: OutboxState,
   sideEffects: OutboxState | undefined,
+<<<<<<< HEAD
 ): OutboxState {
+||||||| merged common ancestors
+): T {
+  // TODO: Should the sideEffectsReducer also deal with unhandled actions?
+  //       Or should that be taken care of manually?
+
+=======
+): T {
+>>>>>>> as-split-wallet-redux-state
   if (!sideEffects) {
     return state;
   }

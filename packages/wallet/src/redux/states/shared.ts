@@ -9,7 +9,6 @@ export interface OutboxState {
   transactionOutbox?: TransactionRequest;
 }
 
-export type SideEffect = DisplayAction | WalletEvent | TransactionRequest;
 export interface NextChannelState<T extends SharedChannelState> {
   channelState: T;
   unhandledAction?: WalletAction;
