@@ -73,7 +73,7 @@ export function channelInitialized<T extends BaseInitializedChannel>(
     type: CHANNEL_INITIALIZED,
     stage: WALLET_INITIALIZED,
     outboxState,
-    channelState: channelState as ChannelState,
+    channelState,
     unhandledAction,
   };
 }
