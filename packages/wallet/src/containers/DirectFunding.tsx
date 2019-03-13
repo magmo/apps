@@ -36,6 +36,8 @@ class DirectFundingContainer extends PureComponent<Props> {
             requestedYourContribution={state.requestedYourContribution}
           />
         );
+
+      // PlayerA
       case fundingStates.A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
         return <AFundingStep step={0} />;
       case fundingStates.A_SUBMIT_DEPOSIT_IN_METAMASK:
@@ -54,8 +56,10 @@ class DirectFundingContainer extends PureComponent<Props> {
         );
       case fundingStates.A_WAIT_FOR_OPPONENT_DEPOSIT:
         return <AFundingStep step={3} />;
+
+      // PlayerB
       case fundingStates.B_WAIT_FOR_OPPONENT_DEPOSIT:
-        return <AFundingStep step={-1} />; // TODO: What step should this be?
+        return <BFundingStep step={1} />;
       case fundingStates.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
         return <BFundingStep step={2} />;
       case fundingStates.B_SUBMIT_DEPOSIT_IN_METAMASK:
