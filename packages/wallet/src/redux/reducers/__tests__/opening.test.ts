@@ -1,4 +1,5 @@
 import * as states from '../../states/channels';
+import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 
 import { itTransitionsToChannelStateType, itDoesntTransition, itSendsThisMessage } from './helpers';
@@ -6,6 +7,7 @@ import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
 import { openingReducer } from '../channels/opening';
+import { bigNumberify } from 'ethers/utils';
 
 const {
   asAddress,
@@ -21,6 +23,10 @@ const defaults = {
   address: asAddress,
   privateKey: asPrivateKey,
   libraryAddress,
+  fundingState: fundingStates.waitForFundingRequest({
+    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+    requestedYourContribution: bigNumberify(500000000000000).toHexString(),
+  }),
 };
 
 describe('when in WaitForChannel', () => {
@@ -86,7 +92,6 @@ describe('when in WaitForPreFundSetup', () => {
     participants: scenarios.channel.participants as [string, string],
     turnNum: 0,
     lastCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
-    fundingState: { requestedTotalFunds: '0x0', requestedYourContribution: '0x0' },
     funded: false,
   };
 

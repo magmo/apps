@@ -1,6 +1,7 @@
 import { closingReducer } from '../channels/closing';
 
 import * as states from '../../states/channels';
+import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
@@ -35,10 +36,11 @@ const defaults = {
   participants: channel.participants as [string, string],
   uid: 'uid',
   transactionHash: '0x0',
-  fundingState: {
+  fundingState: fundingStates.fundingConfirmed({
+    fundingType: fundingStates.DIRECT_FUNDING,
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
     requestedYourContribution: bigNumberify(0).toHexString(),
-  },
+  }),
   funded: true,
 };
 

@@ -1,6 +1,7 @@
 import { respondingReducer } from '../channels/responding';
 
 import * as states from '../../states/channels';
+import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 
 import { itTransitionsToChannelStateType, itDoesntTransition } from './helpers';
@@ -39,10 +40,11 @@ const defaults = {
   moveSelected: false,
   challengeOptions: [],
   transactionHash: '0x0',
-  fundingState: {
+  fundingState: fundingStates.fundingConfirmed({
+    fundingType: fundingStates.DIRECT_FUNDING,
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
     requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  },
+  }),
   funded: false,
 };
 

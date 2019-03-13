@@ -1,4 +1,4 @@
-import { SharedFundingState, SharedUnknownFundingState, UNKNOWN_FUNDING_TYPE } from './shared';
+import { SharedFundingState, UNKNOWN_FUNDING_TYPE, BaseFundingState } from './shared';
 import { DirectFundingState } from './directFunding';
 import { OutboxState } from '../../shared';
 
@@ -11,7 +11,7 @@ export interface WaitForFundingRequest {
   requestedYourContribution: string;
 }
 
-export function waitForFundingRequest<T extends SharedUnknownFundingState>(
+export function waitForFundingRequest<T extends BaseFundingState>(
   params: T,
 ): WaitForFundingRequest {
   const { requestedTotalFunds, requestedYourContribution } = params;

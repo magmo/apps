@@ -1,4 +1,4 @@
-interface BaseFundingState {
+export interface BaseFundingState {
   requestedTotalFunds: string;
   requestedYourContribution: string;
 }

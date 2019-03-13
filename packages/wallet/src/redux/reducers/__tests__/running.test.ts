@@ -1,6 +1,7 @@
 import { runningReducer } from '../channels/running';
 import * as scenarios from './test-scenarios';
 import * as states from '../../states/channels';
+import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import {
@@ -37,10 +38,11 @@ const defaults = {
   adjudicator: 'adj-address',
   challengeExpiry: new Date(),
   networkId: 2132,
-  fundingState: {
+  fundingState: fundingStates.fundingConfirmed({
+    fundingType: fundingStates.DIRECT_FUNDING,
     requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
     requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  },
+  }),
   funded: false,
 };
 
