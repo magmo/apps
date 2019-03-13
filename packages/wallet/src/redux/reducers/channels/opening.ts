@@ -13,6 +13,10 @@ import { CommitmentType } from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
 import { NextChannelState } from '../../states/shared';
+import {
+  WAIT_FOR_FUNDING_REQUEST,
+  UNKNOWN_FUNDING_TYPE,
+} from '../../states/channels/funding/index';
 
 export const openingReducer = (
   state: channelStates.OpeningState,
@@ -31,7 +35,7 @@ export const openingReducer = (
 const waitForChannelReducer = (
   state: channelStates.WaitForChannel,
   action: actions.WalletAction,
-): NextChannelState<channelStates.WaitForPreFundSetup> => {
+): NextChannelState<channelStates.WaitForPreFundSetup | channelStates.WaitForChannel> => {
   switch (action.type) {
     case actions.OWN_COMMITMENT_RECEIVED:
       const ownCommitment = action.commitment;
@@ -80,6 +84,8 @@ const waitForChannelReducer = (
           turnNum: 0,
           lastCommitment: { commitment: ownCommitment, signature },
           fundingState: {
+            type: WAIT_FOR_FUNDING_REQUEST,
+            fundingType: UNKNOWN_FUNDING_TYPE,
             requestedTotalFunds: '0x0',
             requestedYourContribution: '0x0',
           },
@@ -143,6 +149,8 @@ const waitForChannelReducer = (
           turnNum: 0,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
           fundingState: {
+            type: WAIT_FOR_FUNDING_REQUEST,
+            fundingType: UNKNOWN_FUNDING_TYPE,
             requestedTotalFunds: '0x0',
             requestedYourContribution: '0x0',
           },
@@ -190,6 +198,8 @@ const waitForPreFundSetupReducer = (
           lastCommitment: { commitment: ownCommitment, signature },
           penultimateCommitment: state.lastCommitment,
           fundingState: {
+            type: WAIT_FOR_FUNDING_REQUEST,
+            fundingType: UNKNOWN_FUNDING_TYPE,
             requestedTotalFunds: bigNumberify(ownCommitment.allocation[0])
               .add(ownCommitment.allocation[1])
               .toHexString(),
@@ -238,6 +248,8 @@ const waitForPreFundSetupReducer = (
           lastCommitment: { commitment: action.commitment, signature: action.signature },
           penultimateCommitment: state.lastCommitment,
           fundingState: {
+            type: WAIT_FOR_FUNDING_REQUEST,
+            fundingType: UNKNOWN_FUNDING_TYPE,
             requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0])
               .add(opponentCommitment.allocation[1])
               .toHexString(),

@@ -3,9 +3,9 @@ interface BaseFundingState {
   requestedYourContribution: string;
 }
 
-export const UNKNOWN_FUNDING = 'FUNDING_TYPE.UNKNOWN';
+export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
 export interface SharedUnknownFundingState extends BaseFundingState {
-  fundingType: typeof UNKNOWN_FUNDING;
+  fundingType: typeof UNKNOWN_FUNDING_TYPE;
 }
 
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';

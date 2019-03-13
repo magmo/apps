@@ -1,9 +1,8 @@
-import { SharedFundingState, SharedUnknownFundingState } from './shared';
+import { SharedFundingState, SharedUnknownFundingState, UNKNOWN_FUNDING_TYPE } from './shared';
 import { DirectFundingState } from './directFunding';
 import { OutboxState } from '../../shared';
 
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
-export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
 
 export interface WaitForFundingRequest {
   type: typeof WAIT_FOR_FUNDING_REQUEST;
@@ -26,7 +25,7 @@ export function waitForFundingRequest<T extends SharedUnknownFundingState>(
 
 export * from './directFunding';
 export type FundingState = WaitForFundingRequest | DirectFundingState;
-export { SharedFundingState };
+export { SharedFundingState, UNKNOWN_FUNDING_TYPE };
 
 export interface DirectFundingStateWithSideEffects {
   fundingState: WaitForFundingRequest | DirectFundingState;

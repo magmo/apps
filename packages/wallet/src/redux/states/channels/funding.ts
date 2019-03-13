@@ -4,7 +4,6 @@
  */
 
 import { MaybeFunded, channelOpen } from './shared';
-import { DirectFundingState } from './funding/directFunding';
 
 // stage
 export const FUNDING = 'FUNDING';
@@ -26,7 +25,6 @@ export const SEND_FUNDING_DECLINED_MESSAGE = 'SEND_FUNDING_DECLINED_MESSAGE';
 export const ACKNOWLEDGE_FUNDING_DECLINED = 'ACKNOWLEDGE_FUNDING_DECLINED';
 
 interface BaseFundingChannelState extends MaybeFunded {
-  fundingState: DirectFundingState;
   funded: boolean; // Though this is computable from fundingState, it might be convenient to record this on the top-level of the channel state
 }
 
@@ -152,6 +150,7 @@ export function acknowledgeFundingDeclined<T extends BaseFundingChannelState>(
 }
 
 export type FundingChannelState =
+  | WaitForFundingRequest
   | WaitForFundingApproval
   | WaitForFundingAndPostFundSetup
   | WaitForFundingConfirmation
