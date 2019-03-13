@@ -1,18 +1,18 @@
-import * as states from '../../../states/channels/funding/directFunding';
+import * as states from '../../../states/channels/funding/';
 import * as actions from '../../../actions';
 
 import { unreachable } from '../../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../../utils/transaction-generator';
 
 import { bigNumberify } from 'ethers/utils';
-import { DIRECT_FUNDING } from '../../../states/channels/shared';
+import { DIRECT_FUNDING } from '../../../states/channels/funding/';
 
 export const directFundingStateReducer = (
-  state: states.DirectFundingState,
+  state: states.WaitForFundingRequest | states.DirectFundingState,
   action: actions.WalletAction,
   channelId: string,
   ourIndex: number,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (state.type) {
     //
     case states.WAIT_FOR_FUNDING_REQUEST:
@@ -51,7 +51,7 @@ export const directFundingStateReducer = (
 const waitForFundingRequestReducer = (
   state: states.WaitForFundingRequest,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_REQUESTED:
       return {
@@ -70,7 +70,7 @@ const waitForFundingApprovalReducer = (
   action: actions.WalletAction,
   ourIndex: number,
   channelId: string,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_APPROVED:
       if (ourIndex === 0) {
@@ -98,7 +98,7 @@ const waitForFundingApprovalReducer = (
 const aWaitForDepositToBeSentToMetaMaskReducer = (
   state: states.AWaitForDepositToBeSentToMetaMask,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { fundingState: states.aSubmitDepositInMetaMask(state) };
@@ -116,7 +116,7 @@ const aWaitForDepositToBeSentToMetaMaskReducer = (
 const aSubmitDepositToMetaMaskReducer = (
   state: states.ASubmitDepositInMetaMask,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       return {
@@ -139,7 +139,7 @@ const aSubmitDepositToMetaMaskReducer = (
 const aWaitForDepositConfirmationReducer = (
   state: states.AWaitForDepositConfirmation,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       return {
@@ -156,7 +156,7 @@ const aWaitForOpponentDepositReducer = (
   state: states.AWaitForOpponentDeposit,
   action: actions.WalletAction,
   channelId: string,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       if (channelId !== action.destination) {
@@ -176,7 +176,7 @@ const bWaitForOpponentDepositReducer = (
   state: states.BWaitForOpponentDeposit,
   action: actions.WalletAction,
   channelId: string,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       if (channelId !== action.destination) {
@@ -204,7 +204,7 @@ const bWaitForOpponentDepositReducer = (
 const bWaitForDepositToBeSentToMetaMaskReducer = (
   state: states.BWaitForDepositToBeSentToMetaMask,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return { fundingState: states.bSubmitDepositInMetaMask(state) };
@@ -216,7 +216,7 @@ const bWaitForDepositToBeSentToMetaMaskReducer = (
 const bSubmitDepositInMetaMaskReducer = (
   state: states.BSubmitDepositInMetaMask,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     // This case should not happen in theory, but it does in practice.
     // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
@@ -239,7 +239,7 @@ const aDepositTransactionFailedReducer = (
   state: states.ADepositTransactionFailed,
   action: actions.WalletAction,
   channelId: string,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       return {
@@ -258,7 +258,7 @@ const bDepositTransactionFailedReducer = (
   state: states.BDepositTransactionFailed,
   action: actions.WalletAction,
   channelId: string,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.RETRY_TRANSACTION:
       return {
@@ -274,7 +274,7 @@ const bDepositTransactionFailedReducer = (
 const bWaitForDepositConfirmationReducer = (
   state: states.BWaitForDepositConfirmation,
   action: actions.WalletAction,
-): states.FundingStateWithSideEffects => {
+): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
       return { fundingState: states.fundingConfirmed(state) };

@@ -1,13 +1,16 @@
 import { directFundingStateReducer } from '../channels/funding/directFunding';
 
-import * as states from '../../states/channels/funding/directFunding';
+import * as states from '../../states/channels/funding/';
 import * as actions from '../../actions';
 
 import * as scenarios from './test-scenarios';
 import { itTransitionsToStateType, itSendsThisTransaction, itSendsNoTransaction } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { SharedDirectFundingState } from '../../states/channels/shared';
+import {
+  SharedDirectFundingState,
+  SharedUnknownFundingState,
+} from '../../states/channels/funding/shared';
 
 const { channelId } = scenarios;
 
@@ -17,6 +20,12 @@ const YOUR_DEPOSIT_B = bigNumberify(TOTAL_REQUIRED)
   .sub(bigNumberify(YOUR_DEPOSIT_A))
   .toHexString();
 const ZERO = '0x00';
+
+const defaultsForUnknown: SharedUnknownFundingState = {
+  fundingType: states.UNKNOWN_FUNDING_TYPE,
+  requestedTotalFunds: TOTAL_REQUIRED,
+  requestedYourContribution: YOUR_DEPOSIT_A,
+};
 
 const defaultsForA: SharedDirectFundingState = {
   fundingType: states.DIRECT_FUNDING,
@@ -36,7 +45,7 @@ beforeEach(() => {});
 describe('start in WAIT_FOR_FUNDING_REQUEST', () => {
   describe('incoming action: FUNDING_REQUESTED', () => {
     // player A scenario
-    const state = states.waitForFundingRequest(defaultsForA);
+    const state = states.waitForFundingRequest(defaultsForUnknown);
     const action = actions.fundingRequested();
     const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
@@ -45,7 +54,7 @@ describe('start in WAIT_FOR_FUNDING_REQUEST', () => {
 
   describe('incoming action: FUNDING_REQUESTED', () => {
     // player B scenario
-    const state = states.waitForFundingRequest(defaultsForB);
+    const state = states.waitForFundingRequest(defaultsForUnknown);
     const action = actions.fundingRequested();
     const updatedState = directFundingStateReducer(state, action, channelId, 0);
 
