@@ -11,21 +11,21 @@ import {
   acknowledgeConclude,
   AcknowledgeConclude,
   ChannelState,
-} from '../../channel/state';
+} from './state';
 
-import { openingReducer } from './opening';
-import { fundingReducer } from './funding';
-import { runningReducer } from './running';
-import { challengingReducer } from './challenging';
-import { respondingReducer } from './responding';
-import { withdrawingReducer } from './withdrawing';
-import { closingReducer } from './closing';
-import { WalletAction, CONCLUDE_REQUESTED, COMMITMENT_RECEIVED } from '../../actions';
-import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';
-import { validCommitmentSignature } from '../../../utils/signing-utils';
+import { openingReducer } from '../reducers/channels/opening';
+import { fundingReducer } from '../reducers/channels/funding';
+import { runningReducer } from '../reducers/channels/running';
+import { challengingReducer } from '../reducers/channels/challenging';
+import { respondingReducer } from '../reducers/channels/responding';
+import { withdrawingReducer } from '../reducers/channels/withdrawing';
+import { closingReducer } from '../reducers/channels/closing';
+import { WalletAction, CONCLUDE_REQUESTED, COMMITMENT_RECEIVED } from '../actions';
+import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
+import { validCommitmentSignature } from '../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
-import { NextChannelState } from '../../sharedState';
+import { NextChannelState } from '../sharedState';
 
 export const channelReducer = (
   state: ChannelState,
