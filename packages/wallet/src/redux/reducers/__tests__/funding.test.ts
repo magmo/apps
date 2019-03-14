@@ -291,7 +291,7 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     itSendsNoTransaction(updatedState);
   });
 
-  describe('incoming action: second funding received event, without enough funds', () => {
+  describe('incoming action: transaction confirmed', () => {
     // player B scenario
     const createDepositTxMock = jest.fn().mockReturnValue(TX);
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
@@ -303,14 +303,11 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
       requestedYourContribution: B_CONTRIBUTION,
     });
     const state = startingState('B', fundingState);
-    const action = actions.fundingReceivedEvent(channelId, A_CONTRIBUTION, A_CONTRIBUTION);
+    const action = actions.transactionConfirmed();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
-    itTransitionsFundingStateToType(
-      fundingStates.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
-      updatedState,
-    );
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itTransitionsFundingStateToType(fundingStates.FUNDING_CONFIRMED, updatedState);
     itSendsNoTransaction(updatedState);
   });
 
@@ -321,7 +318,7 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
 
     const fundingState = fundingStates.bWaitForDepositConfirmation(fundingStateWithTx);
     const state = startingState('B', fundingState);
-    const action = actions.commitmentReceived(postFundCommitment2, '0x0');
+    const action = actions.commitmentReceived(postFundCommitment1, '0x0');
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
@@ -363,7 +360,7 @@ describe('start in WaitForFundingConfirmation', () => {
 
   describe('incoming action: funding event received, with enough funds', () => {
     // player B scenario
-    const fundingState = fundingStates.bWaitForOpponentDeposit(directFundingState);
+    const fundingState = fundingStates.bWaitForDepositConfirmation(fundingStateWithTx);
     const state = startingState('B', fundingState);
     const action = actions.transactionConfirmed();
     const updatedState = fundingReducer(state, action);
@@ -403,7 +400,10 @@ describe('start in AWaitForPostFundSetup', () => {
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
     const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
-    const state = states.aWaitForPostFundSetup(testDefaults);
+    const state = states.aWaitForPostFundSetup({
+      ...testDefaults,
+      fundingState: { ...directFundingState, type: fundingStates.FUNDING_CONFIRMED },
+    });
     const action = actions.commitmentReceived(postFundCommitment2, 'sig');
     const updatedState = fundingReducer(state, action);
 
