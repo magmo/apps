@@ -1,4 +1,4 @@
-import { initializedReducer } from '../initializedReducer';
+import { initializedReducer } from '../../initializedReducer';
 
 import * as states from '../../state';
 import * as actions from '../../actions';

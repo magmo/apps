@@ -8,10 +8,10 @@ import {
   WaitForAdjudicator,
   waitingForChannelInitialization,
   InitializedState,
-} from '../state';
+} from './state';
 
-import { WalletAction, LOGGED_IN, ADJUDICATOR_KNOWN } from '../actions';
-import { unreachable } from '../../utils/reducer-utils';
+import { WalletAction, LOGGED_IN, ADJUDICATOR_KNOWN } from './actions';
+import { unreachable } from '../utils/reducer-utils';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 
 export const initializingReducer = (
