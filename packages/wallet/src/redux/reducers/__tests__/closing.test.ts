@@ -1,4 +1,4 @@
-import { closingReducer } from '../channels/closing';
+import { closingReducer } from '../channels/closingReducer';
 
 import * as states from '../../channel/state';
 import * as actions from '../../actions';
