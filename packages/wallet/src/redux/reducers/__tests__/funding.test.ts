@@ -56,8 +56,8 @@ const directFundingState: fundingStates.DirectFundingState = {
   requestedTotalFunds: TOTAL_FUNDING,
   requestedYourContribution: ZERO,
 };
-const fundingStateWithTx = { ...directFundingState, transactionHash: TX };
 
+const fundingStateWithTx = { ...directFundingState, transactionHash: TX };
 const defaults = {
   address: asAddress,
   adjudicator: 'adj-address',
@@ -73,25 +73,29 @@ const defaults = {
 };
 
 const A_CONTRIBUTION = bigNumberify(400000000000000).toHexString();
+const B_CONTRIBUTION = bigNumberify(600000000000000).toHexString();
+const playerContribution = {
+  A: A_CONTRIBUTION,
+  B: B_CONTRIBUTION,
+};
+
+const playerFundingState = {
+  A: { ...directFundingState, requestedYourContribution: A_CONTRIBUTION },
+  B: { ...directFundingState, requestedYourContribution: B_CONTRIBUTION },
+};
+
 const defaultsA = {
   ...defaults,
   ourIndex: 0,
   privateKey: asPrivateKey,
-  fundingState: {
-    ...defaults.fundingState,
-    requestedYourContribution: A_CONTRIBUTION,
-  },
+  fundingState: playerFundingState.A,
 };
 
-const B_CONTRIBUTION = bigNumberify(600000000000000).toHexString();
 const defaultsB = {
   ...defaults,
   ourIndex: 1,
   privateKey: bsPrivateKey,
-  fundingState: {
-    ...defaults.fundingState,
-    requestedYourContribution: B_CONTRIBUTION,
-  } as fundingStates.DirectFundingState,
+  fundingState: playerFundingState.B,
 };
 
 const justReceivedPreFundSetupB = {
@@ -195,7 +199,11 @@ describe('start in WaitForFundingApproval', () => {
 
 describe('start in WaitForFundingAndPostFundSetup', () => {
   function startingState(player: 'A' | 'B', fundingState) {
-    const params = { ...playerDefaults[player], ...justReceivedPreFundSetupB, fundingState };
+    const params = {
+      ...playerDefaults[player],
+      ...justReceivedPreFundSetupB,
+      fundingState: { ...fundingState, requestedYourContribution: playerContribution[player] },
+    };
     return states.waitForFundingAndPostFundSetup(params);
   }
 
@@ -227,7 +235,10 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     });
 
     const fundingState = fundingStates.bWaitForOpponentDeposit(directFundingState);
-    const state = startingState('B', fundingState);
+    const state = startingState('B', {
+      ...fundingState,
+      requestedYourContribution: B_CONTRIBUTION,
+    });
     const action = actions.fundingReceivedEvent(channelId, A_CONTRIBUTION, A_CONTRIBUTION);
     const updatedState = fundingReducer(state, action);
 
