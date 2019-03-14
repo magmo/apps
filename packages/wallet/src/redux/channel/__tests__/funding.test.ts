@@ -1,4 +1,4 @@
-import { fundingReducer } from '../funding/reducer';
+import { fundingReducer } from '../fundingReducer';
 
 import * as states from '../state';
 import * as fundingStates from '../funding/state';
