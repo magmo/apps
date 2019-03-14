@@ -1,4 +1,4 @@
-import { runningReducer } from '../channels/runningReducer';
+import { runningReducer } from '../../channel/runningReducer';
 import * as scenarios from './test-scenarios';
 import * as states from '../../channel/state';
 import * as actions from '../../actions';

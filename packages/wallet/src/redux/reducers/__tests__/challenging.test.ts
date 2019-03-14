@@ -1,4 +1,4 @@
-import { challengingReducer } from '../channels/challengingReducer';
+import { challengingReducer } from '../../channel/challengingReducer';
 import * as scenarios from './test-scenarios';
 import * as states from '../../channel/state';
 import * as actions from '../../actions';

@@ -13,13 +13,13 @@ import {
   ChannelState,
 } from './state';
 
-import { openingReducer } from '../reducers/channels/openingReducer';
+import { openingReducer } from './openingReducer';
 import { fundingReducer } from '../reducers/channels/funding';
-import { runningReducer } from '../reducers/channels/runningReducer';
-import { challengingReducer } from '../reducers/channels/challengingReducer';
-import { respondingReducer } from '../reducers/channels/respondingReducer';
-import { withdrawingReducer } from '../reducers/channels/withdrawingReducer';
-import { closingReducer } from '../reducers/channels/closingReducer';
+import { runningReducer } from './runningReducer';
+import { challengingReducer } from './challengingReducer';
+import { respondingReducer } from './respondingReducer';
+import { withdrawingReducer } from './withdrawingReducer';
+import { closingReducer } from './closingReducer';
 import { WalletAction, CONCLUDE_REQUESTED, COMMITMENT_RECEIVED } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { validCommitmentSignature } from '../../utils/signing-utils';

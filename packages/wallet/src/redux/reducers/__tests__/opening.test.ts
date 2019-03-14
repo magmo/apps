@@ -5,7 +5,7 @@ import { itTransitionsToChannelStateType, itDoesntTransition, itSendsThisMessage
 import * as scenarios from './test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
-import { openingReducer } from '../channels/openingReducer';
+import { openingReducer } from '../../channel/openingReducer';
 
 const {
   asAddress,

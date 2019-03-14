@@ -1,4 +1,4 @@
-import { respondingReducer } from '../channels/respondingReducer';
+import { respondingReducer } from '../../channel/respondingReducer';
 
 import * as states from '../../channel/state';
 import * as actions from '../../actions';
