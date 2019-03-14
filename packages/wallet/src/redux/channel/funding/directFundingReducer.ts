@@ -1,11 +1,11 @@
-import * as states from '../../../channel/funding/state';
-import * as actions from '../../../actions';
+import * as states from './state';
+import * as actions from '../../actions';
 
-import { unreachable } from '../../../../utils/reducer-utils';
-import { createDepositTransaction } from '../../../../utils/transaction-generator';
+import { unreachable } from '../../../utils/reducer-utils';
+import { createDepositTransaction } from '../../../utils/transaction-generator';
 
 import { bigNumberify } from 'ethers/utils';
-import { DIRECT_FUNDING } from '../../../channel/funding/state';
+import { DIRECT_FUNDING } from './state';
 
 export const directFundingStateReducer = (
   state: states.WaitForFundingRequest | states.DirectFundingState,
