@@ -88,6 +88,7 @@ const waitForChannelReducer = (
             fundingType: UNKNOWN_FUNDING_TYPE,
             requestedTotalFunds: '0x0',
             requestedYourContribution: '0x0',
+            channelId: channelID(ownCommitment.channel),
           },
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
@@ -153,6 +154,7 @@ const waitForChannelReducer = (
             fundingType: UNKNOWN_FUNDING_TYPE,
             requestedTotalFunds: '0x0',
             requestedYourContribution: '0x0',
+            channelId: channelID(opponentCommitment.channel),
           },
         }),
         outboxState: { messageOutbox: validationSuccess() },
@@ -204,6 +206,7 @@ const waitForPreFundSetupReducer = (
               .add(ownCommitment.allocation[1])
               .toHexString(),
             requestedYourContribution: ownCommitment.allocation[state.ourIndex],
+            channelId: channelID(ownCommitment.channel),
           },
           funded: false,
         }),
@@ -254,6 +257,7 @@ const waitForPreFundSetupReducer = (
               .add(opponentCommitment.allocation[1])
               .toHexString(),
             requestedYourContribution: opponentCommitment.allocation[state.ourIndex],
+            channelId: channelID(action.commitment.channel),
           },
           funded: false,
         }),

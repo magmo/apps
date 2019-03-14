@@ -72,8 +72,8 @@ export interface FundingConfirmed extends SharedDirectFundingState {
 export function directFundingState<T extends SharedDirectFundingState>(
   params: T,
 ): SharedDirectFundingState {
-  const { requestedTotalFunds, requestedYourContribution } = params;
-  return { fundingType: DIRECT_FUNDING, requestedTotalFunds, requestedYourContribution };
+  const { requestedTotalFunds, requestedYourContribution, channelId } = params;
+  return { fundingType: DIRECT_FUNDING, requestedTotalFunds, requestedYourContribution, channelId };
 }
 
 export function waitForFundingApproval<T extends SharedDirectFundingState>(

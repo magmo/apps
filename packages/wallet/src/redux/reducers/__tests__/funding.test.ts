@@ -49,12 +49,14 @@ const unknownFundingState: WaitForFundingRequest = {
   fundingType: fundingStates.UNKNOWN_FUNDING_TYPE,
   requestedTotalFunds: TOTAL_FUNDING,
   requestedYourContribution: ZERO,
+  channelId,
 };
 const directFundingState: fundingStates.DirectFundingState = {
   type: fundingStates.WAIT_FOR_FUNDING_APPROVAL,
   fundingType: DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_FUNDING,
   requestedYourContribution: ZERO,
+  channelId,
 };
 
 const fundingStateWithTx = { ...directFundingState, transactionHash: TX };
