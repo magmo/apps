@@ -12,7 +12,7 @@ import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-eve
 import { ethers } from 'ethers';
 import { channelReducer } from './channels';
 import { unreachable } from '../../utils/reducer-utils';
-import { outboxStateReducer } from '.';
+import { outboxStateReducer } from '../reducer';
 
 export const initializedReducer = (
   state: InitializedState,

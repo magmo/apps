@@ -1,15 +1,15 @@
-import { WalletState, INITIALIZING, waitForLogin, WALLET_INITIALIZED } from '../state';
+import { WalletState, INITIALIZING, waitForLogin, WALLET_INITIALIZED } from './state';
 
-import { initializingReducer } from './initializing';
+import { initializingReducer } from './reducers/initializing';
 import {
   WalletAction,
   MESSAGE_SENT,
   TRANSACTION_SENT_TO_METAMASK,
   DISPLAY_MESSAGE_SENT,
-} from '../actions';
-import { unreachable } from '../../utils/reducer-utils';
-import { OutboxState } from '../outbox/sharedState';
-import { initializedReducer } from './initialized';
+} from './actions';
+import { unreachable } from '../utils/reducer-utils';
+import { OutboxState } from './outbox/sharedState';
+import { initializedReducer } from './reducers/initialized';
 
 const initialState = waitForLogin();
 
