@@ -49,7 +49,7 @@ export const fundingReducer = (
   const {
     channelState: updatedState,
     outboxState: internalReducerSideEffects,
-  } = internalFundingReducer(state, action);
+  } = channelStateReducer(state, action);
 
   // Apply the side effects
   outboxState = outboxStateReducer(outboxState, fundingSideEffects);
@@ -58,7 +58,7 @@ export const fundingReducer = (
   return { channelState: updatedState, outboxState };
 };
 
-const internalFundingReducer = (
+const channelStateReducer = (
   state: states.FundingChannelState,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
