@@ -13,10 +13,7 @@ import { CommitmentType } from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
 import { NextChannelState } from '../../sharedState';
-import {
-  WAIT_FOR_FUNDING_REQUEST,
-  UNKNOWN_FUNDING_TYPE,
-} from '../../states/channels/funding/index';
+import { WAIT_FOR_FUNDING_REQUEST, UNKNOWN_FUNDING_TYPE } from '../../channel/funding/state';
 
 export const openingReducer = (
   state: channelStates.OpeningState,

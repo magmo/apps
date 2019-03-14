@@ -17,7 +17,7 @@ import { handleSignatureAndValidationMessages } from '../../../../utils/state-ut
 import { NextChannelState } from '../../../sharedState';
 import { directFundingStateReducer } from './directFunding';
 import { outboxStateReducer } from '../..';
-import { FUNDING_CONFIRMED } from '../../../states/channels/funding/index';
+import { FUNDING_CONFIRMED } from '../../../channel/funding/state';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
