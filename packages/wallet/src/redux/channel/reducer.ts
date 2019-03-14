@@ -14,7 +14,7 @@ import {
 } from './state';
 
 import { openingReducer } from './openingReducer';
-import { fundingReducer } from '../reducers/channels/funding';
+import { fundingReducer } from '../channel/funding/reducer';
 import { runningReducer } from './runningReducer';
 import { challengingReducer } from './challengingReducer';
 import { respondingReducer } from './respondingReducer';
