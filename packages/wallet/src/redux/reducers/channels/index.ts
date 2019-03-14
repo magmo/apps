@@ -11,7 +11,7 @@ import {
   acknowledgeConclude,
   AcknowledgeConclude,
   ChannelState,
-} from '../../states/channels';
+} from '../../channel/state';
 
 import { openingReducer } from './opening';
 import { fundingReducer } from './funding';

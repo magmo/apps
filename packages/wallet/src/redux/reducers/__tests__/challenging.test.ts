@@ -1,6 +1,6 @@
 import { challengingReducer } from '../channels/challenging';
 import * as scenarios from './test-scenarios';
-import * as states from '../../states/channels';
+import * as states from '../../channel/state';
 import * as actions from '../../actions';
 import {
   itSendsATransaction,

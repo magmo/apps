@@ -1,4 +1,4 @@
-import * as states from '../../states/channels';
+import * as states from '../../channel/state';
 import { WalletAction } from '../../actions';
 import * as actions from '../../actions';
 import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';

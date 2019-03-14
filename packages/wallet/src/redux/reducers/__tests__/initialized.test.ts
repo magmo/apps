@@ -3,11 +3,11 @@ import { initializedReducer } from '../initialized';
 import * as states from '../../state';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as channelStates from '../../states/channels';
+import * as channelStates from '../../channel/state';
 import { INITIALIZING_CHANNEL, CHANNEL_INITIALIZED, channelInitialized } from '../../state';
 import * as scenarios from './test-scenarios';
 import { itSendsThisMessage } from './helpers';
-import { waitForUpdate } from '../../states/channels';
+import { waitForUpdate } from '../../channel/state';
 
 const defaults = {
   uid: 'uid',

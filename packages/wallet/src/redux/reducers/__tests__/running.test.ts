@@ -1,6 +1,6 @@
 import { runningReducer } from '../channels/running';
 import * as scenarios from './test-scenarios';
-import * as states from '../../states/channels';
+import * as states from '../../channel/state';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import {

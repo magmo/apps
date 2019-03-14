@@ -1,4 +1,4 @@
-import * as channelStates from '../../states/channels';
+import * as channelStates from '../../channel/state';
 import * as actions from '../../actions';
 import {
   signatureSuccess,
