@@ -1,6 +1,6 @@
 import { initializingReducer } from '../initializing';
 
-import * as states from '../../states';
+import * as states from '../../state';
 import * as actions from '../../actions';
 
 const defaults = { uid: 'uid', outboxState: {} };

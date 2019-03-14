@@ -25,7 +25,7 @@ import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-ut
 import { validCommitmentSignature } from '../../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
-import { NextChannelState } from '../../states/shared';
+import { NextChannelState } from '../../sharedState';
 
 export const channelReducer = (
   state: ChannelState,

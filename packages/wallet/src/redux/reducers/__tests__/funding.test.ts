@@ -19,7 +19,7 @@ import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
-import { NextChannelState } from '../../states/shared';
+import { NextChannelState } from '../../sharedState';
 import {
   WAIT_FOR_FUNDING_REQUEST,
   WaitForFundingRequest,

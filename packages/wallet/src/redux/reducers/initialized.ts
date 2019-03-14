@@ -5,7 +5,7 @@ import {
   INITIALIZING_CHANNEL,
   WAITING_FOR_CHANNEL_INITIALIZATION,
   channelInitialized,
-} from '../states';
+} from '../state';
 
 import { WalletAction, CHANNEL_INITIALIZED } from '../actions';
 import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';

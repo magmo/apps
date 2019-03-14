@@ -7,7 +7,7 @@ import { ourTurn, validTransition } from '../../../utils/reducer-utils';
 import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
 import { challengeRejected, showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
-import { NextChannelState } from '../../states/shared';
+import { NextChannelState } from '../../sharedState';
 
 export const runningReducer = (
   state: runningStates.RunningState,

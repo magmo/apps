@@ -8,7 +8,7 @@ import {
   WaitForAdjudicator,
   waitingForChannelInitialization,
   InitializedState,
-} from '../states';
+} from '../state';
 
 import { WalletAction, LOGGED_IN, ADJUDICATOR_KNOWN } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';

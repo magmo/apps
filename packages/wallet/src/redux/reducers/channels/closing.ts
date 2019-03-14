@@ -20,7 +20,7 @@ import {
   createConcludeAndWithdrawTransaction,
   ConcludeAndWithdrawArgs,
 } from '../../../utils/transaction-generator';
-import { NextChannelState } from '../../states/shared';
+import { NextChannelState } from '../../sharedState';
 
 export const closingReducer = (
   state: channelStates.ClosingState,

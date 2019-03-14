@@ -1,4 +1,4 @@
-import { WalletState, INITIALIZING, waitForLogin, WALLET_INITIALIZED } from '../states';
+import { WalletState, INITIALIZING, waitForLogin, WALLET_INITIALIZED } from '../state';
 
 import { initializingReducer } from './initializing';
 import {
@@ -8,7 +8,7 @@ import {
   DISPLAY_MESSAGE_SENT,
 } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
-import { OutboxState } from '../states/shared';
+import { OutboxState } from '../sharedState';
 import { initializedReducer } from './initialized';
 
 const initialState = waitForLogin();

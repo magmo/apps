@@ -1,5 +1,5 @@
 import { ChannelState } from '../../states/channels';
-import { NextChannelState, OutboxState } from '../../states/shared';
+import { NextChannelState, OutboxState } from '../../sharedState';
 import { Commitment } from 'fmg-core';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 
