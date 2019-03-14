@@ -17,6 +17,7 @@ import { handleSignatureAndValidationMessages } from '../../../../utils/state-ut
 import { NextChannelState } from '../../../states/shared';
 import { directFundingStateReducer } from './directFunding';
 import { outboxStateReducer } from '../..';
+import { FUNDING_CONFIRMED } from '../../../states/channels/funding/index';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
@@ -44,7 +45,8 @@ export const fundingReducer = (
     state.channelId,
     state.ourIndex,
   );
-  state = { ...state, fundingState };
+
+  state = { ...state, fundingState, funded: fundingState.type === FUNDING_CONFIRMED };
 
   const {
     channelState: updatedState,
