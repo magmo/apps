@@ -1,14 +1,14 @@
-import { closingReducer } from '../../channel/closingReducer';
+import { closingReducer } from '../closingReducer';
 
-import * as states from '../../channel/state';
+import * as states from '../state';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as scenarios from './test-scenarios';
+import * as scenarios from '../../__tests__/test-scenarios';
 import {
   itTransitionsToChannelStateType,
   itSendsThisMessage,
   itSendsThisTransaction,
-} from './helpers';
+} from '../../__tests__/helpers';
 
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as ReducerUtil from '../../../utils/reducer-utils';

@@ -1,11 +1,15 @@
-import * as states from '../../channel/state';
+import * as states from '../state';
 import * as actions from '../../actions';
 
-import { itTransitionsToChannelStateType, itDoesntTransition, itSendsThisMessage } from './helpers';
-import * as scenarios from './test-scenarios';
+import {
+  itTransitionsToChannelStateType,
+  itDoesntTransition,
+  itSendsThisMessage,
+} from '../../__tests__/helpers';
+import * as scenarios from '../../__tests__/test-scenarios';
 import * as SigningUtil from '../../../utils/signing-utils';
 import { validationFailure, SIGNATURE_FAILURE } from 'magmo-wallet-client';
-import { openingReducer } from '../../channel/openingReducer';
+import { openingReducer } from '../openingReducer';
 
 const {
   asAddress,

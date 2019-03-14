@@ -1,6 +1,6 @@
-import { challengingReducer } from '../../channel/challengingReducer';
-import * as scenarios from './test-scenarios';
-import * as states from '../../channel/state';
+import { challengingReducer } from '../challengingReducer';
+import * as scenarios from '../../__tests__/test-scenarios';
+import * as states from '../state';
 import * as actions from '../../actions';
 import {
   itSendsATransaction,
@@ -8,7 +8,7 @@ import {
   itDoesntTransition,
   itSendsThisMessage,
   itSendsThisDisplayEvent,
-} from './helpers';
+} from '../../__tests__/helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { hideWallet, challengeComplete } from 'magmo-wallet-client';
 

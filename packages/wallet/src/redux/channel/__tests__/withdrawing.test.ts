@@ -1,10 +1,10 @@
-import { withdrawingReducer } from '../../channel/withdrawingReducer';
+import { withdrawingReducer } from '../withdrawingReducer';
 
-import * as states from '../../channel/state';
+import * as states from '../state';
 import * as actions from '../../actions';
 
-import { itTransitionsToChannelStateType } from './helpers';
-import * as scenarios from './test-scenarios';
+import { itTransitionsToChannelStateType } from '../../__tests__/helpers';
+import * as scenarios from '../../__tests__/test-scenarios';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as SigningUtil from '../../../utils/signing-utils';
 
