@@ -95,6 +95,7 @@ const waitForFundingApprovalReducer = (
       return { fundingState: state };
   }
 };
+
 const aWaitForDepositToBeSentToMetaMaskReducer = (
   state: states.AWaitForDepositToBeSentToMetaMask,
   action: actions.WalletAction,
@@ -159,14 +160,11 @@ const aWaitForOpponentDepositReducer = (
 ): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
-      if (channelId !== action.destination) {
+      if (sufficientlyFundedToProgress('A', state, action, channelId)) {
+        return { fundingState: states.fundingConfirmed(state) };
+      } else {
         return { fundingState: state };
       }
-      if (bigNumberify(action.totalForDestination).lt(state.requestedTotalFunds)) {
-        return { fundingState: state };
-      }
-
-      return { fundingState: states.fundingConfirmed({ ...state }) };
     default:
       return { fundingState: state };
   }
@@ -282,3 +280,23 @@ const bWaitForDepositConfirmationReducer = (
       return { fundingState: state };
   }
 };
+
+function sufficientlyFundedToProgress(player: 'A' | 'B', state, action, channelId) {
+  if (channelId !== action.destination) {
+    return false;
+  }
+  if (player === 'A' && bigNumberify(action.totalForDestination).gte(state.requestedTotalFunds)) {
+    return true;
+  }
+
+  if (
+    player === 'B' &&
+    bigNumberify(action.totalForDestination).gte(
+      bigNumberify(state.requestedTotalFunds).sub(bigNumberify(state.requestedYourContribution)),
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}

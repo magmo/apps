@@ -17,6 +17,7 @@ import { handleSignatureAndValidationMessages } from '../../../../utils/state-ut
 import { NextChannelState } from '../../../states/shared';
 import { directFundingStateReducer } from './directFunding';
 import { outboxStateReducer } from '../..';
+import { FUNDING_CONFIRMED } from '../../../states/channels/funding/index';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
@@ -44,12 +45,13 @@ export const fundingReducer = (
     state.channelId,
     state.ourIndex,
   );
-  state = { ...state, fundingState };
+
+  state = { ...state, fundingState, funded: fundingState.type === FUNDING_CONFIRMED };
 
   const {
     channelState: updatedState,
     outboxState: internalReducerSideEffects,
-  } = internalFundingReducer(state, action);
+  } = channelStateReducer(state, action);
 
   // Apply the side effects
   outboxState = outboxStateReducer(outboxState, fundingSideEffects);
@@ -58,7 +60,7 @@ export const fundingReducer = (
   return { channelState: updatedState, outboxState };
 };
 
-const internalFundingReducer = (
+const channelStateReducer = (
   state: states.FundingChannelState,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
@@ -71,8 +73,7 @@ const internalFundingReducer = (
 
     // Funding is ongoing
     case states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
-      // TODO: Need to define waitForFundingAndPostFundSetup reducer
-      return { channelState: state };
+      return waitForFundingAndPostFundSetupReducer(state, action);
     case states.WAIT_FOR_FUNDING_CONFIRMATION:
       return waitForFundingConfirmationReducer(state, action);
     case states.A_WAIT_FOR_POST_FUND_SETUP:
@@ -139,6 +140,107 @@ const approveFundingReducer = (
   }
 };
 
+const waitForFundingAndPostFundSetupReducer = (
+  state: states.WaitForFundingAndPostFundSetup,
+  action: actions.WalletAction,
+): NextChannelState<states.OpenedChannelState> => {
+  switch (action.type) {
+    case actions.MESSAGE_RECEIVED:
+      if (action.data === 'FundingDeclined') {
+        return {
+          channelState: states.acknowledgeFundingDeclined({ ...state }),
+        };
+      } else {
+        return { channelState: state };
+      }
+    case actions.COMMITMENT_RECEIVED:
+      const { commitment: postFundState, signature: theirSignature } = action;
+      if (!validTransitionToPostFundState(state, postFundState, theirSignature)) {
+        return { channelState: state };
+      }
+      if (state.ourIndex === 0) {
+        return {
+          channelState: states.waitForFundingConfirmation({
+            ...state,
+            turnNum: postFundState.turnNum,
+            lastCommitment: { commitment: postFundState, signature: theirSignature },
+            penultimateCommitment: state.lastCommitment,
+          }),
+        };
+      } else {
+        const {
+          postFundSetupCommitment: commitment,
+          commitmentSignature: signature,
+          // Don't send the message yet, since funding hasn't been confirmed?
+        } = composePostFundCommitment(state);
+        return {
+          channelState: states.waitForFundingConfirmation({
+            ...state,
+            turnNum: postFundState.turnNum + 1,
+            penultimateCommitment: { commitment: postFundState, signature },
+            lastCommitment: { commitment, signature },
+          }),
+        };
+      }
+
+    case actions.FUNDING_RECEIVED_EVENT:
+      if (state.funded) {
+        const {
+          postFundSetupCommitment,
+          commitmentSignature,
+          sendCommitmentAction,
+        } = composePostFundCommitment(state);
+
+        const params = {
+          ...state,
+          turnNum: postFundSetupCommitment.turnNum,
+          penultimateCommitment: state.lastCommitment,
+          lastCommitment: {
+            commitment: postFundSetupCommitment,
+            signature: commitmentSignature,
+          },
+        };
+
+        if (state.ourIndex === 0) {
+          return {
+            channelState: states.aWaitForPostFundSetup(params),
+            outboxState: {
+              messageOutbox: sendCommitmentAction,
+            },
+          };
+        } else {
+          return {
+            channelState: states.bWaitForPostFundSetup({ ...state }),
+            outboxState: {
+              messageOutbox: sendCommitmentAction,
+            },
+          };
+        }
+      } else {
+        return { channelState: state };
+      }
+
+    case actions.TRANSACTION_CONFIRMED:
+      // WARNING: This is pretty brittle
+      if (state.funded) {
+        // Player B can now confirm funding and is only waiting on post fund setup
+        if (state.ourIndex === 0) {
+          return {
+            channelState: states.aWaitForPostFundSetup({ ...state }),
+          };
+        } else {
+          return {
+            channelState: states.bWaitForPostFundSetup({ ...state }),
+          };
+        }
+      } else {
+        return { channelState: state };
+      }
+    default:
+      return { channelState: state };
+  }
+};
+
 const aWaitForPostFundSetupReducer = (
   state: states.AWaitForPostFundSetup,
   action: actions.WalletAction,
@@ -160,6 +262,8 @@ const aWaitForPostFundSetupReducer = (
           }),
         };
       } else {
+        // This _should_ be unreachable, since you would only arrive in the
+        // aWaitForPostFundSetup state after receiving funding confirmation
         return {
           channelState: states.waitForFundingConfirmation({
             ...state,
@@ -168,32 +272,6 @@ const aWaitForPostFundSetupReducer = (
             penultimateCommitment: state.lastCommitment,
           }),
         };
-      }
-    default:
-      return { channelState: state };
-  }
-};
-
-const waitForFundingConfirmationReducer = (
-  state: states.WaitForFundingConfirmation,
-  action: actions.WalletAction,
-): NextChannelState<states.OpenedChannelState> => {
-  switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
-      if (state.funded) {
-        // Since we're in the WaitForFundingConfirmation state, we've already received the
-        // opponent's post-fund-setup commitment.
-        // However, we haven't sent it yet, so we send it now.
-        // We don't need to update the turnNum on state, as it's already been done.
-        const { sendCommitmentAction } = composePostFundCommitment(state);
-        return {
-          channelState: states.acknowledgeFundingSuccess({
-            ...state,
-          }),
-          outboxState: { messageOutbox: sendCommitmentAction },
-        };
-      } else {
-        return { channelState: state };
       }
     default:
       return { channelState: state };
@@ -226,6 +304,34 @@ const bWaitForPostFundSetupReducer = (
         }),
         outboxState: { messageOutbox: sendCommitmentAction },
       };
+    default:
+      return { channelState: state };
+  }
+};
+
+const waitForFundingConfirmationReducer = (
+  state: states.WaitForFundingConfirmation,
+  action: actions.WalletAction,
+): NextChannelState<states.OpenedChannelState> => {
+  switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+    case actions.TRANSACTION_CONFIRMED:
+      if (state.funded) {
+        // Since we're in the WaitForFundingConfirmation state, we've already received the
+        // opponent's post-fund-setup commitment.
+        // However, we haven't sent it yet, so we send it now.
+        // We don't need to update the turnNum on state, as it's already been done.
+        const { sendCommitmentAction } = composePostFundCommitment(state);
+        return {
+          channelState: states.acknowledgeFundingSuccess({
+            ...state,
+          }),
+          outboxState: { messageOutbox: sendCommitmentAction },
+        };
+      } else {
+        return { channelState: state };
+      }
+
     default:
       return { channelState: state };
   }
@@ -312,7 +418,10 @@ const validTransitionToPostFundState = (
 };
 
 const composePostFundCommitment = (
-  state: states.WaitForFundingConfirmation | states.BWaitForPostFundSetup,
+  state:
+    | states.WaitForFundingConfirmation
+    | states.WaitForFundingAndPostFundSetup
+    | states.BWaitForPostFundSetup,
 ) => {
   const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
   const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
