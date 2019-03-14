@@ -3,8 +3,8 @@ import {
   UNKNOWN_FUNDING_TYPE,
   BaseFundingState,
   SharedUnknownFundingState,
-} from '../../states/channels/funding/sharedState';
-import { DirectFundingState } from '../../states/channels/funding/directFundingState';
+} from './sharedState';
+import { DirectFundingState } from './directFundingState';
 import { OutboxState } from '../../sharedState';
 
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
@@ -26,7 +26,7 @@ export function waitForFundingRequest<T extends BaseFundingState>(
   };
 }
 
-export * from '../../states/channels/funding/directFundingState';
+export * from './directFundingState';
 export type FundingState = WaitForFundingRequest | DirectFundingState;
 export { SharedFundingState, UNKNOWN_FUNDING_TYPE };
 

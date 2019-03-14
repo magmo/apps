@@ -14,7 +14,7 @@ import { bigNumberify } from 'ethers/utils';
 import {
   SharedDirectFundingState,
   SharedUnknownFundingState,
-} from '../../../../states/channels/funding/sharedState';
+} from '../../../../channel/funding/sharedState';
 
 const { channelId } = scenarios;
 
