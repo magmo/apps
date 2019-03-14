@@ -274,6 +274,7 @@ const bWaitForDepositConfirmationReducer = (
   action: actions.WalletAction,
 ): states.DirectFundingStateWithSideEffects => {
   switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
     case actions.TRANSACTION_CONFIRMED:
       return { fundingState: states.fundingConfirmed(state) };
     default:
