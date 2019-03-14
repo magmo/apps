@@ -203,6 +203,23 @@ const waitForFundingAndPostFundSetupReducer = (
       } else {
         return { channelState: state };
       }
+
+    case actions.TRANSACTION_CONFIRMED:
+      // WARNING: This is pretty brittle
+      if (state.funded) {
+        // Player B can now confirm funding and is only waiting on post fund setup
+        if (state.ourIndex === 0) {
+          return {
+            channelState: states.aWaitForPostFundSetup({ ...state }),
+          };
+        } else {
+          return {
+            channelState: states.bWaitForPostFundSetup({ ...state }),
+          };
+        }
+      } else {
+        return { channelState: state };
+      }
     default:
       return { channelState: state };
   }
