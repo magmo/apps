@@ -15,7 +15,7 @@ export const itSendsThisMessage = (
   typeOnly = true,
 ) => {
   if (typeOnly) {
-    it(`sends message ${message.type}`, () => {
+    it(`sends message ${message}`, () => {
       expect(state.outboxState!.messageOutbox!.type).toEqual(message);
     });
   } else {
