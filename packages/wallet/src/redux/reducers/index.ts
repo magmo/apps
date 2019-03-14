@@ -8,7 +8,7 @@ import {
   DISPLAY_MESSAGE_SENT,
 } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
-import { OutboxState } from '../sharedState';
+import { OutboxState } from '../outbox/sharedState';
 import { initializedReducer } from './initialized';
 
 const initialState = waitForLogin();
