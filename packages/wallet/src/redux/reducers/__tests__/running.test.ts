@@ -1,7 +1,6 @@
 import { runningReducer } from '../channels/running';
 import * as scenarios from './test-scenarios';
 import * as states from '../../states/channels';
-import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import {
@@ -11,7 +10,6 @@ import {
   itSendsThisMessage,
 } from './helpers';
 import * as SigningUtil from '../../../utils/signing-utils';
-import { bigNumberify } from 'ethers/utils';
 
 const {
   asAddress,
@@ -24,6 +22,7 @@ const {
   channelNonce,
   channelId,
   channel,
+  fundingState,
 } = scenarios;
 
 const defaults = {
@@ -38,11 +37,7 @@ const defaults = {
   adjudicator: 'adj-address',
   challengeExpiry: new Date(),
   networkId: 2132,
-  fundingState: fundingStates.fundingConfirmed({
-    fundingType: fundingStates.DIRECT_FUNDING,
-    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  }),
+  fundingState,
   funded: false,
 };
 

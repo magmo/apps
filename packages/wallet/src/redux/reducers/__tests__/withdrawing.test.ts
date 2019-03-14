@@ -1,14 +1,12 @@
 import { withdrawingReducer } from '../channels/withdrawing';
 
 import * as states from '../../states/channels';
-import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 
 import { itTransitionsToChannelStateType } from './helpers';
 import * as scenarios from './test-scenarios';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as SigningUtil from '../../../utils/signing-utils';
-import { bigNumberify } from 'ethers/utils';
 
 const {
   asPrivateKey,
@@ -18,6 +16,7 @@ const {
   channelId,
   channelNonce,
   libraryAddress,
+  fundingState,
 } = scenarios;
 
 const defaults = {
@@ -36,11 +35,7 @@ const defaults = {
   networkId: 23213,
   transactionHash: '0x0',
   userAddress: '0x0',
-  fundingState: fundingStates.fundingConfirmed({
-    fundingType: fundingStates.DIRECT_FUNDING,
-    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  }),
+  fundingState,
   funded: false,
 };
 

@@ -1,7 +1,6 @@
 import { challengingReducer } from '../channels/challenging';
 import * as scenarios from './test-scenarios';
 import * as states from '../../states/channels';
-import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 import {
   itSendsATransaction,
@@ -12,7 +11,6 @@ import {
 } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { hideWallet, challengeComplete } from 'magmo-wallet-client';
-import { bigNumberify } from 'ethers/utils';
 
 const {
   asPrivateKey,
@@ -22,6 +20,7 @@ const {
   libraryAddress,
   gameCommitment1,
   gameCommitment2,
+  fundingState,
 } = scenarios;
 
 const defaults = {
@@ -40,11 +39,7 @@ const defaults = {
   networkId: 2323,
   challengeExpiry: 1,
   transactionHash: '0x0',
-  fundingState: fundingStates.fundingConfirmed({
-    fundingType: fundingStates.DIRECT_FUNDING,
-    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  }),
+  fundingState,
   funded: true,
 };
 

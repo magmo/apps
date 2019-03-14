@@ -1,13 +1,11 @@
 import { initializedReducer } from '../initialized';
 
 import * as states from '../../states';
-import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as channelStates from '../../states/channels';
 import { INITIALIZING_CHANNEL, CHANNEL_INITIALIZED, channelInitialized } from '../../states';
 import * as scenarios from './test-scenarios';
-import { bigNumberify } from 'ethers/utils';
 import { itSendsThisMessage } from './helpers';
 import { waitForUpdate } from '../../states/channels';
 
@@ -64,6 +62,7 @@ describe('When the channel reducer declares a side effect', () => {
     channelNonce,
     channelId,
     channel,
+    fundingState,
   } = scenarios;
   const params = {
     uid: 'uid',
@@ -77,11 +76,7 @@ describe('When the channel reducer declares a side effect', () => {
     adjudicator: 'adj-address',
     challengeExpiry: new Date(),
     networkId: 2132,
-    fundingState: fundingStates.fundingConfirmed({
-      fundingType: fundingStates.DIRECT_FUNDING,
-      requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-      requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-    }),
+    fundingState,
     funded: false,
   };
 

@@ -29,12 +29,14 @@ const defaultsForUnknown: SharedUnknownFundingState = {
   fundingType: states.UNKNOWN_FUNDING_TYPE,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
+  channelId,
 };
 
 const defaultsForA: SharedDirectFundingState = {
   fundingType: states.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
+  channelId,
 };
 
 const defaultsForB: SharedDirectFundingState = {

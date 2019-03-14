@@ -1,7 +1,6 @@
 import { closingReducer } from '../channels/closing';
 
 import * as states from '../../states/channels';
-import * as fundingStates from '../../states/channels/funding/index';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from './test-scenarios';
@@ -14,8 +13,8 @@ import {
 import * as SigningUtil from '../../../utils/signing-utils';
 import * as ReducerUtil from '../../../utils/reducer-utils';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
-import { bigNumberify } from 'ethers/utils';
 import { Commitment } from 'fmg-core/lib/commitment';
+import { bigNumberify } from 'ethers/utils';
 
 const {
   asAddress,
@@ -26,6 +25,7 @@ const {
   concludeCommitment1,
   concludeCommitment2,
   channelId,
+  fundingState,
 } = scenarios;
 const defaults = {
   adjudicator: 'adj-address',
@@ -36,11 +36,7 @@ const defaults = {
   participants: channel.participants as [string, string],
   uid: 'uid',
   transactionHash: '0x0',
-  fundingState: fundingStates.fundingConfirmed({
-    fundingType: fundingStates.DIRECT_FUNDING,
-    requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-    requestedYourContribution: bigNumberify(0).toHexString(),
-  }),
+  fundingState,
   funded: true,
 };
 

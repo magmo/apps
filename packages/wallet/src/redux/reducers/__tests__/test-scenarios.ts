@@ -13,6 +13,14 @@ export const channel: Channel = { channelType: libraryAddress, nonce: channelNon
 
 export const channelId = channelID(channel);
 
+export const fundingState = {
+  type: 'FUNDING_CONFIRMED' as 'FUNDING_CONFIRMED',
+  fundingType: 'FUNDING_TYPE.DIRECT' as 'FUNDING_TYPE.DIRECT',
+  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
+  requestedYourContribution: bigNumberify(500000000000000).toHexString(),
+  channelId,
+};
+
 const oneOne = [bigNumberify(1).toHexString(), bigNumberify(1).toHexString()];
 export const postFundCommitment1: Commitment = {
   channel,

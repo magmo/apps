@@ -26,6 +26,7 @@ const defaultFundingState: fundingStates.SharedFundingState = {
   fundingType: fundingStates.DIRECT_FUNDING,
   requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
   requestedYourContribution: bigNumberify(500000000000000).toHexString(),
+  channelId: 'channel id',
 };
 
 const fundingStateWithTX = { ...defaultFundingState, transactionHash: 'TX_HASH' };
