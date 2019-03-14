@@ -154,18 +154,34 @@ const waitForFundingAndPostFundSetupReducer = (
         return { channelState: state };
       }
     case actions.COMMITMENT_RECEIVED:
-      const { commitment: postFundState, signature } = action;
-      if (!validTransitionToPostFundState(state, postFundState, signature)) {
+      const { commitment: postFundState, signature: theirSignature } = action;
+      if (!validTransitionToPostFundState(state, postFundState, theirSignature)) {
         return { channelState: state };
       }
-      return {
-        channelState: states.waitForFundingConfirmation({
-          ...state,
-          turnNum: postFundState.turnNum,
-          lastCommitment: { commitment: postFundState, signature },
-          penultimateCommitment: state.lastCommitment,
-        }),
-      };
+      if (state.ourIndex === 0) {
+        return {
+          channelState: states.waitForFundingConfirmation({
+            ...state,
+            turnNum: postFundState.turnNum,
+            lastCommitment: { commitment: postFundState, signature: theirSignature },
+            penultimateCommitment: state.lastCommitment,
+          }),
+        };
+      } else {
+        const {
+          postFundSetupCommitment: commitment,
+          commitmentSignature: signature,
+          // Don't send the message yet, since funding hasn't been confirmed?
+        } = composePostFundCommitment(state);
+        return {
+          channelState: states.waitForFundingConfirmation({
+            ...state,
+            turnNum: postFundState.turnNum + 1,
+            penultimateCommitment: { commitment: postFundState, signature },
+            lastCommitment: { commitment, signature },
+          }),
+        };
+      }
 
     case actions.FUNDING_RECEIVED_EVENT:
       if (state.funded) {
