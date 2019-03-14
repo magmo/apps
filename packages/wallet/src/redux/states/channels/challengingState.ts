@@ -4,7 +4,7 @@ import {
   TransactionExists,
   MaybeFunded,
   channelOpen,
-} from './shared';
+} from './sharedState';
 export const CHALLENGING = 'CHALLENGING';
 
 export const APPROVE_CHALLENGE = 'APPROVE_CHALLENGE';

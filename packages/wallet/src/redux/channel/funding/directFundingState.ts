@@ -1,5 +1,5 @@
 import { SharedDirectFundingState } from './sharedState';
-import { TransactionExists } from '../../states/channels/shared';
+import { TransactionExists } from '../../states/channels/sharedState';
 
 // state types
 export const WAIT_FOR_FUNDING_APPROVAL = 'WAIT_FOR_FUNDING_APPROVAL';
