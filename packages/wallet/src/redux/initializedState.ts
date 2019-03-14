@@ -1,5 +1,5 @@
 import { AdjudicatorKnown, adjudicatorKnown } from './sharedState';
-import { SharedChannelState } from './states/channels/sharedState';
+import { SharedChannelState } from './channel/sharedState';
 import { waitForChannel, ChannelState, WaitForChannel } from './channel/state';
 
 interface BaseInitializingChannel extends AdjudicatorKnown {

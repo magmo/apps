@@ -1,6 +1,6 @@
-import * as runningStates from '../../states/channels/runningState';
-import * as challengingStates from '../../states/channels/challengingState';
-import * as respondingStates from '../../states/channels/respondingState';
+import * as runningStates from '../../channel/runningState';
+import * as challengingStates from '../../channel/challengingState';
+import * as respondingStates from '../../channel/respondingState';
 import * as actions from '../../actions';
 
 import { ourTurn, validTransition } from '../../../utils/reducer-utils';

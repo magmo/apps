@@ -1,10 +1,10 @@
-import { OpeningState } from '../states/channels/openingState';
-import { RunningState } from '../states/channels/runningState';
-import { FundingChannelState } from '../states/channels/fundingState';
-import { ChallengingState } from '../states/channels/challengingState';
-import { RespondingState } from '../states/channels/respondingState';
-import { WithdrawingState } from '../states/channels/withdrawingState';
-import { ClosingState } from '../states/channels/closingState';
+import { OpeningState } from './openingState';
+import { RunningState } from './runningState';
+import { FundingChannelState } from './fundingState';
+import { ChallengingState } from './challengingState';
+import { RespondingState } from './respondingState';
+import { WithdrawingState } from './withdrawingState';
+import { ClosingState } from './closingState';
 
 export type OpenedChannelState =
   | FundingChannelState
@@ -16,10 +16,10 @@ export type OpenedChannelState =
 
 export type ChannelState = OpeningState | OpenedChannelState;
 
-export * from '../states/channels/openingState';
-export * from '../states/channels/runningState';
-export * from '../states/channels/fundingState';
-export * from '../states/channels/challengingState';
-export * from '../states/channels/respondingState';
-export * from '../states/channels/withdrawingState';
-export * from '../states/channels/closingState';
+export * from './openingState';
+export * from './runningState';
+export * from './fundingState';
+export * from './challengingState';
+export * from './respondingState';
+export * from './withdrawingState';
+export * from './closingState';
