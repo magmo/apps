@@ -315,6 +315,7 @@ const waitForFundingConfirmationReducer = (
 ): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
+    case actions.TRANSACTION_CONFIRMED:
       if (state.funded) {
         // Since we're in the WaitForFundingConfirmation state, we've already received the
         // opponent's post-fund-setup commitment.
@@ -330,6 +331,7 @@ const waitForFundingConfirmationReducer = (
       } else {
         return { channelState: state };
       }
+
     default:
       return { channelState: state };
   }
