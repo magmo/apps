@@ -21,7 +21,7 @@ import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from '../../sharedState';
 import { WAIT_FOR_FUNDING_REQUEST, WaitForFundingRequest } from '../../channel/funding/state';
-import { DIRECT_FUNDING } from '../../states/channels/funding/shared';
+import { DIRECT_FUNDING } from '../../states/channels/funding/sharedState';
 
 const {
   asAddress,

@@ -1,4 +1,4 @@
-import { SharedDirectFundingState } from './shared';
+import { SharedDirectFundingState } from './sharedState';
 import { TransactionExists } from '../shared';
 
 // state types
