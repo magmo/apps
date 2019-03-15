@@ -15,12 +15,10 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { NextChannelState } from '../../shared/state';
-import { directFundingStateReducer } from '../fundingState/directFunding/reducer';
 import { outboxStateReducer } from '../../reducer';
-import { FUNDING_CONFIRMED } from '../fundingState/state';
 
 export const fundingReducer = (
-  state: states.FundingChannelState,
+  state: states.FundingState,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
@@ -36,32 +34,19 @@ export const fundingReducer = (
 
   let outboxState = {};
 
-  // We modify the funding state directly, before applying the rest-of-state reducers.
-  // This lets the rest-of-state reducer decide on what side effects they should have based on
-  // the outcome of funding-related actions on the current funding status.
-  const { fundingState, outboxState: fundingSideEffects } = directFundingStateReducer(
-    state.fundingState,
-    action,
-    state.channelId,
-    state.ourIndex,
-  );
-
-  state = { ...state, fundingState, funded: fundingState.type === FUNDING_CONFIRMED };
-
   const {
     channelState: updatedState,
     outboxState: internalReducerSideEffects,
   } = channelStateReducer(state, action);
 
   // Apply the side effects
-  outboxState = outboxStateReducer(outboxState, fundingSideEffects);
   outboxState = outboxStateReducer(outboxState, internalReducerSideEffects);
 
   return { channelState: updatedState, outboxState };
 };
 
 const channelStateReducer = (
-  state: states.FundingChannelState,
+  state: states.FundingState,
   action: actions.WalletAction,
 ): NextChannelState<states.ChannelState> => {
   switch (state.type) {
@@ -395,7 +380,7 @@ const acknowledgeFundingSuccessReducer = (
 };
 
 const validTransitionToPostFundState = (
-  state: states.FundingChannelState,
+  state: states.FundingState,
   data: Commitment,
   signature: string | undefined,
 ) => {

@@ -80,13 +80,7 @@ const waitForChannelReducer = (
           channelNonce: ownCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: ownCommitment, signature },
-          fundingState: {
-            type: WAIT_FOR_FUNDING_REQUEST,
-            fundingType: UNKNOWN_FUNDING_TYPE,
-            requestedTotalFunds: '0x0',
-            requestedYourContribution: '0x0',
-            channelId: channelID(ownCommitment.channel),
-          },
+          funded: false,
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
       };
@@ -146,13 +140,7 @@ const waitForChannelReducer = (
           channelNonce: opponentCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
-          fundingState: {
-            type: WAIT_FOR_FUNDING_REQUEST,
-            fundingType: UNKNOWN_FUNDING_TYPE,
-            requestedTotalFunds: '0x0',
-            requestedYourContribution: '0x0',
-            channelId: channelID(opponentCommitment.channel),
-          },
+          funded: false,
         }),
         outboxState: { messageOutbox: validationSuccess() },
       };
