@@ -2,7 +2,7 @@ import { OpeningState } from './opening/state';
 import { RunningState } from './runningState';
 import { FundingChannelState } from './funding/state';
 import { ChallengingState } from './challenging/state';
-import { RespondingState } from './respondingState';
+import { RespondingState } from './responding/state';
 import { WithdrawingState } from './withdrawingState';
 import { ClosingState } from './closing/state';
 
@@ -20,6 +20,6 @@ export * from './opening/state';
 export * from './runningState';
 export * from './funding/state';
 export * from './challenging/state';
-export * from './respondingState';
+export * from './responding/state';
 export * from './withdrawingState';
 export * from './closing/state';

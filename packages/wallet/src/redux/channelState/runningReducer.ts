@@ -1,6 +1,6 @@
 import * as runningStates from './runningState';
 import * as challengingStates from './challenging/state';
-import * as respondingStates from './respondingState';
+import * as respondingStates from './responding/state';
 import * as actions from '../actions';
 
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
