@@ -15,7 +15,7 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { NextChannelState } from '../../shared/state';
-import { outboxStateReducer } from '../../reducer';
+import { applySideEffects } from '../../outbox';
 
 export const fundingReducer = (
   state: states.FundingState,
@@ -34,13 +34,13 @@ export const fundingReducer = (
 
   let outboxState = {};
 
-  const {
-    channelState: updatedState,
-    outboxState: internalReducerSideEffects,
-  } = channelStateReducer(state, action);
+  const { channelState: updatedState, outboxState: sideEffects } = channelStateReducer(
+    state,
+    action,
+  );
 
   // Apply the side effects
-  outboxState = outboxStateReducer(outboxState, internalReducerSideEffects);
+  outboxState = applySideEffects(outboxState, sideEffects);
 
   return { channelState: updatedState, outboxState };
 };
