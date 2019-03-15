@@ -1,15 +1,15 @@
-import { challengingReducer } from '../challengingReducer';
-import * as scenarios from '../../__tests__/test-scenarios';
-import * as states from '../state';
-import * as actions from '../../actions';
+import { challengingReducer } from '../reducer';
+import * as scenarios from '../../../__tests__/test-scenarios';
+import * as states from '../../state';
+import * as actions from '../../../actions';
 import {
   itSendsATransaction,
   itTransitionsToChannelStateType,
   itDoesntTransition,
   itSendsThisMessage,
   itSendsThisDisplayEvent,
-} from '../../__tests__/helpers';
-import * as TransactionGenerator from '../../../utils/transaction-generator';
+} from '../../../__tests__/helpers';
+import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import { hideWallet, challengeComplete } from 'magmo-wallet-client';
 
 const {

@@ -1,5 +1,5 @@
 import * as runningStates from './runningState';
-import * as challengingStates from './challengingState';
+import * as challengingStates from './challenging/state';
 import * as respondingStates from './respondingState';
 import * as actions from '../actions';
 
