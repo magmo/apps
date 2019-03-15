@@ -2,14 +2,14 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import WalletContainer from '../containers/Wallet';
 import { Provider } from 'react-redux';
-import * as walletStates from '../redux/states';
-import * as channelStates from '../redux/states/channels';
-import * as fundingStates from '../redux/states/channels/funding/index';
+import * as walletStates from '../redux/state';
+import * as channelStates from '../redux/channelState/state';
+import * as fundingStates from '../redux/channelState/fundingState/state';
 import '../index.scss';
-import * as scenarios from '../redux/reducers/__tests__/test-scenarios';
+import * as scenarios from '../redux/__tests__/test-scenarios';
 import { bigNumberify } from 'ethers/utils';
 import NetworkStatus from '../components/NetworkStatus';
-import { fundingConfirmed } from '../redux/states/channels/funding/index';
+import { fundingConfirmed } from '../redux/channelState/fundingState/state';
 
 const {
   asAddress,
