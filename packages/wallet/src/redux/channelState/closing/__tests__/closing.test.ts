@@ -1,18 +1,18 @@
-import { closingReducer } from '../closingReducer';
+import { closingReducer } from '../reducer';
 
-import * as states from '../state';
-import * as actions from '../../actions';
+import * as states from '../../state';
+import * as actions from '../../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as scenarios from '../../__tests__/test-scenarios';
+import * as scenarios from '../../../__tests__/test-scenarios';
 import {
   itTransitionsToChannelStateType,
   itSendsThisMessage,
   itSendsThisTransaction,
-} from '../../__tests__/helpers';
+} from '../../../__tests__/helpers';
 
-import * as SigningUtil from '../../../utils/signing-utils';
-import * as ReducerUtil from '../../../utils/reducer-utils';
-import * as TransactionGenerator from '../../../utils/transaction-generator';
+import * as SigningUtil from '../../../../utils/signing-utils';
+import * as ReducerUtil from '../../../../utils/reducer-utils';
+import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import { Commitment } from 'fmg-core/lib/commitment';
 import { bigNumberify } from 'ethers/utils';
 

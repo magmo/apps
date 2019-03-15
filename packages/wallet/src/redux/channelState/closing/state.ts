@@ -4,7 +4,7 @@ import {
   TransactionExists,
   UserAddressExists,
   userAddressExists,
-} from './sharedState';
+} from '../sharedState';
 
 // stage
 export const CLOSING = 'CLOSING';

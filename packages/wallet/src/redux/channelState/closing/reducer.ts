@@ -1,13 +1,13 @@
-import * as channelStates from './state';
-import * as actions from '../actions';
+import * as channelStates from '../state';
+import * as actions from '../../actions';
 
-import { WalletAction } from '../actions';
-import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
+import { WalletAction } from '../../actions';
+import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';
 import {
   signCommitment,
   signVerificationData,
   validCommitmentSignature,
-} from '../../utils/signing-utils';
+} from '../../../utils/signing-utils';
 import {
   commitmentRelayRequested,
   closeSuccess,
@@ -19,8 +19,8 @@ import { CommitmentType, Commitment } from 'fmg-core';
 import {
   createConcludeAndWithdrawTransaction,
   ConcludeAndWithdrawArgs,
-} from '../../utils/transaction-generator';
-import { NextChannelState } from '../sharedState';
+} from '../../../utils/transaction-generator';
+import { NextChannelState } from '../../sharedState';
 
 export const closingReducer = (
   state: channelStates.ClosingState,

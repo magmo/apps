@@ -19,7 +19,7 @@ import { runningReducer } from './runningReducer';
 import { challengingReducer } from './challenging/reducer';
 import { respondingReducer } from './respondingReducer';
 import { withdrawingReducer } from './withdrawingReducer';
-import { closingReducer } from './closingReducer';
+import { closingReducer } from './closing/reducer';
 import { WalletAction, CONCLUDE_REQUESTED, COMMITMENT_RECEIVED } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { validCommitmentSignature } from '../../utils/signing-utils';
