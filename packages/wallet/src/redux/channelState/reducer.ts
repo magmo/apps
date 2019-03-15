@@ -18,7 +18,7 @@ import { fundingReducer } from './funding/reducer';
 import { runningReducer } from './running/reducer';
 import { challengingReducer } from './challenging/reducer';
 import { respondingReducer } from './responding/reducer';
-import { withdrawingReducer } from './withdrawingReducer';
+import { withdrawingReducer } from './withdrawing/reducer';
 import { closingReducer } from './closing/reducer';
 import { WalletAction, CONCLUDE_REQUESTED, COMMITMENT_RECEIVED } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';

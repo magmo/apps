@@ -3,7 +3,7 @@ import { RunningState } from './running/state';
 import { FundingChannelState } from './funding/state';
 import { ChallengingState } from './challenging/state';
 import { RespondingState } from './responding/state';
-import { WithdrawingState } from './withdrawingState';
+import { WithdrawingState } from './withdrawing/state';
 import { ClosingState } from './closing/state';
 
 export type OpenedChannelState =
@@ -21,5 +21,5 @@ export * from './running/state';
 export * from './funding/state';
 export * from './challenging/state';
 export * from './responding/state';
-export * from './withdrawingState';
+export * from './withdrawing/state';
 export * from './closing/state';

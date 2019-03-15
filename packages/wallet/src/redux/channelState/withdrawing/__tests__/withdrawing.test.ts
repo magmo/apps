@@ -1,12 +1,12 @@
-import { withdrawingReducer } from '../withdrawingReducer';
+import { withdrawingReducer } from '../reducer';
 
-import * as states from '../state';
-import * as actions from '../../actions';
+import * as states from '../../state';
+import * as actions from '../../../actions';
 
-import { itTransitionsToChannelStateType } from '../../__tests__/helpers';
-import * as scenarios from '../../__tests__/test-scenarios';
-import * as TransactionGenerator from '../../../utils/transaction-generator';
-import * as SigningUtil from '../../../utils/signing-utils';
+import { itTransitionsToChannelStateType } from '../../../__tests__/helpers';
+import * as scenarios from '../../../__tests__/test-scenarios';
+import * as TransactionGenerator from '../../../../utils/transaction-generator';
+import * as SigningUtil from '../../../../utils/signing-utils';
 
 const {
   asPrivateKey,
