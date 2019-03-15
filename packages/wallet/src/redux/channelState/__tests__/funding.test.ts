@@ -1,7 +1,7 @@
 import { fundingReducer } from '../fundingReducer';
 
 import * as states from '../state';
-import * as fundingStates from '../funding/state';
+import * as fundingStates from '../fundingState/state';
 import * as actions from '../../actions';
 
 import * as scenarios from '../../__tests__/test-scenarios';
@@ -20,8 +20,8 @@ import * as SigningUtil from '../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { NextChannelState } from '../../sharedState';
-import { WAIT_FOR_FUNDING_REQUEST, WaitForFundingRequest } from '../funding/state';
-import { DIRECT_FUNDING } from '../funding/sharedState';
+import { WAIT_FOR_FUNDING_REQUEST, WaitForFundingRequest } from '../fundingState/state';
+import { DIRECT_FUNDING } from '../fundingState/sharedState';
 
 const {
   asAddress,

@@ -1,5 +1,5 @@
 import { WalletAction } from './actions';
-import { SharedChannelState } from './channel/sharedState';
+import { SharedChannelState } from './channelState/sharedState';
 import { OutboxState } from './outbox/sharedState';
 
 export interface NextChannelState<T extends SharedChannelState> {

@@ -1,4 +1,4 @@
-import { ChannelState } from '../redux/channel/state';
+import { ChannelState } from '../redux/channelState/state';
 import {
   OWN_COMMITMENT_RECEIVED,
   OPPONENT_COMMITMENT_RECEIVED,

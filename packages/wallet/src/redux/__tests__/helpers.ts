@@ -1,4 +1,4 @@
-import { ChannelState } from '../channel/state';
+import { ChannelState } from '../channelState/state';
 import { OutboxState } from '../outbox/sharedState';
 import { NextChannelState } from '../sharedState';
 import { Commitment } from 'fmg-core';
