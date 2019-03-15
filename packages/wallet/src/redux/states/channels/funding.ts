@@ -160,10 +160,3 @@ export type FundingChannelState =
   | AcknowledgeFundingSuccess // <-- at this point, a message might need to be sent
   | SendFundingDeclinedMessage
   | AcknowledgeFundingDeclined;
-
-/**
- * Question: Is it true that there is exactly one state S such that player B should send
- * their post fund setup upon reaching S?
- *
- * Answer: Yes, and that is whatever you call AcknowledgeFundingSuccess
- */
