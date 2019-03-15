@@ -1,8 +1,8 @@
 import * as states from '../state';
-import * as actions from '../../../actions';
+import * as actions from '../../actions';
 
-import { unreachable } from '../../../../utils/reducer-utils';
-import { createDepositTransaction } from '../../../../utils/transaction-generator';
+import { unreachable } from '../../../utils/reducer-utils';
+import { createDepositTransaction } from '../../../utils/transaction-generator';
 
 import { bigNumberify } from 'ethers/utils';
 import { DIRECT_FUNDING } from '../state';

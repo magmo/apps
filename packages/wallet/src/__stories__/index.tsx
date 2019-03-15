@@ -4,12 +4,12 @@ import WalletContainer from '../containers/Wallet';
 import { Provider } from 'react-redux';
 import * as walletStates from '../redux/state';
 import * as channelStates from '../redux/channelState/state';
-import * as fundingStates from '../redux/channelState/fundingState/state';
+import * as fundingStates from '../redux/fundingState/state';
 import '../index.scss';
 import * as scenarios from '../redux/__tests__/test-scenarios';
 import { bigNumberify } from 'ethers/utils';
 import NetworkStatus from '../components/NetworkStatus';
-import { fundingConfirmed } from '../redux/channelState/fundingState/state';
+import { fundingConfirmed } from '../redux/fundingState/state';
 
 const {
   asAddress,
