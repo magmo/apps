@@ -97,10 +97,17 @@ export const itIncreasesTurnNumBy = (
 };
 
 export const itDispatchesThisAction = (action, state: { outboxState?: OutboxState }) => {
-  it(`dispatches ${action.type}`, () => {
+  it(`dispatches ${action.type || 'this action'}`, () => {
     // The actionOutbox should only dispatch internal actions
-    expect(action.type).toMatch('WALLET.INTERNAL');
-    expect(state.outboxState!.actionOutbox).toEqual(action);
+    if (action.type) {
+      // We were passed the whole action
+      expect(action.type).toMatch('WALLET.INTERNAL');
+      expect(state.outboxState!.actionOutbox).toMatchObject(action);
+    } else {
+      // We were just passed the type
+      expect(action).toMatch('WALLET.INTERNAL');
+      expect(state.outboxState!.actionOutbox!.type).toEqual(action);
+    }
   });
 };
 
