@@ -3,7 +3,7 @@
  * the actual funding of the channel.
  */
 
-import { MaybeFunded, channelOpen } from './sharedState';
+import { MaybeFunded, channelOpen } from '../sharedState';
 
 // stage
 export const FUNDING = 'FUNDING';

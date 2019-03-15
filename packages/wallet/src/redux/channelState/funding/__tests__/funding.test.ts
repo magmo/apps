@@ -1,10 +1,10 @@
-import { fundingReducer } from '../fundingReducer';
+import { fundingReducer } from '../reducer';
 
-import * as states from '../state';
-import * as fundingStates from '../fundingState/state';
-import * as actions from '../../actions';
+import * as states from '../../state';
+import * as fundingStates from '../../fundingState/state';
+import * as actions from '../../../actions';
 
-import * as scenarios from '../../__tests__/test-scenarios';
+import * as scenarios from '../../../__tests__/test-scenarios';
 import {
   itTransitionsToChannelStateType,
   itIncreasesTurnNumBy,
@@ -13,15 +13,15 @@ import {
   expectThisCommitmentSent,
   itSendsThisTransaction,
   itSendsNoTransaction,
-} from '../../__tests__/helpers';
-import * as TransactionGenerator from '../../../utils/transaction-generator';
+} from '../../../__tests__/helpers';
+import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as SigningUtil from '../../../utils/signing-utils';
+import * as SigningUtil from '../../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
-import { NextChannelState } from '../../sharedState';
-import { WAIT_FOR_FUNDING_REQUEST, WaitForFundingRequest } from '../fundingState/state';
-import { DIRECT_FUNDING } from '../fundingState/sharedState';
+import { NextChannelState } from '../../../sharedState';
+import { WAIT_FOR_FUNDING_REQUEST, WaitForFundingRequest } from '../../fundingState/state';
+import { DIRECT_FUNDING } from '../../fundingState/sharedState';
 
 const {
   asAddress,

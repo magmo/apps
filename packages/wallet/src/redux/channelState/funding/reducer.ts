@@ -1,5 +1,5 @@
-import * as states from './state';
-import * as actions from '../actions';
+import * as states from '../state';
+import * as actions from '../../actions';
 import {
   messageRelayRequested,
   fundingSuccess,
@@ -9,15 +9,15 @@ import {
   commitmentRelayRequested,
 } from 'magmo-wallet-client/lib/wallet-events';
 
-import { unreachable, validTransition } from '../../utils/reducer-utils';
-import { signCommitment, validCommitmentSignature } from '../../utils/signing-utils';
+import { unreachable, validTransition } from '../../../utils/reducer-utils';
+import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
 
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
-import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
-import { NextChannelState } from '../sharedState';
-import { directFundingStateReducer } from './fundingState/directFundingReducer';
-import { outboxStateReducer } from '../reducer';
-import { FUNDING_CONFIRMED } from './fundingState/state';
+import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
+import { NextChannelState } from '../../sharedState';
+import { directFundingStateReducer } from '../fundingState/directFundingReducer';
+import { outboxStateReducer } from '../../reducer';
+import { FUNDING_CONFIRMED } from '../fundingState/state';
 
 export const fundingReducer = (
   state: states.FundingChannelState,
