@@ -1,10 +1,5 @@
-import {
-  ChallengeExists,
-  challengeExists,
-  TransactionExists,
-  ChannelOpen,
-  channelOpen,
-} from '../shared/state';
+import { ChallengeExists, challengeExists, ChannelOpen, channelOpen } from '../shared/state';
+import { TransactionExists } from '../../shared/state';
 export const CHALLENGING = 'CHALLENGING';
 
 export const APPROVE_CHALLENGE = 'APPROVE_CHALLENGE';

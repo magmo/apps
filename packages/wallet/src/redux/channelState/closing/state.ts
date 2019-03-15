@@ -1,10 +1,5 @@
-import {
-  ChannelOpen,
-  channelOpen,
-  TransactionExists,
-  UserAddressExists,
-  userAddressExists,
-} from '../shared/state';
+import { ChannelOpen, channelOpen, UserAddressExists, userAddressExists } from '../shared/state';
+import { TransactionExists } from '../../shared/state';
 
 // stage
 export const CLOSING = 'CLOSING';

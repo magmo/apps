@@ -23,6 +23,10 @@ export interface AdjudicatorKnown extends LoggedIn {
   adjudicator: string;
 }
 
+export interface TransactionExists {
+  transactionHash: string;
+}
+
 // creators
 export function base<T extends SharedWalletState>(params: T): SharedWalletState {
   const { outboxState, channelState } = params;

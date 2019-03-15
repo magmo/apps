@@ -26,9 +26,6 @@ export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
 }
 
-export interface TransactionExists {
-  transactionHash: string;
-}
 export interface ChallengeExists extends ChannelOpen {
   challengeExpiry?: number;
 }
