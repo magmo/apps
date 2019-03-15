@@ -184,17 +184,33 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
   });
 
+  describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
+    const state = startingState('A');
+    const action = actions.internal.directFundingConfirmed(channelId);
+    const updatedState = fundingReducer(state, action);
+
+    itTransitionsToChannelStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
+  });
+
   describe('incoming action: message received', () => {
-    // player B scenario
+    const state = startingState('B');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const state = startingState('B');
     const action = actions.commitmentReceived(postFundCommitment1, '0x0');
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
     itIncreasesTurnNumBy(2, state, updatedState);
+  });
+
+  describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
+    const state = startingState('B');
+    const action = actions.internal.directFundingConfirmed(channelId);
+    const updatedState = fundingReducer(state, action);
+
+    itTransitionsToChannelStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
   });
 });
 

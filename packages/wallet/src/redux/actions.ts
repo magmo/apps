@@ -422,4 +422,5 @@ export type WalletAction =
   | WithdrawalApproved
   | WithdrawalRejected
   | WithdrawalRequested
-  | WithdrawalSuccessAcknowledged;
+  | WithdrawalSuccessAcknowledged
+  | internal.InternalAction;

@@ -183,8 +183,8 @@ const waitForFundingAndPostFundSetupReducer = (
         };
       }
 
-    case actions.FUNDING_RECEIVED_EVENT:
-      if (state.funded) {
+    case actions.internal.DIRECT_FUNDING_CONFIRMED:
+      if (action.channelId === state.channelId) {
         const {
           postFundSetupCommitment,
           commitmentSignature,
@@ -314,7 +314,6 @@ const waitForFundingConfirmationReducer = (
   action: actions.WalletAction,
 ): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
     case actions.TRANSACTION_CONFIRMED:
       if (state.funded) {
         // Since we're in the WaitForFundingConfirmation state, we've already received the
