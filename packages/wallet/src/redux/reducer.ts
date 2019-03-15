@@ -28,6 +28,10 @@ export const walletReducer = (
   if (action.type === TRANSACTION_SENT_TO_METAMASK) {
     sideEffects.transactionOutbox = undefined;
   }
+
+  // For the moment, only one action should ever be put in the actionOutbox,
+  // so it's always safe to clear it.
+  sideEffects.actionOutbox = undefined;
   state = { ...state, outboxState: applySideEffects(state.outboxState, sideEffects) };
 
   switch (state.stage) {
