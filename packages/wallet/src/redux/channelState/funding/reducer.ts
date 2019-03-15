@@ -1,4 +1,5 @@
 import * as states from '../state';
+import { addHex } from '../../../utils/hex-utils';
 import * as actions from '../../actions';
 import {
   messageRelayRequested,
@@ -100,8 +101,22 @@ const approveFundingReducer = (
 ): NextChannelState<states.OpenedChannelState> => {
   switch (action.type) {
     case actions.FUNDING_APPROVED:
+      const totalFundingRequired = state.lastCommitment.commitment.allocation.reduce(addHex);
+      const safeToDepositLevel =
+        state.ourIndex === 0
+          ? '0x00'
+          : state.lastCommitment.commitment.allocation.slice(0, state.ourIndex).reduce(addHex);
+      const ourDeposit = state.lastCommitment.commitment.allocation[state.ourIndex];
       return {
         channelState: states.waitForFundingAndPostFundSetup(state),
+        outboxState: {
+          actionOutbox: actions.internal.directFundingRequested(
+            state.channelId,
+            totalFundingRequired,
+            safeToDepositLevel,
+            ourDeposit,
+          ),
+        },
       };
     case actions.FUNDING_REJECTED:
       const sendFundingDeclinedAction = messageRelayRequested(

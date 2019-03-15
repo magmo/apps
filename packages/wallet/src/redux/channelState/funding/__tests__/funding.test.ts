@@ -9,11 +9,13 @@ import {
   itIncreasesTurnNumBy,
   itSendsThisMessage,
   expectThisCommitmentSent,
-  itSendsNoTransaction,
+  itDispatchesThisAction,
+  itDispatchesNoAction,
 } from '../../../__tests__/helpers';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
+import { addHex } from '../../../../utils/hex-utils';
 
 const {
   asAddress,
@@ -27,6 +29,7 @@ const {
   postFundCommitment1,
   postFundCommitment2,
   channelId,
+  twoThree,
 } = scenarios;
 
 const defaults = {
@@ -116,17 +119,24 @@ describe('start in WaitForFundingApproval', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+    itDispatchesThisAction(
+      actions.internal.directFundingRequested(
+        channelId,
+        twoThree.reduce(addHex),
+        '0x00',
+        twoThree[0],
+      ),
+      updatedState,
+    );
   });
-
   describe('incoming action: funding rejected', () => {
-    // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.approveFunding(testDefaults);
     const action = actions.fundingRejected();
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.SEND_FUNDING_DECLINED_MESSAGE, updatedState);
-    itSendsNoTransaction(updatedState);
+    itDispatchesNoAction(updatedState);
   });
 
   describe('incoming action: Funding declined message received', () => {
@@ -135,6 +145,26 @@ describe('start in WaitForFundingApproval', () => {
     const action = actions.messageReceived('FundingDeclined');
     const updatedState = fundingReducer(state, action);
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
+    itDispatchesNoAction(updatedState);
+  });
+
+  describe('incoming action: funding approved', () => {
+    // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
+    const state = states.approveFunding(testDefaults);
+    const action = actions.fundingApproved();
+    const updatedState = fundingReducer(state, action);
+
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+    itDispatchesThisAction(
+      actions.internal.directFundingRequested(
+        channelId,
+        twoThree.reduce(addHex),
+        twoThree[0],
+        twoThree[1],
+      ),
+      updatedState,
+    );
   });
 });
 
