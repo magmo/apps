@@ -13,7 +13,7 @@ import {
   ChannelState,
 } from './state';
 
-import { openingReducer } from './openingReducer';
+import { openingReducer } from './opening/reducer';
 import { fundingReducer } from './funding/reducer';
 import { runningReducer } from './runningReducer';
 import { challengingReducer } from './challenging/reducer';
