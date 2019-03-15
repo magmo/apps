@@ -1,17 +1,17 @@
-import { directFundingStateReducer } from '../directFundingReducer';
+import { directFundingStateReducer } from '../reducer';
 
-import * as states from '../state';
-import * as actions from '../../../actions';
+import * as states from '../../state';
+import * as actions from '../../../../actions';
 
-import * as scenarios from '../../../__tests__/test-scenarios';
+import * as scenarios from '../../../../__tests__/test-scenarios';
 import {
   itTransitionsToStateType,
   itSendsThisTransaction,
   itSendsNoTransaction,
-} from '../../../__tests__/helpers';
-import * as TransactionGenerator from '../../../../utils/transaction-generator';
+} from '../../../../__tests__/helpers';
+import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { SharedDirectFundingState, SharedUnknownFundingState } from '../sharedState';
+import { SharedDirectFundingState, SharedUnknownFundingState } from '../../sharedState';
 
 const { channelId } = scenarios;
 

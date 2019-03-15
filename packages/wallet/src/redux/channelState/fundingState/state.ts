@@ -4,7 +4,7 @@ import {
   BaseFundingState,
   SharedUnknownFundingState,
 } from './sharedState';
-import { DirectFundingState } from './directFundingState';
+import { DirectFundingState } from './directFunding/state';
 import { OutboxState } from '../../outbox/sharedState';
 
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
@@ -26,7 +26,7 @@ export function waitForFundingRequest<T extends BaseFundingState>(
   };
 }
 
-export * from './directFundingState';
+export * from './directFunding/state';
 export type FundingState = WaitForFundingRequest | DirectFundingState;
 export { SharedFundingState, UNKNOWN_FUNDING_TYPE };
 
