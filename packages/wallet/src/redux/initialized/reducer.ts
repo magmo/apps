@@ -12,7 +12,7 @@ import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-eve
 import { ethers } from 'ethers';
 import { channelReducer } from '../channelState/reducer';
 import { unreachable } from '../../utils/reducer-utils';
-import { outboxStateReducer } from '../reducer';
+import { applySideEffects } from '../outbox';
 
 export const initializedReducer = (
   state: InitializedState,
@@ -42,7 +42,7 @@ export const initializedReducer = (
         action,
         state.unhandledAction,
       );
-      state = { ...state, outboxState: outboxStateReducer(state.outboxState, sideEffects) };
+      state = { ...state, outboxState: applySideEffects(state.outboxState, sideEffects) };
       return channelInitialized({
         ...state,
         channelState,
