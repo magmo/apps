@@ -1,4 +1,4 @@
-import { SharedWalletState, base, LoggedIn, loggedIn } from './sharedState';
+import { SharedWalletState, base, LoggedIn, loggedIn } from '../sharedState';
 
 export const INITIALIZING = 'INITIALIZING';
 

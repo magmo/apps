@@ -7,12 +7,12 @@ import {
   channelInitialized,
 } from './state';
 
-import { WalletAction, CHANNEL_INITIALIZED } from './actions';
+import { WalletAction, CHANNEL_INITIALIZED } from '../actions';
 import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { ethers } from 'ethers';
-import { channelReducer } from './channel/reducer';
-import { unreachable } from '../utils/reducer-utils';
-import { outboxStateReducer } from './reducer';
+import { channelReducer } from '../channel/reducer';
+import { unreachable } from '../../utils/reducer-utils';
+import { outboxStateReducer } from '../reducer';
 
 export const initializedReducer = (
   state: InitializedState,

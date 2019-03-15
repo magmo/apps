@@ -1,9 +1,9 @@
 import { SharedWalletState } from './sharedState';
-import { InitializingState } from './initializingState';
-import { InitializedState } from './initializedState';
+import { InitializingState } from './initializing/state';
+import { InitializedState } from './initialized/state';
 
-export * from './initializedState';
-export * from './initializingState';
+export * from './initialized/state';
+export * from './initializing/state';
 
 export { SharedWalletState };
 

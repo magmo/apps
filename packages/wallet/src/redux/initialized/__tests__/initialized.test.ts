@@ -1,13 +1,13 @@
-import { initializedReducer } from '../initializedReducer';
+import { initializedReducer } from '../reducer';
 
-import * as states from '../state';
-import * as actions from '../actions';
+import * as states from '../../state';
+import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as channelStates from '../channel/state';
-import { INITIALIZING_CHANNEL, CHANNEL_INITIALIZED, channelInitialized } from '../state';
-import * as scenarios from './test-scenarios';
-import { itSendsThisMessage } from './helpers';
-import { waitForUpdate } from '../channel/state';
+import * as channelStates from '../../channel/state';
+import { INITIALIZING_CHANNEL, CHANNEL_INITIALIZED, channelInitialized } from '../../state';
+import * as scenarios from '../../__tests__/test-scenarios';
+import { itSendsThisMessage } from '../../__tests__/helpers';
+import { waitForUpdate } from '../../channel/state';
 
 const defaults = {
   uid: 'uid',
