@@ -154,7 +154,8 @@ export type FundingChannelState =
   | WaitForFundingApproval
   | WaitForFundingAndPostFundSetup
   | WaitForFundingConfirmation
-  // ^^^ PlayerA should never let PlayerB get into this state, as it lets PlayerB move to the application phase with no real value at stake, giving them a chance to take the real value that's backing PlayerA's stake.
+  // ^^^ PlayerA should never let PlayerB get into this state, as it lets PlayerB move to the application phase
+  // with no real value at stake, giving them a chance to take the real value that's backing PlayerA's stake.
   | AWaitForPostFundSetup
   | BWaitForPostFundSetup
   | AcknowledgeFundingSuccess // <-- at this point, a message might need to be sent
