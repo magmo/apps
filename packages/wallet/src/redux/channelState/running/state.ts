@@ -1,4 +1,4 @@
-import { MaybeFunded, channelOpen } from './sharedState';
+import { MaybeFunded, channelOpen } from '../sharedState';
 
 // stage
 export const RUNNING = 'RUNNING';

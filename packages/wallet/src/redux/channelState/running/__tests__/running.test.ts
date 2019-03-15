@@ -1,15 +1,15 @@
-import { runningReducer } from '../runningReducer';
-import * as scenarios from '../../__tests__/test-scenarios';
-import * as states from '../state';
-import * as actions from '../../actions';
+import { runningReducer } from '../reducer';
+import * as scenarios from '../../../__tests__/test-scenarios';
+import * as states from '../../state';
+import * as actions from '../../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import {
   itDoesntTransition,
   itIncreasesTurnNumBy,
   itTransitionsToChannelStateType,
   itSendsThisMessage,
-} from '../../__tests__/helpers';
-import * as SigningUtil from '../../../utils/signing-utils';
+} from '../../../__tests__/helpers';
+import * as SigningUtil from '../../../../utils/signing-utils';
 
 const {
   asAddress,

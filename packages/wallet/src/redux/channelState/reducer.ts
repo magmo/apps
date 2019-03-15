@@ -15,7 +15,7 @@ import {
 
 import { openingReducer } from './opening/reducer';
 import { fundingReducer } from './funding/reducer';
-import { runningReducer } from './runningReducer';
+import { runningReducer } from './running/reducer';
 import { challengingReducer } from './challenging/reducer';
 import { respondingReducer } from './responding/reducer';
 import { withdrawingReducer } from './withdrawingReducer';

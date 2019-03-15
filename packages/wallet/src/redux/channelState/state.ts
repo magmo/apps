@@ -1,5 +1,5 @@
 import { OpeningState } from './opening/state';
-import { RunningState } from './runningState';
+import { RunningState } from './running/state';
 import { FundingChannelState } from './funding/state';
 import { ChallengingState } from './challenging/state';
 import { RespondingState } from './responding/state';
@@ -17,7 +17,7 @@ export type OpenedChannelState =
 export type ChannelState = OpeningState | OpenedChannelState;
 
 export * from './opening/state';
-export * from './runningState';
+export * from './running/state';
 export * from './funding/state';
 export * from './challenging/state';
 export * from './responding/state';
