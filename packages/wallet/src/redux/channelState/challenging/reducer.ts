@@ -10,7 +10,7 @@ import {
 } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { bigNumberify } from 'ethers/utils';
-import { NextChannelState } from '../../sharedState';
+import { NextChannelState } from '../../shared/state';
 
 export const challengingReducer = (
   state: states.ChallengingState,

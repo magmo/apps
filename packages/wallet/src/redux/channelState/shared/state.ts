@@ -1,5 +1,5 @@
 import { Commitment } from 'fmg-core';
-import { SharedFundingState, FundingState } from './fundingState/state';
+import { SharedFundingState, FundingState } from '../fundingState/state';
 
 export interface SharedChannelState {
   address: string;

@@ -19,9 +19,9 @@ import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../../utils/signing-utils';
 import * as fmgCore from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
-import { NextChannelState } from '../../../sharedState';
+import { NextChannelState } from '../../../shared/state';
 import { WAIT_FOR_FUNDING_REQUEST, WaitForFundingRequest } from '../../fundingState/state';
-import { DIRECT_FUNDING } from '../../fundingState/sharedState';
+import { DIRECT_FUNDING } from '../../fundingState/shared/state';
 
 const {
   asAddress,

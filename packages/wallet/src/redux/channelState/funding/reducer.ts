@@ -14,7 +14,7 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
-import { NextChannelState } from '../../sharedState';
+import { NextChannelState } from '../../shared/state';
 import { directFundingStateReducer } from '../fundingState/directFunding/reducer';
 import { outboxStateReducer } from '../../reducer';
 import { FUNDING_CONFIRMED } from '../fundingState/state';

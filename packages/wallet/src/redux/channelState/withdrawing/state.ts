@@ -4,7 +4,7 @@ import {
   userAddressExists,
   MaybeFunded,
   channelOpen,
-} from '../sharedState';
+} from '../shared/state';
 
 // stage
 export const WITHDRAWING = 'STAGE.WITHDRAWING';

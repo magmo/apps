@@ -12,7 +12,7 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 import { CommitmentType } from 'fmg-core';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
-import { NextChannelState } from '../../sharedState';
+import { NextChannelState } from '../../shared/state';
 import { WAIT_FOR_FUNDING_REQUEST, UNKNOWN_FUNDING_TYPE } from '../fundingState/state';
 
 export const openingReducer = (

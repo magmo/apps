@@ -1,4 +1,4 @@
-import { SharedWalletState } from './sharedState';
+import { SharedWalletState } from './shared/state';
 import { InitializingState } from './initializing/state';
 import { InitializedState } from './initialized/state';
 

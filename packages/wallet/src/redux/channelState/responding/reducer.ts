@@ -11,7 +11,7 @@ import {
   showWallet,
 } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
-import { NextChannelState } from '../../sharedState';
+import { NextChannelState } from '../../shared/state';
 
 export const respondingReducer = (
   state: states.RespondingState,

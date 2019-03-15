@@ -1,4 +1,4 @@
-import { ChallengeExists, challengeExists, TransactionExists } from '../sharedState';
+import { ChallengeExists, challengeExists, TransactionExists } from '../shared/state';
 
 // stage
 export const RESPONDING = 'RESPONDING';

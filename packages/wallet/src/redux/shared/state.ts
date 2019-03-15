@@ -1,6 +1,6 @@
-import { WalletAction } from './actions';
-import { SharedChannelState } from './channelState/sharedState';
-import { OutboxState } from './outbox/sharedState';
+import { WalletAction } from '../actions';
+import { SharedChannelState } from '../channelState/shared/state';
+import { OutboxState } from '../outbox/state';
 
 export interface NextChannelState<T extends SharedChannelState> {
   channelState: T;

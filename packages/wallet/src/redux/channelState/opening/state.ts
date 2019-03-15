@@ -3,7 +3,7 @@ import {
   firstCommitmentReceived,
   SharedChannelState,
   baseChannelState,
-} from '../sharedState';
+} from '../shared/state';
 
 // stage
 export const OPENING = 'OPENING';

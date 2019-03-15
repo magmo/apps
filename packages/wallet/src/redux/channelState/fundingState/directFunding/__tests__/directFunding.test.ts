@@ -11,7 +11,7 @@ import {
 } from '../../../../__tests__/helpers';
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { SharedDirectFundingState, SharedUnknownFundingState } from '../../sharedState';
+import { SharedDirectFundingState, SharedUnknownFundingState } from '../../shared/state';
 
 const { channelId } = scenarios;
 
