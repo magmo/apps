@@ -95,3 +95,15 @@ export const itIncreasesTurnNumBy = (
     }
   });
 };
+
+export const itDispatchesThisAction = (action, state: { outboxState?: OutboxState }) => {
+  it(`dispatches ${action.type}`, () => {
+    expect(state.outboxState!.actionOutbox).toEqual(action);
+  });
+};
+
+export const itDispatchesNoAction = (state: { outboxState?: OutboxState }) => {
+  it(`dispatches no action`, () => {
+    expect(state.outboxState!.actionOutbox).toBeUndefined();
+  });
+};
