@@ -201,6 +201,19 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
   });
 
   describe('incoming action: COMMITMENT_RECEIVED', () => {
+    const state = startingState('A');
+    const validateMock = jest.fn().mockReturnValue(true);
+    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
+
+    const action = actions.commitmentReceived(postFundCommitment1, '0x0');
+    const updatedState = fundingReducer(state, action);
+
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+    // B moved out of turn, so A should ignore B's move.
+    itIncreasesTurnNumBy(0, state, updatedState);
+  });
+
+  describe('incoming action: COMMITMENT_RECEIVED', () => {
     const state = startingState('B');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
