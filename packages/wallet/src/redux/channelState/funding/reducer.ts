@@ -225,27 +225,14 @@ const aWaitForPostFundSetupReducer = (
         return { channelState: state };
       }
 
-      if (state.funded) {
-        return {
-          channelState: states.acknowledgeFundingSuccess({
-            ...state,
-            turnNum: postFundState.turnNum,
-            lastCommitment: { commitment: postFundState, signature },
-            penultimateCommitment: state.lastCommitment,
-          }),
-        };
-      } else {
-        // This _should_ be unreachable, since you would only arrive in the
-        // aWaitForPostFundSetup state after receiving funding confirmation
-        return {
-          channelState: states.waitForFundingConfirmation({
-            ...state,
-            turnNum: postFundState.turnNum,
-            lastCommitment: { commitment: postFundState, signature },
-            penultimateCommitment: state.lastCommitment,
-          }),
-        };
-      }
+      return {
+        channelState: states.acknowledgeFundingSuccess({
+          ...state,
+          turnNum: postFundState.turnNum,
+          lastCommitment: { commitment: postFundState, signature },
+          penultimateCommitment: state.lastCommitment,
+        }),
+      };
     default:
       return { channelState: state };
   }
