@@ -2,6 +2,7 @@ export interface BaseFundingState {
   requestedTotalFunds: string;
   requestedYourContribution: string;
   channelId: string;
+  ourIndex: number;
 }
 
 export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
