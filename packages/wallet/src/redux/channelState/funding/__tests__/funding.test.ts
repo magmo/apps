@@ -95,6 +95,7 @@ describe('start in WaitForFundingRequest', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 
   describe('action taken: funding requested', () => {
@@ -108,6 +109,7 @@ describe('start in WaitForFundingRequest', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
 
@@ -129,6 +131,7 @@ describe('start in WaitForFundingApproval', () => {
       ),
       updatedState,
     );
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
   describe('incoming action: funding rejected', () => {
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
@@ -138,6 +141,7 @@ describe('start in WaitForFundingApproval', () => {
 
     itTransitionsToChannelStateType(states.SEND_FUNDING_DECLINED_MESSAGE, updatedState);
     itDispatchesNoAction(updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 
   describe('incoming action: Funding declined message received', () => {
@@ -147,6 +151,7 @@ describe('start in WaitForFundingApproval', () => {
     const updatedState = fundingReducer(state, action);
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
     itDispatchesNoAction(updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 
   describe('incoming action: funding approved', () => {
@@ -166,6 +171,7 @@ describe('start in WaitForFundingApproval', () => {
       ),
       updatedState,
     );
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
 
@@ -182,7 +188,9 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     const state = startingState('A');
     const action = actions.messageReceived('FundingDeclined');
     const updatedState = fundingReducer(state, action);
+
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 
   describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
@@ -194,7 +202,7 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 
-  describe('incoming action: message received', () => {
+  describe('incoming action: COMMITMENT_RECEIVED', () => {
     const state = startingState('B');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
@@ -203,7 +211,8 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
-    itIncreasesTurnNumBy(2, state, updatedState);
+    // A sent commitment too early. B stores A's commitment, but does not respond.
+    itIncreasesTurnNumBy(1, state, updatedState);
   });
 
   describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
@@ -212,6 +221,7 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
 
@@ -227,6 +237,7 @@ describe('start in SendFundingDeclinedMessage', () => {
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHANNEL, updatedState);
     itSendsThisMessage(updatedState, outgoing.FUNDING_FAILURE);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
 
@@ -236,15 +247,13 @@ describe('start in AWaitForPostFundSetup', () => {
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
-    const state = states.aWaitForPostFundSetup({
-      ...testDefaults,
-    });
+    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+    const state = states.aWaitForPostFundSetup({ ...testDefaults });
     const action = actions.commitmentReceived(postFundCommitment2, MOCK_SIGNATURE);
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
-    itIncreasesTurnNumBy(1, state, updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
 
@@ -259,8 +268,8 @@ describe('start in BWaitForPostFundSetup', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
-    itIncreasesTurnNumBy(2, state, updatedState);
     itSendsThisMessage(updatedState, outgoing.COMMITMENT_RELAY_REQUESTED);
+    itIncreasesTurnNumBy(2, state, updatedState);
   });
 });
 
@@ -279,6 +288,7 @@ describe('start in AcknowledgeFundingSuccess', () => {
         commitmentCount: 1,
       });
     });
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 
   describe('incoming action: FundingSuccessAcknowledged', () => {
@@ -296,5 +306,6 @@ describe('start in AcknowledgeFundingSuccess', () => {
         commitmentCount: 1,
       });
     });
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
