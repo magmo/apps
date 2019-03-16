@@ -136,30 +136,21 @@ const waitForFundingAndPostFundSetupReducer = (
         return { channelState: state };
       }
     case actions.COMMITMENT_RECEIVED:
-      const { commitment: postFundState, signature: theirSignature } = action;
-      if (!validTransitionToPostFundState(state, postFundState, theirSignature)) {
+      const { commitment, signature } = action;
+      if (!validTransitionToPostFundState(state, commitment, signature)) {
         return { channelState: state };
       }
       if (state.ourIndex === 0) {
-        return {
-          channelState: states.waitForFundingConfirmation({
-            ...state,
-            turnNum: postFundState.turnNum,
-            lastCommitment: { commitment: postFundState, signature: theirSignature },
-            penultimateCommitment: state.lastCommitment,
-          }),
-        };
+        // Player B skipped our turn, and so we should ignore their message.
+        return { channelState: state };
       } else {
-        const {
-          postFundSetupCommitment: commitment,
-          commitmentSignature: signature,
-          // Don't send the message yet, since funding hasn't been confirmed?
-        } = composePostFundCommitment(state);
+        // Player A sent their post fund setup too early.
+        // We shouldn't respond, but we store their commitment.
         return {
           channelState: states.waitForFundingConfirmation({
             ...state,
-            turnNum: postFundState.turnNum + 1,
-            penultimateCommitment: { commitment: postFundState, signature },
+            turnNum: commitment.turnNum,
+            penultimateCommitment: state.lastCommitment,
             lastCommitment: { commitment, signature },
           }),
         };
@@ -400,10 +391,14 @@ const validTransitionToPostFundState = (
 
 const composePostFundCommitment = (
   state:
-    | states.WaitForFundingConfirmation
-    | states.WaitForFundingAndPostFundSetup
-    | states.BWaitForPostFundSetup,
+    | states.WaitForFundingAndPostFundSetup // This is exactly when A should send their commitment
+    | states.WaitForFundingConfirmation // This is when B sends their commitment, if A sends too early
+    | states.BWaitForPostFundSetup, // This is exactly when B should send their commitment
 ) => {
+  // It's beneficial to lazily replace our previous commitment only when it is time
+  // to send our new commitment, rather than eagerly replace it whenever the wallet knows
+  // what the next commitment should be, as this is in line with one of the wallet's obligations:
+  // - Only send a post-fund setup commitment after the channel is fully funded.
   const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
   const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
 
