@@ -10,6 +10,7 @@ import {
   itSendsThisMessage,
   itDispatchesThisAction,
   itDispatchesNoAction,
+  itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../../utils/signing-utils';
@@ -224,6 +225,7 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
     // A sent commitment too early. B stores A's commitment, but does not respond.
     itIncreasesTurnNumBy(1, state, updatedState);
+    itSendsNoMessage(updatedState);
   });
 
   describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
