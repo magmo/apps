@@ -16,7 +16,6 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { NextChannelState } from '../../shared/state';
-import { applySideEffects } from '../../outbox';
 
 export const fundingReducer = (
   state: states.FundingState,
@@ -33,23 +32,6 @@ export const fundingReducer = (
     };
   }
 
-  let outboxState = {};
-
-  const { channelState: updatedState, outboxState: sideEffects } = channelStateReducer(
-    state,
-    action,
-  );
-
-  // Apply the side effects
-  outboxState = applySideEffects(outboxState, sideEffects);
-
-  return { channelState: updatedState, outboxState };
-};
-
-const channelStateReducer = (
-  state: states.FundingState,
-  action: actions.WalletAction,
-): NextChannelState<states.ChannelState> => {
   switch (state.type) {
     // Setup funding process
     case states.WAIT_FOR_FUNDING_REQUEST:
