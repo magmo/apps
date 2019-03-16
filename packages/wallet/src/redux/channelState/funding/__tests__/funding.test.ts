@@ -281,13 +281,13 @@ describe('start in AWaitForPostFundSetup', () => {
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+    const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
     const state = states.aWaitForPostFundSetup({ ...testDefaults });
     const action = actions.commitmentReceived(postFundCommitment2, MOCK_SIGNATURE);
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
-    itIncreasesTurnNumBy(0, state, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
   });
 });
 
