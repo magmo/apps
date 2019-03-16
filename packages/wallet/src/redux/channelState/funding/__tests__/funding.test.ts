@@ -8,13 +8,11 @@ import {
   itTransitionsToChannelStateType,
   itIncreasesTurnNumBy,
   itSendsThisMessage,
-  expectThisCommitmentSent,
   itDispatchesThisAction,
   itDispatchesNoAction,
 } from '../../../__tests__/helpers';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as SigningUtil from '../../../../utils/signing-utils';
-import * as fmgCore from 'fmg-core';
 import { addHex } from '../../../../utils/hex-utils';
 
 const {
@@ -282,12 +280,7 @@ describe('start in AcknowledgeFundingSuccess', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
-    it('sends PostFundSetupB', () => {
-      expectThisCommitmentSent(updatedState, {
-        commitmentType: fmgCore.CommitmentType.PostFundSetup,
-        commitmentCount: 1,
-      });
-    });
+    itSendsThisMessage(updatedState, outgoing.FUNDING_SUCCESS);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
@@ -300,12 +293,6 @@ describe('start in AcknowledgeFundingSuccess', () => {
 
     itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
     itSendsThisMessage(updatedState, outgoing.FUNDING_SUCCESS);
-    it('sends PostFundSetupB', () => {
-      expectThisCommitmentSent(updatedState, {
-        commitmentType: fmgCore.CommitmentType.PostFundSetup,
-        commitmentCount: 1,
-      });
-    });
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
