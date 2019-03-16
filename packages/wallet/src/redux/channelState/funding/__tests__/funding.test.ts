@@ -240,27 +240,6 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
 
 describe('start in WaitForFundingConfirmation', () => {
   describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
-    // As player A
-    const validateMock = jest.fn().mockReturnValue(MOCK_SIGNATURE);
-    Object.defineProperty(SigningUtil, 'signCommitment', { value: validateMock });
-
-    const testData = { ...defaultsA, ...justReceivedPreFundSetupB };
-    const state = states.waitForFundingConfirmation(testData);
-    const action = actions.internal.directFundingConfirmed(channelId);
-    const updatedState = fundingReducer(state, action);
-
-    const sendCommitmentAction = outgoing.commitmentRelayRequested(
-      state.participants[1 - state.ourIndex],
-      postFundCommitment1,
-      MOCK_SIGNATURE,
-    );
-
-    itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
-    itSendsThisMessage(updatedState, sendCommitmentAction);
-    itIncreasesTurnNumBy(1, state, updatedState);
-  });
-
-  describe('incoming action: INTERNAL.DIRECT_FUNDING_CONFIRMED', () => {
     // As player B
     const validateMock = jest.fn().mockReturnValue(MOCK_SIGNATURE);
     Object.defineProperty(SigningUtil, 'signCommitment', { value: validateMock });
