@@ -10,6 +10,14 @@ export const itSendsAMessage = (state: NextChannelState<ChannelState>) => {
   });
 };
 
+export const itSendsNoMessage = (state: NextChannelState<ChannelState>) => {
+  it(`sends no message`, () => {
+    if (state.outboxState) {
+      expect(state.outboxState!.messageOutbox).toBeUndefined();
+    }
+  });
+};
+
 export const itSendsThisMessage = (state: { outboxState?: OutboxState }, message) => {
   if (message.type) {
     // We've received the entire action
