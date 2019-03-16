@@ -113,6 +113,8 @@ export const itDispatchesThisAction = (action, state: { outboxState?: OutboxStat
 
 export const itDispatchesNoAction = (state: { outboxState?: OutboxState }) => {
   it(`dispatches no action`, () => {
-    expect(state.outboxState!.actionOutbox).toBeUndefined();
+    if (state.outboxState) {
+      expect(state.outboxState!.actionOutbox).toBeUndefined();
+    }
   });
 };
