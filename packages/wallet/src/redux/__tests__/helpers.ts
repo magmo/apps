@@ -1,6 +1,6 @@
 import { ChannelState } from '../channelState/state';
 import { OutboxState } from '../outbox/state';
-import { NextChannelState } from '../shared/state';
+import { NextChannelState, StateWithSideEffects } from '../shared/state';
 import { Commitment } from 'fmg-core';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 
@@ -73,9 +73,12 @@ export const itTransitionsToChannelStateType = (type, state: NextChannelState<Ch
   });
 };
 
-export const itTransitionsToStateType = (type, state: { type: any }) => {
+export const itTransitionsToStateType = (
+  type,
+  stateWithSideEffects: StateWithSideEffects<{ type: any }>,
+) => {
   it(`transitions to ${type}`, () => {
-    expect(state.type).toEqual(type);
+    expect(stateWithSideEffects.state.type).toEqual(type);
   });
 };
 
