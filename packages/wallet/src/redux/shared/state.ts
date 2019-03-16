@@ -8,6 +8,11 @@ export interface NextChannelState<T extends SharedChannelState> {
   outboxState?: OutboxState;
 }
 
+export interface StateWithSideEffects<T> {
+  state: T;
+  outboxState?: OutboxState;
+}
+
 export interface SharedWalletState {
   channelState?: SharedChannelState;
   outboxState: OutboxState;
