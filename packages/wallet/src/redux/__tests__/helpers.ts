@@ -10,18 +10,16 @@ export const itSendsAMessage = (state: NextChannelState<ChannelState>) => {
   });
 };
 
-export const itSendsThisMessage = (
-  state: { outboxState?: OutboxState },
-  message,
-  typeOnly = true,
-) => {
-  if (typeOnly) {
-    it(`sends message ${message}`, () => {
-      expect(state.outboxState!.messageOutbox!.type).toEqual(message);
-    });
-  } else {
+export const itSendsThisMessage = (state: { outboxState?: OutboxState }, message) => {
+  if (message.type) {
+    // We've received the entire action
     it(`sends a message `, () => {
       expect(state.outboxState!.messageOutbox!).toMatchObject(message);
+    });
+  } else {
+    // Assume we've only received the type of the message
+    it(`sends message ${message}`, () => {
+      expect(state.outboxState!.messageOutbox!.type).toEqual(message);
     });
   }
 };
