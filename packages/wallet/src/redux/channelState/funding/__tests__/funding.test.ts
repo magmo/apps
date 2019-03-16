@@ -271,7 +271,6 @@ describe('start in SendFundingDeclinedMessage', () => {
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHANNEL, updatedState);
     itSendsThisMessage(updatedState, outgoing.FUNDING_FAILURE);
-    itIncreasesTurnNumBy(0, state, updatedState);
   });
 });
 
