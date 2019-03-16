@@ -57,22 +57,23 @@ const defaultsB = {
   privateKey: bsPrivateKey,
 };
 
+const MOCK_SIGNATURE = 'signature';
 const justReceivedPreFundSetupB = {
-  penultimateCommitment: { commitment: preFundCommitment1, signature: 'sig' },
-  lastCommitment: { commitment: preFundCommitment2, signature: 'sig' },
+  penultimateCommitment: { commitment: preFundCommitment1, signature: MOCK_SIGNATURE },
+  lastCommitment: { commitment: preFundCommitment2, signature: MOCK_SIGNATURE },
   turnNum: 1,
 };
 
 const justReceivedPostFundSetupA = {
-  penultimateCommitment: { commitment: preFundCommitment2, signature: 'sig' },
-  lastCommitment: { commitment: postFundCommitment1, signature: 'sig' },
+  penultimateCommitment: { commitment: preFundCommitment2, signature: MOCK_SIGNATURE },
+  lastCommitment: { commitment: postFundCommitment1, signature: MOCK_SIGNATURE },
   turnNum: 2,
   funded: true,
 };
 
 const justReceivedPostFundSetupB = {
-  penultimateCommitment: { commitment: postFundCommitment1, signature: 'sig' },
-  lastCommitment: { commitment: postFundCommitment2, signature: 'sig' },
+  penultimateCommitment: { commitment: postFundCommitment1, signature: MOCK_SIGNATURE },
+  lastCommitment: { commitment: postFundCommitment2, signature: MOCK_SIGNATURE },
   turnNum: 3,
   funded: true,
 };
@@ -239,7 +240,7 @@ describe('start in AWaitForPostFundSetup', () => {
     const state = states.aWaitForPostFundSetup({
       ...testDefaults,
     });
-    const action = actions.commitmentReceived(postFundCommitment2, 'sig');
+    const action = actions.commitmentReceived(postFundCommitment2, MOCK_SIGNATURE);
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
@@ -254,7 +255,7 @@ describe('start in BWaitForPostFundSetup', () => {
     const state = states.bWaitForPostFundSetup(testDefaults);
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validSignature', { value: validateMock });
-    const action = actions.commitmentReceived(postFundCommitment1, 'sig');
+    const action = actions.commitmentReceived(postFundCommitment1, MOCK_SIGNATURE);
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
