@@ -106,18 +106,20 @@ export const itIncreasesTurnNumBy = (
 };
 
 export const itDispatchesThisAction = (action, state: { outboxState?: OutboxState }) => {
-  it(`dispatches ${action.type || 'this action'}`, () => {
-    // The actionOutbox should only dispatch internal actions
-    if (action.type) {
+  if (action.type) {
+    it(`dispatches ${action.type}`, () => {
+      // The actionOutbox should only dispatch internal actions
       // We were passed the whole action
       expect(action.type).toMatch('WALLET.INTERNAL');
       expect(state.outboxState!.actionOutbox).toMatchObject(action);
-    } else {
+    });
+  } else {
+    it(`dispatches ${action}`, () => {
       // We were just passed the type
       expect(action).toMatch('WALLET.INTERNAL');
       expect(state.outboxState!.actionOutbox!.type).toEqual(action);
-    }
-  });
+    });
+  }
 };
 
 export const itDispatchesNoAction = (state: { outboxState?: OutboxState }) => {
@@ -127,3 +129,17 @@ export const itDispatchesNoAction = (state: { outboxState?: OutboxState }) => {
     }
   });
 };
+
+export function itChangesDepositStatusTo(status: string, state) {
+  it(`changes depositStatus to ${status} `, () => {
+    expect(state.state.depositStatus).toEqual(status);
+  });
+}
+export function itChangesChannelFundingStatusTo<T extends { state: { channelFundingStatus: any } }>(
+  status: string,
+  state: T,
+) {
+  it(`changes channelFundingStatus to ${status}`, () => {
+    expect(state.state.channelFundingStatus).toEqual(status);
+  });
+}
