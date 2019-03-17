@@ -1,187 +1,126 @@
-import { SharedDirectFundingState } from '../shared/state';
-import { TransactionExists } from '../../shared/state';
+import { SharedDirectFundingState, DIRECT_FUNDING } from '../shared/state';
+import * as depositing from './depositing/state';
 
-// state types
+// ChannelFundingStatus
 export const WAIT_FOR_FUNDING_APPROVAL = 'WAIT_FOR_FUNDING_APPROVAL';
+export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
+export const SAFE_TO_DEPOSIT = 'SAFE_TO_DEPOSIT';
+export const CHANNEL_FUNDED = 'CHANNEL_FUNDED';
 
-export const A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
-  'A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK';
-export const A_SUBMIT_DEPOSIT_IN_METAMASK = 'A_SUBMIT_DEPOSIT_IN_METAMASK';
-export const A_WAIT_FOR_DEPOSIT_CONFIRMATION = 'A_WAIT_FOR_DEPOSIT_CONFIRMATION';
-export const A_WAIT_FOR_OPPONENT_DEPOSIT = 'A_WAIT_FOR_OPPONENT_DEPOSIT';
-export const A_DEPOSIT_TRANSACTION_FAILED = 'A_DEPOSIT_TRANSACTION_FAILED';
+// Funding status
+export type ChannelFundingStatus =
+  | typeof WAIT_FOR_FUNDING_APPROVAL
+  | typeof NOT_SAFE_TO_DEPOSIT
+  | typeof SAFE_TO_DEPOSIT
+  | typeof CHANNEL_FUNDED;
 
-export const B_WAIT_FOR_OPPONENT_DEPOSIT = 'B_WAIT_FOR_OPPONENT_DEPOSIT';
-
-export const B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK =
-  'B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK';
-export const B_SUBMIT_DEPOSIT_IN_METAMASK = 'B_SUBMIT_DEPOSIT_IN_METAMASK';
-export const B_WAIT_FOR_DEPOSIT_CONFIRMATION = 'B_WAIT_FOR_DEPOSIT_CONFIRMATION';
-export const B_DEPOSIT_TRANSACTION_FAILED = 'B_DEPOSIT_TRANSACTION_FAILED';
-
-export const FUNDING_CONFIRMED = 'FUNDING_CONFIRMED';
-
-export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
-export interface WaitForFundingApproval extends SharedDirectFundingState {
-  type: typeof WAIT_FOR_FUNDING_APPROVAL;
+export interface BaseDirectFundingState extends SharedDirectFundingState {
+  depositStatus?: depositing.DepositStatus;
+  channelFundingStatus: ChannelFundingStatus;
 }
 
-export interface AWaitForDepositToBeSentToMetaMask extends SharedDirectFundingState {
-  type: typeof A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK;
+export interface WaitForFundingApproval extends BaseDirectFundingState {
+  channelFundingStatus: typeof WAIT_FOR_FUNDING_APPROVAL;
 }
 
-export interface ASubmitDepositInMetaMask extends SharedDirectFundingState {
-  type: typeof A_SUBMIT_DEPOSIT_IN_METAMASK;
+export interface NotSafeToDeposit extends BaseDirectFundingState {
+  channelFundingStatus: typeof NOT_SAFE_TO_DEPOSIT;
 }
 
-export interface AWaitForDepositConfirmation extends SharedDirectFundingState, TransactionExists {
-  type: typeof A_WAIT_FOR_DEPOSIT_CONFIRMATION;
+export interface WaitForFundingConfirmation extends BaseDirectFundingState {
+  depositStatus: typeof depositing.DEPOSIT_CONFIRMED;
+  channelFundingStatus: typeof SAFE_TO_DEPOSIT;
 }
 
-export interface ADepositTransactionFailed extends SharedDirectFundingState {
-  type: typeof A_DEPOSIT_TRANSACTION_FAILED;
+export interface ChannelFunded extends BaseDirectFundingState {
+  depositStatus: depositing.DepositStatus;
+  channelFundingStatus: typeof CHANNEL_FUNDED;
 }
 
-export interface AWaitForOpponentDeposit extends SharedDirectFundingState {
-  type: typeof A_WAIT_FOR_OPPONENT_DEPOSIT;
-}
+export type DirectFundingState =
+  | WaitForFundingApproval
+  | NotSafeToDeposit
+  | depositing.Depositing
+  | WaitForFundingConfirmation
+  | ChannelFunded;
 
-export interface BWaitForOpponentDeposit extends SharedDirectFundingState {
-  type: typeof B_WAIT_FOR_OPPONENT_DEPOSIT;
-}
+// type guards
+const guardGenerator = <T extends DirectFundingState>(type) => (
+  state: DirectFundingState,
+): state is T => {
+  return state.channelFundingStatus === type;
+};
+export const stateIsWaitForFundingApproval = guardGenerator<WaitForFundingApproval>(
+  WAIT_FOR_FUNDING_APPROVAL,
+);
+export const stateIsNotSafeToDeposit = guardGenerator<NotSafeToDeposit>(NOT_SAFE_TO_DEPOSIT);
+export const stateIsDepositing = (state: DirectFundingState): state is depositing.Depositing => {
+  return (
+    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
+    state.depositStatus !== depositing.DEPOSIT_CONFIRMED
+  );
+};
+export const stateIsWaitForFundingConfirmation = (
+  state: DirectFundingState,
+): state is WaitForFundingConfirmation => {
+  return (
+    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
+    state.depositStatus === depositing.DEPOSIT_CONFIRMED
+  );
+};
+export const stateIsChannelFunded = guardGenerator<ChannelFunded>(CHANNEL_FUNDED);
 
-export interface BWaitForDepositToBeSentToMetaMask extends SharedDirectFundingState {
-  type: typeof B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK;
-}
-
-export interface BSubmitDepositInMetaMask extends SharedDirectFundingState {
-  type: typeof B_SUBMIT_DEPOSIT_IN_METAMASK;
-}
-
-export interface BWaitForDepositConfirmation extends SharedDirectFundingState, TransactionExists {
-  type: typeof B_WAIT_FOR_DEPOSIT_CONFIRMATION;
-}
-export interface BDepositTransactionFailed extends SharedDirectFundingState {
-  type: typeof B_DEPOSIT_TRANSACTION_FAILED;
-}
-
-export interface FundingConfirmed extends SharedDirectFundingState {
-  type: typeof FUNDING_CONFIRMED;
-}
-
-export function directFundingState<T extends SharedDirectFundingState>(
+// constructors
+export function sharedDirectFundingState<T extends SharedDirectFundingState>(
   params: T,
 ): SharedDirectFundingState {
-  const { requestedTotalFunds, requestedYourContribution, channelId, ourIndex } = params;
+  const {
+    requestedTotalFunds,
+    requestedYourContribution,
+    channelId,
+    ourIndex,
+    safeToDepositLevel,
+  } = params;
   return {
     fundingType: DIRECT_FUNDING,
     requestedTotalFunds,
     requestedYourContribution,
     channelId,
     ourIndex,
+    safeToDepositLevel,
   };
 }
 
-export function waitForFundingApproval<T extends SharedDirectFundingState>(
+export function waitForFundingApproval<T extends BaseDirectFundingState>(
   params: T,
 ): WaitForFundingApproval {
   return {
-    type: WAIT_FOR_FUNDING_APPROVAL,
-    ...directFundingState(params),
+    ...sharedDirectFundingState(params),
+    channelFundingStatus: WAIT_FOR_FUNDING_APPROVAL,
   };
 }
 
-export function aWaitForDepositToBeSentToMetaMask<T extends SharedDirectFundingState>(
-  params: T,
-): AWaitForDepositToBeSentToMetaMask {
+export function notSafeToDeposit<T extends BaseDirectFundingState>(params: T): NotSafeToDeposit {
   return {
-    type: A_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
-    ...directFundingState(params),
+    ...sharedDirectFundingState(params),
+    channelFundingStatus: NOT_SAFE_TO_DEPOSIT,
   };
 }
 
-export function aSubmitDepositInMetaMask<T extends SharedDirectFundingState>(
+export function waitForFundingConfirmed<T extends BaseDirectFundingState>(
   params: T,
-): ASubmitDepositInMetaMask {
-  return { type: A_SUBMIT_DEPOSIT_IN_METAMASK, ...directFundingState(params) };
-}
-
-export function aWaitForDepositConfirmation<T extends SharedDirectFundingState & TransactionExists>(
-  params: T,
-): AWaitForDepositConfirmation {
+): WaitForFundingConfirmation {
   return {
-    type: A_WAIT_FOR_DEPOSIT_CONFIRMATION,
-    ...directFundingState(params),
-    transactionHash: params.transactionHash,
+    ...sharedDirectFundingState(params),
+    depositStatus: depositing.DEPOSIT_CONFIRMED,
+    channelFundingStatus: SAFE_TO_DEPOSIT,
   };
 }
 
-export function aDepositTransactionFailed<T extends SharedDirectFundingState>(
-  params: T,
-): ADepositTransactionFailed {
-  return { type: A_DEPOSIT_TRANSACTION_FAILED, ...directFundingState(params) };
-}
-
-export function aWaitForOpponentDeposit<T extends SharedDirectFundingState>(
-  params: T,
-): AWaitForOpponentDeposit {
-  return { type: A_WAIT_FOR_OPPONENT_DEPOSIT, ...directFundingState(params) };
-}
-
-export function bWaitForOpponentDeposit<T extends SharedDirectFundingState>(
-  params: T,
-): BWaitForOpponentDeposit {
+export function channelFunded<T extends BaseDirectFundingState>(params: T): ChannelFunded {
   return {
-    type: B_WAIT_FOR_OPPONENT_DEPOSIT,
-    fundingType: DIRECT_FUNDING,
-    ...directFundingState(params),
+    ...sharedDirectFundingState(params),
+    depositStatus: depositing.DEPOSIT_CONFIRMED,
+    channelFundingStatus: CHANNEL_FUNDED,
   };
 }
-export function bWaitForDepositToBeSentToMetaMask<T extends SharedDirectFundingState>(
-  params: T,
-): BWaitForDepositToBeSentToMetaMask {
-  return {
-    type: B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK,
-    ...directFundingState(params),
-  };
-}
-
-export function bSubmitDepositInMetaMask<T extends SharedDirectFundingState>(
-  params: T,
-): BSubmitDepositInMetaMask {
-  return { type: B_SUBMIT_DEPOSIT_IN_METAMASK, ...directFundingState(params) };
-}
-
-export function bWaitForDepositConfirmation<T extends SharedDirectFundingState & TransactionExists>(
-  params: T,
-): BWaitForDepositConfirmation {
-  return {
-    type: B_WAIT_FOR_DEPOSIT_CONFIRMATION,
-    ...directFundingState(params),
-    transactionHash: params.transactionHash,
-  };
-}
-
-export function bDepositTransactionFailed<T extends SharedDirectFundingState>(
-  params: T,
-): BDepositTransactionFailed {
-  return { type: B_DEPOSIT_TRANSACTION_FAILED, ...directFundingState(params) };
-}
-
-export function fundingConfirmed<T extends SharedDirectFundingState>(params: T): FundingConfirmed {
-  return { type: FUNDING_CONFIRMED, ...directFundingState(params) };
-}
-
-export type DirectFundingState =
-  | WaitForFundingApproval
-  | AWaitForDepositToBeSentToMetaMask
-  | ASubmitDepositInMetaMask
-  | AWaitForDepositConfirmation
-  | BWaitForDepositToBeSentToMetaMask
-  | BSubmitDepositInMetaMask
-  | AWaitForOpponentDeposit
-  | BWaitForOpponentDeposit
-  | BWaitForDepositConfirmation
-  | ADepositTransactionFailed
-  | BDepositTransactionFailed
-  | FundingConfirmed;
