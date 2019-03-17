@@ -1,4 +1,6 @@
 import { SharedDirectFundingState, DIRECT_FUNDING } from '../shared/state';
+export { SharedDirectFundingState, DIRECT_FUNDING };
+
 import * as depositing from './depositing/state';
 
 // ChannelFundingStatus
@@ -80,6 +82,7 @@ export function sharedDirectFundingState<T extends SharedDirectFundingState>(
     channelId,
     ourIndex,
     safeToDepositLevel,
+    channelFundingStatus,
   } = params;
   return {
     fundingType: DIRECT_FUNDING,
@@ -88,6 +91,7 @@ export function sharedDirectFundingState<T extends SharedDirectFundingState>(
     channelId,
     ourIndex,
     safeToDepositLevel,
+    channelFundingStatus,
   };
 }
 
