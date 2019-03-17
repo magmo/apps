@@ -16,7 +16,13 @@ export interface WaitForFundingRequest extends SharedUnknownFundingState {
 export function waitForFundingRequest<T extends BaseFundingState>(
   params: T,
 ): WaitForFundingRequest {
-  const { requestedTotalFunds, requestedYourContribution, channelId, ourIndex } = params;
+  const {
+    requestedTotalFunds,
+    requestedYourContribution,
+    channelId,
+    ourIndex,
+    channelFundingStatus,
+  } = params;
   return {
     type: WAIT_FOR_FUNDING_REQUEST,
     fundingType: UNKNOWN_FUNDING_TYPE,
@@ -24,10 +30,12 @@ export function waitForFundingRequest<T extends BaseFundingState>(
     requestedYourContribution,
     channelId,
     ourIndex,
+    channelFundingStatus,
   };
 }
 
 export * from './directFunding/state';
+export * from './shared/state';
 export type FundingState = WaitForFundingRequest | DirectFundingState;
 export { SharedFundingState, UNKNOWN_FUNDING_TYPE };
 

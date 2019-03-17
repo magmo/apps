@@ -28,11 +28,14 @@ const unknownFundingTypeReducer = (
   action: actions.WalletAction,
 ): ReturnType => {
   switch (action.type) {
-    case actions.FUNDING_REQUESTED:
+    case actions.internal.DIRECT_FUNDING_REQUESTED:
+      const { safeToDepositLevel } = action;
       return {
         state: states.waitForFundingApproval({
           ...state,
           fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
+          channelFundingStatus: states.WAIT_FOR_FUNDING_APPROVAL,
+          safeToDepositLevel,
         }),
       };
     default:
