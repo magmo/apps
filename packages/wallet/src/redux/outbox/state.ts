@@ -6,5 +6,5 @@ export interface OutboxState {
   displayOutbox?: DisplayAction;
   messageOutbox?: WalletEvent;
   transactionOutbox?: TransactionRequest;
-  actionOutbox?: internal.Action;
+  actionOutbox?: internal.InternalAction;
 }
