@@ -1,14 +1,14 @@
 import * as states from './state';
 import * as actions from '../actions';
 
-import { unreachable } from '../../utils/reducer-utils';
+import { unreachable, ReducerWithSideEffects } from '../../utils/reducer-utils';
 
 import { StateWithSideEffects } from '../shared/state';
 import { directFundingStateReducer } from './directFunding/reducer';
 
 type ReturnType = StateWithSideEffects<states.FundingState>;
 
-export const fundingStateReducer = (
+export const fundingStateReducer: ReducerWithSideEffects<states.FundingState> = (
   state: states.FundingState = states.waitForFundingRequest(),
   action: actions.WalletAction,
 ): ReturnType => {
