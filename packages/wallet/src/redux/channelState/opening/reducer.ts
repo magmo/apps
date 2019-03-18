@@ -10,10 +10,8 @@ import {
 import { unreachable } from '../../../utils/reducer-utils';
 import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
 import { CommitmentType } from 'fmg-core';
-import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
 import { NextChannelState } from '../../shared/state';
-import { WAIT_FOR_FUNDING_REQUEST, UNKNOWN_FUNDING_TYPE } from '../fundingState/state';
 
 export const openingReducer = (
   state: channelStates.OpeningState,
@@ -80,13 +78,7 @@ const waitForChannelReducer = (
           channelNonce: ownCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: ownCommitment, signature },
-          fundingState: {
-            type: WAIT_FOR_FUNDING_REQUEST,
-            fundingType: UNKNOWN_FUNDING_TYPE,
-            requestedTotalFunds: '0x0',
-            requestedYourContribution: '0x0',
-            channelId: channelID(ownCommitment.channel),
-          },
+          funded: false,
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
       };
@@ -146,13 +138,7 @@ const waitForChannelReducer = (
           channelNonce: opponentCommitment.channel.nonce,
           turnNum: 0,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
-          fundingState: {
-            type: WAIT_FOR_FUNDING_REQUEST,
-            fundingType: UNKNOWN_FUNDING_TYPE,
-            requestedTotalFunds: '0x0',
-            requestedYourContribution: '0x0',
-            channelId: channelID(opponentCommitment.channel),
-          },
+          funded: false,
         }),
         outboxState: { messageOutbox: validationSuccess() },
       };
@@ -196,15 +182,6 @@ const waitForPreFundSetupReducer = (
           turnNum: 1,
           lastCommitment: { commitment: ownCommitment, signature },
           penultimateCommitment: state.lastCommitment,
-          fundingState: {
-            type: WAIT_FOR_FUNDING_REQUEST,
-            fundingType: UNKNOWN_FUNDING_TYPE,
-            requestedTotalFunds: bigNumberify(ownCommitment.allocation[0])
-              .add(ownCommitment.allocation[1])
-              .toHexString(),
-            requestedYourContribution: ownCommitment.allocation[state.ourIndex],
-            channelId: channelID(ownCommitment.channel),
-          },
           funded: false,
         }),
         outboxState: { messageOutbox: signatureSuccess(signature) },
@@ -247,15 +224,6 @@ const waitForPreFundSetupReducer = (
           turnNum: 1,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
           penultimateCommitment: state.lastCommitment,
-          fundingState: {
-            type: WAIT_FOR_FUNDING_REQUEST,
-            fundingType: UNKNOWN_FUNDING_TYPE,
-            requestedTotalFunds: bigNumberify(opponentCommitment.allocation[0])
-              .add(opponentCommitment.allocation[1])
-              .toHexString(),
-            requestedYourContribution: opponentCommitment.allocation[state.ourIndex],
-            channelId: channelID(action.commitment.channel),
-          },
           funded: false,
         }),
         outboxState: { messageOutbox: validationSuccess() },

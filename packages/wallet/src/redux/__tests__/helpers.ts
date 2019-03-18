@@ -10,18 +10,24 @@ export const itSendsAMessage = (state: NextChannelState<ChannelState>) => {
   });
 };
 
-export const itSendsThisMessage = (
-  state: { outboxState?: OutboxState },
-  message,
-  typeOnly = true,
-) => {
-  if (typeOnly) {
-    it(`sends message ${message}`, () => {
-      expect(state.outboxState!.messageOutbox!.type).toEqual(message);
-    });
-  } else {
+export const itSendsNoMessage = (state: NextChannelState<ChannelState>) => {
+  it(`sends no message`, () => {
+    if (state.outboxState) {
+      expect(state.outboxState!.messageOutbox).toBeUndefined();
+    }
+  });
+};
+
+export const itSendsThisMessage = (state: { outboxState?: OutboxState }, message) => {
+  if (message.type) {
+    // We've received the entire action
     it(`sends a message `, () => {
       expect(state.outboxState!.messageOutbox!).toMatchObject(message);
+    });
+  } else {
+    // Assume we've only received the type of the message
+    it(`sends message ${message}`, () => {
+      expect(state.outboxState!.messageOutbox!.type).toEqual(message);
     });
   }
 };
@@ -92,6 +98,29 @@ export const itIncreasesTurnNumBy = (
       fail('turnNum does not exist on one of the states');
     } else {
       expect(newState.channelState.turnNum).toEqual(oldState.turnNum + increase);
+    }
+  });
+};
+
+export const itDispatchesThisAction = (action, state: { outboxState?: OutboxState }) => {
+  it(`dispatches ${action.type || 'this action'}`, () => {
+    // The actionOutbox should only dispatch internal actions
+    if (action.type) {
+      // We were passed the whole action
+      expect(action.type).toMatch('WALLET.INTERNAL');
+      expect(state.outboxState!.actionOutbox).toMatchObject(action);
+    } else {
+      // We were just passed the type
+      expect(action).toMatch('WALLET.INTERNAL');
+      expect(state.outboxState!.actionOutbox!.type).toEqual(action);
+    }
+  });
+};
+
+export const itDispatchesNoAction = (state: { outboxState?: OutboxState }) => {
+  it(`dispatches no action`, () => {
+    if (state.outboxState) {
+      expect(state.outboxState!.actionOutbox).toBeUndefined();
     }
   });
 };

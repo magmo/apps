@@ -5,7 +5,7 @@ import {
   SharedUnknownFundingState,
 } from './shared/state';
 import { DirectFundingState } from './directFunding/state';
-import { OutboxState } from '../../outbox/state';
+import { OutboxState } from '../outbox/state';
 
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 

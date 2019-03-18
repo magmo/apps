@@ -11,9 +11,10 @@ import { unreachable } from '../utils/reducer-utils';
 import ApproveFunding from '../components/funding/ApproveFunding';
 import { AFundingStep, BFundingStep } from '../components/funding/FundingStep';
 import DirectFunding from './DirectFunding';
+import { addHex } from '../utils/hex-utils';
 
 interface Props {
-  state: channelStates.FundingChannelState;
+  state: channelStates.FundingState;
   fundingApproved: () => void;
   fundingRejected: () => void;
   fundingSuccessAcknowledged: () => void;
@@ -39,8 +40,8 @@ class FundingContainer extends PureComponent<Props> {
           <ApproveFunding
             fundingApproved={fundingApproved}
             fundingRejected={fundingRejected}
-            requestedTotalFunds={state.fundingState.requestedTotalFunds}
-            requestedYourContribution={state.fundingState.requestedYourContribution}
+            requestedTotalFunds={state.lastCommitment.commitment.allocation[state.ourIndex]}
+            requestedYourContribution={state.lastCommitment.commitment.allocation.reduce(addHex)}
           />
         );
       case channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
