@@ -14,11 +14,8 @@ export const channel: Channel = { channelType: libraryAddress, nonce: channelNon
 export const channelId = channelID(channel);
 
 export const fundingState = {
-  type: 'FUNDING_CONFIRMED' as 'FUNDING_CONFIRMED',
-  fundingType: 'FUNDING_TYPE.DIRECT' as 'FUNDING_TYPE.DIRECT',
-  requestedTotalFunds: bigNumberify(1000000000000000).toHexString(),
-  requestedYourContribution: bigNumberify(500000000000000).toHexString(),
-  channelId,
+  fundingType: 'FUNDING_TYPE.UNKNOWN' as 'FUNDING_TYPE.UNKNOWN',
+  channelFundingStatus: 'FUNDING_NOT_STARTED' as 'FUNDING_NOT_STARTED',
 };
 
 export const twoThree = [bigNumberify(2).toHexString(), bigNumberify(3).toHexString()];

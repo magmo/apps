@@ -127,6 +127,7 @@ describe('start in WaitForFundingApproval', () => {
         twoThree.reduce(addHex),
         '0x00',
         twoThree[0],
+        0,
       ),
       updatedState,
     );
@@ -167,6 +168,7 @@ describe('start in WaitForFundingApproval', () => {
         twoThree.reduce(addHex),
         twoThree[0],
         twoThree[1],
+        1,
       ),
       updatedState,
     );

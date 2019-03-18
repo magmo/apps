@@ -97,6 +97,7 @@ const approveFundingReducer = (
             totalFundingRequired,
             safeToDepositLevel,
             ourDeposit,
+            state.ourIndex,
           ),
         },
       };

@@ -1,43 +1,30 @@
-import {
-  SharedFundingState,
-  UNKNOWN_FUNDING_TYPE,
-  BaseFundingState,
-  SharedUnknownFundingState,
-} from './shared/state';
 import { DirectFundingState } from './directFunding/state';
 import { OutboxState } from '../outbox/state';
 
+export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
+export const FUNDING_NOT_STARTED = 'FUNDING_NOT_STARTED';
+export interface UnknownFundingState {
+  fundingType: typeof UNKNOWN_FUNDING_TYPE;
+  channelFundingStatus: typeof FUNDING_NOT_STARTED;
+}
+
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 
-export interface WaitForFundingRequest extends SharedUnknownFundingState {
+export interface WaitForFundingRequest extends UnknownFundingState {
   type: typeof WAIT_FOR_FUNDING_REQUEST;
 }
 
-export function waitForFundingRequest<T extends BaseFundingState>(
-  params: T,
-): WaitForFundingRequest {
-  const {
-    requestedTotalFunds,
-    requestedYourContribution,
-    channelId,
-    ourIndex,
-    channelFundingStatus,
-  } = params;
+export function waitForFundingRequest(): WaitForFundingRequest {
   return {
     type: WAIT_FOR_FUNDING_REQUEST,
     fundingType: UNKNOWN_FUNDING_TYPE,
-    requestedTotalFunds,
-    requestedYourContribution,
-    channelId,
-    ourIndex,
-    channelFundingStatus,
+    channelFundingStatus: FUNDING_NOT_STARTED,
   };
 }
 
 export * from './directFunding/state';
 export * from './shared/state';
 export type FundingState = WaitForFundingRequest | DirectFundingState;
-export { SharedFundingState, UNKNOWN_FUNDING_TYPE };
 
 export interface DirectFundingStateWithSideEffects {
   fundingState: WaitForFundingRequest | DirectFundingState;

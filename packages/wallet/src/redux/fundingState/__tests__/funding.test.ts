@@ -6,7 +6,6 @@ import * as actions from '../../actions';
 
 import * as scenarios from '../../__tests__/test-scenarios';
 import { itChangesChannelFundingStatusTo } from '../../__tests__/helpers';
-import { SharedUnknownFundingState } from '../shared/state';
 import { addHex } from '../../../utils/hex-utils';
 
 const { channelId, twoThree } = scenarios;
@@ -14,15 +13,6 @@ const { channelId, twoThree } = scenarios;
 const YOUR_DEPOSIT_A = twoThree[0];
 const YOUR_DEPOSIT_B = twoThree[1];
 const TOTAL_REQUIRED = twoThree.reduce(addHex);
-
-const defaultsForUnknown: SharedUnknownFundingState = {
-  fundingType: states.UNKNOWN_FUNDING_TYPE,
-  requestedTotalFunds: TOTAL_REQUIRED,
-  requestedYourContribution: YOUR_DEPOSIT_A,
-  channelId,
-  ourIndex: 0,
-  channelFundingStatus: '',
-};
 
 const defaultsForA: directFundingStates.DirectFundingState = {
   fundingType: states.DIRECT_FUNDING,
@@ -37,12 +27,13 @@ const defaultsForA: directFundingStates.DirectFundingState = {
 describe('start in UNKNOWN_FUNDING_TYPE', () => {
   describe('incoming action: FUNDING_REQUESTED', () => {
     // player A scenario
-    const state = states.waitForFundingRequest(defaultsForUnknown);
+    const state = states.waitForFundingRequest();
     const action = actions.internal.directFundingRequested(
       channelId,
       '0x',
       TOTAL_REQUIRED,
       YOUR_DEPOSIT_A,
+      0,
     );
     const updatedState = fundingStateReducer(state, action);
 
@@ -51,12 +42,13 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
 
   describe('incoming action: FUNDING_REQUESTED', () => {
     // player B scenario
-    const state = states.waitForFundingRequest(defaultsForUnknown);
+    const state = states.waitForFundingRequest();
     const action = actions.internal.directFundingRequested(
       channelId,
       YOUR_DEPOSIT_A,
       TOTAL_REQUIRED,
       YOUR_DEPOSIT_B,
+      1,
     );
     const updatedState = fundingStateReducer(state, action);
 

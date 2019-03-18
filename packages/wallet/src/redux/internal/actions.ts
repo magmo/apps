@@ -4,12 +4,14 @@ export const directFundingRequested = (
   safeToDepositLevel: string,
   totalFundingRequired: string,
   requiredDeposit: string,
+  ourIndex: number,
 ) => ({
   type: DIRECT_FUNDING_REQUESTED as typeof DIRECT_FUNDING_REQUESTED,
   channelId,
   totalFundingRequired,
   safeToDepositLevel,
   requiredDeposit,
+  ourIndex,
 });
 export type DirectFundingRequested = ReturnType<typeof directFundingRequested>;
 

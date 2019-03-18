@@ -9,7 +9,7 @@ import { directFundingStateReducer } from './directFunding/reducer';
 type ReturnType = StateWithSideEffects<states.FundingState>;
 
 export const fundingStateReducer = (
-  state: states.FundingState,
+  state: states.FundingState = states.waitForFundingRequest(),
   action: actions.WalletAction,
 ): ReturnType => {
   switch (state.fundingType) {
@@ -29,13 +29,23 @@ const unknownFundingTypeReducer = (
 ): ReturnType => {
   switch (action.type) {
     case actions.internal.DIRECT_FUNDING_REQUESTED:
-      const { safeToDepositLevel } = action;
+      const {
+        safeToDepositLevel,
+        totalFundingRequired,
+        requiredDeposit,
+        channelId,
+        ourIndex,
+      } = action;
       return {
         state: states.waitForFundingApproval({
           ...state,
           fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
           channelFundingStatus: states.WAIT_FOR_FUNDING_APPROVAL,
           safeToDepositLevel,
+          channelId,
+          requestedTotalFunds: totalFundingRequired,
+          requestedYourContribution: requiredDeposit,
+          ourIndex,
         }),
       };
     default:
