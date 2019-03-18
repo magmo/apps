@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import SidebarLayout from '../SidebarLayout';
-import { unreachable } from 'src/utils/reducer-utils';
+import { unreachable } from '../../utils/reducer-utils';
 
 interface Props {
   state: states.ApprovedDirectFundingState;
