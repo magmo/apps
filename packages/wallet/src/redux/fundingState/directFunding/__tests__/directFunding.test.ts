@@ -156,4 +156,8 @@ describe(startingIn(states.SAFE_TO_DEPOSIT), () => {
   });
 });
 
-describe(startingIn(states.CHANNEL_FUNDED), () => {});
+describe(startingIn(states.CHANNEL_FUNDED), () => {
+  it.skip('works', () => {
+    expect.assertions(1);
+  });
+});
