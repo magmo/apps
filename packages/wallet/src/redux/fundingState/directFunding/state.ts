@@ -2,6 +2,7 @@ import { SharedDirectFundingState, DIRECT_FUNDING } from '../shared/state';
 export { SharedDirectFundingState, DIRECT_FUNDING };
 
 import * as depositing from './depositing/state';
+export { depositing };
 
 // ChannelFundingStatus
 export const WAIT_FOR_FUNDING_APPROVAL = 'WAIT_FOR_FUNDING_APPROVAL';
@@ -39,12 +40,13 @@ export interface ChannelFunded extends BaseDirectFundingState {
   channelFundingStatus: typeof CHANNEL_FUNDED;
 }
 
-export type DirectFundingState =
-  | WaitForFundingApproval
+export type ApprovedDirectFundingState =
   | NotSafeToDeposit
   | depositing.Depositing
   | WaitForFundingConfirmation
   | ChannelFunded;
+
+export type DirectFundingState = WaitForFundingApproval | ApprovedDirectFundingState;
 
 // type guards
 const guardGenerator = <T extends DirectFundingState>(type) => (
