@@ -2,12 +2,6 @@ import { WalletAction } from '../actions';
 import { SharedChannelState } from '../channelState/shared/state';
 import { OutboxState } from '../outbox/state';
 
-export interface NextChannelState<T extends SharedChannelState> {
-  channelState: T;
-  unhandledAction?: WalletAction;
-  outboxState?: OutboxState;
-}
-
 export interface StateWithSideEffects<T> {
   state: T;
   outboxState?: OutboxState;

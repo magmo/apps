@@ -25,17 +25,16 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { validCommitmentSignature } from '../../utils/signing-utils';
 import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
-import { NextChannelState } from '../shared/state';
+import { StateWithSideEffects } from '../shared/state';
 
 export const channelReducer = (
   state: ChannelState,
   action: WalletAction,
-  unhandledAction?: WalletAction,
-): NextChannelState<ChannelState> => {
+): StateWithSideEffects<ChannelState> => {
   const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
   if (conclusionStateFromOwnRequest) {
     return {
-      channelState: conclusionStateFromOwnRequest,
+      state: conclusionStateFromOwnRequest,
       outboxState: { displayOutbox: showWallet() },
     };
   }
@@ -43,7 +42,7 @@ export const channelReducer = (
   const conclusionStateFromOpponentRequest = receivedValidOpponentConclusionRequest(state, action);
   if (conclusionStateFromOpponentRequest) {
     return {
-      channelState: conclusionStateFromOpponentRequest,
+      state: conclusionStateFromOpponentRequest,
       outboxState: { displayOutbox: showWallet() },
     };
   }
