@@ -12,6 +12,8 @@ import ApproveFunding from '../components/funding/ApproveFunding';
 import { AFundingStep, BFundingStep } from '../components/funding/FundingStep';
 import DirectFunding from './DirectFunding';
 import { addHex } from '../utils/hex-utils';
+import { getWalletState } from '../redux/store';
+import store from '../redux/store';
 
 interface Props {
   state: channelStates.FundingState;
@@ -45,7 +47,8 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
-        return <DirectFunding state={state.fundingState} />;
+        const fundingState = getWalletState(store).fundingState;
+        return <DirectFunding state={fundingState} />;
       case channelStates.A_WAIT_FOR_POST_FUND_SETUP:
         return <AFundingStep step={4}>Waiting for the other player</AFundingStep>;
       case channelStates.WAIT_FOR_FUNDING_CONFIRMATION:
