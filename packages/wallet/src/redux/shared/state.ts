@@ -1,6 +1,7 @@
 import { WalletAction } from '../actions';
 import { SharedChannelState } from '../channelState/shared/state';
 import { OutboxState } from '../outbox/state';
+import { FundingState } from '../fundingState/state';
 
 export interface StateWithSideEffects<T> {
   state: T;
@@ -9,6 +10,7 @@ export interface StateWithSideEffects<T> {
 
 export interface SharedWalletState {
   channelState?: SharedChannelState;
+  fundingState?: FundingState;
   outboxState: OutboxState;
   unhandledAction?: WalletAction;
 }
@@ -28,8 +30,8 @@ export interface TransactionExists {
 
 // creators
 export function base<T extends SharedWalletState>(params: T): SharedWalletState {
-  const { outboxState, channelState } = params;
-  return { outboxState, channelState };
+  const { outboxState, channelState, fundingState } = params;
+  return { outboxState, channelState, fundingState };
 }
 
 export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {
