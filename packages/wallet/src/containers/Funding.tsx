@@ -9,11 +9,11 @@ import * as actions from '../redux/actions';
 import AcknowledgeX from '../components/AcknowledgeX';
 import { unreachable } from '../utils/reducer-utils';
 import ApproveFunding from '../components/funding/ApproveFunding';
-import { AFundingStep, BFundingStep } from '../components/funding/FundingStep';
 import DirectFunding from './DirectFunding';
 import { addHex } from '../utils/hex-utils';
-import { getWalletState } from '../redux/store';
+import { getFundingState } from '../redux/store';
 import store from '../redux/store';
+import { FundingStep } from '../components/funding/FundingStep';
 
 interface Props {
   state: channelStates.FundingState;
@@ -34,6 +34,7 @@ class FundingContainer extends PureComponent<Props> {
       fundingDeclinedAcknowledged,
     } = this.props;
 
+    const fundingState = getFundingState(store);
     switch (state.type) {
       case channelStates.WAIT_FOR_FUNDING_REQUEST:
         return null;
@@ -47,29 +48,17 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
-        const fundingState = getWalletState(store).fundingState;
+      case channelStates.WAIT_FOR_FUNDING_CONFIRMATION:
         return <DirectFunding state={fundingState} />;
       case channelStates.A_WAIT_FOR_POST_FUND_SETUP:
-        return <AFundingStep step={4}>Waiting for the other player</AFundingStep>;
-      case channelStates.WAIT_FOR_FUNDING_CONFIRMATION:
-        return <BFundingStep step={1} />; // TODO: This will need to change based on direct or indirect funding, right?
       case channelStates.B_WAIT_FOR_POST_FUND_SETUP:
-        return <BFundingStep step={4}>Waiting for the other player</BFundingStep>;
-
+        return <FundingStep state={fundingState}>Waiting for the other player</FundingStep>;
       case channelStates.ACKNOWLEDGE_FUNDING_SUCCESS:
-        if (state.ourIndex === 0) {
-          return (
-            <AFundingStep step={5}>
-              <Button onClick={fundingSuccessAcknowledged}>{'Return to game'}</Button>
-            </AFundingStep>
-          );
-        } else {
-          return (
-            <BFundingStep step={5}>
-              <Button onClick={fundingSuccessAcknowledged}>{'Return to game'}</Button>
-            </BFundingStep>
-          );
-        }
+        return (
+          <FundingStep state={fundingState}>
+            <Button onClick={fundingSuccessAcknowledged}>{'Return to game'}</Button>
+          </FundingStep>
+        );
       case channelStates.ACKNOWLEDGE_FUNDING_DECLINED:
         return (
           <AcknowledgeX
