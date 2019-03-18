@@ -7,6 +7,8 @@ import {
   channelInitialized,
 } from './state';
 
+import { waitForFundingRequest } from '../fundingState/state';
+
 import { WalletAction, CHANNEL_INITIALIZED } from '../actions';
 import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { ethers } from 'ethers';
@@ -32,6 +34,7 @@ export const initializedReducer = (
           ...state,
           outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
           channelState: { address, privateKey },
+          fundingState: waitForFundingRequest(),
         });
       }
       break;
