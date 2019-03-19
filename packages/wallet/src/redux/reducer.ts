@@ -29,9 +29,11 @@ export const walletReducer = (
     sideEffects.transactionOutbox = undefined;
   }
 
-  // For the moment, only one action should ever be put in the actionOutbox,
-  // so it's always safe to clear it.
-  sideEffects.actionOutbox = undefined;
+  if (action.type.match('WALLET.INTERNAL')) {
+    // For the moment, only one action should ever be put in the actionOutbox,
+    // so it's always safe to clear it.
+    sideEffects.actionOutbox = undefined;
+  }
   state = { ...state, outboxState: applySideEffects(state.outboxState, sideEffects) };
 
   switch (state.stage) {
