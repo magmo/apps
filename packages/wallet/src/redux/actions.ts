@@ -279,7 +279,7 @@ export const fundingReceivedEvent = (
 export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
 
 export const CHALLENGE_CREATED_EVENT = 'CHALLENGE_CREATED_EVENT';
-export const challengeCreatedEvent = (channelId, commitment, finalizedAt) => ({
+export const challengeCreatedEvent = (channelId: string, commitment: Commitment, finalizedAt) => ({
   channelId,
   commitment,
   finalizedAt,
