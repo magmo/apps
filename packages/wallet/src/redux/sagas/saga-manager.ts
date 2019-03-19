@@ -6,12 +6,13 @@ import { transactionSender } from './transaction-sender';
 import { adjudicatorWatcher } from './adjudicator-watcher';
 import { blockMiningWatcher } from './block-mining-watcher';
 
-import { WalletState, CHANNEL_INITIALIZED, WAIT_FOR_ADJUDICATOR } from '../state';
+import { WalletState, WAIT_FOR_ADJUDICATOR } from '../state';
 import { getProvider } from '../../utils/contract-utils';
 
 import { displaySender } from './display-sender';
 import { ganacheMiner } from './ganache-miner';
 import { adjudicatorLoader } from './adjudicator-loader';
+import { WALLET_INITIALIZED } from '../initialized/state';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -36,7 +37,8 @@ export function* sagaManager(): IterableIterator<any> {
     }
 
     // if have adjudicator, make sure that the adjudicator watcher is running
-    if (state.type === CHANNEL_INITIALIZED) {
+    if (state.type === WALLET_INITIALIZED) {
+      throw new Error('TODO: Correctly use the channel state');
       if ('channelId' in state.channelState) {
         if (!adjudicatorWatcherProcess) {
           const provider = yield getProvider();
