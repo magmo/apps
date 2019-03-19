@@ -11,15 +11,13 @@ import {
   itDispatchesThisAction,
   itDispatchesNoAction,
 } from '../../../__tests__/helpers';
-import { bigNumberify } from 'ethers/utils';
+import { addHex } from '../../../../utils/hex-utils';
 
-const { channelId } = scenarios;
+const { channelId, twoThree } = scenarios;
 
-const TOTAL_REQUIRED = bigNumberify(1000000000000000).toHexString();
-const YOUR_DEPOSIT_A = bigNumberify(100).toHexString();
-const YOUR_DEPOSIT_B = bigNumberify(TOTAL_REQUIRED)
-  .sub(bigNumberify(YOUR_DEPOSIT_A))
-  .toHexString();
+const YOUR_DEPOSIT_A = twoThree[1];
+const YOUR_DEPOSIT_B = twoThree[0];
+const TOTAL_REQUIRED = twoThree.reduce(addHex);
 
 const defaultsForA: states.DirectFundingState = {
   fundingType: states.DIRECT_FUNDING,
@@ -52,7 +50,7 @@ describe(startingIn('any state'), () => {
         itDispatchesThisAction(actions.internal.DIRECT_FUNDING_CONFIRMED, updatedState);
       });
       describe('when the channel is still not funded', () => {
-        const state = states.notSafeToDeposit(defaultsForA);
+        const state = states.notSafeToDeposit(defaultsForB);
         const action = actions.fundingReceivedEvent(channelId, YOUR_DEPOSIT_B, YOUR_DEPOSIT_B);
         const updatedState = directFundingStateReducer(state, action);
         itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, updatedState);

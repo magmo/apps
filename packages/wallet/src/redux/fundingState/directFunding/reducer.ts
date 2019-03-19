@@ -47,7 +47,10 @@ const notSafeToDepositReducer = (
 ): StateWithSideEffects<states.DirectFundingState> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
-      if (bigNumberify(action.totalForDestination).gte(state.safeToDepositLevel)) {
+      if (
+        action.destination === state.channelId &&
+        bigNumberify(action.totalForDestination).gte(state.safeToDepositLevel)
+      ) {
         return {
           state: depositingStates.waitForTransactionSent({ ...state }),
           outboxState: {
