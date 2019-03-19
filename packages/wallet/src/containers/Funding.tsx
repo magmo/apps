@@ -40,8 +40,8 @@ class FundingContainer extends PureComponent<Props> {
           <ApproveFunding
             fundingApproved={fundingApproved}
             fundingRejected={fundingRejected}
-            requestedTotalFunds={state.lastCommitment.commitment.allocation[state.ourIndex]}
-            requestedYourContribution={state.lastCommitment.commitment.allocation.reduce(addHex)}
+            requestedTotalFunds={state.lastCommitment.commitment.allocation.reduce(addHex)}
+            requestedYourContribution={state.lastCommitment.commitment.allocation[state.ourIndex]}
           />
         );
       case channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
