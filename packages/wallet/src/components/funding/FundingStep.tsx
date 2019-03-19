@@ -7,7 +7,7 @@ import SidebarLayout from '../SidebarLayout';
 import { unreachable } from '../../utils/reducer-utils';
 
 interface Props {
-  state: states.ApprovedDirectFundingState;
+  step: Step;
 }
 
 const completeIcon = (
@@ -57,7 +57,7 @@ export const fundingStepByState = (state: states.ApprovedDirectFundingState): St
   return unreachable(state);
 };
 
-enum Step {
+export enum Step {
   NOT_SAFE_TO_DEPOSIT,
   SENDING_DEPOSIT,
   CONFIRMING_DEPOSIT,
@@ -66,7 +66,7 @@ enum Step {
 }
 
 // NOTE: the appearance of this modal is largely influenced by the amount of text in each message. Until a more robust front-end comes along, try to keep messages of the same length within each case block below.
-const message = (currentStep: Step, iconStep: Step) => {
+const message = (iconStep: Step, currentStep: Step) => {
   switch (iconStep) {
     case Step.NOT_SAFE_TO_DEPOSIT:
       if (currentStep < iconStep) {
@@ -113,20 +113,17 @@ const message = (currentStep: Step, iconStep: Step) => {
 
 export class FundingStep extends React.PureComponent<Props> {
   render() {
-    const currentStep = fundingStepByState(this.props.state);
+    const currentStep = this.props.step;
     const children = this.props.children;
 
     return (
       <SidebarLayout>
         <h2 className="bp-2">Opening channel</h2>
         <ul className="fa-ul">
-          if (state.ourIndex > 0){' '}
-          {
-            <li style={{ padding: '0.7em 1em' }}>
-              {icon(Step.NOT_SAFE_TO_DEPOSIT, currentStep)}
-              {message(Step.NOT_SAFE_TO_DEPOSIT, currentStep)}
-            </li>
-          }
+          <li style={{ padding: '0.7em 1em' }}>
+            {icon(Step.NOT_SAFE_TO_DEPOSIT, currentStep)}
+            {message(Step.NOT_SAFE_TO_DEPOSIT, currentStep)}
+          </li>
           <li style={{ padding: '0.7em 1em' }}>
             {icon(Step.SENDING_DEPOSIT, currentStep)}
             {message(Step.SENDING_DEPOSIT, currentStep)}

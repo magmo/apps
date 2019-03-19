@@ -7,7 +7,7 @@ import * as actions from '../redux/actions';
 
 import { unreachable } from '../utils/reducer-utils';
 import ApproveFunding from '../components/funding/ApproveFunding';
-import { FundingStep } from '../components/funding/FundingStep';
+import { FundingStep, fundingStepByState } from '../components/funding/FundingStep';
 import EtherscanLink from '../components/EtherscanLink';
 import TransactionFailed from '../components/TransactionFailed';
 
@@ -33,23 +33,22 @@ class DirectFundingContainer extends PureComponent<Props> {
         />
       );
     }
+    const step = fundingStepByState(state);
     if (
       fundingStates.stateIsNotSafeToDeposit(state) ||
       fundingStates.stateIsWaitForFundingConfirmation(state)
     ) {
-      return <FundingStep state={state} />;
+      return <FundingStep step={step} />;
     }
     if (fundingStates.stateIsDepositing(state)) {
       switch (state.depositStatus) {
         case fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT:
-          return <FundingStep state={state} />;
+          return <FundingStep step={step} />;
         case fundingStates.depositing.WAIT_FOR_DEPOSIT_APPROVAL:
-          return (
-            <FundingStep state={state}>Please confirm the transaction in MetaMask!</FundingStep>
-          );
+          return <FundingStep step={step}>Please confirm the transaction in MetaMask!</FundingStep>;
         case fundingStates.depositing.WAIT_FOR_DEPOSIT_CONFIRMATION:
           return (
-            <FundingStep state={state}>
+            <FundingStep step={step}>
               Check the progress on&nbsp;
               <EtherscanLink
                 transactionID={state.transactionHash}

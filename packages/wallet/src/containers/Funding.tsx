@@ -13,7 +13,7 @@ import DirectFunding from './DirectFunding';
 import { addHex } from '../utils/hex-utils';
 import { getFundingState } from '../redux/store';
 import store from '../redux/store';
-import { FundingStep } from '../components/funding/FundingStep';
+import { FundingStep, Step } from '../components/funding/FundingStep';
 
 interface Props {
   state: channelStates.FundingState;
@@ -52,10 +52,10 @@ class FundingContainer extends PureComponent<Props> {
         return <DirectFunding state={fundingState} />;
       case channelStates.A_WAIT_FOR_POST_FUND_SETUP:
       case channelStates.B_WAIT_FOR_POST_FUND_SETUP:
-        return <FundingStep state={fundingState}>Waiting for the other player</FundingStep>;
+        return <FundingStep step={Step.CHANNEL_FUNDED}>Waiting for the other player</FundingStep>;
       case channelStates.ACKNOWLEDGE_FUNDING_SUCCESS:
         return (
-          <FundingStep state={fundingState}>
+          <FundingStep step={Step.CHANNEL_FUNDED}>
             <Button onClick={fundingSuccessAcknowledged}>{'Return to game'}</Button>
           </FundingStep>
         );
