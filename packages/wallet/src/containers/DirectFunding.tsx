@@ -13,6 +13,7 @@ import TransactionFailed from '../components/TransactionFailed';
 
 interface Props {
   state: fundingStates.DirectFundingState;
+  channelId: string;
   fundingApproved: () => void;
   fundingRejected: () => void;
   fundingSuccessAcknowledged: () => void;
@@ -81,6 +82,6 @@ const mapDispatchToProps = {
 // why does it think that mapStateToProps can return undefined??
 
 export default connect(
-  () => ({}),
+  (state: any) => ({ state: state.fundingState }),
   mapDispatchToProps,
 )(DirectFundingContainer);

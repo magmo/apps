@@ -11,8 +11,6 @@ import { unreachable } from '../utils/reducer-utils';
 import ApproveFunding from '../components/funding/ApproveFunding';
 import DirectFunding from './DirectFunding';
 import { addHex } from '../utils/hex-utils';
-import { getFundingState } from '../redux/store';
-import store from '../redux/store';
 import { FundingStep, Step } from '../components/funding/FundingStep';
 
 interface Props {
@@ -34,7 +32,6 @@ class FundingContainer extends PureComponent<Props> {
       fundingDeclinedAcknowledged,
     } = this.props;
 
-    const fundingState = getFundingState(store);
     switch (state.type) {
       case channelStates.WAIT_FOR_FUNDING_REQUEST:
         return null;
@@ -49,7 +46,7 @@ class FundingContainer extends PureComponent<Props> {
         );
       case channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
       case channelStates.WAIT_FOR_FUNDING_CONFIRMATION:
-        return <DirectFunding state={fundingState} />;
+        return <DirectFunding channelId={state.channelId} />;
       case channelStates.A_WAIT_FOR_POST_FUND_SETUP:
       case channelStates.B_WAIT_FOR_POST_FUND_SETUP:
         return <FundingStep step={Step.CHANNEL_FUNDED}>Waiting for the other player</FundingStep>;
