@@ -15,6 +15,10 @@ export type OpenedState =
   | ClosingState;
 
 export type ChannelStatus = OpeningState | OpenedState;
+// TODO: It would be helpful for channelId to have type Address
+export interface ChannelState {
+  [channelId: string]: ChannelStatus;
+}
 
 export * from './opening/state';
 export * from './running/state';
