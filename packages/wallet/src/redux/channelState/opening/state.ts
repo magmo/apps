@@ -9,16 +9,9 @@ import {
 export const OPENING = 'OPENING';
 
 // state type
-export const WAIT_FOR_ADDRESS = 'WAIT_FOR_ADDRESS';
 export const WAIT_FOR_CHANNEL = 'WAIT_FOR_CHANNEL';
 export const WAIT_FOR_PRE_FUND_SETUP = 'WAIT_FOR_PRE_FUND_SETUP';
 export const METAMASK_LOAD_ERROR = 'METAMASK_LOAD_ERROR';
-
-export interface WaitForAddress {
-  // The default channel state
-  type: typeof WAIT_FOR_ADDRESS;
-  stage: typeof OPENING;
-}
 
 export interface WaitForChannel extends SharedChannelState {
   // In this state, the slot has been reserved for the channel, with
@@ -26,10 +19,6 @@ export interface WaitForChannel extends SharedChannelState {
   type: typeof WAIT_FOR_CHANNEL;
   stage: typeof OPENING;
 }
-export function waitForAddress(): WaitForAddress {
-  return { type: WAIT_FOR_ADDRESS, stage: OPENING };
-}
-
 export function waitForChannel<T extends SharedChannelState>(params: T): WaitForChannel {
   return { type: WAIT_FOR_CHANNEL, stage: OPENING, ...baseChannelState(params) };
 }
@@ -45,4 +34,4 @@ export function waitForPreFundSetup<T extends FirstCommitmentReceived>(
   return { type: WAIT_FOR_PRE_FUND_SETUP, stage: OPENING, ...firstCommitmentReceived(params) };
 }
 
-export type OpeningState = WaitForAddress | WaitForChannel | WaitForPreFundSetup;
+export type OpeningState = WaitForChannel | WaitForPreFundSetup;
