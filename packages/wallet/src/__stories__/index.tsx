@@ -10,6 +10,7 @@ import * as scenarios from '../redux/__tests__/test-scenarios';
 import { bigNumberify } from 'ethers/utils';
 import NetworkStatus from '../components/NetworkStatus';
 import { channelFunded } from '../redux/fundingState/state';
+import { emptyState } from '../redux/state';
 
 const {
   asAddress,
@@ -83,24 +84,24 @@ const fakeStore = state => ({
   },
 });
 
-const initializedWalletState = walletStates.channelInitialized({
+const initializedWalletState = walletStates.initialized({
   ...walletStates.waitForLogin(),
   unhandledAction: undefined,
   outboxState: {},
-  channelState: channelStates.approveFunding({ ...playerADefaults }),
+  channelState: { [channelId]: channelStates.approveFunding({ ...playerADefaults }) },
   networkId: 4,
   adjudicator: '',
   uid: '',
 });
 
 // Want to return top level wallet state, not the channel state
-function walletStateFromChannelState<T extends channelStates.ChannelState>(
+function walletStateFromChannelState<T extends channelStates.OpenedChannelState>(
   channelState: T,
   networkId?: number,
 ): walletStates.WalletState {
   return {
     ...initializedWalletState,
-    channelState: { ...channelState },
+    channelState: { [channelState.channelId]: channelState },
     networkId: networkId || 3,
   };
 }
@@ -298,5 +299,5 @@ addStoriesFromCollection(WalletScreendsClosing, 'Wallet Screens / Closing');
 
 storiesOf('Wallet Landing Page', module).add(
   'Landing Page',
-  channelStateRender(walletStates.waitForLogin({ outboxState: {} })),
+  channelStateRender(walletStates.waitForLogin(emptyState)),
 );
