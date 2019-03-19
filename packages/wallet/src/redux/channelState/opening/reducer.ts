@@ -5,6 +5,7 @@ import {
   validationSuccess,
   signatureFailure,
   validationFailure,
+  channelInitializationSuccess,
 } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable } from '../../../utils/reducer-utils';
@@ -12,18 +13,39 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 import { CommitmentType } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { StateWithSideEffects } from '../../shared/state';
+import { ethers } from 'ethers';
+import { waitForChannel } from './state';
 
 export const openingReducer = (
   state: channelStates.OpeningState,
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelState> => {
   switch (state.type) {
+    case channelStates.WAIT_FOR_ADDRESS:
+      return waitForAddressReducer(state, action);
     case channelStates.WAIT_FOR_CHANNEL:
       return waitForChannelReducer(state, action);
     case channelStates.WAIT_FOR_PRE_FUND_SETUP:
       return waitForPreFundSetupReducer(state, action);
     default:
       return unreachable(state);
+  }
+};
+
+const waitForAddressReducer = (
+  state: channelStates.WaitForAddress,
+  action: actions.WalletAction,
+): StateWithSideEffects<channelStates.WaitForChannel | channelStates.WaitForAddress> => {
+  if (action.type === actions.CHANNEL_INITIALIZED) {
+    const wallet = ethers.Wallet.createRandom();
+    const { address, privateKey } = wallet;
+
+    return {
+      state: waitForChannel({ address, privateKey }),
+      outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
+    };
+  } else {
+    return { state };
   }
 };
 
