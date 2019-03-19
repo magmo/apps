@@ -37,7 +37,7 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
     );
     const updatedState = fundingStateReducer(state, action);
 
-    itChangesChannelFundingStatusTo(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
+    itChangesChannelFundingStatusTo(states.SAFE_TO_DEPOSIT, updatedState);
   });
 
   describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
@@ -52,7 +52,7 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
     );
     const updatedState = fundingStateReducer(state, action);
 
-    itChangesChannelFundingStatusTo(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
+    itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, updatedState);
   });
 
   describe('incoming action: FUNDING_RECEIVED_EVENT', () => {
@@ -60,7 +60,7 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
     const action = actions.fundingReceivedEvent(channelId, TOTAL_REQUIRED, TOTAL_REQUIRED);
     const updatedState = fundingStateReducer(state, action);
 
-    itChangesChannelFundingStatusTo(states.CHANNEL_FUNDED, updatedState);
+    itChangesChannelFundingStatusTo(states.FUNDING_NOT_STARTED, updatedState);
   });
 });
 
