@@ -41,39 +41,40 @@ const unknownFundingTypeReducer = (
         channelId,
         ourIndex,
       } = action;
-      const channelFundingStatus =
-        ourIndex === 0 ? states.SAFE_TO_DEPOSIT : states.NOT_SAFE_TO_DEPOSIT;
-      if (
-        state.destination === channelId &&
-        state.totalForDestination &&
-        bigNumberify(action.totalFundingRequired).lte(state.totalForDestination)
-      ) {
-        return {
-          state: states.channelFunded({
-            ...state,
-            fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
-            channelFundingStatus: states.CHANNEL_FUNDED,
-            safeToDepositLevel,
-            channelId,
-            requestedTotalFunds: totalFundingRequired,
-            requestedYourContribution: requiredDeposit,
-            ourIndex,
-          }),
-        };
-      } else {
-        return {
-          state: states.waitForFundingApproval({
-            ...state,
-            fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
-            channelFundingStatus,
-            safeToDepositLevel,
-            channelId,
-            requestedTotalFunds: totalFundingRequired,
-            requestedYourContribution: requiredDeposit,
-            ourIndex,
-          }),
-        };
-      }
+
+      const alreadySafeToDeposit =
+        bigNumberify(safeToDepositLevel).eq('0x') ||
+        (state.destination === action.channelId &&
+          bigNumberify(action.safeToDepositLevel).lte(state.totalForDestination!));
+      const alreadyFunded =
+        bigNumberify(totalFundingRequired).eq('0x') ||
+        (state.destination === action.channelId &&
+          bigNumberify(action.totalFundingRequired).lte(state.totalForDestination!));
+
+      const channelFundingStatus = alreadyFunded
+        ? states.CHANNEL_FUNDED
+        : alreadySafeToDeposit
+        ? states.SAFE_TO_DEPOSIT
+        : states.NOT_SAFE_TO_DEPOSIT;
+
+      const stateConstructor: any = alreadyFunded
+        ? states.channelFunded
+        : alreadySafeToDeposit
+        ? states.depositing.waitForTransactionSent
+        : states.notSafeToDeposit;
+
+      return {
+        state: stateConstructor({
+          ...state,
+          fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
+          channelFundingStatus,
+          safeToDepositLevel,
+          channelId,
+          requestedTotalFunds: totalFundingRequired,
+          requestedYourContribution: requiredDeposit,
+          ourIndex,
+        }),
+      };
     default:
       return { state };
   }
