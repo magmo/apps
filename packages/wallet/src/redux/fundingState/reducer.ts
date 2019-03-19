@@ -5,6 +5,7 @@ import { unreachable, ReducerWithSideEffects } from '../../utils/reducer-utils';
 
 import { StateWithSideEffects } from '../shared/state';
 import { directFundingStateReducer } from './directFunding/reducer';
+import { bigNumberify } from 'ethers/utils';
 
 type ReturnType = StateWithSideEffects<states.FundingState>;
 
@@ -28,6 +29,10 @@ const unknownFundingTypeReducer = (
   action: actions.WalletAction,
 ): ReturnType => {
   switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      return {
+        state: states.waitForFundingRequest(action),
+      };
     case actions.internal.DIRECT_FUNDING_REQUESTED:
       const {
         safeToDepositLevel,
@@ -36,18 +41,39 @@ const unknownFundingTypeReducer = (
         channelId,
         ourIndex,
       } = action;
-      return {
-        state: states.waitForFundingApproval({
-          ...state,
-          fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
-          channelFundingStatus: states.WAIT_FOR_FUNDING_APPROVAL,
-          safeToDepositLevel,
-          channelId,
-          requestedTotalFunds: totalFundingRequired,
-          requestedYourContribution: requiredDeposit,
-          ourIndex,
-        }),
-      };
+      const channelFundingStatus =
+        ourIndex === 0 ? states.SAFE_TO_DEPOSIT : states.NOT_SAFE_TO_DEPOSIT;
+      if (
+        state.destination === channelId &&
+        state.totalForDestination &&
+        bigNumberify(action.totalFundingRequired).lte(state.totalForDestination)
+      ) {
+        return {
+          state: states.channelFunded({
+            ...state,
+            fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
+            channelFundingStatus: states.CHANNEL_FUNDED,
+            safeToDepositLevel,
+            channelId,
+            requestedTotalFunds: totalFundingRequired,
+            requestedYourContribution: requiredDeposit,
+            ourIndex,
+          }),
+        };
+      } else {
+        return {
+          state: states.waitForFundingApproval({
+            ...state,
+            fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
+            channelFundingStatus,
+            safeToDepositLevel,
+            channelId,
+            requestedTotalFunds: totalFundingRequired,
+            requestedYourContribution: requiredDeposit,
+            ourIndex,
+          }),
+        };
+      }
     default:
       return { state };
   }
