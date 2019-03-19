@@ -1,17 +1,4 @@
-import {
-  OPENING,
-  FUNDING,
-  RUNNING,
-  CHALLENGING,
-  RESPONDING,
-  WITHDRAWING,
-  CLOSING,
-  approveConclude,
-  ApproveConclude,
-  acknowledgeConclude,
-  AcknowledgeConclude,
-  ChannelState,
-} from './state';
+import * as states from './state';
 
 import { openingReducer } from './opening/reducer';
 import { fundingReducer } from './funding/reducer';
@@ -32,10 +19,10 @@ import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
 import { StateWithSideEffects } from '../shared/state';
 
-export const channelReducer: ReducerWithSideEffects<ChannelState> = (
-  state: ChannelState,
+const channelReducer: ReducerWithSideEffects<states.ChannelStatus> = (
+  state: states.ChannelStatus,
   action: WalletAction,
-): StateWithSideEffects<ChannelState> => {
+): StateWithSideEffects<states.ChannelStatus> => {
   const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
   if (conclusionStateFromOwnRequest) {
     return {
@@ -53,19 +40,19 @@ export const channelReducer: ReducerWithSideEffects<ChannelState> = (
   }
 
   switch (state.stage) {
-    case OPENING:
+    case states.OPENING:
       return openingReducer(state, action);
-    case FUNDING:
+    case states.FUNDING:
       return fundingReducer(state, action);
-    case RUNNING:
+    case states.RUNNING:
       return runningReducer(state, action);
-    case CHALLENGING:
+    case states.CHALLENGING:
       return challengingReducer(state, action);
-    case RESPONDING:
+    case states.RESPONDING:
       return respondingReducer(state, action);
-    case WITHDRAWING:
+    case states.WITHDRAWING:
       return withdrawingReducer(state, action);
-    case CLOSING:
+    case states.CLOSING:
       return closingReducer(state, action);
     default:
       return unreachable(state);
@@ -73,23 +60,23 @@ export const channelReducer: ReducerWithSideEffects<ChannelState> = (
 };
 
 const receivedValidOwnConclusionRequest = (
-  state: ChannelState,
+  state: states.ChannelStatus,
   action: WalletAction,
-): ApproveConclude | null => {
-  if (state.stage !== FUNDING && state.stage !== RUNNING) {
+): states.ApproveConclude | null => {
+  if (state.stage !== states.FUNDING && state.stage !== states.RUNNING) {
     return null;
   }
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) {
     return null;
   }
-  return approveConclude({ ...state });
+  return states.approveConclude({ ...state });
 };
 
 const receivedValidOpponentConclusionRequest = (
-  state: ChannelState,
+  state: states.ChannelStatus,
   action: WalletAction,
-): AcknowledgeConclude | null => {
-  if (state.stage !== FUNDING && state.stage !== RUNNING) {
+): states.AcknowledgeConclude | null => {
+  if (state.stage !== states.FUNDING && state.stage !== states.RUNNING) {
     return null;
   }
   if (action.type !== COMMITMENT_RECEIVED) {
@@ -110,7 +97,7 @@ const receivedValidOpponentConclusionRequest = (
     return null;
   }
 
-  return acknowledgeConclude({
+  return states.acknowledgeConclude({
     ...state,
     turnNum: commitment.turnNum,
     lastCommitment: { commitment, signature },
