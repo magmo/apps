@@ -6,9 +6,9 @@ Version: 1.1.2
 Publisher: Matt Bierner
 VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid -->
 # Redux diagrams (current state)
-as of b4296c3
+as of commit 1947c682f74648ee162459314827bb9e24ca1fb1
 ### Methodology
-These flowcharts are made by constructing nodes from the *state types* or (*stage types* where indicated), from the relevant file in a `/states/` directory, and then constructing edges from the relationships defined in the relevant `/reducers/` directory. Edges are labelled with the *action types* from the `/actions/` directory (or function calls such as other reducers), and the flowcharts suppress information about conditional checks that are performed by the reducers. Where useful, reducers have had their sub-reducers unpacked -- making for a fewer number of more complicated flowcharts. When a reducer returns the same state, these loops are also suppressed. Globally handled actions are also sometimes suppressed.
+These flowcharts are made by constructing nodes from the *state types* or (*stage types* where indicated), from the relevant file in a `/states/` directory, and then constructing edges from the relationships defined in the relevant `/reducers/` directory. Edges are labelled with the *action types* from the `/actions/` directory (or function calls such as other reducers), and the flowcharts suppress information about conditional checks that are performed by the reducers. Where useful, reducers have had their sub-reducers unpacked -- making for a fewer number of more complicated flowcharts. When a reducer returns the same state as the result of conditional checks failing, these loops are also suppressed. Globally handled actions are also sometimes suppressed.
 <!-- TODO: consider using the actual `string` value of the types, rather than the variable name. -->
 <!-- TODO: related to ^, consider enforcing this string to be *exactly* the same as the type variable name -->
 <!-- TODO: use hyperlinks / anchors to make this document easier to navigate. -->
@@ -17,6 +17,7 @@ These flowcharts are made by constructing nodes from the *state types* or (*stag
 ### Key: 
 ```mermaid
   graph LR
+  linkStyle default interpolate basis
     STATE --> |ACTION| ANOTHER_STATE
     ANOTHER_STATE.->|functionCall| YET_ANOTHER_STATE
 ```
@@ -24,6 +25,7 @@ These flowcharts are made by constructing nodes from the *state types* or (*stag
 [`/packages/wallet/src/redux/reducers/index.ts`](../src/redux/reducers/index.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     WAIT_FOR_LOGIN -->|LOGGED_IN| WAIT_FOR_ADJUDICATOR
 
     WAIT_FOR_ADJUDICATOR-->|ADJUDICATOR_KNOWN| WAITING_FOR_CHANNEL_INITIALIZATION
@@ -45,6 +47,7 @@ TODO: side effects
 These are values for `channelStage` rather than `type`:
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     OPENING .->|openingReducer| OPENING
     OPENING .->|openingReducer| FUNDING
 
@@ -66,14 +69,11 @@ These are values for `channelStage` rather than `type`:
 [`/packages/wallet/src/redux/reducers/channels/opening.ts`](../src/redux/reducers/channels/opening.ts)
 ```mermaid
   graph TD
-    WAIT_FOR_CHANNEL -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_CHANNEL
+  linkStyle default interpolate basis
     WAIT_FOR_CHANNEL -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
-    WAIT_FOR_CHANNEL -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_CHANNEL
     WAIT_FOR_CHANNEL -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
 
-    WAIT_FOR_PRE_FUND_SETUP -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
     WAIT_FOR_PRE_FUND_SETUP -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_FUNDING_REQUEST
-    WAIT_FOR_PRE_FUND_SETUP -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
     WAIT_FOR_PRE_FUND_SETUP -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_FUNDING_REQUEST
 ```
 
@@ -81,6 +81,7 @@ These are values for `channelStage` rather than `type`:
 [`/packages/wallet/src/redux/reducers/channels/funding/index.ts`](../src/redux/reducers/channels/funding/index.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     WAIT_FOR_FUNDING_REQUEST -->|FUNDING_REQUESTED| WAIT_FOR_FUNDING_APPROVAL
 
     WAIT_FOR_FUNDING_APPROVAL -->|FUNDING_REJECTED| SEND_FUNDING_DECLINED_MESSAGE
@@ -92,8 +93,7 @@ These are values for `channelStage` rather than `type`:
 
     WAIT_FOR_FUNDING_CONFIRMATION -->|FUNDING_RECEIVED_EVENT| ACKNOWLEDGE_FUNDING_REQUEST
 
-    A_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| A_WAIT_FOR_POST_FUND_SETUP
-    A_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| ACKNOWLEDGE_FUNDING_SUCCESS
+        A_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| ACKNOWLEDGE_FUNDING_SUCCESS
     A_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| WAIT_FOR_FUNDING_CONFIRMATION
 
     B_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| B_WAIT_FOR_POST_FUND_SETUP
@@ -110,12 +110,12 @@ These are values for `channelStage` rather than `type`:
 [`/packages/wallet/src/redux/reducers/channels/running.ts`](../src/redux/reducers/channels/running.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     RUNNING .-> |waitForUpdateReducer|...
 
     WAIT_FOR_UPDATE --> |OWN_COMMITMENT_RECEIVED| WAIT_FOR_UPDATE
     WAIT_FOR_UPDATE --> |OPPONENT_COMMITMENT_RECEIVED| WAIT_FOR_UPDATE
     WAIT_FOR_UPDATE --> |CHALLENGE_CREATED_EVENT| CHOOSE_RESPONSE
-    WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| WAIT_FOR_UPDATE
     WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| APPROVE_CHALLENGE
 ```
 
@@ -123,6 +123,7 @@ These are values for `channelStage` rather than `type`:
 [`/packages/wallet/src/redux/reducers/channels/challenging/index.ts`](../src/redux/reducers/channels/challenging/index.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     APPROVE_CHALLENGE --> |CHALLENGE_APPROVED|WAIT_FOR_CHALLENGE_INITIATION
     APPROVE_CHALLENGE --> |CHALLENGE_REJECTED|WAIT_FOR_UPDATE
 
@@ -138,7 +139,6 @@ These are values for `channelStage` rather than `type`:
     WAIT_FOR_RESPONSE_OR_TIMEOUT --> |CHALLENGE_CREATED_EVENT| WAIT_FOR_RESPONSE_OR_TIMEOUT
     WAIT_FOR_RESPONSE_OR_TIMEOUT --> |RESPOND_WITH_MOVE_EVENT| ACKNOWLEDGE_CHALLENGE_RESPONSE
     WAIT_FOR_RESPONSE_OR_TIMEOUT --> |BLOCK_MINED| ACKNOWLEDGE_TIMEOUT
-    WAIT_FOR_RESPONSE_OR_TIMEOUT --> |BLOCK_MINED| WAIT_FOR_RESPONSE_OR_TIMEOUT
 
     ACKNOWLEDGE_CHALLENGE_RESPONSE --> |CHALLENGE_RESPONSE_ACKNOWLEDGED| WAIT_FOR_UPDATE
     
@@ -151,6 +151,7 @@ These are values for `channelStage` rather than `type`:
 [`/packages/wallet/src/redux/reducers/channels/responding/index.ts`](../src/redux/reducers/channels/responding/index.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     CHOOSE_RESPONSE --> |RESPOND_WITH_MOVE_CHOSEN| TAKE_MOVE_IN_APP
     CHOOSE_RESPONSE --> |RESPOND_WITH_EXISTING_MOVE_CHOSEN| INITIATE_RESPONSE
     CHOOSE_RESPONSE --> |RESPOND_WITH_REFUTE_CHOSEN| INITIATE_RESPONSE
@@ -182,6 +183,7 @@ CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT
 [`/packages/wallet/src/redux/reducers/channels/withdrawing/index.ts`](../src/redux/reducers/channels/withdrawing/index.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     APPROVE_WITHDRAWAL --> |WITHDRAWAL_APPROVED| WAIT_FOR_WITHDRAWAL_INITIATION
 
     APPROVE_WITHDRAWAL --> |WITHDRAWAL_REJECTED| ACKNOWLEDGE_CLOSE_SUCCESS
@@ -200,6 +202,7 @@ CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT
 [`/packages/wallet/src/redux/reducers/channels/closing/index.ts`](../src/redux/reducers/channels/closing/index.ts)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     APPROVE_CONCLUDE --> |CONCLUDE_APPROVED| APPROVE_CLOSE_ON_CHAIN
     APPROVE_CONCLUDE --> |CONCLUDE_APPROVED| WAIT_FOR_OPPONENT_CONCLUDE
     APPROVE_CONCLUDE --> |CONCLUDE_REJECTED| WAIT_FOR_UPDATE
@@ -228,6 +231,7 @@ CHALLENGEE_ACKNOWLEDGE_CHALLENGE_TIMEOUT
 [`/packages/wallet/src/redux/reducers/channels/funding/directFunding.ts`](../src/redux/reducers/channels/funding/directFunding.ts`)
 ```mermaid
   graph TD
+  linkStyle default interpolate basis
     WAIT_FOR_FUNDING_REQUEST -->|FUNDING_REQUESTED| WAIT_FOR_FUNDING_APPROVAL
 
     WAIT_FOR_FUNDING_APPROVAL -->|FUNDING_REJECTED| SEND_FUNDING_DECLINED_MESSAGE
@@ -268,13 +272,9 @@ Absorb the above as subgraphs of a single diagram:
 
 ```mermaid
   graph TD
-    WAIT_FOR_LOGIN -->|LOGGED_IN| WAIT_FOR_ADJUDICATOR
-    WAIT_FOR_ADJUDICATOR-->|ADJUDICATOR_KNOWN| WAITING_FOR_CHANNEL_INITIALIZATION
-    WAITING_FOR_CHANNEL_INITIALIZATION -->|CHANNEL_INITIALIZED| INITIALIZING_CHANNEL
-    INITIALIZING_CHANNEL .->|channelReducer| CHANNEL_INITIALIZED
-    CHANNEL_INITIALIZED .->|channelReducer| CHANNEL_INITIALIZED
+  linkStyle default interpolate basis
+  linkStyle default interpolate basis
 
-    subgraph channelReducer
     OPENING .->|openingReducer| OPENING
     OPENING .->|openingReducer| FUNDING
     FUNDING .->|fundingReducer| FUNDING
@@ -286,16 +286,15 @@ Absorb the above as subgraphs of a single diagram:
     WITHDRAWING .->|withdrawingReducer| WITHDRAWING
     WITHDRAWING .->|withdrawingReducer| CLOSING
     CLOSING .->|closingReducer| CLOSING
-    end
 
     subgraph openingReducer
-    WAIT_FOR_CHANNEL -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_CHANNEL
+
     WAIT_FOR_CHANNEL -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
-    WAIT_FOR_CHANNEL -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_CHANNEL
+
     WAIT_FOR_CHANNEL -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
-    WAIT_FOR_PRE_FUND_SETUP -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
+ 
     WAIT_FOR_PRE_FUND_SETUP -->|OWN_COMMITMENT_RECEIEVED| WAIT_FOR_FUNDING_REQUEST
-    WAIT_FOR_PRE_FUND_SETUP -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_PRE_FUND_SETUP
+
     WAIT_FOR_PRE_FUND_SETUP -->|OPPONENT_COMMITMENT_RECEIEVED| WAIT_FOR_FUNDING_REQUEST
     WAIT_FOR_FUNDING_REQUEST -->|FUNDING_REQUESTED| WAIT_FOR_FUNDING_APPROVAL
     WAIT_FOR_FUNDING_APPROVAL -->|FUNDING_REJECTED| SEND_FUNDING_DECLINED_MESSAGE
@@ -314,13 +313,37 @@ Absorb the above as subgraphs of a single diagram:
     ACKNOWLEDGE_FUNDING_DECLINED -->|FUNDING_DECLINED_ACKNOWLEDGED| ACKNOWLEDGE_FUNDING_DECLINED 
     end
 
+    subgraph fundingReducer
+    WAIT_FOR_FUNDING_REQUEST -->|FUNDING_REQUESTED| WAIT_FOR_FUNDING_APPROVAL
+
+    WAIT_FOR_FUNDING_APPROVAL -->|FUNDING_REJECTED| SEND_FUNDING_DECLINED_MESSAGE
+    WAIT_FOR_FUNDING_APPROVAL -->|FUNDING_APPROVED| WAIT_FOR_FUNDING_AND_POST_FUND_SETUP
+    WAIT_FOR_FUNDING_APPROVAL -->|MESSAGE_RECEIVED| ACKNOWLEDGE_FUNDING_DECLINED
+    WAIT_FOR_FUNDING_APPROVAL -->|FUNDING_DECLINED_ACKNOWLEDGED| WAIT_FOR_FUNDING_APPROVAL
+
+    WAIT_FOR_FUNDING_AND_POST_FUND_SETUP
+
+    WAIT_FOR_FUNDING_CONFIRMATION -->|FUNDING_RECEIVED_EVENT| ACKNOWLEDGE_FUNDING_REQUEST
+
+        A_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| ACKNOWLEDGE_FUNDING_SUCCESS
+    A_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| WAIT_FOR_FUNDING_CONFIRMATION
+
+    B_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| B_WAIT_FOR_POST_FUND_SETUP
+    B_WAIT_FOR_POST_FUND_SETUP -->|COMMITMENT_RECEIVED| ACKNOWLEDGE_FUNDING_SUCCESS
+
+    ACKNOWLEDGE_FUNDING_SUCCESS -->|FUNDING_SUCCESS_ACKNOWLEDGED| ACKNOWLEDGE_FUNDING_SUCCESS
+
+    SEND_FUNDING_DECLINED_MESSAGE -->|MESSAGE_SENT| SEND_FUNDING_DECLINED_MESSAGE
+        
+    ACKNOWLEDGE_FUNDING_DECLINED -->|FUNDING_DECLINED_ACKNOWLEDGED| ACKNOWLEDGE_FUNDING_DECLINED
+    end
+
     subgraph runningReducer
     RUNNING .-> |waitForUpdateReducer|...
 
     WAIT_FOR_UPDATE --> |OWN_COMMITMENT_RECEIVED| WAIT_FOR_UPDATE
     WAIT_FOR_UPDATE --> |OPPONENT_COMMITMENT_RECEIVED| WAIT_FOR_UPDATE
     WAIT_FOR_UPDATE --> |CHALLENGE_CREATED_EVENT| CHOOSE_RESPONSE
-    WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| WAIT_FOR_UPDATE
     WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| APPROVE_CHALLENGE
 
     APPROVE_CHALLENGE --> |CHALLENGE_APPROVED|WAIT_FOR_CHALLENGE_INITIATION
@@ -340,7 +363,6 @@ Absorb the above as subgraphs of a single diagram:
     WAIT_FOR_RESPONSE_OR_TIMEOUT --> |CHALLENGE_CREATED_EVENT| WAIT_FOR_RESPONSE_OR_TIMEOUT
     WAIT_FOR_RESPONSE_OR_TIMEOUT --> |RESPOND_WITH_MOVE_EVENT| ACKNOWLEDGE_CHALLENGE_RESPONSE
     WAIT_FOR_RESPONSE_OR_TIMEOUT --> |BLOCK_MINED| ACKNOWLEDGE_TIMEOUT
-    WAIT_FOR_RESPONSE_OR_TIMEOUT --> |BLOCK_MINED| WAIT_FOR_RESPONSE_OR_TIMEOUT
 
     ACKNOWLEDGE_CHALLENGE_RESPONSE --> |CHALLENGE_RESPONSE_ACKNOWLEDGED| WAIT_FOR_UPDATE
     
