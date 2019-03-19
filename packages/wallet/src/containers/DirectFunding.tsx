@@ -48,6 +48,9 @@ class DirectFundingContainer extends PureComponent<Props> {
           );
         case fundingStates.depositing.DEPOSIT_TRANSACTION_FAILED:
           return <TransactionFailed name="deposit" retryAction={retryTransactionAction} />;
+
+        default:
+          return unreachable(state);
       }
     }
     if (fundingStates.stateIsChannelFunded(state)) {
