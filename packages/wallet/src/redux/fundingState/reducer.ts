@@ -6,6 +6,7 @@ import { unreachable, ReducerWithSideEffects } from '../../utils/reducer-utils';
 import { StateWithSideEffects } from '../shared/state';
 import { directFundingStateReducer } from './directFunding/reducer';
 import { bigNumberify } from 'ethers/utils';
+import { createDepositTransaction } from '../../utils/transaction-generator';
 
 type ReturnType = StateWithSideEffects<states.FundingState>;
 
@@ -63,6 +64,10 @@ const unknownFundingTypeReducer = (
         ? states.depositing.waitForTransactionSent
         : states.notSafeToDeposit;
 
+      const transactionOutbox = alreadySafeToDeposit
+        ? createDepositTransaction(action.channelId, action.requiredDeposit)
+        : undefined;
+
       return {
         state: stateConstructor({
           ...state,
@@ -74,6 +79,7 @@ const unknownFundingTypeReducer = (
           requestedYourContribution: requiredDeposit,
           ourIndex,
         }),
+        outboxState: { transactionOutbox },
       };
     default:
       return { state };

@@ -3,9 +3,14 @@ import { fundingStateReducer } from '../reducer';
 import * as states from '../state';
 import * as directFundingStates from '../directFunding/state';
 import * as actions from '../../actions';
+import * as TransactionGenerator from '../../../utils/transaction-generator';
 
 import * as scenarios from '../../__tests__/test-scenarios';
-import { itChangesChannelFundingStatusTo } from '../../__tests__/helpers';
+import {
+  itChangesChannelFundingStatusTo,
+  itSendsThisTransaction,
+  itSendsNoTransaction,
+} from '../../__tests__/helpers';
 import { addHex } from '../../../utils/hex-utils';
 
 const { channelId, twoThree } = scenarios;
@@ -24,9 +29,14 @@ const defaultsForB: directFundingStates.DirectFundingState = {
   channelFundingStatus: directFundingStates.NOT_SAFE_TO_DEPOSIT,
 };
 
+const TX = 'TX';
 describe('start in UNKNOWN_FUNDING_TYPE', () => {
   describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
     // player A scenario
+    const createDepositTxMock = jest.fn(() => TX);
+    Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
+      value: createDepositTxMock,
+    });
     const state = states.waitForFundingRequest();
     const action = actions.internal.directFundingRequested(
       channelId,
@@ -38,6 +48,7 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
     const updatedState = fundingStateReducer(state, action);
 
     itChangesChannelFundingStatusTo(states.SAFE_TO_DEPOSIT, updatedState);
+    itSendsThisTransaction(updatedState, TX);
   });
 
   describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
@@ -53,6 +64,7 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
     const updatedState = fundingStateReducer(state, action);
 
     itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, updatedState);
+    itSendsNoTransaction(updatedState);
   });
 
   describe('incoming action: FUNDING_RECEIVED_EVENT', () => {
@@ -65,10 +77,15 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
 });
 
 describe('start in DIRECT_FUNDING_TYPE', () => {
+  const createDepositTxMock = jest.fn(() => TX);
+  Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
+    value: createDepositTxMock,
+  });
   const state = states.notSafeToDeposit(defaultsForB);
   const action = actions.fundingReceivedEvent(channelId, YOUR_DEPOSIT_A, YOUR_DEPOSIT_A);
 
   const updatedState = fundingStateReducer(state, action);
   // TODO: Mock the delegation
   itChangesChannelFundingStatusTo(states.SAFE_TO_DEPOSIT, updatedState);
+  itSendsThisTransaction(updatedState, TX);
 });
