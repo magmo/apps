@@ -94,8 +94,8 @@ const approveFundingReducer = (
         outboxState: {
           actionOutbox: actions.internal.directFundingRequested(
             state.channelId,
-            totalFundingRequired,
             safeToDepositLevel,
+            totalFundingRequired,
             ourDeposit,
             state.ourIndex,
           ),
