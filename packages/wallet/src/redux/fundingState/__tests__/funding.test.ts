@@ -14,14 +14,14 @@ const YOUR_DEPOSIT_A = twoThree[0];
 const YOUR_DEPOSIT_B = twoThree[1];
 const TOTAL_REQUIRED = twoThree.reduce(addHex);
 
-const defaultsForA: directFundingStates.DirectFundingState = {
+const defaultsForB: directFundingStates.DirectFundingState = {
   fundingType: states.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
   channelId,
-  ourIndex: 0,
+  ourIndex: 1,
   safeToDepositLevel: '0x',
-  channelFundingStatus: directFundingStates.WAIT_FOR_FUNDING_APPROVAL,
+  channelFundingStatus: directFundingStates.NOT_SAFE_TO_DEPOSIT,
 };
 
 describe('start in UNKNOWN_FUNDING_TYPE', () => {
@@ -65,8 +65,8 @@ describe('start in UNKNOWN_FUNDING_TYPE', () => {
 });
 
 describe('start in DIRECT_FUNDING_TYPE', () => {
-  const state = states.waitForFundingApproval(defaultsForA);
-  const action = actions.fundingApproved();
+  const state = states.notSafeToDeposit(defaultsForB);
+  const action = actions.fundingReceivedEvent(channelId, YOUR_DEPOSIT_A, YOUR_DEPOSIT_A);
 
   const updatedState = fundingStateReducer(state, action);
   // TODO: Mock the delegation

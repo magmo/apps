@@ -35,7 +35,7 @@ const defaultFundingState: fundingStates.DirectFundingState = {
   ourIndex: 0,
   safeToDepositLevel: YOUR_CONTRIBUTION,
   depositStatus: fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT,
-  channelFundingStatus: fundingStates.WAIT_FOR_FUNDING_APPROVAL,
+  channelFundingStatus: fundingStates.NOT_SAFE_TO_DEPOSIT,
 };
 
 const fundingStateWithTX = { ...defaultFundingState, transactionHash: 'TX_HASH' };

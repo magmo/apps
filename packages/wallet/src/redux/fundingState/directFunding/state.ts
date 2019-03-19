@@ -5,14 +5,12 @@ import * as depositing from './depositing/state';
 export { depositing };
 
 // ChannelFundingStatus
-export const WAIT_FOR_FUNDING_APPROVAL = 'WAIT_FOR_FUNDING_APPROVAL';
 export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
 export const SAFE_TO_DEPOSIT = 'SAFE_TO_DEPOSIT';
 export const CHANNEL_FUNDED = 'CHANNEL_FUNDED';
 
 // Funding status
 export type ChannelFundingStatus =
-  | typeof WAIT_FOR_FUNDING_APPROVAL
   | typeof NOT_SAFE_TO_DEPOSIT
   | typeof SAFE_TO_DEPOSIT
   | typeof CHANNEL_FUNDED;
@@ -20,10 +18,6 @@ export type ChannelFundingStatus =
 export interface BaseDirectFundingState extends SharedDirectFundingState {
   depositStatus?: depositing.DepositStatus;
   channelFundingStatus: ChannelFundingStatus;
-}
-
-export interface WaitForFundingApproval extends BaseDirectFundingState {
-  channelFundingStatus: typeof WAIT_FOR_FUNDING_APPROVAL;
 }
 
 export interface NotSafeToDeposit extends BaseDirectFundingState {
@@ -40,13 +34,11 @@ export interface ChannelFunded extends BaseDirectFundingState {
   channelFundingStatus: typeof CHANNEL_FUNDED;
 }
 
-export type ApprovedDirectFundingState =
+export type DirectFundingState =
   | NotSafeToDeposit
   | depositing.Depositing
   | WaitForFundingConfirmation
   | ChannelFunded;
-
-export type DirectFundingState = WaitForFundingApproval | ApprovedDirectFundingState;
 
 // type guards
 const guardGenerator = <T extends DirectFundingState>(type) => (
@@ -54,9 +46,6 @@ const guardGenerator = <T extends DirectFundingState>(type) => (
 ): state is T => {
   return state.channelFundingStatus === type;
 };
-export const stateIsWaitForFundingApproval = guardGenerator<WaitForFundingApproval>(
-  WAIT_FOR_FUNDING_APPROVAL,
-);
 export const stateIsNotSafeToDeposit = guardGenerator<NotSafeToDeposit>(NOT_SAFE_TO_DEPOSIT);
 export const stateIsDepositing = (state: DirectFundingState): state is depositing.Depositing => {
   return (
@@ -94,15 +83,6 @@ export function sharedDirectFundingState<T extends SharedDirectFundingState>(
     ourIndex,
     safeToDepositLevel,
     channelFundingStatus,
-  };
-}
-
-export function waitForFundingApproval<T extends BaseDirectFundingState>(
-  params: T,
-): WaitForFundingApproval {
-  return {
-    ...sharedDirectFundingState(params),
-    channelFundingStatus: WAIT_FOR_FUNDING_APPROVAL,
   };
 }
 

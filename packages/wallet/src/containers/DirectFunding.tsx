@@ -6,7 +6,6 @@ import * as fundingStates from '../redux/fundingState/state';
 import * as actions from '../redux/actions';
 
 import { unreachable } from '../utils/reducer-utils';
-import ApproveFunding from '../components/funding/ApproveFunding';
 import { FundingStep, fundingStepByState } from '../components/funding/FundingStep';
 import EtherscanLink from '../components/EtherscanLink';
 import TransactionFailed from '../components/TransactionFailed';
@@ -14,8 +13,6 @@ import TransactionFailed from '../components/TransactionFailed';
 interface Props {
   state: fundingStates.DirectFundingState;
   channelId: string;
-  fundingApproved: () => void;
-  fundingRejected: () => void;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
   retryTransactionAction: () => void;
@@ -23,17 +20,7 @@ interface Props {
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { state, fundingApproved, fundingRejected, retryTransactionAction } = this.props;
-    if (fundingStates.stateIsWaitForFundingApproval(state)) {
-      return (
-        <ApproveFunding
-          fundingApproved={fundingApproved}
-          fundingRejected={fundingRejected}
-          requestedTotalFunds={state.requestedTotalFunds}
-          requestedYourContribution={state.requestedYourContribution}
-        />
-      );
-    }
+    const { state, retryTransactionAction } = this.props;
     const step = fundingStepByState(state);
     if (
       fundingStates.stateIsNotSafeToDeposit(state) ||

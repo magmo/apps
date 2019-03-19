@@ -25,9 +25,6 @@ export const directFundingStateReducer = (
     }
   }
 
-  if (states.stateIsWaitForFundingApproval(state)) {
-    return waitForFundingApprovalReducer(state, action);
-  }
   if (states.stateIsNotSafeToDeposit(state)) {
     return notSafeToDepositReducer(state, action);
   }
@@ -42,31 +39,6 @@ export const directFundingStateReducer = (
   }
 
   return unreachable(state);
-};
-
-const waitForFundingApprovalReducer = (
-  state: states.WaitForFundingApproval,
-  action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingState> => {
-  switch (action.type) {
-    case actions.FUNDING_APPROVED:
-      if (state.ourIndex === 0) {
-        return {
-          state: states.waitForFundingConfirmed({ ...state }),
-          outboxState: {
-            transactionOutbox: createDepositTransaction(
-              state.channelId,
-              state.requestedYourContribution,
-            ),
-          },
-        };
-      }
-      return {
-        state: states.notSafeToDeposit({ ...state }),
-      };
-    default:
-      return { state };
-  }
 };
 
 const notSafeToDepositReducer = (
