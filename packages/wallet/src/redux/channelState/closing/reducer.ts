@@ -26,6 +26,7 @@ export const closingReducer = (
   state: channelStates.ClosingState,
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelState> => {
+  // TODO: Clear funding status.
   switch (state.type) {
     case channelStates.APPROVE_CONCLUDE:
       return approveConcludeReducer(state, action);
