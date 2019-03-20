@@ -24,8 +24,10 @@ sequenceDiagram
     C1->>C2: prefund1 L1
     C2->>C1: prefund2 L1
     C1->>F1: W.I.FUND_CHANNEL L1
-    F1->>C1: W.I.FUNDING_CHANGED L1
     C2->>F2: W.I.FUND_CHANNEL L1
+    Note right of F1: Deposit channel L1
+    Note right of C2: Deposit channel L1
+    F1->>C1: W.I.FUNDING_CHANGED L1
     F2->>C2: W.I.FUNDING_CHANGED L1
     C1->>C2: postfund L1
     C2->>C1: postfund L1
