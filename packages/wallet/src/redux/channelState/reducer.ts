@@ -7,21 +7,104 @@ import { challengingReducer } from './challenging/reducer';
 import { respondingReducer } from './responding/reducer';
 import { withdrawingReducer } from './withdrawing/reducer';
 import { closingReducer } from './closing/reducer';
-import { WalletAction, CONCLUDE_REQUESTED, COMMITMENT_RECEIVED } from '../actions';
+import {
+  WalletAction,
+  CONCLUDE_REQUESTED,
+  COMMITMENT_RECEIVED,
+  CHANNEL_INITIALIZED,
+  ChannelAction,
+  isReceiveFirstCommitment,
+} from '../actions';
 import {
   unreachable,
   ourTurn,
   validTransition,
   ReducerWithSideEffects,
+  combineReducersWithSideEffects,
 } from '../../utils/reducer-utils';
 import { validCommitmentSignature } from '../../utils/signing-utils';
-import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
+import { showWallet, channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
 import { StateWithSideEffects } from '../shared/state';
+import { ethers } from 'ethers';
+import { channelID } from 'fmg-core/lib/channel';
 
-const channelReducer: ReducerWithSideEffects<states.ChannelStatus> = (
-  state: states.ChannelStatus,
+export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = (
+  state: states.ChannelState,
   action: WalletAction,
+): StateWithSideEffects<states.ChannelState> => {
+  if (isReceiveFirstCommitment(action)) {
+    // We manually select and move the initializing channel into the initializedChannelState
+    // before applying the combined reducer, so that the address and private key is in the
+    // right slot (by its channelId)
+    const channel = action.commitment.channel;
+    const channelId = channelID(channel);
+    if (state.initializedChannels[channelId]) {
+      throw new Error('Channel already exists');
+    }
+    const initializingAddresses = new Set(Object.keys(state.initializingChannels));
+    const ourAddress = channel.participants.find(addr => initializingAddresses.has(addr));
+    if (!ourAddress) {
+      return { state };
+    }
+    const ourIndex = channel.participants.indexOf(ourAddress);
+
+    const { address, privateKey } = state.initializingChannels[ourAddress];
+    delete state.initializingChannels[ourAddress];
+    state.initializedChannels[channelId] = states.waitForChannel({ address, privateKey, ourIndex });
+    state.activeAppChannelId = channelId;
+  }
+
+  return combinedReducer(state, action, {
+    initializedChannels: { appChannelId: state.activeAppChannelId },
+  });
+};
+
+const initializingChannels: ReducerWithSideEffects<states.InitializingChannelState> = (
+  state: states.InitializingChannelState,
+  action: ChannelAction,
+): StateWithSideEffects<states.InitializingChannelState> => {
+  if (action.type !== CHANNEL_INITIALIZED) {
+    return { state };
+  }
+
+  const wallet = ethers.Wallet.createRandom();
+  const { address, privateKey } = wallet;
+  return {
+    state: {
+      ...state,
+      // We have to temporarily store the private key under the address, since
+      // we can't know the channel id until both participants know their addresses.
+      [address]: states.waitForChannel({ address, privateKey }),
+    },
+    outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
+  };
+};
+
+const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState> = (
+  state: states.InitializedChannelState,
+  action: ChannelAction,
+  data: { appChannelId: string },
+): StateWithSideEffects<states.InitializedChannelState> => {
+  if (action.type === CHANNEL_INITIALIZED) {
+    return { state };
+  }
+  const { appChannelId } = data;
+
+  const existingChannel = state[appChannelId];
+  if (!existingChannel) {
+    // TODO:  This channel should really exist -- should we throw?
+    return { state };
+  }
+
+  const { state: newState, outboxState } = initializedChannelStatusReducer(existingChannel, action);
+
+  return { state: { ...state, [appChannelId]: newState }, outboxState };
+};
+
+const initializedChannelStatusReducer: ReducerWithSideEffects<states.ChannelStatus> = (
+  state: states.ChannelStatus,
+  action: ChannelAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
   if (conclusionStateFromOwnRequest) {
@@ -58,6 +141,11 @@ const channelReducer: ReducerWithSideEffects<states.ChannelStatus> = (
       return unreachable(state);
   }
 };
+
+const combinedReducer = combineReducersWithSideEffects({
+  initializingChannels,
+  initializedChannels,
+});
 
 const receivedValidOwnConclusionRequest = (
   state: states.ChannelStatus,
