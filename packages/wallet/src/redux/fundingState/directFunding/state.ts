@@ -52,7 +52,8 @@ const guardGenerator = <T extends DirectFundingState>(type) => (
 export const stateIsNotSafeToDeposit = guardGenerator<NotSafeToDeposit>(NOT_SAFE_TO_DEPOSIT);
 export const stateIsDepositing = (state: DirectFundingState): state is depositing.Depositing => {
   return (
-    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
+    (state.channelFundingStatus === SAFE_TO_DEPOSIT ||
+      state.channelFundingStatus === CHANNEL_FUNDED) &&
     state.depositStatus !== depositing.DEPOSIT_CONFIRMED
   );
 };
