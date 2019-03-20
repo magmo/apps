@@ -40,9 +40,6 @@ export type ReducersMapObject<S = any, A extends WalletAction = WalletAction> = 
   [K in keyof S]: ReducerWithSideEffects<S[K], A>
 };
 
-// interface HasOutboxState {
-//   outboxState: OutboxState;
-// }
 export type ReducerWithSideEffects<Tree, A extends WalletAction = WalletAction> = (
   state: Tree,
   action: A,
