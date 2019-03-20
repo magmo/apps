@@ -1,5 +1,4 @@
-import { SharedDirectFundingState, DIRECT_FUNDING } from '../shared/state';
-export { SharedDirectFundingState, DIRECT_FUNDING };
+import { BaseFundingState } from '../shared/state';
 
 import * as depositing from './depositing/state';
 export { depositing };
@@ -15,7 +14,11 @@ export type ChannelFundingStatus =
   | typeof SAFE_TO_DEPOSIT
   | typeof CHANNEL_FUNDED;
 
-export interface BaseDirectFundingState extends SharedDirectFundingState {
+export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
+
+export interface BaseDirectFundingState extends BaseFundingState {
+  fundingType: typeof DIRECT_FUNDING;
+  safeToDepositLevel: string;
   depositStatus?: depositing.DepositStatus;
   channelFundingStatus: ChannelFundingStatus;
 }
@@ -64,9 +67,9 @@ export const stateIsWaitForFundingConfirmation = (
 export const stateIsChannelFunded = guardGenerator<ChannelFunded>(CHANNEL_FUNDED);
 
 // constructors
-export function sharedDirectFundingState<T extends SharedDirectFundingState>(
+export function baseDirectFundingState<T extends BaseDirectFundingState>(
   params: T,
-): SharedDirectFundingState {
+): BaseDirectFundingState {
   const {
     requestedTotalFunds,
     requestedYourContribution,
@@ -83,12 +86,13 @@ export function sharedDirectFundingState<T extends SharedDirectFundingState>(
     ourIndex,
     safeToDepositLevel,
     channelFundingStatus,
+    depositStatus,
   };
 }
 
 export function notSafeToDeposit<T extends BaseDirectFundingState>(params: T): NotSafeToDeposit {
   return {
-    ...sharedDirectFundingState(params),
+    ...baseDirectFundingState(params),
     channelFundingStatus: NOT_SAFE_TO_DEPOSIT,
   };
 }
@@ -97,7 +101,7 @@ export function waitForFundingConfirmed<T extends BaseDirectFundingState>(
   params: T,
 ): WaitForFundingConfirmation {
   return {
-    ...sharedDirectFundingState(params),
+    ...baseDirectFundingState(params),
     depositStatus: depositing.DEPOSIT_CONFIRMED,
     channelFundingStatus: SAFE_TO_DEPOSIT,
   };
@@ -105,8 +109,7 @@ export function waitForFundingConfirmed<T extends BaseDirectFundingState>(
 
 export function channelFunded<T extends BaseDirectFundingState>(params: T): ChannelFunded {
   return {
-    ...sharedDirectFundingState(params),
-    depositStatus: depositing.DEPOSIT_CONFIRMED,
+    ...baseDirectFundingState(params),
     channelFundingStatus: CHANNEL_FUNDED,
   };
 }

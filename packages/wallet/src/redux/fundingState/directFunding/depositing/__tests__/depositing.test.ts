@@ -12,7 +12,7 @@ import {
 } from '../../../../__tests__/helpers';
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { DIRECT_FUNDING } from '../../../shared/state';
+import { DIRECT_FUNDING } from '../../../state';
 
 const { channelId } = scenarios;
 
