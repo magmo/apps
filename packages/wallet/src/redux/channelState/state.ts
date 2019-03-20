@@ -6,6 +6,15 @@ import { RespondingState } from './responding/state';
 import { WithdrawingState } from './withdrawing/state';
 import { ClosingState } from './closing/state';
 
+export interface InitializingChannelStatus {
+  address: string;
+  privateKey: string;
+}
+
+export interface InitializingChannelState {
+  [participantAddress: string]: InitializingChannelStatus;
+}
+
 export type OpenedState =
   | FundingState
   | RunningState
@@ -16,8 +25,14 @@ export type OpenedState =
 
 export type ChannelStatus = OpeningState | OpenedState;
 // TODO: It would be helpful for channelId to have type Address
-export interface ChannelState {
+
+export interface InitializedChannelState {
   [channelId: string]: ChannelStatus;
+}
+export interface ChannelState {
+  initializingChannels: InitializingChannelState;
+  initializedChannels: InitializedChannelState;
+  activeAppChannelId?: string;
 }
 
 export * from './opening/state';
