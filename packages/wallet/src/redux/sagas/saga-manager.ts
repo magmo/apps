@@ -1,4 +1,4 @@
-import { select, cancel, take, fork, actionChannel, put } from 'redux-saga/effects';
+import { select, take, fork, actionChannel, put, cancel } from 'redux-saga/effects';
 
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
@@ -38,13 +38,12 @@ export function* sagaManager(): IterableIterator<any> {
 
     // if have adjudicator, make sure that the adjudicator watcher is running
     if (state.type === WALLET_INITIALIZED) {
-      throw new Error('TODO: Correctly use the channel state');
-      if ('channelId' in state.channelState) {
+      if (state.channelState && 'activeAppChannelId' in state.channelState) {
         if (!adjudicatorWatcherProcess) {
           const provider = yield getProvider();
           adjudicatorWatcherProcess = yield fork(
             adjudicatorWatcher,
-            state.channelState.channelId,
+            state.channelState.activeAppChannelId,
             provider,
           );
         }
@@ -55,8 +54,13 @@ export function* sagaManager(): IterableIterator<any> {
         }
       }
 
-      // We only watch for mined blocks when waiting for a challenge expiry
-      if ('challengeExpiry' in state.channelState && state.channelState.challengeExpiry) {
+      // We only watch for mined blocks when { waiting } for a challenge expiry {
+      const appChannel =
+        state.channelState && state.channelState.activeAppChannelId
+          ? state.channelState.initializedChannels[state.channelState.activeAppChannelId]
+          : undefined;
+
+      if (appChannel && 'challengeExpiry' in appChannel) {
         if (!blockMiningWatcherProcess) {
           blockMiningWatcherProcess = yield fork(blockMiningWatcher);
         }
