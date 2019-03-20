@@ -5,7 +5,7 @@ import * as fundingStates from '../../fundingState/state';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from '../../__tests__/test-scenarios';
-import { itSendsThisMessage } from '../../__tests__/helpers';
+import { itSendsThisMessage, itDispatchesThisAction } from '../../__tests__/helpers';
 import { waitForUpdate } from '../../channelState/state';
 
 const { channelId } = scenarios;
@@ -83,7 +83,7 @@ describe('When the channel reducer declares a side effect', () => {
       initializingChannels: {},
       activeAppChannelId: channelId,
     },
-    outboxState: {},
+    outboxState: { actionOutbox: actions.internal.directFundingConfirmed('channelId') },
   });
 
   const action = actions.challengeRequested();
@@ -91,4 +91,5 @@ describe('When the channel reducer declares a side effect', () => {
   const updatedState = initializedReducer(state, action);
 
   itSendsThisMessage(updatedState, outgoing.CHALLENGE_REJECTED);
+  itDispatchesThisAction(actions.internal.DIRECT_FUNDING_CONFIRMED, updatedState);
 });
