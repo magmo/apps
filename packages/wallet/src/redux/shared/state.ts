@@ -1,5 +1,5 @@
 import { OutboxState } from '../outbox/state';
-import { FundingState } from '../fundingState/state';
+import { FundingState, waitForFundingRequest } from '../fundingState/state';
 import { ChannelState } from '../channelState/state';
 
 export interface StateWithSideEffects<T> {
@@ -8,15 +8,15 @@ export interface StateWithSideEffects<T> {
 }
 
 export interface SharedWalletState {
-  channelState: { [channelId: string]: ChannelState };
-  fundingState: { [channelId: string]: FundingState };
+  channelState: ChannelState;
+  fundingState: FundingState;
   outboxState: OutboxState;
 }
 
 export const emptyState: SharedWalletState = {
   outboxState: {},
-  fundingState: {},
-  channelState: {},
+  fundingState: waitForFundingRequest(),
+  channelState: { initializedChannels: {}, initializingChannels: {} },
 };
 
 export interface LoggedIn extends SharedWalletState {
