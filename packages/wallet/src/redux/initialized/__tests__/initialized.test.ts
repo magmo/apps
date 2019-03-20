@@ -4,7 +4,6 @@ import * as states from '../../state';
 import * as fundingStates from '../../fundingState/state';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as channelStates from '../../channelState/state';
 import * as scenarios from '../../__tests__/test-scenarios';
 import { itSendsThisMessage } from '../../__tests__/helpers';
 import { waitForUpdate } from '../../channelState/state';
@@ -26,7 +25,11 @@ describe('when in WALLET_INITIALIED', () => {
     const updatedState = initializedReducer(state, action);
 
     it('applies the channel reducer', async () => {
-      expect(updatedState.channelState[channelId].type).toEqual(channelStates.WAIT_FOR_CHANNEL);
+      const ids = Object.keys(updatedState.channelState.initializingChannels);
+      expect(ids.length).toEqual(1);
+      expect(updatedState.channelState.initializingChannels[ids[0]].privateKey).toEqual(
+        expect.any(String),
+      );
     });
   });
 
@@ -35,7 +38,9 @@ describe('when in WALLET_INITIALIED', () => {
     const updatedState = initializedReducer(state, action);
 
     it('applies the funding state reducer', async () => {
-      expect(updatedState.fundingState![channelId]).toEqual(fundingStates.WAIT_FOR_FUNDING_REQUEST);
+      expect(updatedState.fundingState.channelFundingStatus).toEqual(
+        fundingStates.FUNDING_NOT_STARTED,
+      );
     });
   });
 });
@@ -73,13 +78,17 @@ describe('When the channel reducer declares a side effect', () => {
 
   const state = states.initialized({
     ...walletParams,
-    channelState: { [channelId]: waitForUpdate(bDefaults) },
+    channelState: {
+      initializedChannels: { [channelId]: waitForUpdate(bDefaults) },
+      initializingChannels: {},
+      activeAppChannelId: channelId,
+    },
     outboxState: {},
   });
 
   const action = actions.challengeRequested();
+
   const updatedState = initializedReducer(state, action);
 
-  expect(state.outboxState).toEqual({});
   itSendsThisMessage(updatedState, outgoing.CHALLENGE_REJECTED);
 });
