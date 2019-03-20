@@ -27,6 +27,7 @@ const defaultsForB: directFundingStates.DirectFundingState = {
   ourIndex: 1,
   safeToDepositLevel: '0x',
   channelFundingStatus: directFundingStates.NOT_SAFE_TO_DEPOSIT,
+  depositStatus: directFundingStates.depositing.WAIT_FOR_TRANSACTION_SENT,
 };
 
 const TX = 'TX';

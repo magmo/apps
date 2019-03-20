@@ -19,7 +19,7 @@ export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface BaseDirectFundingState extends BaseFundingState {
   fundingType: typeof DIRECT_FUNDING;
   safeToDepositLevel: string;
-  depositStatus?: depositing.DepositStatus;
+  depositStatus: depositing.DepositStatus;
   channelFundingStatus: ChannelFundingStatus;
 }
 
@@ -77,6 +77,7 @@ export function baseDirectFundingState<T extends BaseDirectFundingState>(
     ourIndex,
     safeToDepositLevel,
     channelFundingStatus,
+    depositStatus,
   } = params;
   return {
     fundingType: DIRECT_FUNDING,

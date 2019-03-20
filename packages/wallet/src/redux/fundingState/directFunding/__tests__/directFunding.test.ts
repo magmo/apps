@@ -27,6 +27,7 @@ const defaultsForA: states.DirectFundingState = {
   ourIndex: 0,
   safeToDepositLevel: '0x',
   channelFundingStatus: states.NOT_SAFE_TO_DEPOSIT,
+  depositStatus: states.depositing.WAIT_FOR_TRANSACTION_SENT,
 };
 
 const defaultsForB: states.DirectFundingState = {
