@@ -33,29 +33,34 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
   state: states.ChannelState,
   action: WalletAction,
 ): StateWithSideEffects<states.ChannelState> => {
+  const newState = { ...state };
   if (isReceiveFirstCommitment(action)) {
     // We manually select and move the initializing channel into the initializedChannelState
     // before applying the combined reducer, so that the address and private key is in the
     // right slot (by its channelId)
     const channel = action.commitment.channel;
     const channelId = channelID(channel);
-    if (state.initializedChannels[channelId]) {
+    if (newState.initializedChannels[channelId]) {
       throw new Error('Channel already exists');
     }
-    const initializingAddresses = new Set(Object.keys(state.initializingChannels));
+    const initializingAddresses = new Set(Object.keys(newState.initializingChannels));
     const ourAddress = channel.participants.find(addr => initializingAddresses.has(addr));
     if (!ourAddress) {
-      return { state };
+      return { state: newState };
     }
     const ourIndex = channel.participants.indexOf(ourAddress);
 
-    const { address, privateKey } = state.initializingChannels[ourAddress];
-    delete state.initializingChannels[ourAddress];
-    state.initializedChannels[channelId] = states.waitForChannel({ address, privateKey, ourIndex });
-    state.activeAppChannelId = channelId;
+    const { address, privateKey } = newState.initializingChannels[ourAddress];
+    delete newState.initializingChannels[ourAddress];
+    newState.initializedChannels[channelId] = states.waitForChannel({
+      address,
+      privateKey,
+      ourIndex,
+    });
+    newState.activeAppChannelId = channelId;
   }
 
-  return combinedReducer(state, action, {
+  return combinedReducer(newState, action, {
     initializedChannels: { appChannelId: state.activeAppChannelId },
   });
 };
