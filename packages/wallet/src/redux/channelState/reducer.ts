@@ -57,11 +57,17 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
       privateKey,
       ourIndex,
     });
+
+    // Since the wallet only manages one channel at a time, when it receives the first
+    // prefundsetup commitment for a channel, from the application, we set the
+    // activeAppChannelId accordingly.
+    // In the future, the application might need to specify the intended channel id
+    // for the action
     newState.activeAppChannelId = channelId;
   }
 
   return combinedReducer(newState, action, {
-    initializedChannels: { appChannelId: state.activeAppChannelId },
+    initializedChannels: { appChannelId: newState.activeAppChannelId },
   });
 };
 

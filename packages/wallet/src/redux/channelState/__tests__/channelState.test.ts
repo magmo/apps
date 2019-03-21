@@ -2,6 +2,7 @@ import * as actions from '../../actions';
 
 import * as scenarios from '../../__tests__/test-scenarios';
 import { channelStateReducer } from '../reducer';
+import * as states from '../state';
 
 const {
   initializingChannelState: initializingChannels,
@@ -10,6 +11,7 @@ const {
   asAddress,
   asPrivateKey,
   preFundCommitment1,
+  preFundCommitment2,
 } = scenarios;
 
 const defaults = {
@@ -47,6 +49,7 @@ describe('when the channel is part of the initializedChannelState', () => {
 
       expect(updatedState.state.initializedChannels).toMatchObject({
         [channelId]: {
+          type: states.WAIT_FOR_PRE_FUND_SETUP,
           privateKey: asPrivateKey,
           address: asAddress,
           lastCommitment: { commitment: preFundCommitment1 },
@@ -58,9 +61,9 @@ describe('when the channel is part of the initializedChannelState', () => {
 
 describe('when the channel is part of the channelState', () => {
   describe('when a channel action arrives', () => {
-    it.skip('delegates to the single channel reducer', async () => {
+    it('delegates to the single channel reducer', async () => {
       const state = { ...defaults, initializedChannels };
-      const action = actions.ownCommitmentReceived(preFundCommitment1);
+      const action = actions.ownCommitmentReceived(preFundCommitment2);
 
       const updatedState = channelStateReducer(state, action);
 
