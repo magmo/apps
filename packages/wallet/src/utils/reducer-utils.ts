@@ -43,11 +43,11 @@ export type ReducersMapObject<S = any, A extends WalletAction = WalletAction> = 
 export type ReducerWithSideEffects<Tree, A extends WalletAction = WalletAction> = (
   state: Tree,
   action: A,
-  data?: { [Branch in keyof Tree]?: any },
+  data?: any,
 ) => { state: Tree; outboxState?: OutboxState };
 
-export function combineReducersWithSideEffects<Tree, A>(
-  reducers: { [Branch in keyof Tree]: ReducerWithSideEffects<Tree[Branch]> },
+export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
+  reducers: ReducersMapObject<Tree, A>,
 ) {
   return (state: Tree, action: A, data?: { [Branch in keyof Tree]?: any }) => {
     const nextState = { ...state };
