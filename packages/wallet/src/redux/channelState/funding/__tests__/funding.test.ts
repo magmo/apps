@@ -124,9 +124,10 @@ describe('start in WaitForFundingApproval', () => {
     itDispatchesThisAction(
       actions.internal.directFundingRequested(
         channelId,
-        twoThree.reduce(addHex),
         '0x00',
+        twoThree.reduce(addHex),
         twoThree[0],
+        0,
       ),
       updatedState,
     );
@@ -164,9 +165,10 @@ describe('start in WaitForFundingApproval', () => {
     itDispatchesThisAction(
       actions.internal.directFundingRequested(
         channelId,
-        twoThree.reduce(addHex),
         twoThree[0],
+        twoThree.reduce(addHex),
         twoThree[1],
+        1,
       ),
       updatedState,
     );
