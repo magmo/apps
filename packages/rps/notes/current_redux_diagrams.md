@@ -17,8 +17,9 @@ Flowcharts are most useful when the flow is mostly a linear progression.
 ### Key: 
 ```mermaid
   graph LR
-  linkStyle default interpolate basis
-    STATE --> |ACTION| ANOTHER_STATE
+    State--> |ACTION| AnotherState
+    :AllSuchStates --> |ACTION| AnotherState
+    !AnyStateBut --> |ACTION| AnotherState
 ```
 # Top level
 ## loginReducer
@@ -98,9 +99,24 @@ At the start of each mermaid diagram, *all* relevant state names from the `/stat
 
     GameOver -->|RESIGN| WaitForWithdrawal
 
-    WaitForWithdrawal --> |RESIGN| Lobby
+    WaitForWithdrawal -->|RESIGN| Lobby
 
+    PickChallengeWeapon -->|CHOOSE_WEAPON| WaitForRevealB
+    PickChallengeWeapon -->|CHOOSE_WEAPON| WaitForOpponentToPickWeaponA
 
+    ChallengePlayAgain -->|PLAY_AGAIN| WaitForResting
+    ChallengePlayAgain -->|PLAY_AGAIN| PickWeapon
+
+    !NoName-->|EXIT_TO_LOBBY| Lobby
+    PickWeapon -->|CHALLENGE_RESPONSE_REQUESTED| PickChallengeWeapon    PlayAgain -->|CHALLENGE_RESPONSE_REQUESTED| ChallengePlayAgain
+
+    subgraph resignationReducer
+      :PlayingState -->|RESIGN| *CONCLUDE_REQUESTED*
+    end
+
+    subgraph challengeReducer
+      :PlayingState -->|CREATE_CHALLENGE| *CHALLENGE_REQUESTED*
+    end
 
 
 ```
