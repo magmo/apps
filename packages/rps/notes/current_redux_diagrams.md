@@ -19,7 +19,6 @@ Flowcharts are most useful when the flow is mostly a linear progression.
   graph LR
   linkStyle default interpolate basis
     STATE --> |ACTION| ANOTHER_STATE
-    ANOTHER_STATE.->|functionCall| YET_ANOTHER_STATE
 ```
 # Top level
 ## loginReducer
