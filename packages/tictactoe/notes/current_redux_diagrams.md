@@ -9,7 +9,7 @@ VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=bierner
 # Redux diagrams (current state)
 as of commit 1947c682f74648ee162459314827bb9e24ca1fb1
 ### Methodology
-In the RPS app, there are five independent parts of the `SiteState`, each reduced with its own reducer. Where these subreducers switch their behaviour on the name/type of a *state*, this can be nicely presented in a flowchart. Things are not so natural when there are a low number of state names (perhaps one) and reducers tend to switch entirely on the *actions* themselves (often updating fields independently of the current state).
+In the TTT app, there are five independent parts of the `SiteState`, each reduced with its own reducer. Where these subreducers switch their behaviour on the name/type of a *state*, this can be nicely presented in a flowchart. Things are not so natural when there are a low number of state names (perhaps one) and reducers tend to switch entirely on the *actions* themselves (often updating fields independently of the current state).
 
 Flowcharts are most useful when the flow is mostly a linear progression.
 
@@ -41,26 +41,28 @@ At the start of each mermaid diagram, *all* relevant state names from the `/stat
 ```mermaid
   graph TD
   linkStyle default interpolate basis
-    NoName
-    Lobby
-    CreatingOpenGame
-    WaitingRoom
-    WaitForGameConfirmationA
-    ConfirmGameB
-    DeclineGame
-    WaitForFunding
-    PickWeapon
-    WaitForOpponentToPickWeaponA
-    WaitForOpponentToPickWeaponB
-    WaitForRevealB
-    WaitForRestingA
-    PlayAgain
-    OpponentResigned
-    WaitForResignationAcknowledgement
-    GameOver
-    WaitForWithdrawal
-    PickChallengeWeapon
-    ChallengePlayAgain
+  NoName
+  Lobby
+  CreatingOpenGame
+  WaitingRoom
+  WaitForGameConfirmationA
+  ConfirmGameB
+  DeclineGame
+  WaitForFunding
+  WaitForPostFundSetup
+  OsPickMove
+  XsPickMove
+  OsWaitForOpponentToPickMove
+  XsWaitForOpponentToPickMove
+  WaitToPlayAgain
+  PlayAgain
+  WaitToResign
+  OpponentResigned
+  WaitForResignationAcknowledgement
+  WaitForWithdrawal
+  XsPickChallengeMove
+  OsPickChallengeMove
+  PlayAgainChallengeMove
 
     NoName -->|UPDATE_PROFILE| Lobby
 
@@ -79,29 +81,39 @@ At the start of each mermaid diagram, *all* relevant state names from the `/stat
     ConfirmGameB -->|ANYTHING_ELSE| Lobby
 
     WaitForFunding -->|FUNDING_FAILURE| Lobby
-    WaitForFunding -->|FUNDING_SUCCESS| PickWeapon
+    WaitForFunding -->|FUNDING_SUCCESS| XsPickMove
+    WaitForFunding -->|FUNDING_SUCCESS| OsWaitForOpponentToPickMove
+    
+    XsPickMove -->|MARKS_MADE| WaitToPlayAgain
+    XsPickMove -->|MARKS_MADE| XsWaitForOpponentToPickMove
 
-    PickWeapon -->|CHOOSE_WEAPON| WaitForOpponentToPickWeaponA
-    PickWeapon -->|CHOOSE_WEAPON| WaitForOpponentToPickWeaponB
+    XsPickChallengeMove -->|MARKS_MADE| WaitToPlayAgain
+    XsPickChallengeMove -->|MARKS_MADE| XsWaitForOpponentToPickMove
 
-    WaitForOpponentToPickWeaponA -->|COMMITMENT_RECEIVED| PlayAgain
-    WaitForOpponentToPickWeaponA -->|COMMITMENT_RECEIVED| GameOver
+    OsPickMove -->|MARKS_MADE| WaitToPlayAgain
+    OsPickMove -->|MARKS_MADE| OsWaitForOpponentToPickMove
 
-    WaitForOpponentToPickWeaponB -->|COMMITMENT_RECEIEVED| WaitForRevealB
+    OsPickChallengeMove -->|MARKS_MADE| WaitToPlayAgain
+    OsPickChallengeMove -->|MARKS_MADE| OsWaitForOpponentToPickMove
 
-    WaitForRevealB -->|COMMITMENT_RECEIEVED| GameOver
-    WaitForRevealB -->|COMMITMENT_RECEIEVED| PlayAgain
+    XsWaitForOpponentToPickMove -->|POSITION_RECEIVED| XsPickMove
+    XsWaitForOpponentToPickMove -->|POSITION_RECEIVED| PlayAgain
 
-    PlayAgain -->|PLAY_AGAIN| WaitForRestingA
-    PlayAgain -->|PLAY_AGAIN| PickWeapon
+    OsWaitForOpponentToPickMove -->|POSITION_RECEIVED| OsPickMove
+    OsWaitForOpponentToPickMove -->|POSITION_RECEIVED| PlayAgain
 
-    WaitForRestingA -->|COMMITMENT_RECEIVED| PickWeapon
+
+    PlayAgain -->|PLAY_AGAIN| OsWaitForOpponentToPickMove
+    PlayAgain -->|PLAY_AGAIN| WaitToPlayAgain
+
+    PlayAgainChallengeMove -->|PLAY_AGAIN| OsWaitForOpponentToPickMove
+    PlayAgainChallengeMove -->|PLAY_AGAIN| WaitToPlayAgain
+
+    WaitToPlayAgain -->|POSITION_RECEIVED| XsPickMove
+    WaitToPlayAgain -->|POSITION_RECEIVED| PlayAgain
 
     GameOver -->|RESIGN| WaitForWithdrawal
 
-    WaitForWithdrawal --> |RESIGN| Lobby
-
-
-
+    WaitForWithdrawal -->|RESIGN| Lobby
 
 ```
