@@ -108,7 +108,8 @@ At the start of each mermaid diagram, *all* relevant state names from the `/stat
     ChallengePlayAgain -->|PLAY_AGAIN| PickWeapon
 
     !NoName-->|EXIT_TO_LOBBY| Lobby
-    PickWeapon -->|CHALLENGE_RESPONSE_REQUESTED| PickChallengeWeapon    PlayAgain -->|CHALLENGE_RESPONSE_REQUESTED| ChallengePlayAgain
+    PickWeapon -->|CHALLENGE_RESPONSE_REQUESTED| PickChallengeWeapon
+    PlayAgain -->|CHALLENGE_RESPONSE_REQUESTED| ChallengePlayAgain
 
     subgraph resignationReducer
       :PlayingState -->|RESIGN| *CONCLUDE_REQUESTED*
@@ -117,6 +118,5 @@ At the start of each mermaid diagram, *all* relevant state names from the `/stat
     subgraph challengeReducer
       :PlayingState -->|CREATE_CHALLENGE| *CHALLENGE_REQUESTED*
     end
-
 
 ```
