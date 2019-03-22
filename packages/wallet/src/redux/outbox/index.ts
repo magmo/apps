@@ -8,7 +8,7 @@ import { SideEffects, OutboxState } from './state';
  */
 export function accumulateSideEffects<T = SideEffects | OutboxState>(
   state: T,
-  sideEffects: SideEffects,
+  sideEffects: SideEffects | undefined,
 ): T {
   if (!sideEffects) {
     return state;
