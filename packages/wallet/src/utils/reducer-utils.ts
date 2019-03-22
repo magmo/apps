@@ -4,6 +4,7 @@ import { channelID } from 'fmg-core/lib/channel';
 import { applySideEffects } from '../redux/outbox';
 import { OutboxState } from 'src/redux/outbox/state';
 import { WalletAction } from 'src/redux/actions';
+import { StateWithSideEffects } from 'src/redux/shared/state';
 
 export function unreachable(x: never) {
   return x;
@@ -44,7 +45,7 @@ export type ReducerWithSideEffects<Tree, A extends WalletAction = WalletAction> 
   state: Tree,
   action: A,
   data?: any,
-) => { state: Tree; outboxState?: OutboxState };
+) => StateWithSideEffects<Tree>;
 
 export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
   reducers: ReducersMapObject<Tree, A>,
