@@ -1,4 +1,4 @@
-import { OutboxState } from './state';
+import { SideEffects, OutboxState } from './state';
 /**
  *
  * @param state current global state
@@ -6,10 +6,10 @@ import { OutboxState } from './state';
  *
  * For each key k in sideEffects, replace state[k] with sideEffects[k]
  */
-export function accumulateSideEffects(
-  state: OutboxState,
-  sideEffects: OutboxState | undefined,
-): OutboxState {
+export function accumulateSideEffects<T = SideEffects | OutboxState>(
+  state: T,
+  sideEffects: SideEffects,
+): T {
   if (!sideEffects) {
     return state;
   }

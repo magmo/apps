@@ -1,10 +1,10 @@
-import { OutboxState } from '../outbox/state';
+import { OutboxState, SideEffects } from '../outbox/state';
 import { FundingState, waitForFundingRequest } from '../fundingState/state';
 import { ChannelState } from '../channelState/state';
 
 export interface StateWithSideEffects<T> {
   state: T;
-  outboxState?: OutboxState;
+  outboxState?: SideEffects;
 }
 
 export interface SharedWalletState {

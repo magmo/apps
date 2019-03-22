@@ -1,8 +1,8 @@
 import { Commitment } from 'fmg-core';
 import { ChannelStatus } from '../redux/channelState/state';
 import { channelID } from 'fmg-core/lib/channel';
-import { OutboxState } from 'src/redux/outbox/state';
 import { accumulateSideEffects } from '../redux/outbox';
+import { SideEffects } from 'src/redux/outbox/state';
 import { WalletAction } from 'src/redux/actions';
 import { StateWithSideEffects } from 'src/redux/shared/state';
 
@@ -52,7 +52,7 @@ export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
 ) {
   return (state: Tree, action: A, data?: { [Branch in keyof Tree]?: any }) => {
     const nextState = { ...state };
-    let outboxState = {};
+    let outboxState: SideEffects = {};
 
     Object.keys(reducers).map(branch => {
       const reducer = reducers[branch];
@@ -62,7 +62,7 @@ export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
       } else {
         result = reducer(state[branch], action);
       }
-      const { state: updatedState, outboxState: sideEffects } = result;
+      const { state: updatedState, sideEffects } = result;
       nextState[branch] = updatedState;
       outboxState = accumulateSideEffects(outboxState, sideEffects);
     });
