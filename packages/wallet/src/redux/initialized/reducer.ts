@@ -10,7 +10,7 @@ export function initializedReducer(
   state: InitializedState,
   action: WalletAction,
 ): InitializedState {
-  const { state: newState, outboxState: sideEffects } = combinedReducer(state, action);
+  const { state: newState, sideEffects } = combinedReducer(state, action);
   // Since the wallet state itself has an outbox state, we need to apply the side effects
   // by hand.
   return {
