@@ -65,8 +65,6 @@ class FundingContainer extends PureComponent<Props> {
             actionTitle="Return to game"
           />
         );
-      case channelStates.SEND_FUNDING_DECLINED_MESSAGE:
-        return null;
       default:
         return unreachable(state);
     }

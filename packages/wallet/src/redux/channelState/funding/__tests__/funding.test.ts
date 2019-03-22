@@ -139,9 +139,9 @@ describe('start in WaitForFundingApproval', () => {
     const action = actions.channel.fundingRejected();
     const updatedState = fundingReducer(state, action);
 
-    itTransitionsToChannelStateType(states.SEND_FUNDING_DECLINED_MESSAGE, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_CHANNEL, updatedState);
     itDispatchesNoAction(updatedState);
-    itIncreasesTurnNumBy(0, state, updatedState);
+    itSendsThisMessage(updatedState, [outgoing.MESSAGE_RELAY_REQUESTED, outgoing.FUNDING_FAILURE]);
   });
 
   describe('incoming action: Funding declined message received', () => {
@@ -260,19 +260,6 @@ describe('start in WaitForFundingConfirmation', () => {
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
     itSendsThisMessage(updatedState, sendCommitmentAction);
     itIncreasesTurnNumBy(1, state, updatedState);
-  });
-});
-
-describe('start in SendFundingDeclinedMessage', () => {
-  describe('incoming action: message sent', () => {
-    // player A scenario
-    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
-    const state = states.sendFundingDeclinedMessage(testDefaults);
-    const action = actions.messageSent();
-    const updatedState = fundingReducer(state, action);
-
-    itTransitionsToChannelStateType(states.WAIT_FOR_CHANNEL, updatedState);
-    itSendsThisMessage(updatedState, outgoing.FUNDING_FAILURE);
   });
 });
 
