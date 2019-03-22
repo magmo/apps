@@ -49,10 +49,10 @@ export type ReducerWithSideEffects<T, A extends WalletAction = WalletAction> = (
 
 export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
   reducers: ReducersMapObject<Tree, A>,
-) {
+): ReducerWithSideEffects<Tree> {
   return (state: Tree, action: A, data?: { [Branch in keyof Tree]?: any }) => {
     const nextState = { ...state };
-    let outboxState: SideEffects = {};
+    let sideEffects: SideEffects = {};
 
     Object.keys(reducers).map(branch => {
       const reducer = reducers[branch];
@@ -62,10 +62,10 @@ export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
       } else {
         result = reducer(state[branch], action);
       }
-      const { state: updatedState, sideEffects } = result;
+      const { state: updatedState, sideEffects: nextSideEffects } = result;
       nextState[branch] = updatedState;
-      outboxState = accumulateSideEffects(outboxState, sideEffects);
+      sideEffects = accumulateSideEffects(sideEffects, nextSideEffects);
     });
-    return { state: { ...nextState }, outboxState };
+    return { state: { ...nextState }, sideEffects };
   };
 }
