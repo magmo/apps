@@ -82,12 +82,12 @@ class RespondingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  challengeAcknowledged: actions.challengeAcknowledged,
-  challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
-  selectRespondWithMove: actions.respondWithMoveChosen,
-  selectRespondWithExistingMove: actions.respondWithExistingMoveChosen,
-  retryTransaction: actions.retryTransaction,
-  timeoutAcknowledged: actions.challengedTimedOutAcknowledged,
+  challengeAcknowledged: actions.channel.challengeAcknowledged,
+  challengeResponseAcknowledged: actions.channel.challengeResponseAcknowledged,
+  selectRespondWithMove: actions.channel.respondWithMoveChosen,
+  selectRespondWithExistingMove: actions.channel.respondWithExistingMoveChosen,
+  retryTransaction: actions.channel.retryTransaction,
+  timeoutAcknowledged: actions.channel.challengedTimedOutAcknowledged,
 };
 
 export default connect(

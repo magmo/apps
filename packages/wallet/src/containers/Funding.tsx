@@ -74,11 +74,11 @@ class FundingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  fundingApproved: actions.fundingApproved,
-  fundingRejected: actions.fundingRejected,
-  fundingSuccessAcknowledged: actions.fundingSuccessAcknowledged,
-  fundingDeclinedAcknowledged: actions.fundingDeclinedAcknowledged,
-  retryTransactionAction: actions.retryTransaction,
+  fundingApproved: actions.channel.fundingApproved,
+  fundingRejected: actions.channel.fundingRejected,
+  fundingSuccessAcknowledged: actions.channel.fundingSuccessAcknowledged,
+  fundingDeclinedAcknowledged: actions.channel.fundingDeclinedAcknowledged,
+  retryTransactionAction: actions.channel.retryTransaction,
 };
 
 // why does it think that mapStateToProps can return undefined??

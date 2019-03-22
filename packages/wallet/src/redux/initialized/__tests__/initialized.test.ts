@@ -20,7 +20,7 @@ const defaults = {
 const initializedState = states.initialized({ ...defaults });
 
 describe('when the player initializes a channel', () => {
-  const action = actions.channelInitialized();
+  const action = actions.channel.channelInitialized();
   const updatedState = initializedReducer(initializedState, action);
 
   it('applies the channel reducer', async () => {
@@ -87,7 +87,7 @@ describe('When the channel reducer declares a side effect', () => {
     },
   });
 
-  const action = actions.challengeRequested();
+  const action = actions.channel.challengeRequested();
 
   const updatedState = initializedReducer(state, action);
 

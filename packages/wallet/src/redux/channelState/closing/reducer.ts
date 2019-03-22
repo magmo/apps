@@ -58,7 +58,7 @@ const closeTransactionFailedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.RETRY_TRANSACTION:
+    case actions.channel.RETRY_TRANSACTION:
       const { penultimateCommitment: from, lastCommitment: to } = state;
       const myAddress = state.participants[state.ourIndex];
       const amount = to.commitment.allocation[state.ourIndex];
@@ -94,7 +94,7 @@ const acknowledgeConcludeReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.CONCLUDE_APPROVED:
+    case actions.channel.CONCLUDE_APPROVED:
       if (!ourTurn(state)) {
         return {
           state,
@@ -130,7 +130,7 @@ const waitForCloseConfirmedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.TRANSACTION_CONFIRMED:
+    case actions.channel.TRANSACTION_CONFIRMED:
       return {
         state: channelStates.acknowledgeCloseSuccess({ ...state }),
         sideEffects: { messageOutbox: closeSuccess() },
@@ -144,7 +144,7 @@ const waitForCloseInitiatorReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.TRANSACTION_SENT_TO_METAMASK:
+    case actions.channel.TRANSACTION_SENT_TO_METAMASK:
       return { state: channelStates.waitForCloseSubmission(state) };
   }
   return { state };
@@ -155,9 +155,9 @@ const waitForCloseSubmissionReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.TRANSACTION_SUBMISSION_FAILED:
+    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
       return { state: channelStates.closeTransactionFailed(state) };
-    case actions.TRANSACTION_SUBMITTED:
+    case actions.channel.TRANSACTION_SUBMITTED:
       return {
         state: channelStates.waitForCloseConfirmed({
           ...state,
@@ -173,7 +173,7 @@ const approveCloseOnChainReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.APPROVE_CLOSE:
+    case actions.channel.APPROVE_CLOSE:
       const { penultimateCommitment: from, lastCommitment: to } = state;
       const myAddress = state.participants[state.ourIndex];
       const amount = to.commitment.allocation[state.ourIndex];
@@ -212,7 +212,7 @@ const approveConcludeReducer = (
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.CONCLUDE_APPROVED:
+    case actions.channel.CONCLUDE_APPROVED:
       if (!ourTurn(state)) {
         return {
           state,
@@ -251,7 +251,7 @@ const approveConcludeReducer = (
         };
       }
       break;
-    case actions.CONCLUDE_REJECTED:
+    case actions.channel.CONCLUDE_REJECTED:
       return {
         state: channelStates.waitForUpdate({
           ...state,
@@ -271,7 +271,7 @@ const waitForOpponentConclude = (
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
+    case actions.channel.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
 
       const opponentAddress = state.participants[1 - state.ourIndex];
@@ -315,7 +315,7 @@ const acknowledgeCloseSuccessReducer = (
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.CLOSE_SUCCESS_ACKNOWLEDGED:
+    case actions.channel.CLOSE_SUCCESS_ACKNOWLEDGED:
       return {
         state: channelStates.waitForChannel({
           ...state,
@@ -332,7 +332,7 @@ const acknowledgeClosedOnChainReducer = (
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.CLOSED_ON_CHAIN_ACKNOWLEDGED:
+    case actions.channel.CLOSED_ON_CHAIN_ACKNOWLEDGED:
       return {
         state: channelStates.waitForChannel({ ...state }),
         sideEffects: { messageOutbox: closeSuccess() },

@@ -79,15 +79,19 @@ export function* adjudicatorWatcher(channelId, provider) {
       case AdjudicatorEventType.ChallengeCreated:
         const { channelId: eventChannelId, commitment, finalizedAt } = event.eventArgs;
         yield put(
-          actions.challengeCreatedEvent(eventChannelId, fromParameters(commitment), finalizedAt),
+          actions.channel.challengeCreatedEvent(
+            eventChannelId,
+            fromParameters(commitment),
+            finalizedAt,
+          ),
         );
         break;
       case AdjudicatorEventType.Concluded:
-        yield put(actions.concludedEvent(event.eventArgs.channelId));
+        yield put(actions.channel.concludedEvent(event.eventArgs.channelId));
         break;
       case AdjudicatorEventType.Refuted:
         yield put(
-          actions.refutedEvent(
+          actions.channel.refutedEvent(
             event.eventArgs.channelId,
             fromParameters(event.eventArgs.refutation),
           ),
@@ -95,7 +99,7 @@ export function* adjudicatorWatcher(channelId, provider) {
         break;
       case AdjudicatorEventType.RespondWithMove:
         yield put(
-          actions.respondWithMoveEvent(
+          actions.channel.respondWithMoveEvent(
             event.eventArgs.channelId,
             fromParameters(event.eventArgs.response),
           ),

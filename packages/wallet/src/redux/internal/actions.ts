@@ -15,7 +15,7 @@ export const directFundingRequested = (
 });
 export type DirectFundingRequested = ReturnType<typeof directFundingRequested>;
 
-export const DIRECT_FUNDING_CONFIRMED = 'WALLET.INTERNAL.DIRECT_FUNDING_CONFIRMED';
+export const DIRECT_FUNDING_CONFIRMED = 'WALLET.INTERNAL.CHANNEL.DIRECT_FUNDING_CONFIRMED';
 export const directFundingConfirmed = (channelId: string) => ({
   type: DIRECT_FUNDING_CONFIRMED as typeof DIRECT_FUNDING_CONFIRMED,
   channelId,

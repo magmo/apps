@@ -7,7 +7,7 @@ import {
   transactionFinalized,
   transactionSentToMetamask,
   transactionSubmitted,
-} from '../redux/actions';
+} from '../redux/channelState/actions';
 import { transactionSender } from '../redux/sagas/transaction-sender';
 import { signCommitment, signVerificationData } from '../utils/signing-utils';
 import { getLibraryAddress, createChallenge, concludeGame } from './test-utils';

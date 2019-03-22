@@ -123,12 +123,12 @@ class ClosingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  concludeApproved: actions.concludeApproved,
-  concludeRejected: actions.concludeRejected,
-  closeSuccessAcknowledged: actions.closeSuccessAcknowledged,
-  closedOnChainAcknowledged: actions.closedOnChainAcknowledged,
-  closeOnChain: actions.approveClose,
-  retryTransaction: actions.retryTransaction,
+  concludeApproved: actions.channel.concludeApproved,
+  concludeRejected: actions.channel.concludeRejected,
+  closeSuccessAcknowledged: actions.channel.closeSuccessAcknowledged,
+  closedOnChainAcknowledged: actions.channel.closedOnChainAcknowledged,
+  closeOnChain: actions.channel.approveClose,
+  retryTransaction: actions.channel.retryTransaction,
 };
 
 export default connect(

@@ -83,10 +83,10 @@ class WithdrawingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  withdrawalApproved: actions.withdrawalApproved,
-  withdrawalRejected: actions.withdrawalRejected,
-  withdrawalSuccessAcknowledged: actions.withdrawalSuccessAcknowledged,
-  retryTransaction: actions.retryTransaction,
+  withdrawalApproved: actions.channel.withdrawalApproved,
+  withdrawalRejected: actions.channel.withdrawalRejected,
+  withdrawalSuccessAcknowledged: actions.channel.withdrawalSuccessAcknowledged,
+  retryTransaction: actions.channel.retryTransaction,
 };
 
 // why does it think that mapStateToProps can return undefined??

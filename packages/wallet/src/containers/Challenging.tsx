@@ -100,11 +100,11 @@ class ChallengingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  timeoutAcknowledged: actions.challengedTimedOutAcknowledged,
-  challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
-  challengeApproved: actions.challengeApproved,
-  challengeRejected: actions.challengeRejected,
-  retryTransaction: actions.retryTransaction,
+  timeoutAcknowledged: actions.channel.challengedTimedOutAcknowledged,
+  challengeResponseAcknowledged: actions.channel.challengeResponseAcknowledged,
+  challengeApproved: actions.channel.challengeApproved,
+  challengeRejected: actions.channel.challengeRejected,
+  retryTransaction: actions.channel.retryTransaction,
 };
 
 export default connect(

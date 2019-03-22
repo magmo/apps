@@ -47,10 +47,10 @@ const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
 
 describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
-  describe(whenActionArrives(actions.TRANSACTION_SENT_TO_METAMASK), () => {
+  describe(whenActionArrives(actions.channel.TRANSACTION_SENT_TO_METAMASK), () => {
     // player A scenario
     const state = states.waitForTransactionSent(defaultsForA);
-    const action = actions.transactionSentToMetamask();
+    const action = actions.channel.transactionSentToMetamask();
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_APPROVAL, updatedState);
@@ -58,19 +58,19 @@ describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
-  describe(whenActionArrives(actions.TRANSACTION_SUBMITTED), () => {
+  describe(whenActionArrives(actions.channel.TRANSACTION_SUBMITTED), () => {
     // player A scenario
     const state = states.waitForDepositApproval(defaultsForA);
-    const action = actions.transactionSubmitted('0x0');
+    const action = actions.channel.transactionSubmitted('0x0');
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
   });
 
-  describe(whenActionArrives(actions.TRANSACTION_SUBMISSION_FAILED), () => {
+  describe(whenActionArrives(actions.channel.TRANSACTION_SUBMISSION_FAILED), () => {
     // player A scenario
     const state = states.waitForDepositApproval(defaultsForA);
-    const action = actions.transactionSubmissionFailed({ code: '1234' });
+    const action = actions.channel.transactionSubmissionFailed({ code: '1234' });
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.DEPOSIT_TRANSACTION_FAILED, updatedState);
@@ -78,10 +78,11 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_DEPOSIT_CONFIRMATION), () => {
-  describe(whenActionArrives(actions.TRANSACTION_CONFIRMED), () => {
+  describe(whenActionArrives(actions.channel.TRANSACTION_CONFIRMED), () => {
     // player A scenario
     const state = states.waitForDepositConfirmation(defaultsWithTx);
-    const action = actions.transactionConfirmed(TX_HASH);
+    // TODO: This needs to change
+    const action = actions.channel.transactionConfirmed(TX_HASH);
     const updatedState = depositingReducer(state, action);
 
     itChangesChannelFundingStatusTo(directFundingStates.SAFE_TO_DEPOSIT, updatedState);
@@ -90,7 +91,7 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_CONFIRMATION), () => {
 
 // B
 describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
-  describe(whenActionArrives(actions.TRANSACTION_SENT_TO_METAMASK), () => {
+  describe(whenActionArrives(actions.channel.TRANSACTION_SENT_TO_METAMASK), () => {
     // player B scenario
     const createDepositTxMock = jest.fn(() => mockTransaction);
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
@@ -98,7 +99,7 @@ describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
     });
 
     const state = states.depositTransactionFailed(defaultsForB);
-    const action = actions.retryTransaction();
+    const action = actions.channel.retryTransaction();
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_TRANSACTION_SENT, updatedState);

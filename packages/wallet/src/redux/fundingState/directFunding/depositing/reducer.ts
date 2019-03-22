@@ -28,11 +28,11 @@ const waitForTransactionSentReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.Depositing> => {
   switch (action.type) {
-    case actions.TRANSACTION_SENT_TO_METAMASK:
+    case actions.channel.TRANSACTION_SENT_TO_METAMASK:
       return {
         state: states.waitForDepositApproval(state),
       };
-    case actions.TRANSACTION_SUBMISSION_FAILED:
+    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
       return { state: states.depositTransactionFailed(state) };
     default:
       return { state };
@@ -44,14 +44,14 @@ const waitForDepositApprovalReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.Depositing> => {
   switch (action.type) {
-    case actions.TRANSACTION_SUBMITTED:
+    case actions.channel.TRANSACTION_SUBMITTED:
       return {
         state: states.waitForDepositConfirmation({
           ...state,
           transactionHash: action.transactionHash,
         }),
       };
-    case actions.TRANSACTION_SUBMISSION_FAILED:
+    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
       return { state: states.depositTransactionFailed(state) };
     default:
       return { state };
@@ -63,7 +63,7 @@ const waitForDepositConfirmationReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<fundingStates.DirectFundingState> => {
   switch (action.type) {
-    case actions.TRANSACTION_CONFIRMED:
+    case actions.channel.TRANSACTION_CONFIRMED:
       return { state: fundingStates.waitForFundingConfirmed(state) };
     default:
       return { state };
@@ -75,7 +75,7 @@ const depositTransactionFailedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.Depositing> => {
   switch (action.type) {
-    case actions.RETRY_TRANSACTION:
+    case actions.channel.RETRY_TRANSACTION:
       return {
         state: states.waitForTransactionSent({
           ...state,
