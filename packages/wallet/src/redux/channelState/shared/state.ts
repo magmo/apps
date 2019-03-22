@@ -1,8 +1,12 @@
 import { Commitment } from 'fmg-core';
-
+export type ChannelType = 'Application' | 'Ledger';
 export interface SharedChannelState {
   address: string;
   privateKey: string;
+}
+
+export interface TypedChannelState {
+  channelType: ChannelType;
 }
 
 export interface SignedCommitment {
