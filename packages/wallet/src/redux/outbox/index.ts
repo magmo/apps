@@ -6,7 +6,7 @@ import { OutboxState } from './state';
  *
  * For each key k in sideEffects, replace state[k] with sideEffects[k]
  */
-export function applySideEffects(
+export function accumulateSideEffects(
   state: OutboxState,
   sideEffects: OutboxState | undefined,
 ): OutboxState {

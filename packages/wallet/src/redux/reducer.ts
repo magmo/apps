@@ -10,7 +10,7 @@ import {
 import { unreachable } from '../utils/reducer-utils';
 import { OutboxState } from './outbox/state';
 import { initializedReducer } from './initialized/reducer';
-import { applySideEffects } from './outbox';
+import { accumulateSideEffects } from './outbox';
 
 const initialState = waitForLogin();
 
@@ -34,7 +34,7 @@ export const walletReducer = (
     // so it's always safe to clear it.
     sideEffects.actionOutbox = undefined;
   }
-  state = { ...state, outboxState: applySideEffects(state.outboxState, sideEffects) };
+  state = { ...state, outboxState: accumulateSideEffects(state.outboxState, sideEffects) };
 
   switch (state.stage) {
     case INITIALIZING:
