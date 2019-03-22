@@ -1,40 +1,39 @@
 import { ChannelStatus } from '../channelState/state';
-import { OutboxState } from '../outbox/state';
 import { StateWithSideEffects } from '../shared/state';
 import { Commitment } from 'fmg-core';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 
 export const itSendsAMessage = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends a message`, () => {
-    expect(state.outboxState!.messageOutbox).toEqual(expect.anything());
+    expect(state.sideEffects!.messageOutbox).toEqual(expect.anything());
   });
 };
 
 export const itSendsNoMessage = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends no message`, () => {
-    if (state.outboxState) {
-      expect(state.outboxState!.messageOutbox).toBeUndefined();
+    if (state.sideEffects) {
+      expect(state.sideEffects!.messageOutbox).toBeUndefined();
     }
   });
 };
 
-export const itSendsThisMessage = (state: { outboxState?: OutboxState }, message) => {
+export const itSendsThisMessage = (state: StateWithSideEffects<any>, message) => {
   if (message.type) {
     // We've received the entire action
     it(`sends a message `, () => {
-      expect(state.outboxState!.messageOutbox!).toMatchObject(message);
+      expect(state.sideEffects!.messageOutbox!).toMatchObject(message);
     });
   } else {
     // Assume we've only received the type of the message
     it(`sends message ${message}`, () => {
-      expect(state.outboxState!.messageOutbox!.type).toEqual(message);
+      expect(state.sideEffects!.messageOutbox!.type).toEqual(message);
     });
   }
 };
 
 export const itSendsThisDisplayEvent = (state: StateWithSideEffects<ChannelStatus>, event) => {
   it(`sends event ${event.type}`, () => {
-    expect(state.outboxState!.displayOutbox!.type).toEqual(event);
+    expect(state.sideEffects!.displayOutbox!.type).toEqual(event);
   });
 };
 
@@ -44,25 +43,25 @@ export const expectThisCommitmentSent = (
   state: StateWithSideEffects<ChannelStatus>,
   c: Partial<Commitment>,
 ) => {
-  expect((state.outboxState!.messageOutbox! as CommitmentMessage).commitment).toMatchObject(c);
+  expect((state.sideEffects!.messageOutbox! as CommitmentMessage).commitment).toMatchObject(c);
 };
 
 export const itSendsATransaction = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends a transaction`, () => {
-    expect(state.outboxState!.transactionOutbox).toEqual(expect.anything());
+    expect(state.sideEffects!.transactionOutbox).toEqual(expect.anything());
   });
 };
 
-export const itSendsThisTransaction = (state: { outboxState?: OutboxState }, tx) => {
+export const itSendsThisTransaction = (state: StateWithSideEffects<any>, tx) => {
   it(`sends a transaction`, () => {
-    expect(state.outboxState!.transactionOutbox).toEqual(tx);
+    expect(state.sideEffects!.transactionOutbox).toEqual(tx);
   });
 };
 
-export const itSendsNoTransaction = (state: { outboxState?: OutboxState }) => {
+export const itSendsNoTransaction = (state: StateWithSideEffects<any>) => {
   it(`doesn't send a transaction`, () => {
-    if (state.outboxState) {
-      expect(state.outboxState.transactionOutbox).toBeUndefined();
+    if (state.sideEffects) {
+      expect(state.sideEffects.transactionOutbox).toBeUndefined();
     }
   });
 };
@@ -108,27 +107,27 @@ export const itIncreasesTurnNumBy = (
   });
 };
 
-export const itDispatchesThisAction = (action, state: { outboxState?: OutboxState }) => {
+export const itDispatchesThisAction = (action, state: StateWithSideEffects<any>) => {
   if (action.type) {
     it(`dispatches ${action.type}`, () => {
       // The actionOutbox should only dispatch internal actions
       // We were passed the whole action
       expect(action.type).toMatch('WALLET.INTERNAL');
-      expect(state.outboxState!.actionOutbox).toMatchObject(action);
+      expect(state.sideEffects!.actionOutbox).toMatchObject(action);
     });
   } else {
     it(`dispatches ${action}`, () => {
       // We were just passed the type
       expect(action).toMatch('WALLET.INTERNAL');
-      expect(state.outboxState!.actionOutbox!.type).toEqual(action);
+      expect(state.sideEffects!.actionOutbox!.type).toEqual(action);
     });
   }
 };
 
-export const itDispatchesNoAction = (state: { outboxState?: OutboxState }) => {
+export const itDispatchesNoAction = (state: StateWithSideEffects<any>) => {
   it(`dispatches no action`, () => {
-    if (state.outboxState) {
-      expect(state.outboxState!.actionOutbox).toBeUndefined();
+    if (state.sideEffects) {
+      expect(state.sideEffects!.actionOutbox).toBeUndefined();
     }
   });
 };

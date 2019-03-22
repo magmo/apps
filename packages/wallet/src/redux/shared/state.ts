@@ -4,7 +4,7 @@ import { ChannelState } from '../channelState/state';
 
 export interface StateWithSideEffects<T> {
   state: T;
-  outboxState?: SideEffects;
+  sideEffects?: SideEffects;
 }
 
 export interface SharedWalletState {
