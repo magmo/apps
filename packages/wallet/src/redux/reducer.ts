@@ -8,7 +8,7 @@ import {
   DISPLAY_MESSAGE_SENT,
 } from './actions';
 import { unreachable } from '../utils/reducer-utils';
-import { OutboxState } from './outbox/state';
+import { SideEffects } from './outbox/state';
 import { initializedReducer } from './initialized/reducer';
 import { accumulateSideEffects } from './outbox';
 
@@ -18,7 +18,7 @@ export const walletReducer = (
   state: WalletState = initialState,
   action: WalletAction,
 ): WalletState => {
-  const sideEffects: OutboxState = {};
+  const sideEffects: SideEffects = {};
   if (action.type === MESSAGE_SENT) {
     sideEffects.messageOutbox = undefined;
   }

@@ -53,7 +53,7 @@ const waitForAdjudicatorReducer = (
       const { adjudicator, networkId } = action;
       return initialized({
         ...state,
-        outboxState: { messageOutbox: initializationSuccess() },
+        outboxState: { ...state.outboxState, messageOutbox: initializationSuccess() },
         adjudicator,
         networkId,
       });

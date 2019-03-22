@@ -10,10 +10,10 @@ export const EMPTY_OUTBOX_STATE: OutboxState = {
 };
 
 export interface OutboxState {
-  displayOutbox?: DisplayAction;
-  messageOutbox?: WalletEvent;
-  transactionOutbox?: TransactionRequest;
-  actionOutbox?: internal.InternalAction;
+  displayOutbox: DisplayAction | undefined;
+  messageOutbox: WalletEvent | undefined;
+  transactionOutbox: TransactionRequest | undefined;
+  actionOutbox: internal.InternalAction | undefined;
 }
 
 export type SideEffects = Partial<OutboxState> | undefined;
