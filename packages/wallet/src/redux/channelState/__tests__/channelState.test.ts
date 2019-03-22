@@ -2,7 +2,7 @@ import * as actions from '../../actions';
 
 import * as scenarios from '../../__tests__/test-scenarios';
 import { channelStateReducer } from '../reducer';
-import * as states from '../state';
+import * as states from '../app-channel/state';
 
 const {
   initializingChannelState: initializingChannels,
