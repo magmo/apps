@@ -1,7 +1,7 @@
 import * as states from '../state';
 import { addHex } from '../../../utils/hex-utils';
 import * as actions from '../actions';
-import { internal } from '../../actions';
+import { internal, TRANSACTION_CONFIRMED } from '../../actions';
 import {
   messageRelayRequested,
   fundingSuccess,
@@ -197,7 +197,7 @@ const waitForFundingAndPostFundSetupReducer = (
         return { state };
       }
 
-    case actions.TRANSACTION_CONFIRMED:
+    case TRANSACTION_CONFIRMED:
       // WARNING: This is pretty brittle
       if (state.funded) {
         // Player B can now confirm funding and is only waiting on post fund setup

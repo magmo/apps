@@ -7,7 +7,7 @@ import { TransactionResponse } from 'ethers/providers';
 export function* transactionSender(transaction) {
   const provider: ethers.providers.JsonRpcProvider = yield call(getProvider);
   const signer = provider.getSigner();
-  yield put(actions.channel.transactionSentToMetamask());
+  yield put(actions.transactionSentToMetamask());
   let transactionResult: TransactionResponse;
   try {
     const contractAddress = yield call(getAdjudicatorContractAddress, provider);
@@ -16,15 +16,13 @@ export function* transactionSender(transaction) {
       to: contractAddress,
     });
   } catch (err) {
-    yield put(actions.channel.transactionSubmissionFailed(err));
+    yield put(actions.transactionSubmissionFailed(err));
     return;
   }
-  yield put(
-    actions.channel.transactionSubmitted(transactionResult.hash ? transactionResult.hash : ''),
-  );
+  yield put(actions.transactionSubmitted(transactionResult.hash ? transactionResult.hash : ''));
   const confirmedTransaction = yield call([transactionResult, transactionResult.wait]);
-  yield put(actions.channel.transactionConfirmed(confirmedTransaction.contractAddress));
+  yield put(actions.transactionConfirmed(confirmedTransaction.contractAddress));
   // TODO: Figure out how to wait for a transaction to be X blocks deep
   // yield call(transactionResult.wait, 5);
-  yield put(actions.channel.transactionFinalized());
+  yield put(actions.transactionFinalized());
 }

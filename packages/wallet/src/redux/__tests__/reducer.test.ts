@@ -46,7 +46,7 @@ describe('when a side effect occured', () => {
   });
 
   it('clears the first element of the transactionOutbox', () => {
-    const action = actions.channel.transactionSentToMetamask();
+    const action = actions.transactionSentToMetamask();
     const updatedState = walletReducer(state, action);
     expect(updatedState.outboxState.transactionOutbox).toMatchObject(transactionOutbox.slice(1));
   });

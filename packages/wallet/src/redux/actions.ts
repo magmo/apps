@@ -75,6 +75,50 @@ export const metamaskLoadError = () => ({
 });
 export type MetamaskLoadError = ReturnType<typeof metamaskLoadError>;
 
+// These actions are relevant to multiple branches of the wallet state tree
+export const TRANSACTION_SENT_TO_METAMASK = 'WALLET.COMMON.TRANSACTION_SENT_TO_METAMASK';
+export const transactionSentToMetamask = () => ({
+  type: TRANSACTION_SENT_TO_METAMASK as typeof TRANSACTION_SENT_TO_METAMASK,
+});
+export type TransactionSentToMetamask = ReturnType<typeof transactionSentToMetamask>;
+
+export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.COMMON.TRANSACTION_SUBMISSION_FAILED';
+export const transactionSubmissionFailed = (error: { message?: string; code }) => ({
+  error,
+  type: TRANSACTION_SUBMISSION_FAILED as typeof TRANSACTION_SUBMISSION_FAILED,
+});
+export type TransactionSubmissionFailed = ReturnType<typeof transactionSubmissionFailed>;
+
+export const TRANSACTION_SUBMITTED = 'WALLET.COMMON.TRANSACTION_SUBMITTED';
+export const transactionSubmitted = (transactionHash: string) => ({
+  transactionHash,
+  type: TRANSACTION_SUBMITTED as typeof TRANSACTION_SUBMITTED,
+});
+export type TransactionSubmitted = ReturnType<typeof transactionSubmitted>;
+
+export const TRANSACTION_CONFIRMED = 'WALLET.COMMON.TRANSACTION_CONFIRMED';
+export const transactionConfirmed = (contractAddress?: string) => ({
+  type: TRANSACTION_CONFIRMED as typeof TRANSACTION_CONFIRMED,
+  contractAddress,
+});
+export type TransactionConfirmed = ReturnType<typeof transactionConfirmed>;
+
+export const TRANSACTION_FINALIZED = 'WALLET.COMMON.TRANSACTION_FINALIZED';
+export const transactionFinalized = () => ({
+  type: TRANSACTION_FINALIZED as typeof TRANSACTION_FINALIZED,
+});
+export type TransactionFinalized = ReturnType<typeof transactionFinalized>;
+
+export type CommonAction =
+  | TransactionConfirmed
+  | TransactionSentToMetamask
+  | TransactionSubmissionFailed
+  | TransactionSubmitted;
+
+export function isCommonAction(action: WalletAction): action is CommonAction {
+  return action.type.match('WALLET.COMMON') ? true : false;
+}
+
 export { internal, channel };
 
 // TODO: This is getting large, we should probably split this up into separate types for each stage
@@ -88,5 +132,6 @@ export type WalletAction =
   | LoggedIn
   | MessageSent
   | MetamaskLoadError
+  | CommonAction
   | channel.ChannelAction
   | internal.InternalAction;

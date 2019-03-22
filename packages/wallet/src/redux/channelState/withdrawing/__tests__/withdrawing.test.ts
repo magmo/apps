@@ -70,13 +70,13 @@ describe('when in WaitForWithdrawalInitiation', () => {
   const state = states.waitForWithdrawalInitiation(defaults);
 
   describe('and the transaction is submitted', () => {
-    const action = actions.channel.transactionSubmitted('0x0');
+    const action = actions.transactionSubmitted('0x0');
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_WITHDRAWAL_CONFIRMATION, updatedState);
   });
   describe('and the transaction submission errors', () => {
-    const action = actions.channel.transactionSubmissionFailed({ code: 0 });
+    const action = actions.transactionSubmissionFailed({ code: 0 });
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WITHDRAW_TRANSACTION_FAILED, updatedState);
@@ -105,7 +105,7 @@ describe('when in WaitForWithdrawalConfirmation', () => {
   const state = states.waitForWithdrawalConfirmation(defaults);
 
   describe('and the transaction is confirmed', () => {
-    const action = actions.channel.transactionConfirmed();
+    const action = actions.transactionConfirmed();
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_WITHDRAWAL_SUCCESS, updatedState);

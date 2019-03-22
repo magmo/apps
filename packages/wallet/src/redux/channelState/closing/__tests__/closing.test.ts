@@ -108,7 +108,10 @@ describe('start in WaitForOpponentConclude', () => {
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
     Object.defineProperty(ReducerUtil, 'validTransition', { value: validateMock });
 
-    const action = actions.channel.commitmentReceived(('commitment' as unknown) as Commitment, '0x0');
+    const action = actions.channel.commitmentReceived(
+      ('commitment' as unknown) as Commitment,
+      '0x0',
+    );
     describe(' where the adjudicator exists', () => {
       const updatedState = closingReducer(state, action);
       itTransitionsToChannelStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
@@ -149,7 +152,7 @@ describe('start in WaitForCloseInitiation', () => {
     userAddress: '0x0',
   });
   describe('action taken: transaction sent to metamask', () => {
-    const action = actions.channel.transactionSentToMetamask();
+    const action = actions.transactionSentToMetamask();
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
   });
@@ -164,12 +167,12 @@ describe('start in WaitForCloseSubmission', () => {
     userAddress: '0x0',
   });
   describe('action taken: transaction submitted', () => {
-    const action = actions.channel.transactionSubmitted('0x0');
+    const action = actions.transactionSubmitted('0x0');
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_CONFIRMED, updatedState);
   });
   describe('action taken: transaction submitted', () => {
-    const action = actions.channel.transactionSubmissionFailed({ code: 0 });
+    const action = actions.transactionSubmissionFailed({ code: 0 });
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.CLOSE_TRANSACTION_FAILED, updatedState);
   });
@@ -207,7 +210,7 @@ describe('start in WaitForCloseConfirmed', () => {
     turnNum: concludeCommitment2.turnNum,
   });
   describe('action taken: transaction confirmed', () => {
-    const action = actions.channel.transactionConfirmed();
+    const action = actions.transactionConfirmed();
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
   });

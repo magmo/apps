@@ -130,7 +130,7 @@ const waitForCloseConfirmedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       return {
         state: channelStates.acknowledgeCloseSuccess({ ...state }),
         sideEffects: { messageOutbox: closeSuccess() },
@@ -144,7 +144,7 @@ const waitForCloseInitiatorReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_SENT_TO_METAMASK:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return { state: channelStates.waitForCloseSubmission(state) };
   }
   return { state };
@@ -155,9 +155,9 @@ const waitForCloseSubmissionReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
+    case actions.TRANSACTION_SUBMISSION_FAILED:
       return { state: channelStates.closeTransactionFailed(state) };
-    case actions.channel.TRANSACTION_SUBMITTED:
+    case actions.TRANSACTION_SUBMITTED:
       return {
         state: channelStates.waitForCloseConfirmed({
           ...state,

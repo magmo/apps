@@ -103,7 +103,7 @@ const initiateChallengeReducer = (
   action: WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_SENT_TO_METAMASK:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return { state: states.waitForChallengeSubmission(state) };
     default:
       return { state };
@@ -122,14 +122,14 @@ const waitForChallengeSubmissionReducer = (
           challengeExpiry: bigNumberify(action.finalizedAt).toNumber(),
         }),
       };
-    case actions.channel.TRANSACTION_SUBMITTED:
+    case actions.TRANSACTION_SUBMITTED:
       return {
         state: states.waitForChallengeConfirmation({
           ...state,
           transactionHash: action.transactionHash,
         }),
       };
-    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
+    case actions.TRANSACTION_SUBMISSION_FAILED:
       return { state: states.challengeTransactionFailed(state) };
     default:
       return { state };
@@ -148,7 +148,7 @@ const waitForChallengeConfirmationReducer = (
           challengeExpiry: bigNumberify(action.finalizedAt).toNumber(),
         }),
       };
-    case actions.channel.TRANSACTION_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       // This is a best guess on when the challenge will expire and will be updated by the challenge created event
       // TODO: Mover challenge duration to a shared constant
       const challengeExpiry = state.challengeExpiry

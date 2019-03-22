@@ -1,5 +1,5 @@
 import { Commitment } from 'magmo-wallet-client/node_modules/fmg-core';
-import { WalletAction } from '../actions';
+import { WalletAction, CommonAction, isCommonAction } from '../actions';
 
 export const CHANNEL_INITIALIZED = 'WALLET.CHANNEL.CHANNEL_INITIALIZED';
 export const channelInitialized = () => ({
@@ -153,39 +153,6 @@ export const challengeCompletionAcknowledged = () => ({
 });
 export type ChallengeCompletionAcknowledged = ReturnType<typeof challengeCompletionAcknowledged>;
 
-export const TRANSACTION_SENT_TO_METAMASK = 'WALLET.CHANNEL.TRANSACTION_SENT_TO_METAMASK';
-export const transactionSentToMetamask = () => ({
-  type: TRANSACTION_SENT_TO_METAMASK as typeof TRANSACTION_SENT_TO_METAMASK,
-});
-export type TransactionSentToMetamask = ReturnType<typeof transactionSentToMetamask>;
-
-export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.CHANNEL.TRANSACTION_SUBMISSION_FAILED';
-export const transactionSubmissionFailed = (error: { message?: string; code }) => ({
-  error,
-  type: TRANSACTION_SUBMISSION_FAILED as typeof TRANSACTION_SUBMISSION_FAILED,
-});
-export type TransactionSubmissionFailed = ReturnType<typeof transactionSubmissionFailed>;
-
-export const TRANSACTION_SUBMITTED = 'WALLET.CHANNEL.TRANSACTION_SUBMITTED';
-export const transactionSubmitted = (transactionHash: string) => ({
-  transactionHash,
-  type: TRANSACTION_SUBMITTED as typeof TRANSACTION_SUBMITTED,
-});
-export type TransactionSubmitted = ReturnType<typeof transactionSubmitted>;
-
-export const TRANSACTION_CONFIRMED = 'WALLET.CHANNEL.TRANSACTION_CONFIRMED';
-export const transactionConfirmed = (contractAddress?: string) => ({
-  type: TRANSACTION_CONFIRMED as typeof TRANSACTION_CONFIRMED,
-  contractAddress,
-});
-export type TransactionConfirmed = ReturnType<typeof transactionConfirmed>;
-
-export const TRANSACTION_FINALIZED = 'WALLET.CHANNEL.TRANSACTION_FINALIZED';
-export const transactionFinalized = () => ({
-  type: TRANSACTION_FINALIZED as typeof TRANSACTION_FINALIZED,
-});
-export type TransactionFinalized = ReturnType<typeof transactionFinalized>;
-
 export const WITHDRAWAL_REQUESTED = 'WALLET.CHANNEL.WITHDRAWAL_REQUESTED';
 export const withdrawalRequested = () => ({
   type: WITHDRAWAL_REQUESTED as typeof WITHDRAWAL_REQUESTED,
@@ -328,14 +295,11 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | RespondWithRefuteChosen
   | RetryTransaction
   | TakeMoveInAppAcknowledged
-  | TransactionConfirmed
-  | TransactionSentToMetamask
-  | TransactionSubmissionFailed
-  | TransactionSubmitted
   | WithdrawalApproved
   | WithdrawalRejected
   | WithdrawalRequested
-  | WithdrawalSuccessAcknowledged;
+  | WithdrawalSuccessAcknowledged
+  | CommonAction;
 
 export const isChannelAction = (action: WalletAction): action is ChannelAction => {
   // In order for an action to act on a specific channel, it needs to somehow contain a
@@ -346,6 +310,8 @@ export const isChannelAction = (action: WalletAction): action is ChannelAction =
   return action.type.match('WALLET.CHANNEL')
     ? true
     : action.type.match('WALLET.INTERNAL.CHANNEL')
+    ? true
+    : isCommonAction(action)
     ? true
     : false;
 };

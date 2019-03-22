@@ -109,14 +109,14 @@ const waitForWithdrawalInitiationReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_SUBMITTED:
+    case actions.TRANSACTION_SUBMITTED:
       return {
         state: states.waitForWithdrawalConfirmation({
           ...state,
           transactionHash: action.transactionHash,
         }),
       };
-    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
+    case actions.TRANSACTION_SUBMISSION_FAILED:
       return { state: states.withdrawTransactionFailed(state) };
     default:
       return { state };
@@ -128,7 +128,7 @@ const waitForWithdrawalConfirmationReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       return { state: states.acknowledgeWithdrawalSuccess(state) };
     default:
       return { state };

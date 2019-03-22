@@ -159,7 +159,7 @@ export const initiateResponseReducer = (
   action: WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_SENT_TO_METAMASK:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return { state: states.waitForResponseSubmission(state) };
     case actions.BLOCK_MINED:
       if (
@@ -180,14 +180,14 @@ export const waitForResponseSubmissionReducer = (
   action: WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.TRANSACTION_SUBMITTED:
+    case actions.TRANSACTION_SUBMITTED:
       return {
         state: states.waitForResponseConfirmation({
           ...state,
           transactionHash: action.transactionHash,
         }),
       };
-    case actions.channel.TRANSACTION_SUBMISSION_FAILED:
+    case actions.TRANSACTION_SUBMISSION_FAILED:
       return { state: states.responseTransactionFailed(state) };
     case actions.BLOCK_MINED:
       if (
@@ -217,7 +217,7 @@ export const waitForResponseConfirmationReducer = (
       } else {
         return { state };
       }
-    case actions.channel.TRANSACTION_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       return { state: states.acknowledgeChallengeComplete(state) };
     default:
       return { state };
