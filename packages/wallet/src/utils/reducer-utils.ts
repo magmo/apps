@@ -37,15 +37,15 @@ export const ourTurn = (state: ChannelStatus) => {
   return state.turnNum % 2 !== state.ourIndex;
 };
 
-export type ReducersMapObject<S = any, A extends WalletAction = WalletAction> = {
-  [K in keyof S]: ReducerWithSideEffects<S[K], A>
+export type ReducersMapObject<Tree = any, A extends WalletAction = WalletAction> = {
+  [Branch in keyof Tree]: ReducerWithSideEffects<Tree[Branch], A>
 };
 
-export type ReducerWithSideEffects<Tree, A extends WalletAction = WalletAction> = (
-  state: Tree,
+export type ReducerWithSideEffects<T, A extends WalletAction = WalletAction> = (
+  state: T,
   action: A,
   data?: any,
-) => StateWithSideEffects<Tree>;
+) => StateWithSideEffects<T>;
 
 export function combineReducersWithSideEffects<Tree, A extends WalletAction>(
   reducers: ReducersMapObject<Tree, A>,
