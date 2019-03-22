@@ -16,16 +16,21 @@ export const itSendsNoMessage = (state: StateWithSideEffects<ChannelStatus>) => 
   });
 };
 
-export const itSendsThisMessage = (state: StateWithSideEffects<any>, message) => {
+export const itSendsThisMessage = (state: StateWithSideEffects<any>, message, idx = 0) => {
+  if (Array.isArray(message)) {
+    message.map((m, i) => itSendsThisMessage(state, m, i));
+    return;
+  }
+
   if (message.type) {
     // We've received the entire action
     it(`sends a message`, () => {
-      expectSideEffect('messageOutbox', state, message);
+      expectSideEffect('messageOutbox', state, message, idx);
     });
   } else {
     // Assume we've only received the type of the message
     it(`sends message ${message}`, () => {
-      expectSideEffect('messageOutbox', state, message);
+      expectSideEffect('messageOutbox', state, message, idx);
     });
   }
 };
@@ -43,9 +48,10 @@ const expectSideEffect = <StateType>(
   outboxBranch: string,
   state: StateWithSideEffects<StateType>,
   actionOrObject: object | string | undefined,
+  idx = 0,
 ) => {
   const outbox = state.sideEffects![outboxBranch];
-  const item = Array.isArray(outbox) ? outbox[0] : outbox;
+  const item = Array.isArray(outbox) ? outbox[idx] : outbox;
   if (typeof actionOrObject === 'string') {
     expect(item.type).toEqual(actionOrObject);
   } else if (typeof actionOrObject === 'undefined') {
