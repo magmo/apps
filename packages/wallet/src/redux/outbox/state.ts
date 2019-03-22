@@ -3,17 +3,19 @@ import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { internal } from '../actions';
 
 export const EMPTY_OUTBOX_STATE: OutboxState = {
-  displayOutbox: undefined,
-  messageOutbox: undefined,
-  transactionOutbox: undefined,
-  actionOutbox: undefined,
+  displayOutbox: [],
+  messageOutbox: [],
+  transactionOutbox: [],
+  actionOutbox: [],
 };
 
 export interface OutboxState {
-  displayOutbox: DisplayAction | undefined;
-  messageOutbox: WalletEvent | undefined;
-  transactionOutbox: TransactionRequest | undefined;
-  actionOutbox: internal.InternalAction | undefined;
+  displayOutbox: DisplayAction[];
+  messageOutbox: WalletEvent[];
+  transactionOutbox: TransactionRequest[];
+  actionOutbox: internal.InternalAction[];
 }
 
-export type SideEffects = Partial<OutboxState> | undefined;
+export type SideEffects = {
+  [Outbox in keyof OutboxState]?: OutboxState[Outbox] | OutboxState[Outbox][0]
+};
