@@ -1,33 +1,18 @@
 import * as states from './state';
 
-import { openingReducer } from './opening/reducer';
-import { fundingReducer } from './funding/reducer';
-import { runningReducer } from './running/reducer';
-import { challengingReducer } from './challenging/reducer';
-import { respondingReducer } from './responding/reducer';
-import { withdrawingReducer } from './withdrawing/reducer';
-import { closingReducer } from './closing/reducer';
 import {
   WalletAction,
-  CONCLUDE_REQUESTED,
-  COMMITMENT_RECEIVED,
   CHANNEL_INITIALIZED,
   ChannelAction,
   isReceiveFirstCommitment,
 } from '../actions';
-import {
-  unreachable,
-  ourTurn,
-  validTransition,
-  ReducerWithSideEffects,
-  combineReducersWithSideEffects,
-} from '../../utils/reducer-utils';
-import { validCommitmentSignature } from '../../utils/signing-utils';
-import { showWallet, channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
-import { CommitmentType } from 'fmg-core';
+import { ReducerWithSideEffects, combineReducersWithSideEffects } from '../../utils/reducer-utils';
+import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { StateWithSideEffects } from '../shared/state';
 import { ethers } from 'ethers';
 import { channelID } from 'fmg-core/lib/channel';
+import { initializedAppChannelStatusReducer } from './app-channel/reducer';
+import { waitForChannel } from './app-channel/state';
 
 export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = (
   state: states.ChannelState,
@@ -52,7 +37,8 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
 
     const { address, privateKey } = newState.initializingChannels[ourAddress];
     delete newState.initializingChannels[ourAddress];
-    newState.initializedChannels[channelId] = states.waitForChannel({
+    // TODO: Needs to handle both app and ledger
+    newState.initializedChannels[channelId] = waitForChannel({
       address,
       privateKey,
       ourIndex,
@@ -78,15 +64,15 @@ const initializingChannels: ReducerWithSideEffects<states.InitializingChannelSta
   if (action.type !== CHANNEL_INITIALIZED) {
     return { state };
   }
-
   const wallet = ethers.Wallet.createRandom();
   const { address, privateKey } = wallet;
+  // TODO: Needs to handle both app and ledger channels
   return {
     state: {
       ...state,
       // We have to temporarily store the private key under the address, since
       // we can't know the channel id until both participants know their addresses.
-      [address]: states.waitForChannel({ address, privateKey }),
+      [address]: waitForChannel({ address, privateKey }),
     },
     sideEffects: { messageOutbox: channelInitializationSuccess(wallet.address) },
   };
@@ -107,52 +93,16 @@ const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState
     // TODO:  This channel should really exist -- should we throw?
     return { state };
   }
+  if (existingChannel.channelType === 'Application') {
+    const { state: newState, outboxState } = initializedAppChannelStatusReducer(
+      existingChannel,
+      action,
+    );
 
-  const { state: newState, sideEffects: outboxState } = initializedChannelStatusReducer(
-    existingChannel,
-    action,
-  );
-
-  return { state: { ...state, [appChannelId]: newState }, sideEffects: outboxState };
-};
-
-const initializedChannelStatusReducer: ReducerWithSideEffects<states.ChannelStatus> = (
-  state: states.ChannelStatus,
-  action: ChannelAction,
-): StateWithSideEffects<states.ChannelStatus> => {
-  const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
-  if (conclusionStateFromOwnRequest) {
-    return {
-      state: conclusionStateFromOwnRequest,
-      sideEffects: { displayOutbox: showWallet() },
-    };
-  }
-
-  const conclusionStateFromOpponentRequest = receivedValidOpponentConclusionRequest(state, action);
-  if (conclusionStateFromOpponentRequest) {
-    return {
-      state: conclusionStateFromOpponentRequest,
-      sideEffects: { displayOutbox: showWallet() },
-    };
-  }
-
-  switch (state.stage) {
-    case states.OPENING:
-      return openingReducer(state, action);
-    case states.FUNDING:
-      return fundingReducer(state, action);
-    case states.RUNNING:
-      return runningReducer(state, action);
-    case states.CHALLENGING:
-      return challengingReducer(state, action);
-    case states.RESPONDING:
-      return respondingReducer(state, action);
-    case states.WITHDRAWING:
-      return withdrawingReducer(state, action);
-    case states.CLOSING:
-      return closingReducer(state, action);
-    default:
-      return unreachable(state);
+    return { state: { ...state, [appChannelId]: newState }, outboxState };
+  } else {
+    // TODO: Handle ledger channels
+    return { state, outboxState: {} };
   }
 };
 
@@ -160,49 +110,3 @@ const combinedReducer = combineReducersWithSideEffects({
   initializingChannels,
   initializedChannels,
 });
-
-const receivedValidOwnConclusionRequest = (
-  state: states.ChannelStatus,
-  action: WalletAction,
-): states.ApproveConclude | null => {
-  if (state.stage !== states.FUNDING && state.stage !== states.RUNNING) {
-    return null;
-  }
-  if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) {
-    return null;
-  }
-  return states.approveConclude({ ...state });
-};
-
-const receivedValidOpponentConclusionRequest = (
-  state: states.ChannelStatus,
-  action: WalletAction,
-): states.AcknowledgeConclude | null => {
-  if (state.stage !== states.FUNDING && state.stage !== states.RUNNING) {
-    return null;
-  }
-  if (action.type !== COMMITMENT_RECEIVED) {
-    return null;
-  }
-
-  const { commitment, signature } = action;
-
-  if (commitment.commitmentType !== CommitmentType.Conclude) {
-    return null;
-  }
-  // check signature
-  const opponentAddress = state.participants[1 - state.ourIndex];
-  if (!validCommitmentSignature(commitment, signature, opponentAddress)) {
-    return null;
-  }
-  if (!validTransition(state, commitment)) {
-    return null;
-  }
-
-  return states.acknowledgeConclude({
-    ...state,
-    turnNum: commitment.turnNum,
-    lastCommitment: { commitment, signature },
-    penultimateCommitment: state.lastCommitment,
-  });
-};

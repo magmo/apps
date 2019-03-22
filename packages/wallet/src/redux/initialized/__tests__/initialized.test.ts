@@ -5,7 +5,7 @@ import * as fundingStates from '../../fundingState/state';
 import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from '../../__tests__/test-scenarios';
-import { waitForUpdate } from '../../channelState/state';
+import { waitForUpdate } from '../../channelState/app-channel/state';
 import { EMPTY_OUTBOX_STATE } from '../../outbox/state';
 
 const { channelId } = scenarios;

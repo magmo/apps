@@ -3,7 +3,7 @@ import { storiesOf } from '@storybook/react';
 import WalletContainer from '../containers/Wallet';
 import { Provider } from 'react-redux';
 import * as walletStates from '../redux/state';
-import * as channelStates from '../redux/channelState/state';
+import * as appChannelStates from '../redux/channelState/app-channel/state';
 import * as fundingStates from '../redux/fundingState/state';
 import '../index.scss';
 import * as scenarios from '../redux/__tests__/test-scenarios';
@@ -89,7 +89,7 @@ const initializedWalletState = walletStates.initialized({
   unhandledAction: undefined,
   outboxState: EMPTY_OUTBOX_STATE,
   channelState: {
-    initializedChannels: { [channelId]: channelStates.approveFunding({ ...playerADefaults }) },
+    initializedChannels: { [channelId]: appChannelStates.approveFunding({ ...playerADefaults }) },
     initializingChannels: {},
   },
   networkId: 4,
@@ -98,7 +98,7 @@ const initializedWalletState = walletStates.initialized({
 });
 
 // Want to return top level wallet state, not the channel state
-function walletStateFromChannelState<T extends channelStates.OpenedState>(
+function walletStateFromChannelState<T extends appChannelStates.OpenedState>(
   channelState: T,
   networkId?: number,
 ): walletStates.WalletState {
@@ -164,32 +164,32 @@ function addStoriesFromCollection(collection, chapter, renderer = channelStateRe
 }
 
 const WalletScreensFundingPlayerA = {
-  ApproveFunding: { channelState: channelStates.approveFunding(playerADefaults) },
+  ApproveFunding: { channelState: appChannelStates.approveFunding(playerADefaults) },
   WaitForTransactionSent: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerADefaults),
+    channelState: appChannelStates.waitForFundingAndPostFundSetup(playerADefaults),
     fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
   },
   WaitForDepositApproval: {
-    channelState: channelStates.waitForFundingAndPostFundSetup({
+    channelState: appChannelStates.waitForFundingAndPostFundSetup({
       ...playerADefaults,
     }),
     fundingState: fundingStates.depositing.waitForDepositApproval(defaultFundingState),
   },
   WaitForDepositConfirmation: {
-    channelState: channelStates.waitForFundingAndPostFundSetup({
+    channelState: appChannelStates.waitForFundingAndPostFundSetup({
       ...playerADefaults,
     }),
     fundingState: fundingStates.depositing.waitForDepositConfirmation(fundingStateWithTX),
   },
   WaitForFundingConfirmed: {
-    channelState: channelStates.waitForFundingAndPostFundSetup({
+    channelState: appChannelStates.waitForFundingAndPostFundSetup({
       ...playerADefaults,
     }),
     fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
   },
-  WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerADefaults) },
+  WaitForPostFundSetup: { channelState: appChannelStates.aWaitForPostFundSetup(playerADefaults) },
   AcknowledgeFundingSuccess: {
-    channelState: channelStates.acknowledgeFundingSuccess(playerADefaults),
+    channelState: appChannelStates.acknowledgeFundingSuccess(playerADefaults),
   },
 };
 addStoriesFromCollection(
@@ -199,30 +199,30 @@ addStoriesFromCollection(
 );
 
 const WalletScreensFundingPlayerB = {
-  ApproveFunding: { channelState: channelStates.approveFunding(playerBDefaults) },
+  ApproveFunding: { channelState: appChannelStates.approveFunding(playerBDefaults) },
   NotSafeToDeposit: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+    channelState: appChannelStates.waitForFundingAndPostFundSetup(playerBDefaults),
     fundingState: fundingStates.notSafeToDeposit(defaultFundingState),
   },
   WaitForTransactionSent: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+    channelState: appChannelStates.waitForFundingAndPostFundSetup(playerBDefaults),
     fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
   },
   WaitForDepositApproval: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+    channelState: appChannelStates.waitForFundingAndPostFundSetup(playerBDefaults),
     fundingState: fundingStates.depositing.waitForDepositApproval(defaultFundingState),
   },
   WaitForDepositConfirmation: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+    channelState: appChannelStates.waitForFundingAndPostFundSetup(playerBDefaults),
     fundingState: fundingStates.depositing.waitForDepositConfirmation(fundingStateWithTX),
   },
   WaitForFundingConfirmed: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+    channelState: appChannelStates.waitForFundingAndPostFundSetup(playerBDefaults),
     fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
   },
-  WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerBDefaults) },
+  WaitForPostFundSetup: { channelState: appChannelStates.aWaitForPostFundSetup(playerBDefaults) },
   AcknowledgeFundingSuccess: {
-    channelState: channelStates.acknowledgeFundingSuccess(playerBDefaults),
+    channelState: appChannelStates.acknowledgeFundingSuccess(playerBDefaults),
   },
 };
 addStoriesFromCollection(
@@ -233,31 +233,31 @@ addStoriesFromCollection(
 
 // Against bot, who sends funding too early:
 const WalletScreensFundingPlayerAPart2 = {
-  ApproveFunding: { channelState: channelStates.approveFunding(playerADefaults) },
+  ApproveFunding: { channelState: appChannelStates.approveFunding(playerADefaults) },
   WaitForTransactionSent: {
-    channelState: channelStates.waitForFundingConfirmation(playerADefaults),
+    channelState: appChannelStates.waitForFundingConfirmation(playerADefaults),
     fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
   },
   WaitForDepositApproval: {
-    channelState: channelStates.waitForFundingConfirmation({
+    channelState: appChannelStates.waitForFundingConfirmation({
       ...playerADefaults,
     }),
     fundingState: fundingStates.depositing.waitForDepositApproval(defaultFundingState),
   },
   WaitForDepositConfirmation: {
-    channelState: channelStates.waitForFundingConfirmation({
+    channelState: appChannelStates.waitForFundingConfirmation({
       ...playerADefaults,
     }),
     fundingState: fundingStates.depositing.waitForDepositConfirmation(fundingStateWithTX),
   },
   WaitForFundingConfirmed: {
-    channelState: channelStates.waitForFundingConfirmation({
+    channelState: appChannelStates.waitForFundingConfirmation({
       ...playerADefaults,
     }),
     fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
   },
   AcknowledgeFundingSuccess: {
-    channelState: channelStates.acknowledgeFundingSuccess(playerADefaults),
+    channelState: appChannelStates.acknowledgeFundingSuccess(playerADefaults),
   },
 };
 addStoriesFromCollection(
@@ -267,39 +267,41 @@ addStoriesFromCollection(
 );
 
 const WalletScreendsWithdrawing = {
-  ApproveWithdrawal: channelStates.approveWithdrawal(playerADefaults),
-  WaitForWithdrawalInitiation: channelStates.waitForWithdrawalInitiation(playerADefaults),
-  WaitForWithdrawalConfirmation: channelStates.waitForWithdrawalConfirmation(playerADefaults),
-  AcknowledgeWithdrawalSuccess: channelStates.acknowledgeWithdrawalSuccess(playerADefaults),
+  ApproveWithdrawal: appChannelStates.approveWithdrawal(playerADefaults),
+  WaitForWithdrawalInitiation: appChannelStates.waitForWithdrawalInitiation(playerADefaults),
+  WaitForWithdrawalConfirmation: appChannelStates.waitForWithdrawalConfirmation(playerADefaults),
+  AcknowledgeWithdrawalSuccess: appChannelStates.acknowledgeWithdrawalSuccess(playerADefaults),
 };
 addStoriesFromCollection(WalletScreendsWithdrawing, 'Wallet Screens / Withdrawing');
 
 const WalletScreensChallenging = {
-  ApproveChallenge: channelStates.approveChallenge(playerADefaults),
-  WaitForChallengeInitiation: channelStates.waitForChallengeInitiation(playerADefaults),
-  WaitForChallengeSubmission: channelStates.waitForChallengeSubmission(playerADefaults),
-  WaitForChallengeConfirmation: channelStates.waitForChallengeConfirmation(playerADefaults),
-  WaitForResponseOrTimeout: channelStates.waitForResponseOrTimeout(playerADefaults),
-  AcknowledgeChallengeResponse: channelStates.acknowledgeChallengeResponse(playerADefaults),
-  AcknowledgeChallengeTimeout: channelStates.acknowledgeChallengeTimeout(playerADefaults),
+  ApproveChallenge: appChannelStates.approveChallenge(playerADefaults),
+  WaitForChallengeInitiation: appChannelStates.waitForChallengeInitiation(playerADefaults),
+  WaitForChallengeSubmission: appChannelStates.waitForChallengeSubmission(playerADefaults),
+  WaitForChallengeConfirmation: appChannelStates.waitForChallengeConfirmation(playerADefaults),
+  WaitForResponseOrTimeout: appChannelStates.waitForResponseOrTimeout(playerADefaults),
+  AcknowledgeChallengeResponse: appChannelStates.acknowledgeChallengeResponse(playerADefaults),
+  AcknowledgeChallengeTimeout: appChannelStates.acknowledgeChallengeTimeout(playerADefaults),
 };
 addStoriesFromCollection(WalletScreensChallenging, 'Wallet Screens / Challenging');
 
 const WalletScreendsResponding = {
-  ChooseResponse: channelStates.chooseResponse(playerADefaults),
-  AcknowledgeChallengeTimeout: channelStates.challengeeAcknowledgeChallengeTimeOut(playerADefaults),
-  TakeMoveInApp: channelStates.takeMoveInApp(playerADefaults),
-  InitiateResponse: channelStates.initiateResponse(playerADefaults),
-  WaitForResponseSubmission: channelStates.waitForResponseSubmission(playerADefaults),
-  WaitForResponseConfirmation: channelStates.waitForResponseConfirmation(playerADefaults),
-  AcknowledgeChallengeComplete: channelStates.acknowledgeChallengeComplete(playerADefaults),
+  ChooseResponse: appChannelStates.chooseResponse(playerADefaults),
+  AcknowledgeChallengeTimeout: appChannelStates.challengeeAcknowledgeChallengeTimeOut(
+    playerADefaults,
+  ),
+  TakeMoveInApp: appChannelStates.takeMoveInApp(playerADefaults),
+  InitiateResponse: appChannelStates.initiateResponse(playerADefaults),
+  WaitForResponseSubmission: appChannelStates.waitForResponseSubmission(playerADefaults),
+  WaitForResponseConfirmation: appChannelStates.waitForResponseConfirmation(playerADefaults),
+  AcknowledgeChallengeComplete: appChannelStates.acknowledgeChallengeComplete(playerADefaults),
 };
 addStoriesFromCollection(WalletScreendsResponding, 'Wallet Screens / Responding');
 
 const WalletScreendsClosing = {
-  ApproveConclude: channelStates.approveConclude(playerADefaults),
-  WaitForOpponentConclude: channelStates.waitForOpponentConclude(playerADefaults),
-  AcknowledgeConcludeSuccess: channelStates.approveCloseOnChain(playerADefaults),
+  ApproveConclude: appChannelStates.approveConclude(playerADefaults),
+  WaitForOpponentConclude: appChannelStates.waitForOpponentConclude(playerADefaults),
+  AcknowledgeConcludeSuccess: appChannelStates.approveCloseOnChain(playerADefaults),
 };
 addStoriesFromCollection(WalletScreendsClosing, 'Wallet Screens / Closing');
 

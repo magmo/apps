@@ -2,7 +2,7 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import * as states from '../redux/channelState/state';
+import * as states from '../redux/channelState/app-channel/state';
 import FundingContainer from './Funding';
 import RespondingContainer from './Responding';
 import ChallengingContainer from './Challenging';
@@ -11,7 +11,7 @@ import ClosingContainer from './Closing';
 import LandingPage from '../components/LandingPage';
 
 interface ChannelProps {
-  state: states.ChannelStatus;
+  state: states.AppChannelStatus;
 }
 
 class ChannelContainer extends PureComponent<ChannelProps> {
