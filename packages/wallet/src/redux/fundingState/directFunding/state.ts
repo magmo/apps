@@ -36,35 +36,6 @@ export interface ChannelFunded extends BaseDirectFundingState {
   channelFundingStatus: typeof CHANNEL_FUNDED;
 }
 
-export type DirectFundingStatus =
-  | NotSafeToDeposit
-  | depositing.Depositing
-  | WaitForFundingConfirmation
-  | ChannelFunded;
-
-// type guards
-const guardGenerator = <T extends DirectFundingStatus>(type) => (
-  state: DirectFundingStatus,
-): state is T => {
-  return state.channelFundingStatus === type;
-};
-export const stateIsNotSafeToDeposit = guardGenerator<NotSafeToDeposit>(NOT_SAFE_TO_DEPOSIT);
-export const stateIsDepositing = (state: DirectFundingStatus): state is depositing.Depositing => {
-  return (
-    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
-    state.depositStatus !== depositing.DEPOSIT_CONFIRMED
-  );
-};
-export const stateIsWaitForFundingConfirmation = (
-  state: DirectFundingStatus,
-): state is WaitForFundingConfirmation => {
-  return (
-    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
-    state.depositStatus === depositing.DEPOSIT_CONFIRMED
-  );
-};
-export const stateIsChannelFunded = guardGenerator<ChannelFunded>(CHANNEL_FUNDED);
-
 // constructors
 export function baseDirectFundingState<T extends BaseDirectFundingState>(
   params: T,
@@ -111,4 +82,37 @@ export function channelFunded<T extends BaseDirectFundingState>(params: T): Chan
     depositStatus: depositing.DEPOSIT_CONFIRMED,
     channelFundingStatus: CHANNEL_FUNDED,
   };
+}
+
+// type guards
+const guardGenerator = <T extends DirectFundingStatus>(type) => (
+  state: DirectFundingStatus,
+): state is T => {
+  return state.channelFundingStatus === type;
+};
+export const stateIsNotSafeToDeposit = guardGenerator<NotSafeToDeposit>(NOT_SAFE_TO_DEPOSIT);
+export const stateIsDepositing = (state: DirectFundingStatus): state is depositing.Depositing => {
+  return (
+    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
+    state.depositStatus !== depositing.DEPOSIT_CONFIRMED
+  );
+};
+export const stateIsWaitForFundingConfirmation = (
+  state: DirectFundingStatus,
+): state is WaitForFundingConfirmation => {
+  return (
+    state.channelFundingStatus === SAFE_TO_DEPOSIT &&
+    state.depositStatus === depositing.DEPOSIT_CONFIRMED
+  );
+};
+export const stateIsChannelFunded = guardGenerator<ChannelFunded>(CHANNEL_FUNDED);
+
+export type DirectFundingStatus =
+  | NotSafeToDeposit
+  | depositing.Depositing
+  | WaitForFundingConfirmation
+  | ChannelFunded;
+
+export interface DirectFundingState {
+  [channelId: string]: DirectFundingStatus;
 }
