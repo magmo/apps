@@ -8,12 +8,10 @@ import { directFundingStateReducer } from './directFunding/reducer';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 
-type ReturnType = StateWithSideEffects<states.FundingStatus>;
-
 export const fundingStateReducer: ReducerWithSideEffects<states.FundingStatus> = (
   state: states.FundingStatus = states.waitForFundingRequest(),
   action: actions.WalletAction,
-): ReturnType => {
+): StateWithSideEffects<states.FundingStatus> => {
   switch (state.fundingType) {
     //
     case states.UNKNOWN_FUNDING_TYPE:
@@ -28,7 +26,7 @@ export const fundingStateReducer: ReducerWithSideEffects<states.FundingStatus> =
 const unknownFundingTypeReducer = (
   state: states.WaitForFundingRequest,
   action: actions.WalletAction,
-): ReturnType => {
+): StateWithSideEffects<states.FundingStatus> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       return {
