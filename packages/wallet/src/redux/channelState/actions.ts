@@ -302,11 +302,8 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | CommonAction;
 
 export const isChannelAction = (action: WalletAction): action is ChannelAction => {
-  // In order for an action to act on a specific channel, it needs to somehow contain a
-  // channel id.
-  // By rights, the actions themselves should extend a ChannelAction interface
-  // that looks like { channelId: string }
-  // This might require a change to the wallet API
+  // Most of these are actually targetted at the active application channel, and can
+  // probably be namespaced as such.
   return action.type.match('WALLET.CHANNEL')
     ? true
     : action.type.match('WALLET.INTERNAL.CHANNEL')
