@@ -10,9 +10,9 @@ import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 
 export const directFundingStateReducer = (
-  state: states.DirectFundingState,
+  state: states.DirectFundingStatus,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingState> => {
+): StateWithSideEffects<states.DirectFundingStatus> => {
   if (action.type === actions.FUNDING_RECEIVED_EVENT && action.destination === state.channelId) {
     // You can always move to CHANNEL_FUNDED based on the action
     // of some arbitrary actor, so this behaviour is common regardless of the stage of
@@ -44,7 +44,7 @@ export const directFundingStateReducer = (
 const notSafeToDepositReducer = (
   state: states.NotSafeToDeposit,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingState> => {
+): StateWithSideEffects<states.DirectFundingStatus> => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
       if (
@@ -71,7 +71,7 @@ const notSafeToDepositReducer = (
 const waitForFundingConfirmationReducer = (
   state: states.WaitForFundingConfirmation,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingState> => {
+): StateWithSideEffects<states.DirectFundingStatus> => {
   // TODO: This code path is unreachable, but the compiler doesn't know that.
   // Can we fix that?
   switch (action.type) {
@@ -95,7 +95,7 @@ const waitForFundingConfirmationReducer = (
 const channelFundedReducer = (
   state: states.ChannelFunded,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingState> => {
+): StateWithSideEffects<states.DirectFundingStatus> => {
   if (action.type === actions.FUNDING_RECEIVED_EVENT) {
     if (bigNumberify(action.totalForDestination).lt(state.requestedTotalFunds)) {
       // TODO: Deal with chain re-orgs that de-fund the channel here

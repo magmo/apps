@@ -28,7 +28,7 @@ const TOTAL_CONTRIBUTION = bigNumberify(YOUR_CONTRIBUTION)
   .mul(2)
   .toHexString();
 
-const defaultFundingState: fundingStates.DirectFundingState = {
+const defaultFundingState: fundingStates.DirectFundingStatus = {
   fundingType: fundingStates.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_CONTRIBUTION,
   requestedYourContribution: YOUR_CONTRIBUTION,

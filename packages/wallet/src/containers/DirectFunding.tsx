@@ -11,7 +11,7 @@ import EtherscanLink from '../components/EtherscanLink';
 import TransactionFailed from '../components/TransactionFailed';
 
 interface Props {
-  state: fundingStates.DirectFundingState;
+  state: fundingStates.DirectFundingStatus;
   channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
