@@ -1,5 +1,4 @@
 import { DirectFundingState } from './directFunding/state';
-import { OutboxState } from '../outbox/state';
 
 export const UNKNOWN_FUNDING_TYPE = 'FUNDING_TYPE.UNKNOWN';
 export const FUNDING_NOT_STARTED = 'FUNDING_NOT_STARTED';
@@ -33,8 +32,3 @@ export function waitForFundingRequest<T extends SharedFundingState>(
 export * from './directFunding/state';
 export * from './shared/state';
 export type FundingState = WaitForFundingRequest | DirectFundingState;
-
-export interface DirectFundingStateWithSideEffects {
-  fundingState: WaitForFundingRequest | DirectFundingState;
-  outboxState?: OutboxState;
-}
