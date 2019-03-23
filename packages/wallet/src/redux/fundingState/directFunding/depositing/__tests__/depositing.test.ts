@@ -12,7 +12,6 @@ import {
 } from '../../../../__tests__/helpers';
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { DIRECT_FUNDING } from '../../../shared/state';
 
 const { channelId, mockTransaction } = scenarios;
 
@@ -23,7 +22,7 @@ const YOUR_DEPOSIT_B = bigNumberify(TOTAL_REQUIRED)
   .toHexString();
 
 const defaultsForA: states.Depositing = {
-  fundingType: DIRECT_FUNDING,
+  fundingType: directFundingStates.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
   channelId,
