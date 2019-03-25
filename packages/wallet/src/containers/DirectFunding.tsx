@@ -11,7 +11,7 @@ import EtherscanLink from '../components/EtherscanLink';
 import TransactionFailed from '../components/TransactionFailed';
 
 interface Props {
-  state: fundingStates.DirectFundingStatus;
+  state: fundingStates.DirectFundingState;
   channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
@@ -20,16 +20,17 @@ interface Props {
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { state, retryTransactionAction } = this.props;
-    const step = fundingStepByState(state);
+    const { state, retryTransactionAction, channelId } = this.props;
+    const status = state[channelId];
+    const step = fundingStepByState(status);
     if (
-      fundingStates.stateIsNotSafeToDeposit(state) ||
-      fundingStates.stateIsWaitForFundingConfirmation(state)
+      fundingStates.stateIsNotSafeToDeposit(status) ||
+      fundingStates.stateIsWaitForFundingConfirmation(status)
     ) {
       return <FundingStep step={step} />;
     }
-    if (fundingStates.stateIsDepositing(state)) {
-      switch (state.depositStatus) {
+    if (fundingStates.stateIsDepositing(status)) {
+      switch (status.depositStatus) {
         case fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT:
           return <FundingStep step={step} />;
         case fundingStates.depositing.WAIT_FOR_DEPOSIT_APPROVAL:
@@ -39,7 +40,7 @@ class DirectFundingContainer extends PureComponent<Props> {
             <FundingStep step={step}>
               Check the progress on&nbsp;
               <EtherscanLink
-                transactionID={state.transactionHash}
+                transactionID={status.transactionHash}
                 networkId={-1} // TODO: Fix network id
                 title="Etherscan"
               />
@@ -50,19 +51,19 @@ class DirectFundingContainer extends PureComponent<Props> {
           return (
             <TransactionFailed
               name="deposit"
-              retryAction={() => retryTransactionAction(state.channelId)}
+              retryAction={() => retryTransactionAction(status.channelId)}
             />
           );
 
         default:
-          return unreachable(state);
+          return unreachable(status);
       }
     }
-    if (fundingStates.stateIsChannelFunded(state)) {
+    if (fundingStates.stateIsChannelFunded(status)) {
       return null;
     }
 
-    return unreachable(state);
+    return unreachable(status);
   }
 }
 
@@ -77,6 +78,6 @@ const mapDispatchToProps = {
 // why does it think that mapStateToProps can return undefined??
 
 export default connect(
-  (state: any) => ({ state: state.fundingState }),
+  (state: any) => ({ state: state.fundingState.directFunding }),
   mapDispatchToProps,
 )(DirectFundingContainer);
