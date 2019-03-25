@@ -293,14 +293,14 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | WithdrawalRequested
   | WithdrawalSuccessAcknowledged
   | walletActions.CommonAction
-  | walletActions.internal.InternalAction;
+  | walletActions.internal.InternalChannelAction;
 
 export const isChannelAction = (action: walletActions.WalletAction): action is ChannelAction => {
   // Most of these are actually targetted at the active application channel, and can
   // probably be namespaced as such.
   return action.type.match('WALLET.CHANNEL')
     ? true
-    : walletActions.internal.isInternalAction(action)
+    : walletActions.internal.isChannelAction(action)
     ? true
     : walletActions.isCommonAction(action)
     ? true
