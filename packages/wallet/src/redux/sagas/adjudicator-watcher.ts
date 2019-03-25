@@ -107,7 +107,7 @@ export function* adjudicatorWatcher(channelId, provider) {
         break;
       case AdjudicatorEventType.Deposited:
         yield put(
-          actions.fundingReceivedEvent(
+          actions.funding.fundingReceivedEvent(
             event.eventArgs.destination,
             event.eventArgs.amountDeposited.toHexString(),
             event.eventArgs.destinationHoldings.toHexString(),

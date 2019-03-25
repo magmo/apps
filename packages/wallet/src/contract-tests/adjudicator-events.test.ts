@@ -37,10 +37,10 @@ describe('adjudicator listener', () => {
     const sagaTester = new SagaTester({});
     sagaTester.start(adjudicatorWatcher, channelId, provider);
     await depositContract(provider, channelId);
-    await sagaTester.waitFor(actions.FUNDING_RECEIVED_EVENT);
+    await sagaTester.waitFor(actions.funding.FUNDING_RECEIVED_EVENT);
 
-    const action: actions.FundingReceivedEvent = sagaTester.getLatestCalledAction();
-    expect(action.type).toEqual(actions.FUNDING_RECEIVED_EVENT);
+    const action: actions.funding.FundingReceivedEvent = sagaTester.getLatestCalledAction();
+    expect(action.type).toEqual(actions.funding.FUNDING_RECEIVED_EVENT);
     expect(action.destination).toEqual(channelId);
     expect(action.amount).toEqual('0x05');
     expect(action.totalForDestination).toEqual('0x05');

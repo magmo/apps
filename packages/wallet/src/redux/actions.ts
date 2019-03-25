@@ -1,5 +1,6 @@
 import * as internal from './internal/actions';
 import * as channel from './channelState/actions';
+import * as funding from './fundingState/actions';
 
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
@@ -48,20 +49,6 @@ export const depositFinalised = () => ({
 });
 export type DepositFinalised = ReturnType<typeof depositFinalised>;
 
-// Common Transaction Actions
-export const FUNDING_RECEIVED_EVENT = 'FUNDING_RECEIVED_EVENT';
-export const fundingReceivedEvent = (
-  destination: string,
-  amount: string,
-  totalForDestination: string,
-) => ({
-  destination,
-  amount,
-  totalForDestination,
-  type: FUNDING_RECEIVED_EVENT as typeof FUNDING_RECEIVED_EVENT,
-});
-export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
-
 export const BLOCK_MINED = 'BLOCK_MINED';
 export const blockMined = (block: { timestamp: number; number: number }) => ({
   type: BLOCK_MINED as typeof BLOCK_MINED,
@@ -75,6 +62,7 @@ export const metamaskLoadError = () => ({
 });
 export type MetamaskLoadError = ReturnType<typeof metamaskLoadError>;
 
+// Common Transaction Actions
 // These actions are relevant to multiple branches of the wallet state tree
 export const TRANSACTION_SENT_TO_METAMASK = 'WALLET.COMMON.TRANSACTION_SENT_TO_METAMASK';
 export const transactionSentToMetamask = () => ({
@@ -119,7 +107,7 @@ export function isCommonAction(action: WalletAction): action is CommonAction {
   return action.type.match('WALLET.COMMON') ? true : false;
 }
 
-export { internal, channel };
+export { internal, channel, funding };
 
 // TODO: This is getting large, we should probably split this up into separate types for each stage
 export type WalletAction =
@@ -128,10 +116,10 @@ export type WalletAction =
   | DepositConfirmed
   | DepositInitiated
   | DisplayMessageSent
-  | FundingReceivedEvent
   | LoggedIn
   | MessageSent
   | MetamaskLoadError
   | CommonAction
   | channel.ChannelAction
-  | internal.InternalAction;
+  | internal.InternalAction
+  | funding.FundingAction;

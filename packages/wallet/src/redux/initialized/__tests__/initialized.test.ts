@@ -33,7 +33,7 @@ describe('when the player initializes a channel', () => {
 });
 
 describe('when a funding related action arrives', () => {
-  const action = actions.fundingReceivedEvent('0xf00', '0x', '0x');
+  const action = actions.funding.fundingReceivedEvent('0xf00', '0x', '0x');
   const updatedState = initializedReducer(initializedState, action);
 
   it('applies the funding state reducer', async () => {
