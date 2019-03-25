@@ -6,11 +6,17 @@ import { ReducerWithSideEffects, combineReducersWithSideEffects } from '../../ut
 import { StateWithSideEffects } from '../shared/state';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
+import { directFundingStatusReducer } from './directFunding/reducer';
+import { isfundingAction } from './actions';
 
 export const fundingStateReducer = (
   state: states.FundingState,
   action: actions.WalletAction,
 ): StateWithSideEffects<states.FundingState> => {
+  if (!isfundingAction(action)) {
+    return { state };
+  }
+
   switch (action.type) {
     case actions.internal.DIRECT_FUNDING_REQUESTED:
       const {
@@ -71,7 +77,17 @@ const directFunding: ReducerWithSideEffects<states.DirectFundingState> = (
   state,
   action: actions.funding.FundingAction,
 ) => {
-  return { state };
+  const fundingStatus = state[action.channelId];
+
+  if (!fundingStatus) {
+    return { state };
+  }
+
+  const { state: newFundingStatus, sideEffects } = directFundingStatusReducer(
+    fundingStatus,
+    action,
+  );
+  return { state: { ...state, [action.channelId]: newFundingStatus }, sideEffects };
 };
 
 const indirectFunding: ReducerWithSideEffects<states.IndirectFundingState> = (state, action) => {

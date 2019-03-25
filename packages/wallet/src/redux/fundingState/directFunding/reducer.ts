@@ -9,7 +9,7 @@ import { depositingReducer } from './depositing/reducer';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 
-export const directFundingStateReducer = (
+export const directFundingStatusReducer = (
   state: states.DirectFundingStatus,
   action: actions.WalletAction,
 ): StateWithSideEffects<states.DirectFundingStatus> => {

@@ -18,10 +18,19 @@ const YOUR_DEPOSIT_A = twoThree[0];
 const YOUR_DEPOSIT_B = twoThree[1];
 const TOTAL_REQUIRED = twoThree.reduce(addHex);
 
+const defaultsForA: states.DirectFundingStatus = {
+  fundingType: states.DIRECT_FUNDING,
+  requestedTotalFunds: TOTAL_REQUIRED,
+  requestedYourContribution: YOUR_DEPOSIT_A,
+  channelId,
+  ourIndex: 0,
+  safeToDepositLevel: '0x',
+  channelFundingStatus: states.NOT_SAFE_TO_DEPOSIT,
+};
+
 describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   // player A scenario
   const createDepositTxMock = jest.fn(() => mockTransactionOutboxItem.transactionRequest);
-
   Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
     value: createDepositTxMock,
   });
@@ -56,4 +65,17 @@ describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
     state: updatedState.state.directFunding[channelId],
   });
   itSendsNoTransaction(updatedState);
+});
+
+describe('When an action comes in for a specific channel', () => {
+  const state = {
+    ...states.EMPTY_FUNDING_STATE,
+    directFunding: { [channelId]: states.notSafeToDeposit(defaultsForA) },
+  };
+  const action = actions.funding.fundingReceivedEvent(channelId, TOTAL_REQUIRED, TOTAL_REQUIRED);
+  const updatedState = fundingStateReducer(state, action);
+
+  itChangesChannelFundingStatusTo(states.CHANNEL_FUNDED, {
+    state: updatedState.state.directFunding[channelId],
+  });
 });
