@@ -43,3 +43,8 @@ export interface FundingState {
   directFunding: DirectFundingState;
   indirectFunding: IndirectFundingState;
 }
+
+export const EMPTY_FUNDING_STATE: FundingState = {
+  directFunding: {},
+  indirectFunding: {},
+};
