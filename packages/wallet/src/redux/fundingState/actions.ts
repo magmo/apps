@@ -14,7 +14,7 @@ export const fundingReceivedEvent = (
 export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
 
 export function isfundingAction(action: actions.WalletAction): action is FundingAction {
-  return action.type.match('WALLET.COMMON') ? true : false;
+  return action.type.match('WALLET.FUNDING') ? true : actions.isCommonAction(action) ? true : false;
 }
 
 // TODO: This is getting large, we should probably split this up into separate types for each stage
