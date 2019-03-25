@@ -9,9 +9,9 @@ import {
 export const OPENING = 'OPENING';
 
 // state type
-export const SEND_INITIAL_PRE_FUND_SETUP = 'A_WAIT_FOR_CHANNEL';
-export const WAIT_FOR_PRE_FUND_SETUP = 'A_WAIT_FOR_PRE_FUND_SETUP';
-export const WAIT_FOR_INITIAL_PRE_FUND_SETUP = 'B_WAIT_FOR_PRE_FUND_SETUP';
+export const SEND_INITIAL_PRE_FUND_SETUP = 'SEND_INITIAL_PRE_FUND_SETUP';
+export const WAIT_FOR_PRE_FUND_SETUP = 'WAIT_FOR_PRE_FUND_SETUP';
+export const WAIT_FOR_INITIAL_PRE_FUND_SETUP = 'WAIT_FOR_INITIAL_PRE_FUND_SETUP';
 
 export interface SendInitialPreFundSetup extends LedgerChannelInitialized {
   type: typeof SEND_INITIAL_PRE_FUND_SETUP;

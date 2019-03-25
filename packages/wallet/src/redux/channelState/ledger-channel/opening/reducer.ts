@@ -37,12 +37,16 @@ const waitForInitialPreFundSetupReducer = (
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
       const ourIndex = commitment.channel.participants.indexOf(state.address);
-      validatePreFundSetupCommitment(
-        action.commitment,
-        action.signature,
-        ourIndex,
-        commitment.channel.participants,
-      );
+      if (
+        !validPreFundSetupCommitment(
+          action.commitment,
+          action.signature,
+          ourIndex,
+          commitment.channel.participants,
+        )
+      ) {
+        return { state };
+      }
       const {
         preFundSetupCommitment,
         commitmentSignature,
@@ -86,12 +90,16 @@ const waitForPreFundSetupReducer = (
 > => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
-      validatePreFundSetupCommitment(
-        action.commitment,
-        action.signature,
-        state.ourIndex,
-        state.participants,
-      );
+      if (
+        !validPreFundSetupCommitment(
+          action.commitment,
+          action.signature,
+          state.ourIndex,
+          state.participants,
+        )
+      ) {
+        return { state };
+      }
 
       return {
         state: channelStates.waitForFundingApproval({
@@ -113,7 +121,11 @@ const sendInitialPreFundSetupReducer = (
   switch (action.type) {
     case internalActions.OPEN_LEDGER_CHANNEL:
       const { channelNonce, ourIndex, participants } = state;
-      const channel: Channel = { nonce: channelNonce, participants, channelType: 'CONSENSUS_APP' };
+      const channel: Channel = {
+        nonce: channelNonce,
+        participants,
+        channelType: state.libraryAddress,
+      };
 
       const {
         preFundSetupCommitment,
@@ -150,12 +162,12 @@ const composePreFundCommitment = (
   const appAttributes: AppAttributes = {
     proposedAllocation: allocation,
     proposedDestination: destination,
-    consensusCounter: 0,
+    consensusCounter: ourIndex,
   };
   const preFundSetupCommitment: Commitment = {
     channel,
     commitmentType: CommitmentType.PreFundSetup,
-    turnNum: turnNum + 1,
+    turnNum,
     commitmentCount: ourIndex,
     allocation,
     destination,
@@ -171,20 +183,25 @@ const composePreFundCommitment = (
   return { preFundSetupCommitment, commitmentSignature, sendCommitmentAction };
 };
 
-const validatePreFundSetupCommitment = (
+// TODO: We should bubble up the error instead of just logging it out.
+const validPreFundSetupCommitment = (
   opponentCommitment: Commitment,
   opponentSignature: string,
   ourIndex: number,
   participants: string[],
-) => {
+): boolean => {
   if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
-    throw new Error('Expected PrefundSetup commitment.');
+    console.error('Expected PrefundSetup commitment.');
+    return false;
   }
   if (opponentCommitment.commitmentCount !== 1 - ourIndex) {
-    throw new Error(` Expected commitment count to be ${1 - ourIndex}`);
+    console.error(` Expected commitment count to be ${1 - ourIndex}`);
+    return false;
   }
   const opponentAddress = participants[1 - ourIndex];
   if (!validCommitmentSignature(opponentCommitment, opponentSignature, opponentAddress)) {
-    throw new Error('Invalid signature');
+    console.error('Invalid signature');
+    return false;
   }
+  return true;
 };

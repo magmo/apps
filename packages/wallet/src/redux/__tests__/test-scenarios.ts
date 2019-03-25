@@ -2,6 +2,7 @@ import { Channel, CommitmentType, Commitment } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
 import { waitForPreFundSetup } from '../channelState/app-channel/state';
+import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const channelNonce = 4;
@@ -123,4 +124,32 @@ export const initializingChannelState = {
     address: asAddress,
     privateKey: asPrivateKey,
   },
+};
+
+export const consensusPreFundCommitment1: Commitment = {
+  channel,
+  commitmentCount: 0,
+  commitmentType: CommitmentType.PreFundSetup,
+  appAttributes: bytesFromAppAttributes({
+    proposedAllocation: twoThree,
+    proposedDestination: participants,
+    consensusCounter: 0,
+  }),
+  turnNum: 0,
+  allocation: twoThree,
+  destination: participants,
+};
+
+export const consensusPreFundCommitment2: Commitment = {
+  channel,
+  commitmentCount: 1,
+  commitmentType: CommitmentType.PreFundSetup,
+  appAttributes: bytesFromAppAttributes({
+    proposedAllocation: twoThree,
+    proposedDestination: participants,
+    consensusCounter: 1,
+  }),
+  turnNum: 1,
+  allocation: twoThree,
+  destination: participants,
 };
