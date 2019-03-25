@@ -1,6 +1,7 @@
 import { ChannelStatus } from '../channelState/state';
 import { StateWithSideEffects } from '../shared/state';
 import { Commitment } from 'fmg-core';
+import { TransactionOutboxItem } from '../outbox/state';
 
 export const itSendsAMessage = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends a message`, () => {
@@ -77,9 +78,16 @@ export const itSendsATransaction = (state: StateWithSideEffects<ChannelStatus>) 
   });
 };
 
-export const itSendsThisTransaction = (state: StateWithSideEffects<any>, tx) => {
+export const itSendsThisTransaction = (
+  state: StateWithSideEffects<any>,
+  tx: TransactionOutboxItem,
+) => {
   it(`sends a transaction`, () => {
-    expectSideEffect('transactionOutbox', state, tx);
+    const { transactionRequest } = tx;
+    expectSideEffect('transactionOutbox', state, {
+      transactionRequest,
+      channelId: expect.any(String),
+    });
   });
 };
 

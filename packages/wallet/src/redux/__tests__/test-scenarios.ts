@@ -21,7 +21,7 @@ export const fundingState = {
 
 export const mockTransactionOutboxItem = {
   transactionRequest: { to: '0xabc' },
-  channelId: expect.any(String),
+  channelId: 'channelId',
 };
 
 export const twoThree = [bigNumberify(2).toHexString(), bigNumberify(3).toHexString()];

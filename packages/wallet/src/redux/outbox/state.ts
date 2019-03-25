@@ -9,7 +9,7 @@ export const EMPTY_OUTBOX_STATE: OutboxState = {
   actionOutbox: [],
 };
 
-interface TransactionOutboxItem {
+export interface TransactionOutboxItem {
   transactionRequest: TransactionRequest;
   channelId: string;
 }
