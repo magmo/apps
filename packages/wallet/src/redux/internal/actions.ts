@@ -1,3 +1,5 @@
+import { WalletAction } from '../actions';
+
 export const DIRECT_FUNDING_REQUESTED = 'WALLET.INTERNAL.DIRECT_FUNDING_REQUESTED';
 export const directFundingRequested = (
   channelId: string,
@@ -23,3 +25,7 @@ export const directFundingConfirmed = (channelId: string) => ({
 export type DirectFundingConfirmed = ReturnType<typeof directFundingConfirmed>;
 
 export type InternalAction = DirectFundingRequested | DirectFundingConfirmed;
+
+export const isInternalAction = (action: WalletAction): action is InternalAction => {
+  return action.type.match('WALLET.INTERNAL.CHANNEL') ? true : false;
+};

@@ -1,5 +1,5 @@
 import { Commitment } from 'magmo-wallet-client/node_modules/fmg-core';
-import { WalletAction, CommonAction, isCommonAction } from '../actions';
+import * as walletActions from '../actions';
 
 export const CHANNEL_INITIALIZED = 'WALLET.CHANNEL.CHANNEL_INITIALIZED';
 export const channelInitialized = () => ({
@@ -292,22 +292,23 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | WithdrawalRejected
   | WithdrawalRequested
   | WithdrawalSuccessAcknowledged
-  | CommonAction;
+  | walletActions.CommonAction
+  | walletActions.internal.InternalAction;
 
-export const isChannelAction = (action: WalletAction): action is ChannelAction => {
+export const isChannelAction = (action: walletActions.WalletAction): action is ChannelAction => {
   // Most of these are actually targetted at the active application channel, and can
   // probably be namespaced as such.
   return action.type.match('WALLET.CHANNEL')
     ? true
-    : action.type.match('WALLET.INTERNAL.CHANNEL')
+    : walletActions.internal.isInternalAction(action)
     ? true
-    : isCommonAction(action)
+    : walletActions.isCommonAction(action)
     ? true
     : false;
 };
 
 export const isReceiveFirstCommitment = (
-  action: WalletAction,
+  action: walletActions.WalletAction,
 ): action is OwnCommitmentReceived | OpponentCommitmentReceived => {
   return 'commitment' in action && action.commitment.turnNum === 0;
 };
