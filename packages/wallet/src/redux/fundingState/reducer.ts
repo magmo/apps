@@ -26,6 +26,9 @@ export const fundingStateReducer = (
         channelId,
         ourIndex,
       } = action;
+      if (state.directFunding[channelId]) {
+        return { state };
+      }
 
       const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
       const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');

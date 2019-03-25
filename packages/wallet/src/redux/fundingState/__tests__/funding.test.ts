@@ -9,6 +9,7 @@ import {
   itChangesChannelFundingStatusTo,
   itSendsThisTransaction,
   itSendsNoTransaction,
+  itChangesDepositStatusTo,
 } from '../../__tests__/helpers';
 import { addHex } from '../../../utils/hex-utils';
 
@@ -49,6 +50,7 @@ describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   });
   itSendsThisTransaction(updatedState, mockTransactionOutboxItem);
 });
+
 describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   // player B scenario
   const state = { ...states.EMPTY_FUNDING_STATE };
@@ -65,6 +67,31 @@ describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
     state: updatedState.state.directFunding[channelId],
   });
   itSendsNoTransaction(updatedState);
+});
+
+describe('when a directFunding status already exists for the channel', () => {
+  describe.only('incoming action: DIRECT_FUNDING_REQUESTED', () => {
+    // player B scenario
+    const state = {
+      ...states.EMPTY_FUNDING_STATE,
+      directFunding: { [channelId]: states.waitForFundingConfirmed(defaultsForA) },
+    };
+    const action = actions.internal.directFundingRequested(
+      channelId,
+      '0x00',
+      TOTAL_REQUIRED,
+      YOUR_DEPOSIT_B,
+      1,
+    );
+    const updatedState = fundingStateReducer(state, action);
+
+    // If the channel weren't already set up in the funding state,
+    // the deposit status would be WAIT_FOR_TRANSACTION
+    itChangesDepositStatusTo(states.depositing.DEPOSIT_CONFIRMED, {
+      state: updatedState.state.directFunding[channelId],
+    });
+    itSendsNoTransaction(updatedState);
+  });
 });
 
 describe('When an action comes in for a specific channel', () => {

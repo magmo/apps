@@ -93,8 +93,8 @@ export const itSendsThisTransaction = (
 
 export const itSendsNoTransaction = (state: StateWithSideEffects<any>) => {
   it(`doesn't send a transaction`, () => {
-    expectSideEffect('transactionOutbox', state, undefined);
     if (state.sideEffects) {
+      expectSideEffect('transactionOutbox', state, undefined);
       expect(state.sideEffects.transactionOutbox).toBeUndefined();
     }
   });
