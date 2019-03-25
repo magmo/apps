@@ -36,7 +36,7 @@ export type FundingStatus = WaitForFundingRequest | DirectFundingStatus;
 interface IndirectFundingStatus {
   placeholder: 'placeholder';
 }
-interface IndirectFundingState {
+export interface IndirectFundingState {
   [channelId: string]: IndirectFundingStatus;
 }
 export interface FundingState {

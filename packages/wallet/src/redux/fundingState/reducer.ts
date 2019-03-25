@@ -1,37 +1,17 @@
 import * as states from './state';
 import * as actions from '../actions';
 
-import { unreachable, ReducerWithSideEffects } from '../../utils/reducer-utils';
+import { ReducerWithSideEffects, combineReducersWithSideEffects } from '../../utils/reducer-utils';
 
 import { StateWithSideEffects } from '../shared/state';
-import { directFundingStateReducer } from './directFunding/reducer';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 
-export const fundingStateReducer: ReducerWithSideEffects<states.FundingStatus> = (
-  state: states.FundingStatus = states.waitForFundingRequest(),
+export const fundingStateReducer: ReducerWithSideEffects<states.FundingState> = (
+  state: states.FundingState = states.EMPTY_FUNDING_STATE,
   action: actions.WalletAction,
-): StateWithSideEffects<states.FundingStatus> => {
-  switch (state.fundingType) {
-    //
-    case states.UNKNOWN_FUNDING_TYPE:
-      return unknownFundingTypeReducer(state, action);
-    case states.DIRECT_FUNDING:
-      return directFundingStateReducer(state, action);
-    default:
-      return unreachable(state);
-  }
-};
-
-const unknownFundingTypeReducer = (
-  state: states.WaitForFundingRequest,
-  action: actions.WalletAction,
-): StateWithSideEffects<states.FundingStatus> => {
+): StateWithSideEffects<states.FundingState> => {
   switch (action.type) {
-    case actions.FUNDING_RECEIVED_EVENT:
-      return {
-        state: states.waitForFundingRequest(action),
-      };
     case actions.internal.DIRECT_FUNDING_REQUESTED:
       const {
         safeToDepositLevel,
@@ -41,14 +21,8 @@ const unknownFundingTypeReducer = (
         ourIndex,
       } = action;
 
-      const alreadySafeToDeposit =
-        bigNumberify(safeToDepositLevel).eq('0x') ||
-        (state.channelId === action.channelId &&
-          bigNumberify(action.safeToDepositLevel).lte(state.totalForDestination!));
-      const alreadyFunded =
-        bigNumberify(totalFundingRequired).eq('0x') ||
-        (state.channelId === action.channelId &&
-          bigNumberify(action.totalFundingRequired).lte(state.totalForDestination!));
+      const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
+      const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
 
       const channelFundingStatus = alreadyFunded
         ? states.CHANNEL_FUNDED
@@ -80,6 +54,22 @@ const unknownFundingTypeReducer = (
         sideEffects: { transactionOutbox },
       };
     default:
-      return { state };
+      return combinedReducer(state, action);
   }
 };
+
+const directFunding: ReducerWithSideEffects<states.DirectFundingState> = (
+  state,
+  action: actions.funding.FundingAction,
+) => {
+  return { state };
+};
+
+const indirectFunding: ReducerWithSideEffects<states.IndirectFundingState> = (state, action) => {
+  return { state };
+};
+
+const combinedReducer = combineReducersWithSideEffects({
+  directFunding,
+  indirectFunding,
+});
