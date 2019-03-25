@@ -8,7 +8,7 @@ import { respondingReducer } from './responding/reducer';
 import { withdrawingReducer } from './withdrawing/reducer';
 import { closingReducer } from './closing/reducer';
 
-import { showWallet } from 'magmo-wallet-client/lib/wallet-events';
+import { showWallet, channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType } from 'fmg-core';
 import {
   ReducerWithSideEffects,
@@ -21,11 +21,60 @@ import {
   ChannelAction,
   CONCLUDE_REQUESTED,
   COMMITMENT_RECEIVED,
+  CHANNEL_INITIALIZED,
 } from '../../actions';
 import { StateWithSideEffects } from '../../shared/state';
 import { validCommitmentSignature } from '../../../utils/signing-utils';
+import { ethers } from 'ethers';
+import { InitializingChannelState, InitializedChannelState } from '../state';
+import { InternalAction } from '../../internal/actions';
 
-export const initializedAppChannelStatusReducer: ReducerWithSideEffects<states.AppChannelStatus> = (
+export const initializingAppChannels: ReducerWithSideEffects<InitializingChannelState> = (
+  state: InitializingChannelState,
+  action: ChannelAction | InternalAction,
+): StateWithSideEffects<InitializingChannelState> => {
+  if (action.type !== CHANNEL_INITIALIZED) {
+    return { state };
+  }
+  const wallet = ethers.Wallet.createRandom();
+  const { address, privateKey } = wallet;
+  // TODO: Needs to handle both app and ledger channels
+  return {
+    state: {
+      ...state,
+      // We have to temporarily store the private key under the address, since
+      // we can't know the channel id until both participants know their addresses.
+      [address]: states.waitForChannel({ address, privateKey }),
+    },
+    outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
+  };
+};
+
+export const initializedAppChannels: ReducerWithSideEffects<InitializedChannelState> = (
+  state: InitializedChannelState,
+  action: ChannelAction,
+  data: { appChannelId: string },
+): StateWithSideEffects<InitializedChannelState> => {
+  if (action.type === CHANNEL_INITIALIZED) {
+    return { state };
+  }
+  const { appChannelId } = data;
+
+  const existingChannel = state[appChannelId];
+  if (!existingChannel) {
+    // TODO:  This channel should really exist -- should we throw?
+    return { state };
+  }
+
+  const { state: newState, outboxState } = initializedAppChannelStatusReducer(
+    existingChannel as states.AppChannelStatus,
+    action,
+  );
+
+  return { state: { ...state, [appChannelId]: newState }, outboxState };
+};
+
+const initializedAppChannelStatusReducer: ReducerWithSideEffects<states.AppChannelStatus> = (
   state: states.AppChannelStatus,
   action: ChannelAction,
 ): StateWithSideEffects<states.AppChannelStatus> => {

@@ -1,0 +1,190 @@
+import * as channelStates from '../state';
+import * as actions from '../../../actions';
+import { commitmentRelayRequested, showWallet } from 'magmo-wallet-client/lib/wallet-events';
+
+import { unreachable } from '../../../../utils/reducer-utils';
+import { signCommitment, validCommitmentSignature } from '../../../../utils/signing-utils';
+import { CommitmentType, Channel, Commitment } from 'fmg-core';
+import { channelID } from 'fmg-core/lib/channel';
+import { StateWithSideEffects } from '../../../shared/state';
+import * as internalActions from '../../../internal/actions';
+import { bytesFromAppAttributes, AppAttributes } from 'fmg-nitro-adjudicator';
+import { SignedCommitment } from '../../shared/state';
+
+export const openingReducer = (
+  state: channelStates.OpeningState,
+  action: actions.WalletAction,
+): StateWithSideEffects<channelStates.LedgerChannelStatus> => {
+  switch (state.type) {
+    case channelStates.SEND_INITIAL_PRE_FUND_SETUP:
+      return sendInitialPreFundSetupReducer(state, action);
+    case channelStates.WAIT_FOR_PRE_FUND_SETUP:
+      return waitForPreFundSetupReducer(state, action);
+    case channelStates.WAIT_FOR_INITIAL_PRE_FUND_SETUP:
+      return waitForInitialPreFundSetupReducer(state, action);
+    default:
+      return unreachable(state);
+  }
+};
+
+const waitForInitialPreFundSetupReducer = (
+  state: channelStates.WaitForInitialPreFundSetup,
+  action: internalActions.OpenLedgerChannel | actions.WalletAction,
+): StateWithSideEffects<
+  channelStates.WaitForInitialPreFundSetup | channelStates.WaitForFundingApproval
+> => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const { commitment, signature } = action;
+      const ourIndex = commitment.channel.participants.indexOf(state.address);
+      validatePreFundSetupCommitment(
+        action.commitment,
+        action.signature,
+        ourIndex,
+        commitment.channel.participants,
+      );
+      const {
+        preFundSetupCommitment,
+        commitmentSignature,
+        sendCommitmentAction,
+      } = composePreFundCommitment(
+        commitment.channel,
+        commitment.allocation,
+        commitment.destination,
+        ourIndex,
+        state.privateKey,
+      );
+      return {
+        state: channelStates.waitForFundingApproval({
+          ...state,
+          channelId: channelID(commitment.channel),
+          libraryAddress: commitment.channel.channelType,
+          channelNonce: commitment.channel.nonce,
+          ourIndex,
+          funded: false,
+          participants: commitment.channel.participants as [string, string],
+          turnNum: commitment.turnNum + 1,
+          penultimateCommitment: { commitment, signature },
+          lastCommitment: {
+            commitment: preFundSetupCommitment,
+            signature: commitmentSignature,
+          },
+        }),
+        outboxState: {
+          displayOutbox: showWallet(),
+          messageOutbox: sendCommitmentAction,
+        },
+      };
+  }
+  return { state };
+};
+const waitForPreFundSetupReducer = (
+  state: channelStates.WaitForPreFundSetup,
+  action: internalActions.OpenLedgerChannel | actions.WalletAction,
+): StateWithSideEffects<
+  channelStates.WaitForPreFundSetup | channelStates.WaitForFundingApproval
+> => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      validatePreFundSetupCommitment(
+        action.commitment,
+        action.signature,
+        state.ourIndex,
+        state.participants,
+      );
+
+      return {
+        state: channelStates.waitForFundingApproval({
+          ...state,
+          penultimateCommitment: state.lastCommitment,
+          lastCommitment: { commitment: action.commitment, signature: action.signature },
+        }),
+        outboxState: { displayOutbox: showWallet() },
+      };
+  }
+  return { state };
+};
+const sendInitialPreFundSetupReducer = (
+  state: channelStates.SendInitialPreFundSetup,
+  action: internalActions.OpenLedgerChannel | actions.WalletAction,
+): StateWithSideEffects<
+  channelStates.WaitForPreFundSetup | channelStates.SendInitialPreFundSetup
+> => {
+  switch (action.type) {
+    case internalActions.OPEN_LEDGER_CHANNEL:
+      const { channelNonce, ourIndex, participants } = state;
+      const channel: Channel = { nonce: channelNonce, participants, channelType: 'CONSENSUS_APP' };
+
+      const {
+        preFundSetupCommitment,
+        commitmentSignature,
+        sendCommitmentAction,
+      } = composePreFundCommitment(
+        channel,
+        state.allocation,
+        participants,
+        ourIndex,
+        state.privateKey,
+      );
+
+      const lastCommitment: SignedCommitment = {
+        commitment: preFundSetupCommitment,
+        signature: commitmentSignature,
+      };
+      return {
+        state: channelStates.waitForPreFundSetup({ ...state, lastCommitment }),
+        outboxState: { messageOutbox: sendCommitmentAction },
+      };
+  }
+  return { state };
+};
+
+const composePreFundCommitment = (
+  channel: Channel,
+  allocation: string[],
+  destination: string[],
+  ourIndex: number,
+  privateKey: string,
+) => {
+  const turnNum = ourIndex;
+  const appAttributes: AppAttributes = {
+    proposedAllocation: allocation,
+    proposedDestination: destination,
+    consensusCounter: 0,
+  };
+  const preFundSetupCommitment: Commitment = {
+    channel,
+    commitmentType: CommitmentType.PreFundSetup,
+    turnNum: turnNum + 1,
+    commitmentCount: ourIndex,
+    allocation,
+    destination,
+    appAttributes: bytesFromAppAttributes(appAttributes),
+  };
+  const commitmentSignature = signCommitment(preFundSetupCommitment, privateKey);
+
+  const sendCommitmentAction = commitmentRelayRequested(
+    destination[1 - ourIndex],
+    preFundSetupCommitment,
+    commitmentSignature,
+  );
+  return { preFundSetupCommitment, commitmentSignature, sendCommitmentAction };
+};
+
+const validatePreFundSetupCommitment = (
+  opponentCommitment: Commitment,
+  opponentSignature: string,
+  ourIndex: number,
+  participants: string[],
+) => {
+  if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
+    throw new Error('Expected PrefundSetup commitment.');
+  }
+  if (opponentCommitment.commitmentCount !== 1 - ourIndex) {
+    throw new Error(` Expected commitment count to be ${1 - ourIndex}`);
+  }
+  const opponentAddress = participants[1 - ourIndex];
+  if (!validCommitmentSignature(opponentCommitment, opponentSignature, opponentAddress)) {
+    throw new Error('Invalid signature');
+  }
+};

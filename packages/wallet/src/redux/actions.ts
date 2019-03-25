@@ -438,6 +438,6 @@ export const isChannelAction = (action: WalletAction): action is ChannelAction =
 
 export const isReceiveFirstCommitment = (
   action: WalletAction,
-): action is OwnCommitmentReceived | OpponentCommitmentReceived => {
+): action is OwnCommitmentReceived | OpponentCommitmentReceived | CommitmentReceived => {
   return 'commitment' in action && action.commitment.turnNum === 0;
 };

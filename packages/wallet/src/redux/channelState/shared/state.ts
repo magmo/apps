@@ -1,12 +1,7 @@
 import { Commitment } from 'fmg-core';
-export type ChannelType = 'Application' | 'Ledger';
 export interface SharedChannelState {
   address: string;
   privateKey: string;
-}
-
-export interface TypedChannelState {
-  channelType: ChannelType;
 }
 
 export interface SignedCommitment {
@@ -14,15 +9,19 @@ export interface SignedCommitment {
   signature: string;
 }
 
-export interface FirstCommitmentReceived extends SharedChannelState {
+export interface ChannelInitialized extends SharedChannelState {
   channelId: string;
   libraryAddress: string;
   ourIndex: number;
   participants: [string, string];
   channelNonce: number;
   turnNum: number;
-  lastCommitment: SignedCommitment;
+
   funded: boolean;
+}
+
+export interface FirstCommitmentReceived extends ChannelInitialized {
+  lastCommitment: SignedCommitment;
 }
 export interface ChannelOpen extends FirstCommitmentReceived {
   penultimateCommitment: SignedCommitment;
@@ -45,16 +44,13 @@ export function baseChannelState<T extends SharedChannelState>(params: T): Share
   };
 }
 
-export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
-  params: T,
-): FirstCommitmentReceived {
+export function channelInitialized<T extends ChannelInitialized>(params: T): ChannelInitialized {
   const {
     channelId,
     ourIndex,
     participants,
     channelNonce,
     turnNum,
-    lastCommitment: lastPosition,
     libraryAddress,
     funded,
   } = params;
@@ -65,9 +61,18 @@ export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
     participants,
     channelNonce,
     turnNum,
-    lastCommitment: lastPosition,
     libraryAddress,
     funded,
+  };
+}
+
+export function firstCommitmentReceived<T extends FirstCommitmentReceived>(
+  params: T,
+): FirstCommitmentReceived {
+  const { lastCommitment } = params;
+  return {
+    ...channelInitialized(params),
+    lastCommitment,
   };
 }
 

@@ -2,7 +2,6 @@ import { Channel, CommitmentType, Commitment } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
 import { waitForPreFundSetup } from '../channelState/app-channel/state';
-import { ChannelType } from '../channelState/shared/state';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const channelNonce = 4;
@@ -123,6 +122,5 @@ export const initializingChannelState = {
   [asAddress]: {
     address: asAddress,
     privateKey: asPrivateKey,
-    channelType: 'Application' as ChannelType,
   },
 };

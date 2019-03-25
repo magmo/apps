@@ -1,10 +1,4 @@
-import {
-  ChannelOpen,
-  channelOpen,
-  UserAddressExists,
-  userAddressExists,
-  TypedChannelState,
-} from '../../shared/state';
+import { ChannelOpen, channelOpen, UserAddressExists, userAddressExists } from '../../shared/state';
 import { TransactionExists } from '../../../shared/state';
 
 // stage
@@ -22,56 +16,56 @@ export const WAIT_FOR_CLOSE_CONFIRMED = 'WAIT_FOR_CLOSE_CONFIRMED';
 export const ACKNOWLEDGE_CONCLUDE = 'ACKNOWLEDGE_CONCLUDE';
 export const CLOSE_TRANSACTION_FAILED = 'CLOSE_TRANSACTION_FAILED';
 
-export interface CloseTransactionFailed extends UserAddressExists, TypedChannelState {
+export interface CloseTransactionFailed extends UserAddressExists {
   type: typeof CLOSE_TRANSACTION_FAILED;
   stage: typeof CLOSING;
 }
 
-export interface AcknowledgeConclude extends ChannelOpen, TypedChannelState {
+export interface AcknowledgeConclude extends ChannelOpen {
   type: typeof ACKNOWLEDGE_CONCLUDE;
   stage: typeof CLOSING;
 }
 
-export interface WaitForCloseConfirmed extends ChannelOpen, TransactionExists, TypedChannelState {
+export interface WaitForCloseConfirmed extends ChannelOpen, TransactionExists {
   type: typeof WAIT_FOR_CLOSE_CONFIRMED;
   stage: typeof CLOSING;
 }
 
-export interface ApproveConclude extends ChannelOpen, TypedChannelState {
+export interface ApproveConclude extends ChannelOpen {
   type: typeof APPROVE_CONCLUDE;
   stage: typeof CLOSING;
 }
 
-export interface WaitForOpponentConclude extends ChannelOpen, TypedChannelState {
+export interface WaitForOpponentConclude extends ChannelOpen {
   type: typeof WAIT_FOR_OPPONENT_CONCLUDE;
   stage: typeof CLOSING;
 }
 
-export interface AcknowledgeConcludeSuccess extends ChannelOpen, TypedChannelState {
+export interface AcknowledgeConcludeSuccess extends ChannelOpen {
   type: typeof WAIT_FOR_OPPONENT_CONCLUDE;
   stage: typeof CLOSING;
 }
 
-export interface AcknowledgeCloseSuccess extends ChannelOpen, TypedChannelState {
+export interface AcknowledgeCloseSuccess extends ChannelOpen {
   type: typeof ACKNOWLEDGE_CLOSE_SUCCESS;
   stage: typeof CLOSING;
 }
 
-export interface AcknowledgeClosedOnChain extends ChannelOpen, TypedChannelState {
+export interface AcknowledgeClosedOnChain extends ChannelOpen {
   type: typeof ACKNOWLEDGE_CLOSED_ON_CHAIN;
   stage: typeof CLOSING;
 }
-export interface ApproveCloseOnChain extends ChannelOpen, TypedChannelState {
+export interface ApproveCloseOnChain extends ChannelOpen {
   type: typeof APPROVE_CLOSE_ON_CHAIN;
   stage: typeof CLOSING;
 }
 
-export interface WaitForCloseInitiation extends UserAddressExists, TypedChannelState {
+export interface WaitForCloseInitiation extends UserAddressExists {
   type: typeof WAIT_FOR_CLOSE_INITIATION;
   stage: typeof CLOSING;
 }
 
-export interface WaitForCloseSubmission extends UserAddressExists, TypedChannelState {
+export interface WaitForCloseSubmission extends UserAddressExists {
   type: typeof WAIT_FOR_CLOSE_SUBMISSION;
   stage: typeof CLOSING;
 }
@@ -80,7 +74,7 @@ export function approveConclude<T extends ChannelOpen>(params: T): ApproveConclu
   return {
     type: APPROVE_CONCLUDE,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...channelOpen(params),
   };
 }
@@ -88,7 +82,7 @@ export function approveCloseOnChain<T extends ChannelOpen>(params: T): ApproveCl
   return {
     type: APPROVE_CLOSE_ON_CHAIN,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...channelOpen(params),
   };
 }
@@ -97,7 +91,7 @@ export function waitForOpponentConclude<T extends ChannelOpen>(params: T): WaitF
   return {
     type: WAIT_FOR_OPPONENT_CONCLUDE,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...channelOpen(params),
   };
 }
@@ -106,7 +100,7 @@ export function acknowledgeCloseSuccess<T extends ChannelOpen>(params: T): Ackno
   return {
     type: ACKNOWLEDGE_CLOSE_SUCCESS,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...channelOpen(params),
   };
 }
@@ -117,7 +111,7 @@ export function acknowledgeClosedOnChain<T extends ChannelOpen>(
   return {
     type: ACKNOWLEDGE_CLOSED_ON_CHAIN,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...channelOpen(params),
   };
 }
@@ -128,7 +122,7 @@ export function waitForCloseInitiation<T extends UserAddressExists>(
   return {
     type: WAIT_FOR_CLOSE_INITIATION,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...userAddressExists(params),
   };
 }
@@ -139,7 +133,7 @@ export function waitForCloseSubmission<T extends UserAddressExists>(
   return {
     type: WAIT_FOR_CLOSE_SUBMISSION,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...userAddressExists(params),
   };
 }
@@ -152,7 +146,6 @@ export function waitForCloseConfirmed<T extends ChannelOpen & TransactionExists>
     stage: CLOSING,
     ...channelOpen(params),
     transactionHash: params.transactionHash,
-    channelType: 'Application',
   };
 }
 
@@ -160,7 +153,7 @@ export function acknowledgeConclude<T extends ChannelOpen>(params: T): Acknowled
   return {
     type: ACKNOWLEDGE_CONCLUDE,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...channelOpen(params),
   };
 }
@@ -171,7 +164,7 @@ export function closeTransactionFailed<T extends UserAddressExists>(
   return {
     type: CLOSE_TRANSACTION_FAILED,
     stage: CLOSING,
-    channelType: 'Application',
+
     ...userAddressExists(params),
   };
 }

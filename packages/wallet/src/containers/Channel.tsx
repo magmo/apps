@@ -2,7 +2,8 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import * as states from '../redux/channelState/app-channel/state';
+import * as appChannelStates from '../redux/channelState/app-channel/state';
+import * as ledgerChannelStates from '../redux/channelState/ledger-channel/state';
 import FundingContainer from './Funding';
 import RespondingContainer from './Responding';
 import ChallengingContainer from './Challenging';
@@ -11,22 +12,22 @@ import ClosingContainer from './Closing';
 import LandingPage from '../components/LandingPage';
 
 interface ChannelProps {
-  state: states.AppChannelStatus;
+  state: appChannelStates.AppChannelStatus | ledgerChannelStates.LedgerChannelStatus;
 }
 
 class ChannelContainer extends PureComponent<ChannelProps> {
   render() {
     const { state } = this.props;
     switch (state.stage) {
-      case states.FUNDING:
+      case appChannelStates.FUNDING:
         return <FundingContainer state={state} />;
-      case states.CHALLENGING:
+      case appChannelStates.CHALLENGING:
         return <ChallengingContainer state={state} />;
-      case states.WITHDRAWING:
+      case appChannelStates.WITHDRAWING:
         return <WithdrawingContainer state={state} />;
-      case states.RESPONDING:
+      case appChannelStates.RESPONDING:
         return <RespondingContainer state={state} />;
-      case states.CLOSING:
+      case appChannelStates.CLOSING:
         return <ClosingContainer state={state} />;
       default:
         return <LandingPage />;

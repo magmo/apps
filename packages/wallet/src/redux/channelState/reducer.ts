@@ -5,20 +5,24 @@ import {
   CHANNEL_INITIALIZED,
   ChannelAction,
   isReceiveFirstCommitment,
+  COMMITMENT_RECEIVED,
 } from '../actions';
 import { ReducerWithSideEffects, combineReducersWithSideEffects } from '../../utils/reducer-utils';
-import { channelInitializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { StateWithSideEffects } from '../shared/state';
-import { ethers } from 'ethers';
 import { channelID } from 'fmg-core/lib/channel';
-import { initializedAppChannelStatusReducer } from './app-channel/reducer';
-import { waitForChannel } from './app-channel/state';
+import { initializingAppChannels, initializedAppChannels } from './app-channel/reducer';
+import * as appChannelState from './app-channel/state';
+import * as internalActions from '../internal/actions';
+import * as ledgerChannelState from './ledger-channel/state';
+import { initializingLedgerChannels, initializedLedgerChannels } from './ledger-channel/reducer';
+import { Commitment } from 'fmg-core/lib/commitment';
 
 export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = (
   state: states.ChannelState,
-  action: WalletAction,
+  action: WalletAction | internalActions.InternalAction,
 ): StateWithSideEffects<states.ChannelState> => {
   const newState = { ...state };
+
   if (isReceiveFirstCommitment(action)) {
     // We manually select and move the initializing channel into the initializedChannelState
     // before applying the combined reducer, so that the address and private key is in the
@@ -37,19 +41,29 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
 
     const { address, privateKey } = newState.initializingChannels[ourAddress];
     delete newState.initializingChannels[ourAddress];
-    // TODO: Needs to handle both app and ledger
-    newState.initializedChannels[channelId] = waitForChannel({
-      address,
-      privateKey,
-      ourIndex,
-    });
 
-    // Since the wallet only manages one channel at a time, when it receives the first
-    // prefundsetup commitment for a channel, from the application, we set the
-    // activeAppChannelId accordingly.
-    // In the future, the application might need to specify the intended channel id
-    // for the action
-    newState.activeAppChannelId = channelId;
+    if (getCommitmentChannelType(action.commitment) === 'Ledger') {
+      // Ledger channel
+      newState.initializedChannels[channelId] = ledgerChannelState.waitForInitialPreFundSetup({
+        address,
+        privateKey,
+        ourIndex,
+      });
+    } else {
+      // App Channel
+      newState.initializedChannels[channelId] = appChannelState.waitForChannel({
+        address,
+        privateKey,
+        ourIndex,
+      });
+
+      // Since the wallet only manages one channel at a time, when it receives the first
+      // prefundsetup commitment for a channel, from the application, we set the
+      // activeAppChannelId accordingly.
+      // In the future, the application might need to specify the intended channel id
+      // for the action
+      newState.activeAppChannelId = channelId;
+    }
   }
 
   return combinedReducer(newState, action, {
@@ -59,23 +73,14 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
 
 const initializingChannels: ReducerWithSideEffects<states.InitializingChannelState> = (
   state: states.InitializingChannelState,
-  action: ChannelAction,
+  action: ChannelAction | internalActions.InternalAction,
 ): StateWithSideEffects<states.InitializingChannelState> => {
-  if (action.type !== CHANNEL_INITIALIZED) {
-    return { state };
+  if (action.type === CHANNEL_INITIALIZED) {
+    return initializingAppChannels(state, action);
+  } else if (action.type === internalActions.OPEN_LEDGER_CHANNEL) {
+    return initializingLedgerChannels(state, action);
   }
-  const wallet = ethers.Wallet.createRandom();
-  const { address, privateKey } = wallet;
-  // TODO: Needs to handle both app and ledger channels
-  return {
-    state: {
-      ...state,
-      // We have to temporarily store the private key under the address, since
-      // we can't know the channel id until both participants know their addresses.
-      [address]: waitForChannel({ address, privateKey }),
-    },
-    sideEffects: { messageOutbox: channelInitializationSuccess(wallet.address) },
-  };
+  return { state };
 };
 
 const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState> = (
@@ -83,27 +88,23 @@ const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState
   action: ChannelAction,
   data: { appChannelId: string },
 ): StateWithSideEffects<states.InitializedChannelState> => {
-  if (action.type === CHANNEL_INITIALIZED) {
-    return { state };
-  }
-  const { appChannelId } = data;
-
-  const existingChannel = state[appChannelId];
-  if (!existingChannel) {
-    // TODO:  This channel should really exist -- should we throw?
-    return { state };
-  }
-  if (existingChannel.channelType === 'Application') {
-    const { state: newState, outboxState } = initializedAppChannelStatusReducer(
-      existingChannel,
-      action,
-    );
-
-    return { state: { ...state, [appChannelId]: newState }, outboxState };
+  if (isActionForLedgerChannel(action)) {
+    return initializedLedgerChannels(state, action, data);
   } else {
-    // TODO: Handle ledger channels
-    return { state, outboxState: {} };
+    return initializedAppChannels(state, action, data);
   }
+};
+
+const isActionForLedgerChannel = (action): boolean => {
+  if (action.type === COMMITMENT_RECEIVED) {
+    return getCommitmentChannelType(action.commitment) === 'Ledger';
+  } else {
+    return action.type === internalActions.OPEN_LEDGER_CHANNEL;
+  }
+};
+
+const getCommitmentChannelType = (commitment: Commitment): 'Ledger' | 'Application' => {
+  return commitment.channel.channelType === 'CONSENSUS_LIBRARY' ? 'Ledger' : 'Application';
 };
 
 const combinedReducer = combineReducersWithSideEffects({

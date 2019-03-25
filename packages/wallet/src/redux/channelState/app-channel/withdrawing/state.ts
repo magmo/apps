@@ -1,10 +1,4 @@
-import {
-  UserAddressExists,
-  userAddressExists,
-  channelOpen,
-  ChannelOpen,
-  TypedChannelState,
-} from '../../shared/state';
+import { UserAddressExists, userAddressExists, channelOpen, ChannelOpen } from '../../shared/state';
 import { TransactionExists } from '../../../shared/state';
 
 // stage
@@ -17,30 +11,27 @@ export const WAIT_FOR_WITHDRAWAL_CONFIRMATION = 'WAIT_FOR_WITHDRAWAL_CONFIRMATIO
 export const ACKNOWLEDGE_WITHDRAWAL_SUCCESS = 'ACKNOWLEDGE_WITHDRAWAL_SUCCESS';
 export const WITHDRAW_TRANSACTION_FAILED = 'WITHDRAW_TRANSACTION_FAILED';
 
-export interface WithdrawTransactionFailed extends UserAddressExists, TypedChannelState {
+export interface WithdrawTransactionFailed extends UserAddressExists {
   type: typeof WITHDRAW_TRANSACTION_FAILED;
   stage: typeof WITHDRAWING;
 }
 
-export interface ApproveWithdrawal extends ChannelOpen, TypedChannelState {
+export interface ApproveWithdrawal extends ChannelOpen {
   type: typeof APPROVE_WITHDRAWAL;
   stage: typeof WITHDRAWING;
 }
 
-export interface WaitForWithdrawalInitiation extends UserAddressExists, TypedChannelState {
+export interface WaitForWithdrawalInitiation extends UserAddressExists {
   type: typeof WAIT_FOR_WITHDRAWAL_INITIATION;
   stage: typeof WITHDRAWING;
 }
 
-export interface WaitForWithdrawalConfirmation
-  extends UserAddressExists,
-    TransactionExists,
-    TypedChannelState {
+export interface WaitForWithdrawalConfirmation extends UserAddressExists, TransactionExists {
   type: typeof WAIT_FOR_WITHDRAWAL_CONFIRMATION;
   stage: typeof WITHDRAWING;
 }
 
-export interface AcknowledgeWithdrawalSuccess extends ChannelOpen, TypedChannelState {
+export interface AcknowledgeWithdrawalSuccess extends ChannelOpen {
   type: typeof ACKNOWLEDGE_WITHDRAWAL_SUCCESS;
   stage: typeof WITHDRAWING;
 }
@@ -50,7 +41,6 @@ export function approveWithdrawal<T extends ChannelOpen>(params: T): ApproveWith
     ...channelOpen(params),
     type: APPROVE_WITHDRAWAL,
     stage: WITHDRAWING,
-    channelType: 'Application',
   };
 }
 
@@ -61,7 +51,6 @@ export function waitForWithdrawalInitiation<T extends UserAddressExists>(
     ...userAddressExists(params),
     type: WAIT_FOR_WITHDRAWAL_INITIATION,
     stage: WITHDRAWING,
-    channelType: 'Application',
   };
 }
 
@@ -73,7 +62,6 @@ export function waitForWithdrawalConfirmation<T extends UserAddressExists & Tran
     transactionHash: params.transactionHash,
     type: WAIT_FOR_WITHDRAWAL_CONFIRMATION,
     stage: WITHDRAWING,
-    channelType: 'Application',
   };
 }
 
@@ -84,7 +72,6 @@ export function acknowledgeWithdrawalSuccess<T extends ChannelOpen>(
     ...channelOpen(params),
     type: ACKNOWLEDGE_WITHDRAWAL_SUCCESS,
     stage: WITHDRAWING,
-    channelType: 'Application',
   };
 }
 
@@ -95,7 +82,6 @@ export function withdrawTransactionFailed<T extends UserAddressExists>(
     type: WITHDRAW_TRANSACTION_FAILED,
     stage: WITHDRAWING,
     ...userAddressExists(params),
-    channelType: 'Application',
   };
 }
 export type WithdrawingState =

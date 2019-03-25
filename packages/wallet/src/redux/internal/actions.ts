@@ -22,4 +22,11 @@ export const directFundingConfirmed = (channelId: string) => ({
 });
 export type DirectFundingConfirmed = ReturnType<typeof directFundingConfirmed>;
 
-export type InternalAction = DirectFundingRequested | DirectFundingConfirmed;
+export const OPEN_LEDGER_CHANNEL = 'OPEN_LEDGER_CHANNEL';
+export const openLedgerChannel = (appChannelId: string) => ({
+  type: OPEN_LEDGER_CHANNEL as typeof OPEN_LEDGER_CHANNEL,
+  appChannelId,
+});
+export type OpenLedgerChannel = ReturnType<typeof openLedgerChannel>;
+
+export type InternalAction = DirectFundingRequested | DirectFundingConfirmed | OpenLedgerChannel;
