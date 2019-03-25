@@ -15,7 +15,7 @@ interface Props {
   channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
-  retryTransactionAction: () => void;
+  retryTransactionAction: (channelId: string) => void;
 }
 
 class DirectFundingContainer extends PureComponent<Props> {
@@ -47,7 +47,12 @@ class DirectFundingContainer extends PureComponent<Props> {
             </FundingStep>
           );
         case fundingStates.depositing.DEPOSIT_TRANSACTION_FAILED:
-          return <TransactionFailed name="deposit" retryAction={retryTransactionAction} />;
+          return (
+            <TransactionFailed
+              name="deposit"
+              retryAction={() => retryTransactionAction(state.channelId)}
+            />
+          );
 
         default:
           return unreachable(state);
@@ -66,7 +71,7 @@ const mapDispatchToProps = {
   fundingRejected: actions.channel.fundingRejected,
   fundingSuccessAcknowledged: actions.channel.fundingSuccessAcknowledged,
   fundingDeclinedAcknowledged: actions.channel.fundingDeclinedAcknowledged,
-  retryTransactionAction: actions.channel.retryTransaction,
+  retryTransactionAction: actions.retryTransaction,
 };
 
 // why does it think that mapStateToProps can return undefined??

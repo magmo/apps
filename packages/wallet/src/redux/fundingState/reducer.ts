@@ -7,8 +7,8 @@ import { StateWithSideEffects } from '../shared/state';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 
-export const fundingStateReducer: ReducerWithSideEffects<states.FundingState> = (
-  state: states.FundingState = states.EMPTY_FUNDING_STATE,
+export const fundingStateReducer = (
+  state: states.FundingState,
   action: actions.WalletAction,
 ): StateWithSideEffects<states.FundingState> => {
   switch (action.type) {
@@ -37,20 +37,29 @@ export const fundingStateReducer: ReducerWithSideEffects<states.FundingState> = 
         : states.notSafeToDeposit;
 
       const transactionOutbox = alreadySafeToDeposit
-        ? createDepositTransaction(action.channelId, action.requiredDeposit)
+        ? {
+            transactionRequest: createDepositTransaction(action.channelId, action.requiredDeposit),
+            channelId,
+          }
         : undefined;
 
       return {
-        state: stateConstructor({
+        state: {
           ...state,
-          fundingType: states.DIRECT_FUNDING, // TODO: This should come from the action
-          channelFundingStatus,
-          safeToDepositLevel,
-          channelId,
-          requestedTotalFunds: totalFundingRequired,
-          requestedYourContribution: requiredDeposit,
-          ourIndex,
-        }),
+          directFunding: {
+            ...state.directFunding,
+            [channelId]: stateConstructor({
+              ...state,
+              fundingType: states.DIRECT_FUNDING,
+              channelFundingStatus,
+              safeToDepositLevel,
+              channelId,
+              requestedTotalFunds: totalFundingRequired,
+              requestedYourContribution: requiredDeposit,
+              ourIndex,
+            }),
+          },
+        },
         sideEffects: { transactionOutbox },
       };
     default:

@@ -42,7 +42,7 @@ const withdrawTransactionFailedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.RETRY_TRANSACTION:
+    case actions.RETRY_TRANSACTION:
       const myAddress = state.participants[state.ourIndex];
       const myAmount = state.lastCommitment.commitment.allocation[state.ourIndex];
       // TODO: The sender could of changed since the transaction failed. We'll need to check for the updated address.
@@ -53,7 +53,7 @@ const withdrawTransactionFailedReducer = (
         state.userAddress,
         state.privateKey,
       );
-      const transactionOutbox = createTransferAndWithdrawTransaction(
+      const transactionRequest = createTransferAndWithdrawTransaction(
         state.channelId,
         myAddress,
         state.userAddress,
@@ -62,7 +62,7 @@ const withdrawTransactionFailedReducer = (
       );
       return {
         state: states.waitForWithdrawalInitiation({ ...state }),
-        sideEffects: { transactionOutbox },
+        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
       };
   }
   return { state };
@@ -83,7 +83,7 @@ const approveWithdrawalReducer = (
         action.destinationAddress,
         state.privateKey,
       );
-      const transactionOutbox = createTransferAndWithdrawTransaction(
+      const transactionRequest = createTransferAndWithdrawTransaction(
         state.channelId,
         myAddress,
         action.destinationAddress,
@@ -95,7 +95,7 @@ const approveWithdrawalReducer = (
           ...state,
           userAddress: action.destinationAddress,
         }),
-        sideEffects: { transactionOutbox },
+        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
       };
     case actions.channel.WITHDRAWAL_REJECTED:
       return { state: states.acknowledgeCloseSuccess(state) };

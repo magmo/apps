@@ -26,7 +26,7 @@ const {
   concludeCommitment2,
   channelId,
   fundingState,
-  mockTransaction,
+  mockTransactionOutboxItem,
 } = scenarios;
 const defaults = {
   adjudicator: 'adj-address',
@@ -129,7 +129,7 @@ describe('start in ApproveCloseOnChain', () => {
     userAddress: '0x0',
   });
   describe('action taken: approve close on chain', () => {
-    const createConcludeTxMock = jest.fn(() => mockTransaction);
+    const createConcludeTxMock = jest.fn(() => mockTransactionOutboxItem.transactionRequest);
     Object.defineProperty(TransactionGenerator, 'createConcludeAndWithdrawTransaction', {
       value: createConcludeTxMock,
     });
@@ -139,7 +139,7 @@ describe('start in ApproveCloseOnChain', () => {
     const action = actions.channel.approveClose('0x0');
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
-    itSendsThisTransaction(updatedState, mockTransaction);
+    itSendsThisTransaction(updatedState, mockTransactionOutboxItem);
   });
 });
 
@@ -152,7 +152,7 @@ describe('start in WaitForCloseInitiation', () => {
     userAddress: '0x0',
   });
   describe('action taken: transaction sent to metamask', () => {
-    const action = actions.transactionSentToMetamask();
+    const action = actions.transactionSentToMetamask(channelId);
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
   });
@@ -167,12 +167,12 @@ describe('start in WaitForCloseSubmission', () => {
     userAddress: '0x0',
   });
   describe('action taken: transaction submitted', () => {
-    const action = actions.transactionSubmitted('0x0');
+    const action = actions.transactionSubmitted(channelId, '0x0');
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_CONFIRMED, updatedState);
   });
   describe('action taken: transaction submitted', () => {
-    const action = actions.transactionSubmissionFailed({ code: 0 });
+    const action = actions.transactionSubmissionFailed(channelId, { code: 0 });
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.CLOSE_TRANSACTION_FAILED, updatedState);
   });
@@ -195,7 +195,7 @@ describe('start in closeTransactionFailed', () => {
     const signVerMock = jest.fn();
     signVerMock.mockReturnValue('0x0');
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signVerMock });
-    const action = actions.channel.retryTransaction();
+    const action = actions.retryTransaction(channelId);
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
     expect(createConcludeTxMock.mock.calls.length).toBe(1);
@@ -210,7 +210,7 @@ describe('start in WaitForCloseConfirmed', () => {
     turnNum: concludeCommitment2.turnNum,
   });
   describe('action taken: transaction confirmed', () => {
-    const action = actions.transactionConfirmed();
+    const action = actions.transactionConfirmed(channelId);
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
   });

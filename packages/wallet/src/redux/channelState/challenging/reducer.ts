@@ -53,10 +53,10 @@ const challengeTransactionFailedReducer = (
   action: WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.RETRY_TRANSACTION:
+    case actions.RETRY_TRANSACTION:
       const { commitment: fromPosition, signature: fromSignature } = state.penultimateCommitment;
       const { commitment: toPosition, signature: toSignature } = state.lastCommitment;
-      const transaction = createForceMoveTransaction(
+      const transactionRequest = createForceMoveTransaction(
         fromPosition,
         toPosition,
         fromSignature,
@@ -64,7 +64,7 @@ const challengeTransactionFailedReducer = (
       );
       return {
         state: states.waitForChallengeInitiation(state),
-        sideEffects: { transactionOutbox: transaction },
+        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
       };
   }
   return { state };
@@ -78,7 +78,7 @@ const approveChallengeReducer = (
     case actions.channel.CHALLENGE_APPROVED:
       const { commitment: fromPosition, signature: fromSignature } = state.penultimateCommitment;
       const { commitment: toPosition, signature: toSignature } = state.lastCommitment;
-      const transaction = createForceMoveTransaction(
+      const transactionRequest = createForceMoveTransaction(
         fromPosition,
         toPosition,
         fromSignature,
@@ -86,7 +86,7 @@ const approveChallengeReducer = (
       );
       return {
         state: states.waitForChallengeInitiation(state),
-        sideEffects: { transactionOutbox: transaction },
+        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
       };
     case actions.channel.CHALLENGE_REJECTED:
       return {

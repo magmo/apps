@@ -18,7 +18,7 @@ interface Props {
   challengeResponseAcknowledged: () => void;
   challengeApproved: () => void;
   challengeRejected: () => void;
-  retryTransaction: () => void;
+  retryTransaction: (channelId: string) => void;
 }
 
 class ChallengingContainer extends PureComponent<Props> {
@@ -91,7 +91,12 @@ class ChallengingContainer extends PureComponent<Props> {
           </ChallengingStep>
         );
       case states.CHALLENGE_TRANSACTION_FAILED:
-        return <TransactionFailed name="challenge" retryAction={retryTransaction} />;
+        return (
+          <TransactionFailed
+            name="challenge"
+            retryAction={() => retryTransaction(state.channelId)}
+          />
+        );
 
       default:
         return unreachable(state);
@@ -104,7 +109,7 @@ const mapDispatchToProps = {
   challengeResponseAcknowledged: actions.channel.challengeResponseAcknowledged,
   challengeApproved: actions.channel.challengeApproved,
   challengeRejected: actions.channel.challengeRejected,
-  retryTransaction: actions.channel.retryTransaction,
+  retryTransaction: actions.retryTransaction,
 };
 
 export default connect(

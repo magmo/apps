@@ -75,16 +75,19 @@ const depositTransactionFailedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.Depositing> => {
   switch (action.type) {
-    case actions.channel.RETRY_TRANSACTION:
+    case actions.RETRY_TRANSACTION:
       return {
         state: states.waitForTransactionSent({
           ...state,
         }),
         sideEffects: {
-          transactionOutbox: createDepositTransaction(
-            state.channelId,
-            state.requestedYourContribution,
-          ),
+          transactionOutbox: {
+            transactionRequest: createDepositTransaction(
+              state.channelId,
+              state.requestedYourContribution,
+            ),
+            channelId: action.channelId,
+          },
         },
       };
   }

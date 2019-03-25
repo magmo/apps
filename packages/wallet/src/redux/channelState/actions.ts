@@ -247,12 +247,6 @@ export const approveClose = (withdrawAddress: string) => ({
 });
 export type ApproveClose = ReturnType<typeof approveClose>;
 
-export const RETRY_TRANSACTION = 'WALLET.CHANNEL.RETRY_TRANSACTION';
-export const retryTransaction = () => ({
-  type: RETRY_TRANSACTION as typeof RETRY_TRANSACTION,
-});
-export type RetryTransaction = ReturnType<typeof retryTransaction>;
-
 export const MESSAGE_RECEIVED = 'WALLET.CHANNEL.MESSAGE_RECEIVED';
 export const messageReceived = (data: 'FundingDeclined') => ({
   type: MESSAGE_RECEIVED as typeof MESSAGE_RECEIVED,
@@ -293,7 +287,6 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | RespondWithMoveChosen
   | RespondWithMoveEvent
   | RespondWithRefuteChosen
-  | RetryTransaction
   | TakeMoveInAppAcknowledged
   | WithdrawalApproved
   | WithdrawalRejected

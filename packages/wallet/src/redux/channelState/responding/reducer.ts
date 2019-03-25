@@ -55,14 +55,14 @@ const responseTransactionFailedReducer = (
   action: WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.RETRY_TRANSACTION:
-      const transactionOutbox = createRespondWithMoveTransaction(
+    case actions.RETRY_TRANSACTION:
+      const transactionRequest = createRespondWithMoveTransaction(
         state.lastCommitment.commitment,
         state.lastCommitment.signature,
       );
       return {
         state: states.initiateResponse(state),
-        sideEffects: { transactionOutbox },
+        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
       };
     case actions.BLOCK_MINED:
       if (
@@ -88,13 +88,13 @@ export const chooseResponseReducer = (
         sideEffects: { messageOutbox: challengeResponseRequested(), displayOutbox: hideWallet() },
       };
     case actions.channel.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
-      const transaction = createRespondWithMoveTransaction(
+      const transactionRequest = createRespondWithMoveTransaction(
         state.lastCommitment.commitment,
         state.lastCommitment.signature,
       );
       return {
         state: states.initiateResponse(state),
-        sideEffects: { transactionOutbox: transaction },
+        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
       };
     case actions.channel.RESPOND_WITH_REFUTE_CHOSEN:
       return { state: states.initiateResponse(state) };
@@ -129,7 +129,7 @@ export const takeMoveInAppReducer = (
       }
 
       const signature = signCommitment(action.commitment, state.privateKey);
-      const transaction = createRespondWithMoveTransaction(action.commitment, signature);
+      const transactionRequest = createRespondWithMoveTransaction(action.commitment, signature);
       return {
         state: states.initiateResponse({
           ...state,
@@ -137,7 +137,10 @@ export const takeMoveInAppReducer = (
           lastCommitment: { commitment: action.commitment, signature },
           penultimateCommitment: state.lastCommitment,
         }),
-        sideEffects: { transactionOutbox: transaction, displayOutbox: showWallet() },
+        sideEffects: {
+          transactionOutbox: { transactionRequest, channelId: state.channelId },
+          displayOutbox: showWallet(),
+        },
       };
 
     case actions.BLOCK_MINED:

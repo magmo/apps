@@ -57,10 +57,13 @@ const notSafeToDepositReducer = (
         return {
           state: depositingStates.waitForTransactionSent({ ...state }),
           sideEffects: {
-            transactionOutbox: createDepositTransaction(
-              state.channelId,
-              state.requestedYourContribution,
-            ),
+            transactionOutbox: {
+              transactionRequest: createDepositTransaction(
+                state.channelId,
+                state.requestedYourContribution,
+              ),
+              channelId: action.destination,
+            },
           },
         };
       } else {

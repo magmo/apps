@@ -12,7 +12,7 @@ import {
 } from '../../__tests__/helpers';
 import { addHex } from '../../../utils/hex-utils';
 
-const { channelId, twoThree, mockTransaction } = scenarios;
+const { channelId, twoThree, mockTransactionOutboxItem } = scenarios;
 
 const YOUR_DEPOSIT_A = twoThree[0];
 const YOUR_DEPOSIT_B = twoThree[1];
@@ -20,7 +20,8 @@ const TOTAL_REQUIRED = twoThree.reduce(addHex);
 
 describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   // player A scenario
-  const createDepositTxMock = jest.fn(() => mockTransaction);
+  const createDepositTxMock = jest.fn(() => mockTransactionOutboxItem.transactionRequest);
+
   Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
     value: createDepositTxMock,
   });
@@ -37,7 +38,7 @@ describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   itChangesChannelFundingStatusTo(states.SAFE_TO_DEPOSIT, {
     state: updatedState.state.directFunding[channelId],
   });
-  itSendsThisTransaction(updatedState, mockTransaction);
+  itSendsThisTransaction(updatedState, mockTransactionOutboxItem);
 });
 describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   // player B scenario
