@@ -22,4 +22,23 @@ export const directFundingConfirmed = (channelId: string) => ({
 });
 export type DirectFundingConfirmed = ReturnType<typeof directFundingConfirmed>;
 
-export type InternalAction = DirectFundingRequested | DirectFundingConfirmed;
+export const OPEN_CHANNEL_SUCCESS = 'WALLET.INTERNAL.OPEN_CHANNEL_SUCCESS';
+export const openChannelSuccess = (channelId: string) => ({
+  type: OPEN_CHANNEL_SUCCESS as typeof OPEN_CHANNEL_SUCCESS,
+  channelId,
+});
+export type OpenChannelSuccess = ReturnType<typeof openChannelSuccess>;
+
+// TODO: is the last committment needed?
+export const CONSENSUS_REACHED = 'WALLET.INTERNAL.CONSENSUS_REACHED';
+export const consenusReached = (channelId: string) => ({
+  type: CONSENSUS_REACHED as typeof CONSENSUS_REACHED,
+  channelId,
+});
+export type ConsensusReached = ReturnType<typeof consenusReached>;
+
+export type InternalAction =
+  | DirectFundingRequested
+  | DirectFundingConfirmed
+  | OpenChannelSuccess
+  | ConsensusReached;
