@@ -41,7 +41,7 @@ describe('adjudicator listener', () => {
 
     const action: actions.funding.FundingReceivedEvent = sagaTester.getLatestCalledAction();
     expect(action.type).toEqual(actions.funding.FUNDING_RECEIVED_EVENT);
-    expect(action.destination).toEqual(channelId);
+    expect(action.channelId).toEqual(channelId);
     expect(action.amount).toEqual('0x05');
     expect(action.totalForDestination).toEqual('0x05');
   });

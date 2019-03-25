@@ -2,11 +2,11 @@ import * as actions from '../actions';
 
 export const FUNDING_RECEIVED_EVENT = 'FUNDING_RECEIVED_EVENT';
 export const fundingReceivedEvent = (
-  destination: string,
+  channelId: string,
   amount: string,
   totalForDestination: string,
 ) => ({
-  destination,
+  channelId,
   amount,
   totalForDestination,
   type: FUNDING_RECEIVED_EVENT as typeof FUNDING_RECEIVED_EVENT,

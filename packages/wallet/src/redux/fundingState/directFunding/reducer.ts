@@ -15,7 +15,7 @@ export const directFundingStateReducer = (
 ): StateWithSideEffects<states.DirectFundingStatus> => {
   if (
     action.type === actions.funding.FUNDING_RECEIVED_EVENT &&
-    action.destination === state.channelId
+    action.channelId === state.channelId
   ) {
     // You can always move to CHANNEL_FUNDED based on the action
     // of some arbitrary actor, so this behaviour is common regardless of the stage of
@@ -51,7 +51,7 @@ const notSafeToDepositReducer = (
   switch (action.type) {
     case actions.funding.FUNDING_RECEIVED_EVENT:
       if (
-        action.destination === state.channelId &&
+        action.channelId === state.channelId &&
         bigNumberify(action.totalForDestination).gte(state.safeToDepositLevel)
       ) {
         return {
@@ -62,7 +62,7 @@ const notSafeToDepositReducer = (
                 state.channelId,
                 state.requestedYourContribution,
               ),
-              channelId: action.destination,
+              channelId: action.channelId,
             },
           },
         };
@@ -83,7 +83,7 @@ const waitForFundingConfirmationReducer = (
   switch (action.type) {
     case actions.funding.FUNDING_RECEIVED_EVENT:
       if (
-        action.destination === state.channelId &&
+        action.channelId === state.channelId &&
         bigNumberify(action.totalForDestination).gte(state.requestedTotalFunds)
       ) {
         return {
