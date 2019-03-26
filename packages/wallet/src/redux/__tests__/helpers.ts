@@ -45,13 +45,15 @@ const expectSideEffect = <StateType>(
   actionOrObject: object | string | undefined,
 ) => {
   const outbox = state.sideEffects![outboxBranch];
-  const item = Array.isArray(outbox) ? outbox[0] : outbox;
+  const outboxArray = Array.isArray(outbox) ? outbox : [outbox];
   if (typeof actionOrObject === 'string') {
-    expect(item.type).toEqual(actionOrObject);
+    expect(outboxArray).toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: actionOrObject })]),
+    );
+  } else if (typeof actionOrObject === 'object') {
+    expect(outboxArray).toEqual(expect.arrayContaining([expect.objectContaining(actionOrObject)]));
   } else if (typeof actionOrObject === 'undefined') {
-    expect(item).toBeUndefined();
-  } else {
-    expect(item).toMatchObject(actionOrObject);
+    expect(outboxArray.length === 0 || outboxArray[0] === undefined).toBeTruthy();
   }
 };
 
@@ -59,15 +61,14 @@ export const expectThisCommitmentSent = (
   state: StateWithSideEffects<ChannelStatus>,
   c: Partial<Commitment>,
 ) => {
-  expect(state.sideEffects!.messageOutbox![0].commitment).toMatchObject(c);
   const outbox = state.sideEffects!.messageOutbox;
-  const item = Array.isArray(outbox) ? outbox[0] : outbox;
-  expect((item as { commitment: any }).commitment).toMatchObject(c);
+  const outboxArray = Array.isArray(outbox) ? outbox : [outbox];
+  expect(outboxArray).toEqual(expect.arrayContaining([expect.objectContaining(c)]));
 };
 
 export const itSendsATransaction = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends a transaction`, () => {
-    expectSideEffect('transactionOutbox', state, expect.anything());
+    expectSideEffect('transactionOutbox', state, {});
   });
 };
 
