@@ -46,7 +46,7 @@ export const initializingAppChannels: ReducerWithSideEffects<InitializingChannel
       // we can't know the channel id until both participants know their addresses.
       [address]: states.waitForChannel({ address, privateKey }),
     },
-    outboxState: { messageOutbox: channelInitializationSuccess(wallet.address) },
+    sideEffects: { messageOutbox: channelInitializationSuccess(wallet.address) },
   };
 };
 
@@ -66,12 +66,12 @@ export const initializedAppChannels: ReducerWithSideEffects<InitializedChannelSt
     return { state };
   }
 
-  const { state: newState, outboxState } = initializedAppChannelStatusReducer(
+  const { state: newState, sideEffects } = initializedAppChannelStatusReducer(
     existingChannel as states.AppChannelStatus,
     action,
   );
 
-  return { state: { ...state, [appChannelId]: newState }, outboxState };
+  return { state: { ...state, [appChannelId]: newState }, sideEffects };
 };
 
 const initializedAppChannelStatusReducer: ReducerWithSideEffects<states.AppChannelStatus> = (
@@ -82,7 +82,7 @@ const initializedAppChannelStatusReducer: ReducerWithSideEffects<states.AppChann
   if (conclusionStateFromOwnRequest) {
     return {
       state: conclusionStateFromOwnRequest,
-      outboxState: { displayOutbox: showWallet() },
+      sideEffects: { displayOutbox: showWallet() },
     };
   }
 
@@ -90,7 +90,7 @@ const initializedAppChannelStatusReducer: ReducerWithSideEffects<states.AppChann
   if (conclusionStateFromOpponentRequest) {
     return {
       state: conclusionStateFromOpponentRequest,
-      outboxState: { displayOutbox: showWallet() },
+      sideEffects: { displayOutbox: showWallet() },
     };
   }
 

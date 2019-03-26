@@ -10,6 +10,7 @@ import { StateWithSideEffects } from '../../../shared/state';
 import * as internalActions from '../../../internal/actions';
 import { bytesFromAppAttributes, AppAttributes } from 'fmg-nitro-adjudicator';
 import { SignedCommitment } from '../../shared/state';
+import { addHex } from '../../../../utils/hex-utils';
 
 export const openingReducer = (
   state: channelStates.OpeningState,
@@ -58,6 +59,9 @@ const waitForInitialPreFundSetupReducer = (
         ourIndex,
         state.privateKey,
       );
+      const channelId = channelID(commitment.channel);
+      const { allocation } = commitment;
+
       return {
         state: channelStates.waitForFundingAndPostFundSetup({
           ...state,
@@ -74,12 +78,12 @@ const waitForInitialPreFundSetupReducer = (
             signature: commitmentSignature,
           },
         }),
-        outboxState: {
+        sideEffects: {
           messageOutbox: sendCommitmentAction,
-          actionOutbox: internalActions.ledgerChannelOpen(
-            state.appChannelId,
-            channelID(commitment.channel),
-          ),
+          actionOutbox: [
+            internalActions.ledgerChannelOpen(state.appChannelId, channelID(commitment.channel)),
+            createDirectFundingRequest(channelId, allocation, ourIndex),
+          ],
         },
       };
   }
@@ -110,8 +114,15 @@ const waitForPreFundSetupReducer = (
           penultimateCommitment: state.lastCommitment,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
         }),
-        outboxState: {
-          actionOutbox: internalActions.ledgerChannelOpen(state.appChannelId, state.channelId),
+        sideEffects: {
+          actionOutbox: [
+            internalActions.ledgerChannelOpen(state.appChannelId, state.channelId),
+            createDirectFundingRequest(
+              state.channelId,
+              state.lastCommitment.commitment.allocation,
+              state.ourIndex,
+            ),
+          ],
         },
       };
   }
@@ -150,7 +161,7 @@ const sendInitialPreFundSetupReducer = (
       };
       return {
         state: channelStates.waitForPreFundSetup({ ...state, lastCommitment }),
-        outboxState: {
+        sideEffects: {
           messageOutbox: sendCommitmentAction,
         },
       };
@@ -213,18 +224,15 @@ const validPreFundSetupCommitment = (
   return true;
 };
 
-// const createDirectFundingRequest = state => {
-//   const totalFundingRequired = state.lastCommitment.commitment.allocation.reduce(addHex);
-//   const safeToDepositLevel =
-//     state.ourIndex === 0
-//       ? '0x00'
-//       : state.lastCommitment.commitment.allocation.slice(0, state.ourIndex).reduce(addHex);
-//   const ourDeposit = state.lastCommitment.commitment.allocation[state.ourIndex];
-//   return actions.internal.directFundingRequested(
-//     state.channelId,
-//     safeToDepositLevel,
-//     totalFundingRequired,
-//     ourDeposit,
-//     state.ourIndex,
-//   );
-// };
+const createDirectFundingRequest = (channelId: string, allocation: string[], ourIndex: number) => {
+  const totalFundingRequired = allocation.reduce(addHex);
+  const safeToDepositLevel = ourIndex === 0 ? '0x00' : allocation.slice(0, ourIndex).reduce(addHex);
+  const ourDeposit = allocation[ourIndex];
+  return actions.internal.directFundingRequested(
+    channelId,
+    safeToDepositLevel,
+    totalFundingRequired,
+    ourDeposit,
+    ourIndex,
+  );
+};

@@ -14,6 +14,7 @@ import { channelID } from 'fmg-core/lib/channel';
 import * as internalActions from '../../../../internal/actions';
 import { WaitForPreFundSetup } from '../../state';
 import { WaitForFundingAndPostFundSetup } from '../../funding/state';
+import { addHex } from '../../../../../utils/hex-utils';
 const {
   bsAddress,
   bsPrivateKey,
@@ -71,7 +72,7 @@ describe(startingIn(states.SEND_INITIAL_PRE_FUND_SETUP), () => {
         consensusPreFundCommitment1,
         expectedSignature,
       );
-      expect(updatedState.outboxState!.messageOutbox).toEqual(prefundSetupASendAction);
+      expect(updatedState.sideEffects!.messageOutbox).toEqual(prefundSetupASendAction);
     });
 
     it('updates the last commitment', () => {
@@ -99,6 +100,16 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP), () => {
       internalActions.ledgerChannelOpen(aDefaults.appChannelId, aDefaults.channelId),
       updatedState,
     );
+    itDispatchesThisAction(
+      internalActions.directFundingRequested(
+        channelId,
+        '0x00',
+        twoThree.reduce(addHex),
+        twoThree[0],
+        0,
+      ),
+      updatedState,
+    );
   });
 });
 describe(startingIn(states.WAIT_FOR_INITIAL_PRE_FUND_SETUP), () => {
@@ -121,13 +132,24 @@ describe(startingIn(states.WAIT_FOR_INITIAL_PRE_FUND_SETUP), () => {
       internalActions.ledgerChannelOpen(aDefaults.appChannelId, aDefaults.channelId),
       updatedState,
     );
+    itDispatchesThisAction(
+      internalActions.directFundingRequested(
+        channelId,
+        twoThree[0],
+        twoThree.reduce(addHex),
+        twoThree[1],
+        1,
+      ),
+      updatedState,
+    );
+
     it('sends a correct prefund setup', () => {
       const prefundSetupBSendAction = commitmentRelayRequested(
         asAddress,
         consensusPreFundCommitment2,
         expectedSignature,
       );
-      expect(updatedState.outboxState!.messageOutbox).toEqual(prefundSetupBSendAction);
+      expect(updatedState.sideEffects!.messageOutbox).toEqual(prefundSetupBSendAction);
     });
 
     it('stores the channel Id in state', () => {
