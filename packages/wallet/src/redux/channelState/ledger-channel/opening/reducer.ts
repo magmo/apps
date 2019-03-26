@@ -1,16 +1,17 @@
 import * as channelStates from '../state';
 import * as actions from '../../../actions';
-import { commitmentRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable } from '../../../../utils/reducer-utils';
-import { signCommitment, validCommitmentSignature } from '../../../../utils/signing-utils';
-import { CommitmentType, Channel, Commitment } from 'fmg-core';
+import { Channel } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { StateWithSideEffects } from '../../../shared/state';
 import * as internalActions from '../../../internal/actions';
-import { bytesFromAppAttributes, AppAttributes } from 'fmg-nitro-adjudicator';
 import { SignedCommitment } from '../../shared/state';
 import { addHex } from '../../../../utils/hex-utils';
+import {
+  composeConsensusPreFundCommitment,
+  validPreFundSetupCommitment,
+} from '../../shared/commitment-helpers';
 
 export const openingReducer = (
   state: channelStates.OpeningState,
@@ -52,7 +53,7 @@ const waitForInitialPreFundSetupReducer = (
         preFundSetupCommitment,
         commitmentSignature,
         sendCommitmentAction,
-      } = composePreFundCommitment(
+      } = composeConsensusPreFundCommitment(
         commitment.channel,
         commitment.allocation,
         commitment.destination,
@@ -147,7 +148,7 @@ const sendInitialPreFundSetupReducer = (
         preFundSetupCommitment,
         commitmentSignature,
         sendCommitmentAction,
-      } = composePreFundCommitment(
+      } = composeConsensusPreFundCommitment(
         channel,
         state.allocation,
         participants,
@@ -167,61 +168,6 @@ const sendInitialPreFundSetupReducer = (
       };
   }
   return { state };
-};
-
-const composePreFundCommitment = (
-  channel: Channel,
-  allocation: string[],
-  destination: string[],
-  ourIndex: number,
-  privateKey: string,
-) => {
-  const turnNum = ourIndex;
-  const appAttributes: AppAttributes = {
-    proposedAllocation: allocation,
-    proposedDestination: destination,
-    consensusCounter: ourIndex,
-  };
-  const preFundSetupCommitment: Commitment = {
-    channel,
-    commitmentType: CommitmentType.PreFundSetup,
-    turnNum,
-    commitmentCount: ourIndex,
-    allocation,
-    destination,
-    appAttributes: bytesFromAppAttributes(appAttributes),
-  };
-  const commitmentSignature = signCommitment(preFundSetupCommitment, privateKey);
-
-  const sendCommitmentAction = commitmentRelayRequested(
-    destination[1 - ourIndex],
-    preFundSetupCommitment,
-    commitmentSignature,
-  );
-  return { preFundSetupCommitment, commitmentSignature, sendCommitmentAction };
-};
-
-// TODO: We should bubble up the error instead of just logging it out.
-const validPreFundSetupCommitment = (
-  opponentCommitment: Commitment,
-  opponentSignature: string,
-  ourIndex: number,
-  participants: string[],
-): boolean => {
-  if (opponentCommitment.commitmentType !== CommitmentType.PreFundSetup) {
-    console.error('Expected PrefundSetup commitment.');
-    return false;
-  }
-  if (opponentCommitment.commitmentCount !== 1 - ourIndex) {
-    console.error(` Expected commitment count to be ${1 - ourIndex}`);
-    return false;
-  }
-  const opponentAddress = participants[1 - ourIndex];
-  if (!validCommitmentSignature(opponentCommitment, opponentSignature, opponentAddress)) {
-    console.error('Invalid signature');
-    return false;
-  }
-  return true;
 };
 
 const createDirectFundingRequest = (channelId: string, allocation: string[], ourIndex: number) => {

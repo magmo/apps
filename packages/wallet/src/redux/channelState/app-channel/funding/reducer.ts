@@ -7,15 +7,15 @@ import {
   fundingFailure,
   showWallet,
   hideWallet,
-  commitmentRelayRequested,
 } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable, validTransition } from '../../../../utils/reducer-utils';
-import { signCommitment, validCommitmentSignature } from '../../../../utils/signing-utils';
+import { validCommitmentSignature } from '../../../../utils/signing-utils';
 
-import { Channel, Commitment, CommitmentType } from 'fmg-core';
+import { Channel, Commitment } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../../utils/state-utils';
 import { StateWithSideEffects } from '../../../shared/state';
+import { composePostFundCommitment } from '../../shared/commitment-helpers';
 
 export const fundingReducer = (
   state: states.FundingState,
@@ -159,11 +159,22 @@ const waitForFundingAndPostFundSetupReducer = (
 
     case actions.internal.DIRECT_FUNDING_CONFIRMED:
       if (action.channelId === state.channelId) {
+        const channel: Channel = {
+          channelType: state.libraryAddress,
+          nonce: state.channelNonce,
+          participants: state.participants,
+        };
         const {
           postFundSetupCommitment,
           commitmentSignature,
           sendCommitmentAction,
-        } = composePostFundCommitment(state);
+        } = composePostFundCommitment(
+          channel,
+          state.lastCommitment.commitment,
+          state.turnNum,
+          state.ourIndex,
+          state.privateKey,
+        );
 
         const params = {
           ...state,
@@ -251,11 +262,22 @@ const bWaitForPostFundSetupReducer = (
       }
 
       const newState = { ...state, turnNum: commitment.turnNum };
+      const channel: Channel = {
+        channelType: newState.libraryAddress,
+        nonce: newState.channelNonce,
+        participants: newState.participants,
+      };
       const {
         postFundSetupCommitment,
         commitmentSignature,
         sendCommitmentAction,
-      } = composePostFundCommitment(newState);
+      } = composePostFundCommitment(
+        channel,
+        newState.lastCommitment.commitment,
+        newState.turnNum,
+        newState.ourIndex,
+        newState.privateKey,
+      );
       return {
         state: states.acknowledgeFundingSuccess({
           ...newState,
@@ -277,11 +299,23 @@ const waitForFundingConfirmationReducer = (
   switch (action.type) {
     case actions.internal.DIRECT_FUNDING_CONFIRMED:
       if (state.channelId === action.channelId) {
+        const channel: Channel = {
+          channelType: state.libraryAddress,
+          nonce: state.channelNonce,
+          participants: state.participants,
+        };
         const {
           postFundSetupCommitment,
           commitmentSignature,
           sendCommitmentAction,
-        } = composePostFundCommitment(state);
+        } = composePostFundCommitment(
+          channel,
+          state.lastCommitment.commitment,
+          state.turnNum,
+          state.ourIndex,
+          state.privateKey,
+        );
+
         return {
           state: states.acknowledgeFundingSuccess({
             ...state,
@@ -381,36 +415,4 @@ const validTransitionToPostFundState = (
     return false;
   }
   return true;
-};
-
-const composePostFundCommitment = (
-  state:
-    | states.WaitForFundingAndPostFundSetup // This is exactly when A should send their commitment
-    | states.WaitForFundingConfirmation // This is when B sends their commitment, if A sends too early
-    | states.BWaitForPostFundSetup, // This is exactly when B should send their commitment
-) => {
-  // It's beneficial to lazily replace our previous commitment only when it is time
-  // to send our new commitment, rather than eagerly replace it whenever the wallet knows
-  // what the next commitment should be, as this is in line with one of the wallet's obligations:
-  // - Only send a post-fund setup commitment after the channel is fully funded.
-  const { libraryAddress, channelNonce, participants, turnNum, lastCommitment } = state;
-  const channel: Channel = { channelType: libraryAddress, nonce: channelNonce, participants };
-
-  const postFundSetupCommitment: Commitment = {
-    channel,
-    commitmentType: CommitmentType.PostFundSetup,
-    turnNum: turnNum + 1,
-    commitmentCount: state.ourIndex,
-    allocation: lastCommitment.commitment.allocation,
-    destination: lastCommitment.commitment.destination,
-    appAttributes: state.lastCommitment.commitment.appAttributes,
-  };
-  const commitmentSignature = signCommitment(postFundSetupCommitment, state.privateKey);
-
-  const sendCommitmentAction = commitmentRelayRequested(
-    state.participants[1 - state.ourIndex],
-    postFundSetupCommitment,
-    commitmentSignature,
-  );
-  return { postFundSetupCommitment, commitmentSignature, sendCommitmentAction };
 };
