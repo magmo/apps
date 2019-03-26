@@ -3,7 +3,6 @@ import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
 import * as appChannelStates from '../redux/channelState/app-channel/state';
-import * as ledgerChannelStates from '../redux/channelState/ledger-channel/state';
 import FundingContainer from './Funding';
 import RespondingContainer from './Responding';
 import ChallengingContainer from './Challenging';
@@ -12,7 +11,7 @@ import ClosingContainer from './Closing';
 import LandingPage from '../components/LandingPage';
 
 interface ChannelProps {
-  state: appChannelStates.AppChannelStatus | ledgerChannelStates.LedgerChannelStatus;
+  state: appChannelStates.AppChannelStatus;
 }
 
 class ChannelContainer extends PureComponent<ChannelProps> {
