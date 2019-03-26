@@ -1,6 +1,6 @@
 import * as channelStates from '../state';
 import * as actions from '../../../actions';
-import { commitmentRelayRequested, showWallet } from 'magmo-wallet-client/lib/wallet-events';
+import { commitmentRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable } from '../../../../utils/reducer-utils';
 import { signCommitment, validCommitmentSignature } from '../../../../utils/signing-utils';
@@ -31,7 +31,7 @@ const waitForInitialPreFundSetupReducer = (
   state: channelStates.WaitForInitialPreFundSetup,
   action: internalActions.OpenLedgerChannel | actions.WalletAction,
 ): StateWithSideEffects<
-  channelStates.WaitForInitialPreFundSetup | channelStates.WaitForFundingApproval
+  channelStates.WaitForInitialPreFundSetup | channelStates.WaitForFundingAndPostFundSetup
 > => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
@@ -59,7 +59,7 @@ const waitForInitialPreFundSetupReducer = (
         state.privateKey,
       );
       return {
-        state: channelStates.waitForFundingApproval({
+        state: channelStates.waitForFundingAndPostFundSetup({
           ...state,
           channelId: channelID(commitment.channel),
           libraryAddress: commitment.channel.channelType,
@@ -75,8 +75,11 @@ const waitForInitialPreFundSetupReducer = (
           },
         }),
         outboxState: {
-          displayOutbox: showWallet(),
           messageOutbox: sendCommitmentAction,
+          actionOutbox: internalActions.ledgerChannelOpen(
+            state.appChannelId,
+            channelID(commitment.channel),
+          ),
         },
       };
   }
@@ -86,7 +89,7 @@ const waitForPreFundSetupReducer = (
   state: channelStates.WaitForPreFundSetup,
   action: internalActions.OpenLedgerChannel | actions.WalletAction,
 ): StateWithSideEffects<
-  channelStates.WaitForPreFundSetup | channelStates.WaitForFundingApproval
+  channelStates.WaitForPreFundSetup | channelStates.WaitForFundingAndPostFundSetup
 > => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
@@ -102,12 +105,14 @@ const waitForPreFundSetupReducer = (
       }
 
       return {
-        state: channelStates.waitForFundingApproval({
+        state: channelStates.waitForFundingAndPostFundSetup({
           ...state,
           penultimateCommitment: state.lastCommitment,
           lastCommitment: { commitment: action.commitment, signature: action.signature },
         }),
-        outboxState: { displayOutbox: showWallet() },
+        outboxState: {
+          actionOutbox: internalActions.ledgerChannelOpen(state.appChannelId, state.channelId),
+        },
       };
   }
   return { state };
@@ -145,7 +150,9 @@ const sendInitialPreFundSetupReducer = (
       };
       return {
         state: channelStates.waitForPreFundSetup({ ...state, lastCommitment }),
-        outboxState: { messageOutbox: sendCommitmentAction },
+        outboxState: {
+          messageOutbox: sendCommitmentAction,
+        },
       };
   }
   return { state };
@@ -205,3 +212,19 @@ const validPreFundSetupCommitment = (
   }
   return true;
 };
+
+// const createDirectFundingRequest = state => {
+//   const totalFundingRequired = state.lastCommitment.commitment.allocation.reduce(addHex);
+//   const safeToDepositLevel =
+//     state.ourIndex === 0
+//       ? '0x00'
+//       : state.lastCommitment.commitment.allocation.slice(0, state.ourIndex).reduce(addHex);
+//   const ourDeposit = state.lastCommitment.commitment.allocation[state.ourIndex];
+//   return actions.internal.directFundingRequested(
+//     state.channelId,
+//     safeToDepositLevel,
+//     totalFundingRequired,
+//     ourDeposit,
+//     state.ourIndex,
+//   );
+// };

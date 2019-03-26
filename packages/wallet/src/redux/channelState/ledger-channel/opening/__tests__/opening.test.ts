@@ -4,20 +4,16 @@ import * as SigningUtil from '../../../../../utils/signing-utils';
 import {
   itTransitionsToChannelStateType,
   itSendsThisMessage,
-  itSendsThisDisplayEvent,
+  itDispatchesThisAction,
 } from '../../../../__tests__/helpers';
 import * as scenarios from '../../../../__tests__/test-scenarios';
 
 import { openingReducer } from '../reducer';
-import {
-  commitmentRelayRequested,
-  COMMITMENT_RELAY_REQUESTED,
-  SHOW_WALLET,
-} from 'magmo-wallet-client';
+import { commitmentRelayRequested, COMMITMENT_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { channelID } from 'fmg-core/lib/channel';
-import { WaitForFundingApproval } from '../../funding/state';
 import * as internalActions from '../../../../internal/actions';
 import { WaitForPreFundSetup } from '../../state';
+import { WaitForFundingAndPostFundSetup } from '../../funding/state';
 const {
   bsAddress,
   bsPrivateKey,
@@ -46,10 +42,12 @@ const aDefaults = {
   allocation: twoThree as [string, string],
   turnNum: 0,
   funded: false,
+  appChannelId: '0x0123',
 };
 const bDefaults = {
   address: bsAddress,
   privateKey: bsPrivateKey,
+  appChannelId: '0x0123',
 };
 
 const startingIn = stage => `start in ${stage}`;
@@ -96,8 +94,11 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP), () => {
 
     const updatedState = openingReducer(state, action);
 
-    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
-    itSendsThisDisplayEvent(updatedState, SHOW_WALLET);
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+    itDispatchesThisAction(
+      internalActions.ledgerChannelOpen(aDefaults.appChannelId, aDefaults.channelId),
+      updatedState,
+    );
   });
 });
 describe(startingIn(states.WAIT_FOR_INITIAL_PRE_FUND_SETUP), () => {
@@ -112,11 +113,14 @@ describe(startingIn(states.WAIT_FOR_INITIAL_PRE_FUND_SETUP), () => {
     Object.defineProperty(SigningUtil, 'signCommitment', { value: signMock });
     const updatedState = openingReducer(state, action);
 
-    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
 
-    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_APPROVAL, updatedState);
+    itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
     itSendsThisMessage(updatedState, COMMITMENT_RELAY_REQUESTED);
-    itSendsThisDisplayEvent(updatedState, SHOW_WALLET);
+    itDispatchesThisAction(
+      internalActions.ledgerChannelOpen(aDefaults.appChannelId, aDefaults.channelId),
+      updatedState,
+    );
     it('sends a correct prefund setup', () => {
       const prefundSetupBSendAction = commitmentRelayRequested(
         asAddress,
@@ -128,7 +132,9 @@ describe(startingIn(states.WAIT_FOR_INITIAL_PRE_FUND_SETUP), () => {
 
     it('stores the channel Id in state', () => {
       const commitmentChannelId = channelID(consensusPreFundCommitment1.channel);
-      expect((updatedState.state as WaitForFundingApproval).channelId).toEqual(commitmentChannelId);
+      expect((updatedState.state as WaitForFundingAndPostFundSetup).channelId).toEqual(
+        commitmentChannelId,
+      );
     });
   });
 });
