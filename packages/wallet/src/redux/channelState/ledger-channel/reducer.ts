@@ -27,7 +27,11 @@ export const initializingLedgerChannels: ReducerWithSideEffects<InitializingChan
           ...state,
           // We have to temporarily store the private key under the address, since
           // we can't know the channel id until both participants know their addresses.
-          [address]: states.waitForInitialPreFundSetup({ address, privateKey }),
+          [address]: states.waitForInitialPreFundSetup({
+            address,
+            privateKey,
+            appChannelId: action.appChannelId,
+          }),
         },
       };
     }

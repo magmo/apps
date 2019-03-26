@@ -1,13 +1,13 @@
 import { AppChannelStatus } from './app-channel/state';
-import { LedgerChannelStatus } from './ledger-channel/state';
+import { LedgerChannelStatus, InitializingLedgerChannelStatus } from './ledger-channel/state';
 
-export interface InitializingChannelStatus {
+export interface BaseInitializingChannelStatus {
   address: string;
   privateKey: string;
 }
 
 export interface InitializingChannelState {
-  [participantAddress: string]: InitializingChannelStatus;
+  [participantAddress: string]: BaseInitializingChannelStatus | InitializingLedgerChannelStatus;
 }
 
 export type ChannelStatus = AppChannelStatus | LedgerChannelStatus;

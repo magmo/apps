@@ -22,11 +22,22 @@ export const directFundingConfirmed = (channelId: string) => ({
 });
 export type DirectFundingConfirmed = ReturnType<typeof directFundingConfirmed>;
 
-export const OPEN_LEDGER_CHANNEL = 'OPEN_LEDGER_CHANNEL';
+export const OPEN_LEDGER_CHANNEL = 'WALLET.INTERNAL.OPEN_LEDGER_CHANNEL';
 export const openLedgerChannel = (appChannelId: string) => ({
   type: OPEN_LEDGER_CHANNEL as typeof OPEN_LEDGER_CHANNEL,
   appChannelId,
 });
+export const LEDGER_CHANNEL_OPEN = 'WALLET.INTERNAL.LEDGER_CHANNEL_INITIALIZED';
+export const ledgerChannelOpen = (appChannelId: string, ledgerChannelId: string) => ({
+  appChannelId,
+  ledgerChannelId,
+  type: LEDGER_CHANNEL_OPEN as typeof LEDGER_CHANNEL_OPEN,
+});
+export type LedgerChannelOpen = ReturnType<typeof ledgerChannelOpen>;
 export type OpenLedgerChannel = ReturnType<typeof openLedgerChannel>;
 
-export type InternalAction = DirectFundingRequested | DirectFundingConfirmed | OpenLedgerChannel;
+export type InternalAction =
+  | DirectFundingRequested
+  | DirectFundingConfirmed
+  | OpenLedgerChannel
+  | LedgerChannelOpen;

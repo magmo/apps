@@ -43,11 +43,15 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
     delete newState.initializingChannels[ourAddress];
 
     if (getCommitmentChannelType(action.commitment) === 'Ledger') {
+      const { appChannelId } = state.initializingChannels[
+        ourAddress
+      ] as ledgerChannelState.InitializingLedgerChannelStatus;
       // Ledger channel
       newState.initializedChannels[channelId] = ledgerChannelState.waitForInitialPreFundSetup({
         address,
         privateKey,
         ourIndex,
+        appChannelId,
       });
     } else {
       // App Channel
