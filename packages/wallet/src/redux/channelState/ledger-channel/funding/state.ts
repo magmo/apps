@@ -10,6 +10,18 @@ export interface WaitForFundingConfirmation extends ChannelOpen {
   type: typeof WAIT_FOR_FUNDING_CONFIRMATION;
   stage: typeof FUNDING;
 }
+
+export function waitForFundingConfirmation<T extends ChannelOpen>(
+         params: T,
+       ): WaitForFundingConfirmation {
+         return {
+           type: WAIT_FOR_FUNDING_CONFIRMATION,
+           stage: FUNDING,
+
+           ...channelOpen(params),
+         };
+       }
+
 export interface WaitForPostFundSetup extends ChannelOpen {
   type: typeof WAIT_FOR_POST_FUND_SETUP;
   stage: typeof FUNDING;
