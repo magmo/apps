@@ -70,7 +70,7 @@ describe('when a fundingReceivedEvent caused a channel to be funded', () => {
     const fundingState: fundingStates.FundingState = {
       ...fundingStates.EMPTY_FUNDING_STATE,
       directFunding: {
-        [channelId]: fundingStates.notSafeToDeposit(fundingDefaults),
+        [channelId]: fundingStates.channelFunded(fundingDefaults),
       },
     };
 
