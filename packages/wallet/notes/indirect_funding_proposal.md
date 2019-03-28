@@ -28,13 +28,13 @@ sequenceDiagram
     participant wltA as A's wallet
     participant wltB as B's wallet
 
-    Note over wltA, wltB: X in DETERMINE_STRATEGY
+    Note over wltA, wltB: channels.X in DETERMINE_STRATEGY
 
 
     wltA->>wltB: Fund X indirectly?
     wltB->>wltA: Ok!
 
-    Note over wltA, wltB: X in WAIT_FOR_FUNDING
+    Note over wltA, wltB: channels.X in WAIT_FOR_FUNDING
 ```
 After this the wallet state updates as follows:
 ```json
