@@ -21,7 +21,6 @@ export function isfundingAction(action: actions.WalletAction): action is Funding
     : false;
 }
 
-// TODO: This is getting large, we should probably split this up into separate types for each stage
 export type FundingAction =
   | FundingReceivedEvent
   | actions.internal.InternalFundingAction
