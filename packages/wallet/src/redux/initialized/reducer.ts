@@ -1,14 +1,18 @@
 import { InitializedState } from './state';
 
-import { WalletAction } from '../actions';
+import * as actions from '../actions';
 import { combineReducersWithSideEffects } from '../../utils/reducer-utils';
 import { channelStateReducer } from '../channelState/reducer';
 import { fundingStateReducer } from '../fundingState/reducer';
 import { accumulateSideEffects } from '../outbox';
+import { getChannelStatus, getDirectFundingStatus } from '../state';
+import { stateIsChannelFunded } from '../fundingState/state';
+import { fundingReducer } from '../channelState/funding/reducer';
+import { WAIT_FOR_FUNDING_AND_POST_FUND_SETUP } from '../channelState/state';
 
 export function initializedReducer(
   state: InitializedState,
-  action: WalletAction,
+  action: actions.WalletAction,
 ): InitializedState {
   // Apply the "independent" reducer
   const { state: newState, sideEffects } = combinedReducer(state, action);
@@ -28,6 +32,39 @@ const combinedReducer = combineReducersWithSideEffects({
   fundingState: fundingStateReducer,
 });
 
-export function coordinator(state: InitializedState, action: WalletAction): InitializedState {
-  return state;
+export function coordinator(
+  state: InitializedState,
+  action: actions.WalletAction,
+): InitializedState {
+  switch (action.type) {
+    case actions.funding.FUNDING_RECEIVED_EVENT:
+      return fundingReceivedEventCoordinator(state, action);
+    default:
+      return state;
+  }
+}
+
+function fundingReceivedEventCoordinator(
+  state: InitializedState,
+  action: actions.funding.FundingReceivedEvent,
+): InitializedState {
+  const { channelId } = action;
+  const channelStatus = getChannelStatus(state, channelId);
+  if (channelStatus.type !== WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+    return state;
+  }
+  const fundingStatus = getDirectFundingStatus(state, channelId);
+
+  const newState = { ...state };
+  if (stateIsChannelFunded(fundingStatus)) {
+    const { state: newChannelStatus, sideEffects } = fundingReducer(
+      channelStatus,
+      actions.internal.directFundingConfirmed(channelId),
+    );
+
+    newState.channelState.initializedChannels[channelId] = newChannelStatus;
+    newState.outboxState = accumulateSideEffects(newState.outboxState, sideEffects);
+  }
+
+  return newState;
 }
