@@ -11,7 +11,7 @@ It is deliberately high-level and hand-wavy, designed to start a discussion rath
 * Running the full funding algorithm
   * Instead we'll assume the simple case of one app channel A, funded by a directly-funded ledger channel L.
 * Storing the funding table / funding relationships
-  * We'll just focus on opening an L that funds A, without worrying about how we remember that A is funded by L.
+  * We'll just focus on opening an L that funds A, without worrying about how to remember that A is funded by L.
 
 
 ## Proposed Operation
@@ -88,7 +88,7 @@ When the indirectFunding is in the `WAIT_FOR_FUNDING` state, the wallet state wi
 ```
 Note: like before, the info in the `indirectFunding` record can be used to find the corresponding `directFunding`.
 
-The `directFunding` state tracks the direct funding state machine that we're already used to.
+The `directFunding` state tracks the direct funding state machine as found currently in the codebase.
 
 The interaction proceeds as follows:
 ```mermaid
