@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { OutboxState, EMPTY_OUTBOX_STATE } from './outbox/state';
 import { FundingState, EMPTY_FUNDING_STATE } from './fundingState/state';
 import { ChannelState } from './channelState/state';
 import { Properties } from './utils';
+=======
+import { SharedWalletState, emptyState } from './shared/state';
+import { InitializingState } from './initializing/state';
+import { InitializedState } from './initialized/state';
+import { ChannelStatus } from './channelState/state';
+>>>>>>> Add getChannelStatus selector
 
 export type WalletState = WaitForLogin | WaitForAdjudicator | MetaMaskError | Initialized;
 
@@ -13,6 +20,7 @@ export const METAMASK_ERROR = 'INITIALIZING.METAMASK_ERROR';
 export const WAIT_FOR_ADJUDICATOR = 'INITIALIZING.WAIT_FOR_ADJUDICATOR';
 export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 
+<<<<<<< HEAD
 // ------
 // States
 // ------
@@ -82,4 +90,10 @@ export function initialized(params: Properties<Initialized>): Initialized {
     networkId,
     adjudicator,
   };
+=======
+export type WalletState = InitializingState | InitializedState;
+
+export function getChannelStatus(state: WalletState, channelId: string): ChannelStatus {
+  return state.channelState.initializedChannels[channelId];
+>>>>>>> Add getChannelStatus selector
 }
