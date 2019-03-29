@@ -1,12 +1,12 @@
-import { initializedReducer } from '../reducer';
+import { initializedReducer } from '../initialized/reducer';
 
-import * as states from '../../state';
-import * as fundingStates from '../../fundingState/state';
-import * as actions from '../../actions';
+import * as states from '../state';
+import * as fundingStates from '../fundingState/state';
+import * as actions from '../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as scenarios from '../../__tests__/test-scenarios';
-import { waitForUpdate } from '../../channelState/state';
-import { EMPTY_OUTBOX_STATE } from '../../outbox/state';
+import * as scenarios from './test-scenarios';
+import { waitForUpdate } from '../channelState/state';
+import { EMPTY_OUTBOX_STATE } from '../outbox/state';
 
 const { channelId } = scenarios;
 
