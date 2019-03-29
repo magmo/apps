@@ -1,5 +1,5 @@
 import { BaseDirectFundingState, SAFE_TO_DEPOSIT, baseDirectFundingState } from '../state';
-import { TransactionExists } from '../../../shared/state';
+import { TransactionExists } from '../../../utils';
 
 // Deposit status
 export const WAIT_FOR_TRANSACTION_SENT = 'WAIT_FOR_TRANSACTION_SENT';
@@ -15,7 +15,7 @@ export type DepositStatus =
   | typeof DEPOSIT_TRANSACTION_FAILED
   | typeof DEPOSIT_CONFIRMED;
 
-interface BaseWithTransaction extends BaseDirectFundingState, TransactionExists {}
+interface BaseWithTransaction extends BaseDirectFundingState, TransactionExists { }
 
 export interface WaitForTransactionSent extends BaseDirectFundingState {
   depositStatus: typeof WAIT_FOR_TRANSACTION_SENT;

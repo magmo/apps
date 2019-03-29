@@ -1,6 +1,6 @@
-import { OutboxState, SideEffects, EMPTY_OUTBOX_STATE } from '../outbox/state';
-import { FundingState, EMPTY_FUNDING_STATE } from '../fundingState/state';
-import { ChannelState } from '../channelState/state';
+import { OutboxState, SideEffects, EMPTY_OUTBOX_STATE } from './outbox/state';
+import { FundingState, EMPTY_FUNDING_STATE } from './fundingState/state';
+import { ChannelState } from './channelState/state';
 
 export interface StateWithSideEffects<T> {
   state: T;

@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
-import { AdjudicatorKnown } from '../redux/shared/state';
+import { AdjudicatorKnown } from '../redux/utils';
 
 interface NetworkStatusProps {
   networkId: number;
