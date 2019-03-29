@@ -2,10 +2,12 @@ import * as states from './state';
 
 import * as actions from './actions';
 import { unreachable } from '../utils/reducer-utils';
-import { initializedReducer } from './initialized/reducer';
 import { clearOutbox } from './outbox/reducer';
 import { accumulateSideEffects } from './outbox';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
+import { channelStateReducer } from './channelState/reducer';
+import { fundingStateReducer } from './fundingState/reducer';
+import { combineReducersWithSideEffects } from './../utils/reducer-utils';
 
 const initialState = states.waitForLogin();
 
@@ -24,6 +26,25 @@ export const walletReducer = (
       return unreachable(nextState);
   }
 };
+
+export function initializedReducer(
+  state: states.InitializedState,
+  action: actions.WalletAction,
+): states.InitializedState {
+  const { state: newState, sideEffects } = combinedReducer(state, action);
+  // Since the wallet state itself has an outbox state, we need to apply the side effects
+  // by hand.
+  return {
+    ...state,
+    ...newState,
+    outboxState: accumulateSideEffects(state.outboxState, sideEffects),
+  };
+}
+
+const combinedReducer = combineReducersWithSideEffects({
+  channelState: channelStateReducer,
+  fundingState: fundingStateReducer,
+});
 
 export const initializingReducer = (
   state: states.InitializingState,
