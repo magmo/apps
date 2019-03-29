@@ -6,7 +6,7 @@ import {
   WAIT_FOR_ADJUDICATOR,
   WaitForLogin,
   WaitForAdjudicator,
-} from './state';
+} from '../state';
 import { InitializedState } from '../state';
 
 import { WalletAction, LOGGED_IN, ADJUDICATOR_KNOWN } from '../actions';
