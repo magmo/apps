@@ -1,12 +1,10 @@
 import { OutboxState, EMPTY_OUTBOX_STATE } from './outbox/state';
 import { FundingState, EMPTY_FUNDING_STATE } from './fundingState/state';
 import { ChannelState } from './channelState/state';
-import { InitializedState } from './initialized/state';
-
-export * from './initialized/state';
 
 export type WalletState = InitializingState | InitializedState;
 export type InitializingState = WaitForLogin | WaitForAdjudicator | MetaMaskError;
+export type InitializedState = Initialized;
 
 export const INITIALIZING = 'INITIALIZING';
 // -----------
@@ -15,6 +13,7 @@ export const INITIALIZING = 'INITIALIZING';
 export const WAIT_FOR_LOGIN = 'INITIALIZING.WAIT_FOR_LOGIN';
 export const METAMASK_ERROR = 'INITIALIZING.METAMASK_ERROR';
 export const WAIT_FOR_ADJUDICATOR = 'INITIALIZING.WAIT_FOR_ADJUDICATOR';
+export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 
 
 // ------
@@ -45,6 +44,17 @@ export interface WaitForAdjudicator {
   uid: string;
 }
 
+export interface Initialized {
+  stage: typeof WALLET_INITIALIZED;
+  type: typeof WALLET_INITIALIZED;
+  channelState: ChannelState;
+  fundingState: FundingState;
+  outboxState: OutboxState;
+  uid: string;
+  networkId: number;
+  adjudicator: string;
+}
+
 // ------------
 // Constructors
 // ------------
@@ -67,6 +77,20 @@ export function metaMaskError(params: Properties<MetaMaskError>): MetaMaskError 
 export function waitForAdjudicator(params: Properties<WaitForAdjudicator>): WaitForAdjudicator {
   const { outboxState, fundingState, channelState, uid } = params;
   return { type: WAIT_FOR_ADJUDICATOR, stage: INITIALIZING, outboxState, fundingState, channelState, uid };
+}
+
+export function initialized(params: Properties<Initialized>): Initialized {
+  const { outboxState, fundingState, channelState, uid, networkId, adjudicator } = params;
+  return {
+    stage: WALLET_INITIALIZED,
+    type: WALLET_INITIALIZED,
+    channelState,
+    fundingState,
+    outboxState,
+    uid,
+    networkId,
+    adjudicator,
+  };
 }
 
 type Properties<T> = Pick<T, Exclude<keyof T, 'type' | 'stage'>> & { [x: string]: any };

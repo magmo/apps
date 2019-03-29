@@ -1,4 +1,4 @@
-import { InitializedState } from './state';
+import { Initialized as InitializedState } from '../state';
 
 import { WalletAction } from '../actions';
 import { combineReducersWithSideEffects } from '../../utils/reducer-utils';
