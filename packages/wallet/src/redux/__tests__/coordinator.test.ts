@@ -4,7 +4,7 @@ import * as channelStates from '../channelState/state';
 import * as fundingStates from '../fundingState/state';
 import * as actions from '../actions';
 import { addHex } from '../../utils/hex-utils';
-import { coordinator } from '../initialized/reducer';
+import { walletReducer } from '../reducer';
 
 const {
   asAddress,
@@ -82,7 +82,7 @@ describe('when a fundingReceivedEvent caused a channel to be funded', () => {
     });
 
     const action = actions.funding.fundingReceivedEvent(channelId, TOTAL_REQUIRED, TOTAL_REQUIRED);
-    const updatedState = coordinator(state, action);
+    const updatedState = walletReducer(state, action);
     const updatedChannel = states.getChannelStatus(updatedState, channelId);
     expect(updatedChannel.type).toEqual(channelStates.A_WAIT_FOR_POST_FUND_SETUP);
   });
