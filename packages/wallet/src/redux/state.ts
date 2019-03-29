@@ -1,6 +1,7 @@
 import { OutboxState, EMPTY_OUTBOX_STATE } from './outbox/state';
 import { FundingState, EMPTY_FUNDING_STATE } from './fundingState/state';
 import { ChannelState } from './channelState/state';
+import { Properties } from './utils';
 
 export type WalletState = WaitForLogin | WaitForAdjudicator | MetaMaskError | Initialized;
 
@@ -82,6 +83,3 @@ export function initialized(params: Properties<Initialized>): Initialized {
     adjudicator,
   };
 }
-
-// Constructs a type that must include all properties of T apart from 'type' and 'stage'
-type Properties<T> = Pick<T, Exclude<keyof T, 'type' | 'stage'>> & { [x: string]: any };

@@ -2,6 +2,9 @@ import { OutboxState, SideEffects, EMPTY_OUTBOX_STATE } from './outbox/state';
 import { FundingState, EMPTY_FUNDING_STATE } from './fundingState/state';
 import { ChannelState } from './channelState/state';
 
+// Constructs a type that must include all properties of T apart from 'type' and 'stage'
+export type Properties<T> = Pick<T, Exclude<keyof T, 'type' | 'stage'>> & { [x: string]: any };
+
 export interface StateWithSideEffects<T> {
   state: T;
   sideEffects?: SideEffects;
