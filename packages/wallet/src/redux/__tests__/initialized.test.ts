@@ -1,4 +1,4 @@
-import { initializedReducer } from '../initialized/reducer';
+import { walletReducer } from '../reducer';
 
 import * as states from '../state';
 import * as fundingStates from '../fundingState/state';
@@ -21,7 +21,7 @@ const initializedState = states.initialized({ ...defaults });
 
 describe('when the player initializes a channel', () => {
   const action = actions.channel.channelInitialized();
-  const updatedState = initializedReducer(initializedState, action);
+  const updatedState = walletReducer(initializedState, action);
 
   it('applies the channel reducer', async () => {
     const ids = Object.keys(updatedState.channelState.initializingChannels);
@@ -34,7 +34,7 @@ describe('when the player initializes a channel', () => {
 
 describe.skip('when a funding related action arrives', () => {
   const action = actions.funding.fundingReceivedEvent('0xf00', '0x', '0x');
-  const updatedState = initializedReducer(initializedState, action);
+  const updatedState = walletReducer(initializedState, action);
 
   it('applies the funding state reducer', async () => {
     expect(updatedState.fundingState).toEqual(fundingStates.FUNDING_NOT_STARTED);
@@ -87,7 +87,7 @@ describe('When the channel reducer declares a side effect', () => {
 
   const action = actions.channel.challengeRequested();
 
-  const updatedState = initializedReducer(state, action);
+  const updatedState = walletReducer(state, action);
 
   expect(updatedState.outboxState.messageOutbox![0].type).toEqual(outgoing.CHALLENGE_REJECTED);
   expect(updatedState.outboxState!.actionOutbox![0].type).toEqual(

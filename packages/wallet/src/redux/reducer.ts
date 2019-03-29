@@ -17,9 +17,15 @@ export const walletReducer = (
 ): states.WalletState => {
   const nextState = { ...state, outboxState: clearOutbox(state.outboxState, action) };
 
-  switch (nextState.stage) {
-    case states.INITIALIZING:
-      return initializingReducer(nextState, action);
+  switch (nextState.type) {
+    case states.WAIT_FOR_LOGIN:
+      return waitForLoginReducer(nextState, action);
+    case states.WAIT_FOR_ADJUDICATOR:
+      return waitForAdjudicatorReducer(nextState, action);
+    case states.METAMASK_ERROR:
+      // We stay in the metamask error state until a change to
+      // metamask settings forces a refresh
+      return state;
     case states.WALLET_INITIALIZED:
       return initializedReducer(nextState, action);
     default:
@@ -28,9 +34,9 @@ export const walletReducer = (
 };
 
 export function initializedReducer(
-  state: states.InitializedState,
+  state: states.Initialized,
   action: actions.WalletAction,
-): states.InitializedState {
+): states.WalletState {
   const { state: newState, sideEffects } = combinedReducer(state, action);
   // Since the wallet state itself has an outbox state, we need to apply the side effects
   // by hand.
@@ -46,25 +52,7 @@ const combinedReducer = combineReducersWithSideEffects({
   fundingState: fundingStateReducer,
 });
 
-export const initializingReducer = (
-  state: states.InitializingState,
-  action: actions.WalletAction,
-): states.WalletState => {
-  switch (state.type) {
-    case states.WAIT_FOR_LOGIN:
-      return waitForLoginReducer(state, action);
-    case states.WAIT_FOR_ADJUDICATOR:
-      return waitForAdjudicatorReducer(state, action);
-    case states.METAMASK_ERROR:
-      // We stay in the metamask error state until a change to
-      // metamask settings forces a refresh
-      return state;
-    default:
-      return unreachable(state);
-  }
-};
-
-const waitForLoginReducer = (state: states.WaitForLogin, action: actions.WalletAction): states.InitializingState => {
+const waitForLoginReducer = (state: states.WaitForLogin, action: actions.WalletAction): states.WalletState => {
   switch (action.type) {
     case actions.LOGGED_IN:
       return states.waitForAdjudicator({ ...state, uid: action.uid });
