@@ -58,7 +58,7 @@ export const emptyState = {
 };
 
 export function waitForLogin(): WaitForLogin {
-  return { type: WAIT_FOR_LOGIN, ...emptyState, };
+  return { type: WAIT_FOR_LOGIN, ...emptyState };
 }
 
 export function metaMaskError(params: Properties<MetaMaskError>): MetaMaskError {

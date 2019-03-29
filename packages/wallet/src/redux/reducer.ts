@@ -52,7 +52,10 @@ const combinedReducer = combineReducersWithSideEffects({
   fundingState: fundingStateReducer,
 });
 
-const waitForLoginReducer = (state: states.WaitForLogin, action: actions.WalletAction): states.WalletState => {
+const waitForLoginReducer = (
+  state: states.WaitForLogin,
+  action: actions.WalletAction,
+): states.WalletState => {
   switch (action.type) {
     case actions.LOGGED_IN:
       return states.waitForAdjudicator({ ...state, uid: action.uid });
@@ -80,4 +83,3 @@ const waitForAdjudicatorReducer = (
       return state;
   }
 };
-
