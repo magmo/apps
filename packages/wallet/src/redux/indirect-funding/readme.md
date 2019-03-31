@@ -4,7 +4,7 @@ The indirect funding module coordinates the process of funding an application ch
 
 ## How do actions get routed to the indirect funding module?
 
-We the `process` property added to actions to decide which actions to route to the indirect funding. For example, the following action will be processed by the indirect funding module:
+The wallet uses the `process` on the action to decide which module to route it to. For example, the following action will be processed by the indirect funding module:
 
 ```js
 {
@@ -24,10 +24,10 @@ The `indirect-funding` module takes top priority for actions marked for it: thes
 
 ## What is the signature of the indirect-funding reducer?
 
-For the time being, the indirect-funding reducer will accept a _wallet state_ and return a _wallet state_:
+For the time being, the indirect-funding reducer will accept an _initialized wallet state_ and return an _initialized wallet state_:
 
 ```ts
-function indirectFundingReducer(state: WalletState, action: IndirectFundingAction): WalletState {
+function indirectFundingReducer(state: Initialized, action: IndirectFundingAction): Initialized {
   // ...
 }
 ```
@@ -58,6 +58,26 @@ graph TD
   N8 --> |PostFundSetup received, send Update| N9(WaitForLedgerUpdate1)
   N9 --> |Update received| N10(Success)
 ```
+
+### Example: receiving PostFundSetup1
+
+1. The `MessageReceiver` receives a message:
+   ```
+   { process: 'indirect-funding', channelId: 'abc123', data: '0x123a32...' }
+   ```
+2. It triggers a `MessageReceived` action:
+   ```
+   { type: 'message-received', process: 'indirect-funding', channelId: 'abc123', commitment: '0x123a32...' }
+   ```
+3. This is routed to the `IndirectFundingReducer`, which looks to see if there's a current indirect funding for channel `abc123`. The player on the state is player A, so the request is delegated to the `PlayerAReducer`.
+4. The `PlayerAReducer` sees that it is in the `WaitForLedgerPostFundSetup1` state.
+5. It fetches the ledger channel data, `ledgerState`, from the channel store and calls the channel reducer:
+   ```ts
+   newLedgerState = channelReducer(ledgerState, action);
+   ```
+6. It sees whether `newLedgerState` is now in the `running` state (which will be the case if it received a valid PostFundSetup). If it is, it constructs the state change that will fund the application channel, `fundingCommitment`.
+7. It then calls the `channelReducer` again with an `ownPositionReceived` action, which will cause it to check, store and sign the `fundingCommitment`.
+8. It then sends this `fundingCommitment` to its opponent.
 
 ## What about re-using our existing direct funding code?
 
