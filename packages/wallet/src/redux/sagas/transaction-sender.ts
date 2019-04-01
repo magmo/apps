@@ -31,7 +31,7 @@ export function* transactionSender(
     ),
   );
   const confirmedTransaction = yield call([transactionResult, transactionResult.wait]);
-  yield put(actions.transactionConfirmed(channelId, confirmedTransaction.contractAddress));
+  yield put(actions.transactionConfirmed(channelId, process, confirmedTransaction.contractAddress));
   // TODO: Figure out how to wait for a transaction to be X blocks deep
   // yield call(transactionResult.wait, 5);
   yield put(actions.transactionFinalized(channelId, process));
