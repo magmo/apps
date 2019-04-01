@@ -293,29 +293,6 @@ export const messageRelayRequested = (to: string, data: string) => ({
 export type MessageRelayRequested = ReturnType<typeof messageRelayRequested>;
 
 /**
- * The type of event when a commitment relay to the opponent's wallet is requested.
- */
-export const COMMITMENT_RELAY_REQUESTED = 'WALLET.MESSAGING.COMMITMENT_RELAY_REQUESTED';
-/**
- * @ignore
- */
-export const commitmentRelayRequested = (
-  to: string,
-  commitment: Commitment,
-  signature: string,
-) => ({
-  type: COMMITMENT_RELAY_REQUESTED as typeof COMMITMENT_RELAY_REQUESTED,
-  to,
-  commitment,
-  signature,
-});
-
-/**
- * The event emitted when the wallet requests a commitment be relayed to the opponent's wallet.
- */
-export type CommitmentRelayRequested = ReturnType<typeof commitmentRelayRequested>;
-
-/**
  * The type for events where a challenge position is received from the wallet.
  */
 export const CHALLENGE_COMMITMENT_RECEIVED = 'WALLET.MESSAGING.CHALLENGE_COMMITMENT_RECEIVED';
@@ -384,7 +361,6 @@ export type WalletEventType =
   | typeof CHALLENGE_REJECTED
   | typeof CHALLENGE_RESPONSE_REQUESTED
   | typeof CLOSE_SUCCESS
-  | typeof COMMITMENT_RELAY_REQUESTED
   | typeof CONCLUDE_FAILURE
   | typeof CONCLUDE_SUCCESS
   | typeof FUNDING_FAILURE

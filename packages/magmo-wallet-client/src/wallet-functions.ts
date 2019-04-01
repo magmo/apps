@@ -19,7 +19,6 @@ import {
   receiveMessage,
   createChallenge,
   respondToChallenge,
-  receiveCommitment,
   initializeChannelRequest,
 } from './wallet-instructions';
 import { Commitment } from 'fmg-core';
@@ -183,19 +182,6 @@ export async function signCommitment(iFrameId: string, commitment: Commitment): 
 
   iFrame.contentWindow.postMessage(message, '*');
   return signPromise;
-}
-
-/**
- * Relays a commitment to the wallet, from the opponent's wallet.
- * Used, for example, when the opponent's wallet is funding a channel through a ledger channel.
- * @param iFrameId The id of the embedded wallet iframe.
- * @param commitment The commitment to send to the wallet that was received from the opponent's wallet.
- * @param signature The signature that was received from the opponent's wallet.
- */
-export function relayCommitment(iFrameId: string, commitment: Commitment, signature: string) {
-  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
-  const message = receiveCommitment(commitment, signature);
-  iFrame.contentWindow.postMessage(message, '*');
 }
 
 /**

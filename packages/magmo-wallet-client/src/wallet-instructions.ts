@@ -111,17 +111,6 @@ export const receiveMessage = (data: string) => ({
 });
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 
-// Called when a "wallet commitment" is received from the opponent.
-// By "wallet commitment" we mean a commitment that was created directly from the opponent's
-// wallet meant for wallet-to-wallet communication (e.g. commitments used to set up a ledger channel)
-export const RECEIVE_COMMITMENT = 'WALLET.MESSAGING.RECEIVE_COMMITMENT';
-export const receiveCommitment = (commitment: Commitment, signature: string) => ({
-  type: RECEIVE_COMMITMENT,
-  commitment,
-  signature,
-});
-export type ReceiveCommitment = ReturnType<typeof receiveCommitment>;
-
 // Requests
 // ========
 export type RequestAction =
