@@ -1,1 +1,1 @@
-export type WalletProcess = 'indirect_funding' | 'direct_funding';
+export type WalletProcess = 'IndirectFunding' | 'DirectFunding';
