@@ -5,6 +5,7 @@ import { StateWithSideEffects } from '../../../utils';
 import * as actions from '../../../actions';
 import * as states from './state';
 import * as fundingStates from '../state';
+import { WalletProcedure } from '../../../actions';
 
 export const depositingReducer = (
   state: states.Depositing,
@@ -87,7 +88,7 @@ const depositTransactionFailedReducer = (
               state.requestedYourContribution,
             ),
             channelId: action.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };

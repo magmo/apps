@@ -1,7 +1,7 @@
 import * as channelStates from '../state';
 import * as actions from '../../actions';
 
-import { WalletAction } from '../../actions';
+import { WalletAction, WalletProcedure } from '../../actions';
 import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';
 import {
   signCommitment,
@@ -88,7 +88,7 @@ const closeTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };
@@ -213,7 +213,7 @@ const approveCloseOnChainReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };

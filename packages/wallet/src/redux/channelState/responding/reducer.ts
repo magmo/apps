@@ -1,5 +1,5 @@
 import * as states from '../state';
-import { WalletAction } from '../../actions';
+import { WalletAction, WalletProcedure } from '../../actions';
 import * as actions from '../../actions';
 import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';
 import { signCommitment } from '../../../utils/signing-utils';
@@ -67,7 +67,7 @@ const responseTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };
@@ -106,7 +106,7 @@ export const chooseResponseReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };
@@ -155,7 +155,7 @@ export const takeMoveInAppReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
           displayOutbox: showWallet(),
         },

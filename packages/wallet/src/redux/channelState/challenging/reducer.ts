@@ -1,6 +1,6 @@
 import * as states from '../state';
 import * as actions from '../../actions';
-import { WalletAction } from '../../actions';
+import { WalletAction, WalletProcedure } from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../../utils/transaction-generator';
 import {
@@ -69,7 +69,7 @@ const challengeTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };
@@ -98,7 +98,7 @@ const approveChallengeReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: actions.WalletProcess.DirectFunding,
+            procedure: WalletProcedure.DirectFunding,
           },
         },
       };

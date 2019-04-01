@@ -7,6 +7,7 @@ import { itTransitionsToChannelStateType } from '../../../__tests__/helpers';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import * as SigningUtil from '../../../../utils/signing-utils';
+import { WalletProcedure } from '../../../actions';
 
 const {
   asPrivateKey,
@@ -70,23 +71,15 @@ describe('when in WaitForWithdrawalInitiation', () => {
   const state = states.waitForWithdrawalInitiation(defaults);
 
   describe('and the transaction is submitted', () => {
-    const action = actions.transactionSubmitted(
-      channelId,
-      actions.WalletProcess.DirectFunding,
-      '0x0',
-    );
+    const action = actions.transactionSubmitted(channelId, WalletProcedure.DirectFunding, '0x0');
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_WITHDRAWAL_CONFIRMATION, updatedState);
   });
   describe('and the transaction submission errors', () => {
-    const action = actions.transactionSubmissionFailed(
-      channelId,
-      actions.WalletProcess.DirectFunding,
-      {
-        code: 0,
-      },
-    );
+    const action = actions.transactionSubmissionFailed(channelId, WalletProcedure.DirectFunding, {
+      code: 0,
+    });
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WITHDRAW_TRANSACTION_FAILED, updatedState);
@@ -115,7 +108,7 @@ describe('when in WaitForWithdrawalConfirmation', () => {
   const state = states.waitForWithdrawalConfirmation(defaults);
 
   describe('and the transaction is confirmed', () => {
-    const action = actions.transactionConfirmed(channelId, actions.WalletProcess.DirectFunding);
+    const action = actions.transactionConfirmed(channelId, WalletProcedure.DirectFunding);
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_WITHDRAWAL_SUCCESS, updatedState);

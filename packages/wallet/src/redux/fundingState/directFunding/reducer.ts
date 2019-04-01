@@ -8,6 +8,7 @@ import { StateWithSideEffects } from 'src/redux/utils';
 import { depositingReducer } from './depositing/reducer';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
+import { WalletProcedure } from '../../actions';
 
 export const directFundingStatusReducer = (
   state: states.DirectFundingStatus,
@@ -64,7 +65,7 @@ const notSafeToDepositReducer = (
               ),
               channelId: action.channelId,
 
-              process: actions.WalletProcess.DirectFunding,
+              procedure: WalletProcedure.DirectFunding,
             },
           },
         };

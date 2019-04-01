@@ -14,7 +14,7 @@ import { StateName, GameState } from '../game/state';
 export default function* openGameSaga() {
   // could be more efficient by only watching actions that could change the state
   // this is more robust though, so stick to watching all actions for the time being
-  let openGameSyncerProcess: any = null;
+  let openGameSyncerprocedure: any = null;
   let myGameIsOnFirebase = false;
 
   while (true) {
