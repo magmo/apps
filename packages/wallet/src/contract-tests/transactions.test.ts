@@ -7,6 +7,7 @@ import {
   transactionFinalized,
   transactionSentToMetamask,
   transactionSubmitted,
+  Process,
 } from '../redux/actions';
 import { transactionSender } from '../redux/sagas/transaction-sender';
 import { signCommitment, signVerificationData } from '../utils/signing-utils';
@@ -47,9 +48,11 @@ describe('transactions', () => {
   }
 
   async function testTransactionSender(transactionToSend) {
-    const saga = transactionSender(transactionToSend, 'channelId');
+    const process = Process.DirectFunding;
+    const channelId = 'channelId';
+    const saga = transactionSender(transactionToSend, channelId, process);
     saga.next();
-    expect(saga.next(provider).value).toEqual(put(transactionSentToMetamask('channelId')));
+    expect(saga.next(provider).value).toEqual(put(transactionSentToMetamask(channelId, process)));
     saga.next();
     const signer = provider.getSigner();
     const contractAddress = await getAdjudicatorContractAddress(provider);
@@ -58,15 +61,15 @@ describe('transactions', () => {
 
     saga.next();
     expect(saga.next(transactionReceipt).value).toEqual(
-      put(transactionSubmitted('channelId', transactionReceipt.hash || '')),
+      put(transactionSubmitted(channelId, process, transactionReceipt.hash || '')),
     );
     const confirmedTransaction = await transactionReceipt.wait();
     saga.next();
     expect(saga.next(confirmedTransaction).value).toEqual(
-      put(transactionConfirmed('channelId', confirmedTransaction.contractAddress)),
+      put(transactionConfirmed(channelId, process, confirmedTransaction.contractAddress)),
     );
 
-    expect(saga.next().value).toEqual(put(transactionFinalized()));
+    expect(saga.next().value).toEqual(put(transactionFinalized(channelId, process)));
     expect(saga.next().done).toBe(true);
   }
 

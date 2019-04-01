@@ -83,7 +83,14 @@ const closeTransactionFailedReducer = (
       const transactionRequest = createConcludeAndWithdrawTransaction(args);
       return {
         state: channelStates.waitForCloseSubmission({ ...state }),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
   }
   return { state };
@@ -201,7 +208,14 @@ const approveCloseOnChainReducer = (
           ...state,
           userAddress: action.withdrawAddress,
         }),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
   }
   return { state };

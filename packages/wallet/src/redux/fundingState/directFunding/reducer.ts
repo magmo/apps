@@ -56,12 +56,15 @@ const notSafeToDepositReducer = (
         return {
           state: depositingStates.waitForTransactionSent({ ...state }),
           sideEffects: {
+            // TODO: This will be factored out as channel reducers should not be sending transactions itself
             transactionOutbox: {
               transactionRequest: createDepositTransaction(
                 state.channelId,
                 state.requestedYourContribution,
               ),
               channelId: action.channelId,
+
+              process: actions.Process.DirectFunding,
             },
           },
         };
