@@ -3,6 +3,7 @@ import * as channel from './channelState/actions';
 import * as funding from './fundingState/actions';
 import { WalletProcedure } from './types';
 import { Commitment } from 'fmg-core';
+import { WalletProcess } from 'magmo-wallet-client';
 
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
@@ -131,9 +132,10 @@ export type RetryTransaction = ReturnType<typeof retryTransaction>;
 
 export type Message = 'FundingDeclined';
 export const MESSAGE_RECEIVED = 'WALLET.COMMON.MESSAGE_RECEIVED';
-export const messageReceived = (channelId: string, data: Message) => ({
+export const messageReceived = (channelId: string, process: WalletProcess, data: Message) => ({
   type: MESSAGE_RECEIVED as typeof MESSAGE_RECEIVED,
   channelId,
+  process,
   data,
 });
 export type MessageReceived = ReturnType<typeof messageReceived>;
@@ -141,6 +143,7 @@ export type MessageReceived = ReturnType<typeof messageReceived>;
 export const COMMITMENT_RECEIVED = 'WALLET.COMMON.COMMITMENT_RECEIVED';
 export const commitmentReceived = (
   channelId: string,
+  process: WalletProcess,
   commitment: Commitment,
   signature: string,
 ) => ({

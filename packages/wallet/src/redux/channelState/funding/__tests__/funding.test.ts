@@ -131,7 +131,7 @@ describe('start in WaitForFundingApproval', () => {
   describe('incoming action: Funding declined message received', () => {
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.approveFunding(testDefaults);
-    const action = actions.messageReceived(channelId, 'FundingDeclined');
+    const action = actions.messageReceived(channelId, 'DirectFunding', 'FundingDeclined');
     const updatedState = fundingReducer(state, action);
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
@@ -160,7 +160,7 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
 
   describe('incoming action: Funding declined message received', () => {
     const state = startingState('A');
-    const action = actions.messageReceived(channelId, 'FundingDeclined');
+    const action = actions.messageReceived(channelId, 'DirectFunding', 'FundingDeclined');
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_DECLINED, updatedState);
@@ -180,7 +180,12 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     const state = startingState('A');
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-    const action = actions.commitmentReceived(channelId, postFundCommitment1, MOCK_SIGNATURE);
+    const action = actions.commitmentReceived(
+      channelId,
+      'DirectFunding',
+      postFundCommitment1,
+      MOCK_SIGNATURE,
+    );
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
@@ -193,7 +198,12 @@ describe('start in WaitForFundingAndPostFundSetup', () => {
     const validateMock = jest.fn().mockReturnValue(true);
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
-    const action = actions.commitmentReceived(channelId, postFundCommitment1, MOCK_SIGNATURE);
+    const action = actions.commitmentReceived(
+      channelId,
+      'DirectFunding',
+      postFundCommitment1,
+      MOCK_SIGNATURE,
+    );
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
@@ -223,10 +233,14 @@ describe('start in WaitForFundingConfirmation', () => {
     const action = actions.internal.directFundingConfirmed(channelId);
     const updatedState = fundingReducer(state, action);
 
-    const sendCommitmentAction = outgoing.commitmentRelayRequested(
+    const sendCommitmentAction = outgoing.messageRelayRequested(
       state.participants[1 - state.ourIndex],
-      postFundCommitment2,
-      MOCK_SIGNATURE,
+      state.channelId,
+      'DirectFunding',
+      {
+        commitment: postFundCommitment2,
+        signature: MOCK_SIGNATURE,
+      },
     );
 
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);

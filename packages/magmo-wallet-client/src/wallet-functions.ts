@@ -184,12 +184,13 @@ export async function signCommitment(iFrameId: string, commitment: Commitment): 
   return signPromise;
 }
 
+export const;
 /**
  * Relays a message to the wallet, from the opponent's wallet.
  * @param iFrameId The id of the embedded wallet iframe.
  * @param data The message to send to the wallet that was received from the opponent's wallet.
  */
-export function relayMessage(iFrameId: string, data) {
+export function relayMessage(iFrameId: string, channelId: string, process: WalletProcess, data) {
   const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = receiveMessage(data);
   iFrame.contentWindow.postMessage(message, '*');

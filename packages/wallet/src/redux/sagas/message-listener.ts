@@ -38,11 +38,13 @@ export function* messageListener() {
         yield put(actions.channel.opponentCommitmentReceived(action.commitment, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
-        const { data, channelId } = action;
+        const { data, channelId, process } = action as incoming.ReceiveMessage;
         if ('commitment' in data) {
-          yield put(actions.commitmentReceived(channelId, data.commitment, data.signature));
+          yield put(
+            actions.commitmentReceived(channelId, process, data.commitment, data.signature),
+          );
         } else {
-          yield put(actions.messageReceived(channelId, data));
+          yield put(actions.messageReceived(channelId, process, data));
         }
         break;
       case incoming.RESPOND_TO_CHALLENGE:

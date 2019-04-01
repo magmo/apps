@@ -1,4 +1,5 @@
 import { Commitment } from 'fmg-core';
+import { WalletProcess, WalletMessage } from './wallet-types';
 
 export enum PlayerIndex {
   'A' = 0,
@@ -105,9 +106,9 @@ export type ConcludeChannelRequest = ReturnType<typeof concludeChannelRequest>;
 // wallet meant for wallet-to-wallet communication (e.g. communicating the address of the
 // adjudicator).
 export const RECEIVE_MESSAGE = 'WALLET.MESSAGING.RECEIVE_MESSAGE';
-export const receiveMessage = data => ({
+export const receiveMessage = (message: WalletMessage) => ({
   type: RECEIVE_MESSAGE,
-  data,
+  message,
 });
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 
