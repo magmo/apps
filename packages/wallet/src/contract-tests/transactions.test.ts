@@ -7,6 +7,7 @@ import {
   transactionFinalized,
   transactionSentToMetamask,
   transactionSubmitted,
+  WalletProcess,
 } from '../redux/actions';
 import { transactionSender } from '../redux/sagas/transaction-sender';
 import { signCommitment, signVerificationData } from '../utils/signing-utils';
@@ -47,7 +48,7 @@ describe('transactions', () => {
   }
 
   async function testTransactionSender(transactionToSend) {
-    const process = 'DirectFunding';
+    const process = WalletProcess.DirectFunding;
     const channelId = 'channelId';
     const saga = transactionSender(transactionToSend, channelId, process);
     saga.next();

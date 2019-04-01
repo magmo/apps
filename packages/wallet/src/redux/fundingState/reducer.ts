@@ -8,7 +8,6 @@ import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 import { directFundingStatusReducer } from './directFunding/reducer';
 import { isfundingAction } from './actions';
-import { WalletProcess } from 'magmo-wallet-client';
 
 export const fundingStateReducer = (
   state: states.FundingState,
@@ -50,7 +49,7 @@ export const fundingStateReducer = (
         ? {
             transactionRequest: createDepositTransaction(action.channelId, action.requiredDeposit),
             channelId,
-            process: 'DirectFunding' as WalletProcess,
+            process: actions.WalletProcess.DirectFunding,
           }
         : undefined;
 

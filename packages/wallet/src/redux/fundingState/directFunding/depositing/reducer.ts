@@ -87,7 +87,7 @@ const depositTransactionFailedReducer = (
               state.requestedYourContribution,
             ),
             channelId: action.channelId,
-            process: 'DirectFunding',
+            process: actions.WalletProcess.DirectFunding,
           },
         },
       };

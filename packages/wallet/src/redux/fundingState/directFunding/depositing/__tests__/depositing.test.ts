@@ -49,7 +49,10 @@ describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
   describe(whenActionArrives(actions.TRANSACTION_SENT_TO_METAMASK), () => {
     // player A scenario
     const state = states.waitForTransactionSent(defaultsForA);
-    const action = actions.transactionSentToMetamask(channelId, 'DirectFunding');
+    const action = actions.transactionSentToMetamask(
+      channelId,
+      actions.WalletProcess.DirectFunding,
+    );
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_APPROVAL, updatedState);
@@ -60,7 +63,11 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
   describe(whenActionArrives(actions.TRANSACTION_SUBMITTED), () => {
     // player A scenario
     const state = states.waitForDepositApproval(defaultsForA);
-    const action = actions.transactionSubmitted(channelId, 'DirectFunding', '0x0');
+    const action = actions.transactionSubmitted(
+      channelId,
+      actions.WalletProcess.DirectFunding,
+      '0x0',
+    );
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
@@ -69,9 +76,13 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
   describe(whenActionArrives(actions.TRANSACTION_SUBMISSION_FAILED), () => {
     // player A scenario
     const state = states.waitForDepositApproval(defaultsForA);
-    const action = actions.transactionSubmissionFailed(channelId, 'DirectFunding', {
-      code: '1234',
-    });
+    const action = actions.transactionSubmissionFailed(
+      channelId,
+      actions.WalletProcess.DirectFunding,
+      {
+        code: '1234',
+      },
+    );
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.DEPOSIT_TRANSACTION_FAILED, updatedState);
@@ -83,7 +94,7 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_CONFIRMATION), () => {
     // player A scenario
     const state = states.waitForDepositConfirmation(defaultsWithTx);
     // TODO: This needs to change
-    const action = actions.transactionConfirmed(TX_HASH, 'DirectFunding');
+    const action = actions.transactionConfirmed(TX_HASH, actions.WalletProcess.DirectFunding);
     const updatedState = depositingReducer(state, action);
 
     itChangesChannelFundingStatusTo(directFundingStates.SAFE_TO_DEPOSIT, updatedState);

@@ -2,7 +2,7 @@ import { Channel, CommitmentType, Commitment } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
 import { waitForPreFundSetup } from '../channelState/state';
-import { WalletProcess } from 'magmo-wallet-client';
+import { WalletProcess } from '../actions';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const channelNonce = 4;
@@ -23,7 +23,7 @@ export const fundingState = {
 export const mockTransactionOutboxItem = {
   transactionRequest: { to: '0xabc' },
   channelId: 'channelId',
-  process: 'DirectFunding' as WalletProcess,
+  process: WalletProcess.DirectFunding,
 };
 
 export const twoThree = [bigNumberify(2).toHexString(), bigNumberify(3).toHexString()];

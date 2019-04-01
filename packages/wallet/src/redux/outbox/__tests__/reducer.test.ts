@@ -32,7 +32,10 @@ describe('when a side effect occured', () => {
   });
 
   it('clears the first element of the transactionOutbox', () => {
-    const action = actions.transactionSentToMetamask(channelId, 'DirectFunding');
+    const action = actions.transactionSentToMetamask(
+      channelId,
+      actions.WalletProcess.DirectFunding,
+    );
     const updatedState = clearOutbox(state, action);
     expect(updatedState.transactionOutbox).toMatchObject(transactionOutbox.slice(1));
   });
