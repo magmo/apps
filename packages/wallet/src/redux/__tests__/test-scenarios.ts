@@ -2,6 +2,7 @@ import { Channel, CommitmentType, Commitment } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
 import { waitForPreFundSetup } from '../channelState/state';
+import { Process } from '../actions';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const channelNonce = 4;
@@ -22,6 +23,7 @@ export const fundingState = {
 export const mockTransactionOutboxItem = {
   transactionRequest: { to: '0xabc' },
   channelId: 'channelId',
+  process: Process.DirectFunding,
 };
 
 export const twoThree = [bigNumberify(2).toHexString(), bigNumberify(3).toHexString()];

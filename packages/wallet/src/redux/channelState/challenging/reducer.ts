@@ -64,7 +64,14 @@ const challengeTransactionFailedReducer = (
       );
       return {
         state: states.waitForChallengeInitiation(state),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
   }
   return { state };
@@ -86,7 +93,14 @@ const approveChallengeReducer = (
       );
       return {
         state: states.waitForChallengeInitiation(state),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
     case actions.channel.CHALLENGE_REJECTED:
       return {

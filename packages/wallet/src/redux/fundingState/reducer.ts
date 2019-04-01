@@ -49,6 +49,7 @@ export const fundingStateReducer = (
         ? {
             transactionRequest: createDepositTransaction(action.channelId, action.requiredDeposit),
             channelId,
+            process: actions.Process.DirectFunding,
           }
         : undefined;
 

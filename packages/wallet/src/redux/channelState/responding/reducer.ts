@@ -62,7 +62,14 @@ const responseTransactionFailedReducer = (
       );
       return {
         state: states.initiateResponse(state),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
     case actions.BLOCK_MINED:
       if (
@@ -94,7 +101,14 @@ export const chooseResponseReducer = (
       );
       return {
         state: states.initiateResponse(state),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
     case actions.channel.RESPOND_WITH_REFUTE_CHOSEN:
       return { state: states.initiateResponse(state) };
@@ -138,7 +152,11 @@ export const takeMoveInAppReducer = (
           penultimateCommitment: state.lastCommitment,
         }),
         sideEffects: {
-          transactionOutbox: { transactionRequest, channelId: state.channelId },
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
           displayOutbox: showWallet(),
         },
       };

@@ -103,7 +103,7 @@ describe('when in TAKE_MOVE_IN_APP', () => {
 describe('when in INITIATE_RESPONSE', () => {
   const state = states.initiateResponse(defaults);
   describe('when the challenge response is initiated', () => {
-    const action = actions.transactionSentToMetamask(channelId);
+    const action = actions.transactionSentToMetamask(channelId, actions.Process.DirectFunding);
     const updatedState = respondingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_SUBMISSION, updatedState);
   });
@@ -117,12 +117,14 @@ describe('when in INITIATE_RESPONSE', () => {
 describe('when in WAIT_FOR_RESPONSE_SUBMISSION', () => {
   const state = states.waitForResponseSubmission(defaults);
   describe('when the challenge response is submitted', () => {
-    const action = actions.transactionSubmitted(channelId, '0x0');
+    const action = actions.transactionSubmitted(channelId, actions.Process.DirectFunding, '0x0');
     const updatedState = respondingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_CONFIRMATION, updatedState);
   });
   describe('when an error occurs when submitting a challenge response', () => {
-    const action = actions.transactionSubmissionFailed(channelId, { code: 0 });
+    const action = actions.transactionSubmissionFailed(channelId, actions.Process.DirectFunding, {
+      code: 0,
+    });
     const updatedState = respondingReducer(state, action);
     itTransitionsToChannelStateType(states.RESPONSE_TRANSACTION_FAILED, updatedState);
   });
@@ -136,7 +138,7 @@ describe('when in WAIT_FOR_RESPONSE_SUBMISSION', () => {
 describe('when in WAIT_FOR_RESPONSE_CONFIRMED', () => {
   const state = states.waitForResponseConfirmation(defaults);
   describe('when the challenge response is confirmed', () => {
-    const action = actions.transactionConfirmed(channelId);
+    const action = actions.transactionConfirmed(channelId, actions.Process.DirectFunding);
     const updatedState = respondingReducer(state, action);
     itTransitionsToChannelStateType(states.ACKNOWLEDGE_CHALLENGE_COMPLETE, updatedState);
   });

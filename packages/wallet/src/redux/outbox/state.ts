@@ -1,5 +1,6 @@
 import { TransactionRequest } from 'ethers/providers';
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
+import { Process } from '../actions';
 
 export const EMPTY_OUTBOX_STATE: OutboxState = {
   displayOutbox: [],
@@ -10,6 +11,7 @@ export const EMPTY_OUTBOX_STATE: OutboxState = {
 export interface TransactionOutboxItem {
   transactionRequest: TransactionRequest;
   channelId: string;
+  process: Process;
 }
 export interface OutboxState {
   displayOutbox: DisplayAction[];

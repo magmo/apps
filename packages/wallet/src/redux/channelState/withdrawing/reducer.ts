@@ -62,7 +62,14 @@ const withdrawTransactionFailedReducer = (
       );
       return {
         state: states.waitForWithdrawalInitiation({ ...state }),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
   }
   return { state };
@@ -95,7 +102,14 @@ const approveWithdrawalReducer = (
           ...state,
           userAddress: action.destinationAddress,
         }),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            process: actions.Process.DirectFunding,
+          },
+        },
       };
     case actions.channel.WITHDRAWAL_REJECTED:
       return { state: states.acknowledgeCloseSuccess(state) };
