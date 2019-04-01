@@ -82,3 +82,69 @@ graph TD
 ## What about re-using our existing direct funding code?
 
 I think that, for the time being, we should just duplicate the direct funding code inside the indirect funding. It should be easy to factor this out later and it avoids having to decide upfront what the interface should be between these two different processes.
+
+## State machines
+
+```mermaid
+  graph TD
+  linkStyle default interpolate basis
+    SOME_STATE -->|SOME_ACTION| ANOTHER_STATE
+
+    ANOTHER_STATE -->|SOME_ACTION| terminated{TERMINATED}
+```
+
+Once the state machine reaches a terminated state, the process is dismantled.
+
+### Player A
+
+```mermaid
+  graph TD
+  linkStyle default interpolate basis
+    WAIT_FOR_APPROVAL -->|INDIRECT_FUNDING_APPROVED| WAIT_FOR_INDIRECT_STRATEGY_RESPONSE[WAIT_FOR_STRATEGY_RESPONSE: INDIRECT]
+    WAIT_FOR_APPROVAL -->|DIRECT_FUNDING_APPROVED| WAIT_FOR_DIRECT_STRATEGY_RESPONSE[WAIT_FOR_STRATEGY_RESPONSE: DIRECT]
+    WAIT_FOR_APPROVAL -->|REJECTED| earlyFail{FAIL}
+
+    WAIT_FOR_INDIRECT_STRATEGY_RESPONSE -->|STRATEGY_AGREED| WAIT_FOR_PREFUND_SETUP1
+    WAIT_FOR_INDIRECT_STRATEGY_RESPONSE -->|STRATEGY_REFUSED| fail{ FAIL }
+
+    WAIT_FOR_PREFUND_SETUP1 -->|RECEIVE_COMMITMENT| indirect[WAIT_FOR_DIRECT_FUNDING]
+
+    indirect[WAIT_FOR_DIRECT_FUNDING] -->|FUNDING_EVENT| indirect[WAIT_FOR_DIRECT_FUNDING]
+    indirect[WAIT_FOR_DIRECT_FUNDING] -->|"FUNDING_RECEIVED_EVENT(funded)"| WAIT_FOR_POST_FUND_SETUP1
+
+    WAIT_FOR_POST_FUND_SETUP1 --> |RECEIVE_COMMITMENT| WAIT_FOR_LEDGER_UPDATE1
+
+    WAIT_FOR_LEDGER_UPDATE1 --> |RECEIVE_COMMITMENT| success{ SUCCESS }
+
+    WAIT_FOR_DIRECT_STRATEGY_RESPONSE -->|STRATEGY_AGREED| direct[WAIT_FOR_DIRECT_FUNDING]
+
+    direct[WAIT_FOR_DIRECT_FUNDING] -->|FUNDING_EVENT| direct[WAIT_FOR_DIRECT_FUNDING]
+    direct[WAIT_FOR_DIRECT_FUNDING] -->|"FUNDING_RECEIVED_EVENT(funded)"| success{ SUCCESS }
+
+    WAIT_FOR_DIRECT_STRATEGY_RESPONSE -->|STRATEGY_REFUSED| fail{ FAIL }
+```
+
+### Player B
+
+```mermaid
+  graph TD
+  linkStyle default interpolate basis
+    WAIT_FOR_STRATEGY_REQUEST -->|INDIRECT| indirectStrategy[WAIT_FOR_APPROVAL]
+    WAIT_FOR_STRATEGY_REQUEST -->|DIRECT| directStrategy[WAIT_FOR_APPROVAL]
+
+    indirectStrategy[WAIT_FOR_APPROVAL] -->|FUNDING_APPROVED| WAIT_FOR_PREFUND_SETUP0
+    indirectStrategy[WAIT_FOR_APPROVAL] -->|REJECTED| fail{FAIL}
+
+    WAIT_FOR_PREFUND_SETUP0 -->|RECEIVE_COMMITMENT| WAIT_FOR_DIRECT_FUNDING
+
+    WAIT_FOR_DIRECT_FUNDING -->|FUNDING_EVENT| WAIT_FOR_DIRECT_FUNDING
+    WAIT_FOR_DIRECT_FUNDING -->|"FUNDING_RECEIVED_EVENT(funded)"| WAIT_FOR_POST_FUND_SETUP0
+
+    WAIT_FOR_POST_FUND_SETUP0 --> |RECEIVE_COMMITMENT| WAIT_FOR_LEDGER_UPDATE0
+
+    WAIT_FOR_LEDGER_UPDATE0 --> |RECEIVE_COMMITMENT| success{SUCCESS}
+
+    directStrategy[WAIT_FOR_APPROVAL] -->|FUNDING_APPROVED| direct[WAIT_FOR_DIRECT_FUNDING]
+    directStrategy[WAIT_FOR_APPROVAL] -->|REJECTED| fail{FAIL}
+    direct[WAIT_FOR_DIRECT_FUNDING] -->|"FUNDING_RECEIVED_EVENT(funded)"| success{ SUCCESS }
+```
