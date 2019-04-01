@@ -3,11 +3,12 @@ import * as actions from '../actions';
 import { ethers } from 'ethers';
 import { getProvider, getAdjudicatorContractAddress } from '../../utils/contract-utils';
 import { TransactionResponse, TransactionRequest } from 'ethers/providers';
+import { WalletProcess } from 'magmo-wallet-client';
 
 export function* transactionSender(
   transaction: TransactionRequest,
   channelId: string,
-  process: actions.Process,
+  process: WalletProcess,
 ) {
   const provider: ethers.providers.JsonRpcProvider = yield call(getProvider);
   const signer = provider.getSigner();

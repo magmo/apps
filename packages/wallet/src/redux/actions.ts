@@ -71,7 +71,7 @@ export type MetamaskLoadError = ReturnType<typeof metamaskLoadError>;
 // Common Transaction Actions
 // These actions are relevant to multiple branches of the wallet state tree
 export const TRANSACTION_SENT_TO_METAMASK = 'WALLET.COMMON.TRANSACTION_SENT_TO_METAMASK';
-export const transactionSentToMetamask = (channelId: string, process: Process) => ({
+export const transactionSentToMetamask = (channelId: string, process: WalletProcess) => ({
   type: TRANSACTION_SENT_TO_METAMASK as typeof TRANSACTION_SENT_TO_METAMASK,
   channelId,
   process,
@@ -81,7 +81,7 @@ export type TransactionSentToMetamask = ReturnType<typeof transactionSentToMetam
 export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.COMMON.TRANSACTION_SUBMISSION_FAILED';
 export const transactionSubmissionFailed = (
   channelId: string,
-  process: Process,
+  process: WalletProcess,
   error: { message?: string; code },
 ) => ({
   error,
@@ -94,7 +94,7 @@ export type TransactionSubmissionFailed = ReturnType<typeof transactionSubmissio
 export const TRANSACTION_SUBMITTED = 'WALLET.COMMON.TRANSACTION_SUBMITTED';
 export const transactionSubmitted = (
   channelId: string,
-  process: Process,
+  process: WalletProcess,
   transactionHash: string,
 ) => ({
   channelId,
@@ -107,7 +107,7 @@ export type TransactionSubmitted = ReturnType<typeof transactionSubmitted>;
 export const TRANSACTION_CONFIRMED = 'WALLET.COMMON.TRANSACTION_CONFIRMED';
 export const transactionConfirmed = (
   channelId: string,
-  process: Process,
+  process: WalletProcess,
   contractAddress?: string,
 ) => ({
   channelId,
@@ -118,7 +118,7 @@ export const transactionConfirmed = (
 export type TransactionConfirmed = ReturnType<typeof transactionConfirmed>;
 
 export const TRANSACTION_FINALIZED = 'WALLET.COMMON.TRANSACTION_FINALIZED';
-export const transactionFinalized = (channelId: string, process: Process) => ({
+export const transactionFinalized = (channelId: string, process: WalletProcess) => ({
   channelId,
   process,
   type: TRANSACTION_FINALIZED as typeof TRANSACTION_FINALIZED,

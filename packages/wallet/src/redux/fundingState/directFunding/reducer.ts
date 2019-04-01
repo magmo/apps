@@ -64,7 +64,7 @@ const notSafeToDepositReducer = (
               ),
               channelId: action.channelId,
 
-              process: actions.Process.DirectFunding,
+              process: "DirectFunding",
             },
           },
         };
