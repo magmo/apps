@@ -286,7 +286,7 @@ const waitForOpponentConclude = (
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.COMMITMENT_RECEIVED:
+    case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
 
       const opponentAddress = state.participants[1 - state.ourIndex];
