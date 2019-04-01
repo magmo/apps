@@ -2,6 +2,12 @@ import * as internal from './internal/actions';
 import * as channel from './channelState/actions';
 import * as funding from './fundingState/actions';
 
+// TODO: This should probably be in a constant folder since it's used by actions and outboxes
+export enum WalletProcess {
+  'DirectFunding',
+  'IndirectFunding',
+}
+
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
   type: LOGGED_IN as typeof LOGGED_IN,
