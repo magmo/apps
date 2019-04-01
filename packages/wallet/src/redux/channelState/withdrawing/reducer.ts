@@ -67,7 +67,7 @@ const withdrawTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: "DirectFunding",
+            process: 'DirectFunding',
           },
         },
       };
@@ -107,7 +107,7 @@ const approveWithdrawalReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: "DirectFunding",
+            process: 'DirectFunding',
           },
         },
       };

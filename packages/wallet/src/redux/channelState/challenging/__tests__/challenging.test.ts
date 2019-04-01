@@ -70,7 +70,7 @@ describe('when in INITIATE_CHALLENGE', () => {
   const state = states.waitForChallengeInitiation(defaults);
 
   describe('when a challenge is initiated', () => {
-    const action = actions.transactionSentToMetamask(channelId, "DirectFunding");
+    const action = actions.transactionSentToMetamask(channelId, 'DirectFunding');
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
@@ -81,14 +81,14 @@ describe('when in WAIT_FOR_CHALLENGE_SUBMISSION', () => {
   const state = states.waitForChallengeSubmission(defaults);
 
   describe('when a challenge is submitted', () => {
-    const action = actions.transactionSubmitted(channelId, "DirectFunding", '0x0');
+    const action = actions.transactionSubmitted(channelId, 'DirectFunding', '0x0');
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_CONFIRMATION, updatedState);
   });
 
   describe('when a challenge submissions fails', () => {
-    const action = actions.transactionSubmissionFailed(channelId, "DirectFunding", {
+    const action = actions.transactionSubmissionFailed(channelId, 'DirectFunding', {
       code: 0,
     });
     const updatedState = challengingReducer(state, action);
@@ -115,7 +115,7 @@ describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
   const state = states.waitForChallengeConfirmation({ ...defaults });
 
   describe('when a challenge is confirmed', () => {
-    const action = actions.transactionConfirmed(channelId, "DirectFunding");
+    const action = actions.transactionConfirmed(channelId, 'DirectFunding');
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_OR_TIMEOUT, updatedState);

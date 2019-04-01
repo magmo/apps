@@ -88,7 +88,7 @@ const closeTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: "DirectFunding",
+            process: 'DirectFunding',
           },
         },
       };
@@ -213,7 +213,7 @@ const approveCloseOnChainReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            process: "DirectFunding",
+            process: 'DirectFunding',
           },
         },
       };
