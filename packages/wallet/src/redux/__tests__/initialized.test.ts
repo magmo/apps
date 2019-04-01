@@ -3,6 +3,7 @@ import { walletReducer } from '../reducer';
 import * as states from './../state';
 import * as fundingStates from './../fundingState/state';
 import * as actions from './../actions';
+import * as IndirectFunding from '../indirect-funding/reducer';
 
 const defaults = {
   ...states.emptyState,
@@ -32,5 +33,17 @@ describe.skip('when a funding related action arrives', () => {
 
   it('applies the funding state reducer', async () => {
     expect(updatedState.fundingState).toEqual(fundingStates.FUNDING_NOT_STARTED);
+  });
+});
+
+describe('when an action has a process of IndirectFunding', () => {
+  it('apples the indirectFunding reducer', () => {
+    const action = actions.transactionConfirmed('0x0', actions.Process.IndirectFunding);
+    const indirectFundingReducerMock = jest.fn().mockReturnValue({ initializedState });
+    Object.defineProperty(IndirectFunding, 'indirectFundingReducer', {
+      value: indirectFundingReducerMock,
+    });
+    walletReducer(initializedState, action);
+    expect(indirectFundingReducerMock).toBeCalledWith(initializedState, action);
   });
 });

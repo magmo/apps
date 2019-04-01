@@ -8,6 +8,7 @@ import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { channelStateReducer } from './channelState/reducer';
 import { fundingStateReducer } from './fundingState/reducer';
 import { combineReducersWithSideEffects } from './../utils/reducer-utils';
+import { indirectFundingReducer } from './indirect-funding/reducer';
 
 const initialState = states.waitForLogin();
 
@@ -37,14 +38,24 @@ export function initializedReducer(
   state: states.Initialized,
   action: actions.WalletAction,
 ): states.WalletState {
-  const { state: newState, sideEffects } = combinedReducer(state, action);
-  // Since the wallet state itself has an outbox state, we need to apply the side effects
-  // by hand.
-  return {
-    ...state,
-    ...newState,
-    outboxState: accumulateSideEffects(state.outboxState, sideEffects),
-  };
+  if ('process' in action && action.process === actions.Process.IndirectFunding) {
+    const { state: newState, sideEffects } = indirectFundingReducer(state, action);
+    return {
+      ...state,
+      ...newState,
+      outboxState: accumulateSideEffects(state.outboxState, sideEffects),
+    };
+  } else {
+    // TODO: sideEffects should be handled by the indirectFunding/directFunding reducer
+    const { state: newState, sideEffects } = combinedReducer(state, action);
+    // Since the wallet state itself has an outbox state, we need to apply the side effects
+    // by hand.
+    return {
+      ...state,
+      ...newState,
+      outboxState: accumulateSideEffects(state.outboxState, sideEffects),
+    };
+  }
 }
 
 const combinedReducer = combineReducersWithSideEffects({
