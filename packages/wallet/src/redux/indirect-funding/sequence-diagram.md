@@ -41,7 +41,7 @@ sequenceDiagram
   adj->>B: funding changed for L
   A->>B: type: ledger_postfund, commitment: C3
   B->>A: type: ledger_postfund, commitment: C4
-  Note  over A, B: use L to fund A
+  Note  over A, B: use L to fund X
   A->>B: type: allocate_ledger_to_application, commitment: C4
   B->>A: type: allocate_ledger_to_application, commitment: C5
   Note  over A, B: Finish indirect funding
