@@ -108,7 +108,8 @@ describe('start in WaitForOpponentConclude', () => {
     Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
     Object.defineProperty(ReducerUtil, 'validTransition', { value: validateMock });
 
-    const action = actions.channel.commitmentReceived(
+    const action = actions.commitmentReceived(
+      channelId,
       ('commitment' as unknown) as Commitment,
       '0x0',
     );
