@@ -44,7 +44,6 @@ sequenceDiagram
   Note  over A, B: use L to fund X
   A->>B: type: allocate_ledger_to_application, commitment: C4
   B->>A: type: allocate_ledger_to_application, commitment: C5
-  Note  over A, B: Finish indirect funding
-  A->>B: type: application_postfund, commitment: C6
-  B->>A: type: application_postfund, commitment: C7
+  Note  over A, B: Proceed with to postfund messages
+  Note  over A, B: Postfund messsages are outside the scope of this diagram.
 ```
