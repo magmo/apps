@@ -12,7 +12,7 @@ import {
 } from '../../../../__tests__/helpers';
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { WalletProcedure } from '../../../../actions';
+import { WalletProcedure } from '../../../../types';
 
 const { channelId, mockTransactionOutboxItem } = scenarios;
 

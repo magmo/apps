@@ -7,7 +7,6 @@ import {
   transactionFinalized,
   transactionSentToMetamask,
   transactionSubmitted,
-  WalletProcedure,
 } from '../redux/actions';
 import { transactionSender } from '../redux/sagas/transaction-sender';
 import { signCommitment, signVerificationData } from '../utils/signing-utils';
@@ -28,6 +27,7 @@ import { depositContract } from './test-utils';
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { getAdjudicatorContractAddress } from '../utils/contract-utils';
 import { channelID } from 'fmg-core/lib/channel';
+import { WalletProcedure } from '../redux/types';
 
 jest.setTimeout(90000);
 

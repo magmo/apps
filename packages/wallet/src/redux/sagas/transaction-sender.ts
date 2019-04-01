@@ -3,7 +3,7 @@ import * as actions from '../actions';
 import { ethers } from 'ethers';
 import { getProvider, getAdjudicatorContractAddress } from '../../utils/contract-utils';
 import { TransactionResponse, TransactionRequest } from 'ethers/providers';
-import { WalletProcedure } from '../actions';
+import { WalletProcedure } from '../types';
 
 export function* transactionSender(
   transaction: TransactionRequest,

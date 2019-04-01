@@ -4,7 +4,7 @@ import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
 import * as scenarios from '../../__tests__/test-scenarios';
 import { OutboxState } from '../state';
-import { WalletProcedure } from '../../actions';
+import { WalletProcedure } from '../../types';
 
 const { channelId, mockTransactionOutboxItem } = scenarios;
 

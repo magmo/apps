@@ -6,7 +6,7 @@ import { createTransferAndWithdrawTransaction } from '../../../utils/transaction
 import { signVerificationData } from '../../../utils/signing-utils';
 import { closeSuccess, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { StateWithSideEffects } from '../../utils';
-import { WalletProcedure } from '../../actions';
+import { WalletProcedure } from '../../types';
 
 export const withdrawingReducer = (
   state: states.WithdrawingState,

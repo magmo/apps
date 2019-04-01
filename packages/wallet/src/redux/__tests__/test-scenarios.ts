@@ -2,7 +2,7 @@ import { Channel, CommitmentType, Commitment } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
 import { waitForPreFundSetup } from '../channelState/state';
-import { WalletProcedure } from '../actions';
+import { WalletProcedure } from '../types';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const channelNonce = 4;

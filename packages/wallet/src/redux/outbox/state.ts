@@ -1,6 +1,6 @@
 import { TransactionRequest } from 'ethers/providers';
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
-import { WalletProcedure } from '../actions';
+import { WalletProcedure } from '../types';
 
 export const EMPTY_OUTBOX_STATE: OutboxState = {
   displayOutbox: [],

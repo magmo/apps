@@ -8,7 +8,7 @@ import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 import { directFundingStatusReducer } from './directFunding/reducer';
 import { isfundingAction } from './actions';
-import { WalletProcedure } from '../actions';
+import { WalletProcedure } from '../types';
 
 export const fundingStateReducer = (
   state: states.FundingState,

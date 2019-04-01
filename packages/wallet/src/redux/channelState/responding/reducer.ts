@@ -1,5 +1,5 @@
 import * as states from '../state';
-import { WalletAction, WalletProcedure } from '../../actions';
+import { WalletAction } from '../../actions';
 import * as actions from '../../actions';
 import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';
 import { signCommitment } from '../../../utils/signing-utils';
@@ -12,6 +12,7 @@ import {
 } from 'magmo-wallet-client/lib/wallet-events';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { StateWithSideEffects } from '../../utils';
+import { WalletProcedure } from '../../types';
 
 export const respondingReducer = (
   state: states.RespondingState,

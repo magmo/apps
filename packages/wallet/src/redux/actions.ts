@@ -1,12 +1,7 @@
 import * as internal from './internal/actions';
 import * as channel from './channelState/actions';
 import * as funding from './fundingState/actions';
-
-// TODO: Move this a proper location. It is used in sagas/state/actions.
-export enum WalletProcedure {
-  DirectFunding = 'DirectFunding',
-  IndirectFunding = 'IndirectFunding',
-}
+import { WalletProcedure } from './types';
 
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({

@@ -7,7 +7,7 @@ import { itTransitionsToChannelStateType } from '../../../__tests__/helpers';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import * as SigningUtil from '../../../../utils/signing-utils';
-import { WalletProcedure } from '../../../actions';
+import { WalletProcedure } from '../../../types';
 
 const {
   asPrivateKey,

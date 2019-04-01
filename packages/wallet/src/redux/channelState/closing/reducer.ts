@@ -1,7 +1,7 @@
 import * as channelStates from '../state';
 import * as actions from '../../actions';
 
-import { WalletAction, WalletProcedure } from '../../actions';
+import { WalletAction } from '../../actions';
 import { unreachable, ourTurn, validTransition } from '../../../utils/reducer-utils';
 import {
   signCommitment,
@@ -21,6 +21,7 @@ import {
   ConcludeAndWithdrawArgs,
 } from '../../../utils/transaction-generator';
 import { StateWithSideEffects } from '../../utils';
+import { WalletProcedure } from '../../types';
 
 export const closingReducer = (
   state: channelStates.ClosingState,

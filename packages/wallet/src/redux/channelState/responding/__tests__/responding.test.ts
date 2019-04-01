@@ -8,7 +8,7 @@ import * as scenarios from '../../../__tests__/test-scenarios';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import * as SigningUtil from '../../../../utils/signing-utils';
 import * as FmgCore from 'fmg-core';
-import { WalletProcedure } from '../../../actions';
+import { WalletProcedure } from '../../../types';
 
 const {
   asPrivateKey,

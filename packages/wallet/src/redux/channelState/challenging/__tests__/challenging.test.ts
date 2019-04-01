@@ -11,7 +11,7 @@ import {
 } from '../../../__tests__/helpers';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import { hideWallet, challengeComplete } from 'magmo-wallet-client';
-import { WalletProcedure } from '../../../actions';
+import { WalletProcedure } from '../../../types';
 
 const {
   asPrivateKey,

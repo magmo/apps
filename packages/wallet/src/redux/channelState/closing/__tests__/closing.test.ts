@@ -15,7 +15,7 @@ import * as ReducerUtil from '../../../../utils/reducer-utils';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import { Commitment } from 'fmg-core/lib/commitment';
 import { bigNumberify } from 'ethers/utils';
-import { WalletProcedure } from '../../../actions';
+import { WalletProcedure } from '../../../types';
 
 const {
   asAddress,

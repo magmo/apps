@@ -5,7 +5,7 @@ import { StateWithSideEffects } from '../../../utils';
 import * as actions from '../../../actions';
 import * as states from './state';
 import * as fundingStates from '../state';
-import { WalletProcedure } from '../../../actions';
+import { WalletProcedure } from '../../../types';
 
 export const depositingReducer = (
   state: states.Depositing,
