@@ -1,14 +1,9 @@
 // Player B
-interface WaitForStrategy {}
+export interface WaitForStrategy {
+  channelId: string;
+}
 
-interface WaitForLedgerPreFundSetup0 {}
-
-interface WaitForLedgerDeposit0 {}
-
-interface WaitForLedgerDeposit1Approval {}
-interface WaitForLedgerDeposit1Submission {}
-interface WaitForLedgerDeposit1Confirmation {}
-
-interface WaitForLedgerPostFundSetup0 {}
-
-interface Success {}
+export enum Outcome {
+  Success = 'SUCCESS',
+  Failure = 'FAILURE',
+}

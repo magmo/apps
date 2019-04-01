@@ -1,3 +1,4 @@
-export const WAIT_FOR_APPROVAL = '';
-
-// Player A
+export enum Strategy {
+  Direct = 'DIRECT',
+  Indirect = 'INDIRECT',
+}
