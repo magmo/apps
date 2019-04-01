@@ -281,7 +281,7 @@ export const MESSAGE_RELAY_REQUESTED = 'WALLET.MESSAGING.MESSAGE_RELAY_REQUESTED
 /**
  * @ignore
  */
-export const messageRelayRequested = (to: string, data: string) => ({
+export const messageRelayRequested = (to: string, data: any) => ({
   type: MESSAGE_RELAY_REQUESTED as typeof MESSAGE_RELAY_REQUESTED,
   to,
   data,
@@ -386,7 +386,6 @@ export type WalletEvent =
   | ChallengeResponseRequested
   | ChannelInitializationSuccess
   | CloseSuccess
-  | CommitmentRelayRequested
   | ConcludeFailure
   | ConcludeSuccess
   | FundingFailure
