@@ -4,8 +4,8 @@ import * as funding from './fundingState/actions';
 
 // TODO: Move this a proper location. It is used in sagas/state/actions.
 export enum WalletProcedure {
-  'DirectFunding',
-  'IndirectFunding',
+  DirectFunding = 'DirectFunding',
+  IndirectFunding = 'IndirectFunding',
 }
 
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
