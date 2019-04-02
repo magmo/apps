@@ -134,8 +134,14 @@ export type CommonAction =
   | TransactionSubmitted
   | RetryTransaction;
 
+export type ProcedureAction = CommonAction;
+
 export function isCommonAction(action: WalletAction): action is CommonAction {
   return action.type.match('WALLET.COMMON') ? true : false;
+}
+
+export function isProcedureAction(action: WalletAction): action is ProcedureAction {
+  return 'procedure' in action;
 }
 
 export { internal, channel, funding };
