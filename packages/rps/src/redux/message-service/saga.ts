@@ -40,7 +40,7 @@ interface AppMessage {
 }
 
 interface WalletMessage {
-  message: any;
+  payload: any;
   queue: Queue.WALLET;
   userName?: string;
 }
@@ -52,12 +52,12 @@ export function* sendWalletMessageSaga() {
   while (true) {
     const messageRelayRequest: MessageRelayRequested = yield take(sendMessageChannel);
 
-    const { message: messageFromWallet, to } = messageRelayRequest;
-    const messageToSend: WalletMessage = { message: messageFromWallet, queue: Queue.WALLET };
+    const { messagePayload, to } = messageRelayRequest;
+    const messageToSend: WalletMessage = { payload: messagePayload, queue: Queue.WALLET };
 
     if (process.env.NODE_ENV === 'development' && to === process.env.SERVER_WALLET_ADDRESS) {
       try {
-        const response = yield call(postData, { ...messageFromWallet });
+        const response = yield call(postData, { ...messagePayload });
 
         // Since the response is returned straight away, we have to relay the commitment
         // immediately
@@ -184,8 +184,8 @@ function* receiveFromFirebaseSaga(address) {
         throw new Error('Invalid game message received: signature missing');
       }
     } else {
-      if ('message' in value) {
-        Wallet.relayMessage(WALLET_IFRAME_ID, value.message);
+      if ('payload' in value) {
+        Wallet.relayMessage(WALLET_IFRAME_ID, value.payload);
       } else {
         throw new Error('Invalid wallet message received: message missing');
       }

@@ -1,4 +1,4 @@
-export interface WalletMessage {
+export interface WalletMessagePayload {
   channelId: string;
   procedure: string;
   data: any;

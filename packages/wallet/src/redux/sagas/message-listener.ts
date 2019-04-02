@@ -43,7 +43,7 @@ export function* messageListener() {
           data,
           channelId,
           procedure: incomingProcedure,
-        } = (action as incoming.ReceiveMessage).message;
+        } = (action as incoming.ReceiveMessage).messagePayload;
         const procedure = convertToWalletProcedure(incomingProcedure);
         if ('commitment' in data) {
           yield put(
