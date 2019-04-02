@@ -9,11 +9,11 @@ import {
   validCommitmentSignature,
 } from '../../../utils/signing-utils';
 import {
-  commitmentRelayRequested,
   closeSuccess,
   concludeSuccess,
   concludeFailure,
   hideWallet,
+  messageRelayRequested,
 } from 'magmo-wallet-client/lib/wallet-events';
 import { CommitmentType, Commitment } from 'fmg-core';
 import {
@@ -21,6 +21,7 @@ import {
   ConcludeAndWithdrawArgs,
 } from '../../../utils/transaction-generator';
 import { StateWithSideEffects } from '../../utils';
+import { WalletProcedure } from '../../types';
 
 export const closingReducer = (
   state: channelStates.ClosingState,
@@ -83,7 +84,14 @@ const closeTransactionFailedReducer = (
       const transactionRequest = createConcludeAndWithdrawTransaction(args);
       return {
         state: channelStates.waitForCloseSubmission({ ...state }),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            procedure: WalletProcedure.Closing,
+          },
+        },
       };
   }
   return { state };
@@ -201,7 +209,14 @@ const approveCloseOnChainReducer = (
           ...state,
           userAddress: action.withdrawAddress,
         }),
-        sideEffects: { transactionOutbox: { transactionRequest, channelId: state.channelId } },
+        // TODO: This will be factored out as channel reducers should not be sending transactions itself
+        sideEffects: {
+          transactionOutbox: {
+            transactionRequest,
+            channelId: state.channelId,
+            procedure: WalletProcedure.Closing,
+          },
+        },
       };
   }
   return { state };
@@ -271,7 +286,7 @@ const waitForOpponentConclude = (
   action: WalletAction,
 ): StateWithSideEffects<channelStates.ChannelStatus> => {
   switch (action.type) {
-    case actions.channel.COMMITMENT_RECEIVED:
+    case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
 
       const opponentAddress = state.participants[1 - state.ourIndex];
@@ -353,10 +368,13 @@ const composeConcludePosition = (state: channelStates.ClosingState) => {
   };
 
   const commitmentSignature = signCommitment(concludeCommitment, state.privateKey);
-  const sendCommitmentAction = commitmentRelayRequested(
-    state.participants[1 - state.ourIndex],
-    concludeCommitment,
-    commitmentSignature,
-  );
+  const sendCommitmentAction = messageRelayRequested(state.participants[1 - state.ourIndex], {
+    channelId: state.channelId,
+    procedure: WalletProcedure.DirectFunding,
+    data: {
+      concludeCommitment,
+      commitmentSignature,
+    },
+  });
   return { concludeCommitment, positionSignature: commitmentSignature, sendCommitmentAction };
 };
