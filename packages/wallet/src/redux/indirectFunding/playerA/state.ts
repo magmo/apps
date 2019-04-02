@@ -5,7 +5,7 @@ export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL';
 export const WAIT_FOR_PRE_FUND_SETUP_1 = 'WAIT_FOR_PRE_FUND_SETUP_1';
 export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING';
 export const WAIT_FOR_POST_FUND_SETUP_1 = 'WAIT_FOR_POST_FUND_SETUP_1';
-export const WAI_FOR_LEDGER_UPDATE_1 = 'WAI_FOR_LEDGER_UPDATE_1';
+export const WAIT_FOR_LEDGER_UPDATE_1 = 'WAIT_FOR_LEDGER_UPDATE_1';
 
 interface BasePlayerAState {
   channelId: string;
@@ -31,7 +31,7 @@ export interface WaitForPostFundSetup1 extends LedgerChannelExists {
   type: typeof WAIT_FOR_POST_FUND_SETUP_1;
 }
 export interface WaitForLedgerUpdate1 extends LedgerChannelExists {
-  type: typeof WAI_FOR_LEDGER_UPDATE_1;
+  type: typeof WAIT_FOR_LEDGER_UPDATE_1;
 }
 
 export type PlayerAState =
@@ -72,5 +72,5 @@ export function waitForLedgerUpdate1(
   params: Properties<WaitForLedgerUpdate1>,
 ): WaitForLedgerUpdate1 {
   const { channelId, ledgerId } = params;
-  return { type: WAI_FOR_LEDGER_UPDATE_1, player: PlayerIndex.A, channelId, ledgerId };
+  return { type: WAIT_FOR_LEDGER_UPDATE_1, player: PlayerIndex.A, channelId, ledgerId };
 }
