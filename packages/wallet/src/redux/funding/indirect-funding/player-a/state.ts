@@ -1,10 +1,6 @@
 import { Properties } from '../../../utils';
 
-export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL';
-export const WAIT_FOR_INDIRECT_FUNDING_STRATEGY_RESPONSE =
-  'WAIT_FOR_INDIRECT_FUNDING_STRATEGY_RESPONSE';
-export const WAIT_FOR_DIRECT_FUNDING_STRATEGY_RESPONSE =
-  'WAIT_FOR_DIRECT_FUNDING_STRATEGY_RESPONSE';
+export const WAIT_FOR_STRATEGY_RESPONSE = 'WAIT_FOR_STRATEGY_RESPONSE';
 export const WAIT_FOR_PRE_FUND_SETUP_1 = 'WAIT_FOR_PRE_FUND_SETUP_1';
 export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING';
 export const WAIT_FOR_POST_FUND_SETUP_1 = 'WAIT_FOR_POST_FUND_SETUP_1';
@@ -15,17 +11,10 @@ interface BasePlayerAState {
   ledgerId: string;
 }
 
-export interface WaitForApproval extends BasePlayerAState {
-  type: typeof WAIT_FOR_APPROVAL;
+export interface WaitForStrategyResponse extends BasePlayerAState {
+  type: typeof WAIT_FOR_STRATEGY_RESPONSE;
 }
 
-export interface WaitForIndirectFundingStrategyResponse extends BasePlayerAState {
-  type: typeof WAIT_FOR_INDIRECT_FUNDING_STRATEGY_RESPONSE;
-}
-
-export interface WaitForDirectFundingStrategyResponse extends BasePlayerAState {
-  type: typeof WAIT_FOR_DIRECT_FUNDING_STRATEGY_RESPONSE;
-}
 export interface WaitForPreFundSetup1 extends BasePlayerAState {
   type: typeof WAIT_FOR_PRE_FUND_SETUP_1;
 }
@@ -41,30 +30,17 @@ export interface WaitForLedgerUpdate1 extends BasePlayerAState {
 }
 
 export type PlayerAState =
-  | WaitForApproval
-  | WaitForDirectFundingStrategyResponse
-  | WaitForIndirectFundingStrategyResponse
+  | WaitForStrategyResponse
   | WaitForPreFundSetup1
   | WaitForDirectFunding
   | WaitForPostFundSetup1
   | WaitForLedgerUpdate1;
 
-export function waitForApproval(params: Properties<WaitForApproval>): WaitForApproval {
+export function waitForStrategyResponse(
+  params: Properties<WaitForStrategyResponse>,
+): WaitForStrategyResponse {
   const { channelId, ledgerId } = params;
-  return { type: WAIT_FOR_APPROVAL, channelId, ledgerId };
-}
-export function waitForIndirectFundingStrategyResponse(
-  params: Properties<WaitForIndirectFundingStrategyResponse>,
-): WaitForIndirectFundingStrategyResponse {
-  const { channelId, ledgerId } = params;
-  return { type: WAIT_FOR_INDIRECT_FUNDING_STRATEGY_RESPONSE, channelId, ledgerId };
-}
-
-export function waitForDirectFundingStrategyResponse(
-  params: Properties<WaitForDirectFundingStrategyResponse>,
-): WaitForDirectFundingStrategyResponse {
-  const { channelId, ledgerId } = params;
-  return { type: WAIT_FOR_DIRECT_FUNDING_STRATEGY_RESPONSE, channelId, ledgerId };
+  return { type: WAIT_FOR_STRATEGY_RESPONSE, channelId, ledgerId };
 }
 
 export function waitForPreFundSetup1(
