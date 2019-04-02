@@ -233,10 +233,7 @@ describe('start in BWaitForPostFundSetup', () => {
     const updatedState = fundingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_UPDATE, updatedState);
-    itSendsThisMessage(updatedState, [
-      outgoing.COMMITMENT_RELAY_REQUESTED,
-      outgoing.FUNDING_SUCCESS,
-    ]);
+    itSendsThisMessage(updatedState, [outgoing.MESSAGE_RELAY_REQUESTED, outgoing.FUNDING_SUCCESS]);
     itIncreasesTurnNumBy(2, state, updatedState);
   });
 });
