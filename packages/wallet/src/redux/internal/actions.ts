@@ -22,10 +22,10 @@ export const fundingConfirmed = (channelId: string) => ({
   type: FUNDING_CONFIRMED as typeof FUNDING_CONFIRMED,
   channelId,
 });
-export type fundingConfirmed = ReturnType<typeof fundingConfirmed>;
+export type FundingConfirmed = ReturnType<typeof fundingConfirmed>;
 
 export type InternalFundingAction = DirectFundingRequested;
-export type InternalChannelAction = fundingConfirmed;
+export type InternalChannelAction = FundingConfirmed;
 
 export type InternalAction = InternalFundingAction | InternalChannelAction;
 

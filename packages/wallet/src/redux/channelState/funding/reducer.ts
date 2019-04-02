@@ -1,20 +1,8 @@
 import * as states from '../state';
 import * as actions from '../actions';
 
-import {
-  internal,
-  TRANSACTION_CONFIRMED,
-  MESSAGE_RECEIVED,
-  COMMITMENT_RECEIVED,
-} from '../../actions';
-import {
-  messageRelayRequested,
-  fundingSuccess,
-  fundingFailure,
-  showWallet,
-  hideWallet,
-} from 'magmo-wallet-client/lib/wallet-events';
-
+import { internal, COMMITMENT_RECEIVED } from '../../actions';
+import { messageRelayRequested, fundingSuccess } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable, validTransition } from '../../../utils/reducer-utils';
 import { signCommitment, validCommitmentSignature } from '../../../utils/signing-utils';
@@ -26,7 +14,7 @@ import { WalletProcedure } from '../../types';
 
 export const fundingReducer = (
   state: states.FundingState,
-  action: actions.ChannelAction | internal.fundingConfirmed,
+  action: actions.ChannelAction | internal.FundingConfirmed,
 ): StateWithSideEffects<states.ChannelStatus> => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
   if (
@@ -74,66 +62,12 @@ const waitForFundingRequestReducer = (
   }
 };
 
-<<<<<<< HEAD
-const approveFundingReducer = (
-  state: states.WaitForFundingApproval,
-  action: actions.ChannelAction | internal.InternalAction,
-): StateWithSideEffects<states.OpenedState | states.WaitForChannel> => {
-  switch (action.type) {
-    case actions.FUNDING_APPROVED:
-      return {
-        state: states.waitForFundingAndPostFundSetup(state),
-      };
-    case actions.FUNDING_REJECTED:
-      const relayFundingDeclinedMessage = messageRelayRequested(
-        state.participants[1 - state.ourIndex],
-        {
-          channelId: state.channelId,
-          procedure: WalletProcedure.DirectFunding,
-          data: 'FundingDeclined',
-        },
-      );
-      const fundingFailureMessage = fundingFailure(state.channelId, 'FundingDeclined');
-      return {
-        state: states.waitForChannel({ ...state }),
-        sideEffects: {
-          messageOutbox: [relayFundingDeclinedMessage, fundingFailureMessage],
-          displayOutbox: hideWallet(),
-        },
-      };
-    case MESSAGE_RECEIVED:
-      if (action.data === 'FundingDeclined') {
-        return { state: states.acknowledgeFundingDeclined(state) };
-      } else {
-        return { state };
-      }
-    case actions.FUNDING_DECLINED_ACKNOWLEDGED:
-      return { state: states.approveFunding({ ...state, unhandledAction: action }) };
-    default:
-      return { state };
-  }
-};
-
-=======
->>>>>>> channelState funding reducer simplification
 const waitForFundingAndPostFundSetupReducer = (
   state: states.WaitForFundingAndPostFundSetup,
   action: actions.ChannelAction | internal.InternalAction,
 ): StateWithSideEffects<states.OpenedState> => {
   switch (action.type) {
-<<<<<<< HEAD
-    case MESSAGE_RECEIVED:
-      if (action.data === 'FundingDeclined') {
-        return {
-          state: states.acknowledgeFundingDeclined({ ...state }),
-        };
-      } else {
-        return { state };
-      }
     case COMMITMENT_RECEIVED:
-=======
-    case actions.COMMITMENT_RECEIVED:
->>>>>>> channelState funding reducer simplification
       const { commitment, signature } = action;
       if (!validTransitionToPostFundState(state, commitment, signature)) {
         return { state };
@@ -207,12 +141,15 @@ const aWaitForPostFundSetupReducer = (
       }
 
       return {
-        state: states.waitForFundingConfirmation({
+        state: states.waitForUpdate({
           ...state,
           turnNum: postFundState.turnNum,
           lastCommitment: { commitment: postFundState, signature },
           penultimateCommitment: state.lastCommitment,
         }),
+        sideEffects: {
+          messageOutbox: [fundingSuccess(state.channelId, state.lastCommitment.commitment)],
+        },
       };
     default:
       return { state };
@@ -243,7 +180,12 @@ const bWaitForPostFundSetupReducer = (
           lastCommitment: { commitment: postFundSetupCommitment, signature: commitmentSignature },
           penultimateCommitment: { commitment, signature },
         }),
-        sideEffects: { messageOutbox: sendCommitmentAction },
+        sideEffects: {
+          messageOutbox: [
+            sendCommitmentAction,
+            fundingSuccess(state.channelId, state.lastCommitment.commitment),
+          ],
+        },
       };
     default:
       return { state };
