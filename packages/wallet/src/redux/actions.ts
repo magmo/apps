@@ -146,7 +146,6 @@ export function isProcedureAction(action: WalletAction): action is ProcedureActi
 
 export { internal, channel, funding };
 
-// TODO: This is getting large, we should probably split this up into separate types for each stage
 export type WalletAction =
   | AdjudicatorKnown
   | BlockMined
