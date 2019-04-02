@@ -1,5 +1,5 @@
 import * as states from '../state';
-import * as indirectFundingState from './states';
+import * as indirectFundingState from './state';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { PlayerIndex } from '../types';
