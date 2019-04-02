@@ -101,7 +101,7 @@ describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
     });
 
     const state = states.depositTransactionFailed(defaultsForB);
-    const action = actions.retryTransaction(channelId);
+    const action = actions.retryTransaction(channelId, WalletProcedure.DirectFunding);
     const updatedState = depositingReducer(state, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_TRANSACTION_SENT, updatedState);

@@ -68,7 +68,7 @@ const withdrawTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            procedure: WalletProcedure.DirectFunding,
+            procedure: WalletProcedure.Withdrawing,
           },
         },
       };
@@ -108,7 +108,7 @@ const approveWithdrawalReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            procedure: WalletProcedure.DirectFunding,
+            procedure: WalletProcedure.Withdrawing,
           },
         },
       };
