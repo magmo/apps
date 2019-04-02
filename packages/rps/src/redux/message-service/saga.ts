@@ -28,36 +28,36 @@ export default function* messageSaga() {
   yield fork(sendWalletMessageSaga);
   yield fork(receiveChallengePositionFromWalletSaga);
   yield fork(receiveChallengeFromWalletSaga);
-  yield fork(recieveDisplayEventFromWalletSaga);
+  yield fork(receiveDisplayEventFromWalletSaga);
   yield fork(exitGameSaga);
 }
 
-interface AppCommunication {
+interface AppMessage {
   commitment: Commitment;
   signature: string;
   queue: Queue.GAME_ENGINE;
   userName?: string;
 }
 
-interface WalletCommunication {
+interface WalletMessage {
   message: any;
   queue: Queue.WALLET;
   userName?: string;
 }
 
-type Communication = AppCommunication | WalletCommunication;
+type Message = AppMessage | WalletMessage;
 
 export function* sendWalletMessageSaga() {
   const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_RELAY_REQUESTED]);
   while (true) {
     const messageRelayRequest: MessageRelayRequested = yield take(sendMessageChannel);
 
-    const { message, to } = messageRelayRequest;
-    const messageToSend: WalletCommunication = { message, queue: Queue.WALLET };
+    const { message: messageFromWallet, to } = messageRelayRequest;
+    const messageToSend: WalletMessage = { message: messageFromWallet, queue: Queue.WALLET };
 
     if (process.env.NODE_ENV === 'development' && to === process.env.SERVER_WALLET_ADDRESS) {
       try {
-        const response = yield call(postData, { ...message });
+        const response = yield call(postData, { ...messageFromWallet });
 
         // Since the response is returned straight away, we have to relay the commitment
         // immediately
@@ -106,7 +106,7 @@ export function* sendMessagesSaga() {
       const commitment = messageState.opponentOutbox.commitment;
       const signature = yield signMessage(commitment);
       const userName = gameState.name !== gameStates.StateName.NoName ? gameState.myName : '';
-      const message: AppCommunication = { commitment, queue, signature, userName };
+      const toSend: AppMessage = { commitment, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
 
       if (
@@ -114,7 +114,7 @@ export function* sendMessagesSaga() {
         commitment.channel.participants[1] === process.env.SERVER_WALLET_ADDRESS
       ) {
         // To ease local development, we bypass firebase and make http requests directly against the local server
-        const response = yield call(postData, { ...message, commitment: message.commitment });
+        const response = yield call(postData, { ...toSend, commitment: toSend.commitment });
         yield put(gameActions.messageSent());
 
         // Since the response is returned straight away, we have to receive the commitment immediately
@@ -129,7 +129,7 @@ export function* sendMessagesSaga() {
         yield call(
           reduxSagaFirebase.database.create,
           `/messages/${opponentAddress.toLowerCase()}`,
-          message,
+          toSend,
         );
         yield put(gameActions.messageSent());
       }
@@ -173,7 +173,7 @@ function* receiveFromFirebaseSaga(address) {
 
   while (true) {
     const message = yield take(channel);
-    const value: Communication = message.value;
+    const value: Message = message.value;
 
     const key = message.snapshot.key;
     const { queue } = value;
@@ -297,7 +297,7 @@ function* receiveChallengeFromWalletSaga() {
   }
 }
 
-function* recieveDisplayEventFromWalletSaga() {
+function* receiveDisplayEventFromWalletSaga() {
   const displayChannel = createWalletEventChannel([Wallet.SHOW_WALLET, Wallet.HIDE_WALLET]);
   while (true) {
     const event = yield take(displayChannel);
@@ -325,7 +325,7 @@ function* receiveChallengePositionFromWalletSaga() {
   }
 }
 
-function* receiveCommitmentSaga(message: AppCommunication) {
+function* receiveCommitmentSaga(message: AppMessage) {
   const { commitment: data, signature, userName } = message;
   const validMessage = yield validateMessage(data, signature);
   if (!validMessage) {
