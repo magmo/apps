@@ -18,7 +18,7 @@ export const allocationChanged = (
   procedure: WalletProcedure.IndirectFunding,
   commitment: Commitment,
 ) => ({
-  type: STRATEGY_APPROVED as typeof STRATEGY_APPROVED,
+  type: ALLOCATION_CHANGED as typeof ALLOCATION_CHANGED,
   channelId,
   procedure,
   commitment,
