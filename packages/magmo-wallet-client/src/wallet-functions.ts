@@ -22,6 +22,7 @@ import {
   initializeChannelRequest,
 } from './wallet-instructions';
 import { Commitment } from 'fmg-core';
+import { WalletMessage } from './wallet-types';
 
 /**
  * Creates an iframe element for the wallet to be embedded in the page. The wallet iframe will hide itself and only show when interaction with the wallet is necessary.
@@ -184,15 +185,14 @@ export async function signCommitment(iFrameId: string, commitment: Commitment): 
   return signPromise;
 }
 
-export const;
 /**
  * Relays a message to the wallet, from the opponent's wallet.
  * @param iFrameId The id of the embedded wallet iframe.
- * @param data The message to send to the wallet that was received from the opponent's wallet.
+ * @param walletMessage The message to send to the wallet that was received from the opponent's wallet.
  */
-export function relayMessage(iFrameId: string, channelId: string, process: WalletProcess, data) {
+export function relayMessage(iFrameId: string, walletMessage: WalletMessage) {
   const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
-  const message = receiveMessage(data);
+  const message = receiveMessage(walletMessage);
   iFrame.contentWindow.postMessage(message, '*');
 }
 

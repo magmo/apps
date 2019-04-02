@@ -1,5 +1,5 @@
 import { Commitment } from 'fmg-core';
-import { WalletProcess, WalletMessage } from './wallet-types';
+import { WalletMessage } from './wallet-types';
 
 export enum PlayerIndex {
   'A' = 0,

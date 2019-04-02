@@ -1,5 +1,5 @@
 import { Commitment } from 'fmg-core';
-import { WalletProcess, WalletMessage } from './wallet-types';
+import { WalletMessage } from './wallet-types';
 
 // TODO: We should limit WalletEvent/WalletEventTypes to the bare minimum of events we expect the app to handle. Some of these can be pruned.
 // Events that we handle for the user (HideWallet,ShowWallet, ValidateSuccess, etc..) should be removed from WalletEvent/WalletEventTypes

@@ -12,7 +12,6 @@ import {
   fundingFailure,
   showWallet,
   hideWallet,
-  commitmentRelayRequested,
 } from 'magmo-wallet-client/lib/wallet-events';
 
 import { unreachable, validTransition } from '../../../utils/reducer-utils';
@@ -21,6 +20,7 @@ import { signCommitment, validCommitmentSignature } from '../../../utils/signing
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { handleSignatureAndValidationMessages } from '../../../utils/state-utils';
 import { StateWithSideEffects } from '../../utils';
+import { WalletProcedure } from '../../types';
 
 export const fundingReducer = (
   state: states.FundingState,
@@ -92,7 +92,11 @@ const approveFundingReducer = (
     case actions.FUNDING_REJECTED:
       const relayFundingDeclinedMessage = messageRelayRequested(
         state.participants[1 - state.ourIndex],
-        'FundingDeclined',
+        {
+          channelId: state.channelId,
+          procedure: WalletProcedure.DirectFunding,
+          data: 'FundingDeclined',
+        },
       );
       const fundingFailureMessage = fundingFailure(state.channelId, 'FundingDeclined');
       return {
@@ -381,10 +385,13 @@ const composePostFundCommitment = (
   };
   const commitmentSignature = signCommitment(postFundSetupCommitment, state.privateKey);
 
-  const sendCommitmentAction = commitmentRelayRequested(
-    state.participants[1 - state.ourIndex],
-    postFundSetupCommitment,
-    commitmentSignature,
-  );
+  const sendCommitmentAction = messageRelayRequested(state.participants[1 - state.ourIndex], {
+    channelId: state.channelId,
+    procedure: WalletProcedure.DirectFunding,
+    data: {
+      commitment: postFundSetupCommitment,
+      signature: commitmentSignature,
+    },
+  });
   return { postFundSetupCommitment, commitmentSignature, sendCommitmentAction };
 };
