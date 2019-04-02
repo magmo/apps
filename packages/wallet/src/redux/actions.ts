@@ -121,9 +121,10 @@ export const transactionFinalized = (channelId: string, procedure: WalletProcedu
 export type TransactionFinalized = ReturnType<typeof transactionFinalized>;
 
 export const RETRY_TRANSACTION = 'WALLET.COMMON.RETRY_TRANSACTION';
-export const retryTransaction = (channelId: string) => ({
+export const retryTransaction = (channelId: string, procedure: WalletProcedure) => ({
   type: RETRY_TRANSACTION as typeof RETRY_TRANSACTION,
   channelId,
+  procedure,
 });
 export type RetryTransaction = ReturnType<typeof retryTransaction>;
 

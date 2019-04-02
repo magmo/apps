@@ -89,7 +89,7 @@ const closeTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            procedure: WalletProcedure.DirectFunding,
+            procedure: WalletProcedure.Closing,
           },
         },
       };
@@ -214,7 +214,7 @@ const approveCloseOnChainReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            procedure: WalletProcedure.DirectFunding,
+            procedure: WalletProcedure.Closing,
           },
         },
       };

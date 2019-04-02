@@ -71,7 +71,7 @@ describe('when in INITIATE_CHALLENGE', () => {
   const state = states.waitForChallengeInitiation(defaults);
 
   describe('when a challenge is initiated', () => {
-    const action = actions.transactionSentToMetamask(channelId, WalletProcedure.DirectFunding);
+    const action = actions.transactionSentToMetamask(channelId, WalletProcedure.Challenging);
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
@@ -82,14 +82,14 @@ describe('when in WAIT_FOR_CHALLENGE_SUBMISSION', () => {
   const state = states.waitForChallengeSubmission(defaults);
 
   describe('when a challenge is submitted', () => {
-    const action = actions.transactionSubmitted(channelId, WalletProcedure.DirectFunding, '0x0');
+    const action = actions.transactionSubmitted(channelId, WalletProcedure.Challenging, '0x0');
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_CONFIRMATION, updatedState);
   });
 
   describe('when a challenge submissions fails', () => {
-    const action = actions.transactionSubmissionFailed(channelId, WalletProcedure.DirectFunding, {
+    const action = actions.transactionSubmissionFailed(channelId, WalletProcedure.Challenging, {
       code: 0,
     });
     const updatedState = challengingReducer(state, action);
@@ -105,7 +105,7 @@ describe('when in CHALLENGE_TRANSACTION_FAILED', () => {
     Object.defineProperty(TransactionGenerator, 'createForceMoveTransaction', {
       value: createChallengeTxMock,
     });
-    const action = actions.retryTransaction(channelId);
+    const action = actions.retryTransaction(channelId, WalletProcedure.Challenging);
     const updatedState = challengingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
     expect(createChallengeTxMock.mock.calls.length).toBe(1);
@@ -116,7 +116,7 @@ describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
   const state = states.waitForChallengeConfirmation({ ...defaults });
 
   describe('when a challenge is confirmed', () => {
-    const action = actions.transactionConfirmed(channelId, WalletProcedure.DirectFunding);
+    const action = actions.transactionConfirmed(channelId, WalletProcedure.Challenging);
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_OR_TIMEOUT, updatedState);

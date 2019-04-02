@@ -70,7 +70,7 @@ const challengeTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            procedure: WalletProcedure.DirectFunding,
+            procedure: WalletProcedure.Challenging,
           },
         },
       };
@@ -99,7 +99,7 @@ const approveChallengeReducer = (
           transactionOutbox: {
             transactionRequest,
             channelId: state.channelId,
-            procedure: WalletProcedure.DirectFunding,
+            procedure: WalletProcedure.Challenging,
           },
         },
       };
