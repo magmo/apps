@@ -3,15 +3,15 @@ import * as states from './state';
 import * as actions from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { PlayerIndex, WalletProcedure } from '../../types';
-import { OpenedState } from '../../channelState/state';
+import { OpenedState } from '../../channel-state/state';
 import { Channel, CommitmentType } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
-import * as channelState from '../../channelState/state';
+import * as channelState from '../../channel-state/state';
 import { Commitment } from 'fmg-core/lib/commitment';
 import { signCommitment } from '../../../utils/signing-utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
-import { channelStateReducer } from '../../channelState/reducer';
-import * as channelActions from '../../channelState/actions';
+import { channelStateReducer } from '../../channel-state/reducer';
+import * as channelActions from '../../channel-state/actions';
 import { messageRelayRequested } from 'magmo-wallet-client';
 
 export function playerAReducer(
