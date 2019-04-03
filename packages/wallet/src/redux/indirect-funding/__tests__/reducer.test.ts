@@ -1,6 +1,7 @@
 import * as actions from '../../actions';
 import * as states from '../../state';
 import { indirectFundingReducer } from '../reducer';
+import * as playerA from '../player-a/reducer';
 
 import * as scenarios from '../../__tests__/test-scenarios';
 import { PlayerIndex } from '../../types';
@@ -33,6 +34,23 @@ describe("when the indirectFunding branch doesn't exist", () => {
 });
 
 describe('when the indirectFunding branch exists', () => {
+  describe('when in a player A state', () => {
+    const player = PlayerIndex.A;
+    it('delegates to the playerAReducer', () => {
+      const state = {
+        ...defaultState,
+        indirectFunding: states.indirectFunding.playerA.waitForApproval({ channelId, player }),
+      };
+      const action = actions.indirectFunding.playerA.strategyApproved(channelId);
+
+      const playerAReducer = jest.fn();
+      Object.defineProperty(playerA, 'playerAReducer', { value: playerAReducer });
+
+      indirectFundingReducer(state, action);
+      expect(playerAReducer).toBeCalledWith(state, action);
+    });
+  });
+
   describe('when in a player B state', () => {
     const player = PlayerIndex.B;
     it('delegates to the playerBReducer', () => {
