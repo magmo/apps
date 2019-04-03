@@ -3,7 +3,7 @@ import * as states from './state';
 import * as actions from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { PlayerIndex, WalletProcedure } from '../../types';
-import { OpenedState } from '../../channel-state/state';
+
 import { Channel, CommitmentType } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
 import * as channelState from '../../channel-state/state';
@@ -13,6 +13,7 @@ import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { channelStateReducer } from '../../channel-state/reducer';
 import * as channelActions from '../../channel-state/actions';
 import { messageRelayRequested } from 'magmo-wallet-client';
+import * as selectors from '../../selectors';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -30,10 +31,7 @@ export function playerAReducer(
     case states.WAIT_FOR_APPROVAL:
       return waitForApprovalReducer(state, action);
     case states.WAIT_FOR_PRE_FUND_SETUP_1:
-    // pass the commitment to the channel state reducer
-    // update channel state based on outcome
-    // if ready to fund:
-    //   initiate direct funding
+      return waitForPreFundSetup1Reducer(state, action);
     case states.WAIT_FOR_DIRECT_FUNDING:
     // progress direct funding
     // if direct funding is finished:
@@ -46,15 +44,41 @@ export function playerAReducer(
   }
 }
 
+const waitForPreFundSetup1Reducer = (
+  state: walletStates.Initialized,
+  action: actions.indirectFunding.Action,
+) => {
+  const indirectFundingState = selectors.getIndirectFundingState(
+    state,
+  ) as states.WaitForPostFundSetup1;
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const newState = { ...state };
+      updateChannelState(
+        newState,
+        channelActions.opponentCommitmentReceived(action.commitment, action.signature),
+      );
+      const appChannel = selectors.getOpenedChannelState(state, indirectFundingState.channelId);
+      if (appChannel.type === channelState.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+        // TODO: Start direct funding
+      }
+
+      newState.indirectFunding = states.waitForDirectFunding(indirectFundingState);
+
+    default:
+      return state;
+  }
+};
+
 const waitForApprovalReducer = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
-  const indirectFundingState = state.indirectFunding as states.WaitForApproval;
+  const indirectFundingState = selectors.getIndirectFundingState(state);
   switch (action.type) {
     case actions.indirectFunding.playerA.FUNDING_APPROVED:
       const newState = { ...state };
-      const appChannel: OpenedState = newState.channelState[indirectFundingState.channelId];
+      const appChannel = selectors.getOpenedChannelState(state, indirectFundingState.channelId);
 
       // Create new ledger channel
       const nonce = 4; // TODO: Make random
@@ -93,7 +117,7 @@ const waitForApprovalReducer = (
           commitmentSignature,
         ),
       ];
-      return state;
+      return newState;
     default:
       return state;
   }
