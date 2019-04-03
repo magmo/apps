@@ -47,7 +47,7 @@ describe('when the indirectFunding branch exists', () => {
       Object.defineProperty(playerA, 'playerAReducer', { value: playerAReducer });
 
       indirectFundingReducer(state, action);
-      expect(playerAReducer).toBeCalledWith(state, action);
+      expect(playerAReducer).toHaveBeenCalledWith(state, action);
     });
   });
 
