@@ -60,7 +60,7 @@ const waitForLedgerUpdateReducer = (
     case actions.COMMITMENT_RECEIVED:
       const newState = { ...state };
       const indirectFundingState = selectors.getIndirectFundingState(
-        state,
+        newState,
       ) as states.WaitForLedgerUpdate1;
 
       // Update ledger state
@@ -68,7 +68,10 @@ const waitForLedgerUpdateReducer = (
         newState,
         channelActions.opponentCommitmentReceived(action.commitment, action.signature),
       );
-      const ledgerChannel = selectors.getOpenedChannelState(state, indirectFundingState.ledgerId);
+      const ledgerChannel = selectors.getOpenedChannelState(
+        newState,
+        indirectFundingState.ledgerId,
+      );
       if (
         hasConsensusBeenReached(
           ledgerChannel.lastCommitment.commitment,
@@ -81,7 +84,7 @@ const waitForLedgerUpdateReducer = (
           actions.internal.fundingConfirmed(indirectFundingState.channelId),
         );
       }
-
+      return newState;
     default:
       return state;
   }
@@ -102,12 +105,18 @@ const waitForPostFundSetup1 = (
         channelActions.opponentCommitmentReceived(action.commitment, action.signature),
       );
 
-      const ledgerChannel = selectors.getOpenedChannelState(state, indirectFundingState.ledgerId);
+      const ledgerChannel = selectors.getOpenedChannelState(
+        newState,
+        indirectFundingState.ledgerId,
+      );
 
       if (ledgerChannel.type !== channelStates.WAIT_FOR_UPDATE) {
         return newState;
       } else {
-        const appChannel = selectors.getOpenedChannelState(state, indirectFundingState.channelId);
+        const appChannel = selectors.getOpenedChannelState(
+          newState,
+          indirectFundingState.channelId,
+        );
         const proposedAllocation = [
           calculateChannelTotal(appChannel.lastCommitment.commitment.allocation),
         ];
