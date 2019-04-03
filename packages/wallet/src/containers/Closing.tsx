@@ -14,7 +14,7 @@ import WaitForOtherPlayer from '../components/wait-for-other-player';
 // import WaitForXInitiation from '../components/WaitForXInitiation';
 import TransactionFailed from '../components/transaction-failed';
 import SelectAddress from '../components/withdrawing/select-address';
-import { ClosingStep } from '../components/closing/ClosingStep';
+import { ClosingStep } from '../components/closing/closing-step';
 import EtherscanLink from '../components/etherscan-link';
 import { WalletProcedure } from '../redux/types';
 

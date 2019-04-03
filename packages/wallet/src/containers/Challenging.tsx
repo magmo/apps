@@ -9,7 +9,7 @@ import * as actions from '../redux/actions';
 import ApproveX from '../components/approve-x';
 import { unreachable } from '../utils/reducer-utils';
 import TransactionFailed from '../components/transaction-failed';
-import { ChallengingStep } from '../components/challenging/ChallengingStep';
+import { ChallengingStep } from '../components/challenging/challenging-step';
 import EtherscanLink from '../components/etherscan-link';
 import { WalletProcedure } from '../redux/types';
 
