@@ -54,12 +54,16 @@ const waitForApprovalReducer = (
   switch (action.type) {
     case actions.indirectFunding.playerA.FUNDING_APPROVED:
       const newState = { ...state };
-      const appChannel: OpenedState = state.channelState[indirectFundingState.channelId];
+      const appChannel: OpenedState = newState.channelState[indirectFundingState.channelId];
 
       // Create new ledger channel
       const nonce = 4; // TODO: Make random
       const { participants } = appChannel;
-      const ledgerChannel: Channel = { channelType: state.consensusLibrary, nonce, participants };
+      const ledgerChannel: Channel = {
+        channelType: newState.consensusLibrary,
+        nonce,
+        participants,
+      };
       const ledgerChannelId = channelID(ledgerChannel);
       initializeChannelState(newState, ledgerChannelId, appChannel.address, appChannel.privateKey);
 
