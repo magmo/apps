@@ -3,7 +3,7 @@ import * as states from '../../state';
 import { indirectFundingReducer } from '../reducer';
 
 import * as scenarios from '../../__tests__/test-scenarios';
-import { PlayerIndex, WalletProcedure } from '../../types';
+import { PlayerIndex } from '../../types';
 
 const { channelId, initializedState } = scenarios;
 const defaultState = { ...initializedState };
@@ -40,10 +40,7 @@ describe('when the indirectFunding branch exists', () => {
         ...defaultState,
         indirectFunding: states.indirectFunding.playerB.waitForApproval({ channelId, player }),
       };
-      const action = actions.indirectFunding.playerB.strategyProposed(
-        channelId,
-        WalletProcedure.IndirectFunding,
-      );
+      const action = actions.indirectFunding.playerB.strategyProposed(channelId);
       const updatedState = indirectFundingReducer(state, action);
 
       expect(updatedState.indirectFunding).toMatchObject({
