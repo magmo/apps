@@ -32,6 +32,9 @@ You can also run `yarn prettier:write`.
 // ok
 foo/bar/foo-bar/foo-bar.ts
 
+// ok
+foo/bar/foo-bar/FooBar.tsx
+
 // tslint error
 foo/bar/foo-bar/fooBar.ts
 
