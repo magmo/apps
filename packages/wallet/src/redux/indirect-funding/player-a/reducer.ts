@@ -14,6 +14,8 @@ import { channelStateReducer } from '../../channel-state/reducer';
 import * as channelActions from '../../channel-state/actions';
 import { messageRelayRequested } from 'magmo-wallet-client';
 import * as selectors from '../../selectors';
+import { fundingStateReducer } from '../../funding-state/reducer';
+import { CHANNEL_FUNDED } from '../../funding-state/state';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -33,9 +35,7 @@ export function playerAReducer(
     case states.WAIT_FOR_PRE_FUND_SETUP_1:
       return waitForPreFundSetup1Reducer(state, action);
     case states.WAIT_FOR_DIRECT_FUNDING:
-    // progress direct funding
-    // if direct funding is finished:
-    //   send and/or wait for post-fund setup
+      return waitForDirectFunding(state, action);
     case states.WAIT_FOR_POST_FUND_SETUP_1:
     case states.WAIT_FOR_LEDGER_UPDATE_1:
       return state;
@@ -43,7 +43,58 @@ export function playerAReducer(
       return unreachable(state.indirectFunding);
   }
 }
+const waitForDirectFunding = (
+  state: walletStates.Initialized,
+  action: actions.indirectFunding.Action,
+) => {
+  const indirectFundingState = selectors.getIndirectFundingState(
+    state,
+  ) as states.WaitForDirectFunding;
+  switch (action.type) {
+    case actions.funding.FUNDING_RECEIVED_EVENT:
+      // We only want to handle our ledger channel being funded.
+      if (action.channelId !== indirectFundingState.ledgerId) {
+        return state;
+      }
+      const newState = { ...state };
+      // Update the funding state
+      updateFundingState(newState, action);
+      const fundingStatus = selectors.getDirectFundingStatus(
+        newState,
+        indirectFundingState.channelId,
+      );
 
+      if (fundingStatus.channelFundingStatus === CHANNEL_FUNDED) {
+        const ledgerChannel = selectors.getOpenedChannelState(
+          newState,
+          indirectFundingState.ledgerId,
+        );
+        const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
+          ledgerChannel.lastCommitment.commitment,
+          PlayerIndex.A,
+          ledgerChannel.privateKey,
+        );
+
+        // Update ledger state
+        updateChannelState(newState, channelActions.ownCommitmentReceived(postFundCommitment));
+        // Update our indirect funding state
+        newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
+
+        // Message opponent
+        newState.outboxState.messageOutbox = [
+          createCommitmentMessageRelay(
+            ledgerChannel.participants[PlayerIndex.B],
+            indirectFundingState.ledgerId,
+            postFundCommitment,
+            commitmentSignature,
+          ),
+        ];
+      }
+      return newState;
+    default:
+      return state;
+  }
+};
 const waitForPreFundSetup1Reducer = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
@@ -64,7 +115,7 @@ const waitForPreFundSetup1Reducer = (
       }
 
       newState.indirectFunding = states.waitForDirectFunding(indirectFundingState);
-
+      return newState;
     default:
       return state;
   }
@@ -160,6 +211,39 @@ export const updateChannelState = (
   state.channelState = updatedChannelState.state;
 };
 
+export const updateFundingState = (
+  state: walletStates.Initialized,
+  action: actions.funding.FundingAction,
+) => {
+  const updatedFundingState = fundingStateReducer(state.fundingState, action);
+  state.fundingState = updatedFundingState.state;
+};
+
+export const composePostFundCommitment = (
+  lastCommitment: Commitment,
+  ourIndex: PlayerIndex,
+  privateKey: string,
+) => {
+  const {
+    channel,
+    turnNum: previousTurnNum,
+    allocation,
+    destination,
+    appAttributes,
+  } = lastCommitment;
+  const postFundCommitment: Commitment = {
+    channel,
+    commitmentType: CommitmentType.PostFundSetup,
+    turnNum: previousTurnNum + 1,
+    commitmentCount: ourIndex,
+    allocation,
+    destination,
+    appAttributes,
+  };
+  const commitmentSignature = signCommitment(postFundCommitment, privateKey);
+
+  return { postFundCommitment, commitmentSignature };
+};
 export const composePreFundCommitment = (
   channel: Channel,
   allocation: string[],
