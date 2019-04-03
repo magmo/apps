@@ -100,6 +100,8 @@ const waitForPostFundSetup1 = (
       const indirectFundingState = selectors.getIndirectFundingState(
         state,
       ) as states.WaitForPostFundSetup1;
+
+      // Update  ledger channel
       updateChannelState(
         newState,
         channelActions.opponentCommitmentReceived(action.commitment, action.signature),
@@ -109,10 +111,10 @@ const waitForPostFundSetup1 = (
         newState,
         indirectFundingState.ledgerId,
       );
-
       if (ledgerChannel.type !== channelStates.WAIT_FOR_UPDATE) {
         return newState;
       } else {
+        // If the ledger channel is funded we can create the allocation request
         const appChannel = selectors.getOpenedChannelState(
           newState,
           indirectFundingState.channelId,
@@ -130,7 +132,9 @@ const waitForPostFundSetup1 = (
           ledgerChannel.privateKey,
         );
 
+        // Update our ledger channel with the latest commitment
         updateChannelState(newState, channelActions.ownCommitmentReceived(updateCommitment));
+        // Send out the commitment to the opponent
         newState.outboxState.messageOutbox = [
           createCommitmentMessageRelay(
             ledgerChannel.participants[PlayerIndex.B],
@@ -166,7 +170,7 @@ const waitForDirectFunding = (
         newState,
         indirectFundingState.channelId,
       );
-
+      // If we're funded  we can send out the post fund commitment
       if (fundingStatus.channelFundingStatus === CHANNEL_FUNDED) {
         const ledgerChannel = selectors.getOpenedChannelState(
           newState,
@@ -202,16 +206,19 @@ const waitForPreFundSetup1Reducer = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
-  const indirectFundingState = selectors.getIndirectFundingState(
-    state,
-  ) as states.WaitForPostFundSetup1;
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
+      const indirectFundingState = selectors.getIndirectFundingState(
+        state,
+      ) as states.WaitForPostFundSetup1;
       const newState = { ...state };
+
+      // Update our ledger  channel
       updateChannelState(
         newState,
         channelActions.opponentCommitmentReceived(action.commitment, action.signature),
       );
+      // If the app channel is waiting for funding we can start direct funding
       const appChannel = selectors.getOpenedChannelState(state, indirectFundingState.channelId);
       if (appChannel.type === channelState.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
         // TODO: Start direct funding
@@ -228,10 +235,11 @@ const waitForApprovalReducer = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
-  const indirectFundingState = selectors.getIndirectFundingState(state);
   switch (action.type) {
     case actions.indirectFunding.playerA.FUNDING_APPROVED:
+      const indirectFundingState = selectors.getIndirectFundingState(state);
       const newState = { ...state };
+
       const appChannel = selectors.getOpenedChannelState(state, indirectFundingState.channelId);
 
       // Create new ledger channel
@@ -240,7 +248,7 @@ const waitForApprovalReducer = (
       const ledgerChannel: Channel = {
         channelType: newState.consensusLibrary,
         nonce,
-        participants,
+        participants, // TODO: In the future we can use different participants
       };
       const ledgerChannelId = channelID(ledgerChannel);
       initializeChannelState(newState, ledgerChannelId, appChannel.address, appChannel.privateKey);
@@ -287,8 +295,6 @@ export const calculateChannelTotal = (allocation: string[]): string => {
   return total;
 };
 
-// Communication helper
-
 export const createCommitmentMessageRelay = (
   to: string,
   channelId: string,
@@ -303,7 +309,7 @@ export const createCommitmentMessageRelay = (
   return messageRelayRequested(to, payload);
 };
 
-// State updaters
+// TODO: These all update state and can probably be stored in a file together.
 
 export const initializeChannelState = (
   state: walletStates.Initialized,
