@@ -24,25 +24,26 @@ You can also run `yarn prettier:write`.
 
 #### Naming
 
-- Directories should be kebab-cased.
-- `.ts` files should be kebab-cased.
-- `.tsx` files should be Pascal--cased.
+- Directories and files should be kebab-cased.
 
 ```
 // ok
 foo/bar/foo-bar/foo-bar.ts
 
 // ok
-foo/bar/foo-bar/FooBar.tsx
+foo/bar/foo-bar/foo-bar.tsx
 
 // tslint error
 foo/bar/foo-bar/fooBar.ts
 
 // tslint error
-foo/bar/foo-bar/foo-bar.tsx
+foo/bar/foo-bar/FooBar.tsx
 
 // no tslint error, but please avoid this
-foo/bar/fooBar/foo-bar.ts
+foo/bar/fooBar/foo-bar.svg
+
+// no tslint error, but please avoid this
+foo/bar/foo-bar/FooBar.svg
 ```
 
 #### Setting up development environment and running a game application
