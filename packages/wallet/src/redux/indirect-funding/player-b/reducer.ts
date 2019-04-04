@@ -2,14 +2,13 @@ import * as walletStates from '../../state';
 import * as states from './state';
 
 import * as actions from '../../actions';
-import * as channelActions from '../../channel-state/actions';
 
 import { unreachable } from '../../../utils/reducer-utils';
 import { PlayerIndex } from '../../types';
 import { channelID } from 'fmg-core/lib/channel';
 
 import * as selectors from '../../selectors';
-import { updateChannelState, appChannelIsWaitingForFunding } from '../reducer-helpers';
+import { appChannelIsWaitingForFunding, receiveLedgerCommitment } from '../reducer-helpers';
 
 export function playerBReducer(
   state: walletStates.Initialized,
@@ -80,11 +79,4 @@ const waitForPreFundSetup0Reducer = (
 
 function startDirectFunding(state: walletStates.IndirectFundingOngoing, channelId, ledgerId) {
   state.indirectFunding = states.waitForDirectFunding({ channelId, ledgerId });
-}
-
-function receiveLedgerCommitment(state, commitment, signature) {
-  return updateChannelState(
-    state,
-    channelActions.opponentCommitmentReceived(commitment, signature),
-  );
 }

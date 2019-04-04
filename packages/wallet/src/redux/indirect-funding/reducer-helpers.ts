@@ -3,10 +3,12 @@ import * as selectors from '../selectors';
 import * as channelStates from '../channel-state/state';
 
 import * as actions from '../actions';
+import * as channelActions from '../channel-state/actions';
 
 import { channelStateReducer } from '../channel-state/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { directFundingStoreReducer } from '../direct-funding-store/reducer';
+import { Commitment } from 'fmg-core';
 
 export const appChannelIsWaitingForFunding = (
   state: walletStates.Initialized,
@@ -17,6 +19,17 @@ export const appChannelIsWaitingForFunding = (
 };
 
 // Global state updaters
+export const receiveLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+  signature: string,
+): walletStates.Initialized => {
+  return updateChannelState(
+    state,
+    channelActions.opponentCommitmentReceived(commitment, signature),
+  );
+};
+
 export const initializeChannelState = (
   state: walletStates.Initialized,
   channelId: string,

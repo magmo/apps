@@ -28,6 +28,7 @@ import {
   initializeChannelState,
   updateChannelState,
   updateDirectFundingStatus,
+  receiveLedgerCommitment,
 } from '../reducer-helpers';
 
 export function playerAReducer(
@@ -328,17 +329,6 @@ const confirmFundingForAppChannel = (
   channelId: string,
 ): walletStates.Initialized => {
   return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
-};
-
-const receiveLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-  signature: string,
-): walletStates.Initialized => {
-  return updateChannelState(
-    state,
-    channelActions.opponentCommitmentReceived(commitment, signature),
-  );
 };
 
 const receiveOwnLedgerCommitment = (
