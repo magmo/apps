@@ -1,18 +1,20 @@
-import * as walletStates from '../../state';
 import * as states from './state';
+import * as walletStates from '../../state';
+import * as channelStates from '../../channel-state/state';
+
 import * as actions from '../../actions';
+import * as channelActions from '../../channel-state/actions';
+
+import * as selectors from '../../selectors';
+
 import { unreachable } from '../../../utils/reducer-utils';
 import { PlayerIndex, WalletProcedure } from '../../types';
 
 import { Channel } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
-import * as channelState from '../../channel-state/state';
 import { Commitment } from 'fmg-core/lib/commitment';
 import { channelStateReducer } from '../../channel-state/reducer';
-import * as channelActions from '../../channel-state/actions';
 import { messageRelayRequested } from 'magmo-wallet-client';
-import * as selectors from '../../selectors';
-import * as channelStates from '../../channel-state/state';
 import { addHex } from '../../../utils/hex-utils';
 import { accumulateSideEffects } from '../../outbox';
 import {
@@ -211,7 +213,7 @@ const appChannelIsWaitingForFunding = (
   channelId: string,
 ): boolean => {
   const appChannel = selectors.getOpenedChannelState(state, channelId);
-  return appChannel.type === channelState.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
+  return appChannel.type === channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
 };
 
 const createAndSendUpdateCommitment = (
@@ -274,7 +276,7 @@ const createAndSendPostFundCommitment = (
 
 const createAndSendPreFundCommitment = (
   state: walletStates.Initialized,
-  appChannelState: channelState.OpenedState,
+  appChannelState: channelStates.OpenedState,
   ledgerChannel: Channel,
 ): walletStates.Initialized => {
   const newState = { ...state };
@@ -353,7 +355,7 @@ const receiveOwnLedgerCommitment = (
 
 const createLedgerChannel = (
   state: walletStates.Initialized,
-  appChannelState: channelState.OpenedState,
+  appChannelState: channelStates.OpenedState,
 ): { state: walletStates.Initialized; ledgerChannel: Channel } => {
   const nonce = 4; // TODO: Make random
   const { participants } = appChannelState;
@@ -394,7 +396,7 @@ export const initializeChannelState = (
 ): walletStates.Initialized => {
   const newState = { ...state };
   // Create initial channel state for new ledger channel
-  newState.channelState.initializedChannels[channelId] = channelState.waitForChannel({
+  newState.channelState.initializedChannels[channelId] = channelStates.waitForChannel({
     address,
     privateKey,
   });
