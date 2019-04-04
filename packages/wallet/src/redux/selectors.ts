@@ -1,7 +1,7 @@
 import { OpenedState, OPENING, ChannelStatus } from './channel-state/state';
 import * as walletStates from './state';
 import * as indirectFundingStates from './indirect-funding/state';
-import { DirectFundingStatus } from './funding-state/state';
+import { DirectFundingState } from './direct-funding-store/direct-funding-state/state';
 
 export const getOpenedChannelState = (
   state: walletStates.Initialized,
@@ -35,10 +35,10 @@ export function getIndirectFundingState(
   return state.indirectFunding;
 }
 
-export const getDirectFundingStatus = (
+export const getDirectFundingState = (
   state: walletStates.Initialized,
   channelId: string,
-): DirectFundingStatus => {
+): DirectFundingState => {
   const fundingStatus = state.directFundingStore.directFunding[channelId];
   if (!fundingStatus) {
     throw new Error(`No funding status for channel ${channelId}`);

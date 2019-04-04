@@ -202,7 +202,7 @@ const ledgerChannelFundsAppChannel = (
 };
 
 const directFundingIsComplete = (state: walletStates.Initialized, channelId: string): boolean => {
-  const fundingStatus = selectors.getDirectFundingStatus(state, channelId);
+  const fundingStatus = selectors.getDirectFundingState(state, channelId);
   return fundingStatus.channelFundingStatus === CHANNEL_FUNDED;
 };
 
