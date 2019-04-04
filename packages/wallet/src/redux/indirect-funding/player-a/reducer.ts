@@ -110,7 +110,7 @@ const waitForPostFundSetup1 = (
 const waitForDirectFunding = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
-) => {
+): walletStates.Initialized => {
   const indirectFundingState = selectors.getIndirectFundingState(
     state,
   ) as states.WaitForDirectFunding;
@@ -118,7 +118,7 @@ const waitForDirectFunding = (
     return state;
   } else {
     let newState = updateFundingState(state, action);
-    if (isDirectFundingComplete(newState, action.channelId)) {
+    if (directFundingIsComplete(newState, action.channelId)) {
       newState = createAndSendPostFundCommitment(newState, action.channelId);
       newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
     }
@@ -129,7 +129,7 @@ const waitForDirectFunding = (
 const waitForPreFundSetup1Reducer = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
-) => {
+): walletStates.Initialized => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const indirectFundingState = selectors.getIndirectFundingState(
@@ -150,7 +150,7 @@ const waitForPreFundSetup1Reducer = (
 const waitForApprovalReducer = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
-) => {
+): walletStates.Initialized => {
   switch (action.type) {
     case actions.indirectFunding.playerA.FUNDING_APPROVED:
       let newState = { ...state };
@@ -187,13 +187,6 @@ const ledgerChannelIsWaitingForUpdate = (
   return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE;
 };
 
-const confirmFundingForAppChannel = (
-  state: walletStates.Initialized,
-  channelId: string,
-): walletStates.Initialized => {
-  return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
-};
-
 const ledgerChannelFundsAppChannel = (
   state: walletStates.Initialized,
   appChannelId: string,
@@ -208,7 +201,7 @@ const ledgerChannelFundsAppChannel = (
   return bigNumberify(allocation[indexOfTargetChannel]).gte(appChannelTotal);
 };
 
-const isDirectFundingComplete = (state: walletStates.Initialized, channelId: string): boolean => {
+const directFundingIsComplete = (state: walletStates.Initialized, channelId: string): boolean => {
   const fundingStatus = selectors.getDirectFundingStatus(state, channelId);
   return fundingStatus.channelFundingStatus === CHANNEL_FUNDED;
 };
@@ -229,7 +222,7 @@ const createAndSendUpdateCommitment = (
   const appChannelState = selectors.getOpenedChannelState(state, appChannelId);
   const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
   const proposedDestination = [appChannelState.channelId];
-
+  // Compose the update commitment
   const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
   const { updateCommitment, commitmentSignature } = composeLedgerUpdateCommitment(
     ledgerChannelState.lastCommitment.commitment,
@@ -240,7 +233,8 @@ const createAndSendUpdateCommitment = (
   );
 
   // Update our ledger channel with the latest commitment
-  let newState = receiveOwnLedgerCommitment(state, updateCommitment);
+  const newState = receiveOwnLedgerCommitment(state, updateCommitment);
+
   // Send out the commitment to the opponent
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
@@ -309,6 +303,13 @@ const createAndSendPreFundCommitment = (
   return newState;
 };
 
+const confirmFundingForAppChannel = (
+  state: walletStates.Initialized,
+  channelId: string,
+): walletStates.Initialized => {
+  return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
+};
+
 const receiveLedgerCommitment = (
   state: walletStates.Initialized,
   commitment: Commitment,
@@ -348,16 +349,6 @@ const createLedgerChannel = (
   return { state: updatedState, ledgerChannel };
 };
 
-// TODO: These are utility methods that can be shared by player A/B
-
-export const calculateChannelTotal = (allocation: string[]): string => {
-  let total = '0x0';
-  allocation.forEach(amount => {
-    total = addHex(total, amount);
-  });
-  return total;
-};
-
 export const createCommitmentMessageRelay = (
   to: string,
   channelId: string,
@@ -371,8 +362,6 @@ export const createCommitmentMessageRelay = (
   };
   return messageRelayRequested(to, payload);
 };
-
-// TODO: These all update state and can probably be stored in a file together.
 
 export const initializeChannelState = (
   state: walletStates.Initialized,
