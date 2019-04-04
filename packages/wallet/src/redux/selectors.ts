@@ -39,7 +39,7 @@ export const getDirectFundingStatus = (
   state: walletStates.Initialized,
   channelId: string,
 ): DirectFundingStatus => {
-  const fundingStatus = state.fundingState.directFunding[channelId];
+  const fundingStatus = state.directFundingStore.directFunding[channelId];
   if (!fundingStatus) {
     throw new Error(`No funding status for channel ${channelId}`);
   }

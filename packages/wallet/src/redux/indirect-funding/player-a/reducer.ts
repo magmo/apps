@@ -23,6 +23,7 @@ import {
 import { isFundingAction } from '../../internal/actions';
 import { bigNumberify } from 'ethers/utils';
 import { directFundingStoreReducer } from '../../direct-funding-store/reducer';
+import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -117,7 +118,7 @@ const waitForDirectFunding = (
   if (!isFundingAction(action) || action.channelId !== indirectFundingState.ledgerId) {
     return state;
   } else {
-    let newState = updateDirectFundingStore(state, action);
+    let newState = updateDirectFundingStatus(state, action);
     if (directFundingIsComplete(newState, action.channelId)) {
       newState = createAndSendPostFundCommitment(newState, action.channelId);
       newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
@@ -313,7 +314,7 @@ const requestDirectFunding = (
   const totalFundingRequested = allocation.reduce(addHex);
   const depositAmount = allocation[ourIndex];
 
-  return updateDirectFundingStore(
+  return updateDirectFundingStatus(
     state,
     actions.internal.directFundingRequested(
       ledgerChannelId,
@@ -414,7 +415,7 @@ export const updateChannelState = (
   return newState;
 };
 
-export const updateDirectFundingStore = (
+export const updateDirectFundingStatus = (
   state: walletStates.Initialized,
   action: actions.funding.FundingAction,
 ): walletStates.Initialized => {
