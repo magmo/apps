@@ -12,8 +12,6 @@ import { channelStateReducer } from '../../channel-state/reducer';
 import * as channelActions from '../../channel-state/actions';
 import { messageRelayRequested } from 'magmo-wallet-client';
 import * as selectors from '../../selectors';
-import { fundingStateReducer } from '../../funding-state/reducer';
-import { CHANNEL_FUNDED } from '../../funding-state/state';
 import * as channelStates from '../../channel-state/state';
 import { addHex } from '../../../utils/hex-utils';
 import { accumulateSideEffects } from '../../outbox';
@@ -24,6 +22,7 @@ import {
 } from '../../../utils/commitment-utils';
 import { isFundingAction } from '../../internal/actions';
 import { bigNumberify } from 'ethers/utils';
+import { directFundingStoreReducer } from '../../direct-funding-store/reducer';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -114,10 +113,11 @@ const waitForDirectFunding = (
   const indirectFundingState = selectors.getIndirectFundingState(
     state,
   ) as states.WaitForDirectFunding;
-  if (!isFundingAction(action) || action.channelId !== indirectFundingState.channelId) {
+  // Funding events currently occur directly against the ledger channel
+  if (!isFundingAction(action) || action.channelId !== indirectFundingState.ledgerId) {
     return state;
   } else {
-    let newState = updateFundingState(state, action);
+    let newState = updateDirectFundingStore(state, action);
     if (directFundingIsComplete(newState, action.channelId)) {
       newState = createAndSendPostFundCommitment(newState, action.channelId);
       newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
@@ -138,11 +138,7 @@ const waitForPreFundSetup1Reducer = (
       let newState = { ...state };
       newState = receiveLedgerCommitment(newState, action.commitment, action.signature);
       if (appChannelIsWaitingForFunding(newState, indirectFundingState.channelId)) {
-        newState = requestDirectFunding(
-          newState,
-          indirectFundingState.channelId,
-          indirectFundingState.ledgerId,
-        );
+        newState = requestDirectFunding(newState, indirectFundingState.ledgerId);
         newState.indirectFunding = states.waitForDirectFunding(indirectFundingState);
       }
       return newState;
@@ -308,7 +304,6 @@ const createAndSendPreFundCommitment = (
 
 const requestDirectFunding = (
   state: walletStates.Initialized,
-  appChannelId: string,
   ledgerChannelId: string,
 ): walletStates.Initialized => {
   const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
@@ -318,10 +313,10 @@ const requestDirectFunding = (
   const totalFundingRequested = allocation.reduce(addHex);
   const depositAmount = allocation[ourIndex];
 
-  return updateFundingState(
+  return updateDirectFundingStore(
     state,
     actions.internal.directFundingRequested(
-      appChannelId,
+      ledgerChannelId,
       safeToDeposit,
       totalFundingRequested,
       depositAmount,
@@ -419,12 +414,12 @@ export const updateChannelState = (
   return newState;
 };
 
-export const updateFundingState = (
+export const updateDirectFundingStore = (
   state: walletStates.Initialized,
   action: actions.funding.FundingAction,
 ): walletStates.Initialized => {
   const newState = { ...state };
-  const updatedFundingState = fundingStateReducer(state.fundingState, action);
-  newState.fundingState = updatedFundingState.state;
+  const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
+  newState.directFundingStore = updatedDirectFundingStore.state;
   return newState;
 };
