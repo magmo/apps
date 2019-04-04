@@ -114,6 +114,6 @@ export type DirectFundingStatus =
   | WaitForFundingConfirmation
   | ChannelFunded;
 
-export interface DirectFundingState {
+export interface DirectFundingStore {
   [channelId: string]: DirectFundingStatus;
 }

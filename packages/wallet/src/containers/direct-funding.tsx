@@ -12,7 +12,7 @@ import TransactionFailed from '../components/transaction-failed';
 import { WalletProcedure } from '../redux/types';
 
 interface Props {
-  state: fundingStates.DirectFundingState;
+  directFundingStore: fundingStates.DirectFundingStore;
   channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
@@ -21,8 +21,8 @@ interface Props {
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { state, retryTransactionAction, channelId } = this.props;
-    const status = state[channelId];
+    const { directFundingStore, retryTransactionAction, channelId } = this.props;
+    const status = directFundingStore[channelId];
     const step = fundingStepByState(status);
     if (
       fundingStates.stateIsNotSafeToDeposit(status) ||
@@ -81,6 +81,6 @@ const mapDispatchToProps = {
 // why does it think that mapStateToProps can return undefined??
 
 export default connect(
-  (state: any) => ({ state: state.fundingState.directFunding }),
+  (state: any) => ({ directFundingStore: state.channelState.directFunding }),
   mapDispatchToProps,
 )(DirectFundingContainer);
