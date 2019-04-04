@@ -26,6 +26,7 @@ import { isFundingAction } from '../../internal/actions';
 import { bigNumberify } from 'ethers/utils';
 import { directFundingStoreReducer } from '../../direct-funding-store/reducer';
 import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
+import { appChannelIsWaitingForFunding } from '../reducer-helpers';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -206,14 +207,6 @@ const ledgerChannelFundsAppChannel = (
 const directFundingIsComplete = (state: walletStates.Initialized, channelId: string): boolean => {
   const fundingStatus = selectors.getDirectFundingState(state, channelId);
   return fundingStatus.channelFundingStatus === CHANNEL_FUNDED;
-};
-
-const appChannelIsWaitingForFunding = (
-  state: walletStates.Initialized,
-  channelId: string,
-): boolean => {
-  const appChannel = selectors.getOpenedChannelState(state, channelId);
-  return appChannel.type === channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
 };
 
 const createAndSendUpdateCommitment = (
