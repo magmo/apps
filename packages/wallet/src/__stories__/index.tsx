@@ -10,6 +10,7 @@ import NetworkStatus from '../components/network-status';
 import { channelFunded } from '../redux/funding-state/state';
 import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
 import { WaitForFundingAndPostFundSetup } from '../redux/channel-state/state';
+import './styles.css';
 
 const {
   asAddress,
@@ -117,12 +118,26 @@ function walletStateFromChannelState<T extends channelStates.OpenedState>(
   };
 }
 
-const walletStateRender = state => () => {
+// const walletStateRender = state => () => {
+//   const fullState = { ...initializedWalletState, networkId: 3, ...state };
+//   return (
+//     <Provider store={fakeStore(fullState)}>
+//       <WalletContainer position="center"/>
+//     </Provider>
+//   );
+// };
+
+const twinWalletStateRender = state => () => {
   const fullState = { ...initializedWalletState, networkId: 3, ...state };
   return (
+    <div>
     <Provider store={fakeStore(fullState)}>
-      <WalletContainer />
-    </Provider>
+        <WalletContainer position="left"/>
+      </Provider>
+    <Provider store={fakeStore(fullState)}>
+        <WalletContainer position="right"/>
+      </Provider>
+      </div>
   );
 };
 
@@ -266,7 +281,7 @@ const WalletScreensIndirectFundingPlayerA = {
 addStoriesFromCollection(
   WalletScreensIndirectFundingPlayerA,
   'Wallet Screens / Indirect Funding / Player A',
-  walletStateRender,
+  twinWalletStateRender,
 );
 
 // const WalletScreensFundingPlayerB = {
