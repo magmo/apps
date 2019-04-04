@@ -22,7 +22,7 @@ const customStyles = {
   },
 };
 
-export default class SidebarLayout extends PureComponent {
+export default class StatusBarLayout extends PureComponent {
   render() {
     return (
       <Modal isOpen={true} style={customStyles} ariaHideApp={false}>

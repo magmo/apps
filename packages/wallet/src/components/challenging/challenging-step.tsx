@@ -9,7 +9,7 @@ import {
   faBullhorn,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
-import SidebarLayout from '../sidebar-layout';
+import StatusBarLayout from '../status-bar-layout';
 
 interface Props {
   step: number;
@@ -128,7 +128,7 @@ export class ChallengingStep extends React.PureComponent<Props> {
       expiryDate +
       ', the channel will be closed and you can withdraw your funds.';
     return (
-      <SidebarLayout>
+      <StatusBarLayout>
         <h2 className="bp-2">Challenging</h2>
         <ul className="fa-ul">
           <li style={{ padding: '0.7em 1em' }}>
@@ -148,7 +148,7 @@ export class ChallengingStep extends React.PureComponent<Props> {
           {children}
           {currentStep === 3 ? CHALLENGE_PERIOD_MESSAGE : null}
         </div>
-      </SidebarLayout>
+      </StatusBarLayout>
     );
   }
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
-import SidebarLayout from '../sidebar-layout';
+import StatusBarLayout from '../status-bar-layout';
 
 interface Props {
   step: number;
@@ -72,7 +72,7 @@ export class RespondingStep extends React.PureComponent<Props> {
     const children = this.props.children;
 
     return (
-      <SidebarLayout>
+      <StatusBarLayout>
         <h2 className="bp-2">Responding</h2>
         <ul className="fa-ul">
           <li style={{ padding: '0.7em 1em' }}>
@@ -89,7 +89,7 @@ export class RespondingStep extends React.PureComponent<Props> {
           </li>
         </ul>
         <div className="pb-2">{children}</div>
-      </SidebarLayout>
+      </StatusBarLayout>
     );
   }
 }
