@@ -18,7 +18,6 @@ const YOUR_DEPOSIT_B = twoThree[0];
 const TOTAL_REQUIRED = twoThree.reduce(addHex);
 
 const defaultsForA: states.DirectFundingStatus = {
-  fundingType: states.DIRECT_FUNDING,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
   channelId,

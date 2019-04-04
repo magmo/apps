@@ -1,5 +1,4 @@
 import * as depositing from './depositing/state';
-import { BaseFundingState } from '../state';
 export { depositing };
 
 // ChannelFundingStatus
@@ -15,11 +14,14 @@ export type ChannelFundingStatus =
 
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 
-export interface BaseDirectFundingState extends BaseFundingState {
-  fundingType: typeof DIRECT_FUNDING;
+export interface BaseDirectFundingState {
   safeToDepositLevel: string;
   depositStatus?: depositing.DepositStatus;
   channelFundingStatus: ChannelFundingStatus;
+  requestedTotalFunds: string;
+  requestedYourContribution: string;
+  channelId: string;
+  ourIndex: number;
 }
 
 export interface NotSafeToDeposit extends BaseDirectFundingState {
@@ -49,7 +51,6 @@ export function baseDirectFundingState<T extends BaseDirectFundingState>(
     channelFundingStatus,
   } = params;
   return {
-    fundingType: DIRECT_FUNDING,
     requestedTotalFunds,
     requestedYourContribution,
     channelId,

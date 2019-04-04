@@ -2,7 +2,7 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import * as fundingStates from '../redux/funding-state/state';
+import * as fundingStates from '../redux/channel-state/direct-funding/state';
 import * as actions from '../redux/actions';
 
 import { unreachable } from '../utils/reducer-utils';

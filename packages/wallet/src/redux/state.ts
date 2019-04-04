@@ -1,5 +1,4 @@
 import { OutboxState, EMPTY_OUTBOX_STATE } from './outbox/state';
-import { FundingState, EMPTY_FUNDING_STATE } from './funding-state/state';
 import { ChannelState, ChannelStatus } from './channel-state/state';
 import { Properties } from './utils';
 import * as indirectFunding from './indirect-funding/state';
@@ -20,21 +19,18 @@ export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 export interface WaitForLogin {
   type: typeof WAIT_FOR_LOGIN;
   channelState: ChannelState;
-  fundingState: FundingState;
   outboxState: OutboxState;
 }
 
 export interface MetaMaskError {
   type: typeof METAMASK_ERROR;
   channelState: ChannelState;
-  fundingState: FundingState;
   outboxState: OutboxState;
 }
 
 export interface WaitForAdjudicator {
   type: typeof WAIT_FOR_ADJUDICATOR;
   channelState: ChannelState;
-  fundingState: FundingState;
   outboxState: OutboxState;
   uid: string;
 }
@@ -42,7 +38,6 @@ export interface WaitForAdjudicator {
 export interface Initialized {
   type: typeof WALLET_INITIALIZED;
   channelState: ChannelState;
-  fundingState: FundingState;
 
   outboxState: OutboxState;
   uid: string;
@@ -58,7 +53,6 @@ export interface Initialized {
 // ------------
 export const emptyState = {
   outboxState: EMPTY_OUTBOX_STATE,
-  fundingState: EMPTY_FUNDING_STATE,
   channelState: { initializedChannels: {}, initializingChannels: {} },
 };
 
@@ -67,21 +61,20 @@ export function waitForLogin(): WaitForLogin {
 }
 
 export function metaMaskError(params: Properties<MetaMaskError>): MetaMaskError {
-  const { outboxState, fundingState, channelState } = params;
-  return { type: METAMASK_ERROR, outboxState, fundingState, channelState };
+  const { outboxState, channelState } = params;
+  return { type: METAMASK_ERROR, outboxState, channelState };
 }
 
 export function waitForAdjudicator(params: Properties<WaitForAdjudicator>): WaitForAdjudicator {
-  const { outboxState, fundingState, channelState, uid } = params;
-  return { type: WAIT_FOR_ADJUDICATOR, outboxState, fundingState, channelState, uid };
+  const { outboxState, channelState, uid } = params;
+  return { type: WAIT_FOR_ADJUDICATOR, outboxState, channelState, uid };
 }
 
 export function initialized(params: Properties<Initialized>): Initialized {
-  const { outboxState, fundingState, channelState, uid, networkId, adjudicator } = params;
+  const { outboxState, channelState, uid, networkId, adjudicator } = params;
   return {
     type: WALLET_INITIALIZED,
     channelState,
-    fundingState,
     outboxState,
     uid,
     networkId,
