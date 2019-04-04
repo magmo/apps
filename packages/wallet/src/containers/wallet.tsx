@@ -29,9 +29,9 @@ const baseStyle = {
 };
 
 const leftStyle = {
-  ...baseStyle,
   content: {
     left: '20%',
+    ...baseStyle.content,
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0)',
@@ -39,9 +39,9 @@ const leftStyle = {
 };
 
 const rightStyle = {
-  ...baseStyle,
   content: {
     left: '70%',
+    ...baseStyle.content,
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0)',
@@ -56,19 +56,18 @@ const centerStyle = {
 };
 
 
-
+function setStyle(position) {
+  switch (position) {
+    case "left":
+      return leftStyle;
+    case "right":
+      return rightStyle;
+    default:
+      return centerStyle;
+    }
+  }  
 class WalletContainer extends PureComponent<WalletProps> {
   render() {
-    function setStyle(position) {
-      switch (position) {
-        case "left":
-          return leftStyle;
-        case "right":
-          return rightStyle;
-        default:
-          return centerStyle;
-        }
-      }  
     const { state } = this.props;
     switch (state.type) {
       case states.WAIT_FOR_LOGIN:
@@ -94,9 +93,9 @@ class WalletContainer extends PureComponent<WalletProps> {
   }
 }
 
-const mapStateToProps = (state: states.WalletState): WalletProps => ({
+const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => ({
   state,
-  position: "center",
+  position: ownProps.position,
 });
 
 export default connect(mapStateToProps)(WalletContainer);
