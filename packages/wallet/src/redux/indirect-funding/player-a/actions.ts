@@ -8,8 +8,9 @@ export const strategyApproved = (channelId: string) => ({
   procedure: WalletProcedure.IndirectFunding as WalletProcedure.IndirectFunding,
 });
 export const FUNDING_APPROVED = 'FUNDING_APPROVED';
-export const fundingApproved = () => ({
+export const fundingApproved = (channelId: string) => ({
   type: FUNDING_APPROVED as typeof FUNDING_APPROVED,
+  channelId,
 });
 export type FundingApproved = ReturnType<typeof fundingApproved>;
 
