@@ -157,7 +157,6 @@ const waitForApprovalReducer = (
 
       const appChannelState = selectors.getOpenedChannelState(state, action.channelId);
 
-      // Create new ledger channel
       const { state: ledgerChannelState, ledgerChannel } = createLedgerChannel(
         newState,
         appChannelState,
