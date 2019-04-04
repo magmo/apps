@@ -121,7 +121,7 @@ const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState
   return { state: { ...state, [channelId]: newState }, sideEffects: outboxState };
 };
 
-const initializedChannelStatusReducer: ReducerWithSideEffects<states.ChannelStatus> = (
+export const initializedChannelStatusReducer: ReducerWithSideEffects<states.ChannelStatus> = (
   state: states.ChannelStatus,
   action: actions.ChannelAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
