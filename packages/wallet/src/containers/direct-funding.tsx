@@ -2,7 +2,7 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import * as fundingStates from '../redux/direct-funding-store/state';
+import * as fundingStore from '../redux/direct-funding-store/state';
 import * as actions from '../redux/actions';
 
 import { unreachable } from '../utils/reducer-utils';
@@ -12,7 +12,7 @@ import TransactionFailed from '../components/transaction-failed';
 import { WalletProcedure } from '../redux/types';
 
 interface Props {
-  directFundingStore: fundingStates.DirectFundingStore;
+  directFundingStore: fundingStore.DirectFundingStore;
   channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
@@ -25,18 +25,18 @@ class DirectFundingContainer extends PureComponent<Props> {
     const state = directFundingStore[channelId];
     const step = fundingStepByState(state);
     if (
-      fundingStates.stateIsNotSafeToDeposit(state) ||
-      fundingStates.stateIsWaitForFundingConfirmation(state)
+      fundingStore.states.stateIsNotSafeToDeposit(state) ||
+      fundingStore.states.stateIsWaitForFundingConfirmation(state)
     ) {
       return <FundingStep step={step} />;
     }
-    if (fundingStates.stateIsDepositing(state)) {
+    if (fundingStore.states.stateIsDepositing(state)) {
       switch (state.depositStatus) {
-        case fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT:
+        case fundingStore.states.depositing.WAIT_FOR_TRANSACTION_SENT:
           return <FundingStep step={step} />;
-        case fundingStates.depositing.WAIT_FOR_DEPOSIT_APPROVAL:
+        case fundingStore.states.depositing.WAIT_FOR_DEPOSIT_APPROVAL:
           return <FundingStep step={step}>Please confirm the transaction in MetaMask!</FundingStep>;
-        case fundingStates.depositing.WAIT_FOR_DEPOSIT_CONFIRMATION:
+        case fundingStore.states.depositing.WAIT_FOR_DEPOSIT_CONFIRMATION:
           return (
             <FundingStep step={step}>
               Check the progress on&nbsp;
@@ -48,7 +48,7 @@ class DirectFundingContainer extends PureComponent<Props> {
               !
             </FundingStep>
           );
-        case fundingStates.depositing.DEPOSIT_TRANSACTION_FAILED:
+        case fundingStore.states.depositing.DEPOSIT_TRANSACTION_FAILED:
           return (
             <TransactionFailed
               name="deposit"
@@ -62,7 +62,7 @@ class DirectFundingContainer extends PureComponent<Props> {
           return unreachable(state);
       }
     }
-    if (fundingStates.stateIsChannelFunded(state)) {
+    if (fundingStore.states.stateIsChannelFunded(state)) {
       return null;
     }
 

@@ -1,7 +1,6 @@
-import { directFundingStateReducer } from '../reducer';
+import { directFundingStateReducer } from '../direct-funding-state/reducer';
 
-import * as states from '../state';
-import * as depositingStates from '../depositing/state';
+import * as states from '../direct-funding-state/state';
 import * as actions from '../../actions';
 
 import * as scenarios from '../../__tests__/test-scenarios';
@@ -80,7 +79,7 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
       const updatedState = directFundingStateReducer(state, action);
 
       itChangesChannelFundingStatusTo(states.SAFE_TO_DEPOSIT, updatedState);
-      itChangesDepositStatusTo(depositingStates.WAIT_FOR_TRANSACTION_SENT, updatedState);
+      itChangesDepositStatusTo(states.depositing.WAIT_FOR_TRANSACTION_SENT, updatedState);
     });
 
     describe('when it is still not safe to deposit', () => {
