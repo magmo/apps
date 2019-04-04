@@ -84,7 +84,7 @@ class WalletContainer extends PureComponent<WalletProps> {
       return (
         <Modal isOpen={true} style={setStyle(this.props.position)}
           ariaHideApp={false}>
-          <WalletInitializedContainer state={state} />;
+          <WalletInitializedContainer state={state} />
         </Modal>
       )
       default:
@@ -92,6 +92,7 @@ class WalletContainer extends PureComponent<WalletProps> {
     }
   }
 }
+
 
 const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => ({
   state,

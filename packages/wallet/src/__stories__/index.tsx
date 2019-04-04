@@ -10,7 +10,6 @@ import NetworkStatus from '../components/network-status';
 import { channelFunded } from '../redux/funding-state/state';
 import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
 import { WaitForFundingAndPostFundSetup } from '../redux/channel-state/state';
-import './styles.css';
 
 const {
   asAddress,
@@ -231,11 +230,47 @@ const WaitForApprovalA: walletStates.Initialized = {
         },
         type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
         stage: 'FUNDING',
+      } as WaitForFundingAndPostFundSetup,
+      'TTT': {
+        address: asAddress,
+        privateKey: asPrivateKey,
+        channelId: 'RPS',
+        libraryAddress: '',
+        ourIndex: 0,
+        participants: [asAddress, bsAddress],
+        channelNonce: 0,
+        turnNum: 2,
+        lastCommitment: {
+          commitment: {
+            commitmentType: 0, // prefundsetup
+            appAttributes: '',
+          },
+          signature: '',
+          },
+        funded: false,
+        penultimateCommitment: {
+          commitment: {
+            channel: {
+              channelType: '0',
+              nonce: 0,
+              participants: [asAddress,bsAddress],
+            },
+            turnNum: 1,
+            allocation: ['5','5'],
+            destination: [asAddress,bsAddress],
+            commitmentCount: 1,
+            commitmentType: 0, // prefundsetup
+            appAttributes: '',
+          },
+          signature: '',
+        },
+        type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
+        stage: 'FUNDING',
       }  as WaitForFundingAndPostFundSetup } ,
   },
   fundingState: {
     directFunding: 
-      {channelId: {
+      {'TTT': {
         requestedTotalFunds: '10',
         requestedYourContribution: '5',
         channelId,
