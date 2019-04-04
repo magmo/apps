@@ -2,14 +2,11 @@ import { directFundingStateReducer } from '../reducer';
 
 import * as states from '../state';
 import * as depositingStates from '../depositing/state';
-import * as actions from '../../../actions';
+import * as actions from '../../actions';
 
-import * as scenarios from '../../../__tests__/test-scenarios';
-import {
-  itChangesChannelFundingStatusTo,
-  itChangesDepositStatusTo,
-} from '../../../__tests__/helpers';
-import { addHex } from '../../../../utils/hex-utils';
+import * as scenarios from '../../__tests__/test-scenarios';
+import { itChangesChannelFundingStatusTo, itChangesDepositStatusTo } from '../../__tests__/helpers';
+import { addHex } from '../../../utils/hex-utils';
 
 const { channelId, twoThree } = scenarios;
 
