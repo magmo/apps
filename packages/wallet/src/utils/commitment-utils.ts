@@ -7,7 +7,7 @@ import { Channel } from 'fmg-core';
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,
   penultimateCommitment: Commitment,
-) => {
+): boolean => {
   const numOfPlayers = lastCommitment.channel.participants.length;
   const lastAppAttributes = appAttributesFromBytes(lastCommitment.appAttributes);
   const penultimateAppAttributes = appAttributesFromBytes(penultimateCommitment.appAttributes);
