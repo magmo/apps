@@ -104,19 +104,19 @@ const initializedWalletState = walletStates.initialized({
 });
 
 // Want to return top level wallet state, not the channel state
-function walletStateFromChannelState<T extends channelStates.OpenedState>(
-  channelState: T,
-  networkId?: number,
-): walletStates.WalletState {
-  return {
-    ...initializedWalletState,
-    channelState: {
-      initializedChannels: { [channelState.channelId]: channelState },
-      initializingChannels: {},
-    },
-    networkId: networkId || 3,
-  };
-}
+// function walletStateFromChannelState<T extends channelStates.OpenedState>(
+//   channelState: T,
+//   networkId?: number,
+// ): walletStates.WalletState {
+//   return {
+//     ...initializedWalletState,
+//     channelState: {
+//       initializedChannels: { [channelState.channelId]: channelState },
+//       initializingChannels: {},
+//     },
+//     networkId: networkId || 3,
+//   };
+// }
 
 // const walletStateRender = state => () => {
 //   const fullState = { ...initializedWalletState, networkId: 3, ...state };
@@ -127,28 +127,29 @@ function walletStateFromChannelState<T extends channelStates.OpenedState>(
 //   );
 // };
 
-const twinWalletStateRender = state => () => {
-  const fullState = { ...initializedWalletState, networkId: 3, ...state };
+const twinWalletStateRender = (aState,bState) => () => {
+  const aFullState = { ...initializedWalletState, networkId: 3, ...aState };
+  const bFullState = { ...initializedWalletState, networkId: 3, ...bState };
   return (
     <div>
-    <Provider store={fakeStore(fullState)}>
+    <Provider store={fakeStore(aFullState)}>
         <WalletContainer position="left"/>
       </Provider>
-    <Provider store={fakeStore(fullState)}>
+    <Provider store={fakeStore(bFullState)}>
         <WalletContainer position="right"/>
       </Provider>
       </div>
   );
 };
 
-const channelStateRender = channelState => () => {
-  const walletState = walletStateFromChannelState(channelState);
-  return (
-    <Provider store={fakeStore(walletState)}>
-      <WalletContainer />
-    </Provider>
-  );
-};
+// const channelStateRender = channelState => () => {
+//   const walletState = walletStateFromChannelState(channelState);
+//   return (
+//     <Provider store={fakeStore(walletState)}>
+//       <WalletContainer />
+//     </Provider>
+//   );
+// };
 
 storiesOf('Network Status', module)
   .add('Mainnet', () => (
@@ -177,13 +178,19 @@ storiesOf('Network Status', module)
     </Provider>
   ));
 
-function addStoriesFromCollection(collection, chapter, renderer = channelStateRender) {
+function addTwinStoriesFromCollection(collection, chapter, renderer = twinWalletStateRender) {
   Object.keys(collection).map(storyName => {
-    storiesOf(chapter, module).add(storyName, renderer(collection[storyName]));
+    storiesOf(chapter, module).add(storyName, renderer(collection[storyName].a,collection[storyName].b));
   });
 }
 
-const WaitForApproval: walletStates.Initialized = {
+// function addStoriesFromCollection(collection, chapter, renderer = channelStateRender) {
+//   Object.keys(collection).map(storyName => {
+//     storiesOf(chapter, module).add(storyName, renderer(collection[storyName]));
+//   });
+// }
+
+const WaitForApprovalA: walletStates.Initialized = {
   type: 'WALLET.INITIALIZED',
   channelState: {
     initializingChannels:
@@ -252,8 +259,53 @@ const WaitForApproval: walletStates.Initialized = {
   adjudicator: 'somewhere',
 }
 
-const WalletScreensIndirectFundingPlayerA = {
-  WaitForApproval,
+const WaitForApprovalB = {
+  ...WaitForApprovalA,
+  channelState: {
+    initializingChannels:
+      {},
+    initializedChannels:
+      {'TTT': {
+        address: asAddress,
+        privateKey: asPrivateKey,
+        channelId: 'RPS',
+        libraryAddress: '',
+        ourIndex: 0,
+        participants: [asAddress, bsAddress],
+        channelNonce: 0,
+        turnNum: 2,
+        lastCommitment: {
+          commitment: {
+            commitmentType: 0, // prefundsetup
+            appAttributes: '',
+          },
+          signature: '',
+          },
+        funded: false,
+        penultimateCommitment: {
+          commitment: {
+            channel: {
+              channelType: '0',
+              nonce: 0,
+              participants: [asAddress,bsAddress],
+            },
+            turnNum: 1,
+            allocation: ['5','5'],
+            destination: [asAddress,bsAddress],
+            commitmentCount: 1,
+            commitmentType: 0, // prefundsetup
+            appAttributes: '',
+          },
+          signature: '',
+        },
+        type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
+        stage: 'FUNDING',
+      }  as WaitForFundingAndPostFundSetup } ,
+  },
+}
+
+const TwinWalletScreensIndirectFunding = [
+  {a: WaitForApprovalA, b: WaitForApprovalB},
   // WaitForPreFundSetup1: {
   //   channelState: channelStates.waitForFundingAndPostFundSetup(playerADefaults),
   //   fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
@@ -277,10 +329,10 @@ const WalletScreensIndirectFundingPlayerA = {
   //   fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
   // },
   // WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerADefaults) },
-};
-addStoriesFromCollection(
-  WalletScreensIndirectFundingPlayerA,
-  'Wallet Screens / Indirect Funding / Player A',
+];
+addTwinStoriesFromCollection(
+  TwinWalletScreensIndirectFunding,
+  'Wallet Screens / Indirect Funding / Player A x Player B',
   twinWalletStateRender,
 );
 

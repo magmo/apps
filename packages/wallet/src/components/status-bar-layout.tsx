@@ -2,11 +2,9 @@ import React from 'react';
 import { PureComponent } from 'react';
 import NetworkStatus from './network-status';
 
-interface LayoutProps {
-  position: "left" | "center" | "right";
-}
 
-export default class StatusBarLayout extends PureComponent<LayoutProps> {
+
+export default class StatusBarLayout extends PureComponent {
   render() {
 
     return (
