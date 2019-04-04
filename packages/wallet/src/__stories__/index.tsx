@@ -7,7 +7,6 @@ import * as channelStates from '../redux/channel-state/state';
 import '../index.scss';
 import * as scenarios from '../redux/__tests__/test-scenarios';
 import NetworkStatus from '../components/network-status';
-import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
 
 const {
   asAddress,
@@ -64,7 +63,7 @@ const fakeStore = state => ({
 const initializedWalletState = walletStates.initialized({
   ...walletStates.waitForLogin(),
   unhandledAction: undefined,
-  outboxState: EMPTY_OUTBOX_STATE,
+  ...walletStates.emptyState,
   channelState: {
     initializedChannels: {
       [channelId]: channelStates.waitForFundingAndPostFundSetup({ ...playerADefaults }),
