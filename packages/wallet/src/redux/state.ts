@@ -2,6 +2,7 @@ import { OutboxState, EMPTY_OUTBOX_STATE } from './outbox/state';
 import { ChannelState, ChannelStatus } from './channel-state/state';
 import { Properties } from './utils';
 import * as indirectFunding from './indirect-funding/state';
+import { DirectFundingStore } from './direct-funding-store/state';
 
 export type WalletState = WaitForLogin | WaitForAdjudicator | MetaMaskError | Initialized;
 
@@ -20,6 +21,7 @@ export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 interface Shared {
   channelState: ChannelState;
   outboxState: OutboxState;
+  directFundingStore: DirectFundingStore;
 }
 
 export interface WaitForLogin extends Shared {
@@ -51,11 +53,12 @@ export interface Initialized extends Shared {
 export const emptyState: Shared = {
   outboxState: EMPTY_OUTBOX_STATE,
   channelState: { initializedChannels: {}, initializingChannels: {} },
+  directFundingStore: {},
 };
 
 function shared(params: Shared): Shared {
-  const { outboxState, channelState } = params;
-  return { outboxState, channelState };
+  const { outboxState, channelState, directFundingStore } = params;
+  return { outboxState, channelState, directFundingStore };
 }
 
 export function waitForLogin(): WaitForLogin {
