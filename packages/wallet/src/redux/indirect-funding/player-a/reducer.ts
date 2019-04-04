@@ -138,7 +138,11 @@ const waitForPreFundSetup1Reducer = (
       let newState = { ...state };
       newState = receiveLedgerCommitment(newState, action.commitment, action.signature);
       if (appChannelIsWaitingForFunding(newState, indirectFundingState.channelId)) {
-        // TODO: Start direct funding
+        newState = requestDirectFunding(
+          newState,
+          indirectFundingState.channelId,
+          indirectFundingState.ledgerId,
+        );
         newState.indirectFunding = states.waitForDirectFunding(indirectFundingState);
       }
       return newState;
@@ -300,6 +304,30 @@ const createAndSendPreFundCommitment = (
     ),
   ];
   return newState;
+};
+
+const requestDirectFunding = (
+  state: walletStates.Initialized,
+  appChannelId: string,
+  ledgerChannelId: string,
+): walletStates.Initialized => {
+  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
+  const { ourIndex } = ledgerChannelState;
+  const { allocation } = ledgerChannelState.lastCommitment.commitment;
+  const safeToDeposit = ourIndex === PlayerIndex.A ? '0x0' : allocation[0];
+  const totalFundingRequested = allocation.reduce(addHex);
+  const depositAmount = allocation[ourIndex];
+
+  return updateFundingState(
+    state,
+    actions.internal.directFundingRequested(
+      appChannelId,
+      safeToDeposit,
+      totalFundingRequested,
+      depositAmount,
+      ourIndex,
+    ),
+  );
 };
 
 const confirmFundingForAppChannel = (
