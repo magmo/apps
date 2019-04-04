@@ -1,10 +1,16 @@
 import * as walletStates from '../../state';
 import * as states from './state';
+import * as channelState from '../../channel-state/state';
+
 import * as actions from '../../actions';
+import * as channelActions from '../../channel-state/actions';
+
 import { unreachable } from '../../../utils/reducer-utils';
 import { PlayerIndex } from '../../types';
+import { channelID } from 'fmg-core/lib/channel';
 
 import * as selectors from '../../selectors';
+import { updateChannelState } from '../state-updaters';
 
 export function playerBReducer(
   state: walletStates.Initialized,
@@ -27,7 +33,7 @@ export function playerBReducer(
     case states.WAIT_FOR_APPROVAL:
       return waitForApprovalReducer(state, action);
     case states.WAIT_FOR_PRE_FUND_SETUP_0:
-      return state;
+      return waitForPreFundSetup0Reducer(state, action);
     case states.WAIT_FOR_DIRECT_FUNDING:
       return state;
     case states.WAIT_FOR_POST_FUND_SETUP_0:
@@ -51,3 +57,40 @@ const waitForApprovalReducer = (
       return state;
   }
 };
+
+const waitForPreFundSetup0Reducer = (
+  state: walletStates.IndirectFundingOngoing,
+  action: actions.indirectFunding.Action,
+) => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const newState = { ...state };
+      const { commitment, signature, channelId } = action;
+
+      receiveLedgerCommitment(state, commitment, signature);
+
+      const ledgerChannelId = channelID(commitment.channel);
+      if (appChannelIsWaitingForFunding(state, channelId)) {
+        startDirectFunding(state, channelId, ledgerChannelId);
+      }
+      return newState;
+    default:
+      return state;
+  }
+};
+
+function appChannelIsWaitingForFunding(
+  state: walletStates.IndirectFundingOngoing,
+  appChannelId,
+): boolean {
+  const appChannel = selectors.getOpenedChannelState(state, appChannelId);
+  return appChannel.type === channelState.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
+}
+
+function startDirectFunding(state: walletStates.IndirectFundingOngoing, channelId, ledgerId) {
+  state.indirectFunding = states.waitForDirectFunding({ channelId, ledgerId });
+}
+
+function receiveLedgerCommitment(state, commitment, signature) {
+  updateChannelState(state, channelActions.opponentCommitmentReceived(commitment, signature));
+}
