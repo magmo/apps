@@ -114,7 +114,7 @@ const waitForDirectFunding = (
   const indirectFundingState = selectors.getIndirectFundingState(
     state,
   ) as states.WaitForDirectFunding;
-  if (!isFundingAction(action) || action.channelId !== indirectFundingState.ledgerId) {
+  if (!isFundingAction(action) || action.channelId !== indirectFundingState.channelId) {
     return state;
   } else {
     let newState = updateFundingState(state, action);
