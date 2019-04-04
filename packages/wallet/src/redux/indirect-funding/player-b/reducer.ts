@@ -10,7 +10,7 @@ import { PlayerIndex } from '../../types';
 import { channelID } from 'fmg-core/lib/channel';
 
 import * as selectors from '../../selectors';
-import { updateChannelState } from '../state-updaters';
+import { updateChannelState } from '../reducer-helpers';
 
 export function playerBReducer(
   state: walletStates.Initialized,
@@ -92,5 +92,8 @@ function startDirectFunding(state: walletStates.IndirectFundingOngoing, channelI
 }
 
 function receiveLedgerCommitment(state, commitment, signature) {
-  updateChannelState(state, channelActions.opponentCommitmentReceived(commitment, signature));
+  return updateChannelState(
+    state,
+    channelActions.opponentCommitmentReceived(commitment, signature),
+  );
 }

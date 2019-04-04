@@ -13,10 +13,8 @@ import { PlayerIndex, WalletProcedure } from '../../types';
 import { Channel } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
 import { Commitment } from 'fmg-core/lib/commitment';
-import { channelStateReducer } from '../../channel-state/reducer';
 import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../../utils/hex-utils';
-import { accumulateSideEffects } from '../../outbox';
 import {
   composeLedgerUpdateCommitment,
   composePostFundCommitment,
@@ -24,9 +22,13 @@ import {
 } from '../../../utils/commitment-utils';
 import { isFundingAction } from '../../internal/actions';
 import { bigNumberify } from 'ethers/utils';
-import { directFundingStoreReducer } from '../../direct-funding-store/reducer';
 import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
-import { appChannelIsWaitingForFunding } from '../reducer-helpers';
+import {
+  appChannelIsWaitingForFunding,
+  initializeChannelState,
+  updateChannelState,
+  updateDirectFundingStatus,
+} from '../reducer-helpers';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -379,43 +381,4 @@ export const createCommitmentMessageRelay = (
     data: { commitment, signature },
   };
   return messageRelayRequested(to, payload);
-};
-
-export const initializeChannelState = (
-  state: walletStates.Initialized,
-  channelId: string,
-  address: string,
-  privateKey: string,
-): walletStates.Initialized => {
-  const newState = { ...state };
-  // Create initial channel state for new ledger channel
-  newState.channelState.initializedChannels[channelId] = channelStates.waitForChannel({
-    address,
-    privateKey,
-  });
-  return newState;
-};
-export const updateChannelState = (
-  state: walletStates.Initialized,
-  channelAction: actions.channel.ChannelAction,
-): walletStates.Initialized => {
-  const newState = { ...state };
-  const updatedChannelState = channelStateReducer(newState.channelState, channelAction);
-  newState.channelState = updatedChannelState.state;
-  // App channel state may still generate side effects
-  newState.outboxState = accumulateSideEffects(
-    newState.outboxState,
-    updatedChannelState.sideEffects,
-  );
-  return newState;
-};
-
-export const updateDirectFundingStatus = (
-  state: walletStates.Initialized,
-  action: actions.funding.FundingAction,
-): walletStates.Initialized => {
-  const newState = { ...state };
-  const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
-  newState.directFundingStore = updatedDirectFundingStore.state;
-  return newState;
 };
