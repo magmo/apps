@@ -9,16 +9,20 @@ interface Props {
 class ChannelRegistryLayout extends PureComponent<Props> {
   render() {
     const channels = this.props.state.channelState.initializedChannels;
-    let channelList: string = '';
+    const channelList: string[] = [];
     for (const key in channels) {
         if (key) {
-            channelList = channelList.concat(key);
-            channelList = channelList.concat(', ');
-            // console.log(key);
-            // console.log(channelList);
+            channelList.push(key);
+            // channelList = channelList.concat(', ');
+            // // console.log(key);
+            // // console.log(channelList);
         }
     }
-    console.log(channelList);
+    const renderRow = (name) => (<td>{name}</td>);
+
+    // const channelRows = channelList.map((name, index) => {
+    //     <td key={index}>{name}</td><td></td><td></td>}};
+    // console.log(channelList);
     return (
         <div>
         {/* <div style={{borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
@@ -28,11 +32,27 @@ class ChannelRegistryLayout extends PureComponent<Props> {
             <i> Application Channels</i>
         </div> */}
         <div style={{borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
-            <i>Channels </i>
+            <i>Ledger Channels </i>
         </div>
-        { channelList }
+            <table style={{width: '100%'}}>
+            <tr>
+                <th>Channel</th>
+                <th>Counterparties</th> 
+                <th>Funded?</th>
+            </tr>
+            {channelList.map(renderRow)}
+            <tr>
+                <td>RPS</td>
+                <td>Bob</td> 
+                <td>✗</td>
+            </tr>
+            <tr>
+                <td>TTT</td>
+                <td>Charlie</td> 
+                <td>✗</td>
+            </tr>
+            </table>
         </div>
-
     );
   }
 }
