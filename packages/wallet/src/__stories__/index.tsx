@@ -7,11 +7,16 @@ import * as channelStates from '../redux/channel-state/state';
 import '../index.scss';
 import * as scenarios from '../redux/__tests__/test-scenarios';
 import NetworkStatus from '../components/network-status';
+import { channelFunded } from '../redux/funding-state/state';
+import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
+import { WaitForFundingAndPostFundSetup } from '../redux/channel-state/state';
 
 const {
   asAddress,
-  channelId,
   asPrivateKey,
+  bsAddress,
+  // bsPrivateKey,
+  channelId,
   channelNonce,
   libraryAddress,
   participants,
@@ -19,8 +24,25 @@ const {
   preFundCommitment2,
 } = scenarios;
 
+const YOUR_CONTRIBUTION = bigNumberify(500000000000000).toHexString();
+const TOTAL_CONTRIBUTION = bigNumberify(YOUR_CONTRIBUTION)
+  .mul(2)
+  .toHexString();
+
+const defaultFundingState: fundingStates.DirectFundingStatus = {
+  fundingType: fundingStates.DIRECT_FUNDING,
+  requestedTotalFunds: TOTAL_CONTRIBUTION,
+  requestedYourContribution: YOUR_CONTRIBUTION,
+  channelId: 'channel id',
+  ourIndex: 0,
+  safeToDepositLevel: YOUR_CONTRIBUTION,
+  depositStatus: fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT,
+  channelFundingStatus: fundingStates.NOT_SAFE_TO_DEPOSIT,
+};
+
+// const fundingStateWithTX = { ...defaultFundingState, transactionHash: 'TX_HASH' };
+
 const defaults = {
-  address: asAddress,
   adjudicator: 'adj-address',
   channelId,
   channelNonce,
@@ -40,11 +62,15 @@ const defaults = {
 const playerADefaults = {
   ...defaults,
   ourIndex: 0,
+  fundingState: channelFunded(defaultFundingState),
+  address: asAddress,
 };
-const playerBDefaults = {
-  ...defaults,
-  ourIndex: 1,
-};
+// const playerBDefaults = {
+//   ...defaults,
+//   ourIndex: 1,
+//   fundingState: channelFunded(defaultFundingState),
+//   address: bsAddress,
+// };
 
 const fakeStore = state => ({
   dispatch: action => {
@@ -142,122 +168,205 @@ function addStoriesFromCollection(collection, chapter, renderer = channelStateRe
   });
 }
 
-const WalletScreensFundingPlayerA = {
-  WaitForTransactionSent: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerADefaults),
+const WaitForApproval: walletStates.Initialized = {
+  type: 'WALLET.INITIALIZED',
+  channelState: {
+    initializingChannels:
+      {},
+    initializedChannels:
+      {'RPS': {
+        address: asAddress,
+        privateKey: asPrivateKey,
+        channelId: 'RPS',
+        libraryAddress: '',
+        ourIndex: 0,
+        participants: [asAddress, bsAddress],
+        channelNonce: 0,
+        turnNum: 2,
+        lastCommitment: {
+          commitment: {
+            commitmentType: 0, // prefundsetup
+            appAttributes: '',
+          },
+          signature: '',
+          },
+        funded: false,
+        penultimateCommitment: {
+          commitment: {
+            channel: {
+              channelType: '0',
+              nonce: 0,
+              participants: [asAddress,bsAddress],
+            },
+            turnNum: 1,
+            allocation: ['5','5'],
+            destination: [asAddress,bsAddress],
+            commitmentCount: 1,
+            commitmentType: 0, // prefundsetup
+            appAttributes: '',
+          },
+          signature: '',
+        },
+        type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
+        stage: 'FUNDING',
+      }  as WaitForFundingAndPostFundSetup } ,
   },
-  WaitForDepositApproval: {
-    channelState: channelStates.waitForFundingAndPostFundSetup({
-      ...playerADefaults,
-    }),
+  fundingState: {
+    directFunding: 
+      {channelId: {
+        requestedTotalFunds: '10',
+        requestedYourContribution: '5',
+        channelId,
+        ourIndex: 0,
+        fundingType: 'FUNDING_TYPE.DIRECT',
+        safeToDepositLevel: '1',
+        channelFundingStatus: 'NOT_SAFE_TO_DEPOSIT',
+      }},
+    indirectFunding:
+      {channelId: {
+        placeholder: 'placeholder',
+      }},
+    },
+  outboxState: {
+    displayOutbox: [],
+    messageOutbox: [],
+    transactionOutbox: [],
   },
-  WaitForDepositConfirmation: {
-    channelState: channelStates.waitForFundingAndPostFundSetup({
-      ...playerADefaults,
-    }),
-  },
-  WaitForFundingConfirmed: {
-    channelState: channelStates.waitForFundingAndPostFundSetup({
-      ...playerADefaults,
-    }),
-  },
-  WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerADefaults) },
+  uid: '9',
+  networkId: 1,
+  adjudicator: 'somewhere',
+}
+
+const WalletScreensIndirectFundingPlayerA = {
+  WaitForApproval,
+  // WaitForPreFundSetup1: {
+  //   channelState: channelStates.waitForFundingAndPostFundSetup(playerADefaults),
+  //   fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
+  // },
+  // WaitForDepositApproval: {
+  //   channelState: channelStates.waitForFundingAndPostFundSetup({
+  //     ...playerADefaults,
+  //   }),
+  //   fundingState: fundingStates.depositing.waitForDepositApproval(defaultFundingState),
+  // },
+  // WaitForDepositConfirmation: {
+  //   channelState: channelStates.waitForFundingAndPostFundSetup({
+  //     ...playerADefaults,
+  //   }),
+  //   fundingState: fundingStates.depositing.waitForDepositConfirmation(fundingStateWithTX),
+  // },
+  // WaitForFundingConfirmed: {
+  //   channelState: channelStates.waitForFundingAndPostFundSetup({
+  //     ...playerADefaults,
+  //   }),
+  //   fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
+  // },
+  // WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerADefaults) },
 };
 addStoriesFromCollection(
-  WalletScreensFundingPlayerA,
-  'Wallet Screens / Funding / Player A',
+  WalletScreensIndirectFundingPlayerA,
+  'Wallet Screens / Indirect Funding / Player A',
   walletStateRender,
 );
 
-const WalletScreensFundingPlayerB = {
-  NotSafeToDeposit: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
-  },
-  WaitForTransactionSent: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
-  },
-  WaitForDepositApproval: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
-  },
-  WaitForDepositConfirmation: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
-  },
-  WaitForFundingConfirmed: {
-    channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
-  },
-  WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerBDefaults) },
-};
-addStoriesFromCollection(
-  WalletScreensFundingPlayerB,
-  'Wallet Screens / Funding / Player B',
-  walletStateRender,
-);
+// const WalletScreensFundingPlayerB = {
+//   NotSafeToDeposit: {
+//     channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+//     fundingState: fundingStates.notSafeToDeposit(defaultFundingState),
+//   },
+//   WaitForTransactionSent: {
+//     channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+//     fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
+//   },
+//   WaitForDepositApproval: {
+//     channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+//     fundingState: fundingStates.depositing.waitForDepositApproval(defaultFundingState),
+//   },
+//   WaitForDepositConfirmation: {
+//     channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+//     fundingState: fundingStates.depositing.waitForDepositConfirmation(fundingStateWithTX),
+//   },
+//   WaitForFundingConfirmed: {
+//     channelState: channelStates.waitForFundingAndPostFundSetup(playerBDefaults),
+//     fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
+//   },
+//   WaitForPostFundSetup: { channelState: channelStates.aWaitForPostFundSetup(playerBDefaults) },
+// };
+// addStoriesFromCollection(
+//   WalletScreensFundingPlayerB,
+//   'Wallet Screens / Indirect Funding / Player B',
+//   walletStateRender,
+// );
 
-// Against bot, who sends funding too early:
-const WalletScreensFundingPlayerAPart2 = {
-  WaitForTransactionSent: {
-    channelState: channelStates.waitForFundingConfirmation(playerADefaults),
-  },
-  WaitForDepositApproval: {
-    channelState: channelStates.waitForFundingConfirmation({
-      ...playerADefaults,
-    }),
-  },
-  WaitForDepositConfirmation: {
-    channelState: channelStates.waitForFundingConfirmation({
-      ...playerADefaults,
-    }),
-  },
-  WaitForFundingConfirmed: {
-    channelState: channelStates.waitForFundingConfirmation({
-      ...playerADefaults,
-    }),
-  },
-};
-addStoriesFromCollection(
-  WalletScreensFundingPlayerAPart2,
-  'Wallet Screens / Funding / Player A -- already have PostFundSetup',
-  walletStateRender,
-);
+// // Against bot, who sends funding too early:
+// const WalletScreensIndirectFundingPlayerAPart2 = {
+//   WaitForTransactionSent: {
+//     channelState: channelStates.waitForFundingConfirmation(playerADefaults),
+//     fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
+//   },
+//   WaitForDepositApproval: {
+//     channelState: channelStates.waitForFundingConfirmation({
+//       ...playerADefaults,
+//     }),
+//     fundingState: fundingStates.depositing.waitForDepositApproval(defaultFundingState),
+//   },
+//   WaitForDepositConfirmation: {
+//     channelState: channelStates.waitForFundingConfirmation({
+//       ...playerADefaults,
+//     }),
+//     fundingState: fundingStates.depositing.waitForDepositConfirmation(fundingStateWithTX),
+//   },
+//   WaitForFundingConfirmed: {
+//     channelState: channelStates.waitForFundingConfirmation({
+//       ...playerADefaults,
+//     }),
+//     fundingState: fundingStates.waitForFundingConfirmed(defaultFundingState),
+//   },
+// };
+// addStoriesFromCollection(
+//   WalletScreensIndirectFundingPlayerAPart2,
+//   'Wallet Screens / Indirect Funding / Player A -- already have PostFundSetup',
+//   walletStateRender,
+// );
 
-const WalletScreendsWithdrawing = {
-  ApproveWithdrawal: channelStates.approveWithdrawal(playerADefaults),
-  WaitForWithdrawalInitiation: channelStates.waitForWithdrawalInitiation(playerADefaults),
-  WaitForWithdrawalConfirmation: channelStates.waitForWithdrawalConfirmation(playerADefaults),
-  AcknowledgeWithdrawalSuccess: channelStates.acknowledgeWithdrawalSuccess(playerADefaults),
-};
-addStoriesFromCollection(WalletScreendsWithdrawing, 'Wallet Screens / Withdrawing');
+// const WalletScreendsWithdrawing = {
+//   ApproveWithdrawal: channelStates.approveWithdrawal(playerADefaults),
+//   WaitForWithdrawalInitiation: channelStates.waitForWithdrawalInitiation(playerADefaults),
+//   WaitForWithdrawalConfirmation: channelStates.waitForWithdrawalConfirmation(playerADefaults),
+//   AcknowledgeWithdrawalSuccess: channelStates.acknowledgeWithdrawalSuccess(playerADefaults),
+// };
+// addStoriesFromCollection(WalletScreendsWithdrawing, 'Wallet Screens / Withdrawing');
 
-const WalletScreensChallenging = {
-  ApproveChallenge: channelStates.approveChallenge(playerADefaults),
-  WaitForChallengeInitiation: channelStates.waitForChallengeInitiation(playerADefaults),
-  WaitForChallengeSubmission: channelStates.waitForChallengeSubmission(playerADefaults),
-  WaitForChallengeConfirmation: channelStates.waitForChallengeConfirmation(playerADefaults),
-  WaitForResponseOrTimeout: channelStates.waitForResponseOrTimeout(playerADefaults),
-  AcknowledgeChallengeResponse: channelStates.acknowledgeChallengeResponse(playerADefaults),
-  AcknowledgeChallengeTimeout: channelStates.acknowledgeChallengeTimeout(playerADefaults),
-};
-addStoriesFromCollection(WalletScreensChallenging, 'Wallet Screens / Challenging');
+// const WalletScreensChallenging = {
+//   ApproveChallenge: channelStates.approveChallenge(playerADefaults),
+//   WaitForChallengeInitiation: channelStates.waitForChallengeInitiation(playerADefaults),
+//   WaitForChallengeSubmission: channelStates.waitForChallengeSubmission(playerADefaults),
+//   WaitForChallengeConfirmation: channelStates.waitForChallengeConfirmation(playerADefaults),
+//   WaitForResponseOrTimeout: channelStates.waitForResponseOrTimeout(playerADefaults),
+//   AcknowledgeChallengeResponse: channelStates.acknowledgeChallengeResponse(playerADefaults),
+//   AcknowledgeChallengeTimeout: channelStates.acknowledgeChallengeTimeout(playerADefaults),
+// };
+// addStoriesFromCollection(WalletScreensChallenging, 'Wallet Screens / Challenging');
 
-const WalletScreendsResponding = {
-  ChooseResponse: channelStates.chooseResponse(playerADefaults),
-  AcknowledgeChallengeTimeout: channelStates.challengeeAcknowledgeChallengeTimeOut(playerADefaults),
-  TakeMoveInApp: channelStates.takeMoveInApp(playerADefaults),
-  InitiateResponse: channelStates.initiateResponse(playerADefaults),
-  WaitForResponseSubmission: channelStates.waitForResponseSubmission(playerADefaults),
-  WaitForResponseConfirmation: channelStates.waitForResponseConfirmation(playerADefaults),
-  AcknowledgeChallengeComplete: channelStates.acknowledgeChallengeComplete(playerADefaults),
-};
-addStoriesFromCollection(WalletScreendsResponding, 'Wallet Screens / Responding');
+// const WalletScreendsResponding = {
+//   ChooseResponse: channelStates.chooseResponse(playerADefaults),
+//   AcknowledgeChallengeTimeout: channelStates.challengeeAcknowledgeChallengeTimeOut(playerADefaults),
+//   TakeMoveInApp: channelStates.takeMoveInApp(playerADefaults),
+//   InitiateResponse: channelStates.initiateResponse(playerADefaults),
+//   WaitForResponseSubmission: channelStates.waitForResponseSubmission(playerADefaults),
+//   WaitForResponseConfirmation: channelStates.waitForResponseConfirmation(playerADefaults),
+//   AcknowledgeChallengeComplete: channelStates.acknowledgeChallengeComplete(playerADefaults),
+// };
+// addStoriesFromCollection(WalletScreendsResponding, 'Wallet Screens / Responding');
 
-const WalletScreendsClosing = {
-  ApproveConclude: channelStates.approveConclude(playerADefaults),
-  WaitForOpponentConclude: channelStates.waitForOpponentConclude(playerADefaults),
-  AcknowledgeConcludeSuccess: channelStates.approveCloseOnChain(playerADefaults),
-};
-addStoriesFromCollection(WalletScreendsClosing, 'Wallet Screens / Closing');
+// const WalletScreendsClosing = {
+//   ApproveConclude: channelStates.approveConclude(playerADefaults),
+//   WaitForOpponentConclude: channelStates.waitForOpponentConclude(playerADefaults),
+//   AcknowledgeConcludeSuccess: channelStates.approveCloseOnChain(playerADefaults),
+// };
+// addStoriesFromCollection(WalletScreendsClosing, 'Wallet Screens / Closing');
 
-storiesOf('Wallet Landing Page', module).add(
-  'Landing Page',
-  channelStateRender(walletStates.waitForLogin()),
-);
+// storiesOf('Wallet Landing Page', module).add(
+//   'Landing Page',
+//   channelStateRender(walletStates.waitForLogin()),
+// );
