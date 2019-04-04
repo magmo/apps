@@ -10,10 +10,10 @@ import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 import { WalletProcedure } from '../../types';
 
-export const directFundingStatusReducer = (
-  state: states.DirectFundingStatus,
+export const DirectFundingStateReducer = (
+  state: states.DirectFundingState,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingStatus> => {
+): StateWithSideEffects<states.DirectFundingState> => {
   if (
     action.type === actions.funding.FUNDING_RECEIVED_EVENT &&
     action.channelId === state.channelId
@@ -47,7 +47,7 @@ export const directFundingStatusReducer = (
 const notSafeToDepositReducer = (
   state: states.NotSafeToDeposit,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingStatus> => {
+): StateWithSideEffects<states.DirectFundingState> => {
   switch (action.type) {
     case actions.funding.FUNDING_RECEIVED_EVENT:
       if (
@@ -80,7 +80,7 @@ const notSafeToDepositReducer = (
 const waitForFundingConfirmationReducer = (
   state: states.WaitForFundingConfirmation,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingStatus> => {
+): StateWithSideEffects<states.DirectFundingState> => {
   // TODO: This code path is unreachable, but the compiler doesn't know that.
   // Can we fix that?
   switch (action.type) {
@@ -103,7 +103,7 @@ const waitForFundingConfirmationReducer = (
 const channelFundedReducer = (
   state: states.ChannelFunded,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingStatus> => {
+): StateWithSideEffects<states.DirectFundingState> => {
   if (action.type === actions.funding.FUNDING_RECEIVED_EVENT) {
     if (bigNumberify(action.totalForDestination).lt(state.requestedTotalFunds)) {
       // TODO: Deal with chain re-orgs that de-fund the channel here

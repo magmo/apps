@@ -22,16 +22,16 @@ interface Props {
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
     const { directFundingStore, retryTransactionAction, channelId } = this.props;
-    const status = directFundingStore[channelId];
-    const step = fundingStepByState(status);
+    const state = directFundingStore[channelId];
+    const step = fundingStepByState(state);
     if (
-      fundingStates.stateIsNotSafeToDeposit(status) ||
-      fundingStates.stateIsWaitForFundingConfirmation(status)
+      fundingStates.stateIsNotSafeToDeposit(state) ||
+      fundingStates.stateIsWaitForFundingConfirmation(state)
     ) {
       return <FundingStep step={step} />;
     }
-    if (fundingStates.stateIsDepositing(status)) {
-      switch (status.depositStatus) {
+    if (fundingStates.stateIsDepositing(state)) {
+      switch (state.depositStatus) {
         case fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT:
           return <FundingStep step={step} />;
         case fundingStates.depositing.WAIT_FOR_DEPOSIT_APPROVAL:
@@ -41,7 +41,7 @@ class DirectFundingContainer extends PureComponent<Props> {
             <FundingStep step={step}>
               Check the progress on&nbsp;
               <EtherscanLink
-                transactionID={status.transactionHash}
+                transactionID={state.transactionHash}
                 networkId={-1} // TODO: Fix network id
                 title="Etherscan"
               />
@@ -53,20 +53,20 @@ class DirectFundingContainer extends PureComponent<Props> {
             <TransactionFailed
               name="deposit"
               retryAction={() =>
-                retryTransactionAction(status.channelId, WalletProcedure.DirectFunding)
+                retryTransactionAction(state.channelId, WalletProcedure.DirectFunding)
               }
             />
           );
 
         default:
-          return unreachable(status);
+          return unreachable(state);
       }
     }
-    if (fundingStates.stateIsChannelFunded(status)) {
+    if (fundingStates.stateIsChannelFunded(state)) {
       return null;
     }
 
-    return unreachable(status);
+    return unreachable(state);
   }
 }
 
