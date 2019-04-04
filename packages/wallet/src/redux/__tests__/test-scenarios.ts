@@ -138,47 +138,47 @@ export const initializingChannelState = {
   [asAddress]: { address: asAddress, privateKey: asPrivateKey },
 };
 
-const ledgerAppAttributes = consensusCounter =>
-  bytesFromAppAttributes({
+const ledgerAppAttributes = consensusCounter => {
+  return bytesFromAppAttributes({
     proposedAllocation: twoThree,
     proposedDestination: participants,
     consensusCounter,
   });
+};
+const ledgerChannel: Channel = {
+  nonce: 0,
+  channelType: 'ledger',
+  participants,
+};
+const ledgerChannelAttrs = {
+  channel: ledgerChannel,
+  appAttributes: ledgerAppAttributes(0),
+  allocation: twoThree,
+  destination: participants,
+};
 export const ledgerCommitments: { [name: string]: Commitment } = {
   preFundCommitment1: {
-    channel,
+    ...ledgerChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.PreFundSetup,
-    appAttributes: ledgerAppAttributes(0),
     turnNum: 0,
-    allocation: twoThree,
-    destination: participants,
   },
   preFundCommitment2: {
-    channel,
+    ...ledgerChannelAttrs,
     commitmentCount: 1,
     commitmentType: CommitmentType.PreFundSetup,
-    appAttributes: ledgerAppAttributes(0),
     turnNum: 1,
-    allocation: twoThree,
-    destination: participants,
   },
   postFundCommitment1: {
-    channel,
+    ...ledgerChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.PostFundSetup,
-    appAttributes: ledgerAppAttributes(0),
     turnNum: 2,
-    allocation: twoThree,
-    destination: participants,
   },
   postFundCommitment2: {
-    channel,
+    ...ledgerChannelAttrs,
     commitmentCount: 1,
     commitmentType: CommitmentType.PostFundSetup,
-    appAttributes: ledgerAppAttributes(0),
     turnNum: 3,
-    allocation: twoThree,
-    destination: participants,
   },
 };
