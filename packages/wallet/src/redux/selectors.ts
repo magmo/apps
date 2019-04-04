@@ -1,5 +1,6 @@
 import { OpenedState, OPENING } from './channel-state/state';
 import * as walletStates from './state';
+import * as indirectFundingStates from './indirect-funding/state';
 import { DirectFundingStatus } from './funding-state/state';
 
 export const getOpenedChannelState = (
@@ -18,7 +19,7 @@ export const getOpenedChannelState = (
 
 // TODO: Ideally we should be able to pass in a expected state type and have the selector either return that type of state or throw an error
 export function getIndirectFundingState(
-  state: walletStates.Initialized
+  state: walletStates.Initialized,
 ): indirectFundingStates.IndirectFundingState {
   if (!state.indirectFunding) {
     throw new Error('Indirect Funding state is not defined.');
