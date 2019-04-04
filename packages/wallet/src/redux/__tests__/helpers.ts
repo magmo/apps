@@ -2,6 +2,7 @@ import { ChannelStatus } from '../channel-state/state';
 import { StateWithSideEffects } from '../utils';
 import { Commitment } from 'fmg-core';
 import { TransactionOutboxItem } from '../outbox/state';
+import { Initialized } from '../state';
 
 export const itSendsAMessage = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends a message`, () => {
@@ -152,5 +153,16 @@ export function itChangesChannelFundingStatusTo<T extends { state: { channelFund
 ) {
   it(`changes channelFundingStatus to ${status}`, () => {
     expect(state.state.channelFundingStatus).toEqual(status);
+  });
+}
+
+// Procedure helpers
+export function itTransitionsProcedureToStateType(
+  procedureBranchName: string,
+  state: Initialized,
+  type: string,
+) {
+  it(`transitions the ${procedureBranchName} state to ${type}`, () => {
+    expect(state[procedureBranchName].type).toEqual(type);
   });
 }
