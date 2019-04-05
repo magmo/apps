@@ -1,7 +1,6 @@
 import { Properties } from '../../utils';
 import { PlayerIndex } from '../../types';
 
-
 export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL';
 export const WAIT_FOR_PRE_FUND_SETUP_1 = 'WAIT_FOR_PRE_FUND_SETUP_1';
 export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING';

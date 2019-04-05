@@ -7,19 +7,19 @@ import Todo from '../components/todo';
 import { connect } from 'react-redux';
 import ChannelContainer from './channel';
 
-import { 
+import {
   WAIT_FOR_APPROVAL,
   WAIT_FOR_PRE_FUND_SETUP_1,
   WAIT_FOR_DIRECT_FUNDING,
   WAIT_FOR_POST_FUND_SETUP_1,
   WAIT_FOR_LEDGER_UPDATE_1,
-  } from '../redux/indirect-funding/player-a/state';
+} from '../redux/indirect-funding/player-a/state';
 
-import { 
+import {
   WAIT_FOR_PRE_FUND_SETUP_0,
   WAIT_FOR_POST_FUND_SETUP_0,
   WAIT_FOR_LEDGER_UPDATE_0,
-  } from '../redux/indirect-funding/player-b/state';
+} from '../redux/indirect-funding/player-b/state';
 
 import { Button } from 'reactstrap';
 
@@ -43,9 +43,10 @@ class WalletInitializedContainer extends PureComponent<Props> {
             return (
               <StatusBarLayout>
                 <ChannelRegistryLayout state={state} />
-                Would you like to fund the application channel indirectly (by opening, funding and updating a ledger channel)?
-                  <br/>
-                  <Button>Approve</Button>
+                Would you like to fund the application channel indirectly (by opening, funding and
+                updating a ledger channel)?
+                <br />
+                <Button>Approve</Button>
               </StatusBarLayout>
             );
           case WAIT_FOR_PRE_FUND_SETUP_0:
@@ -58,8 +59,9 @@ class WalletInitializedContainer extends PureComponent<Props> {
           default:
             return <Todo stateType={state.indirectFunding.type} />;
         }
-        }
-       else {return <LandingPage />;} // Wallet is neither handling an active application channel process nor managing an indirect funding process.
+      } else {
+        return <LandingPage />;
+      } // Wallet is neither handling an active application channel process nor managing an indirect funding process.
     }
   }
 }

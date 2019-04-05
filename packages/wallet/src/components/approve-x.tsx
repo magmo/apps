@@ -24,7 +24,7 @@ export default class ApproveX extends React.PureComponent<Props> {
       children,
     } = this.props;
     return (
-      <StatusBarLayout >
+      <StatusBarLayout>
         <h2>{title}</h2>
 
         {children}
