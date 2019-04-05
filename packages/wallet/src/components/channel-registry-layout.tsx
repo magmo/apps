@@ -13,28 +13,17 @@ class ChannelRegistryLayout extends PureComponent<Props> {
     for (const key in channels) {
         if (key) {
             channelList.push(key);
-            // channelList = channelList.concat(', ');
-            // // console.log(key);
-            // // console.log(channelList);
         }
     }
-    const renderRow = (name) => (<td>{name}</td>);
-
-    // const channelRows = channelList.map((name, index) => {
-    //     <td key={index}>{name}</td><td></td><td></td>}};
-    // console.log(channelList);
+    const renderRow = (name) => (<tr><td>{name}</td><td>/</td><td>/</td></tr>);
     return (
         <div>
-        {/* <div style={{borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
-            <i> Ledger Channels </i>
-        </div>
-        <div style={{borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
-            <i> Application Channels</i>
-        </div> */}
         <div style={{borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
             <i>Ledger Channels </i>
         </div>
+        <div style={{borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
             <table style={{width: '100%'}}>
+            <tbody>
             <tr>
                 <th>Channel</th>
                 <th>Counterparties</th> 
@@ -51,7 +40,9 @@ class ChannelRegistryLayout extends PureComponent<Props> {
                 <td>Charlie</td> 
                 <td>✗</td>
             </tr>
+            </tbody>
             </table>
+        </div>
         </div>
     );
   }

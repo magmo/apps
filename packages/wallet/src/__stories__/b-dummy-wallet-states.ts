@@ -8,8 +8,8 @@ import { defaultParams }from './dummy-wallet-states';
 import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
 
 import {
-    asAddress,
-    asPrivateKey,
+    bsAddress,
+    bsPrivateKey,
 } from '../redux/__tests__/test-scenarios';
 
 const { channelId, libraryAddress, participants,
@@ -17,23 +17,22 @@ const { channelId, libraryAddress, participants,
 
 import { 
     waitForApproval, 
-    waitForPreFundSetup1,
-    waitForDirectFunding,
-    waitForPostFundSetup1,
-    waitForLedgerUpdate1,
-    } from '../redux/indirect-funding/player-a/state';
+    waitForPreFundSetup0,
+    waitForLedgerUpdate0,
+    waitForPostFundSetup0,
+    } from '../redux/indirect-funding/player-b/state';
 
-export const playerADefaults = {
+export const playerBDefaults = {
     ...defaultParams,
     ourIndex: 0,
-    address: asAddress,
-    privateKey: asPrivateKey,
+    address: bsAddress,
+    privateKey: bsPrivateKey,
     };
+
 
 /////////////////////
 // DEFAULT OBJECTS //
 /////////////////////
-
 
 // const defaultFundingState: fundingStates.DirectFundingStatus = {
 //     fundingType: fundingStates.DIRECT_FUNDING,
@@ -65,8 +64,8 @@ const defaultInitializingChannelState: channelStates.InitializingChannelState  =
   
 const defaultChannelOpen: sharedStates.ChannelOpen = {
     ...defaultParams,
-    address: asAddress,
-    privateKey: asPrivateKey,
+    address: bsAddress,
+    privateKey: bsPrivateKey,
     channelId,
     libraryAddress,
     ourIndex: 0,
@@ -99,7 +98,7 @@ const defaultInitialized: walletStates.Initialized = walletStates.initialized(
     ...defaultParams,
     commitment: {},
     funded: false,
-    userAddress: asAddress,
+    userAddress: bsAddress,
     channelState: defaultChannelState,
     outboxState: EMPTY_OUTBOX_STATE,
     consensusLibrary: '',
@@ -121,36 +120,27 @@ export const dummyWaitForApproval: walletStates.Initialized = {
     }),
 };
 
-export const dummyWaitForPreFundSetup1: walletStates.WalletState = {
+export const dummyWaitForPreFundSetup0: walletStates.WalletState = {
     ...dummyWaitForApproval,
-    indirectFunding: waitForPreFundSetup1({
+    indirectFunding: waitForPreFundSetup0({
         ...defaultInitialized,
         ...defaultParams,
         ledgerId: '0xLedger',
     }),
 };
 
-export const dummyWaitForDirectFunding: walletStates.WalletState = {
-    ...dummyWaitForPreFundSetup1,
-    indirectFunding: waitForDirectFunding({
+export const dummyWaitForPostFundSetup0: walletStates.WalletState = {
+    ...dummyWaitForPreFundSetup0,
+    indirectFunding: waitForPostFundSetup0({
         ...defaultInitialized,
         ...defaultParams,
         ledgerId: '0xLedger',
     }),
 };
 
-export const dummyWaitForPostFundSetup1: walletStates.WalletState = {
-    ...dummyWaitForPreFundSetup1,
-    indirectFunding: waitForPostFundSetup1({
-        ...defaultInitialized,
-        ...defaultParams,
-        ledgerId: '0xLedger',
-    }),
-};
-
-export const dummyWaitForLedgerUpdate1: walletStates.WalletState = {
-    ...dummyWaitForPreFundSetup1,
-    indirectFunding: waitForLedgerUpdate1({
+export const dummyWaitForLedgerUpdate0: walletStates.WalletState = {
+    ...dummyWaitForPreFundSetup0,
+    indirectFunding: waitForLedgerUpdate0({
         ...defaultInitialized,
         ...defaultParams,
         ledgerId: '0xLedger',
