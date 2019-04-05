@@ -12,6 +12,45 @@ interface WalletProps {
   state: states.WalletState;
   position: "left" | "center" | "right";
 }
+ 
+class WalletContainer extends PureComponent<WalletProps> {
+  render() {
+    const { state } = this.props;
+    switch (state.type) {
+      case states.WAIT_FOR_LOGIN:
+      case states.METAMASK_ERROR:
+      case states.WAIT_FOR_ADJUDICATOR:
+        return (
+        <Modal isOpen={true} style={setStyle(this.props.position)}
+          ariaHideApp={false}>
+          <InitializingContainer state={state}/>
+        </Modal>
+        )
+      case states.WALLET_INITIALIZED:
+      return (
+        <Modal isOpen={true} style={setStyle(this.props.position)}
+          ariaHideApp={false}>
+          <WalletInitializedContainer state={state} />
+        </Modal>
+      )
+      default:
+        return <LandingPage />;
+    }
+  }
+}
+
+
+const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => ({
+  state,
+  position: ownProps.position,
+});
+
+export default connect(mapStateToProps)(WalletContainer);
+
+
+/////////////
+// Styling //
+/////////////
 
 const baseStyle = {
   content: {
@@ -51,6 +90,7 @@ const rightStyle = {
 const centerStyle = {
   ...baseStyle,
   content: {
+    ...baseStyle.content,
     left: '50%',
   },
 };
@@ -65,38 +105,4 @@ function setStyle(position) {
     default:
       return centerStyle;
     }
-  }  
-class WalletContainer extends PureComponent<WalletProps> {
-  render() {
-    const { state } = this.props;
-    switch (state.type) {
-      case states.WAIT_FOR_LOGIN:
-      case states.METAMASK_ERROR:
-      case states.WAIT_FOR_ADJUDICATOR:
-        return (
-        <Modal isOpen={true} style={setStyle(this.props.position)}
-          ariaHideApp={false}>
-          <InitializingContainer state={state}/>
-        </Modal>
-        )
-        ;
-      case states.WALLET_INITIALIZED:
-      return (
-        <Modal isOpen={true} style={setStyle(this.props.position)}
-          ariaHideApp={false}>
-          <WalletInitializedContainer state={state} />
-        </Modal>
-      )
-      default:
-        return <LandingPage />;
-    }
-  }
-}
-
-
-const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => ({
-  state,
-  position: ownProps.position,
-});
-
-export default connect(mapStateToProps)(WalletContainer);
+  } 
