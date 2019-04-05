@@ -22,6 +22,7 @@ import { StateWithSideEffects } from '../utils';
 import { ethers } from 'ethers';
 import { channelID } from 'fmg-core/lib/channel';
 import { WalletAction, COMMITMENT_RECEIVED } from '../actions';
+import { Commitment } from 'fmg-core/lib/commitment';
 
 export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = (
   state: states.ChannelState,
@@ -32,7 +33,7 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = 
   }
 
   const newState = { ...state };
-  if (actions.isReceiveFirstCommitment(action)) {
+  if (actions.isReceiveFirstCommitment(action) && !channelIsInitialized(action.commitment, state)) {
     // We manually select and move the initializing channel into the initializedChannelState
     // before applying the combined reducer, so that the address and private key is in the
     // right slot (by its channelId)
@@ -210,4 +211,10 @@ const receivedValidOpponentConclusionRequest = (
     lastCommitment: { commitment, signature },
     penultimateCommitment: state.lastCommitment,
   });
+};
+
+const channelIsInitialized = (commitment: Commitment, state: states.ChannelState): boolean => {
+  const channelId = channelID(commitment.channel);
+  const initializedChannelAddresses = new Set(Object.keys(state.initializedChannels));
+  return initializedChannelAddresses.has(channelId);
 };

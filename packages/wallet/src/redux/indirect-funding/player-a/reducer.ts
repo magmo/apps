@@ -277,7 +277,7 @@ const createAndSendPreFundCommitment = (
   appChannelState: channelState.OpenedState,
   ledgerChannel: Channel,
 ): walletStates.Initialized => {
-  const newState = { ...state };
+  let newState = { ...state };
   // Create prefund commitment
   const { allocation, destination } = appChannelState.lastCommitment.commitment;
   const { preFundSetupCommitment, commitmentSignature } = composePreFundCommitment(
@@ -289,7 +289,7 @@ const createAndSendPreFundCommitment = (
   );
 
   // Update state
-  receiveOwnLedgerCommitment(newState, preFundSetupCommitment);
+  newState = receiveOwnLedgerCommitment(newState, preFundSetupCommitment);
 
   // Message opponent
   newState.outboxState.messageOutbox = [

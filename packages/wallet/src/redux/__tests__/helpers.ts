@@ -2,6 +2,7 @@ import { ChannelStatus } from '../channel-state/state';
 import { StateWithSideEffects } from '../utils';
 import { Commitment } from 'fmg-core';
 import { TransactionOutboxItem } from '../outbox/state';
+import * as walletStates from '../state';
 
 export const itSendsAMessage = (state: StateWithSideEffects<ChannelStatus>) => {
   it(`sends a message`, () => {
@@ -152,5 +153,14 @@ export function itChangesChannelFundingStatusTo<T extends { state: { channelFund
 ) {
   it(`changes channelFundingStatus to ${status}`, () => {
     expect(state.state.channelFundingStatus).toEqual(status);
+  });
+}
+
+export function itTransitionsToIndirectFundingStateType(
+  stateType,
+  state: walletStates.Initialized,
+) {
+  it(`transitions indirectFundingStatus to ${stateType}`, () => {
+    expect(state.indirectFunding!.type).toEqual(stateType);
   });
 }
