@@ -19,7 +19,7 @@ import {
   initializeChannelState,
   updateDirectFundingStatus,
   receiveLedgerCommitment,
-  ledgerChannelIsWaitingForUpdate,
+  safeToSendLedgerUpdate,
   receiveOwnLedgerCommitment,
   createCommitmentMessageRelay,
   createAndSendPostFundCommitment,
@@ -96,7 +96,7 @@ const waitForPostFundSetup1 = (
 
       let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
 
-      if (ledgerChannelIsWaitingForUpdate(newState, indirectFundingState.ledgerId)) {
+      if (safeToSendLedgerUpdate(newState, indirectFundingState.ledgerId)) {
         newState = createAndSendUpdateCommitment(
           newState,
           indirectFundingState.channelId,

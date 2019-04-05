@@ -17,6 +17,7 @@ import { WalletProcedure } from '../types';
 import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
+import { ourTurn } from '../../utils/reducer-utils';
 
 export const appChannelIsWaitingForFunding = (
   state: walletStates.Initialized,
@@ -26,12 +27,12 @@ export const appChannelIsWaitingForFunding = (
   return appChannel.type === channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
 };
 
-export const ledgerChannelIsWaitingForUpdate = (
+export const safeToSendLedgerUpdate = (
   state: walletStates.Initialized,
   ledgerChannelId: string,
 ): boolean => {
   const ledgerChannel = selectors.getOpenedChannelState(state, ledgerChannelId);
-  return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE;
+  return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE && ourTurn(ledgerChannel);
 };
 
 export const ledgerChannelFundsAppChannel = (
@@ -172,6 +173,7 @@ export const createAndSendUpdateCommitment = (
   const appChannelState = selectors.getOpenedChannelState(state, appChannelId);
   const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
   const proposedDestination = [appChannelState.channelId];
+
   // Compose the update commitment
   const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
   const { updateCommitment, commitmentSignature } = composeLedgerUpdateCommitment(
