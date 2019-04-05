@@ -3,6 +3,7 @@ import {
   ChannelState,
   ChannelStatus,
   setChannel as setChannelInStore,
+  WaitForChannel,
 } from './channel-state/state';
 import { Properties } from './utils';
 import * as indirectFunding from './indirect-funding/state';
@@ -104,7 +105,12 @@ export function setSideEffects(state: Initialized, sideEffects: SideEffects): In
   return { ...state, outboxState: accumulateSideEffects(state.outboxState, sideEffects) };
 }
 
-export function setChannel(state: Initialized, channel: ChannelStatus): Initialized {
+// WaitForChannel is the only ChannelStatus without a channelId.
+// We don't need it anymore, as it's covered by InitializingChannelStatus.
+// This is a temporary fix to the signature while we work to remove it.
+type ChannelStatusV2 = Exclude<ChannelStatus, WaitForChannel>;
+
+export function setChannel(state: Initialized, channel: ChannelStatusV2): Initialized {
   return { ...state, channelState: setChannelInStore(state.channelState, channel) };
 }
 
