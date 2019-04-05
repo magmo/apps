@@ -157,6 +157,7 @@ const ledgerChannelAttrs = {
   allocation: twoThree,
   destination: participants,
 };
+export const ledgerId = channelID(ledgerChannel);
 export const ledgerCommitments: { [name: string]: Commitment } = {
   preFundCommitment0: {
     ...ledgerChannelAttrs,
