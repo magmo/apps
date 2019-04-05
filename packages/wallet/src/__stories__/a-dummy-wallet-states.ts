@@ -7,7 +7,7 @@ import * as scenarios from '../redux/__tests__/test-scenarios';
 
 import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
 
-import { WaitForApproval, waitForApproval } from '../redux/indirect-funding/player-a/state';
+import { waitForApproval } from '../redux/indirect-funding/player-a/state';
 
 /////////////////////
 // DEFAULT OBJECTS //
@@ -101,7 +101,7 @@ channelId: defaultChannelStatus,
 const defaultChannelState: channelStates.ChannelState = {
 initializingChannels: defaultInitializingChannelState,
 initializedChannels: defaultInitializedChannelState,
-activeAppChannelId: '',
+// activeAppChannelId: '',
 }
 
 
@@ -118,12 +118,15 @@ const defaultInitialized: walletStates.Initialized = walletStates.initialized(
 }
 );
 
-export const dummyWaitForApprovalA: WaitForApproval = waitForApproval(
-{
+
+export const dummyWaitForApprovalA: walletStates.WalletState = {
     ...defaultInitialized,
-    ...defaultParams,
-}
-);
+    indirectFunding: waitForApproval({
+        ...defaultInitialized,
+        ...defaultParams,
+    }),
+};
+
 
 // player agnostic (should go in separate file)
 export const dummyWaitForLogin: walletStates.WalletState = walletStates.waitForLogin();
