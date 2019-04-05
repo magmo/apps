@@ -60,7 +60,9 @@ const expectSideEffect = <StateType>(
 };
 
 export const expectThisCommitmentSent = (state: SideEffectState, c: Partial<Commitment>) => {
-  expectSideEffect('messageOutbox', state, item => expect(item.commitment).toMatchObject(c));
+  expectSideEffect('messageOutbox', state, item =>
+    expect(item.messagePayload.data.commitment).toMatchObject(c),
+  );
 };
 
 export const itSendsATransaction = (state: SideEffectState) => {
