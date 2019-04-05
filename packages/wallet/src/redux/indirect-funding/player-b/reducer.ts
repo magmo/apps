@@ -43,7 +43,7 @@ export function playerBReducer(
     case states.WAIT_FOR_POST_FUND_SETUP_0:
       return waitForPostFundSetup0Reducer(state, action);
     case states.WAIT_FOR_LEDGER_UPDATE_0:
-      return state;
+      return waitForLedgerUpdate0Reducer(state, action);
     default:
       return unreachable(state.indirectFunding);
   }
@@ -105,6 +105,33 @@ const waitForPostFundSetup0Reducer = (
       return state;
   }
 };
+
+const waitForLedgerUpdate0Reducer = (
+  state: walletStates.Initialized,
+  action: actions.indirectFunding.Action,
+): walletStates.Initialized => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const indirectFundingState = selectors.getIndirectFundingState(
+        state,
+      ) as states.WaitForLedgerUpdate0;
+
+      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      if (
+        ledgerChannelFundsAppChannel(
+          newState,
+          indirectFundingState.channelId,
+          indirectFundingState.ledgerId,
+        )
+      ) {
+        newState = confirmFundingForAppChannel(newState, indirectFundingState.channelId);
+      }
+      return newState;
+    default:
+      return state;
+  }
+};
+
 function startDirectFunding(state: walletStates.Initialized, channelId, ledgerId) {
   state.indirectFunding = states.waitForDirectFunding({ channelId, ledgerId });
   return state;

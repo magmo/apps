@@ -5,6 +5,7 @@ import { waitForPreFundSetup } from '../channel-state/state';
 import { WalletProcedure } from '../types';
 import * as states from '../state';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
+import { addHex } from '../../utils/hex-utils';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const ledgerLibraryAddress = '0x' + '2'.repeat(40);
@@ -139,10 +140,16 @@ export const initializingChannelState = {
   [asAddress]: { address: asAddress, privateKey: asPrivateKey },
 };
 
-const ledgerAppAttributes = consensusCounter => {
+// Ledger channel commitments
+
+const ledgerAppAttributes = (
+  consensusCounter,
+  proposedAllocation: string[] = twoThree,
+  proposedDestination: string[] = participants,
+) => {
   return bytesFromAppAttributes({
-    proposedAllocation: twoThree,
-    proposedDestination: participants,
+    proposedAllocation,
+    proposedDestination,
     consensusCounter,
   });
 };
@@ -157,8 +164,25 @@ const ledgerChannelAttrs = {
   allocation: twoThree,
   destination: participants,
 };
+
+const allocatesToChannel = [twoThree.reduce(addHex, '0x0')];
+const destinationChannel = [channelId];
+const updatedLedgerChannelAttrs = consensusCounter => ({
+  channel: ledgerChannel,
+  appAttributes: ledgerAppAttributes(consensusCounter, allocatesToChannel, destinationChannel),
+  allocation: twoThree,
+  destination: participants,
+});
+
+const allocatesToChannelAttrs = {
+  channel: ledgerChannel,
+  appAttributes: ledgerAppAttributes(0, [twoThree.reduce(addHex, '0x0')], [channelId]),
+  allocation: twoThree,
+  destination: participants,
+};
+
 export const ledgerId = channelID(ledgerChannel);
-export const ledgerCommitments: { [name: string]: Commitment } = {
+export const ledgerCommitments = {
   preFundCommitment0: {
     ...ledgerChannelAttrs,
     commitmentCount: 0,
@@ -182,5 +206,23 @@ export const ledgerCommitments: { [name: string]: Commitment } = {
     commitmentCount: 1,
     commitmentType: CommitmentType.PostFundSetup,
     turnNum: 3,
+  },
+  ledgerUpdate0: {
+    ...updatedLedgerChannelAttrs(0),
+    commitmentCount: 0,
+    commitmentType: CommitmentType.App,
+    turnNum: 4,
+  },
+  ledgerUpdate1: {
+    ...updatedLedgerChannelAttrs(1),
+    commitmentCount: 0,
+    commitmentType: CommitmentType.App,
+    turnNum: 4,
+  },
+  ledgerUpdate2: {
+    ...allocatesToChannelAttrs,
+    commitmentCount: 0,
+    commitmentType: CommitmentType.App,
+    turnNum: 5,
   },
 };

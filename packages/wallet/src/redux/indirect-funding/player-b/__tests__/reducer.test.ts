@@ -170,3 +170,29 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
   });
 });
 
+describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
+  describe.only(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const state = startingState(states.waitForLedgerUpdate0({ channelId, ledgerId }), {
+      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+      [ledgerId]: channelStates.waitForUpdate({
+        ...ledgerChannelStateDefaults,
+        lastCommitment: {
+          commitment: ledgerCommitments.postFundCommitment1,
+          signature: MOCK_SIGNATURE,
+        },
+      }),
+    });
+
+    const action = actions.commitmentReceived(
+      channelId,
+      WalletProcedure.IndirectFunding,
+      ledgerCommitments.ledgerUpdate0,
+      'signature',
+    );
+    const updatedState = playerBReducer(state, action);
+
+    itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
+    expectThisCommitmentSent(updatedState, ledgerCommitments.ledgerUpdate1);
+    itSendsNoTransaction(updatedState);
+  });
+});
