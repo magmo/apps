@@ -10,9 +10,9 @@ import Modal from 'react-modal';
 
 interface WalletProps {
   state: states.WalletState;
-  position: "left" | "center" | "right";
+  position: 'left' | 'center' | 'right';
 }
- 
+
 class WalletContainer extends PureComponent<WalletProps> {
   render() {
     const { state } = this.props;
@@ -21,24 +21,21 @@ class WalletContainer extends PureComponent<WalletProps> {
       case states.METAMASK_ERROR:
       case states.WAIT_FOR_ADJUDICATOR:
         return (
-        <Modal isOpen={true} style={setStyle(this.props.position)}
-          ariaHideApp={false}>
-          <InitializingContainer state={state}/>
-        </Modal>
-        )
+          <Modal isOpen={true} style={setStyle(this.props.position)} ariaHideApp={false}>
+            <InitializingContainer state={state} />
+          </Modal>
+        );
       case states.WALLET_INITIALIZED:
-      return (
-        <Modal isOpen={true} style={setStyle(this.props.position)}
-          ariaHideApp={false}>
-          <WalletInitializedContainer state={state} />
-        </Modal>
-      )
+        return (
+          <Modal isOpen={true} style={setStyle(this.props.position)} ariaHideApp={false}>
+            <WalletInitializedContainer state={state} />
+          </Modal>
+        );
       default:
         return <LandingPage />;
     }
   }
 }
-
 
 const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => ({
   state,
@@ -46,7 +43,6 @@ const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => (
 });
 
 export default connect(mapStateToProps)(WalletContainer);
-
 
 /////////////
 // Styling //
@@ -95,14 +91,13 @@ const centerStyle = {
   },
 };
 
-
 function setStyle(position) {
   switch (position) {
-    case "left":
+    case 'left':
       return leftStyle;
-    case "right":
+    case 'right':
       return rightStyle;
     default:
       return centerStyle;
-    }
-  } 
+  }
+}
