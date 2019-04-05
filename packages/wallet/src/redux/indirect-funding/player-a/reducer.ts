@@ -111,6 +111,7 @@ const waitForPostFundSetup1 = (
       return state;
   }
 };
+
 const waitForDirectFunding = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,

@@ -14,7 +14,12 @@ import {
 } from '../../../__tests__/helpers';
 import { WalletProcedure } from '../../../types';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
+
 import * as SigningUtil from '../../../../utils/signing-utils';
+const validCommitmentSignature = jest.fn().mockReturnValue(true);
+Object.defineProperty(SigningUtil, 'validCommitmentSignature', {
+  value: validCommitmentSignature,
+});
 
 const startingIn = type => `starting in ${type}`;
 const whenActionArrives = type => `when ${type} arrives`;
@@ -175,11 +180,6 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
 
 describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const validCommitmentSignature = jest.fn().mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validCommitmentSignature', {
-      value: validCommitmentSignature,
-    });
-
     const state = startingState(states.waitForLedgerUpdate0({ channelId, ledgerId }), {
       [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
       [ledgerId]: channelStates.waitForUpdate({
