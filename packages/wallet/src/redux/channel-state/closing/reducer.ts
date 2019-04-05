@@ -334,7 +334,7 @@ const acknowledgeCloseSuccessReducer = (
   switch (action.type) {
     case actions.channel.CLOSE_SUCCESS_ACKNOWLEDGED:
       return {
-        state: channelStates.waitForChannel({
+        state: channelStates.finalized({
           ...state,
         }),
         sideEffects: { messageOutbox: closeSuccess(), displayOutbox: hideWallet() },
@@ -351,7 +351,7 @@ const acknowledgeClosedOnChainReducer = (
   switch (action.type) {
     case actions.channel.CLOSED_ON_CHAIN_ACKNOWLEDGED:
       return {
-        state: channelStates.waitForChannel({ ...state }),
+        state: channelStates.finalized({ ...state }),
         sideEffects: { messageOutbox: closeSuccess() },
       };
     default:
