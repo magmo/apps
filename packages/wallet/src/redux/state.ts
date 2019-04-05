@@ -1,8 +1,13 @@
-import { OutboxState, EMPTY_OUTBOX_STATE } from './outbox/state';
-import { ChannelState, ChannelStatus } from './channel-state/state';
+import { OutboxState, EMPTY_OUTBOX_STATE, SideEffects } from './outbox/state';
+import {
+  ChannelState,
+  ChannelStatus,
+  setChannel as setChannelInStore,
+} from './channel-state/state';
 import { Properties } from './utils';
 import * as indirectFunding from './indirect-funding/state';
 import { DirectFundingStore } from './direct-funding-store/state';
+import { accumulateSideEffects } from './outbox';
 
 export type WalletState = WaitForLogin | WaitForAdjudicator | MetaMaskError | Initialized;
 
@@ -87,8 +92,20 @@ export function initialized(params: Properties<Initialized>): Initialized {
   };
 }
 
+// -------------------
+// Getters and setters
+// -------------------
+
 export function getChannelStatus(state: WalletState, channelId: string): ChannelStatus {
   return state.channelState.initializedChannels[channelId];
+}
+
+export function setSideEffects(state: Initialized, sideEffects: SideEffects): Initialized {
+  return { ...state, outboxState: accumulateSideEffects(state.outboxState, sideEffects) };
+}
+
+export function setChannel(state: Initialized, channel: ChannelStatus): Initialized {
+  return { ...state, channelState: setChannelInStore(state.channelState, channel) };
 }
 
 export { indirectFunding };

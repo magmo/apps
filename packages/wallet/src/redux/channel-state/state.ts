@@ -34,6 +34,16 @@ export interface ChannelState {
   activeAppChannelId?: string;
 }
 
+// -------------------
+// Getters and setters
+// -------------------
+
+export function setChannel(channelStore: ChannelState, channel: ChannelStatus): ChannelState {
+  const channelId = channel.channelId;
+  const initializedChannels = { ...channelStore.initializedChannels, [channelId]: channel };
+  return { ...channelStore, initializedChannels };
+}
+
 export * from './opening/state';
 export * from './running/state';
 export * from './funding/state';
