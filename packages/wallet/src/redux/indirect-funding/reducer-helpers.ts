@@ -9,6 +9,9 @@ import { channelStateReducer } from '../channel-state/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { directFundingStoreReducer } from '../direct-funding-store/reducer';
 import { Commitment } from 'fmg-core';
+import { composePostFundCommitment } from '../../utils/commitment-utils';
+import { WalletProcedure } from '../types';
+import { messageRelayRequested } from 'magmo-wallet-client';
 
 export const appChannelIsWaitingForFunding = (
   state: walletStates.Initialized,
@@ -16,6 +19,14 @@ export const appChannelIsWaitingForFunding = (
 ): boolean => {
   const appChannel = selectors.getOpenedChannelState(state, channelId);
   return appChannel.type === channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
+};
+
+export const ledgerChannelIsWaitingForUpdate = (
+  state: walletStates.Initialized,
+  ledgerChannelId: string,
+): boolean => {
+  const ledgerChannel = selectors.getOpenedChannelState(state, ledgerChannelId);
+  return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE;
 };
 
 // Global state updaters
@@ -68,4 +79,53 @@ export const updateDirectFundingStatus = (
   const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
   newState.directFundingStore = updatedDirectFundingStore.state;
   return newState;
+};
+
+export const receiveOwnLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+): walletStates.Initialized => {
+  return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
+};
+
+export const createAndSendPostFundCommitment = (
+  state: walletStates.Initialized,
+  ledgerChannelId: string,
+): walletStates.Initialized => {
+  let newState = { ...state };
+  const ledgerChannelState = selectors.getOpenedChannelState(newState, ledgerChannelId);
+  const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
+    ledgerChannelState.lastCommitment.commitment,
+    ledgerChannelState.ourIndex,
+    ledgerChannelState.privateKey,
+  );
+
+  const theirIndex = (ledgerChannelState.ourIndex + 1) % ledgerChannelState.participants.length;
+  const theirAddress = ledgerChannelState.participants[theirIndex];
+
+  newState = receiveOwnLedgerCommitment(state, postFundCommitment);
+
+  newState.outboxState.messageOutbox = [
+    createCommitmentMessageRelay(
+      theirAddress,
+      ledgerChannelId,
+      postFundCommitment,
+      commitmentSignature,
+    ),
+  ];
+  return newState;
+};
+
+export const createCommitmentMessageRelay = (
+  to: string,
+  channelId: string,
+  commitment: Commitment,
+  signature: string,
+) => {
+  const payload = {
+    channelId,
+    procedure: WalletProcedure.IndirectFunding,
+    data: { commitment, signature },
+  };
+  return messageRelayRequested(to, payload);
 };

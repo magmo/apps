@@ -3,21 +3,17 @@ import * as walletStates from '../../state';
 import * as channelStates from '../../channel-state/state';
 
 import * as actions from '../../actions';
-import * as channelActions from '../../channel-state/actions';
 
 import * as selectors from '../../selectors';
 
 import { unreachable } from '../../../utils/reducer-utils';
-import { PlayerIndex, WalletProcedure } from '../../types';
+import { PlayerIndex } from '../../types';
 
 import { Channel } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
-import { Commitment } from 'fmg-core/lib/commitment';
-import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../../utils/hex-utils';
 import {
   composeLedgerUpdateCommitment,
-  composePostFundCommitment,
   composePreFundCommitment,
 } from '../../../utils/commitment-utils';
 import { isFundingAction } from '../../internal/actions';
@@ -29,6 +25,10 @@ import {
   updateChannelState,
   updateDirectFundingStatus,
   receiveLedgerCommitment,
+  ledgerChannelIsWaitingForUpdate,
+  receiveOwnLedgerCommitment,
+  createCommitmentMessageRelay,
+  createAndSendPostFundCommitment,
 } from '../reducer-helpers';
 
 export function playerAReducer(
@@ -185,14 +185,6 @@ const waitForApprovalReducer = (
   }
 };
 
-const ledgerChannelIsWaitingForUpdate = (
-  state: walletStates.Initialized,
-  ledgerChannelId: string,
-): boolean => {
-  const ledgerChannel = selectors.getOpenedChannelState(state, ledgerChannelId);
-  return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE;
-};
-
 const ledgerChannelFundsAppChannel = (
   state: walletStates.Initialized,
   appChannelId: string,
@@ -239,31 +231,6 @@ const createAndSendUpdateCommitment = (
       ledgerChannelState.participants[PlayerIndex.B],
       appChannelId,
       updateCommitment,
-      commitmentSignature,
-    ),
-  ];
-  return newState;
-};
-
-const createAndSendPostFundCommitment = (
-  state: walletStates.Initialized,
-  ledgerChannelId: string,
-): walletStates.Initialized => {
-  let newState = { ...state };
-  const ledgerChannelState = selectors.getOpenedChannelState(newState, ledgerChannelId);
-  const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
-    ledgerChannelState.lastCommitment.commitment,
-    ledgerChannelState.ourIndex,
-    ledgerChannelState.privateKey,
-  );
-
-  newState = receiveOwnLedgerCommitment(state, postFundCommitment);
-
-  newState.outboxState.messageOutbox = [
-    createCommitmentMessageRelay(
-      ledgerChannelState.participants[PlayerIndex.B],
-      ledgerChannelId,
-      postFundCommitment,
       commitmentSignature,
     ),
   ];
@@ -331,13 +298,6 @@ const confirmFundingForAppChannel = (
   return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
 };
 
-const receiveOwnLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-): walletStates.Initialized => {
-  return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
-};
-
 const createLedgerChannel = (
   state: walletStates.Initialized,
   appChannelState: channelStates.OpenedState,
@@ -357,18 +317,4 @@ const createLedgerChannel = (
     appChannelState.privateKey,
   );
   return { state: updatedState, ledgerChannel };
-};
-
-export const createCommitmentMessageRelay = (
-  to: string,
-  channelId: string,
-  commitment: Commitment,
-  signature: string,
-) => {
-  const payload = {
-    channelId,
-    procedure: WalletProcedure.IndirectFunding,
-    data: { commitment, signature },
-  };
-  return messageRelayRequested(to, payload);
 };
