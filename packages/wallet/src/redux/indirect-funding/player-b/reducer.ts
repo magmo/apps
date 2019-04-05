@@ -12,8 +12,8 @@ import {
   appChannelIsWaitingForFunding,
   receiveLedgerCommitment,
   createAndSendPostFundCommitment,
-  ledgerChannelFundsAppChannel,
-  confirmFundingForAppChannel,
+  safeToSendLedgerUpdate,
+  createAndSendUpdateCommitment,
 } from '../reducer-helpers';
 
 export function playerBReducer(
@@ -44,6 +44,8 @@ export function playerBReducer(
       return waitForPostFundSetup0Reducer(state, action);
     case states.WAIT_FOR_LEDGER_UPDATE_0:
       return waitForLedgerUpdate0Reducer(state, action);
+    case states.WAIT_FOR_CONSENSUS:
+      return state;
     default:
       return unreachable(state.indirectFunding);
   }
@@ -117,14 +119,13 @@ const waitForLedgerUpdate0Reducer = (
       ) as states.WaitForLedgerUpdate0;
 
       let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
-      if (
-        ledgerChannelFundsAppChannel(
+      if (safeToSendLedgerUpdate(newState, indirectFundingState.ledgerId)) {
+        newState = createAndSendUpdateCommitment(
           newState,
           indirectFundingState.channelId,
           indirectFundingState.ledgerId,
-        )
-      ) {
-        newState = confirmFundingForAppChannel(newState, indirectFundingState.channelId);
+        );
+        newState.indirectFunding = states.waitForConsensus(indirectFundingState);
       }
       return newState;
     default:
