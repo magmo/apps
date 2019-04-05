@@ -12,6 +12,8 @@ import { Commitment } from 'fmg-core';
 import { composePostFundCommitment } from '../../utils/commitment-utils';
 import { WalletProcedure } from '../types';
 import { messageRelayRequested } from 'magmo-wallet-client';
+import { addHex } from '../../utils/hex-utils';
+import { bigNumberify } from 'ethers/utils';
 
 export const appChannelIsWaitingForFunding = (
   state: walletStates.Initialized,
@@ -29,6 +31,21 @@ export const ledgerChannelIsWaitingForUpdate = (
   return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE;
 };
 
+export const ledgerChannelFundsAppChannel = (
+  state: walletStates.Initialized,
+  appChannelId: string,
+  ledgerChannelId: string,
+): boolean => {
+  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
+  const appChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
+  const lastCommitment = ledgerChannelState.lastCommitment.commitment;
+  const { allocation, destination } = lastCommitment;
+  const indexOfTargetChannel = destination.indexOf(appChannelId);
+  const appChannelTotal = appChannelState.lastCommitment.commitment.allocation.reduce(addHex);
+
+  return bigNumberify(allocation[indexOfTargetChannel]).gte(appChannelTotal);
+};
+
 // Global state updaters
 export const receiveLedgerCommitment = (
   state: walletStates.Initialized,
@@ -39,6 +56,36 @@ export const receiveLedgerCommitment = (
     state,
     channelActions.opponentCommitmentReceived(commitment, signature),
   );
+};
+
+export const requestDirectFunding = (
+  state: walletStates.Initialized,
+  ledgerChannelId: string,
+): walletStates.Initialized => {
+  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
+  const { ourIndex } = ledgerChannelState;
+  const { allocation } = ledgerChannelState.lastCommitment.commitment;
+  const safeToDeposit = allocation.slice(0, ourIndex).reduce(addHex, '0x0');
+  const totalFundingRequested = allocation.reduce(addHex);
+  const depositAmount = allocation[ourIndex];
+
+  return updateDirectFundingStatus(
+    state,
+    actions.internal.directFundingRequested(
+      ledgerChannelId,
+      safeToDeposit,
+      totalFundingRequested,
+      depositAmount,
+      ourIndex,
+    ),
+  );
+};
+
+export const confirmFundingForAppChannel = (
+  state: walletStates.Initialized,
+  channelId: string,
+): walletStates.Initialized => {
+  return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
 };
 
 export const initializeChannelState = (

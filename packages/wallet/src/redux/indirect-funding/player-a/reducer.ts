@@ -17,18 +17,19 @@ import {
   composePreFundCommitment,
 } from '../../../utils/commitment-utils';
 import { isFundingAction } from '../../internal/actions';
-import { bigNumberify } from 'ethers/utils';
 import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
 import {
   appChannelIsWaitingForFunding,
   initializeChannelState,
-  updateChannelState,
   updateDirectFundingStatus,
   receiveLedgerCommitment,
   ledgerChannelIsWaitingForUpdate,
   receiveOwnLedgerCommitment,
   createCommitmentMessageRelay,
   createAndSendPostFundCommitment,
+  ledgerChannelFundsAppChannel,
+  confirmFundingForAppChannel,
+  requestDirectFunding,
 } from '../reducer-helpers';
 
 export function playerAReducer(
@@ -185,20 +186,6 @@ const waitForApprovalReducer = (
   }
 };
 
-const ledgerChannelFundsAppChannel = (
-  state: walletStates.Initialized,
-  appChannelId: string,
-  ledgerChannelId: string,
-): boolean => {
-  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
-  const appChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
-  const lastCommitment = ledgerChannelState.lastCommitment.commitment;
-  const { allocation, destination } = lastCommitment;
-  const indexOfTargetChannel = destination.indexOf(appChannelId);
-  const appChannelTotal = appChannelState.lastCommitment.commitment.allocation.reduce(addHex);
-  return bigNumberify(allocation[indexOfTargetChannel]).gte(appChannelTotal);
-};
-
 const directFundingIsComplete = (state: walletStates.Initialized, channelId: string): boolean => {
   const fundingStatus = selectors.getDirectFundingState(state, channelId);
   return fundingStatus.channelFundingStatus === CHANNEL_FUNDED;
@@ -266,36 +253,6 @@ const createAndSendPreFundCommitment = (
     ),
   ];
   return newState;
-};
-
-const requestDirectFunding = (
-  state: walletStates.Initialized,
-  ledgerChannelId: string,
-): walletStates.Initialized => {
-  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
-  const { ourIndex } = ledgerChannelState;
-  const { allocation } = ledgerChannelState.lastCommitment.commitment;
-  const safeToDeposit = ourIndex === PlayerIndex.A ? '0x0' : allocation[0];
-  const totalFundingRequested = allocation.reduce(addHex);
-  const depositAmount = allocation[ourIndex];
-
-  return updateDirectFundingStatus(
-    state,
-    actions.internal.directFundingRequested(
-      ledgerChannelId,
-      safeToDeposit,
-      totalFundingRequested,
-      depositAmount,
-      ourIndex,
-    ),
-  );
-};
-
-const confirmFundingForAppChannel = (
-  state: walletStates.Initialized,
-  channelId: string,
-): walletStates.Initialized => {
-  return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
 };
 
 const createLedgerChannel = (
