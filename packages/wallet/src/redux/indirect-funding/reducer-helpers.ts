@@ -47,7 +47,7 @@ export const ledgerChannelFundsAppChannel = (
   const indexOfTargetChannel = destination.indexOf(appChannelId);
   const appChannelTotal = appChannelState.lastCommitment.commitment.allocation.reduce(addHex);
 
-  return bigNumberify(allocation[indexOfTargetChannel]).gte(appChannelTotal);
+  return bigNumberify(allocation[indexOfTargetChannel] || '0x0').gte(appChannelTotal);
 };
 
 // Global state updaters
