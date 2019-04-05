@@ -49,6 +49,8 @@ export const closingReducer = (
       return acknowledgeConcludeReducer(state, action);
     case channelStates.CLOSE_TRANSACTION_FAILED:
       return closeTransactionFailedReducer(state, action);
+    case channelStates.FINALIZED:
+      return { state };
     default:
       return unreachable(state);
   }
