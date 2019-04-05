@@ -83,8 +83,8 @@ const twinWalletStateRender = (aState: walletStates.Initialized ,bState: walletS
   );
 };
 
-const channelStateRender = channelState => () => {
-  const walletState = walletStateFromChannelState(channelState);
+const channelStateRender = channelStateContainer => () => {
+  const walletState = walletStateFromChannelState(channelStateContainer.channelState);
   return (
     <Provider store={fakeStore(walletState)}>
       <WalletContainer />
