@@ -1,5 +1,5 @@
 import { ChannelOpen, channelOpen, UserAddressExists, userAddressExists } from '../shared/state';
-import { TransactionExists } from '../../utils';
+import { TransactionExists, Properties } from '../../utils';
 
 // stage
 export const CLOSING = 'CLOSING';
@@ -15,6 +15,8 @@ export const WAIT_FOR_CLOSE_SUBMISSION = 'WAIT_FOR_CLOSE_SUBMISSION';
 export const WAIT_FOR_CLOSE_CONFIRMED = 'WAIT_FOR_CLOSE_CONFIRMED';
 export const ACKNOWLEDGE_CONCLUDE = 'ACKNOWLEDGE_CONCLUDE';
 export const CLOSE_TRANSACTION_FAILED = 'CLOSE_TRANSACTION_FAILED';
+
+export const FINALIZED = 'FINALIZED'; // when the outcome has been finalized in the adjudicator
 
 export interface CloseTransactionFailed extends UserAddressExists {
   type: typeof CLOSE_TRANSACTION_FAILED;
@@ -67,6 +69,11 @@ export interface WaitForCloseInitiation extends UserAddressExists {
 
 export interface WaitForCloseSubmission extends UserAddressExists {
   type: typeof WAIT_FOR_CLOSE_SUBMISSION;
+  stage: typeof CLOSING;
+}
+
+export interface Finalized extends ChannelOpen {
+  type: typeof FINALIZED;
   stage: typeof CLOSING;
 }
 
@@ -124,6 +131,10 @@ export function closeTransactionFailed<T extends UserAddressExists>(
   return { type: CLOSE_TRANSACTION_FAILED, stage: CLOSING, ...userAddressExists(params) };
 }
 
+export function finalized(params: Properties<Finalized>): Finalized {
+  return { type: FINALIZED, stage: CLOSING, ...channelOpen(params) };
+}
+
 export type ClosingState =
   | ApproveConclude
   | WaitForOpponentConclude
@@ -134,4 +145,5 @@ export type ClosingState =
   | WaitForCloseSubmission
   | WaitForCloseConfirmed
   | AcknowledgeConclude
-  | CloseTransactionFailed;
+  | CloseTransactionFailed
+  | Finalized;
