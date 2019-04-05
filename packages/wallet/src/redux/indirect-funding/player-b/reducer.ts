@@ -14,6 +14,8 @@ import {
   createAndSendPostFundCommitment,
   safeToSendLedgerUpdate,
   createAndSendUpdateCommitment,
+  ledgerChannelFundsAppChannel,
+  confirmFundingForAppChannel,
 } from '../reducer-helpers';
 
 export function playerBReducer(
@@ -126,6 +128,31 @@ const waitForLedgerUpdate0 = (
           indirectFundingState.ledgerId,
         );
         newState.indirectFunding = states.waitForConsensus(indirectFundingState);
+      }
+      return newState;
+    default:
+      return state;
+  }
+};
+const waitForConsensus = (
+  state: walletStates.Initialized,
+  action: actions.indirectFunding.Action,
+): walletStates.Initialized => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const indirectFundingState = selectors.getIndirectFundingState(
+        state,
+      ) as states.WaitForConsensus;
+
+      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      if (
+        ledgerChannelFundsAppChannel(
+          newState,
+          indirectFundingState.channelId,
+          indirectFundingState.ledgerId,
+        )
+      ) {
+        newState = confirmFundingForAppChannel(newState, indirectFundingState.channelId);
       }
       return newState;
     default:
