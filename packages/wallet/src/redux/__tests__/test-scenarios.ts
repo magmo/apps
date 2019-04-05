@@ -153,7 +153,7 @@ const ledgerAppAttributes = (
     consensusCounter,
   });
 };
-const ledgerChannel: Channel = {
+export const ledgerChannel: Channel = {
   nonce: 0,
   channelType: ledgerLibraryAddress,
   participants,
@@ -217,12 +217,12 @@ export const ledgerCommitments = {
     ...updatedLedgerChannelAttrs(1),
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    turnNum: 4,
+    turnNum: 5,
   },
   ledgerUpdate2: {
     ...allocatesToChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    turnNum: 5,
+    turnNum: 6,
   },
 };
