@@ -35,23 +35,23 @@ export function playerBReducer(
 
   switch (state.indirectFunding.type) {
     case states.WAIT_FOR_APPROVAL:
-      return waitForApprovalReducer(state, action);
+      return waitForApproval(state, action);
     case states.WAIT_FOR_PRE_FUND_SETUP_0:
-      return waitForPreFundSetup0Reducer(state, action);
+      return waitForPreFundSetup0(state, action);
     case states.WAIT_FOR_DIRECT_FUNDING:
       return state;
     case states.WAIT_FOR_POST_FUND_SETUP_0:
-      return waitForPostFundSetup0Reducer(state, action);
+      return waitForPostFundSetup0(state, action);
     case states.WAIT_FOR_LEDGER_UPDATE_0:
-      return waitForLedgerUpdate0Reducer(state, action);
+      return waitForLedgerUpdate0(state, action);
     case states.WAIT_FOR_CONSENSUS:
-      return state;
+      return waitForConsensus(state, action);
     default:
       return unreachable(state.indirectFunding);
   }
 }
 
-const waitForApprovalReducer = (
+const waitForApproval = (
   state: walletStates.IndirectFundingOngoing,
   action: actions.indirectFunding.Action,
 ) => {
@@ -64,7 +64,7 @@ const waitForApprovalReducer = (
   }
 };
 
-const waitForPreFundSetup0Reducer = (
+const waitForPreFundSetup0 = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
@@ -85,7 +85,7 @@ const waitForPreFundSetup0Reducer = (
   }
 };
 
-const waitForPostFundSetup0Reducer = (
+const waitForPostFundSetup0 = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
@@ -108,7 +108,7 @@ const waitForPostFundSetup0Reducer = (
   }
 };
 
-const waitForLedgerUpdate0Reducer = (
+const waitForLedgerUpdate0 = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ): walletStates.Initialized => {
