@@ -40,9 +40,9 @@ export const composeLedgerUpdateCommitment = (
   });
   const updateCommitment: Commitment = {
     channel,
-    commitmentType: CommitmentType.PostFundSetup,
+    commitmentType: CommitmentType.App,
     turnNum: previousTurnNum + 1,
-    commitmentCount: ourIndex,
+    commitmentCount: 0,
     allocation,
     destination,
     appAttributes,
