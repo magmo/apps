@@ -1,4 +1,4 @@
-import { OpeningState } from './opening/state';
+import { OpeningState, WaitForChannel } from './opening/state';
 import { RunningState } from './running/state';
 import { FundingState } from './funding/state';
 import { ChallengingState } from './challenging/state';
@@ -38,7 +38,10 @@ export interface ChannelState {
 // Getters and setters
 // -------------------
 
-export function setChannel(channelStore: ChannelState, channel: ChannelStatus): ChannelState {
+export function setChannel(
+  channelStore: ChannelState,
+  channel: Exclude<ChannelStatus, WaitForChannel>, // temporary fix while working to remove WaitForChannel from ChannelStatus
+): ChannelState {
   const channelId = channel.channelId;
   const initializedChannels = { ...channelStore.initializedChannels, [channelId]: channel };
   return { ...channelStore, initializedChannels };
