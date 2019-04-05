@@ -7,6 +7,7 @@ import * as states from '../state';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
+export const ledgerLibraryAddress = '0x' + '2'.repeat(40);
 export const channelNonce = 4;
 export const asPrivateKey = '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d';
 export const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
@@ -147,7 +148,7 @@ const ledgerAppAttributes = consensusCounter => {
 };
 const ledgerChannel: Channel = {
   nonce: 0,
-  channelType: 'ledger',
+  channelType: ledgerLibraryAddress,
   participants,
 };
 const ledgerChannelAttrs = {
@@ -157,25 +158,25 @@ const ledgerChannelAttrs = {
   destination: participants,
 };
 export const ledgerCommitments: { [name: string]: Commitment } = {
-  preFundCommitment1: {
+  preFundCommitment0: {
     ...ledgerChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.PreFundSetup,
     turnNum: 0,
   },
-  preFundCommitment2: {
+  preFundCommitment1: {
     ...ledgerChannelAttrs,
     commitmentCount: 1,
     commitmentType: CommitmentType.PreFundSetup,
     turnNum: 1,
   },
-  postFundCommitment1: {
+  postFundCommitment0: {
     ...ledgerChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.PostFundSetup,
     turnNum: 2,
   },
-  postFundCommitment2: {
+  postFundCommitment1: {
     ...ledgerChannelAttrs,
     commitmentCount: 1,
     commitmentType: CommitmentType.PostFundSetup,
