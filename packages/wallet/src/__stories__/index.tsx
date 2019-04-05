@@ -1,76 +1,16 @@
+
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import WalletContainer from '../containers/wallet';
 import { Provider } from 'react-redux';
 import * as walletStates from '../redux/state';
-import * as channelStates from '../redux/channel-state/state';
+import {
+  dummyWaitForApprovalA,
+  dummyWaitForLogin,
+ } from './a-dummy-wallet-states';
 import '../index.scss';
-import * as scenarios from '../redux/__tests__/test-scenarios';
 import NetworkStatus from '../components/network-status';
-import { channelFunded } from '../redux/funding-state/state';
-import { EMPTY_OUTBOX_STATE } from '../redux/outbox/state';
-import { WaitForFundingAndPostFundSetup } from '../redux/channel-state/state';
 
-const {
-  asAddress,
-  asPrivateKey,
-  bsAddress,
-  // bsPrivateKey,
-  channelId,
-  channelNonce,
-  libraryAddress,
-  participants,
-  preFundCommitment1,
-  preFundCommitment2,
-} = scenarios;
-
-const YOUR_CONTRIBUTION = bigNumberify(500000000000000).toHexString();
-const TOTAL_CONTRIBUTION = bigNumberify(YOUR_CONTRIBUTION)
-  .mul(2)
-  .toHexString();
-
-const defaultFundingState: fundingStates.DirectFundingStatus = {
-  fundingType: fundingStates.DIRECT_FUNDING,
-  requestedTotalFunds: TOTAL_CONTRIBUTION,
-  requestedYourContribution: YOUR_CONTRIBUTION,
-  channelId: 'channel id',
-  ourIndex: 0,
-  safeToDepositLevel: YOUR_CONTRIBUTION,
-  depositStatus: fundingStates.depositing.WAIT_FOR_TRANSACTION_SENT,
-  channelFundingStatus: fundingStates.NOT_SAFE_TO_DEPOSIT,
-};
-
-// const fundingStateWithTX = { ...defaultFundingState, transactionHash: 'TX_HASH' };
-
-const defaults = {
-  adjudicator: 'adj-address',
-  channelId,
-  channelNonce,
-  libraryAddress,
-  participants,
-  privateKey: asPrivateKey,
-  uid: 'uid',
-  lastCommitment: { commitment: preFundCommitment2, signature: 'fake-sig' },
-  penultimateCommitment: { commitment: preFundCommitment1, signature: 'fake-sig' },
-  turnNum: preFundCommitment2.turnNum,
-  networkId: 3,
-  challengeExpiry: 0,
-  transactionHash: '0x0',
-  userAddress: '0x0',
-  funded: false,
-};
-const playerADefaults = {
-  ...defaults,
-  ourIndex: 0,
-  fundingState: channelFunded(defaultFundingState),
-  address: asAddress,
-};
-// const playerBDefaults = {
-//   ...defaults,
-//   ourIndex: 1,
-//   fundingState: channelFunded(defaultFundingState),
-//   address: bsAddress,
-// };
 
 const fakeStore = state => ({
   dispatch: action => {
@@ -86,21 +26,6 @@ const fakeStore = state => ({
   },
 });
 
-const initializedWalletState = walletStates.initialized({
-  ...walletStates.waitForLogin(),
-  unhandledAction: undefined,
-  ...walletStates.emptyState,
-  channelState: {
-    initializedChannels: {
-      [channelId]: channelStates.waitForFundingAndPostFundSetup({ ...playerADefaults }),
-    },
-    initializingChannels: {},
-  },
-  networkId: 4,
-  adjudicator: '',
-  uid: '',
-  consensusLibrary: '0x0',
-});
 
 // Want to return top level wallet state, not the channel state
 // function walletStateFromChannelState<T extends channelStates.OpenedState>(
@@ -117,24 +42,24 @@ const initializedWalletState = walletStates.initialized({
 //   };
 // }
 
-// const walletStateRender = state => () => {
-//   const fullState = { ...initializedWalletState, networkId: 3, ...state };
-//   return (
-//     <Provider store={fakeStore(fullState)}>
-//       <WalletContainer position="center"/>
-//     </Provider>
-//   );
-// };
+const walletStateRender = state => () => {
+  // const fullState = { ...initializedWalletState, networkId: 3, ...state };
+  return (
+    <Provider store={fakeStore(state)}>
+      <WalletContainer position="center"/>
+    </Provider>
+  );
+};
 
-const twinWalletStateRender = (aState,bState) => () => {
-  const aFullState = { ...initializedWalletState, networkId: 3, ...aState };
-  const bFullState = { ...initializedWalletState, networkId: 3, ...bState };
+const twinWalletStateRender = (aState: walletStates.Initialized ,bState: walletStates.Initialized) => () => {
+  // const aFullState = { ...initializedWalletState, networkId: 3, ...aState };
+  // const bFullState = { ...initializedWalletState, networkId: 3, ...bState };
   return (
     <div>
-    <Provider store={fakeStore(aFullState)}>
+    <Provider store={fakeStore(aState)}>
         <WalletContainer position="left"/>
       </Provider>
-    <Provider store={fakeStore(bFullState)}>
+    <Provider store={fakeStore(bState)}>
         <WalletContainer position="right"/>
       </Provider>
       </div>
@@ -189,158 +114,10 @@ function addTwinStoriesFromCollection(collection, chapter, renderer = twinWallet
 //   });
 // }
 
-const WaitForApprovalA: walletStates.Initialized = {
-  type: 'WALLET.INITIALIZED',
-  channelState: {
-    initializingChannels:
-      {},
-    initializedChannels:
-      {'RPS': {
-        address: asAddress,
-        privateKey: asPrivateKey,
-        channelId: 'RPS',
-        libraryAddress: '',
-        ourIndex: 0,
-        participants: [asAddress, bsAddress],
-        channelNonce: 0,
-        turnNum: 2,
-        lastCommitment: {
-          commitment: {
-            commitmentType: 0, // prefundsetup
-            appAttributes: '',
-          },
-          signature: '',
-          },
-        funded: false,
-        penultimateCommitment: {
-          commitment: {
-            channel: {
-              channelType: '0',
-              nonce: 0,
-              participants: [asAddress,bsAddress],
-            },
-            turnNum: 1,
-            allocation: ['5','5'],
-            destination: [asAddress,bsAddress],
-            commitmentCount: 1,
-            commitmentType: 0, // prefundsetup
-            appAttributes: '',
-          },
-          signature: '',
-        },
-        type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
-        stage: 'FUNDING',
-      } as WaitForFundingAndPostFundSetup,
-      'TTT': {
-        address: asAddress,
-        privateKey: asPrivateKey,
-        channelId: 'RPS',
-        libraryAddress: '',
-        ourIndex: 0,
-        participants: [asAddress, bsAddress],
-        channelNonce: 0,
-        turnNum: 2,
-        lastCommitment: {
-          commitment: {
-            commitmentType: 0, // prefundsetup
-            appAttributes: '',
-          },
-          signature: '',
-          },
-        funded: false,
-        penultimateCommitment: {
-          commitment: {
-            channel: {
-              channelType: '0',
-              nonce: 0,
-              participants: [asAddress,bsAddress],
-            },
-            turnNum: 1,
-            allocation: ['5','5'],
-            destination: [asAddress,bsAddress],
-            commitmentCount: 1,
-            commitmentType: 0, // prefundsetup
-            appAttributes: '',
-          },
-          signature: '',
-        },
-        type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
-        stage: 'FUNDING',
-      }  as WaitForFundingAndPostFundSetup } ,
-  },
-  fundingState: {
-    directFunding: 
-      {'TTT': {
-        requestedTotalFunds: '10',
-        requestedYourContribution: '5',
-        channelId,
-        ourIndex: 0,
-        fundingType: 'FUNDING_TYPE.DIRECT',
-        safeToDepositLevel: '1',
-        channelFundingStatus: 'NOT_SAFE_TO_DEPOSIT',
-      }},
-    indirectFunding:
-      {channelId: {
-        placeholder: 'placeholder',
-      }},
-    },
-  outboxState: {
-    displayOutbox: [],
-    messageOutbox: [],
-    transactionOutbox: [],
-  },
-  uid: '9',
-  networkId: 1,
-  adjudicator: 'somewhere',
-}
 
-const WaitForApprovalB = {
-  ...WaitForApprovalA,
-  channelState: {
-    initializingChannels:
-      {},
-    initializedChannels:
-      {'TTT': {
-        address: asAddress,
-        privateKey: asPrivateKey,
-        channelId: 'RPS',
-        libraryAddress: '',
-        ourIndex: 0,
-        participants: [asAddress, bsAddress],
-        channelNonce: 0,
-        turnNum: 2,
-        lastCommitment: {
-          commitment: {
-            commitmentType: 0, // prefundsetup
-            appAttributes: '',
-          },
-          signature: '',
-          },
-        funded: false,
-        penultimateCommitment: {
-          commitment: {
-            channel: {
-              channelType: '0',
-              nonce: 0,
-              participants: [asAddress,bsAddress],
-            },
-            turnNum: 1,
-            allocation: ['5','5'],
-            destination: [asAddress,bsAddress],
-            commitmentCount: 1,
-            commitmentType: 0, // prefundsetup
-            appAttributes: '',
-          },
-          signature: '',
-        },
-        type: 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP',
-        stage: 'FUNDING',
-      }  as WaitForFundingAndPostFundSetup } ,
-  },
-}
 
 const TwinWalletScreensIndirectFunding = [
-  {a: WaitForApprovalA, b: WaitForApprovalB},
+  {a: dummyWaitForApprovalA, b: dummyWaitForApprovalA},
   // WaitForPreFundSetup1: {
   //   channelState: channelStates.waitForFundingAndPostFundSetup(playerADefaults),
   //   fundingState: fundingStates.depositing.waitForTransactionSent(defaultFundingState),
@@ -468,7 +245,7 @@ addTwinStoriesFromCollection(
 // };
 // addStoriesFromCollection(WalletScreendsClosing, 'Wallet Screens / Closing');
 
-// storiesOf('Wallet Landing Page', module).add(
-//   'Landing Page',
-//   channelStateRender(walletStates.waitForLogin()),
-// );
+storiesOf('Wallet Landing Page', module).add(
+  'Landing Page',
+  walletStateRender(dummyWaitForLogin),
+);
