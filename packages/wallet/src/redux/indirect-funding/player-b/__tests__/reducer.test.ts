@@ -9,6 +9,8 @@ import {
   itTransitionsProcedureToStateType,
   itSendsNoMessage,
   itSendsNoTransaction,
+  itSendsThisMessage,
+  expectThisCommitmentSent,
 } from '../../../__tests__/helpers';
 import { WalletProcedure } from '../../../types';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
@@ -31,12 +33,13 @@ const {
   preFundCommitment1,
   preFundCommitment2,
   channelId,
+  ledgerId,
 } = scenarios;
 
-const { preFundCommitment0 } = ledgerCommitments;
+const { preFundCommitment0, postFundCommitment0 } = ledgerCommitments;
 
 const MOCK_SIGNATURE = 'signature';
-const channelStateDefaults = {
+const appChannelStateDefaults = {
   address: bsAddress,
   privateKey: bsPrivateKey,
   adjudicator: 'adj-address',
@@ -54,16 +57,37 @@ const channelStateDefaults = {
   ourIndex: PlayerIndex.B,
 };
 
+const ledgerChannelStateDefaults = {
+  address: bsAddress,
+  privateKey: bsPrivateKey,
+  adjudicator: 'adj-address',
+  channelId: ledgerId,
+  channelNonce,
+  libraryAddress,
+  networkId: 3,
+  participants,
+  uid: 'uid',
+  transactionHash: '0x0',
+  funded: false,
+  penultimateCommitment: {
+    commitment: ledgerCommitments.preFundCommitment0,
+    signature: MOCK_SIGNATURE,
+  },
+  lastCommitment: { commitment: ledgerCommitments.preFundCommitment1, signature: MOCK_SIGNATURE },
+  turnNum: 1,
+  ourIndex: PlayerIndex.B,
+};
+
 const defaultState = { ...initializedState };
 const startingState = (
   state: states.PlayerBState,
-  channelState?: channelStates.OpenedState,
+  channelState?: { [channelId: string]: channelStates.OpenedState },
 ): walletStates.IndirectFundingOngoing => ({
   ...defaultState,
   indirectFunding: state,
   channelState: {
     ...channelStates.EMPTY_CHANNEL_STATE,
-    initializedChannels: channelState ? { [channelState.channelId]: channelState } : {},
+    initializedChannels: channelState || {},
   },
 });
 
@@ -78,11 +102,10 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
-  describe.only(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const state = startingState(
-      states.waitForPreFundSetup0({ channelId }),
-      channelStates.waitForFundingAndPostFundSetup(channelStateDefaults),
-    );
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const state = startingState(states.waitForPreFundSetup0({ channelId }), {
+      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+    });
 
     const action = actions.commitmentReceived(
       channelId,
@@ -97,3 +120,53 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
     itSendsNoTransaction(updatedState);
   });
 });
+
+describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
+  describe.skip(whenActionArrives(actions.funding.FUNDING_RECEIVED_EVENT), () => {
+    // Need to hook up the direct funding store first, which isn't yet in this branch
+    const state = startingState(states.waitForDirectFunding({ channelId, ledgerId }), {
+      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+    });
+
+    const action = actions.commitmentReceived(
+      channelId,
+      WalletProcedure.IndirectFunding,
+      preFundCommitment0,
+      'signature',
+    );
+    // TODO: This should fail, since we're not mocking the signature...
+    const updatedState = playerBReducer(state, action);
+
+    itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
+    itSendsThisMessage(updatedState, { foo: 'foo' });
+    itSendsNoTransaction(updatedState);
+  });
+});
+
+describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
+  describe.skip(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const state = startingState(states.waitForPostFundSetup0({ channelId, ledgerId }), {
+      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+      [ledgerId]: channelStates.bWaitForPostFundSetup({
+        ...ledgerChannelStateDefaults,
+        lastCommitment: {
+          commitment: ledgerCommitments.preFundCommitment1,
+          signature: MOCK_SIGNATURE,
+        },
+      }),
+    });
+
+    const action = actions.commitmentReceived(
+      channelId,
+      WalletProcedure.IndirectFunding,
+      postFundCommitment0,
+      'signature',
+    );
+    const updatedState = playerBReducer(state, action);
+
+    itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
+    expectThisCommitmentSent(updatedState, ledgerCommitments.postFundCommitment1); // fails because of the implementation of initializedChannels
+    itSendsNoTransaction(updatedState);
+  });
+});
+

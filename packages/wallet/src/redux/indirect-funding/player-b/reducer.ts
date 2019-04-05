@@ -8,7 +8,13 @@ import { PlayerIndex } from '../../types';
 import { channelID } from 'fmg-core/lib/channel';
 
 import * as selectors from '../../selectors';
-import { appChannelIsWaitingForFunding, receiveLedgerCommitment } from '../reducer-helpers';
+import {
+  appChannelIsWaitingForFunding,
+  receiveLedgerCommitment,
+  createAndSendPostFundCommitment,
+  ledgerChannelFundsAppChannel,
+  confirmFundingForAppChannel,
+} from '../reducer-helpers';
 
 export function playerBReducer(
   state: walletStates.Initialized,
@@ -35,7 +41,7 @@ export function playerBReducer(
     case states.WAIT_FOR_DIRECT_FUNDING:
       return state;
     case states.WAIT_FOR_POST_FUND_SETUP_0:
-      return state;
+      return waitForPostFundSetup0Reducer(state, action);
     case states.WAIT_FOR_LEDGER_UPDATE_0:
       return state;
     default:
@@ -77,6 +83,28 @@ const waitForPreFundSetup0Reducer = (
   }
 };
 
+const waitForPostFundSetup0Reducer = (
+  state: walletStates.Initialized,
+  action: actions.indirectFunding.Action,
+) => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      let newState = { ...state };
+      const { commitment, signature } = action;
+      const indirectFundingState = selectors.getIndirectFundingState(
+        state,
+      ) as states.WaitForPostFundSetup0;
+
+      newState = receiveLedgerCommitment(newState, commitment, signature);
+
+      newState = createAndSendPostFundCommitment(newState, indirectFundingState.ledgerId);
+      newState.indirectFunding = states.waitForLedgerUpdate0(indirectFundingState);
+
+      return newState;
+    default:
+      return state;
+  }
+};
 function startDirectFunding(state: walletStates.Initialized, channelId, ledgerId) {
   state.indirectFunding = states.waitForDirectFunding({ channelId, ledgerId });
   return state;
