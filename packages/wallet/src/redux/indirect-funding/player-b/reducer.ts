@@ -57,19 +57,19 @@ const waitForApprovalReducer = (
 };
 
 const waitForPreFundSetup0Reducer = (
-  state: walletStates.IndirectFundingOngoing,
+  state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
-      const newState = { ...state };
+      let newState = { ...state };
       const { commitment, signature, channelId } = action;
 
-      receiveLedgerCommitment(state, commitment, signature);
+      newState = receiveLedgerCommitment(newState, commitment, signature);
 
       const ledgerChannelId = channelID(commitment.channel);
       if (appChannelIsWaitingForFunding(state, channelId)) {
-        startDirectFunding(state, channelId, ledgerChannelId);
+        newState = startDirectFunding(newState, channelId, ledgerChannelId);
       }
       return newState;
     default:
@@ -77,6 +77,7 @@ const waitForPreFundSetup0Reducer = (
   }
 };
 
-function startDirectFunding(state: walletStates.IndirectFundingOngoing, channelId, ledgerId) {
+function startDirectFunding(state: walletStates.Initialized, channelId, ledgerId) {
   state.indirectFunding = states.waitForDirectFunding({ channelId, ledgerId });
+  return state;
 }

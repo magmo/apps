@@ -5,8 +5,13 @@ import * as actions from '../../../actions';
 
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { playerBReducer } from '../reducer';
-import { itTransitionsProcedureToStateType } from '../../../__tests__/helpers';
+import {
+  itTransitionsProcedureToStateType,
+  itSendsNoMessage,
+  itSendsNoTransaction,
+} from '../../../__tests__/helpers';
 import { WalletProcedure } from '../../../types';
+import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 
 const startingIn = type => `starting in ${type}`;
 const whenActionArrives = type => `when ${type} arrives`;
@@ -15,8 +20,40 @@ function itTransitionToStateType(state, type) {
   itTransitionsProcedureToStateType('indirectFunding', state, type);
 }
 
-const { initializedState, channelId, ledgerCommitments } = scenarios;
-const { preFundCommitment1 } = ledgerCommitments;
+const {
+  initializedState,
+  ledgerCommitments,
+  bsAddress,
+  bsPrivateKey,
+  channelNonce,
+  libraryAddress,
+  participants,
+  preFundCommitment1,
+  preFundCommitment2,
+  channelId,
+} = scenarios;
+
+const { preFundCommitment0 } = ledgerCommitments;
+
+const MOCK_SIGNATURE = 'signature';
+const channelStateDefaults = {
+  address: bsAddress,
+  privateKey: bsPrivateKey,
+  adjudicator: 'adj-address',
+  channelId,
+  channelNonce,
+  libraryAddress,
+  networkId: 3,
+  participants,
+  uid: 'uid',
+  transactionHash: '0x0',
+  funded: false,
+  penultimateCommitment: { commitment: preFundCommitment1, signature: MOCK_SIGNATURE },
+  lastCommitment: { commitment: preFundCommitment2, signature: MOCK_SIGNATURE },
+  turnNum: 1,
+  ourIndex: PlayerIndex.B,
+};
+
 const defaultState = { ...initializedState };
 const startingState = (
   state: states.PlayerBState,
@@ -41,15 +78,22 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
-  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {});
-  const state = startingState(states.waitForPreFundSetup0({ channelId }));
-  const action = actions.commitmentReceived(
-    channelId,
-    WalletProcedure.IndirectFunding,
-    preFundCommitment1,
-    'signature',
-  );
-  const updatedState = playerBReducer(state, action);
+  describe.only(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const state = startingState(
+      states.waitForPreFundSetup0({ channelId }),
+      channelStates.waitForFundingAndPostFundSetup(channelStateDefaults),
+    );
 
-  itTransitionToStateType(updatedState, states.WAIT_FOR_DIRECT_FUNDING);
+    const action = actions.commitmentReceived(
+      channelId,
+      WalletProcedure.IndirectFunding,
+      preFundCommitment0,
+      'signature',
+    );
+    const updatedState = playerBReducer(state, action);
+
+    itTransitionToStateType(updatedState, states.WAIT_FOR_DIRECT_FUNDING);
+    itSendsNoMessage(updatedState);
+    itSendsNoTransaction(updatedState);
+  });
 });
