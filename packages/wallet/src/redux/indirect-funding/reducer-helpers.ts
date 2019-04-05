@@ -9,7 +9,10 @@ import { channelStateReducer } from '../channel-state/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { directFundingStoreReducer } from '../direct-funding-store/reducer';
 import { Commitment } from 'fmg-core';
-import { composePostFundCommitment } from '../../utils/commitment-utils';
+import {
+  composePostFundCommitment,
+  composeLedgerUpdateCommitment,
+} from '../../utils/commitment-utils';
 import { WalletProcedure } from '../types';
 import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../utils/hex-utils';
@@ -141,20 +144,18 @@ export const createAndSendPostFundCommitment = (
 ): walletStates.Initialized => {
   let newState = { ...state };
   const ledgerChannelState = selectors.getOpenedChannelState(newState, ledgerChannelId);
+  const appChannelState = selectors.getOpenedChannelState(state, ledgerChannelState.channelId);
   const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
     ledgerChannelState.lastCommitment.commitment,
     ledgerChannelState.ourIndex,
     ledgerChannelState.privateKey,
   );
 
-  const theirIndex = (ledgerChannelState.ourIndex + 1) % ledgerChannelState.participants.length;
-  const theirAddress = ledgerChannelState.participants[theirIndex];
-
   newState = receiveOwnLedgerCommitment(state, postFundCommitment);
 
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
-      theirAddress,
+      theirAddress(appChannelState),
       ledgerChannelId,
       postFundCommitment,
       commitmentSignature,
@@ -162,6 +163,44 @@ export const createAndSendPostFundCommitment = (
   ];
   return newState;
 };
+
+export const createAndSendUpdateCommitment = (
+  state: walletStates.Initialized,
+  appChannelId: string,
+  ledgerChannelId: string,
+): walletStates.Initialized => {
+  const appChannelState = selectors.getOpenedChannelState(state, appChannelId);
+  const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
+  const proposedDestination = [appChannelState.channelId];
+  // Compose the update commitment
+  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
+  const { updateCommitment, commitmentSignature } = composeLedgerUpdateCommitment(
+    ledgerChannelState.lastCommitment.commitment,
+    ledgerChannelState.ourIndex,
+    proposedAllocation,
+    proposedDestination,
+    ledgerChannelState.privateKey,
+  );
+
+  // Update our ledger channel with the latest commitment
+  const newState = receiveOwnLedgerCommitment(state, updateCommitment);
+
+  // Send out the commitment to the opponent
+  newState.outboxState.messageOutbox = [
+    createCommitmentMessageRelay(
+      theirAddress(appChannelState),
+      appChannelId,
+      updateCommitment,
+      commitmentSignature,
+    ),
+  ];
+  return newState;
+};
+
+function theirAddress(appChannelState: channelStates.OpenedState) {
+  const theirIndex = (appChannelState.ourIndex + 1) % appChannelState.participants.length;
+  return appChannelState.participants[theirIndex];
+}
 
 export const createCommitmentMessageRelay = (
   to: string,

@@ -11,11 +11,7 @@ import { PlayerIndex } from '../../types';
 
 import { Channel } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
-import { addHex } from '../../../utils/hex-utils';
-import {
-  composeLedgerUpdateCommitment,
-  composePreFundCommitment,
-} from '../../../utils/commitment-utils';
+import { composePreFundCommitment } from '../../../utils/commitment-utils';
 import { isFundingAction } from '../../internal/actions';
 import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
 import {
@@ -30,6 +26,7 @@ import {
   ledgerChannelFundsAppChannel,
   confirmFundingForAppChannel,
   requestDirectFunding,
+  createAndSendUpdateCommitment,
 } from '../reducer-helpers';
 
 export function playerAReducer(
@@ -189,39 +186,6 @@ const waitForApprovalReducer = (
 const directFundingIsComplete = (state: walletStates.Initialized, channelId: string): boolean => {
   const fundingStatus = selectors.getDirectFundingState(state, channelId);
   return fundingStatus.channelFundingStatus === CHANNEL_FUNDED;
-};
-
-const createAndSendUpdateCommitment = (
-  state: walletStates.Initialized,
-  appChannelId: string,
-  ledgerChannelId: string,
-): walletStates.Initialized => {
-  const appChannelState = selectors.getOpenedChannelState(state, appChannelId);
-  const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
-  const proposedDestination = [appChannelState.channelId];
-  // Compose the update commitment
-  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
-  const { updateCommitment, commitmentSignature } = composeLedgerUpdateCommitment(
-    ledgerChannelState.lastCommitment.commitment,
-    ledgerChannelState.ourIndex,
-    proposedAllocation,
-    proposedDestination,
-    ledgerChannelState.privateKey,
-  );
-
-  // Update our ledger channel with the latest commitment
-  const newState = receiveOwnLedgerCommitment(state, updateCommitment);
-
-  // Send out the commitment to the opponent
-  newState.outboxState.messageOutbox = [
-    createCommitmentMessageRelay(
-      ledgerChannelState.participants[PlayerIndex.B],
-      appChannelId,
-      updateCommitment,
-      commitmentSignature,
-    ),
-  ];
-  return newState;
 };
 
 const createAndSendPreFundCommitment = (
