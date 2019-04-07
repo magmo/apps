@@ -29,5 +29,5 @@ export type SideEffects = {
 // -------------------
 
 export function queueMessage(state: OutboxState, message: WalletEvent): OutboxState {
-  return accumulateSideEffects(state, { messageOutbox: [message]});
+  return accumulateSideEffects(state, { messageOutbox: [message] });
 }
