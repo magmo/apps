@@ -81,64 +81,6 @@ export const confirmFundingForAppChannel = (
   return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
 };
 
-export const initializeChannelState = (
-  state: walletStates.Initialized,
-  channelId: string,
-  address: string,
-  privateKey: string,
-): walletStates.Initialized => {
-  // Create initial channel state for new ledger channel
-  state.channelState.initializedChannels[channelId] = channelStates.waitForChannel({
-    address,
-    privateKey,
-  });
-
-  return state;
-};
-
-export const updateChannelState = (
-  state: walletStates.Initialized,
-  channelAction: actions.channel.ChannelAction,
-): walletStates.Initialized => {
-  const newState = { ...state };
-  const updatedChannelState = channelStateReducer(newState.channelState, channelAction);
-  newState.channelState = updatedChannelState.state;
-  // App channel state may still generate side effects
-  newState.outboxState = accumulateSideEffects(
-    newState.outboxState,
-    updatedChannelState.sideEffects,
-  );
-  return newState;
-};
-
-export const updateDirectFundingStatus = (
-  state: walletStates.Initialized,
-  action: actions.funding.FundingAction,
-): walletStates.Initialized => {
-  const newState = { ...state };
-  const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
-  newState.directFundingStore = updatedDirectFundingStore.state;
-  return newState;
-};
-
-export const receiveOwnLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-): walletStates.Initialized => {
-  return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
-};
-
-export const receiveOpponentLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-  signature: string,
-): walletStates.Initialized => {
-  return updateChannelState(
-    state,
-    channelActions.opponentCommitmentReceived(commitment, signature),
-  );
-};
-
 export const createAndSendPostFundCommitment = (
   state: walletStates.Initialized,
   ledgerChannelId: string,
@@ -196,6 +138,84 @@ export const createAndSendUpdateCommitment = (
       commitmentSignature,
     ),
   ];
+  return newState;
+};
+
+// RECEIVING COMMITMENTS
+
+// NOTES on receiving a commitment
+// When the ledger channel is in the FUNDING stage,
+// `receiveOwnCommitment` and `receiveOpponentCommitment` are ignored, by the
+// channelState reducer, while `receiveCommitment` triggers a channel state
+// update (and puts a message in the outbox)
+// When the ledger channel is _not_ in the FUNDING stage, it is the opposite.
+// This needs to be considered when deciding what action to pass to the channelState
+// reducer
+
+export const receiveOwnLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+): walletStates.Initialized => {
+  return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
+};
+
+export const receiveOpponentLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+  signature: string,
+): walletStates.Initialized => {
+  return updateChannelState(
+    state,
+    channelActions.opponentCommitmentReceived(commitment, signature),
+  );
+};
+
+export const receiveLedgerCommitment = (
+  state: walletStates.Initialized,
+  action: actions.CommitmentReceived,
+): walletStates.Initialized => {
+  return updateChannelState(state, action);
+};
+
+export const initializeChannelState = (
+  state: walletStates.Initialized,
+  channelId: string,
+  address: string,
+  privateKey: string,
+): walletStates.Initialized => {
+  // Create initial channel state for new ledger channel
+  state.channelState.initializedChannels[channelId] = channelStates.waitForChannel({
+    address,
+    privateKey,
+  });
+
+  return state;
+};
+
+// STATE UPDATERS
+
+export const updateChannelState = (
+  state: walletStates.Initialized,
+  channelAction: actions.channel.ChannelAction,
+): walletStates.Initialized => {
+  const newState = { ...state };
+  const updatedChannelState = channelStateReducer(newState.channelState, channelAction);
+  newState.channelState = updatedChannelState.state;
+  // App channel state may still generate side effects
+  newState.outboxState = accumulateSideEffects(
+    newState.outboxState,
+    updatedChannelState.sideEffects,
+  );
+  return newState;
+};
+
+export const updateDirectFundingStatus = (
+  state: walletStates.Initialized,
+  action: actions.funding.FundingAction,
+): walletStates.Initialized => {
+  const newState = { ...state };
+  const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
+  newState.directFundingStore = updatedDirectFundingStore.state;
   return newState;
 };
 
