@@ -9,7 +9,6 @@ import {
   itSendsThisMessage,
   itTransitionsToChannelStateType,
 } from '../../../__tests__/helpers';
-import { ethers } from 'ethers';
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { WalletProcedure } from '../../../types';
 import * as selectors from '../../../selectors';
@@ -27,27 +26,14 @@ function itTransitionsChannelToStateType(channelId: string, state: walletStates.
   itTransitionsToChannelStateType(type, { state: channelState });
 }
 
-const playerAWallet = ethers.Wallet.createRandom();
-const playerBWallet = ethers.Wallet.createRandom();
-
 const defaults = {
-  uid: '1',
-  networkId: 1,
-  address: playerAWallet.address,
-  adjudicator: ethers.Wallet.createRandom().address,
-  consensusLibrary: ethers.Wallet.createRandom().address,
-  channelId: ethers.Wallet.createRandom().address,
+  ...testScenarios,
   ourIndex: PlayerIndex.A,
-  nonce: 4,
-  libraryAddress: ethers.Wallet.createRandom().address,
-  participants: [playerAWallet.address, playerBWallet.address] as [string, string],
-  privateKey: playerAWallet.privateKey,
-  ledgerId: testScenarios.ledgerId,
+  privateKey: testScenarios.asPrivateKey,
 };
 
 const channelDefaults = {
   ...defaults,
-  channelNonce: defaults.nonce,
   turnNum: 5,
   lastCommitment: {
     commitment: testScenarios.ledgerCommitments.preFundCommitment1,
@@ -70,7 +56,8 @@ const defaultChannelState: channelStates.ChannelState = {
 };
 
 const defaultWalletState = walletStates.initialized({
-  ...defaults,
+  ...testScenarios.initializedState,
+  consensusLibrary: testScenarios.ledgerLibraryAddress,
   channelState: defaultChannelState,
   fundingState: { directFunding: {}, indirectFunding: {} },
   outboxState: { displayOutbox: [], messageOutbox: [], transactionOutbox: [] },
