@@ -11,11 +11,11 @@ import * as selectors from '../../selectors';
 import {
   appChannelIsWaitingForFunding,
   receiveOpponentLedgerCommitment,
-  createAndSendPostFundCommitment,
   safeToSendLedgerUpdate,
   createAndSendUpdateCommitment,
   ledgerChannelFundsAppChannel,
   confirmFundingForAppChannel,
+  createAndSendPostFundCommitment,
 } from '../reducer-helpers';
 
 export function playerBReducer(
@@ -25,12 +25,6 @@ export function playerBReducer(
   if (!walletStates.indirectFundingOngoing(state)) {
     return state;
   }
-
-  const indirectFunding = selectors.getIndirectFundingState(state);
-  if (indirectFunding.channelId !== action.channelId) {
-    return state;
-  }
-
   if (state.indirectFunding.player !== PlayerIndex.B) {
     return state;
   }
@@ -72,14 +66,15 @@ const waitForPreFundSetup0 = (
 ) => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
+      const indirectFundingState = selectors.getIndirectFundingState(state);
       let newState = { ...state };
-      const { commitment, signature, channelId } = action;
+      const { commitment, signature } = action;
 
       newState = receiveOpponentLedgerCommitment(newState, commitment, signature);
 
       const ledgerChannelId = channelID(commitment.channel);
-      if (appChannelIsWaitingForFunding(state, channelId)) {
-        newState = startDirectFunding(newState, channelId, ledgerChannelId);
+      if (appChannelIsWaitingForFunding(state, indirectFundingState.channelId)) {
+        newState = startDirectFunding(newState, indirectFundingState.channelId, ledgerChannelId);
       }
       return newState;
     default:

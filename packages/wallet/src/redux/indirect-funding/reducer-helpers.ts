@@ -226,12 +226,12 @@ function theirAddress(appChannelState: channelStates.OpenedState) {
 
 export const createCommitmentMessageRelay = (
   to: string,
-  channelId: string,
+  processId: string,
   commitment: Commitment,
   signature: string,
 ) => {
   const payload = {
-    channelId,
+    processId,
     procedure: WalletProcedure.IndirectFunding,
     data: { commitment, signature },
   };
