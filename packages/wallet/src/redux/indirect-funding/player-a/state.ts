@@ -7,31 +7,36 @@ export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING';
 export const WAIT_FOR_POST_FUND_SETUP_1 = 'WAIT_FOR_POST_FUND_SETUP_1';
 export const WAIT_FOR_LEDGER_UPDATE_1 = 'WAIT_FOR_LEDGER_UPDATE_1';
 
-interface BasePlayerAState {
+export interface WaitForApproval {
+  type: typeof WAIT_FOR_APPROVAL;
   channelId: string;
   player: PlayerIndex.A;
 }
 
-interface LedgerChannelExists extends BasePlayerAState {
+export interface WaitForPreFundSetup1 {
+  type: typeof WAIT_FOR_PRE_FUND_SETUP_1;
+  channelId: string;
+  player: PlayerIndex.A;
   ledgerId: string;
 }
 
-export interface WaitForApproval extends BasePlayerAState {
-  type: typeof WAIT_FOR_APPROVAL;
-}
-
-export interface WaitForPreFundSetup1 extends LedgerChannelExists {
-  type: typeof WAIT_FOR_PRE_FUND_SETUP_1;
-}
-
-export interface WaitForDirectFunding extends LedgerChannelExists {
+export interface WaitForDirectFunding {
   type: typeof WAIT_FOR_DIRECT_FUNDING;
+  channelId: string;
+  player: PlayerIndex.A;
+  ledgerId: string;
 }
-export interface WaitForPostFundSetup1 extends LedgerChannelExists {
+export interface WaitForPostFundSetup1 {
   type: typeof WAIT_FOR_POST_FUND_SETUP_1;
+  channelId: string;
+  player: PlayerIndex.A;
+  ledgerId: string;
 }
-export interface WaitForLedgerUpdate1 extends LedgerChannelExists {
+export interface WaitForLedgerUpdate1 {
   type: typeof WAIT_FOR_LEDGER_UPDATE_1;
+  channelId: string;
+  player: PlayerIndex.A;
+  ledgerId: string;
 }
 
 export type PlayerAState =
