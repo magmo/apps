@@ -194,3 +194,31 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
     );
   });
 });
+
+describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
+  const { channelId, ledgerId } = defaults;
+  const walletState = { ...defaultWalletState };
+
+  walletState.indirectFunding = states.waitForLedgerUpdate1({ channelId, ledgerId });
+  // Add the ledger channel to state
+  const ledgerChannelState = channelStates.waitForUpdate({
+    ...channelDefaults,
+    turnNum: testScenarios.ledgerCommitments.postFundCommitment1.turnNum,
+    libraryAddress: testScenarios.ledgerLibraryAddress,
+    channelId: ledgerId,
+  });
+  walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const validateMock = jest.fn().mockReturnValue(true);
+    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
+
+    const action = actions.commitmentReceived(
+      ledgerId,
+      WalletProcedure.IndirectFunding,
+      testScenarios.ledgerCommitments.ledgerUpdate1,
+      '0x0',
+    );
+    playerAReducer(walletState, action);
+    // TODO: We need a "finished" state to test against
+  });
+});

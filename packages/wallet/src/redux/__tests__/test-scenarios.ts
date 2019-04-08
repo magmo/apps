@@ -177,8 +177,8 @@ const updatedLedgerChannelAttrs = consensusCounter => ({
 const allocatesToChannelAttrs = {
   channel: ledgerChannel,
   appAttributes: ledgerAppAttributes(0, [twoThree.reduce(addHex, '0x0')], [channelId]),
-  allocation: twoThree,
-  destination: participants,
+  allocation: [twoThree.reduce(addHex, '0x0')],
+  destination: [channelId],
 };
 
 export const ledgerId = channelID(ledgerChannel);
@@ -217,12 +217,12 @@ export const ledgerCommitments = {
     ...updatedLedgerChannelAttrs(1),
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    turnNum: 4,
+    turnNum: 5,
   },
   ledgerUpdate2: {
     ...allocatesToChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    turnNum: 5,
+    turnNum: 6,
   },
 };

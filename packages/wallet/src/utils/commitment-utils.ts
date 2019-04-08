@@ -26,13 +26,15 @@ export const hasConsensusBeenReached = (
 // Commitment composers
 
 export const composeLedgerUpdateCommitment = (
-  lastCommitment: Commitment,
+  channel: Channel,
+  turnNum: number,
   ourIndex: PlayerIndex,
   proposedAllocation: string[],
   proposedDestination: string[],
+  allocation: string[],
+  destination: string[],
   privateKey: string,
 ) => {
-  const { channel, turnNum: previousTurnNum, allocation, destination } = lastCommitment;
   const appAttributes = bytesFromAppAttributes({
     proposedAllocation,
     proposedDestination,
@@ -40,8 +42,8 @@ export const composeLedgerUpdateCommitment = (
   });
   const updateCommitment: Commitment = {
     channel,
-    commitmentType: CommitmentType.PostFundSetup,
-    turnNum: previousTurnNum + 1,
+    commitmentType: CommitmentType.App,
+    turnNum,
     commitmentCount: ourIndex,
     allocation,
     destination,
