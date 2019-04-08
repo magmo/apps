@@ -134,7 +134,7 @@ const waitForDirectFunding = (
   } else {
     let newState = updateDirectFundingStatus(state, action);
     if (directFundingIsComplete(newState, action.channelId)) {
-      newState = confirmFundingForChannel(state, action.channelId);
+      newState = confirmFundingForChannel(state, indirectFundingState.ledgerId);
       newState = createAndSendPostFundCommitment(newState, action.channelId);
       newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
     }

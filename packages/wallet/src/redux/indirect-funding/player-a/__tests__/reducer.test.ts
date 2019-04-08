@@ -169,6 +169,8 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
   // Add the ledger channel to state
   const ledgerChannelState = channelStates.aWaitForPostFundSetup({
     ...channelDefaults,
+    turnNum: 2,
+    libraryAddress: testScenarios.ledgerLibraryAddress,
     channelId: ledgerId,
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
