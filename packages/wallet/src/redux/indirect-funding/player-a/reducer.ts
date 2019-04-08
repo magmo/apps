@@ -33,7 +33,7 @@ export function playerAReducer(
     return state;
   }
 
-  if (state.indirectFunding.player !== PlayerIndex.A) {
+  if (!states.isPlayerAState(state.indirectFunding)) {
     return state;
   }
 

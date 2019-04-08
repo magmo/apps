@@ -17,14 +17,10 @@ export const indirectFundingReducer = (
     return state;
   }
 
-  switch (state.indirectFunding.player) {
-    case PlayerIndex.A:
-      return playerAReducer(state, action);
-    case PlayerIndex.B:
-      return playerBReducer(state, action);
-
-    default:
-      return unreachable(state.indirectFunding);
+  if (indirectFundingState.isPlayerAState(state.indirectFunding)) {
+    return playerAReducer(state, action);
+  } else {
+    return playerBReducer(state, action);
   }
 };
 

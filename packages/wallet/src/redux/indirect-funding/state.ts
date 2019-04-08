@@ -4,3 +4,5 @@ import * as playerB from './player-b/state';
 export { playerA, playerB };
 
 export type IndirectFundingState = playerA.PlayerAState | playerB.PlayerBState;
+
+export const isPlayerAState = playerA.isPlayerAState;
