@@ -5,7 +5,7 @@ import * as walletStates from '../../../state';
 import * as channelStates from '../../../channel-state/state';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { Commitment, CommitmentType } from 'fmg-core/lib/commitment';
-import { itTransitionsToIndirectFundingStateType } from '../../../__tests__/helpers';
+import { itTransitionsProcedureToStateType } from '../../../__tests__/helpers';
 import { ethers } from 'ethers';
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { WalletProcedure } from '../../../types';
@@ -16,6 +16,9 @@ import * as SigningUtil from '../../../../utils/signing-utils';
 
 const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
+function itTransitionToStateType(state, type) {
+  itTransitionsProcedureToStateType('indirectFunding', state, type);
+}
 
 const playerAWallet = ethers.Wallet.createRandom();
 const playerBWallet = ethers.Wallet.createRandom();
@@ -82,7 +85,7 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   describe(whenActionArrives(actions.indirectFunding.playerA.FUNDING_APPROVED), () => {
     const action = actions.indirectFunding.playerA.fundingApproved(channelId);
     const updatedState = playerAReducer(walletState, action);
-    itTransitionsToIndirectFundingStateType(states.WAIT_FOR_PRE_FUND_SETUP_1, updatedState);
+    itTransitionToStateType(states.WAIT_FOR_PRE_FUND_SETUP_1, updatedState);
     it('creates a ledger channel in the correct state', () => {
       const newLedgerId = (updatedState.indirectFunding as states.WaitForPreFundSetup1).ledgerId;
       const ledgerChannel = updatedState.channelState.initializedChannels[newLedgerId];
@@ -133,7 +136,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
     );
     const updatedState = playerAReducer(walletState, action);
 
-    itTransitionsToIndirectFundingStateType(states.WAIT_FOR_DIRECT_FUNDING, updatedState);
+    itTransitionToStateType(states.WAIT_FOR_DIRECT_FUNDING, updatedState);
     it('updates the ledger state', () => {
       const updatedLedgerState = selectors.getChannelState(updatedState, ledgerId);
       expect(updatedLedgerState.type).toEqual(channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
