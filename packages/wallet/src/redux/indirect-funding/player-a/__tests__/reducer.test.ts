@@ -85,7 +85,7 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   describe(whenActionArrives(actions.indirectFunding.playerA.FUNDING_APPROVED), () => {
     const action = actions.indirectFunding.playerA.fundingApproved(channelId);
     const updatedState = playerAReducer(walletState, action);
-    itTransitionToStateType(states.WAIT_FOR_PRE_FUND_SETUP_1, updatedState);
+    itTransitionToStateType(updatedState, states.WAIT_FOR_PRE_FUND_SETUP_1);
     it('creates a ledger channel in the correct state', () => {
       const newLedgerId = (updatedState.indirectFunding as states.WaitForPreFundSetup1).ledgerId;
       const ledgerChannel = updatedState.channelState.initializedChannels[newLedgerId];
@@ -136,7 +136,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
     );
     const updatedState = playerAReducer(walletState, action);
 
-    itTransitionToStateType(states.WAIT_FOR_DIRECT_FUNDING, updatedState);
+    itTransitionToStateType(updatedState, states.WAIT_FOR_DIRECT_FUNDING);
     it('updates the ledger state', () => {
       const updatedLedgerState = selectors.getChannelState(updatedState, ledgerId);
       expect(updatedLedgerState.type).toEqual(channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
