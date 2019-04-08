@@ -1,38 +1,42 @@
 import { Properties } from '../../utils';
 import { PlayerIndex } from '../../types';
 
-export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL';
+export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL_B';
 export const WAIT_FOR_PRE_FUND_SETUP_0 = 'WAIT_FOR_PRE_FUND_SETUP_0';
-export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING';
+export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING_B';
 export const WAIT_FOR_POST_FUND_SETUP_0 = 'WAIT_FOR_POST_FUND_SETUP_0';
 export const WAIT_FOR_LEDGER_UPDATE_0 = 'WAIT_FOR_LEDGER_UPDATE_0';
 export const WAIT_FOR_CONSENSUS = 'WAIT_FOR_CONSENSUS';
 
-interface BasePlayerBState {
+export interface WaitForApproval {
+  type: typeof WAIT_FOR_APPROVAL;
   channelId: string;
   player: PlayerIndex.B;
 }
 
-interface LedgerChannelExists extends BasePlayerBState {
+export interface WaitForPreFundSetup0 {
+  type: typeof WAIT_FOR_PRE_FUND_SETUP_0;
+  channelId: string;
+  player: PlayerIndex.B;
+}
+
+export interface WaitForDirectFunding {
+  type: typeof WAIT_FOR_DIRECT_FUNDING;
+  channelId: string;
+  player: PlayerIndex.B;
   ledgerId: string;
 }
-
-export interface WaitForApproval extends BasePlayerBState {
-  type: typeof WAIT_FOR_APPROVAL;
-}
-
-export interface WaitForPreFundSetup0 extends BasePlayerBState {
-  type: typeof WAIT_FOR_PRE_FUND_SETUP_0;
-}
-
-export interface WaitForDirectFunding extends LedgerChannelExists {
-  type: typeof WAIT_FOR_DIRECT_FUNDING;
-}
-export interface WaitForPostFundSetup0 extends LedgerChannelExists {
+export interface WaitForPostFundSetup0 {
   type: typeof WAIT_FOR_POST_FUND_SETUP_0;
+  channelId: string;
+  player: PlayerIndex.B;
+  ledgerId: string;
 }
-export interface WaitForLedgerUpdate0 extends LedgerChannelExists {
+export interface WaitForLedgerUpdate0 {
   type: typeof WAIT_FOR_LEDGER_UPDATE_0;
+  channelId: string;
+  player: PlayerIndex.B;
+  ledgerId: string;
 }
 
 export interface WaitForConsensus extends LedgerChannelExists {
