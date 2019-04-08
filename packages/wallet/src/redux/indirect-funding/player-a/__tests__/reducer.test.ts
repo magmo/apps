@@ -10,6 +10,9 @@ import { ethers } from 'ethers';
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { WalletProcedure } from '../../../types';
 import * as selectors from '../../../selectors';
+import { Channel } from 'magmo-wallet-client/node_modules/fmg-core';
+import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
+import * as SigningUtil from '../../../../utils/signing-utils';
 
 const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
@@ -96,7 +99,9 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   const { channelId } = defaults;
-  const ledgerId = ethers.Wallet.createRandom().address;
+  const { nonce, consensusLibrary, participants } = channelDefaults;
+  const ledgerChannel: Channel = { nonce, participants, channelType: consensusLibrary };
+  const ledgerId = channelID(ledgerChannel);
   const walletState = { ...defaultWalletState };
 
   walletState.indirectFunding = states.waitForPreFundSetup1({ channelId, ledgerId });
@@ -108,14 +113,13 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const validateMock = jest.fn().mockReturnValue(true);
+    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
+
     const ledgerPrefundCommitment: Commitment = {
-      channel: {
-        nonce: ledgerChannelState.channelNonce,
-        channelType: ledgerChannelState.libraryAddress,
-        participants: ledgerChannelState.participants,
-      },
-      allocation: [],
-      destination: [],
+      channel: ledgerChannel,
+      allocation: ['0x01', '0x01'],
+      destination: participants,
       appAttributes: '0x0',
       commitmentCount: 1,
       turnNum: 1,
@@ -128,14 +132,14 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
       '0x0',
     );
     const updatedState = playerAReducer(walletState, action);
-    console.log(updatedState);
+
     itTransitionsToIndirectFundingStateType(states.WAIT_FOR_DIRECT_FUNDING, updatedState);
     it('updates the ledger state', () => {
       const updatedLedgerState = selectors.getChannelState(updatedState, ledgerId);
       expect(updatedLedgerState.type).toEqual(channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
     });
     it('updates the direct funding status ', () => {
-      const directFundingState = selectors.getDirectFundingState(updatedState, channelId);
+      const directFundingState = selectors.getDirectFundingState(updatedState, ledgerId);
       expect(directFundingState.channelFundingStatus).toBeDefined();
     });
   });

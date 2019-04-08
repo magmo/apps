@@ -90,7 +90,13 @@ const waitForPostFundSetup1 = (
         state,
       ) as states.WaitForPostFundSetup1;
 
-      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      let newState = receiveLedgerWalletCommitment(
+        state,
+        action.channelId,
+        action.procedure,
+        action.commitment,
+        action.signature,
+      );
 
       if (ledgerChannelIsWaitingForUpdate(newState, indirectFundingState.ledgerId)) {
         newState = createAndSendUpdateCommitment(
@@ -259,8 +265,6 @@ const createAndSendPostFundCommitment = (
     ledgerChannelState.privateKey,
   );
 
-  newState = receiveOwnLedgerCommitment(state, postFundCommitment);
-
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
       ledgerChannelState.participants[PlayerIndex.B],
@@ -341,6 +345,19 @@ const receiveLedgerCommitment = (
   return updateChannelState(
     state,
     channelActions.opponentCommitmentReceived(commitment, signature),
+  );
+};
+
+const receiveLedgerWalletCommitment = (
+  state: walletStates.Initialized,
+  channelId: string,
+  procedure: WalletProcedure,
+  commitment: Commitment,
+  signature: string,
+): walletStates.Initialized => {
+  return updateChannelState(
+    state,
+    actions.commitmentReceived(channelId, procedure, commitment, signature),
   );
 };
 
