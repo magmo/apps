@@ -10,7 +10,7 @@ import { channelID } from 'fmg-core/lib/channel';
 import * as selectors from '../../selectors';
 import {
   appChannelIsWaitingForFunding,
-  receiveLedgerCommitment,
+  receiveOpponentLedgerCommitment,
   createAndSendPostFundCommitment,
   safeToSendLedgerUpdate,
   createAndSendUpdateCommitment,
@@ -75,7 +75,7 @@ const waitForPreFundSetup0 = (
       let newState = { ...state };
       const { commitment, signature, channelId } = action;
 
-      newState = receiveLedgerCommitment(newState, commitment, signature);
+      newState = receiveOpponentLedgerCommitment(newState, commitment, signature);
 
       const ledgerChannelId = channelID(commitment.channel);
       if (appChannelIsWaitingForFunding(state, channelId)) {
@@ -99,8 +99,10 @@ const waitForPostFundSetup0 = (
         state,
       ) as states.WaitForPostFundSetup0;
 
-      newState = receiveLedgerCommitment(newState, commitment, signature);
+      newState = receiveOpponentLedgerCommitment(newState, commitment, signature);
 
+      // if (safeToSendPostFundSetup(newState)) {
+      // }
       newState = createAndSendPostFundCommitment(newState, indirectFundingState.ledgerId);
       newState.indirectFunding = states.waitForLedgerUpdate0(indirectFundingState);
 
@@ -120,7 +122,7 @@ const waitForLedgerUpdate0 = (
         state,
       ) as states.WaitForLedgerUpdate0;
 
-      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      let newState = receiveOpponentLedgerCommitment(state, action.commitment, action.signature);
       if (safeToSendLedgerUpdate(newState, indirectFundingState.ledgerId)) {
         newState = createAndSendUpdateCommitment(
           newState,
@@ -144,7 +146,7 @@ const waitForConsensus = (
         state,
       ) as states.WaitForConsensus;
 
-      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      let newState = receiveOpponentLedgerCommitment(state, action.commitment, action.signature);
       if (
         ledgerChannelFundsAppChannel(
           newState,

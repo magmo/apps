@@ -18,7 +18,7 @@ import {
   appChannelIsWaitingForFunding,
   initializeChannelState,
   updateDirectFundingStatus,
-  receiveLedgerCommitment,
+  receiveOpponentLedgerCommitment,
   safeToSendLedgerUpdate,
   receiveOwnLedgerCommitment,
   createCommitmentMessageRelay,
@@ -68,7 +68,7 @@ const waitForLedgerUpdateReducer = (
       ) as states.WaitForLedgerUpdate1;
 
       // Update ledger state
-      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      let newState = receiveOpponentLedgerCommitment(state, action.commitment, action.signature);
       if (
         ledgerChannelFundsAppChannel(
           newState,
@@ -94,7 +94,7 @@ const waitForPostFundSetup1 = (
         state,
       ) as states.WaitForPostFundSetup1;
 
-      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      let newState = receiveOpponentLedgerCommitment(state, action.commitment, action.signature);
 
       if (safeToSendLedgerUpdate(newState, indirectFundingState.ledgerId)) {
         newState = createAndSendUpdateCommitment(
@@ -142,7 +142,7 @@ const waitForPreFundSetup1Reducer = (
         state,
       ) as states.WaitForPostFundSetup1;
       let newState = { ...state };
-      newState = receiveLedgerCommitment(newState, action.commitment, action.signature);
+      newState = receiveOpponentLedgerCommitment(newState, action.commitment, action.signature);
       if (appChannelIsWaitingForFunding(newState, indirectFundingState.channelId)) {
         newState = requestDirectFunding(newState, indirectFundingState.ledgerId);
         newState.indirectFunding = states.waitForDirectFunding(indirectFundingState);

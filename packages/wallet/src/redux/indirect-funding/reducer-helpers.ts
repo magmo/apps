@@ -51,17 +51,6 @@ export const ledgerChannelFundsAppChannel = (
 };
 
 // Global state updaters
-export const receiveLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-  signature: string,
-): walletStates.Initialized => {
-  return updateChannelState(
-    state,
-    channelActions.opponentCommitmentReceived(commitment, signature),
-  );
-};
-
 export const requestDirectFunding = (
   state: walletStates.Initialized,
   ledgerChannelId: string,
@@ -137,6 +126,17 @@ export const receiveOwnLedgerCommitment = (
   commitment: Commitment,
 ): walletStates.Initialized => {
   return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
+};
+
+export const receiveOpponentLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+  signature: string,
+): walletStates.Initialized => {
+  return updateChannelState(
+    state,
+    channelActions.opponentCommitmentReceived(commitment, signature),
+  );
 };
 
 export const createAndSendPostFundCommitment = (
