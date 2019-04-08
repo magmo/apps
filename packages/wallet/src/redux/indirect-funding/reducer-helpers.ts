@@ -15,6 +15,7 @@ import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
 import { directFundingStateReducer } from '../direct-funding-store/direct-funding-state/reducer';
+import { FundingAction } from '../direct-funding-store/direct-funding-state/actions';
 
 export const appChannelIsWaitingForFunding = (
   state: walletStates.Initialized,
@@ -121,7 +122,7 @@ export const updateChannelState = (
 
 export const updateDirectFundingStatus = (
   state: walletStates.Initialized,
-  action: actions.funding.FundingAction,
+  action: FundingAction,
 ): walletStates.Initialized => {
   const newState = { ...state };
   const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
@@ -156,6 +157,7 @@ export const receiveOwnLedgerCommitment = (
 
 export const createAndSendPostFundCommitment = (
   state: walletStates.Initialized,
+  appChannelId: string,
   ledgerChannelId: string,
 ): walletStates.Initialized => {
   let newState = { ...state };
@@ -180,7 +182,7 @@ export const createAndSendPostFundCommitment = (
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
       theirAddress,
-      ledgerChannelId,
+      appChannelId,
       postFundCommitment,
       commitmentSignature,
     ),
@@ -190,12 +192,12 @@ export const createAndSendPostFundCommitment = (
 
 export const createCommitmentMessageRelay = (
   to: string,
-  channelId: string,
+  processId: string,
   commitment: Commitment,
   signature: string,
 ) => {
   const payload = {
-    channelId,
+    processId,
     procedure: WalletProcedure.IndirectFunding,
     data: { commitment, signature },
   };

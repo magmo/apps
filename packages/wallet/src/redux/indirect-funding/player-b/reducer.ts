@@ -23,12 +23,6 @@ export function playerBReducer(
   if (!walletStates.indirectFundingOngoing(state)) {
     return state;
   }
-
-  const indirectFunding = selectors.getIndirectFundingState(state);
-  if (indirectFunding.channelId !== action.channelId) {
-    return state;
-  }
-
   if (state.indirectFunding.player !== PlayerIndex.B) {
     return state;
   }
@@ -68,14 +62,15 @@ const waitForPreFundSetup0Reducer = (
 ) => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
+      const indirectFundingState = selectors.getIndirectFundingState(state);
       let newState = { ...state };
-      const { commitment, signature, channelId } = action;
+      const { commitment, signature } = action;
 
       newState = receiveLedgerCommitment(newState, commitment, signature);
 
       const ledgerChannelId = channelID(commitment.channel);
-      if (appChannelIsWaitingForFunding(state, channelId)) {
-        newState = startDirectFunding(newState, channelId, ledgerChannelId);
+      if (appChannelIsWaitingForFunding(state, indirectFundingState.channelId)) {
+        newState = startDirectFunding(newState, indirectFundingState.channelId, ledgerChannelId);
       }
       return newState;
     default:
@@ -97,7 +92,11 @@ const waitForPostFundSetup0Reducer = (
 
       newState = receiveLedgerCommitment(newState, commitment, signature);
 
-      newState = createAndSendPostFundCommitment(newState, indirectFundingState.ledgerId);
+      newState = createAndSendPostFundCommitment(
+        newState,
+        indirectFundingState.channelId,
+        indirectFundingState.ledgerId,
+      );
       newState.indirectFunding = states.waitForLedgerUpdate0(indirectFundingState);
 
       return newState;

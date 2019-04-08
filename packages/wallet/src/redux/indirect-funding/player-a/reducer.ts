@@ -100,7 +100,7 @@ const waitForPostFundSetup1 = (
 
       let newState = receiveLedgerWalletCommitment(
         state,
-        action.channelId,
+        action.processId,
         action.procedure,
         action.commitment,
         action.signature,
@@ -129,13 +129,17 @@ const waitForDirectFunding = (
     state,
   ) as states.WaitForDirectFunding;
   // Funding events currently occur directly against the ledger channel
-  if (!isfundingAction(action) || action.channelId !== indirectFundingState.ledgerId) {
+  if (!isfundingAction(action)) {
     return state;
   } else {
     let newState = updateDirectFundingStatus(state, action);
-    if (directFundingIsComplete(newState, action.channelId)) {
+    if (directFundingIsComplete(newState, indirectFundingState.ledgerId)) {
       newState = confirmFundingForChannel(state, indirectFundingState.ledgerId);
-      newState = createAndSendPostFundCommitment(newState, action.channelId);
+      newState = createAndSendPostFundCommitment(
+        newState,
+        indirectFundingState.channelId,
+        indirectFundingState.ledgerId,
+      );
       newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
     }
     return newState;
