@@ -137,6 +137,7 @@ export const receiveOwnLedgerCommitment = (
 
 export const createAndSendPostFundCommitment = (
   state: walletStates.Initialized,
+  appChannelId: string,
   ledgerChannelId: string,
 ): walletStates.Initialized => {
   let newState = { ...state };
@@ -155,7 +156,7 @@ export const createAndSendPostFundCommitment = (
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
       theirAddress,
-      ledgerChannelId,
+      appChannelId,
       postFundCommitment,
       commitmentSignature,
     ),
@@ -165,12 +166,12 @@ export const createAndSendPostFundCommitment = (
 
 export const createCommitmentMessageRelay = (
   to: string,
-  channelId: string,
+  processId: string,
   commitment: Commitment,
   signature: string,
 ) => {
   const payload = {
-    channelId,
+    processId,
     procedure: WalletProcedure.IndirectFunding,
     data: { commitment, signature },
   };
