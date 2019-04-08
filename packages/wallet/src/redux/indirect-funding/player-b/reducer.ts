@@ -13,7 +13,7 @@ import {
   receiveLedgerCommitment,
   createAndSendPostFundCommitment,
   ledgerChannelFundsAppChannel,
-  confirmFundingForAppChannel,
+  confirmFundingForChannel,
 } from '../reducer-helpers';
 
 export function playerBReducer(
@@ -124,7 +124,7 @@ const waitForLedgerUpdate0Reducer = (
           indirectFundingState.ledgerId,
         )
       ) {
-        newState = confirmFundingForAppChannel(newState, indirectFundingState.channelId);
+        newState = confirmFundingForChannel(newState, indirectFundingState.channelId);
       }
       return newState;
     default:

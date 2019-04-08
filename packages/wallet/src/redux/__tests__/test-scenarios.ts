@@ -154,7 +154,7 @@ const ledgerAppAttributes = (
   });
 };
 const ledgerChannel: Channel = {
-  nonce: 0,
+  nonce: 4,
   channelType: ledgerLibraryAddress,
   participants,
 };

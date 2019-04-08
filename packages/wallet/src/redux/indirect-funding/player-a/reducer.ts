@@ -16,7 +16,7 @@ import {
   composeLedgerUpdateCommitment,
   composePreFundCommitment,
 } from '../../../utils/commitment-utils';
-import { isFundingAction } from '../../internal/actions';
+import { isfundingAction } from '../../direct-funding-store/direct-funding-state/actions';
 import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
 import {
   appChannelIsWaitingForFunding,
@@ -28,7 +28,7 @@ import {
   createCommitmentMessageRelay,
   createAndSendPostFundCommitment,
   ledgerChannelFundsAppChannel,
-  confirmFundingForAppChannel,
+  confirmFundingForChannel,
   requestDirectFunding,
   receiveLedgerWalletCommitment,
 } from '../reducer-helpers';
@@ -80,7 +80,7 @@ const waitForLedgerUpdateReducer = (
           indirectFundingState.ledgerId,
         )
       ) {
-        newState = confirmFundingForAppChannel(newState, indirectFundingState.channelId);
+        newState = confirmFundingForChannel(newState, indirectFundingState.channelId);
       }
       return newState;
     default:
@@ -129,11 +129,12 @@ const waitForDirectFunding = (
     state,
   ) as states.WaitForDirectFunding;
   // Funding events currently occur directly against the ledger channel
-  if (!isFundingAction(action) || action.channelId !== indirectFundingState.ledgerId) {
+  if (!isfundingAction(action) || action.channelId !== indirectFundingState.ledgerId) {
     return state;
   } else {
     let newState = updateDirectFundingStatus(state, action);
     if (directFundingIsComplete(newState, action.channelId)) {
+      newState = confirmFundingForChannel(state, action.channelId);
       newState = createAndSendPostFundCommitment(newState, action.channelId);
       newState.indirectFunding = states.waitForPostFundSetup1(indirectFundingState);
     }
