@@ -24,7 +24,7 @@ class WalletContainer extends PureComponent<WalletProps> {
           <Modal
             isOpen={true}
             className={'wallet-content-' + this.props.position}
-            overlayClassName={'.wallet-overlay-' + this.props.position}
+            overlayClassName={'wallet-overlay-' + this.props.position}
             ariaHideApp={false}
           >
             <InitializingContainer state={state} />
@@ -36,6 +36,7 @@ class WalletContainer extends PureComponent<WalletProps> {
             isOpen={true}
             className={'wallet-content-' + this.props.position}
             overlayClassName={'wallet-overlay-' + this.props.position}
+            ariaHideApp={false}
           >
             <WalletInitializedContainer state={state} />
           </Modal>
