@@ -16,6 +16,7 @@ enum AdjudicatorEventType {
 
 interface AdjudicatorEvent {
   eventArgs: any;
+  channelId: string;
   eventType: AdjudicatorEventType;
 }
 
@@ -62,40 +63,36 @@ function* adjudicatorWatcherForProcess(
 ) {
   while (true) {
     const event: AdjudicatorEvent = yield take(adjudicatorEventChannel);
-
+    const { channelId } = event;
     // If it is not a channel we've been registered for we ignore the event
-    if (!channelIdsToListenFor.indexOf(event.eventArgs.eventChannelId)) {
+    if (channelIdsToListenFor.indexOf(channelId) === -1) {
       continue;
     }
     switch (event.eventType) {
       case AdjudicatorEventType.ChallengeCreated:
-        const { channelId: eventChannelId, commitment, finalizedAt } = event.eventArgs;
+        const { commitment, finalizedAt } = event.eventArgs;
         yield put(
           actions.challengeCreatedEvent(
             processId,
-            eventChannelId,
+            channelId,
             fromParameters(commitment),
             finalizedAt,
           ),
         );
         break;
       case AdjudicatorEventType.Concluded:
-        yield put(actions.concludedEvent(processId, event.eventArgs.channelId));
+        yield put(actions.concludedEvent(processId, channelId));
         break;
       case AdjudicatorEventType.Refuted:
         yield put(
-          actions.refutedEvent(
-            processId,
-            event.eventArgs.channelId,
-            fromParameters(event.eventArgs.refutation),
-          ),
+          actions.refutedEvent(processId, channelId, fromParameters(event.eventArgs.refutation)),
         );
         break;
       case AdjudicatorEventType.RespondWithMove:
         yield put(
           actions.respondWithMoveEvent(
             processId,
-            event.eventArgs.channelId,
+            channelId,
             fromParameters(event.eventArgs.response),
           ),
         );
@@ -104,7 +101,7 @@ function* adjudicatorWatcherForProcess(
         yield put(
           actions.fundingReceivedEvent(
             processId,
-            event.eventArgs.destination,
+            channelId,
             event.eventArgs.amountDeposited.toHexString(),
             event.eventArgs.destinationHoldings.toHexString(),
           ),
@@ -129,25 +126,28 @@ function* createAdjudicatorEventChannel(provider) {
     adjudicator.on(challengeCreatedFilter, (channelId, commitment, finalizedAt) => {
       emitter({
         eventType: AdjudicatorEventType.ChallengeCreated,
-        eventArgs: { channelId, commitment, finalizedAt },
+        channelId,
+        eventArgs: { commitment, finalizedAt },
       });
     });
     adjudicator.on(gameConcludedFilter, channelId => {
-      emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
+      emitter({ eventType: AdjudicatorEventType.Concluded, channelId });
     });
     adjudicator.on(refutedFilter, (channelId, refutation) => {
-      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
+      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { refutation }, channelId });
     });
     adjudicator.on(respondWithMoveFilter, (channelId, response) => {
       emitter({
         eventType: AdjudicatorEventType.RespondWithMove,
-        eventArgs: { channelId, response },
+        eventArgs: { response },
+        channelId,
       });
     });
-    adjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
+    adjudicator.on(depositedFilter, (channelId, amountDeposited, destinationHoldings) => {
       emitter({
         eventType: AdjudicatorEventType.Deposited,
-        eventArgs: { destination, amountDeposited, destinationHoldings },
+        eventArgs: { amountDeposited, destinationHoldings },
+        channelId,
       });
     });
     return () => {
