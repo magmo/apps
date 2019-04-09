@@ -22,7 +22,7 @@ describe('adjudicator listener', () => {
   const participantA = ethers.Wallet.createRandom();
   const participantB = ethers.Wallet.createRandom();
   let nonce = 5;
-  const processId = 'A process identifier';
+
   function getNextNonce() {
     return ++nonce;
   }
@@ -46,6 +46,7 @@ describe('adjudicator listener', () => {
 
   it('should not handle a event after a process unregisters', async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
+    const processId = ethers.Wallet.createRandom().address;
     const sagaTester = new SagaTester({});
 
     sagaTester.start(adjudicatorWatcher, provider);
@@ -59,6 +60,7 @@ describe('adjudicator listener', () => {
 
   it('should handle a funds received event when registered for that channel', async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
+    const processId = ethers.Wallet.createRandom().address;
     const sagaTester = new SagaTester({});
     sagaTester.start(adjudicatorWatcher, provider);
     sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
@@ -81,6 +83,7 @@ describe('adjudicator listener', () => {
     const startTimestamp = Date.now();
     const channelNonce = getNextNonce();
     const channelId = await getChannelId(provider, channelNonce, participantA, participantB);
+    const processId = ethers.Wallet.createRandom().address;
 
     const sagaTester = new SagaTester({});
     sagaTester.start(adjudicatorWatcher, provider);
@@ -104,6 +107,7 @@ describe('adjudicator listener', () => {
   it('should handle a concluded event when registered for that channel', async () => {
     const channelNonce = getNextNonce();
     const channelId = await getChannelId(provider, channelNonce, participantA, participantB);
+    const processId = ethers.Wallet.createRandom().address;
     const sagaTester = new SagaTester({});
 
     sagaTester.start(adjudicatorWatcher, provider);
@@ -120,6 +124,7 @@ describe('adjudicator listener', () => {
   it('should handle a refute event when registered for that channel', async () => {
     const channelNonce = getNextNonce();
     const channelId = await getChannelId(provider, channelNonce, participantA, participantB);
+    const processId = ethers.Wallet.createRandom().address;
     await createChallenge(provider, channelNonce, participantA, participantB);
 
     const sagaTester = new SagaTester({});
@@ -142,6 +147,7 @@ describe('adjudicator listener', () => {
   it('should handle a respondWithMove event when registered for that channel', async () => {
     const channelNonce = getNextNonce();
     const channelId = await getChannelId(provider, channelNonce, participantA, participantB);
+    const processId = ethers.Wallet.createRandom().address;
 
     await createChallenge(provider, channelNonce, participantA, participantB);
 
