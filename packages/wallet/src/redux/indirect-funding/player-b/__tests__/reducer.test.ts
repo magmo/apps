@@ -152,7 +152,7 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
-  describe.only(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const state = startingState(states.waitForPostFundSetup0({ channelId, ledgerId }), {
       [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
       [ledgerId]: channelStates.bWaitForPostFundSetup({
