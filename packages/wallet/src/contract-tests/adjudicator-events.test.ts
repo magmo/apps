@@ -58,6 +58,24 @@ describe('adjudicator listener', () => {
     expect(sagaTester.numCalled(actions.FUNDING_RECEIVED_EVENT)).toEqual(0);
   });
 
+  it('should ignore events for other channels', async () => {
+    const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
+    const channelIdToIgnore = await getChannelId(
+      provider,
+      getNextNonce(),
+      participantA,
+      participantB,
+    );
+    const processId = ethers.Wallet.createRandom().address;
+    const sagaTester = new SagaTester({});
+
+    sagaTester.start(adjudicatorWatcher, provider);
+    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
+
+    await depositContract(provider, channelIdToIgnore);
+    expect(sagaTester.numCalled(actions.FUNDING_RECEIVED_EVENT)).toEqual(0);
+  });
+
   it('should handle a funds received event when registered for that channel', async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
     const processId = ethers.Wallet.createRandom().address;
