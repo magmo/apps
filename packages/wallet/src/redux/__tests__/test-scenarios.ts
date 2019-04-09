@@ -153,8 +153,9 @@ const ledgerAppAttributes = (
     consensusCounter,
   });
 };
+const LEDGER_CHANNEL_NONCE = 0;
 export const ledgerChannel: Channel = {
-  nonce: 0,
+  nonce: LEDGER_CHANNEL_NONCE,
   channelType: ledgerLibraryAddress,
   participants,
 };
