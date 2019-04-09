@@ -93,8 +93,8 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   const walletState = { ...defaultWalletState };
   walletState.indirectFunding = states.waitForApproval({ channelId });
 
-  describe(whenActionArrives(actions.indirectFunding.playerA.FUNDING_APPROVED), () => {
-    const action = actions.indirectFunding.playerA.fundingApproved(channelId);
+  describe(whenActionArrives(actions.indirectFunding.playerA.STRATEGY_APPROVED), () => {
+    const action = actions.indirectFunding.playerA.strategyApproved(channelId);
     const updatedState = playerAReducer(walletState, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_PRE_FUND_SETUP_1);

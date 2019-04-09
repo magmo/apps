@@ -168,7 +168,7 @@ const waitForApprovalReducer = (
   action: actions.indirectFunding.Action,
 ): walletStates.Initialized => {
   switch (action.type) {
-    case actions.indirectFunding.playerA.FUNDING_APPROVED:
+    case actions.indirectFunding.playerA.STRATEGY_APPROVED:
       let newState = { ...state };
 
       const appChannelState = selectors.getOpenedChannelState(state, action.channelId);
