@@ -21,13 +21,22 @@ class WalletContainer extends PureComponent<WalletProps> {
       case states.METAMASK_ERROR:
       case states.WAIT_FOR_ADJUDICATOR:
         return (
-          <Modal isOpen={true} style={setStyle(this.props.position)} ariaHideApp={false}>
+          <Modal
+            isOpen={true}
+            className={'wallet-content-' + this.props.position}
+            overlayClassName={'.wallet-overlay-' + this.props.position}
+            ariaHideApp={false}
+          >
             <InitializingContainer state={state} />
           </Modal>
         );
       case states.WALLET_INITIALIZED:
         return (
-          <Modal isOpen={true} style={setStyle(this.props.position)} ariaHideApp={false}>
+          <Modal
+            isOpen={true}
+            className={'wallet-content-' + this.props.position}
+            overlayClassName={'wallet-overlay-' + this.props.position}
+          >
             <WalletInitializedContainer state={state} />
           </Modal>
         );
@@ -43,61 +52,3 @@ const mapStateToProps = (state: states.WalletState, ownProps?): WalletProps => (
 });
 
 export default connect(mapStateToProps)(WalletContainer);
-
-/////////////
-// Styling //
-/////////////
-
-const baseStyle = {
-  content: {
-    position: 'relative',
-    top: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    transform: 'translate(-50%, -50%)',
-    width: '320px',
-    height: '450px',
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-};
-
-const leftStyle = {
-  content: {
-    left: '20%',
-    ...baseStyle.content,
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-  },
-};
-
-const rightStyle = {
-  content: {
-    left: '70%',
-    ...baseStyle.content,
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-  },
-};
-
-const centerStyle = {
-  ...baseStyle,
-  content: {
-    ...baseStyle.content,
-    left: '50%',
-  },
-};
-
-function setStyle(position) {
-  switch (position) {
-    case 'left':
-      return leftStyle;
-    case 'right':
-      return rightStyle;
-    default:
-      return centerStyle;
-  }
-}
