@@ -9,11 +9,15 @@ import { channelStateReducer } from '../channel-state/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { directFundingStoreReducer } from '../direct-funding-store/reducer';
 import { Commitment } from 'fmg-core';
-import { composePostFundCommitment } from '../../utils/commitment-utils';
+import {
+  composePostFundCommitment,
+  composeLedgerUpdateCommitment,
+} from '../../utils/commitment-utils';
 import { WalletProcedure } from '../types';
 import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
+import { ourTurn } from '../../utils/reducer-utils';
 import { directFundingStateReducer } from '../direct-funding-store/direct-funding-state/reducer';
 import { FundingAction } from '../direct-funding-store/direct-funding-state/actions';
 
@@ -25,12 +29,12 @@ export const appChannelIsWaitingForFunding = (
   return appChannel.type === channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
 };
 
-export const ledgerChannelIsWaitingForUpdate = (
+export const safeToSendLedgerUpdate = (
   state: walletStates.Initialized,
   ledgerChannelId: string,
 ): boolean => {
   const ledgerChannel = selectors.getOpenedChannelState(state, ledgerChannelId);
-  return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE;
+  return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE && ourTurn(ledgerChannel);
 };
 
 export const ledgerChannelFundsAppChannel = (
@@ -45,21 +49,10 @@ export const ledgerChannelFundsAppChannel = (
   const indexOfTargetChannel = destination.indexOf(appChannelId);
   const appChannelTotal = appChannelState.lastCommitment.commitment.allocation.reduce(addHex);
 
-  return bigNumberify(allocation[indexOfTargetChannel]).gte(appChannelTotal);
+  return bigNumberify(allocation[indexOfTargetChannel] || '0x0').gte(appChannelTotal);
 };
 
 // Global state updaters
-export const receiveLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-  signature: string,
-): walletStates.Initialized => {
-  return updateChannelState(
-    state,
-    channelActions.opponentCommitmentReceived(commitment, signature),
-  );
-};
-
 export const requestDirectFunding = (
   state: walletStates.Initialized,
   ledgerChannelId: string,
@@ -90,6 +83,106 @@ export const confirmFundingForChannel = (
   return updateChannelState(state, actions.internal.fundingConfirmed(channelId));
 };
 
+export const createAndSendPostFundCommitment = (
+  state: walletStates.Initialized,
+  ledgerChannelId: string,
+): walletStates.Initialized => {
+  let newState = { ...state };
+  const ledgerChannelState = selectors.getOpenedChannelState(newState, ledgerChannelId);
+  const appChannelState = selectors.getOpenedChannelState(state, ledgerChannelState.channelId);
+  const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
+    ledgerChannelState.lastCommitment.commitment,
+    ledgerChannelState.ourIndex,
+    ledgerChannelState.privateKey,
+  );
+
+  newState = receiveOwnLedgerCommitment(state, postFundCommitment);
+
+  newState.outboxState.messageOutbox = [
+    createCommitmentMessageRelay(
+      theirAddress(appChannelState),
+      ledgerChannelId,
+      postFundCommitment,
+      commitmentSignature,
+    ),
+  ];
+  return newState;
+};
+
+export const createAndSendUpdateCommitment = (
+  state: walletStates.Initialized,
+  appChannelId: string,
+  ledgerChannelId: string,
+): walletStates.Initialized => {
+  const appChannelState = selectors.getOpenedChannelState(state, appChannelId);
+  const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
+  const proposedDestination = [appChannelState.channelId];
+
+  // Compose the update commitment
+  const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
+  const { commitment } = ledgerChannelState.lastCommitment;
+  const { updateCommitment, commitmentSignature } = composeLedgerUpdateCommitment(
+    commitment.channel,
+    ledgerChannelState.turnNum + 1,
+    ledgerChannelState.ourIndex,
+    proposedAllocation,
+    proposedDestination,
+    commitment.allocation,
+    commitment.destination,
+    ledgerChannelState.privateKey,
+  );
+
+  // Update our ledger channel with the latest commitment
+  const newState = receiveOwnLedgerCommitment(state, updateCommitment);
+
+  // Send out the commitment to the opponent
+  newState.outboxState.messageOutbox = [
+    createCommitmentMessageRelay(
+      theirAddress(appChannelState),
+      appChannelId,
+      updateCommitment,
+      commitmentSignature,
+    ),
+  ];
+  return newState;
+};
+
+// RECEIVING COMMITMENTS
+
+// NOTES on receiving a commitment
+// When the ledger channel is in the FUNDING stage,
+// `receiveOwnCommitment` and `receiveOpponentCommitment` are ignored, by the
+// channelState reducer, while `receiveCommitment` triggers a channel state
+// update (and puts a message in the outbox)
+// When the ledger channel is _not_ in the FUNDING stage, it is the opposite.
+// This needs to be considered when deciding what action to pass to the channelState
+// reducer
+
+export const receiveOwnLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+): walletStates.Initialized => {
+  return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
+};
+
+export const receiveOpponentLedgerCommitment = (
+  state: walletStates.Initialized,
+  commitment: Commitment,
+  signature: string,
+): walletStates.Initialized => {
+  return updateChannelState(
+    state,
+    channelActions.opponentCommitmentReceived(commitment, signature),
+  );
+};
+
+export const receiveLedgerCommitment = (
+  state: walletStates.Initialized,
+  action: actions.CommitmentReceived,
+): walletStates.Initialized => {
+  return updateChannelState(state, action);
+};
+
 export const initializeChannelState = (
   state: walletStates.Initialized,
   channelId: string,
@@ -104,6 +197,8 @@ export const initializeChannelState = (
 
   return state;
 };
+
+// STATE UPDATERS
 
 export const updateChannelState = (
   state: walletStates.Initialized,
@@ -135,60 +230,10 @@ export const updateDirectFundingStatus = (
   return newState;
 };
 
-export const receiveLedgerWalletCommitment = (
-  state: walletStates.Initialized,
-  channelId: string,
-  procedure: WalletProcedure,
-  commitment: Commitment,
-  signature: string,
-): walletStates.Initialized => {
-  return updateChannelState(
-    state,
-    actions.commitmentReceived(channelId, procedure, commitment, signature),
-  );
-};
-
-export const receiveOwnLedgerCommitment = (
-  state: walletStates.Initialized,
-  commitment: Commitment,
-): walletStates.Initialized => {
-  return updateChannelState(state, channelActions.ownCommitmentReceived(commitment));
-};
-
-export const createAndSendPostFundCommitment = (
-  state: walletStates.Initialized,
-  appChannelId: string,
-  ledgerChannelId: string,
-): walletStates.Initialized => {
-  let newState = { ...state };
-  const ledgerChannelState = selectors.getOpenedChannelState(newState, ledgerChannelId);
-  const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
-    ledgerChannelState.lastCommitment.commitment,
-    ledgerChannelState.ourIndex,
-    ledgerChannelState.privateKey,
-  );
-
-  const theirIndex = (ledgerChannelState.ourIndex + 1) % ledgerChannelState.participants.length;
-  const theirAddress = ledgerChannelState.participants[theirIndex];
-
-  newState = receiveLedgerWalletCommitment(
-    state,
-    ledgerChannelId,
-    WalletProcedure.IndirectFunding,
-    postFundCommitment,
-    commitmentSignature,
-  );
-
-  newState.outboxState.messageOutbox = [
-    createCommitmentMessageRelay(
-      theirAddress,
-      appChannelId,
-      postFundCommitment,
-      commitmentSignature,
-    ),
-  ];
-  return newState;
-};
+function theirAddress(appChannelState: channelStates.OpenedState) {
+  const theirIndex = (appChannelState.ourIndex + 1) % appChannelState.participants.length;
+  return appChannelState.participants[theirIndex];
+}
 
 export const createCommitmentMessageRelay = (
   to: string,

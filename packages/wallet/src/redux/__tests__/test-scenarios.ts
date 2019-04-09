@@ -153,8 +153,9 @@ const ledgerAppAttributes = (
     consensusCounter,
   });
 };
-const ledgerChannel: Channel = {
-  nonce: 4,
+const LEDGER_CHANNEL_NONCE = 0;
+export const ledgerChannel: Channel = {
+  nonce: LEDGER_CHANNEL_NONCE,
   channelType: ledgerLibraryAddress,
   participants,
 };
@@ -176,9 +177,9 @@ const updatedLedgerChannelAttrs = consensusCounter => ({
 
 const allocatesToChannelAttrs = {
   channel: ledgerChannel,
-  appAttributes: ledgerAppAttributes(0, [twoThree.reduce(addHex, '0x0')], [channelId]),
-  allocation: [twoThree.reduce(addHex, '0x0')],
-  destination: [channelId],
+  appAttributes: ledgerAppAttributes(0, allocatesToChannel, [channelId]),
+  allocation: allocatesToChannel,
+  destination: destinationChannel,
 };
 
 export const ledgerId = channelID(ledgerChannel);

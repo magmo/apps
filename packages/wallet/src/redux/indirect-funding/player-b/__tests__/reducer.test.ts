@@ -15,6 +15,12 @@ import {
 import { WalletProcedure } from '../../../types';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 
+import * as SigningUtil from '../../../../utils/signing-utils';
+const validCommitmentSignature = jest.fn().mockReturnValue(true);
+Object.defineProperty(SigningUtil, 'validCommitmentSignature', {
+  value: validCommitmentSignature,
+});
+
 const startingIn = type => `starting in ${type}`;
 const whenActionArrives = type => `when ${type} arrives`;
 
@@ -29,11 +35,13 @@ const {
   bsPrivateKey,
   channelNonce,
   libraryAddress,
+  ledgerLibraryAddress,
   participants,
   preFundCommitment1,
   preFundCommitment2,
   channelId,
   ledgerId,
+  ledgerChannel,
 } = scenarios;
 
 const { preFundCommitment0, postFundCommitment0 } = ledgerCommitments;
@@ -62,10 +70,10 @@ const ledgerChannelStateDefaults = {
   privateKey: bsPrivateKey,
   adjudicator: 'adj-address',
   channelId: ledgerId,
-  channelNonce,
-  libraryAddress,
+  channelNonce: ledgerChannel.nonce,
+  libraryAddress: ledgerLibraryAddress,
   networkId: 3,
-  participants,
+  participants: ledgerChannel.participants as [string, string],
   uid: 'uid',
   transactionHash: '0x0',
   funded: false,
@@ -144,7 +152,7 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
-  describe.skip(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const state = startingState(states.waitForPostFundSetup0({ channelId, ledgerId }), {
       [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
       [ledgerId]: channelStates.bWaitForPostFundSetup({
@@ -165,13 +173,13 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
     const updatedState = playerBReducer(state, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
-    expectThisCommitmentSent(updatedState, ledgerCommitments.postFundCommitment1); // fails because of the implementation of initializedChannels
+    expectThisCommitmentSent(updatedState, ledgerCommitments.postFundCommitment1);
     itSendsNoTransaction(updatedState);
   });
 });
 
 describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
-  describe.only(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const state = startingState(states.waitForLedgerUpdate0({ channelId, ledgerId }), {
       [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
       [ledgerId]: channelStates.waitForUpdate({
@@ -180,6 +188,11 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
           commitment: ledgerCommitments.postFundCommitment1,
           signature: MOCK_SIGNATURE,
         },
+        penultimateCommitment: {
+          commitment: ledgerCommitments.postFundCommitment0,
+          signature: MOCK_SIGNATURE,
+        },
+        turnNum: 3,
       }),
     });
 
@@ -191,8 +204,46 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
     );
     const updatedState = playerBReducer(state, action);
 
-    itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
+    itTransitionToStateType(updatedState, states.WAIT_FOR_CONSENSUS);
     expectThisCommitmentSent(updatedState, ledgerCommitments.ledgerUpdate1);
     itSendsNoTransaction(updatedState);
+    it('does not confirm funding', () => {
+      expect(updatedState.channelState.initializedChannels[channelId].type).toEqual(
+        channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
+      );
+    });
+  });
+});
+
+describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const state = startingState(states.waitForConsensus({ channelId, ledgerId }), {
+      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+      [ledgerId]: channelStates.waitForUpdate({
+        ...ledgerChannelStateDefaults,
+        lastCommitment: {
+          commitment: ledgerCommitments.ledgerUpdate1,
+          signature: MOCK_SIGNATURE,
+        },
+        turnNum: 5,
+      }),
+    });
+
+    const action = actions.commitmentReceived(
+      channelId,
+      WalletProcedure.IndirectFunding,
+      ledgerCommitments.ledgerUpdate2,
+      'signature',
+    );
+    const updatedState = playerBReducer(state, action);
+
+    itTransitionToStateType(updatedState, states.WAIT_FOR_CONSENSUS);
+    // itSendsNoCommitment(updatedState);
+    itSendsNoTransaction(updatedState);
+    it('confirms funding', () => {
+      expect(updatedState.channelState.initializedChannels[channelId].type).toEqual(
+        channelStates.B_WAIT_FOR_POST_FUND_SETUP,
+      );
+    });
   });
 });

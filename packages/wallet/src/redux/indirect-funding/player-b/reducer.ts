@@ -10,10 +10,12 @@ import { channelID } from 'fmg-core/lib/channel';
 import * as selectors from '../../selectors';
 import {
   appChannelIsWaitingForFunding,
-  receiveLedgerCommitment,
-  createAndSendPostFundCommitment,
+  receiveOpponentLedgerCommitment,
+  safeToSendLedgerUpdate,
+  createAndSendUpdateCommitment,
   ledgerChannelFundsAppChannel,
   confirmFundingForChannel,
+  receiveLedgerCommitment,
 } from '../reducer-helpers';
 
 export function playerBReducer(
@@ -29,21 +31,23 @@ export function playerBReducer(
 
   switch (state.indirectFunding.type) {
     case states.WAIT_FOR_APPROVAL:
-      return waitForApprovalReducer(state, action);
+      return waitForApproval(state, action);
     case states.WAIT_FOR_PRE_FUND_SETUP_0:
-      return waitForPreFundSetup0Reducer(state, action);
+      return waitForPreFundSetup0(state, action);
     case states.WAIT_FOR_DIRECT_FUNDING:
       return state;
     case states.WAIT_FOR_POST_FUND_SETUP_0:
-      return waitForPostFundSetup0Reducer(state, action);
+      return waitForPostFundSetup0(state, action);
     case states.WAIT_FOR_LEDGER_UPDATE_0:
-      return waitForLedgerUpdate0Reducer(state, action);
+      return waitForLedgerUpdate0(state, action);
+    case states.WAIT_FOR_CONSENSUS:
+      return waitForConsensus(state, action);
     default:
       return unreachable(state.indirectFunding);
   }
 }
 
-const waitForApprovalReducer = (
+const waitForApproval = (
   state: walletStates.IndirectFundingOngoing,
   action: actions.indirectFunding.Action,
 ) => {
@@ -56,7 +60,7 @@ const waitForApprovalReducer = (
   }
 };
 
-const waitForPreFundSetup0Reducer = (
+const waitForPreFundSetup0 = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
@@ -66,7 +70,7 @@ const waitForPreFundSetup0Reducer = (
       let newState = { ...state };
       const { commitment, signature } = action;
 
-      newState = receiveLedgerCommitment(newState, commitment, signature);
+      newState = receiveOpponentLedgerCommitment(newState, commitment, signature);
 
       const ledgerChannelId = channelID(commitment.channel);
       if (appChannelIsWaitingForFunding(state, indirectFundingState.channelId)) {
@@ -78,25 +82,22 @@ const waitForPreFundSetup0Reducer = (
   }
 };
 
-const waitForPostFundSetup0Reducer = (
+const waitForPostFundSetup0 = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ) => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       let newState = { ...state };
-      const { commitment, signature } = action;
       const indirectFundingState = selectors.getIndirectFundingState(
         state,
       ) as states.WaitForPostFundSetup0;
 
-      newState = receiveLedgerCommitment(newState, commitment, signature);
-
-      newState = createAndSendPostFundCommitment(
-        newState,
-        indirectFundingState.channelId,
-        indirectFundingState.ledgerId,
-      );
+      // The ledger channel is in the `FUNDING` stage, so we have to use the
+      // `receiveLedgerCommitment` helper and not the `receiveOpponentLedgerCommitment`
+      // helper
+      // Note that the channelStateReducer currently sends the post fund setup message
+      newState = receiveLedgerCommitment(newState, action);
       newState.indirectFunding = states.waitForLedgerUpdate0(indirectFundingState);
 
       return newState;
@@ -105,7 +106,7 @@ const waitForPostFundSetup0Reducer = (
   }
 };
 
-const waitForLedgerUpdate0Reducer = (
+const waitForLedgerUpdate0 = (
   state: walletStates.Initialized,
   action: actions.indirectFunding.Action,
 ): walletStates.Initialized => {
@@ -115,7 +116,31 @@ const waitForLedgerUpdate0Reducer = (
         state,
       ) as states.WaitForLedgerUpdate0;
 
-      let newState = receiveLedgerCommitment(state, action.commitment, action.signature);
+      let newState = receiveOpponentLedgerCommitment(state, action.commitment, action.signature);
+      if (safeToSendLedgerUpdate(newState, indirectFundingState.ledgerId)) {
+        newState = createAndSendUpdateCommitment(
+          newState,
+          indirectFundingState.channelId,
+          indirectFundingState.ledgerId,
+        );
+        newState.indirectFunding = states.waitForConsensus(indirectFundingState);
+      }
+      return newState;
+    default:
+      return state;
+  }
+};
+const waitForConsensus = (
+  state: walletStates.Initialized,
+  action: actions.indirectFunding.Action,
+): walletStates.Initialized => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      const indirectFundingState = selectors.getIndirectFundingState(
+        state,
+      ) as states.WaitForConsensus;
+
+      let newState = receiveOpponentLedgerCommitment(state, action.commitment, action.signature);
       if (
         ledgerChannelFundsAppChannel(
           newState,

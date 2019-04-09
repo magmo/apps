@@ -40,22 +40,38 @@ const defaults = {
   privateKey: testScenarios.asPrivateKey,
 };
 
-const channelDefaults = {
+const ledgerChannelDefaults = {
   ...defaults,
   turnNum: 5,
   lastCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
+    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
     signature: '0x0',
   },
   penultimateCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
+    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
+    signature: '0x0',
+  },
+  funded: false,
+  address: testScenarios.ledgerChannel.participants[0],
+  channelNonce: testScenarios.ledgerChannel.nonce,
+  libraryAddress: testScenarios.ledgerChannel.channelType,
+  participants: testScenarios.ledgerChannel.participants as [string, string],
+};
+
+const defaultAppChannelState = channelStates.waitForFundingAndPostFundSetup({
+  ...defaults,
+  turnNum: 5,
+  lastCommitment: {
+    commitment: testScenarios.preFundCommitment1,
+    signature: '0x0',
+  },
+  penultimateCommitment: {
+    commitment: testScenarios.preFundCommitment2,
     signature: '0x0',
   },
   funded: false,
   address: defaults.participants[0],
-};
-
-const defaultAppChannelState = channelStates.waitForFundingAndPostFundSetup(channelDefaults);
+});
 const defaultChannelState: channelStates.ChannelState = {
   initializedChannels: {
     [defaultAppChannelState.channelId]: defaultAppChannelState,
@@ -98,7 +114,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   walletState.indirectFunding = states.waitForPreFundSetup1({ channelId, ledgerId });
   // Add the ledger channel to state
   const ledgerChannelState = channelStates.waitForPreFundSetup({
-    ...channelDefaults,
+    ...ledgerChannelDefaults,
     channelId: ledgerId,
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
@@ -133,7 +149,7 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   walletState.indirectFunding = states.waitForDirectFunding({ channelId, ledgerId });
   // Add the ledger channel to state
   const ledgerChannelState = channelStates.waitForFundingAndPostFundSetup({
-    ...channelDefaults,
+    ...ledgerChannelDefaults,
     channelId: ledgerId,
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
@@ -168,9 +184,8 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
   walletState.indirectFunding = states.waitForPostFundSetup1({ channelId, ledgerId });
   // Add the ledger channel to state
   const ledgerChannelState = channelStates.aWaitForPostFundSetup({
-    ...channelDefaults,
+    ...ledgerChannelDefaults,
     turnNum: 2,
-    libraryAddress: testScenarios.ledgerLibraryAddress,
     channelId: ledgerId,
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
@@ -202,9 +217,8 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
   walletState.indirectFunding = states.waitForLedgerUpdate1({ channelId, ledgerId });
   // Add the ledger channel to state
   const ledgerChannelState = channelStates.waitForUpdate({
-    ...channelDefaults,
+    ...ledgerChannelDefaults,
     turnNum: testScenarios.ledgerCommitments.postFundCommitment1.turnNum,
-    libraryAddress: testScenarios.ledgerLibraryAddress,
     channelId: ledgerId,
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
