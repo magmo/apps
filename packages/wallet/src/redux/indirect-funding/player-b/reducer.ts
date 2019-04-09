@@ -15,7 +15,7 @@ import {
   createAndSendUpdateCommitment,
   ledgerChannelFundsAppChannel,
   confirmFundingForAppChannel,
-  createAndSendPostFundCommitment,
+  receiveLedgerCommitment,
 } from '../reducer-helpers';
 
 export function playerBReducer(
@@ -89,16 +89,15 @@ const waitForPostFundSetup0 = (
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       let newState = { ...state };
-      const { commitment, signature } = action;
       const indirectFundingState = selectors.getIndirectFundingState(
         state,
       ) as states.WaitForPostFundSetup0;
 
-      newState = receiveOpponentLedgerCommitment(newState, commitment, signature);
-
-      // if (safeToSendPostFundSetup(newState)) {
-      // }
-      newState = createAndSendPostFundCommitment(newState, indirectFundingState.ledgerId);
+      // The ledger channel is in the `FUNDING` stage, so we have to use the
+      // `receiveLedgerCommitment` helper and not the `receiveOpponentLedgerCommitment`
+      // helper
+      // Note that the channelStateReducer currently sends the post fund setup message
+      newState = receiveLedgerCommitment(newState, action);
       newState.indirectFunding = states.waitForLedgerUpdate0(indirectFundingState);
 
       return newState;

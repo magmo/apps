@@ -152,7 +152,7 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
-  describe.skip(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+  describe.only(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const state = startingState(states.waitForPostFundSetup0({ channelId, ledgerId }), {
       [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
       [ledgerId]: channelStates.bWaitForPostFundSetup({
@@ -173,7 +173,7 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
     const updatedState = playerBReducer(state, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
-    expectThisCommitmentSent(updatedState, ledgerCommitments.postFundCommitment1); // fails because of the implementation of initializedChannels
+    expectThisCommitmentSent(updatedState, ledgerCommitments.postFundCommitment1);
     itSendsNoTransaction(updatedState);
   });
 });
