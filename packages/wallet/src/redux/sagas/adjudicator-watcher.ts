@@ -1,5 +1,5 @@
 import { getAdjudicatorContract } from '../../utils/contract-utils';
-import { call, take, put } from 'redux-saga/effects';
+import { call, take, put, fork, cancel, actionChannel } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import * as actions from '../actions';
 import { ethers } from 'ethers';
@@ -18,68 +18,61 @@ interface AdjudicatorEvent {
   eventArgs: any;
   eventType: AdjudicatorEventType;
 }
-function* createEventChannel(provider, channelId: string) {
-  const adjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
 
-  return eventChannel(emitter => {
-    const challengeCreatedFilter = adjudicator.filters.ChallengeCreated();
-    const gameConcludedFilter = adjudicator.filters.Concluded();
-    const refutedFilter = adjudicator.filters.Refuted();
-    const respondWithMoveFilter = adjudicator.filters.RespondedWithMove();
-    const depositedFilter = adjudicator.filters.Deposited();
+export function* adjudicatorWatcher(provider) {
+  const registerActionChannel = yield actionChannel([
+    actions.REGISTER_FOR_ADJUDICATOR_EVENTS,
+    actions.UNREGISTER_FOR_ADJUDICATOR_EVENTS,
+  ]);
+  const adjudicatorWatchers = {};
+  const adjudicatorEventChannel = yield call(createAdjudicatorEventChannel, provider);
 
-    adjudicator.on(challengeCreatedFilter, (cId, commitment, finalizedAt) => {
-      if (channelId === cId) {
-        emitter({
-          eventType: AdjudicatorEventType.ChallengeCreated,
-          eventArgs: { channelId, commitment, finalizedAt },
-        });
-      }
-    });
-    adjudicator.on(gameConcludedFilter, cId => {
-      if (channelId === cId) {
-        emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
-      }
-    });
-    adjudicator.on(refutedFilter, (cId, refutation) => {
-      if (channelId === cId) {
-        emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
-      }
-    });
-    adjudicator.on(respondWithMoveFilter, (cId, response) => {
-      if (channelId === cId) {
-        emitter({
-          eventType: AdjudicatorEventType.RespondWithMove,
-          eventArgs: { channelId, response },
-        });
-      }
-    });
-    adjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
-      if (destination === channelId) {
-        emitter({
-          eventType: AdjudicatorEventType.Deposited,
-          eventArgs: { destination, amountDeposited, destinationHoldings },
-        });
-      }
-    });
-    return () => {
-      // This function is called when the channel gets closed
-      adjudicator.removeAllListeners(challengeCreatedFilter);
-      adjudicator.removeAllListeners(gameConcludedFilter);
-      adjudicator.removeAllListeners(refutedFilter);
-      adjudicator.removeAllListeners(respondWithMoveFilter);
-    };
-  });
-}
-export function* adjudicatorWatcher(channelId, provider) {
-  const channel = yield call(createEventChannel, provider, channelId);
   while (true) {
-    const event: AdjudicatorEvent = yield take(channel);
+    const registerAction: actions.AdjudicatorRegisterAction = yield take(registerActionChannel);
+    switch (registerAction.type) {
+      case actions.REGISTER_FOR_ADJUDICATOR_EVENTS:
+        // We cancel the existing listener and register the new one
+        if (adjudicatorWatchers[registerAction.processId]) {
+          yield cancel(adjudicatorWatchers[registerAction.processId]);
+        }
+        adjudicatorWatchers[registerAction.processId] = yield fork(
+          adjudicatorWatcherForProcess,
+          registerAction.processId,
+          registerAction.channelIds,
+          adjudicatorEventChannel,
+        );
+        break;
+      case actions.UNREGISTER_FOR_ADJUDICATOR_EVENTS:
+        if (adjudicatorWatchers[registerAction.processId]) {
+          yield cancel(adjudicatorWatchers[registerAction.processId]);
+        } else {
+          throw new Error(
+            `There is no adjudicator watcher registered for process ${registerAction.processId}`,
+          );
+        }
+        break;
+    }
+  }
+}
+
+function* adjudicatorWatcherForProcess(
+  processId: string,
+  channelIdsToListenFor: string[],
+  adjudicatorEventChannel,
+) {
+  while (true) {
+    const event: AdjudicatorEvent = yield take(adjudicatorEventChannel);
+
+    // If it is not a channel we've been registered for we ignore the event
+    if (!channelIdsToListenFor.indexOf(event.eventArgs.eventChannelId)) {
+      continue;
+    }
     switch (event.eventType) {
       case AdjudicatorEventType.ChallengeCreated:
         const { channelId: eventChannelId, commitment, finalizedAt } = event.eventArgs;
         yield put(
-          actions.channel.challengeCreatedEvent(
+          actions.challengeCreatedEvent(
+            processId,
             eventChannelId,
             fromParameters(commitment),
             finalizedAt,
@@ -87,11 +80,12 @@ export function* adjudicatorWatcher(channelId, provider) {
         );
         break;
       case AdjudicatorEventType.Concluded:
-        yield put(actions.channel.concludedEvent(event.eventArgs.channelId));
+        yield put(actions.concludedEvent(processId, event.eventArgs.channelId));
         break;
       case AdjudicatorEventType.Refuted:
         yield put(
-          actions.channel.refutedEvent(
+          actions.refutedEvent(
+            processId,
             event.eventArgs.channelId,
             fromParameters(event.eventArgs.refutation),
           ),
@@ -99,7 +93,8 @@ export function* adjudicatorWatcher(channelId, provider) {
         break;
       case AdjudicatorEventType.RespondWithMove:
         yield put(
-          actions.channel.respondWithMoveEvent(
+          actions.respondWithMoveEvent(
+            processId,
             event.eventArgs.channelId,
             fromParameters(event.eventArgs.response),
           ),
@@ -107,7 +102,8 @@ export function* adjudicatorWatcher(channelId, provider) {
         break;
       case AdjudicatorEventType.Deposited:
         yield put(
-          actions.funding.fundingReceivedEvent(
+          actions.fundingReceivedEvent(
+            processId,
             event.eventArgs.destination,
             event.eventArgs.amountDeposited.toHexString(),
             event.eventArgs.destinationHoldings.toHexString(),
@@ -118,4 +114,48 @@ export function* adjudicatorWatcher(channelId, provider) {
         unreachable(event.eventType);
     }
   }
+}
+
+function* createAdjudicatorEventChannel(provider) {
+  const adjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
+
+  return eventChannel(emitter => {
+    const challengeCreatedFilter = adjudicator.filters.ChallengeCreated();
+    const gameConcludedFilter = adjudicator.filters.Concluded();
+    const refutedFilter = adjudicator.filters.Refuted();
+    const respondWithMoveFilter = adjudicator.filters.RespondedWithMove();
+    const depositedFilter = adjudicator.filters.Deposited();
+
+    adjudicator.on(challengeCreatedFilter, (channelId, commitment, finalizedAt) => {
+      emitter({
+        eventType: AdjudicatorEventType.ChallengeCreated,
+        eventArgs: { channelId, commitment, finalizedAt },
+      });
+    });
+    adjudicator.on(gameConcludedFilter, channelId => {
+      emitter({ eventType: AdjudicatorEventType.Concluded, eventArgs: { channelId } });
+    });
+    adjudicator.on(refutedFilter, (channelId, refutation) => {
+      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { channelId, refutation } });
+    });
+    adjudicator.on(respondWithMoveFilter, (channelId, response) => {
+      emitter({
+        eventType: AdjudicatorEventType.RespondWithMove,
+        eventArgs: { channelId, response },
+      });
+    });
+    adjudicator.on(depositedFilter, (destination, amountDeposited, destinationHoldings) => {
+      emitter({
+        eventType: AdjudicatorEventType.Deposited,
+        eventArgs: { destination, amountDeposited, destinationHoldings },
+      });
+    });
+    return () => {
+      // This function is called when the channel gets closed
+      adjudicator.removeAllListeners(challengeCreatedFilter);
+      adjudicator.removeAllListeners(gameConcludedFilter);
+      adjudicator.removeAllListeners(refutedFilter);
+      adjudicator.removeAllListeners(respondWithMoveFilter);
+    };
+  });
 }
