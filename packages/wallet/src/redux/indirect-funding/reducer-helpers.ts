@@ -1,4 +1,3 @@
-import * as walletStates from '../state';
 import * as selectors from '../selectors';
 import * as channelStates from '../channel-state/state';
 
@@ -7,7 +6,6 @@ import * as channelActions from '../channel-state/actions';
 
 import { channelStateReducer } from '../channel-state/reducer';
 import { accumulateSideEffects } from '../outbox';
-import { directFundingStoreReducer } from '../direct-funding-store/reducer';
 import { Commitment } from 'fmg-core';
 import {
   composePostFundCommitment,
@@ -18,12 +16,11 @@ import { messageRelayRequested, WalletEvent } from 'magmo-wallet-client';
 import { addHex } from '../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
 import { ourTurn } from '../../utils/reducer-utils';
-import { directFundingStateReducer } from '../direct-funding/reducer';
-import { FundingAction } from '../direct-funding/actions';
-import { EMPTY_SHARED_DATA } from '../protocols';
 import { SharedData } from '../protocols';
 import { queueMessage as queueMessageOutbox } from '../outbox/state';
 import { DirectFundingState } from '../direct-funding/state';
+import { FundingAction } from '../direct-funding/actions';
+
 export const appChannelIsWaitingForFunding = (
   sharedData: SharedData,
   channelId: string,
