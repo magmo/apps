@@ -11,8 +11,20 @@ import {
   getChannelId,
   defaultDepositAmount,
 } from './test-utils';
+import { ProcessStore } from '../redux/state';
 
 jest.setTimeout(60000);
+
+const createWatcherState = (processId: string, ...channelIds: string[]) => {
+  const processStore: ProcessStore = {
+    [processId]: {
+      protocolState: {},
+      processId,
+      channelsToMonitor: channelIds,
+    },
+  };
+  return { processStore };
+};
 
 describe('adjudicator listener', () => {
   const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(
@@ -34,25 +46,11 @@ describe('adjudicator listener', () => {
     await depositContract(provider, channelId);
   });
 
-  it('should not handle a event when no process has registered', async () => {
+  it('should not handle an event when no process has registered', async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
     const sagaTester = new SagaTester({});
 
     sagaTester.start(adjudicatorWatcher, provider);
-    await depositContract(provider, channelId);
-
-    expect(sagaTester.numCalled(actions.FUNDING_RECEIVED_EVENT)).toEqual(0);
-  });
-
-  it('should not handle a event after a process unregisters', async () => {
-    const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
-    const processId = ethers.Wallet.createRandom().address;
-    const sagaTester = new SagaTester({});
-
-    sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
-    sagaTester.dispatch(actions.unregisterForAdjudicatorEvents(processId));
-
     await depositContract(provider, channelId);
 
     expect(sagaTester.numCalled(actions.FUNDING_RECEIVED_EVENT)).toEqual(0);
@@ -67,21 +65,21 @@ describe('adjudicator listener', () => {
       participantB,
     );
     const processId = ethers.Wallet.createRandom().address;
-    const sagaTester = new SagaTester({});
+    const sagaTester = new SagaTester({ initialState: createWatcherState(processId, channelId) });
 
     sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
 
     await depositContract(provider, channelIdToIgnore);
     expect(sagaTester.numCalled(actions.FUNDING_RECEIVED_EVENT)).toEqual(0);
   });
 
-  it('should handle a funds received event when registered for that channel', async () => {
+  it.only('should handle a funds received event when registered for that channel', async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
     const processId = ethers.Wallet.createRandom().address;
-    const sagaTester = new SagaTester({});
+    const sagaTester = new SagaTester({
+      initialState: createWatcherState(processId, channelId),
+    });
     sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
 
     await depositContract(provider, channelId);
     await sagaTester.waitFor(actions.FUNDING_RECEIVED_EVENT);
@@ -103,9 +101,8 @@ describe('adjudicator listener', () => {
     const channelId = await getChannelId(provider, channelNonce, participantA, participantB);
     const processId = ethers.Wallet.createRandom().address;
 
-    const sagaTester = new SagaTester({});
+    const sagaTester = new SagaTester({ initialState: createWatcherState(processId, channelId) });
     sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
 
     const challengeState = await createChallenge(
       provider,
@@ -126,10 +123,8 @@ describe('adjudicator listener', () => {
     const channelNonce = getNextNonce();
     const channelId = await getChannelId(provider, channelNonce, participantA, participantB);
     const processId = ethers.Wallet.createRandom().address;
-    const sagaTester = new SagaTester({});
-
+    const sagaTester = new SagaTester({ initialState: createWatcherState(processId, channelId) });
     sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
 
     await concludeGame(provider, channelNonce, participantA, participantB);
 
@@ -145,9 +140,8 @@ describe('adjudicator listener', () => {
     const processId = ethers.Wallet.createRandom().address;
     await createChallenge(provider, channelNonce, participantA, participantB);
 
-    const sagaTester = new SagaTester({});
+    const sagaTester = new SagaTester({ initialState: createWatcherState(processId, channelId) });
     sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
 
     const refuteCommitment = await refuteChallenge(
       provider,
@@ -169,9 +163,8 @@ describe('adjudicator listener', () => {
 
     await createChallenge(provider, channelNonce, participantA, participantB);
 
-    const sagaTester = new SagaTester({});
+    const sagaTester = new SagaTester({ initialState: createWatcherState(processId, channelId) });
     sagaTester.start(adjudicatorWatcher, provider);
-    sagaTester.dispatch(actions.registerForAdjudicatorEvents(processId, channelId));
 
     const responseCommitment = await respondWithMove(
       provider,

@@ -174,6 +174,7 @@ export type RefutedEvent = ReturnType<typeof refutedEvent>;
 
 export const RESPOND_WITH_MOVE_EVENT = 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT';
 export const respondWithMoveEvent = (processId: string, channelId: string, responseCommitment) => ({
+  processId,
   channelId,
   responseCommitment,
   type: RESPOND_WITH_MOVE_EVENT as typeof RESPOND_WITH_MOVE_EVENT,
@@ -201,24 +202,6 @@ export type AdjudicatorEventAction =
   | RefutedEvent
   | RespondWithMoveEvent
   | FundingReceivedEvent;
-
-export const REGISTER_FOR_ADJUDICATOR_EVENTS = 'REGISTER_FOR_ADJUDICATOR_EVENTS';
-export const registerForAdjudicatorEvents = (processId: string, ...channelIds: string[]) => ({
-  type: REGISTER_FOR_ADJUDICATOR_EVENTS as typeof REGISTER_FOR_ADJUDICATOR_EVENTS,
-  processId,
-  channelIds,
-});
-export type RegisterForAdjudicatorEvents = ReturnType<typeof registerForAdjudicatorEvents>;
-export const UNREGISTER_FOR_ADJUDICATOR_EVENTS = 'UNREGISTER_FOR_ADJUDICATOR_EVENTS';
-export const unregisterForAdjudicatorEvents = (processId: string) => ({
-  type: UNREGISTER_FOR_ADJUDICATOR_EVENTS as typeof UNREGISTER_FOR_ADJUDICATOR_EVENTS,
-  processId,
-});
-export type UnregisterForAdjudicatorEvents = ReturnType<typeof unregisterForAdjudicatorEvents>;
-
-export type AdjudicatorRegisterAction =
-  | RegisterForAdjudicatorEvents
-  | UnregisterForAdjudicatorEvents;
 
 export type CommonAction =
   | TransactionConfirmed
