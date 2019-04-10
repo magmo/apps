@@ -357,5 +357,5 @@ const receivedValidOpponentConclusionRequest = (
 
 const channelIsInitialized = (commitment: Commitment, state: states.ChannelState): boolean => {
   const channelId = channelID(commitment.channel);
-  const initializedChannelAddresses = new Set(Object.keys(state.initializedChannels));
+  return channelId in state. initializedChannels
 };
