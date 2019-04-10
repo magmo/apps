@@ -88,20 +88,20 @@ export const createAndSendPostFundCommitment = (
   let newState = { ...state };
   const ledgerChannelState = selectors.getOpenedChannelState(newState, ledgerChannelId);
   const appChannelState = selectors.getOpenedChannelState(state, ledgerChannelState.channelId);
-  const { postFundCommitment, commitmentSignature } = composePostFundCommitment(
+  const { commitment, signature } = composePostFundCommitment(
     ledgerChannelState.lastCommitment.commitment,
     ledgerChannelState.ourIndex,
     ledgerChannelState.privateKey,
   );
 
-  newState = receiveOwnLedgerCommitment(state, postFundCommitment);
+  newState = receiveOwnLedgerCommitment(state, commitment);
 
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
       theirAddress(appChannelState),
       ledgerChannelId,
-      postFundCommitment,
-      commitmentSignature,
+      commitment,
+      signature,
     ),
   ];
   return newState;
@@ -118,7 +118,7 @@ export const createAndSendUpdateCommitment = (
 
   // Compose the update commitment
   const ledgerChannelState = selectors.getOpenedChannelState(state, ledgerChannelId);
-  const { updateCommitment, commitmentSignature } = composeLedgerUpdateCommitment(
+  const { commitment, signature } = composeLedgerUpdateCommitment(
     ledgerChannelState.lastCommitment.commitment,
     ledgerChannelState.ourIndex,
     proposedAllocation,
@@ -127,15 +127,15 @@ export const createAndSendUpdateCommitment = (
   );
 
   // Update our ledger channel with the latest commitment
-  const newState = receiveOwnLedgerCommitment(state, updateCommitment);
+  const newState = receiveOwnLedgerCommitment(state, commitment);
 
   // Send out the commitment to the opponent
   newState.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
       theirAddress(appChannelState),
       appChannelId,
-      updateCommitment,
-      commitmentSignature,
+      commitment,
+      signature,
     ),
   ];
   return newState;
@@ -175,21 +175,6 @@ export const receiveLedgerCommitment = (
   action: actions.CommitmentReceived,
 ): walletStates.Initialized => {
   return updateChannelState(state, action);
-};
-
-export const initializeChannelState = (
-  state: walletStates.Initialized,
-  channelId: string,
-  address: string,
-  privateKey: string,
-): walletStates.Initialized => {
-  // Create initial channel state for new ledger channel
-  state.channelState.initializedChannels[channelId] = channelStates.waitForChannel({
-    address,
-    privateKey,
-  });
-
-  return state;
 };
 
 // STATE UPDATERS

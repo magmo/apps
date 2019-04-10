@@ -1,6 +1,6 @@
 import * as states from './state';
 import * as walletStates from '../../state';
-import * as channelStates from '../../channel-state/state';
+import * as channelState from '../../channel-state/state';
 
 import * as actions from '../../actions';
 
@@ -11,23 +11,22 @@ import { PlayerIndex } from '../../types';
 
 import { Channel } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
-import { composePreFundCommitment } from '../../../utils/commitment-utils';
 import { isFundingAction } from '../../internal/actions';
 import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
 import {
   appChannelIsWaitingForFunding,
-  initializeChannelState,
   updateDirectFundingStatus,
   receiveOpponentLedgerCommitment,
   safeToSendLedgerUpdate,
-  receiveOwnLedgerCommitment,
-  createCommitmentMessageRelay,
   createAndSendPostFundCommitment,
   ledgerChannelFundsAppChannel,
   confirmFundingForAppChannel,
   requestDirectFunding,
   createAndSendUpdateCommitment,
+  createCommitmentMessageRelay,
 } from '../reducer-helpers';
+import { composePreFundCommitment } from '../../../utils/commitment-utils';
+import { WalletEvent } from 'magmo-wallet-client';
 
 export function playerAReducer(
   state: walletStates.Initialized,
@@ -163,19 +162,17 @@ const waitForApprovalReducer = (
 
       const appChannelState = selectors.getOpenedChannelState(state, action.channelId);
 
-      const { state: ledgerChannelState, ledgerChannel } = createLedgerChannel(
-        newState,
+      const { ledgerChannelState, preFundSetupMessage } = createLedgerChannel(
+        state,
         appChannelState,
       );
-      newState = ledgerChannelState;
 
-      const ledgerChannelId = channelID(ledgerChannel);
-
-      newState = createAndSendPreFundCommitment(newState, appChannelState, ledgerChannel);
+      newState = walletStates.setChannel(newState, ledgerChannelState);
+      newState = walletStates.queueMessage(newState, preFundSetupMessage);
 
       newState.indirectFunding = states.waitForPreFundSetup1({
         channelId: action.channelId,
-        ledgerId: ledgerChannelId,
+        ledgerId: ledgerChannelState.channelId,
       });
 
       return newState;
@@ -189,15 +186,20 @@ const directFundingIsComplete = (state: walletStates.Initialized, channelId: str
   return fundingStatus.channelFundingStatus === CHANNEL_FUNDED;
 };
 
-const createAndSendPreFundCommitment = (
+const createLedgerChannel = (
   state: walletStates.Initialized,
-  appChannelState: channelStates.OpenedState,
-  ledgerChannel: Channel,
-): walletStates.Initialized => {
-  const newState = { ...state };
-  // Create prefund commitment
+  appChannelState: channelState.OpenedState,
+): { ledgerChannelState: channelState.WaitForPreFundSetup; preFundSetupMessage: WalletEvent } => {
+  // 1. Determine ledger channel properties
+  const nonce = 4; // TODO: Make random
+  const { participants, address, privateKey } = appChannelState;
+  const channelType = state.consensusLibrary;
+  const ledgerChannel: Channel = { channelType, nonce, participants };
+  const ledgerChannelId = channelID(ledgerChannel);
   const { allocation, destination } = appChannelState.lastCommitment.commitment;
-  const { preFundSetupCommitment, commitmentSignature } = composePreFundCommitment(
+
+  // 2. Create preFundSetupMessage
+  const preFundSetupCommitment = composePreFundCommitment(
     ledgerChannel,
     allocation,
     destination,
@@ -205,38 +207,27 @@ const createAndSendPreFundCommitment = (
     appChannelState.privateKey,
   );
 
-  // Update state
-  receiveOwnLedgerCommitment(newState, preFundSetupCommitment);
+  // 3. Create the channel state
+  const ledgerChannelState = channelState.waitForPreFundSetup({
+    address,
+    privateKey,
+    channelId: ledgerChannelId,
+    libraryAddress: channelType,
+    ourIndex: 0,
+    participants,
+    channelNonce: nonce,
+    turnNum: 0,
+    lastCommitment: preFundSetupCommitment,
+    funded: false,
+  });
 
-  // Message opponent
-  newState.outboxState.messageOutbox = [
-    createCommitmentMessageRelay(
-      appChannelState.participants[PlayerIndex.B],
-      appChannelState.channelId,
-      preFundSetupCommitment,
-      commitmentSignature,
-    ),
-  ];
-  return newState;
-};
-
-const createLedgerChannel = (
-  state: walletStates.Initialized,
-  appChannelState: channelStates.OpenedState,
-): { state: walletStates.Initialized; ledgerChannel: Channel } => {
-  const nonce = 4; // TODO: Make random
-  const { participants } = appChannelState;
-  const ledgerChannel: Channel = {
-    channelType: state.consensusLibrary,
-    nonce,
-    participants, // TODO: In the future we can use different participants
-  };
-  const ledgerChannelId = channelID(ledgerChannel);
-  const updatedState = initializeChannelState(
-    state,
-    ledgerChannelId,
-    appChannelState.address,
-    appChannelState.privateKey,
+  const { commitment, signature } = preFundSetupCommitment;
+  const preFundSetupMessage = createCommitmentMessageRelay(
+    appChannelState.participants[PlayerIndex.B],
+    appChannelState.channelId,
+    commitment,
+    signature,
   );
-  return { state: updatedState, ledgerChannel };
+
+  return { ledgerChannelState, preFundSetupMessage };
 };
