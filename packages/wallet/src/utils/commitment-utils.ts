@@ -3,6 +3,7 @@ import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudi
 import { PlayerIndex } from '../redux/types';
 import { signCommitment } from './signing-utils';
 import { Channel } from 'fmg-core';
+import { SignedCommitment } from 'src/redux/channel-state/shared/state';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,
@@ -40,7 +41,7 @@ export const composeLedgerUpdateCommitment = (
     proposedDestination,
     consensusCounter: ourIndex,
   });
-  const updateCommitment: Commitment = {
+  const commitment: Commitment = {
     channel,
     commitmentType: CommitmentType.App,
     turnNum,
@@ -49,16 +50,16 @@ export const composeLedgerUpdateCommitment = (
     destination,
     appAttributes,
   };
-  const commitmentSignature = signCommitment(updateCommitment, privateKey);
+  const signature = signCommitment(commitment, privateKey);
 
-  return { updateCommitment, commitmentSignature };
+  return { commitment, signature };
 };
 
 export const composePostFundCommitment = (
   lastCommitment: Commitment,
   ourIndex: PlayerIndex,
   privateKey: string,
-) => {
+): SignedCommitment => {
   const {
     channel,
     turnNum: previousTurnNum,
@@ -66,7 +67,7 @@ export const composePostFundCommitment = (
     destination,
     appAttributes,
   } = lastCommitment;
-  const postFundCommitment: Commitment = {
+  const commitment: Commitment = {
     channel,
     commitmentType: CommitmentType.PostFundSetup,
     turnNum: previousTurnNum + 1,
@@ -75,9 +76,9 @@ export const composePostFundCommitment = (
     destination,
     appAttributes,
   };
-  const commitmentSignature = signCommitment(postFundCommitment, privateKey);
+  const signature = signCommitment(commitment, privateKey);
 
-  return { postFundCommitment, commitmentSignature };
+  return { commitment, signature };
 };
 export const composePreFundCommitment = (
   channel: Channel,
@@ -85,13 +86,13 @@ export const composePreFundCommitment = (
   destination: string[],
   ourIndex: PlayerIndex,
   privateKey: string,
-) => {
+): SignedCommitment => {
   const appAttributes = bytesFromAppAttributes({
     proposedAllocation: allocation,
     proposedDestination: destination,
     consensusCounter: ourIndex,
   });
-  const preFundSetupCommitment: Commitment = {
+  const commitment: Commitment = {
     channel,
     commitmentType: CommitmentType.PreFundSetup,
     turnNum: ourIndex,
@@ -100,7 +101,7 @@ export const composePreFundCommitment = (
     destination,
     appAttributes,
   };
-  const commitmentSignature = signCommitment(preFundSetupCommitment, privateKey);
+  const signature = signCommitment(commitment, privateKey);
 
-  return { preFundSetupCommitment, commitmentSignature };
+  return { commitment, signature };
 };
