@@ -73,7 +73,7 @@ describe('adjudicator listener', () => {
     expect(sagaTester.numCalled(actions.FUNDING_RECEIVED_EVENT)).toEqual(0);
   });
 
-  it.only('should handle a funds received event when registered for that channel', async () => {
+  it('should handle a funds received event when registered for that channel', async () => {
     const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
     const processId = ethers.Wallet.createRandom().address;
     const sagaTester = new SagaTester({
