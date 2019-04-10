@@ -45,7 +45,7 @@ describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   const updatedState = directFundingStoreReducer(state, action);
 
   itChangesChannelFundingStatusTo(states.SAFE_TO_DEPOSIT, {
-    state: updatedState.state[channelId],
+    protocolState: updatedState.state[channelId],
   });
   itSendsThisTransaction(updatedState, mockTransactionOutboxItem);
 });
@@ -63,7 +63,7 @@ describe('incoming action: DIRECT_FUNDING_REQUESTED', () => {
   const updatedState = directFundingStoreReducer(state, action);
 
   itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, {
-    state: updatedState.state[channelId],
+    protocolState: updatedState.state[channelId],
   });
   itSendsNoTransaction(updatedState);
 });
