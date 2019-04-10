@@ -17,12 +17,25 @@ export const directFundingStoreReducer = (
     return { state };
   }
 
-  const { safeToDepositLevel, totalFundingRequired, requiredDeposit, channelId, ourIndex } = action;
+  const { channelId } = action;
   if (state[channelId]) {
     // The wallet has requested to start the funding for a channel that already has
     // a funding state
     return { state };
   }
+  const { state: directFunding, sideEffects } = beginDirectFunding(action);
+
+  return {
+    state: {
+      ...state,
+      [channelId]: directFunding,
+    },
+    sideEffects,
+  };
+};
+
+const beginDirectFunding = (action: actions.internal.DirectFundingRequested) => {
+  const { safeToDepositLevel, totalFundingRequired, requiredDeposit, channelId, ourIndex } = action;
 
   const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
   const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
@@ -48,19 +61,15 @@ export const directFundingStoreReducer = (
     : undefined;
 
   return {
-    state: {
-      ...state,
-      [channelId]: stateConstructor({
-        ...state,
-        fundingType: states.DIRECT_FUNDING,
-        channelFundingStatus,
-        safeToDepositLevel,
-        channelId,
-        requestedTotalFunds: totalFundingRequired,
-        requestedYourContribution: requiredDeposit,
-        ourIndex,
-      }),
-    },
+    state: stateConstructor({
+      fundingType: states.DIRECT_FUNDING,
+      channelFundingStatus,
+      safeToDepositLevel,
+      channelId,
+      requestedTotalFunds: totalFundingRequired,
+      requestedYourContribution: requiredDeposit,
+      ourIndex,
+    }),
     sideEffects: { transactionOutbox },
   };
 };
