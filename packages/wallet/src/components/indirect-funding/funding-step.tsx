@@ -118,19 +118,19 @@ export class FundingStep extends React.PureComponent<Props> {
       <StatusBarLayout>
         <h2 className="bp-2">Opening ledger channel</h2>
         <ul className="fa-ul">
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(Step.WAIT_FOR_PRE_FUND_SETUP, currentStep)}
             {message(Step.WAIT_FOR_PRE_FUND_SETUP, currentStep)}
           </li>
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(Step.WAIT_FOR_DIRECT_FUNDING, currentStep)}
             {message(Step.WAIT_FOR_DIRECT_FUNDING, currentStep)}
           </li>
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(Step.WAIT_FOR_POST_FUND_SETUP, currentStep)}
             {message(Step.WAIT_FOR_POST_FUND_SETUP, currentStep)}
           </li>
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(Step.WAIT_FOR_LEDGER_UPDATE, currentStep)}
             {message(Step.WAIT_FOR_LEDGER_UPDATE, currentStep)}
           </li>

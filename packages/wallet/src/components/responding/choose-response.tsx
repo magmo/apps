@@ -45,7 +45,7 @@ export default class ChooseResponse extends React.PureComponent<Props> {
         <div style={{ paddingBottom: '1em' }}>
           The game will expire at
           <ul className="fa-ul">
-            <li style={{ padding: '0.7em 1em' }}>
+            <li>
               {timeRunningIcon}
               {expiryDate}
             </li>

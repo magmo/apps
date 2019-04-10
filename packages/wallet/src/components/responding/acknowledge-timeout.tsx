@@ -32,7 +32,7 @@ export default class AcknowledgeTimeout extends React.PureComponent<Props> {
         <div>
           The game expired at
           <ul className="fa-ul">
-            <li style={{ padding: '0.7em 1em' }}>
+            <li>
               {timeOutIcon}
               {expiryDate}
             </li>

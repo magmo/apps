@@ -43,15 +43,15 @@ export class ClosingStep extends React.PureComponent<Props> {
       <StatusBarLayout>
         <h2 className="bp-2">Closing channel</h2>
         <ul className="fa-ul">
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(1, currentStep)}
             Preparing your close transaction
           </li>
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(2, currentStep)}
             Wait for confirmation
           </li>
-          <li style={{ padding: '0.7em 1em' }}>
+          <li>
             {icon(3, currentStep)}
             Close and Withdrawal Successful!
           </li>
