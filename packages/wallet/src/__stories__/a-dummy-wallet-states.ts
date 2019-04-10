@@ -112,7 +112,7 @@ export const dummyWaitForApproval: walletStates.Initialized = {
 };
 
 export const dummyWaitForPreFundSetup1: walletStates.WalletState = {
-  ...dummyWaitForApproval,
+  ...defaultInitialized,
   indirectFunding: waitForPreFundSetup1({
     ...defaultInitialized,
     ...defaultParams,
@@ -121,7 +121,7 @@ export const dummyWaitForPreFundSetup1: walletStates.WalletState = {
 };
 
 export const dummyWaitForDirectFunding: walletStates.WalletState = {
-  ...dummyWaitForPreFundSetup1,
+  ...defaultInitialized,
   indirectFunding: waitForDirectFunding({
     ...defaultInitialized,
     ...defaultParams,
@@ -130,7 +130,7 @@ export const dummyWaitForDirectFunding: walletStates.WalletState = {
 };
 
 export const dummyWaitForPostFundSetup1: walletStates.WalletState = {
-  ...dummyWaitForPreFundSetup1,
+  ...defaultInitialized,
   indirectFunding: waitForPostFundSetup1({
     ...defaultInitialized,
     ...defaultParams,
@@ -139,7 +139,7 @@ export const dummyWaitForPostFundSetup1: walletStates.WalletState = {
 };
 
 export const dummyWaitForLedgerUpdate1: walletStates.WalletState = {
-  ...dummyWaitForPreFundSetup1,
+  ...defaultInitialized,
   indirectFunding: waitForLedgerUpdate1({
     ...defaultInitialized,
     ...defaultParams,

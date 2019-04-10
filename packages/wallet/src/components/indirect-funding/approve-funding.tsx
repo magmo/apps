@@ -19,15 +19,15 @@ export default class ApproveFunding extends React.PureComponent<Props> {
     } = this.props;
     return (
       <ApproveX
-        title="Opening ledger channel"
-        description="Do you want to open this ledger channel?"
-        yesMessage="Open Channel"
+        title="Funding a channel"
+        description="Do you want to indirectly fund this channel?"
+        yesMessage="Start indirect funding"
         noMessage="Cancel"
         approvalAction={fundingApproved}
         rejectionAction={fundingRejected}
       >
         <React.Fragment>
-          This site wants you to open a new state channel.
+          This site wants you to fund a new state channel.
           <br />
           <br />
           <div className="row">

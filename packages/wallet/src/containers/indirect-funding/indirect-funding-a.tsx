@@ -2,9 +2,10 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import ApproveFunding from '../../components/indirect-funding/approve-funding';
 import { FundingStep, fundingStepByState } from '../../components/indirect-funding/funding-step';
+import * as actions from '../../redux/indirect-funding/player-a/actions';
 import * as indirectFundingPlayerA from '../../redux/indirect-funding/player-a/state';
 import { unreachable } from '../../utils/reducer-utils';
-import * as actions from '../../redux/indirect-funding/player-a/actions';
+import DirectFundingContainer from '../direct-funding/direct-funding';
 
 interface Props {
   indirectFundingAState: indirectFundingPlayerA.PlayerAState;
@@ -36,9 +37,8 @@ class IndirectFundingAContainer extends PureComponent<Props> {
       case indirectFundingPlayerA.WAIT_FOR_LEDGER_UPDATE_1:
         return <FundingStep step={step} />;
       case indirectFundingPlayerA.WAIT_FOR_DIRECT_FUNDING:
-        return <div />;
-      // TODO: pass the relevant state to DirectFundingContainer
-      // return <DirectFundingContainer />;
+        // TODO: is the plan to pass in a channel id?
+        return <DirectFundingContainer state={indirectFundingAState.directFunding} />;
       default:
         return unreachable(indirectFundingAState);
     }
