@@ -8,6 +8,7 @@ import { depositingReducer } from './depositing/reducer';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 import { WalletProcedure } from '../types';
+
 export const directFundingStateReducer = (
   state: states.DirectFundingState,
   action: actions.WalletAction,
