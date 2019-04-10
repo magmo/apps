@@ -34,6 +34,7 @@ class IndirectFundingBContainer extends PureComponent<Props> {
       case indirectFundingPlayerB.WAIT_FOR_PRE_FUND_SETUP_0:
       case indirectFundingPlayerB.WAIT_FOR_POST_FUND_SETUP_0:
       case indirectFundingPlayerB.WAIT_FOR_LEDGER_UPDATE_0:
+      case indirectFundingPlayerB.WAIT_FOR_CONSENSUS:
         return <FundingStep step={step} />;
       case indirectFundingPlayerB.WAIT_FOR_DIRECT_FUNDING:
         return <div />;
@@ -46,8 +47,9 @@ class IndirectFundingBContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  fundingApproved: actions.fundingApproved,
-  fundingRejected: actions.fundingApproved,
+  // TODO: wire up the reject action
+  fundingApproved: actions.strategyApproved,
+  fundingRejected: actions.strategyApproved,
 };
 
 export default connect(

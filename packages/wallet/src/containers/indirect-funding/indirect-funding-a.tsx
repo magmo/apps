@@ -46,8 +46,9 @@ class IndirectFundingAContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  fundingApproved: actions.fundingApproved,
-  fundingRejected: actions.fundingApproved,
+  // TODO: wire up the reject action.
+  fundingApproved: actions.strategyApproved,
+  fundingRejected: actions.strategyApproved,
 };
 
 export default connect(
