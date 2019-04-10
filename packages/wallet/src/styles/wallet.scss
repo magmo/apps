@@ -53,3 +53,8 @@
 .wallet-overlay-center {
   @extend .wallet-overlay;
 }
+
+.wallet-body {
+  height: 440px;
+  padding-top: 1em;
+}

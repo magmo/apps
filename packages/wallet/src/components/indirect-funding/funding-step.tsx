@@ -122,14 +122,10 @@ export class FundingStep extends React.PureComponent<Props> {
             {icon(Step.WAIT_FOR_PRE_FUND_SETUP, currentStep)}
             {message(Step.WAIT_FOR_PRE_FUND_SETUP, currentStep)}
           </li>
-        </ul>
-        <ul className="fa-ul">
           <li style={{ padding: '0.7em 1em' }}>
             {icon(Step.WAIT_FOR_DIRECT_FUNDING, currentStep)}
             {message(Step.WAIT_FOR_DIRECT_FUNDING, currentStep)}
           </li>
-        </ul>
-        <ul className="fa-ul">
           <li style={{ padding: '0.7em 1em' }}>
             {icon(Step.WAIT_FOR_POST_FUND_SETUP, currentStep)}
             {message(Step.WAIT_FOR_POST_FUND_SETUP, currentStep)}
