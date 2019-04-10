@@ -133,9 +133,9 @@ export const itIncreasesTurnNumBy = (
   });
 };
 
-export function itChangesDepositStatusTo(status: string, state) {
+export function itChangesDepositStatusTo(status: string, state: { protocolState: any }) {
   it(`changes depositStatus to ${status} `, () => {
-    expect(state.state.depositStatus).toEqual(status);
+    expect(state.protocolState.depositStatus).toEqual(status);
   });
 }
 export function itChangesChannelFundingStatusTo<

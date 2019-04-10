@@ -86,7 +86,7 @@ describe('when a directFunding status already exists for the channel', () => {
     // If the channel weren't already set up in the funding state,
     // the deposit status would be WAIT_FOR_TRANSACTION
     itChangesDepositStatusTo(states.depositing.DEPOSIT_CONFIRMED, {
-      state: updatedState.state[channelId],
+      protocolState: updatedState.state[channelId],
     });
     itSendsNoTransaction(updatedState);
   });
