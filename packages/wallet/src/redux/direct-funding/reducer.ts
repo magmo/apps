@@ -8,38 +8,60 @@ import { depositingReducer } from './depositing/reducer';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../utils/transaction-generator';
 import { WalletProcedure } from '../types';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '../protocols';
+import { SideEffects } from '../outbox/state';
+import { accumulateSideEffects } from '../outbox';
 
-export const directFundingStateReducer = (
-  state: states.DirectFundingState,
+export const directFundingStateReducer: ProtocolReducer<states.DirectFundingState> = (
+  state: ProtocolStateWithSharedData<states.DirectFundingState>,
   action: actions.WalletAction,
-): StateWithSideEffects<states.DirectFundingState> => {
+): ProtocolStateWithSharedData<states.DirectFundingState> => {
+  const { protocolState, sharedData } = state;
   if (
     action.type === actions.funding.FUNDING_RECEIVED_EVENT &&
-    action.channelId === state.channelId
+    action.channelId === protocolState.channelId
   ) {
     // You can always move to CHANNEL_FUNDED based on the action
     // of some arbitrary actor, so this behaviour is common regardless of the stage of
     // the state
-    if (bigNumberify(action.totalForDestination).gte(state.requestedTotalFunds)) {
+    if (bigNumberify(action.totalForDestination).gte(protocolState.requestedTotalFunds)) {
       return {
-        state: states.channelFunded(state),
+        protocolState: states.channelFunded(protocolState),
+        sharedData,
       };
     }
   }
-  if (states.stateIsNotSafeToDeposit(state)) {
-    return notSafeToDepositReducer(state, action);
+
+  if (states.stateIsNotSafeToDeposit(protocolState)) {
+    return applyUpdate(state, notSafeToDepositReducer(protocolState, action));
   }
-  if (states.stateIsDepositing(state)) {
+  if (states.stateIsDepositing(protocolState)) {
     return depositingReducer(state, action);
   }
-  if (states.stateIsWaitForFundingConfirmation(state)) {
-    return waitForFundingConfirmationReducer(state, action);
+  if (states.stateIsWaitForFundingConfirmation(protocolState)) {
+    return applyUpdate(state, waitForFundingConfirmationReducer(protocolState, action));
   }
-  if (states.stateIsChannelFunded(state)) {
-    return channelFundedReducer(state, action);
+  if (states.stateIsChannelFunded(protocolState)) {
+    return applyUpdate(state, channelFundedReducer(protocolState, action));
   }
-  return unreachable(state);
+  return unreachable(protocolState);
 };
+
+function applyUpdate(
+  state: ProtocolStateWithSharedData<states.DirectFundingState>,
+  updateData: { state: states.DirectFundingState; sideEffects?: SideEffects },
+): ProtocolStateWithSharedData<states.DirectFundingState> {
+  const { state: protocolState, sideEffects } = updateData;
+  return {
+    ...state,
+    protocolState,
+    sharedData: {
+      ...state.sharedData,
+      outboxState: accumulateSideEffects(state.sharedData.outboxState, sideEffects),
+    },
+  };
+}
+
 const notSafeToDepositReducer = (
   state: states.NotSafeToDeposit,
   action: actions.WalletAction,

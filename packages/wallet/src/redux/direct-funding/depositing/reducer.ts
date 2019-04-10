@@ -6,23 +6,43 @@ import * as actions from '../../actions';
 import * as states from './state';
 import * as fundingStates from '../state';
 import { WalletProcedure } from '../../types';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
+import { SideEffects } from '../../outbox/state';
+import { accumulateSideEffects } from '../../outbox';
 
-export const depositingReducer = (
-  state: states.Depositing,
+export const depositingReducer: ProtocolReducer<fundingStates.DirectFundingState> = (
+  state: ProtocolStateWithSharedData<states.Depositing>,
   action: actions.WalletAction,
-): StateWithSideEffects<fundingStates.DirectFundingState> => {
-  switch (state.depositStatus) {
+): ProtocolStateWithSharedData<fundingStates.DirectFundingState> => {
+  const { protocolState } = state;
+
+  switch (protocolState.depositStatus) {
     case states.WAIT_FOR_TRANSACTION_SENT:
-      return waitForTransactionSentReducer(state, action);
+      return applyUpdate(state, waitForTransactionSentReducer(protocolState, action));
     case states.WAIT_FOR_DEPOSIT_APPROVAL:
-      return waitForDepositApprovalReducer(state, action);
+      return applyUpdate(state, waitForDepositApprovalReducer(protocolState, action));
     case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
-      return waitForDepositConfirmationReducer(state, action);
+      return applyUpdate(state, waitForDepositConfirmationReducer(protocolState, action));
     case states.DEPOSIT_TRANSACTION_FAILED:
-      return depositTransactionFailedReducer(state, action);
+      return applyUpdate(state, depositTransactionFailedReducer(protocolState, action));
   }
-  return unreachable(state);
+  return unreachable(protocolState);
 };
+
+function applyUpdate(
+  state: ProtocolStateWithSharedData<fundingStates.DirectFundingState>,
+  updateData: { state: fundingStates.DirectFundingState; sideEffects?: SideEffects },
+): ProtocolStateWithSharedData<fundingStates.DirectFundingState> {
+  const { state: protocolState, sideEffects } = updateData;
+  return {
+    ...state,
+    protocolState,
+    sharedData: {
+      ...state.sharedData,
+      outboxState: accumulateSideEffects(state.sharedData.outboxState, sideEffects),
+    },
+  };
+}
 
 const waitForTransactionSentReducer = (
   state: states.WaitForTransactionSent,
