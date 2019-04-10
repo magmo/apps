@@ -1,16 +1,18 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
+import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { DirectFundingState } from 'src/redux/direct-funding-store/direct-funding-state/state';
-import EtherscanLink from '../../components/etherscan-link';
-import { FundingStep, fundingStepByState } from '../../components/funding/funding-step';
-import TransactionFailed from '../../components/transaction-failed';
-import * as actions from '../../redux/actions';
+
 import * as fundingStore from '../../redux/direct-funding-store/state';
-import { WalletProcedure } from '../../redux/types';
+import * as actions from '../../redux/actions';
+
 import { unreachable } from '../../utils/reducer-utils';
+import { FundingStep, fundingStepByState } from '../../components/funding/funding-step';
+import EtherscanLink from '../../components/etherscan-link';
+import TransactionFailed from '../../components/transaction-failed';
+import { WalletProcedure } from '../../redux/types';
 
 interface Props {
-  state: DirectFundingState;
+  directFundingStore: fundingStore.DirectFundingStore;
   channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
@@ -19,7 +21,8 @@ interface Props {
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { state, retryTransactionAction } = this.props;
+    const { directFundingStore, retryTransactionAction, channelId } = this.props;
+    const state = directFundingStore[channelId];
     const step = fundingStepByState(state);
     if (
       fundingStore.states.stateIsNotSafeToDeposit(state) ||
@@ -78,6 +81,6 @@ const mapDispatchToProps = {
 // why does it think that mapStateToProps can return undefined??
 
 export default connect(
-  () => ({}),
+  (state: any) => ({ directFundingStore: state.channelState.directFunding }),
   mapDispatchToProps,
 )(DirectFundingContainer);

@@ -1,28 +1,18 @@
-import React from 'react';
 import { storiesOf } from '@storybook/react';
-import WalletContainer from '../containers/wallet';
+import React from 'react';
 import { Provider } from 'react-redux';
+import WalletContainer from '../containers/wallet';
+import '../index.scss';
+import * as indirectFundingPlayerA from '../redux/indirect-funding/player-a/state';
+import * as indirectFundingPlayerB from '../redux/indirect-funding/player-b/state';
 import * as walletStates from '../redux/state';
-
+import { indirectFundingWalletState as indirectFundingWalletStateA } from './a-dummy-wallet-states';
+import { indirectFundingWalletState as indirectFundingWalletStateB } from './b-dummy-wallet-states';
 import {
-  dummyWaitForLogin,
   dummyWaitForAdjudicator,
+  dummyWaitForLogin,
   dummyWaitForMetaMask,
 } from './dummy-wallet-states';
-import {
-  dummyWaitForApproval,
-  dummyWaitForPreFundSetup1,
-  dummyWaitForPostFundSetup1,
-  dummyWaitForLedgerUpdate1,
-  dummyWaitForDirectFunding,
-} from './a-dummy-wallet-states';
-import {
-  dummyWaitForPreFundSetup0,
-  dummyWaitForPostFundSetup0,
-  dummyWaitForLedgerUpdate0,
-} from './b-dummy-wallet-states';
-
-import '../index.scss';
 
 const fakeStore = state => ({
   dispatch: action => {
@@ -97,11 +87,26 @@ const NetworkStatuses = {
 addStoriesFromCollection(NetworkStatuses, 'Network Statuses');
 
 const TwinWalletScreensIndirectFunding = {
-  'Both in WaitForApproval': { a: dummyWaitForApproval, b: dummyWaitForApproval },
-  'Both in WaitForPreFundSetup': { a: dummyWaitForPreFundSetup1, b: dummyWaitForPreFundSetup0 },
-  'Both in WaitForDirectFunding': { a: dummyWaitForDirectFunding, b: dummyWaitForDirectFunding },
-  'Both in WaitForPostFundSetup': { a: dummyWaitForPostFundSetup1, b: dummyWaitForPostFundSetup0 },
-  'Both in WaitForLedgerUpdate': { a: dummyWaitForLedgerUpdate1, b: dummyWaitForLedgerUpdate0 },
+  'Both in WaitForApproval': {
+    a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_APPROVAL),
+    b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_APPROVAL),
+  },
+  'Both in WaitForPreFundSetup': {
+    a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_PRE_FUND_SETUP_1),
+    b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_PRE_FUND_SETUP_0),
+  },
+  'Both in WaitForDirectFunding': {
+    a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_DIRECT_FUNDING),
+    b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_DIRECT_FUNDING),
+  },
+  'Both in WaitForPostFundSetup': {
+    a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_POST_FUND_SETUP_1),
+    b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_POST_FUND_SETUP_0),
+  },
+  'Both in WaitForLedgerUpdate': {
+    a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_LEDGER_UPDATE_1),
+    b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_LEDGER_UPDATE_0),
+  },
 };
 
 addTwinStoriesFromCollection(
