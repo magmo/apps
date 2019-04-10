@@ -75,6 +75,10 @@ const waitForLedgerUpdate1State = indirectFundingPlayerB.waitForLedgerUpdate0({
   channelId,
   ledgerId,
 });
+const waitForConsensusState = indirectFundingPlayerB.waitForConsensus({
+  channelId,
+  ledgerId,
+});
 
 export const indirectFundingWalletState = (
   indirectFundingStateType: string,
@@ -95,6 +99,9 @@ export const indirectFundingWalletState = (
       break;
     case indirectFundingPlayerB.WAIT_FOR_LEDGER_UPDATE_0:
       indirectFunding = waitForLedgerUpdate1State;
+      break;
+    case indirectFundingPlayerB.WAIT_FOR_CONSENSUS:
+      indirectFunding = waitForConsensusState;
       break;
     default:
       indirectFunding = waitForLedgerUpdate1State;

@@ -107,6 +107,10 @@ const TwinWalletScreensIndirectFunding = {
     a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_LEDGER_UPDATE_1),
     b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_LEDGER_UPDATE_0),
   },
+  'B in WaitForConsensus': {
+    a: indirectFundingWalletStateA(indirectFundingPlayerA.WAIT_FOR_LEDGER_UPDATE_1),
+    b: indirectFundingWalletStateB(indirectFundingPlayerB.WAIT_FOR_CONSENSUS),
+  },
 };
 
 addTwinStoriesFromCollection(

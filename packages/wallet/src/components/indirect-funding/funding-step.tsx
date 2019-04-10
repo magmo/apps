@@ -5,6 +5,7 @@ import React from 'react';
 import * as indirectFundingPlayerA from '../../redux/indirect-funding/player-a/state';
 import * as indirectFundingPlayerB from '../../redux/indirect-funding/player-b/state';
 import * as indirectFunding from '../../redux/indirect-funding/state';
+import { unreachable } from '../../utils/reducer-utils';
 import StatusBarLayout from '../status-bar-layout';
 
 interface Props {
@@ -38,18 +39,27 @@ const icon = (iconStep: number, currentStep: number) => {
 };
 
 export const fundingStepByState = (state: indirectFunding.IndirectFundingState): Step => {
-  if (
-    indirectFundingPlayerA.WAIT_FOR_PRE_FUND_SETUP_1 === state.type ||
-    indirectFundingPlayerB.WAIT_FOR_PRE_FUND_SETUP_0 === state.type
-  ) {
-    return Step.WAIT_FOR_PRE_FUND_SETUP;
-  } else if (
-    indirectFundingPlayerA.WAIT_FOR_POST_FUND_SETUP_1 === state.type ||
-    indirectFundingPlayerB.WAIT_FOR_POST_FUND_SETUP_0 === state.type
-  ) {
-    return Step.WAIT_FOR_POST_FUND_SETUP;
-  } else {
-    return Step.WAIT_FOR_LEDGER_UPDATE;
+  switch (state.type) {
+    case indirectFundingPlayerA.WAIT_FOR_APPROVAL:
+    case indirectFundingPlayerB.WAIT_FOR_APPROVAL:
+    case indirectFundingPlayerA.WAIT_FOR_PRE_FUND_SETUP_1:
+    case indirectFundingPlayerB.WAIT_FOR_PRE_FUND_SETUP_0:
+      return Step.WAIT_FOR_PRE_FUND_SETUP;
+    case indirectFundingPlayerA.WAIT_FOR_DIRECT_FUNDING:
+    case indirectFundingPlayerB.WAIT_FOR_DIRECT_FUNDING:
+    case indirectFundingPlayerA.WAIT_FOR_POST_FUND_SETUP_1:
+    case indirectFundingPlayerB.WAIT_FOR_POST_FUND_SETUP_0:
+      return Step.WAIT_FOR_POST_FUND_SETUP;
+    case indirectFundingPlayerA.WAIT_FOR_LEDGER_UPDATE_1:
+    case indirectFundingPlayerB.WAIT_FOR_LEDGER_UPDATE_0:
+      return Step.WAIT_FOR_LEDGER_UPDATE;
+    case indirectFundingPlayerA.WAIT_FOR_LEDGER_UPDATE_1:
+    case indirectFundingPlayerB.WAIT_FOR_LEDGER_UPDATE_0:
+      return Step.WAIT_FOR_LEDGER_UPDATE;
+    case indirectFundingPlayerB.WAIT_FOR_CONSENSUS:
+      return Step.WAIT_FOR_CONSENSUS;
+    default:
+      return unreachable(state);
   }
 };
 
@@ -58,6 +68,7 @@ export enum Step {
   WAIT_FOR_DIRECT_FUNDING,
   WAIT_FOR_POST_FUND_SETUP,
   WAIT_FOR_LEDGER_UPDATE,
+  WAIT_FOR_CONSENSUS,
 }
 
 const message = (iconStep: Step, currentStep: Step) => {
@@ -85,6 +96,14 @@ const message = (iconStep: Step, currentStep: Step) => {
         return 'Waiting for opponent postfund setup';
       } else {
         return 'Received opponent postfund setup';
+      }
+    case Step.WAIT_FOR_LEDGER_UPDATE:
+      if (currentStep < iconStep) {
+        return 'Not ready to allocate from ledger channel';
+      } else if (currentStep === iconStep) {
+        return 'Waiting for opponent ledger channel update';
+      } else {
+        return 'Received opponent ledger channel update';
       }
   }
   return '';
@@ -114,6 +133,10 @@ export class FundingStep extends React.PureComponent<Props> {
           <li style={{ padding: '0.7em 1em' }}>
             {icon(Step.WAIT_FOR_POST_FUND_SETUP, currentStep)}
             {message(Step.WAIT_FOR_POST_FUND_SETUP, currentStep)}
+          </li>
+          <li style={{ padding: '0.7em 1em' }}>
+            {icon(Step.WAIT_FOR_LEDGER_UPDATE, currentStep)}
+            {message(Step.WAIT_FOR_LEDGER_UPDATE, currentStep)}
           </li>
         </ul>
         <div className="pb-2">{children}</div>
