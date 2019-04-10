@@ -23,7 +23,11 @@ const whenActionArrives = action => `incoming action ${action}`;
 function itTransitionToStateType(state, type) {
   itTransitionsProcedureToStateType('indirectFunding', state, type);
 }
-function itTransitionsChannelToStateType(state: ProtocolStateWithSharedData<states.PlayerAState>, channelId: string, type) {
+function itTransitionsChannelToStateType(
+  state: ProtocolStateWithSharedData<states.PlayerAState>,
+  channelId: string,
+  type,
+) {
   const channelState = state.sharedData.channelState.initializedChannels[channelId];
   itTransitionsToChannelStateType(type, { state: channelState });
 }
@@ -58,22 +62,21 @@ const ledgerChannelDefaults = {
   participants: testScenarios.ledgerChannel.participants as [string, string],
 };
 
-
 const startingState = (
   protocolState: states.PlayerAState,
-  ...channelStatuses:channelStates.ChannelStatus[]
+  ...channelStatuses: channelStates.ChannelStatus[]
 ): ProtocolStateWithSharedData<states.PlayerAState> => {
-  const channelState = {...channelStates.EMPTY_CHANNEL_STATE};
-  for (const channelStatus of channelStatuses){
+  const channelState = { ...channelStates.EMPTY_CHANNEL_STATE };
+  for (const channelStatus of channelStatuses) {
     channelState.initializedChannels[channelStatus.channelId] = channelStatus;
   }
   return {
     protocolState,
-    sharedData:{
-      outboxState:EMPTY_OUTBOX_STATE,
+    sharedData: {
+      outboxState: EMPTY_OUTBOX_STATE,
       channelState,
-    };
-  }
+    },
+  };
 };
 
 const validateMock = jest.fn().mockReturnValue(true);
@@ -82,15 +85,15 @@ Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validate
 describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   const { channelId } = defaults;
 
- const state = startingState(states.waitForApproval({ channelId }));
+  const state = startingState(states.waitForApproval({ channelId }));
 
   describe(whenActionArrives(actions.indirectFunding.playerA.STRATEGY_APPROVED), () => {
-    const action = actions.indirectFunding.playerA.strategyApproved(channelId,'0x0');
+    const action = actions.indirectFunding.playerA.strategyApproved(channelId, '0x0');
     const updatedState = playerAReducer(state, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_PRE_FUND_SETUP_1);
     itSendsThisMessage(updatedState, MESSAGE_RELAY_REQUESTED);
-    const newLedgerId =(updatedState.protocolState as states.WaitForDirectFunding).ledgerId;
+    const newLedgerId = (updatedState.protocolState as states.WaitForDirectFunding).ledgerId;
     itTransitionsChannelToStateType(
       updatedState,
       newLedgerId,
@@ -100,12 +103,15 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
-  const { channelId, ledgerId } = defaults;  // Add the ledger channel to state
+  const { channelId, ledgerId } = defaults; // Add the ledger channel to state
   const ledgerChannelState = channelStates.waitForPreFundSetup({
     ...ledgerChannelDefaults,
     channelId: ledgerId,
   });
- const state =  startingState(states.waitForPreFundSetup1({ channelId, ledgerId }),ledgerChannelState);
+  const state = startingState(
+    states.waitForPreFundSetup1({ channelId, ledgerId }),
+    ledgerChannelState,
+  );
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
@@ -132,7 +138,10 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
     ...ledgerChannelDefaults,
     channelId: ledgerId,
   });
-const state = startingState(states.waitForDirectFunding({ channelId, ledgerId }),ledgerChannelState);
+  const state = startingState(
+    states.waitForDirectFunding({ channelId, ledgerId }),
+    ledgerChannelState,
+  );
   // Add the ledger channel to state
   const total = testScenarios.twoThree.reduce(addHex);
   describe(whenActionArrives(actions.funding.FUNDING_RECEIVED_EVENT), () => {
@@ -157,7 +166,10 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
     turnNum: 2,
     channelId: ledgerId,
   });
-  const state = startingState(states.waitForPostFundSetup1({ channelId, ledgerId }), ledgerChannelState);
+  const state = startingState(
+    states.waitForPostFundSetup1({ channelId, ledgerId }),
+    ledgerChannelState,
+  );
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
       ledgerId,
@@ -184,7 +196,10 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
     turnNum: testScenarios.ledgerCommitments.postFundCommitment1.turnNum,
     channelId: ledgerId,
   });
-  const state = startingState(states.waitForLedgerUpdate1({ channelId, ledgerId }), ledgerChannelState);
+  const state = startingState(
+    states.waitForLedgerUpdate1({ channelId, ledgerId }),
+    ledgerChannelState,
+  );
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
       ledgerId,
