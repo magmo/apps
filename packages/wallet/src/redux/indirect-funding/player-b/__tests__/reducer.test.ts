@@ -1,5 +1,4 @@
 import * as states from '../state';
-import * as walletStates from '../../../state';
 import * as channelStates from '../../../channel-state/state';
 import * as actions from '../../../actions';
 
@@ -11,11 +10,14 @@ import {
   itSendsNoTransaction,
   itSendsThisMessage,
   expectThisCommitmentSent,
+  itTransitionsToChannelStateType,
 } from '../../../__tests__/helpers';
 import { WalletProcedure } from '../../../types';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 
 import * as SigningUtil from '../../../../utils/signing-utils';
+import { ProtocolStateWithSharedData } from '../../../protocols';
+import { EMPTY_OUTBOX_STATE } from '../../../outbox/state';
 const validCommitmentSignature = jest.fn().mockReturnValue(true);
 Object.defineProperty(SigningUtil, 'validCommitmentSignature', {
   value: validCommitmentSignature,
@@ -28,8 +30,16 @@ function itTransitionToStateType(state, type) {
   itTransitionsProcedureToStateType('indirectFunding', state, type);
 }
 
+function itTransitionsChannelToStateType(
+  state: ProtocolStateWithSharedData<states.PlayerBState>,
+  channelId: string,
+  type,
+) {
+  const channelState = state.sharedData.channelState.initializedChannels[channelId];
+  itTransitionsToChannelStateType(type, { state: channelState });
+}
+
 const {
-  initializedState,
   ledgerCommitments,
   bsAddress,
   bsPrivateKey,
@@ -86,18 +96,22 @@ const ledgerChannelStateDefaults = {
   ourIndex: PlayerIndex.B,
 };
 
-const defaultState = { ...initializedState };
 const startingState = (
-  state: states.PlayerBState,
-  channelState?: { [channelId: string]: channelStates.OpenedState },
-): walletStates.IndirectFundingOngoing => ({
-  ...defaultState,
-  indirectFunding: state,
-  channelState: {
-    ...channelStates.EMPTY_CHANNEL_STATE,
-    initializedChannels: channelState || {},
-  },
-});
+  protocolState: states.PlayerBState,
+  ...channelStatuses: channelStates.ChannelStatus[]
+): ProtocolStateWithSharedData<states.PlayerBState> => {
+  const channelState = { ...channelStates.EMPTY_CHANNEL_STATE };
+  for (const channelStatus of channelStatuses) {
+    channelState.initializedChannels[channelStatus.channelId] = channelStatus;
+  }
+  return {
+    protocolState,
+    sharedData: {
+      outboxState: EMPTY_OUTBOX_STATE,
+      channelState,
+    },
+  };
+};
 
 describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   describe(whenActionArrives(actions.indirectFunding.playerB.STRATEGY_PROPOSED), () => {
@@ -111,9 +125,10 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const state = startingState(states.waitForPreFundSetup0({ channelId }), {
-      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
-    });
+    const state = startingState(
+      states.waitForPreFundSetup0({ channelId }),
+      channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+    );
 
     const action = actions.commitmentReceived(
       channelId,
@@ -132,9 +147,10 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
 describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   describe.skip(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     // Need to hook up the direct funding store first, which isn't yet in this branch
-    const state = startingState(states.waitForDirectFunding({ channelId, ledgerId }), {
-      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
-    });
+    const state = startingState(
+      states.waitForDirectFunding({ channelId, ledgerId }),
+      channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+    );
 
     const action = actions.commitmentReceived(
       channelId,
@@ -153,16 +169,17 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const state = startingState(states.waitForPostFundSetup0({ channelId, ledgerId }), {
-      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
-      [ledgerId]: channelStates.bWaitForPostFundSetup({
+    const state = startingState(
+      states.waitForPostFundSetup0({ channelId, ledgerId }),
+      channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+      channelStates.bWaitForPostFundSetup({
         ...ledgerChannelStateDefaults,
         lastCommitment: {
           commitment: ledgerCommitments.preFundCommitment1,
           signature: MOCK_SIGNATURE,
         },
       }),
-    });
+    );
 
     const action = actions.commitmentReceived(
       channelId,
@@ -180,9 +197,10 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
 
 describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const state = startingState(states.waitForLedgerUpdate0({ channelId, ledgerId }), {
-      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
-      [ledgerId]: channelStates.waitForUpdate({
+    const state = startingState(
+      states.waitForLedgerUpdate0({ channelId, ledgerId }),
+      channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+      channelStates.waitForUpdate({
         ...ledgerChannelStateDefaults,
         lastCommitment: {
           commitment: ledgerCommitments.postFundCommitment1,
@@ -194,7 +212,7 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
         },
         turnNum: 3,
       }),
-    });
+    );
 
     const action = actions.commitmentReceived(
       channelId,
@@ -207,19 +225,20 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
     itTransitionToStateType(updatedState, states.WAIT_FOR_CONSENSUS);
     expectThisCommitmentSent(updatedState, ledgerCommitments.ledgerUpdate1);
     itSendsNoTransaction(updatedState);
-    it('does not confirm funding', () => {
-      expect(updatedState.channelState.initializedChannels[channelId].type).toEqual(
-        channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
-      );
-    });
+    itTransitionsChannelToStateType(
+      updatedState,
+      channelId,
+      channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
+    );
   });
 });
 
 describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const state = startingState(states.waitForConsensus({ channelId, ledgerId }), {
-      [channelId]: channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
-      [ledgerId]: channelStates.waitForUpdate({
+    const state = startingState(
+      states.waitForConsensus({ channelId, ledgerId }),
+      channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
+      channelStates.waitForUpdate({
         ...ledgerChannelStateDefaults,
         lastCommitment: {
           commitment: ledgerCommitments.ledgerUpdate1,
@@ -227,7 +246,7 @@ describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
         },
         turnNum: 5,
       }),
-    });
+    );
 
     const action = actions.commitmentReceived(
       channelId,
@@ -240,10 +259,10 @@ describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
     itTransitionToStateType(updatedState, states.WAIT_FOR_CONSENSUS);
     // itSendsNoCommitment(updatedState);
     itSendsNoTransaction(updatedState);
-    it('confirms funding', () => {
-      expect(updatedState.channelState.initializedChannels[channelId].type).toEqual(
-        channelStates.B_WAIT_FOR_POST_FUND_SETUP,
-      );
-    });
+    itTransitionsChannelToStateType(
+      updatedState,
+      channelId,
+      channelStates.B_WAIT_FOR_POST_FUND_SETUP,
+    );
   });
 });
