@@ -20,6 +20,7 @@ import { addHex } from '../../../../utils/hex-utils';
 
 const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
+
 function itTransitionToStateType(state, type) {
   itTransitionsProcedureToStateType('indirectFunding', state, type);
 }
@@ -88,6 +89,9 @@ const defaultWalletState = walletStates.initialized({
   directFundingStore: {},
 });
 
+const validateMock = jest.fn().mockReturnValue(true);
+Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
+
 describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   const { channelId } = defaults;
   const walletState = { ...defaultWalletState };
@@ -120,9 +124,6 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const validateMock = jest.fn().mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-
     const action = actions.commitmentReceived(
       ledgerId,
       WalletProcedure.IndirectFunding,
@@ -190,9 +191,6 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const validateMock = jest.fn().mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-
     const action = actions.commitmentReceived(
       ledgerId,
       WalletProcedure.IndirectFunding,
@@ -223,9 +221,6 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
   });
   walletState.channelState.initializedChannels[ledgerId] = ledgerChannelState;
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
-    const validateMock = jest.fn().mockReturnValue(true);
-    Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
-
     const action = actions.commitmentReceived(
       ledgerId,
       WalletProcedure.IndirectFunding,
