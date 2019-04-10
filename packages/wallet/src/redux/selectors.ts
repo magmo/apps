@@ -1,12 +1,9 @@
-import { OpenedState, OPENING, ChannelStatus } from './channel-state/state';
+import { OpenedState, OPENING, ChannelStatus, ChannelState } from './channel-state/state';
 import * as walletStates from './state';
 import * as indirectFundingStates from './indirect-funding/state';
 import { DirectFundingState } from './direct-funding-store/direct-funding-state/state';
 
-export const getOpenedChannelState = (
-  state: walletStates.Initialized,
-  channelId: string,
-): OpenedState => {
+export const getOpenedChannelState = (state: ChannelState, channelId: string): OpenedState => {
   const channelStatus = getChannelState(state, channelId);
   if (channelStatus.stage === OPENING) {
     throw new Error(`Channel ${channelId} is still in the process of being opened.`);
@@ -14,11 +11,8 @@ export const getOpenedChannelState = (
   return channelStatus;
 };
 
-export const getChannelState = (
-  state: walletStates.Initialized,
-  channelId: string,
-): ChannelStatus => {
-  const channelStatus = state.channelState.initializedChannels[channelId];
+export const getChannelState = (state: ChannelState, channelId: string): ChannelStatus => {
+  const channelStatus = state.initializedChannels[channelId];
   if (!channelStatus) {
     throw new Error(`Could not find any initialized channel state for channel ${channelId}.`);
   }
