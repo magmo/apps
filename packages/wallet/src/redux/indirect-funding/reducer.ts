@@ -3,7 +3,6 @@ import * as indirectFundingState from './state';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { PlayerIndex } from '../types';
-import { playerAReducer } from './player-a/reducer';
 
 export const indirectFundingReducer = (
   state: states.Initialized,
@@ -28,6 +27,19 @@ export const indirectFundingReducer = (
   }
 };
 
+function playerAReducer(
+  state: states.Initialized,
+  action: actions.indirectFunding.Action,
+): states.Initialized {
+  return {
+    ...state,
+    indirectFunding: states.indirectFunding.playerA.waitForDirectFunding({
+      ledgerId: 'ledgerId',
+      channelId: 'channelId',
+      player: PlayerIndex.A,
+    }),
+  };
+}
 function playerBReducer(
   state: states.Initialized,
   action: actions.indirectFunding.Action,

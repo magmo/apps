@@ -41,7 +41,10 @@ describe('when the indirectFunding branch exists', () => {
         ...defaultState,
         indirectFunding: states.indirectFunding.playerA.waitForApproval({ channelId, player }),
       };
-      const action = actions.indirectFunding.playerA.strategyApproved(channelId);
+      const action = actions.indirectFunding.playerA.strategyApproved(
+        channelId,
+        state.consensusLibrary,
+      );
 
       const playerAReducer = jest.fn();
       Object.defineProperty(playerA, 'playerAReducer', { value: playerAReducer });
