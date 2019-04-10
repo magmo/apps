@@ -1,6 +1,6 @@
-import { directFundingStateReducer } from '../direct-funding-state/reducer';
+import { directFundingStateReducer } from '../../direct-funding/reducer';
 
-import * as states from '../direct-funding-state/state';
+import * as states from '../../direct-funding/state';
 import * as actions from '../../actions';
 
 import * as scenarios from '../../__tests__/test-scenarios';

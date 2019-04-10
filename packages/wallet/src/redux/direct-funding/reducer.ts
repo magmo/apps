@@ -1,13 +1,13 @@
 import * as states from './state';
-import * as actions from '../../actions';
+import * as actions from '../actions';
 import * as depositingStates from './depositing/state';
 
-import { unreachable } from '../../../utils/reducer-utils';
+import { unreachable } from '../../utils/reducer-utils';
 import { StateWithSideEffects } from 'src/redux/utils';
 import { depositingReducer } from './depositing/reducer';
 import { bigNumberify } from 'ethers/utils';
-import { createDepositTransaction } from '../../../utils/transaction-generator';
-import { WalletProcedure } from '../../types';
+import { createDepositTransaction } from '../../utils/transaction-generator';
+import { WalletProcedure } from '../types';
 export const directFundingStateReducer = (
   state: states.DirectFundingState,
   action: actions.WalletAction,

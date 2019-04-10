@@ -1,11 +1,11 @@
-import { unreachable } from '../../../../utils/reducer-utils';
-import { createDepositTransaction } from '../../../../utils/transaction-generator';
-import { StateWithSideEffects } from '../../../utils';
+import { unreachable } from '../../../utils/reducer-utils';
+import { createDepositTransaction } from '../../../utils/transaction-generator';
+import { StateWithSideEffects } from '../../utils';
 
-import * as actions from '../../../actions';
+import * as actions from '../../actions';
 import * as states from './state';
-import * as fundingStates from '../../direct-funding-state/state';
-import { WalletProcedure } from '../../../types';
+import * as fundingStates from '../state';
+import { WalletProcedure } from '../../types';
 
 export const depositingReducer = (
   state: states.Depositing,

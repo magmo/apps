@@ -1,6 +1,6 @@
 import { directFundingStoreReducer } from '../reducer';
 
-import * as states from '../direct-funding-state/state';
+import * as states from '../../direct-funding/state';
 import * as actions from '../../actions';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 

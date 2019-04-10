@@ -12,7 +12,7 @@ import { PlayerIndex } from '../../types';
 import { Channel } from 'fmg-core';
 import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel';
 import { isFundingAction } from '../../internal/actions';
-import { CHANNEL_FUNDED } from '../../direct-funding-store/direct-funding-state/state';
+import { CHANNEL_FUNDED } from '../../direct-funding/state';
 import {
   appChannelIsWaitingForFunding,
   updateDirectFundingStatus,
