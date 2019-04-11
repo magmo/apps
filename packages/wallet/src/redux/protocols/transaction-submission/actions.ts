@@ -1,3 +1,6 @@
+import { WalletProtocol } from '../../types';
+import { ProcessAction } from '../actions';
+
 export type TransactionAction =
   | TransactionSentToMetamask
   | TransactionSubmissionFailed
@@ -10,43 +13,48 @@ export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.COMMON.TRANSACTION_SUBMISSI
 export const TRANSACTION_SUBMITTED = 'WALLET.COMMON.TRANSACTION_SUBMITTED';
 export const TRANSACTION_CONFIRMED = 'WALLET.COMMON.TRANSACTION_CONFIRMED';
 export const RETRY_TRANSACTION = 'WALLET.COMMON.RETRY_TRANSACTION';
+export const TRANSACTION_FINALIZED = 'WALLET.COMMON.TRANSACTION_FINALIZED';
 
-export interface TransactionSentToMetamask {
+export interface TransactionSentToMetamask extends ProcessAction {
   type: typeof TRANSACTION_SENT_TO_METAMASK;
+  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
-export interface TransactionSubmissionFailed {
+export interface TransactionSubmissionFailed extends ProcessAction {
   type: typeof TRANSACTION_SUBMISSION_FAILED;
+  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
   error: { message?: string; code };
 }
 
-export interface TransactionSubmitted {
+export interface TransactionSubmitted extends ProcessAction {
   type: typeof TRANSACTION_SUBMITTED;
+  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
   transactionHash: string;
 }
 
-export interface TransactionConfirmed {
+export interface TransactionConfirmed extends ProcessAction {
   type: typeof TRANSACTION_CONFIRMED;
+  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
   contractAddress?: string;
 }
 
-export interface TransactionFinalized {
+export interface TransactionFinalized extends ProcessAction {
   type: typeof TRANSACTION_FINALIZED;
+  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
 
-export const TRANSACTION_FINALIZED = 'WALLET.COMMON.TRANSACTION_FINALIZED';
-
-export interface RetryTransaction {
+export interface RetryTransaction extends ProcessAction {
   type: typeof RETRY_TRANSACTION;
+  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
@@ -60,6 +68,7 @@ export const transactionSentToMetamask = (
   processId: string,
 ): TransactionSentToMetamask => ({
   type: TRANSACTION_SENT_TO_METAMASK,
+  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
 });
@@ -70,6 +79,7 @@ export const transactionSubmissionFailed = (
   error: { message?: string; code },
 ): TransactionSubmissionFailed => ({
   type: TRANSACTION_SUBMISSION_FAILED,
+  protocol: WalletProtocol.TransactionSubmission,
   error,
   channelId,
   processId,
@@ -81,6 +91,7 @@ export const transactionSubmitted = (
   transactionHash: string,
 ): TransactionSubmitted => ({
   type: TRANSACTION_SUBMITTED,
+  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
   transactionHash,
@@ -92,6 +103,8 @@ export const transactionConfirmed = (
   contractAddress?: string,
 ): TransactionConfirmed => ({
   type: TRANSACTION_CONFIRMED,
+  protocol: WalletProtocol.TransactionSubmission,
+
   channelId,
   processId,
   contractAddress,
@@ -101,13 +114,15 @@ export const transactionFinalized = (
   channelId: string,
   processId: string,
 ): TransactionFinalized => ({
+  type: TRANSACTION_FINALIZED,
+  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
-  type: TRANSACTION_FINALIZED,
 });
 
 export const retryTransaction = (channelId: string, processId: string): RetryTransaction => ({
   type: RETRY_TRANSACTION,
+  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
 });
