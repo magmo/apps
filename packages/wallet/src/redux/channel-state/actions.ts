@@ -250,7 +250,7 @@ export const isChannelAction = (action: walletActions.WalletAction): action is C
     ? true
     : walletActions.internal.isChannelAction(action)
     ? true
-    : walletActions.isCommonAction(action)
+    : walletActions.isTransactionAction(action)
     ? true
     : false;
 };
