@@ -25,7 +25,7 @@ export const appChannelIsWaitingForFunding = (
   sharedData: SharedData,
   channelId: string,
 ): boolean => {
-  const appChannel = selectors.getOpenedChannelState(sharedData.channelState, channelId);
+  const appChannel = selectors.getOpenedChannelState(sharedData, channelId);
   return appChannel.type === channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
 };
 
@@ -33,7 +33,7 @@ export const safeToSendLedgerUpdate = (
   sharedData: SharedData,
   ledgerChannelId: string,
 ): boolean => {
-  const ledgerChannel = selectors.getOpenedChannelState(sharedData.channelState, ledgerChannelId);
+  const ledgerChannel = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   return ledgerChannel.type === channelStates.WAIT_FOR_UPDATE && ourTurn(ledgerChannel);
 };
 
@@ -42,11 +42,8 @@ export const ledgerChannelFundsAppChannel = (
   appChannelId: string,
   ledgerChannelId: string,
 ): boolean => {
-  const ledgerChannelState = selectors.getOpenedChannelState(
-    sharedData.channelState,
-    ledgerChannelId,
-  );
-  const appChannelState = selectors.getOpenedChannelState(sharedData.channelState, ledgerChannelId);
+  const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
+  const appChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   const lastCommitment = ledgerChannelState.lastCommitment.commitment;
   const { allocation, destination } = lastCommitment;
   const indexOfTargetChannel = destination.indexOf(appChannelId);
@@ -64,12 +61,9 @@ export const createAndSendPostFundCommitment = (
   ledgerChannelId: string,
 ): SharedData => {
   let newSharedData = { ...sharedData };
-  const ledgerChannelState = selectors.getOpenedChannelState(
-    newSharedData.channelState,
-    ledgerChannelId,
-  );
+  const ledgerChannelState = selectors.getOpenedChannelState(newSharedData, ledgerChannelId);
   const appChannelState = selectors.getOpenedChannelState(
-    newSharedData.channelState,
+    newSharedData,
     ledgerChannelState.channelId,
   );
   const { commitment, signature } = composePostFundCommitment(
@@ -96,15 +90,12 @@ export const createAndSendUpdateCommitment = (
   appChannelId: string,
   ledgerChannelId: string,
 ): SharedData => {
-  const appChannelState = selectors.getOpenedChannelState(sharedData.channelState, appChannelId);
+  const appChannelState = selectors.getOpenedChannelState(sharedData, appChannelId);
   const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
   const proposedDestination = [appChannelState.channelId];
 
   // Compose the update commitment
-  const ledgerChannelState = selectors.getOpenedChannelState(
-    sharedData.channelState,
-    ledgerChannelId,
-  );
+  const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   const { commitment: lastLedgerCommitment } = ledgerChannelState.lastCommitment;
   const { commitment, signature } = composeLedgerUpdateCommitment(
     lastLedgerCommitment.channel,
@@ -175,10 +166,7 @@ export const requestDirectFunding = (
   sharedData: SharedData,
   ledgerChannelId: string,
 ): DirectFundingState => {
-  const ledgerChannelState = selectors.getOpenedChannelState(
-    sharedData.channelState,
-    ledgerChannelId,
-  );
+  const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   const { ourIndex } = ledgerChannelState;
   const { allocation } = ledgerChannelState.lastCommitment.commitment;
   const safeToDeposit = allocation.slice(0, ourIndex).reduce(addHex, '0x0');

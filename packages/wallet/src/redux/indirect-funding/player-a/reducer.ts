@@ -161,10 +161,7 @@ const waitForApprovalReducer = (
 ): ProtocolStateWithSharedData<states.PlayerAState> => {
   switch (action.type) {
     case actions.indirectFunding.playerA.STRATEGY_APPROVED:
-      const appChannelState = selectors.getOpenedChannelState(
-        sharedData.channelState,
-        action.channelId,
-      );
+      const appChannelState = selectors.getOpenedChannelState(sharedData, action.channelId);
 
       const { ledgerChannelState, preFundSetupMessage } = createLedgerChannel(
         action.consensusLibrary,
@@ -194,13 +191,10 @@ const createAndSendFinalUpdateCommitment = (
   appChannelId: string,
   ledgerChannelId: string,
 ): SharedData => {
-  const appChannelState = selectors.getOpenedChannelState(sharedData.channelState, appChannelId);
+  const appChannelState = selectors.getOpenedChannelState(sharedData, appChannelId);
   const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
   const proposedDestination = [appChannelState.channelId];
-  const ledgerChannelState = selectors.getOpenedChannelState(
-    sharedData.channelState,
-    ledgerChannelId,
-  );
+  const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   const { channel } = ledgerChannelState.lastCommitment.commitment;
   const { commitment, signature } = composeLedgerUpdateCommitment(
     channel,
@@ -233,14 +227,11 @@ const createAndSendFirstUpdateCommitment = (
   appChannelId: string,
   ledgerChannelId: string,
 ): SharedData => {
-  const appChannelState = selectors.getOpenedChannelState(sharedData.channelState, appChannelId);
+  const appChannelState = selectors.getOpenedChannelState(sharedData, appChannelId);
   const proposedAllocation = [appChannelState.lastCommitment.commitment.allocation.reduce(addHex)];
   const proposedDestination = [appChannelState.channelId];
   // Compose the update commitment
-  const ledgerChannelState = selectors.getOpenedChannelState(
-    sharedData.channelState,
-    ledgerChannelId,
-  );
+  const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   const { channel, allocation, destination } = ledgerChannelState.lastCommitment.commitment;
   const { commitment, signature } = composeLedgerUpdateCommitment(
     channel,
