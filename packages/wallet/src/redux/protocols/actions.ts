@@ -11,9 +11,8 @@ export function isProtocolAction(action: WalletAction) {
 
 export interface ProcessAction {
   processId: string;
-  protocol: WalletProtocol;
 }
 
 export function isProcessAction(action: WalletAction) {
-  return 'processId' in action && 'protocol' in action;
+  return 'processId' in action;
 }
