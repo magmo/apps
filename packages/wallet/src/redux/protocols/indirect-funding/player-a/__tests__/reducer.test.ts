@@ -12,6 +12,7 @@ import * as testScenarios from '../../../../__tests__/test-scenarios';
 import { addHex } from '../../../../../utils/hex-utils';
 import { ProtocolStateWithSharedData } from '../../../../protocols';
 import { EMPTY_OUTBOX_STATE } from '../../../../outbox/state';
+import * as directFundingStates from '../../../direct-funding/state';
 
 const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
@@ -147,12 +148,21 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
     ...ledgerChannelDefaults,
     channelId: ledgerId,
   });
+  const total = testScenarios.twoThree.reduce(addHex);
+  const directFundingState = directFundingStates.waitForFundingConfirmed({
+    safeToDepositLevel: '0x0',
+    requestedTotalFunds: total,
+    requestedYourContribution: testScenarios.twoThree[0],
+    channelId: ledgerId,
+    channelFundingStatus: directFundingStates.SAFE_TO_DEPOSIT,
+    ourIndex: PlayerIndex.A,
+  });
   const state = startingState(
-    states.waitForDirectFunding({ channelId, ledgerId }),
+    states.waitForDirectFunding({ channelId, ledgerId, directFundingState }),
     ledgerChannelState,
   );
   // Add the ledger channel to state
-  const total = testScenarios.twoThree.reduce(addHex);
+
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     const action = actions.fundingReceivedEvent('processId', defaults.ledgerId, total, total);
     const updatedState = playerAReducer(state.protocolState, state.sharedData, action);

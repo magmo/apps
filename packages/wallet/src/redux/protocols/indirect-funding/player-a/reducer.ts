@@ -22,15 +22,18 @@ import {
   receiveLedgerCommitment,
   queueMessage,
   initializeChannelState,
+  updateDirectFundingStatus,
+  requestDirectFunding,
 } from '../reducer-helpers';
 import {
   composePreFundCommitment,
   composeLedgerUpdateCommitment,
 } from '../../../../utils/commitment-utils';
 import { WalletEvent } from 'magmo-wallet-client';
-import { isfundingAction } from '../../direct-funding/actions';
+import { isfundingAction, FundingAction } from '../../direct-funding/actions';
 import { addHex } from '../../../../utils/hex-utils';
 import { ProtocolStateWithSharedData, SharedData } from '../../';
+import { CHANNEL_FUNDED } from '../../direct-funding/state';
 
 export function playerAReducer(
   protocolState: states.PlayerAState,
@@ -117,15 +120,22 @@ const waitForDirectFunding = (
   if (!isfundingAction(action)) {
     return { sharedData, protocolState };
   } else {
-    // TODO: We need to add the direct funding to the state.
-    // let newDirectFundingState = updateDirectFundingStatus(protocolState.directFunding, action);
+    const updatedStateAndSharedData = updateStateWithDirectFundingAction(
+      action,
+      protocolState,
+      sharedData,
+    );
+
+    let newSharedData = updatedStateAndSharedData.sharedData;
+    let newProtocolState: states.PlayerAState = updatedStateAndSharedData.protocolState;
+
     if (directFundingIsComplete(protocolState)) {
-      let newSharedData = confirmFundingForChannel(sharedData, protocolState.ledgerId);
+      newSharedData = confirmFundingForChannel(sharedData, protocolState.ledgerId);
       newSharedData = createAndSendPostFundCommitment(newSharedData, protocolState.ledgerId);
-      const newProtocolState = states.waitForPostFundSetup1(protocolState);
+      newProtocolState = states.waitForPostFundSetup1(updatedStateAndSharedData.protocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
     } else {
-      return { sharedData, protocolState };
+      return { sharedData, protocolState: newProtocolState };
     }
   }
 };
@@ -142,11 +152,9 @@ const waitForPreFundSetup1Reducer = (
         action.commitment,
         action.signature,
       );
+
       if (appChannelIsWaitingForFunding(newSharedData, protocolState.channelId)) {
-        // TODO: Request direct funding
-        // newSharedData = requestDirectFunding(protocolState.directFundingState,newSharedData, protocolState.ledgerId)
-        const newProtocolState = states.waitForDirectFunding(protocolState);
-        return { protocolState: newProtocolState, sharedData: newSharedData };
+        return startDirectFunding(protocolState, sharedData);
       }
       return { protocolState, sharedData: newSharedData };
     default:
@@ -181,10 +189,41 @@ const waitForApprovalReducer = (
   }
 };
 
+const updateStateWithDirectFundingAction = (
+  action: FundingAction,
+  protocolState: states.WaitForDirectFunding,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.WaitForDirectFunding> => {
+  const directFundingResult = updateDirectFundingStatus(
+    protocolState.directFundingState,
+    sharedData,
+    action,
+  );
+  const newSharedData = directFundingResult.sharedData;
+  const newProtocolState: states.PlayerAState = states.waitForDirectFunding({
+    ...protocolState,
+    directFundingState: directFundingResult.protocolState,
+  });
+  return { protocolState: newProtocolState, sharedData: newSharedData };
+};
+
+const startDirectFunding = (
+  protocolState: states.WaitForPreFundSetup1,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.WaitForDirectFunding> => {
+  const {
+    protocolState: directFundingProtocolState,
+    sharedData: updatedSharedData,
+  } = requestDirectFunding(sharedData, protocolState.ledgerId);
+  const newProtocolState = states.waitForDirectFunding({
+    ...protocolState,
+    directFundingState: directFundingProtocolState,
+  });
+  return { protocolState: newProtocolState, sharedData: updatedSharedData };
+};
+
 const directFundingIsComplete = (protocolState: states.WaitForDirectFunding): boolean => {
-  return true;
-  // TODO: Handle this when direct funding is defined on the state.
-  // return protocolState.directFundingStatus === CHANNEL_FUNDED;
+  return protocolState.directFundingState.channelFundingStatus === CHANNEL_FUNDED;
 };
 const createAndSendFinalUpdateCommitment = (
   sharedData: SharedData,

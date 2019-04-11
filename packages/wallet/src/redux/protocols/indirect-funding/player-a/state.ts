@@ -1,5 +1,6 @@
 import { Properties } from '../../../utils';
 import { PlayerIndex } from '../../../types';
+import { DirectFundingState } from '../../direct-funding/state';
 
 export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL';
 export const WAIT_FOR_PRE_FUND_SETUP_1 = 'WAIT_FOR_PRE_FUND_SETUP_1';
@@ -16,6 +17,10 @@ interface LedgerChannelExists extends BasePlayerAState {
   ledgerId: string;
 }
 
+interface DirectFundingExists extends LedgerChannelExists {
+  directFundingState: DirectFundingState;
+}
+
 export interface WaitForApproval extends BasePlayerAState {
   type: typeof WAIT_FOR_APPROVAL;
 }
@@ -24,7 +29,7 @@ export interface WaitForPreFundSetup1 extends LedgerChannelExists {
   type: typeof WAIT_FOR_PRE_FUND_SETUP_1;
 }
 
-export interface WaitForDirectFunding extends LedgerChannelExists {
+export interface WaitForDirectFunding extends DirectFundingExists {
   type: typeof WAIT_FOR_DIRECT_FUNDING;
 }
 export interface WaitForPostFundSetup1 extends LedgerChannelExists {
@@ -57,12 +62,13 @@ export function waitForPreFundSetup1(
 export function waitForDirectFunding(
   params: Properties<WaitForDirectFunding>,
 ): WaitForDirectFunding {
-  const { channelId, ledgerId } = params;
+  const { channelId, ledgerId, directFundingState } = params;
   return {
     type: WAIT_FOR_DIRECT_FUNDING,
     player: PlayerIndex.A,
     channelId,
     ledgerId,
+    directFundingState,
   };
 }
 

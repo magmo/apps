@@ -16,10 +16,14 @@ import { messageRelayRequested, WalletEvent } from 'magmo-wallet-client';
 import { addHex } from '../../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
 import { ourTurn } from '../../../utils/reducer-utils';
-import { SharedData } from '../../protocols';
+import { SharedData, ProtocolStateWithSharedData } from '../../protocols';
 import { queueMessage as queueMessageOutbox } from '../../outbox/state';
-import { DirectFundingState } from '../../protocols/direct-funding/state';
+import {
+  DirectFundingState,
+  initialDirectFundingState,
+} from '../../protocols/direct-funding/state';
 import { FundingAction } from '../../protocols/direct-funding/actions';
+import { directFundingStateReducer } from '../direct-funding/reducer';
 
 export const appChannelIsWaitingForFunding = (
   sharedData: SharedData,
@@ -162,27 +166,23 @@ export const receiveLedgerCommitment = (
 // STATE UPDATERS
 // Global state updaters
 export const requestDirectFunding = (
-  directFundingState: DirectFundingState,
   sharedData: SharedData,
   ledgerChannelId: string,
-): DirectFundingState => {
+): ProtocolStateWithSharedData<DirectFundingState> => {
   const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
   const { ourIndex } = ledgerChannelState;
   const { allocation } = ledgerChannelState.lastCommitment.commitment;
   const safeToDeposit = allocation.slice(0, ourIndex).reduce(addHex, '0x0');
   const totalFundingRequested = allocation.reduce(addHex);
   const depositAmount = allocation[ourIndex];
-
-  return updateDirectFundingStatus(
-    directFundingState,
-    actions.internal.directFundingRequested(
-      ledgerChannelId,
-      safeToDeposit,
-      totalFundingRequested,
-      depositAmount,
-      ourIndex,
-    ),
+  const action = actions.internal.directFundingRequested(
+    ledgerChannelId,
+    safeToDeposit,
+    totalFundingRequested,
+    depositAmount,
+    ourIndex,
   );
+  return initialDirectFundingState(action, sharedData);
 };
 export const updateChannelState = (
   sharedData: SharedData,
@@ -201,10 +201,11 @@ export const updateChannelState = (
 
 export const updateDirectFundingStatus = (
   directFundingState: DirectFundingState,
+  sharedData: SharedData,
   action: FundingAction,
-): DirectFundingState => {
+): ProtocolStateWithSharedData<DirectFundingState> => {
   // TODO: Update the direct funding state
-  return directFundingState;
+  return directFundingStateReducer(directFundingState, sharedData, action);
 };
 
 function theirAddress(appChannelState: channelStates.OpenedState) {

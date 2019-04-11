@@ -53,6 +53,7 @@ const {
   channelId,
   ledgerId,
   ledgerChannel,
+  ledgerInitialDirectFundingStates,
 } = scenarios;
 
 const { preFundCommitment0, postFundCommitment0 } = ledgerCommitments;
@@ -149,7 +150,11 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   describe.skip(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     // Need to hook up the direct funding store first, which isn't yet in this branch
     const state = startingState(
-      states.waitForDirectFunding({ channelId, ledgerId }),
+      states.waitForDirectFunding({
+        channelId,
+        ledgerId,
+        directFundingState: ledgerInitialDirectFundingStates.playerB,
+      }),
       channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
     );
 
