@@ -1,7 +1,7 @@
 import { OpenedState, OPENING, ChannelStatus } from './channel-state/state';
 import * as walletStates from './state';
 import * as indirectFundingStates from './indirect-funding/state';
-import { DirectFundingState } from './direct-funding-store/direct-funding-state/state';
+import { DirectFundingState } from './protocols/direct-funding/state';
 import { SharedData } from './protocols';
 
 export const getOpenedChannelState = (state: SharedData, channelId: string): OpenedState => {

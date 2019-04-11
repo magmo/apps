@@ -2,8 +2,12 @@ import { ChannelStatus } from '../channel-state/state';
 import { StateWithSideEffects } from '../utils';
 import { Commitment } from 'fmg-core';
 import { TransactionOutboxItem, OutboxState } from '../outbox/state';
+import { SharedData } from '../protocols';
 
-type SideEffectState = StateWithSideEffects<any> | { outboxState: OutboxState };
+type SideEffectState =
+  | StateWithSideEffects<any>
+  | { outboxState: OutboxState }
+  | { sharedData: SharedData };
 export const itSendsAMessage = (state: SideEffectState) => {
   it(`sends a message`, () => {
     expectSideEffect('messageOutbox', state, item => expect(item).toEqual(expect.anything()));
@@ -53,6 +57,8 @@ const expectSideEffect = (
     outbox = state.sideEffects[outboxBranch];
   } else if ('outboxState' in state) {
     outbox = state.outboxState[outboxBranch];
+  } else if ('sharedData' in state) {
+    outbox = state.sharedData.outboxState[outboxBranch];
   }
   const item = Array.isArray(outbox) ? outbox[idx] : outbox;
   expectation(item);
@@ -126,16 +132,15 @@ export const itIncreasesTurnNumBy = (
   });
 };
 
-export function itChangesDepositStatusTo(status: string, state) {
+export function itChangesDepositStatusTo(status: string, state: { protocolState: any }) {
   it(`changes depositStatus to ${status} `, () => {
-    expect(state.state.depositStatus).toEqual(status);
+    expect(state.protocolState.depositStatus).toEqual(status);
   });
 }
-export function itChangesChannelFundingStatusTo<T extends { state: { channelFundingStatus: any } }>(
-  status: string,
-  state: T,
-) {
+export function itChangesChannelFundingStatusTo<
+  T extends { protocolState: { channelFundingStatus: any } }
+>(status: string, state: T) {
   it(`changes channelFundingStatus to ${status}`, () => {
-    expect(state.state.channelFundingStatus).toEqual(status);
+    expect(state.protocolState.channelFundingStatus).toEqual(status);
   });
 }

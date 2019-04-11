@@ -28,7 +28,7 @@ import {
   composeLedgerUpdateCommitment,
 } from '../../../utils/commitment-utils';
 import { WalletEvent } from 'magmo-wallet-client';
-import { isfundingAction } from '../../direct-funding-store/direct-funding-state/actions';
+import { isfundingAction } from '../../protocols/direct-funding/actions';
 import { addHex } from '../../../utils/hex-utils';
 import { ProtocolStateWithSharedData, SharedData } from '../../protocols';
 

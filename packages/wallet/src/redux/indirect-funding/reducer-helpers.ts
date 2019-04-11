@@ -18,8 +18,8 @@ import { bigNumberify } from 'ethers/utils';
 import { ourTurn } from '../../utils/reducer-utils';
 import { SharedData } from '../protocols';
 import { queueMessage as queueMessageOutbox } from '../outbox/state';
-import { DirectFundingState } from '../direct-funding-store/direct-funding-state/state';
-import { FundingAction } from '../direct-funding-store/direct-funding-state/actions';
+import { DirectFundingState } from '../protocols/direct-funding/state';
+import { FundingAction } from '../protocols/direct-funding/actions';
 
 export const appChannelIsWaitingForFunding = (
   sharedData: SharedData,
