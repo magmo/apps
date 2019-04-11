@@ -158,7 +158,7 @@ const waitForPreFundSetup1Reducer = (
       );
       if (appChannelIsWaitingForFunding(newSharedData, protocolState.channelId)) {
         // TODO: Request direct funding
-        //newSharedData = requestDirectFunding(protocolState.directFundingState,newSharedData, protocolState.ledgerId)
+        // newSharedData = requestDirectFunding(protocolState.directFundingState,newSharedData, protocolState.ledgerId)
         const newProtocolState = states.waitForDirectFunding(protocolState);
         return { protocolState: newProtocolState, sharedData: newSharedData };
       }
