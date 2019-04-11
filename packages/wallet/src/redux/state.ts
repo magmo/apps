@@ -1,14 +1,19 @@
-import { OutboxState, EMPTY_OUTBOX_STATE, SideEffects } from './outbox/state';
+import {
+  OutboxState,
+  EMPTY_OUTBOX_STATE,
+  SideEffects,
+  queueMessage as queueMessageOutbox,
+} from './outbox/state';
 import {
   ChannelState,
   ChannelStatus,
   setChannel as setChannelInStore,
-  WaitForChannel,
 } from './channel-state/state';
 import { Properties } from './utils';
 import * as indirectFunding from './indirect-funding/state';
 import { DirectFundingStore } from './direct-funding-store/state';
 import { accumulateSideEffects } from './outbox';
+import { WalletEvent } from 'magmo-wallet-client';
 
 export type WalletState = WaitForLogin | WaitForAdjudicator | MetaMaskError | Initialized;
 
@@ -49,9 +54,26 @@ export interface Initialized extends Shared {
   networkId: number;
   adjudicator: string;
   consensusLibrary: string;
-
+  processStore: ProcessStore;
   // procedure branches are optional, and exist precisely when that procedure is running
   indirectFunding?: indirectFunding.IndirectFundingState;
+}
+
+// TODO: Once these are fleshed out they should be moved to their own file.
+export interface ProcessStore {
+  [processId: string]: ProcessState;
+}
+export interface ProcessState {
+  processId: string;
+  protocolState: any;
+  channelsToMonitor: string[];
+}
+
+export interface IndirectFundingOngoing extends Initialized {
+  indirectFunding: indirectFunding.IndirectFundingState;
+}
+export function indirectFundingOngoing(state: Initialized): state is IndirectFundingOngoing {
+  return state.indirectFunding ? true : false;
 }
 
 // ------------
@@ -82,7 +104,7 @@ export function waitForAdjudicator(params: Properties<WaitForAdjudicator>): Wait
 }
 
 export function initialized(params: Properties<Initialized>): Initialized {
-  const { uid, networkId, adjudicator, consensusLibrary } = params;
+  const { uid, networkId, adjudicator, consensusLibrary, processStore } = params;
   return {
     ...shared(params),
     type: WALLET_INITIALIZED,
@@ -90,6 +112,7 @@ export function initialized(params: Properties<Initialized>): Initialized {
     networkId,
     adjudicator,
     consensusLibrary,
+    processStore,
   };
 }
 
@@ -105,13 +128,12 @@ export function setSideEffects(state: Initialized, sideEffects: SideEffects): In
   return { ...state, outboxState: accumulateSideEffects(state.outboxState, sideEffects) };
 }
 
-// WaitForChannel is the only ChannelStatus without a channelId.
-// We don't need it anymore, as it's covered by InitializingChannelStatus.
-// This is a temporary fix to the signature while we work to remove it.
-type ChannelStatusV2 = Exclude<ChannelStatus, WaitForChannel>;
-
-export function setChannel(state: Initialized, channel: ChannelStatusV2): Initialized {
+export function setChannel(state: Initialized, channel: ChannelStatus): Initialized {
   return { ...state, channelState: setChannelInStore(state.channelState, channel) };
+}
+
+export function queueMessage(state: Initialized, message: WalletEvent): Initialized {
+  return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
 }
 
 export { indirectFunding };

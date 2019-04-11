@@ -39,9 +39,28 @@ export const getDirectFundingState = (
   state: walletStates.Initialized,
   channelId: string,
 ): DirectFundingState => {
-  const fundingStatus = state.directFundingStore.directFunding[channelId];
+  const fundingStatus = state.directFundingStore[channelId];
   if (!fundingStatus) {
     throw new Error(`No funding status for channel ${channelId}`);
   }
   return fundingStatus;
+};
+
+export const getAdjudicatorWatcherProcessesForChannel = (
+  state: walletStates.Initialized,
+  channelId: string,
+): string[] => {
+  const processIds: string[] = [];
+
+  if (!state.processStore) {
+    return processIds;
+  }
+  for (const processId of Object.keys(state.processStore)) {
+    const { channelsToMonitor } = state.processStore[processId];
+
+    if (channelsToMonitor.indexOf(channelId) > -1) {
+      processIds.push(processId);
+    }
+  }
+  return processIds;
 };
