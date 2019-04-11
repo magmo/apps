@@ -8,14 +8,20 @@ It covers:
 - Retrying in the case of a transaction failure
 - Communicating progress to other participants (if required)
 
+Out of scope (for the time being):
+
+- Waiting for finalization (for the transaction to be n blocks deep)
+- Handling chain reorgs
+- Resubmitting transaction with higher gas if taking too long
+
 ## State machine
 
 The protocol is implemented with the following state machine
 
 ```mermaid
 graph LR
-  S((start)) --> |Send to Metamask| WFS(WatForSubmission)
-  WFS --> |Submitted| WFC(WaitForConfirmation)
+  S((start)) --> |TRANSACTION_SENT| WFS(WatForSubmission)
+  WFS --> |TRANSACTION_SUBMITTED| WFC(WaitForConfirmation)
   WFS --> |Submission failed| AR(ApproveRetry)
   AR --> |Retry approved| WFS
   AR --> |Retry denied| F((fail))
