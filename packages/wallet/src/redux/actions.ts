@@ -154,10 +154,6 @@ export function isTransactionAction(action: WalletAction): action is Transaction
   return action.type.indexOf('TRANSACTION') > -1;
 }
 
-export function isCommonAction(action: WalletAction): action is CommonAction {
-  return action.type.match('WALLET.COMMON') ? true : false;
-}
-
 export function isprotocolAction(action: WalletAction): action is protocolAction {
   return 'protocol' in action;
 }
