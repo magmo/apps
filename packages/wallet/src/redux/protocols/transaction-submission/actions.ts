@@ -1,5 +1,3 @@
-import { Properties as Prop } from '../../utils';
-
 export type TransactionAction =
   | TransactionSentToMetamask
   | TransactionSubmissionFailed
@@ -50,38 +48,49 @@ export interface RetryTransaction {
 // --------
 
 export const transactionSentToMetamask = (
-  p: Prop<TransactionSentToMetamask>,
+  channelId: string,
+  processId: string,
 ): TransactionSentToMetamask => ({
   type: TRANSACTION_SENT_TO_METAMASK,
-  channelId: p.channelId,
-  processId: p.processId,
+  channelId,
+  processId,
 });
 
 export const transactionSubmissionFailed = (
-  p: Prop<TransactionSubmissionFailed>,
+  channelId: string,
+  processId: string,
+  error: { message?: string; code },
 ): TransactionSubmissionFailed => ({
   type: TRANSACTION_SUBMISSION_FAILED,
-  error: p.error,
-  channelId: p.channelId,
-  processId: p.processId,
+  error,
+  channelId,
+  processId,
 });
 
-export const transactionSubmitted = (p: Prop<TransactionSubmitted>): TransactionSubmitted => ({
+export const transactionSubmitted = (
+  channelId: string,
+  processId: string,
+  transactionHash: string,
+): TransactionSubmitted => ({
   type: TRANSACTION_SUBMITTED,
-  channelId: p.channelId,
-  processId: p.processId,
-  transactionHash: p.transactionHash,
+  channelId,
+  processId,
+  transactionHash,
 });
 
-export const transactionConfirmed = (p: Prop<TransactionConfirmed>): TransactionConfirmed => ({
+export const transactionConfirmed = (
+  channelId: string,
+  processId: string,
+  contractAddress: string,
+): TransactionConfirmed => ({
   type: TRANSACTION_CONFIRMED,
-  channelId: p.channelId,
-  processId: p.processId,
-  contractAddress: p.contractAddress,
+  channelId,
+  processId,
+  contractAddress,
 });
 
-export const retryTransaction = (p: Prop<RetryTransaction>): RetryTransaction => ({
+export const retryTransaction = (channelId: string, processId: string): RetryTransaction => ({
   type: RETRY_TRANSACTION,
-  channelId: p.channelId,
-  processId: p.processId,
+  channelId,
+  processId,
 });
