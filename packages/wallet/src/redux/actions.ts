@@ -153,10 +153,6 @@ export function isTransactionAction(action: WalletAction): action is Transaction
   return 'protocol' in action && action.protocol === WalletProtocol.TransactionSubmission;
 }
 
-export function isprotocolAction(action: WalletAction): action is protocolAction {
-  return 'protocol' in action;
-}
-
 export { internal, channel, funding, indirectFunding };
 
 export type WalletAction =
