@@ -18,8 +18,8 @@ import { messageRelayRequested } from 'magmo-wallet-client';
 import { addHex } from '../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
 import { ourTurn } from '../../utils/reducer-utils';
-import { directFundingStateReducer } from '../direct-funding/reducer';
-import { FundingAction } from '../direct-funding/actions';
+import { directFundingStateReducer } from '../protocols/direct-funding/reducer';
+import { FundingAction } from '../protocols/direct-funding/actions';
 import { EMPTY_SHARED_DATA } from '../protocols';
 
 export const appChannelIsWaitingForFunding = (

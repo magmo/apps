@@ -1,7 +1,7 @@
 import { OutboxState, EMPTY_OUTBOX_STATE } from '../outbox/state';
 import { ChannelState, EMPTY_CHANNEL_STATE } from '../channel-state/state';
 import { IndirectFundingState } from '../indirect-funding/state';
-import { DirectFundingState } from '../direct-funding/state';
+import { DirectFundingState } from './direct-funding/state';
 
 export interface SharedData {
   channelState: ChannelState;

@@ -2,18 +2,18 @@ import { depositingReducer } from '../reducer';
 
 import * as states from '../state';
 import * as directFundingStates from '../../state';
-import * as actions from '../../../actions';
+import * as actions from '../../../../actions';
 
-import * as scenarios from '../../../__tests__/test-scenarios';
+import * as scenarios from '../../../../__tests__/test-scenarios';
 import {
   itSendsThisTransaction,
   itChangesDepositStatusTo,
   itChangesChannelFundingStatusTo,
-} from '../../../__tests__/helpers';
-import * as TransactionGenerator from '../../../../utils/transaction-generator';
+} from '../../../../__tests__/helpers';
+import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
-import { WalletProcedure } from '../../../types';
-import { SharedData, EMPTY_SHARED_DATA, ProtocolStateWithSharedData } from '../../../protocols';
+import { WalletProcedure } from '../../../../types';
+import { SharedData, EMPTY_SHARED_DATA, ProtocolStateWithSharedData } from '../../../../protocols';
 
 const { channelId, mockTransactionOutboxItem } = scenarios;
 

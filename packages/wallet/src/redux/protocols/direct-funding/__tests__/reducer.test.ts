@@ -1,12 +1,15 @@
 import { directFundingStateReducer } from '../reducer';
 
 import * as states from '../state';
-import * as actions from '../../actions';
+import * as actions from '../../../actions';
 
-import * as scenarios from '../../__tests__/test-scenarios';
-import { itChangesChannelFundingStatusTo, itChangesDepositStatusTo } from '../../__tests__/helpers';
-import { addHex } from '../../../utils/hex-utils';
-import { ProtocolStateWithSharedData, EMPTY_SHARED_DATA, SharedData } from '../../protocols';
+import * as scenarios from '../../../__tests__/test-scenarios';
+import {
+  itChangesChannelFundingStatusTo,
+  itChangesDepositStatusTo,
+} from '../../../__tests__/helpers';
+import { addHex } from '../../../../utils/hex-utils';
+import { ProtocolStateWithSharedData, EMPTY_SHARED_DATA, SharedData } from '../../../protocols';
 
 const { channelId, twoThree } = scenarios;
 

@@ -1,5 +1,5 @@
 import * as directFundingStore from './state';
-import * as states from '../direct-funding/state';
+import * as states from '../protocols/direct-funding/state';
 import * as actions from '../actions';
 
 import { StateWithSideEffects } from 'src/redux/utils';

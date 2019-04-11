@@ -1,14 +1,14 @@
-import { unreachable } from '../../../utils/reducer-utils';
-import { createDepositTransaction } from '../../../utils/transaction-generator';
-import { StateWithSideEffects } from '../../utils';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { createDepositTransaction } from '../../../../utils/transaction-generator';
+import { StateWithSideEffects } from '../../../utils';
 
-import * as actions from '../../actions';
+import * as actions from '../../../actions';
 import * as states from './state';
 import * as fundingStates from '../state';
-import { WalletProcedure } from '../../types';
-import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
-import { SideEffects } from '../../outbox/state';
-import { accumulateSideEffects } from '../../outbox';
+import { WalletProcedure } from '../../../types';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '../../../protocols';
+import { SideEffects } from '../../../outbox/state';
+import { accumulateSideEffects } from '../../../outbox';
 
 export const depositingReducer: ProtocolReducer<fundingStates.DirectFundingState> = (
   state: ProtocolStateWithSharedData<states.Depositing>,
