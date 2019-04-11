@@ -1,5 +1,13 @@
 import { TransactionRequest } from 'ethers/providers';
 
+export type TransactionSubmission =
+  | Start
+  | WaitForSubmission
+  | WaitForConfirmation
+  | ApproveRetry
+  | Success
+  | Fail;
+
 export interface Start {
   type: 'Start';
   transactionRequest: TransactionRequest;
@@ -28,4 +36,12 @@ export interface Fail {
 
 export interface Success {
   type: 'Success';
+}
+
+// -------
+// Helpers
+// -------
+
+export function isTerminal(state: TransactionSubmission): state is Fail | Success {
+  return state.type === 'Fail' || state.type === 'Success';
 }
