@@ -6,6 +6,7 @@ interface Props {
   state: states.Initialized;
 }
 
+// TODO: This component is unused
 class ChannelRegistryLayout extends PureComponent<Props> {
   render() {
     const channels = this.props.state.channelState.initializedChannels;
