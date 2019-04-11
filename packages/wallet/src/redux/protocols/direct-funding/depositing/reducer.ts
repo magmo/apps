@@ -8,7 +8,8 @@ import { WalletProcedure } from '../../../types';
 import { ProtocolReducer, ProtocolStateWithSharedData, SharedData } from '../../../protocols';
 import { accumulateSideEffects } from '../../../outbox';
 
-export const depositingReducer: ProtocolReducer<fundingStates.DirectFundingState> = (
+type DFReducer = ProtocolReducer<fundingStates.DirectFundingState>;
+export const depositingReducer: DFReducer = (
   state: states.Depositing,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -26,7 +27,7 @@ export const depositingReducer: ProtocolReducer<fundingStates.DirectFundingState
   return unreachable(state);
 };
 
-const waitForTransactionSentReducer = (
+const waitForTransactionSentReducer: DFReducer = (
   state: states.WaitForTransactionSent,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -44,7 +45,7 @@ const waitForTransactionSentReducer = (
   }
 };
 
-const waitForDepositApprovalReducer = (
+const waitForDepositApprovalReducer: DFReducer = (
   state: states.WaitForDepositApproval,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -65,7 +66,7 @@ const waitForDepositApprovalReducer = (
   }
 };
 
-const waitForDepositConfirmationReducer = (
+const waitForDepositConfirmationReducer: DFReducer = (
   state: states.WaitForDepositConfirmation,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -78,7 +79,7 @@ const waitForDepositConfirmationReducer = (
   }
 };
 
-const depositTransactionFailedReducer = (
+const depositTransactionFailedReducer: DFReducer = (
   state: states.DepositTransactionFailed,
   sharedData: SharedData,
   action: actions.WalletAction,

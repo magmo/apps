@@ -10,7 +10,9 @@ import { WalletProcedure } from '../../types';
 import { ProtocolReducer, ProtocolStateWithSharedData, SharedData } from '../../protocols';
 import { accumulateSideEffects } from '../../outbox';
 
-export const directFundingStateReducer: ProtocolReducer<states.DirectFundingState> = (
+type DFReducer = ProtocolReducer<states.DirectFundingState>;
+
+export const directFundingStateReducer: DFReducer = (
   state: states.DirectFundingState,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -42,7 +44,7 @@ export const directFundingStateReducer: ProtocolReducer<states.DirectFundingStat
   return unreachable(state);
 };
 
-const notSafeToDepositReducer = (
+const notSafeToDepositReducer: DFReducer = (
   state: states.NotSafeToDeposit,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -78,7 +80,7 @@ const notSafeToDepositReducer = (
       return { protocolState: state, sharedData };
   }
 };
-const waitForFundingConfirmationReducer = (
+const waitForFundingConfirmationReducer: DFReducer = (
   state: states.WaitForFundingConfirmation,
   sharedData: SharedData,
   action: actions.WalletAction,
@@ -102,7 +104,7 @@ const waitForFundingConfirmationReducer = (
       return { protocolState: state, sharedData };
   }
 };
-const channelFundedReducer = (
+const channelFundedReducer: DFReducer = (
   state: states.ChannelFunded,
   sharedData: SharedData,
   action: actions.WalletAction,
