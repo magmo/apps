@@ -4,7 +4,10 @@ import * as funding from './direct-funding-store/direct-funding-state/actions';
 import * as indirectFunding from './indirect-funding/actions';
 import { WalletProcedure } from './types';
 import { Commitment } from 'fmg-core';
-import { TransactionAction } from './protocols/transaction-submission/actions';
+import { TransactionAction as TA } from './protocols/transaction-submission/actions';
+export * from './protocols/transaction-submission/actions';
+
+export type TransactionAction = TA;
 
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
