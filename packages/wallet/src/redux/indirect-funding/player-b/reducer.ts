@@ -14,63 +14,52 @@ import {
   confirmFundingForChannel,
   receiveLedgerCommitment,
 } from '../reducer-helpers';
-import { ProtocolStateWithSharedData } from '../../protocols';
+import { ProtocolStateWithSharedData, SharedData } from '../../protocols';
 
 export function playerBReducer(
-  state: ProtocolStateWithSharedData<states.PlayerBState>,
+  protocolState: states.PlayerBState,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<states.PlayerBState> {
-  switch (state.protocolState.type) {
+  switch (protocolState.type) {
     case states.WAIT_FOR_APPROVAL:
-      return waitForApproval(state as ProtocolStateWithSharedData<states.WaitForApproval>, action);
+      return waitForApproval(protocolState, sharedData, action);
     case states.WAIT_FOR_PRE_FUND_SETUP_0:
-      return waitForPreFundSetup0(
-        state as ProtocolStateWithSharedData<states.WaitForPreFundSetup0>,
-        action,
-      );
+      return waitForPreFundSetup0(protocolState, sharedData, action);
     case states.WAIT_FOR_DIRECT_FUNDING:
-      return state;
+      return { protocolState, sharedData };
     case states.WAIT_FOR_POST_FUND_SETUP_0:
-      return waitForPostFundSetup0(
-        state as ProtocolStateWithSharedData<states.WaitForPostFundSetup0>,
-        action,
-      );
+      return waitForPostFundSetup0(protocolState, sharedData, action);
     case states.WAIT_FOR_LEDGER_UPDATE_0:
-      return waitForLedgerUpdate0(
-        state as ProtocolStateWithSharedData<states.WaitForLedgerUpdate0>,
-        action,
-      );
+      return waitForLedgerUpdate0(protocolState, sharedData, action);
     case states.WAIT_FOR_CONSENSUS:
-      return waitForConsensus(
-        state as ProtocolStateWithSharedData<states.WaitForConsensus>,
-        action,
-      );
+      return waitForConsensus(protocolState, sharedData, action);
     default:
-      return unreachable(state.protocolState);
+      return unreachable(protocolState);
   }
 }
 
 const waitForApproval = (
-  state: ProtocolStateWithSharedData<states.WaitForApproval>,
+  protocolState: states.WaitForApproval,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
   switch (action.type) {
     case actions.indirectFunding.playerB.STRATEGY_PROPOSED:
-      const { protocolState, sharedData } = state;
       return { protocolState: states.waitForPreFundSetup0(protocolState), sharedData };
     default:
-      return state;
+      return { protocolState, sharedData };
   }
 };
 
 const waitForPreFundSetup0 = (
-  state: ProtocolStateWithSharedData<states.WaitForPreFundSetup0>,
+  protocolState: states.WaitForPreFundSetup0,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
-      const { protocolState, sharedData } = state;
       const newSharedData = receiveOpponentLedgerCommitment(sharedData, commitment, signature);
       const ledgerId = channelID(commitment.channel);
       if (appChannelIsWaitingForFunding(newSharedData, protocolState.channelId)) {
@@ -79,17 +68,17 @@ const waitForPreFundSetup0 = (
       const newProtocolState = states.waitForDirectFunding({ ...protocolState, ledgerId });
       return { protocolState: newProtocolState, sharedData: newSharedData };
     default:
-      return state;
+      return { protocolState, sharedData };
   }
 };
 
 const waitForPostFundSetup0 = (
-  state: ProtocolStateWithSharedData<states.WaitForPostFundSetup0>,
+  protocolState: states.WaitForPostFundSetup0,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
-      const { sharedData, protocolState } = state;
       // The ledger channel is in the `FUNDING` stage, so we have to use the
       // `receiveLedgerCommitment` helper and not the `receiveOpponentLedgerCommitment`
       // helper
@@ -98,17 +87,17 @@ const waitForPostFundSetup0 = (
       const newProtocolState = states.waitForLedgerUpdate0(protocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
     default:
-      return state;
+      return { protocolState, sharedData };
   }
 };
 
 const waitForLedgerUpdate0 = (
-  state: ProtocolStateWithSharedData<states.WaitForLedgerUpdate0>,
+  protocolState: states.WaitForLedgerUpdate0,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
-      const { sharedData, protocolState } = state;
       let newSharedData = receiveOpponentLedgerCommitment(
         sharedData,
         action.commitment,
@@ -125,16 +114,16 @@ const waitForLedgerUpdate0 = (
       }
       return { protocolState, sharedData: newSharedData };
     default:
-      return state;
+      return { protocolState, sharedData };
   }
 };
 const waitForConsensus = (
-  state: ProtocolStateWithSharedData<states.WaitForConsensus>,
+  protocolState: states.WaitForConsensus,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
-      const { sharedData, protocolState } = state;
       let newSharedData = receiveOpponentLedgerCommitment(
         sharedData,
         action.commitment,
@@ -147,6 +136,6 @@ const waitForConsensus = (
       }
       return { protocolState, sharedData: newSharedData };
     default:
-      return state;
+      return { protocolState, sharedData };
   }
 };

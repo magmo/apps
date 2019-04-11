@@ -98,10 +98,10 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
       channelId,
       ledgerChannelDefaults.libraryAddress,
     );
-    const updatedState = playerAReducer(state, action);
+    const updatedState = playerAReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_PRE_FUND_SETUP_1);
-    itSendsThisMessage(updatedState, MESSAGE_RELAY_REQUESTED);
+    itSendsThisMessage(updatedState.sharedData, MESSAGE_RELAY_REQUESTED);
     const newLedgerId = (updatedState.protocolState as states.WaitForDirectFunding).ledgerId;
     itTransitionsChannelToStateType(
       updatedState,
@@ -130,7 +130,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
       testScenarios.ledgerCommitments.preFundCommitment1,
       '0x0',
     );
-    const updatedState = playerAReducer(state, action);
+    const updatedState = playerAReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_DIRECT_FUNDING);
     itTransitionsChannelToStateType(
@@ -153,9 +153,9 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   );
   // Add the ledger channel to state
   const total = testScenarios.twoThree.reduce(addHex);
-  describe(whenActionArrives(actions.funding.FUNDING_RECEIVED_EVENT), () => {
-    const action = actions.funding.fundingReceivedEvent(defaults.ledgerId, total, total);
-    const updatedState = playerAReducer(state, action);
+  describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
+    const action = actions.fundingReceivedEvent('processId', defaults.ledgerId, total, total);
+    const updatedState = playerAReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_POST_FUND_SETUP_1);
     itTransitionsChannelToStateType(
@@ -186,7 +186,7 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
       testScenarios.ledgerCommitments.postFundCommitment1,
       '0x0',
     );
-    const updatedState = playerAReducer(state, action);
+    const updatedState = playerAReducer(state.protocolState, state.sharedData, action);
     itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_1);
     itTransitionsChannelToStateType(
       updatedState,
@@ -216,7 +216,7 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
       testScenarios.ledgerCommitments.ledgerUpdate1,
       '0x0',
     );
-    playerAReducer(state, action);
+    playerAReducer(state.protocolState, state.sharedData, action);
     // TODO: We need a "finished" state to test against
   });
 });

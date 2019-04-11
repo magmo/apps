@@ -2,7 +2,6 @@ import { ChannelStatus } from '../channel-state/state';
 import { StateWithSideEffects } from '../utils';
 import { Commitment } from 'fmg-core';
 import { TransactionOutboxItem, OutboxState } from '../outbox/state';
-import { SharedData } from '../protocols';
 
 type SideEffectState = StateWithSideEffects<any> | { outboxState: OutboxState };
 export const itSendsAMessage = (state: SideEffectState) => {

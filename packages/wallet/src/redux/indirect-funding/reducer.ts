@@ -2,48 +2,44 @@ import * as indirectFundingState from './state';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { PlayerIndex } from '../types';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '../protocols';
+import { ProtocolStateWithSharedData, ProtocolReducer, SharedData } from '../protocols';
 import { playerAReducer } from './player-a/reducer';
 import { playerBReducer } from './player-b/reducer';
 
 export const indirectFundingReducer: ProtocolReducer<indirectFundingState.IndirectFundingState> = (
-  state: ProtocolStateWithSharedData<indirectFundingState.IndirectFundingState>,
+  protocolState: indirectFundingState.IndirectFundingState,
+  sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ProtocolStateWithSharedData<indirectFundingState.IndirectFundingState> => {
   if (action.type === actions.indirectFunding.FUNDING_REQUESTED) {
-    return fundingRequestedReducer(state, action);
+    return fundingRequestedReducer(protocolState, sharedData, action);
   }
-  switch (state.protocolState.player) {
+  switch (protocolState.player) {
     case PlayerIndex.A:
-      return playerAReducer(
-        state as ProtocolStateWithSharedData<indirectFundingState.playerA.PlayerAState>,
-        action,
-      );
+      return playerAReducer(protocolState, sharedData, action);
     case PlayerIndex.B:
-      return playerBReducer(
-        state as ProtocolStateWithSharedData<indirectFundingState.playerB.PlayerBState>,
-        action,
-      );
+      return playerBReducer(protocolState, sharedData, action);
 
     default:
-      return unreachable(state.protocolState);
+      return unreachable(protocolState);
   }
 };
 
 function fundingRequestedReducer(
-  state: ProtocolStateWithSharedData<indirectFundingState.IndirectFundingState>,
+  protocolState: indirectFundingState.IndirectFundingState,
+  sharedData: SharedData,
   action: actions.indirectFunding.FundingRequested,
 ): ProtocolStateWithSharedData<indirectFundingState.IndirectFundingState> {
   const { channelId, playerIndex: player } = action;
   switch (player) {
     case PlayerIndex.A:
       return {
-        ...state,
+        sharedData,
         protocolState: indirectFundingState.playerA.waitForApproval({ channelId, player }),
       };
     case PlayerIndex.B:
       return {
-        ...state,
+        sharedData,
         protocolState: indirectFundingState.playerB.waitForApproval({ channelId, player }),
       };
     default:

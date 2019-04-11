@@ -118,7 +118,7 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   describe(whenActionArrives(actions.indirectFunding.playerB.STRATEGY_PROPOSED), () => {
     const state = startingState(states.waitForApproval({ channelId }));
     const action = actions.indirectFunding.playerB.strategyProposed(channelId);
-    const updatedState = playerBReducer(state, action);
+    const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_PRE_FUND_SETUP_0);
   });
@@ -137,11 +137,11 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
       preFundCommitment0,
       'signature',
     );
-    const updatedState = playerBReducer(state, action);
+    const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_DIRECT_FUNDING);
-    itSendsNoMessage(updatedState);
-    itSendsNoTransaction(updatedState);
+    itSendsNoMessage(updatedState.sharedData);
+    itSendsNoTransaction(updatedState.sharedData);
   });
 });
 
@@ -160,11 +160,11 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
       'signature',
     );
     // TODO: This should fail, since we're not mocking the signature...
-    const updatedState = playerBReducer(state, action);
+    const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
-    itSendsThisMessage(updatedState, { foo: 'foo' });
-    itSendsNoTransaction(updatedState);
+    itSendsThisMessage(updatedState.sharedData, { foo: 'foo' });
+    itSendsNoTransaction(updatedState.sharedData);
   });
 });
 
@@ -188,11 +188,11 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_0), () => {
       postFundCommitment0,
       'signature',
     );
-    const updatedState = playerBReducer(state, action);
+    const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_LEDGER_UPDATE_0);
-    expectThisCommitmentSent(updatedState, ledgerCommitments.postFundCommitment1);
-    itSendsNoTransaction(updatedState);
+    expectThisCommitmentSent(updatedState.sharedData, ledgerCommitments.postFundCommitment1);
+    itSendsNoTransaction(updatedState.sharedData);
   });
 });
 
@@ -221,11 +221,11 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_0), () => {
       ledgerCommitments.ledgerUpdate0,
       'signature',
     );
-    const updatedState = playerBReducer(state, action);
+    const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_CONSENSUS);
-    expectThisCommitmentSent(updatedState, ledgerCommitments.ledgerUpdate1);
-    itSendsNoTransaction(updatedState);
+    expectThisCommitmentSent(updatedState.sharedData, ledgerCommitments.ledgerUpdate1);
+    itSendsNoTransaction(updatedState.sharedData);
     itTransitionsChannelToStateType(
       updatedState,
       channelId,
@@ -255,11 +255,11 @@ describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
       ledgerCommitments.ledgerUpdate2,
       'signature',
     );
-    const updatedState = playerBReducer(state, action);
+    const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_CONSENSUS);
     // itSendsNoCommitment(updatedState);
-    itSendsNoTransaction(updatedState);
+    itSendsNoTransaction(updatedState.sharedData);
     itTransitionsChannelToStateType(
       updatedState,
       channelId,
