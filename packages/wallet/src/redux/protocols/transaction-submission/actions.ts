@@ -37,6 +37,14 @@ export interface TransactionConfirmed {
   contractAddress?: string;
 }
 
+export interface TransactionFinalized {
+  type: typeof TRANSACTION_FINALIZED;
+  channelId: string;
+  processId: string;
+}
+
+export const TRANSACTION_FINALIZED = 'WALLET.COMMON.TRANSACTION_FINALIZED';
+
 export interface RetryTransaction {
   type: typeof RETRY_TRANSACTION;
   channelId: string;
@@ -81,12 +89,21 @@ export const transactionSubmitted = (
 export const transactionConfirmed = (
   channelId: string,
   processId: string,
-  contractAddress: string,
+  contractAddress?: string,
 ): TransactionConfirmed => ({
   type: TRANSACTION_CONFIRMED,
   channelId,
   processId,
   contractAddress,
+});
+
+export const transactionFinalized = (
+  channelId: string,
+  processId: string,
+): TransactionFinalized => ({
+  channelId,
+  processId,
+  type: TRANSACTION_FINALIZED,
 });
 
 export const retryTransaction = (channelId: string, processId: string): RetryTransaction => ({
