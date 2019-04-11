@@ -13,7 +13,7 @@ import {
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { bigNumberify } from 'ethers/utils';
 import { WalletProcedure } from '../../../../types';
-import { SharedData, EMPTY_SHARED_DATA, ProtocolStateWithSharedData } from '../../../../protocols';
+import { EMPTY_SHARED_DATA } from '../../../../protocols';
 
 const { channelId, mockTransactionOutboxItem } = scenarios;
 
@@ -46,22 +46,12 @@ const defaultsWithTx = { ...defaultsForA, transactionHash: TX_HASH };
 const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
 
-function startingState(
-  state: states.Depositing,
-  sharedData: SharedData = EMPTY_SHARED_DATA,
-): ProtocolStateWithSharedData<states.Depositing> {
-  return {
-    protocolState: state,
-    sharedData,
-  };
-}
-
 describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
   describe(whenActionArrives(actions.TRANSACTION_SENT_TO_METAMASK), () => {
     // player A scenario
-    const state = startingState(states.waitForTransactionSent(defaultsForA));
+    const state = states.waitForTransactionSent(defaultsForA);
     const action = actions.transactionSentToMetamask(channelId, WalletProcedure.DirectFunding);
-    const updatedState = depositingReducer(state, action);
+    const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_APPROVAL, updatedState);
   });
@@ -70,20 +60,20 @@ describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
 describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
   describe(whenActionArrives(actions.TRANSACTION_SUBMITTED), () => {
     // player A scenario
-    const state = startingState(states.waitForDepositApproval(defaultsForA));
+    const state = states.waitForDepositApproval(defaultsForA);
     const action = actions.transactionSubmitted(channelId, WalletProcedure.DirectFunding, '0x0');
-    const updatedState = depositingReducer(state, action);
+    const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
   });
 
   describe(whenActionArrives(actions.TRANSACTION_SUBMISSION_FAILED), () => {
     // player A scenario
-    const state = startingState(states.waitForDepositApproval(defaultsForA));
+    const state = states.waitForDepositApproval(defaultsForA);
     const action = actions.transactionSubmissionFailed(channelId, WalletProcedure.DirectFunding, {
       code: '1234',
     });
-    const updatedState = depositingReducer(state, action);
+    const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.DEPOSIT_TRANSACTION_FAILED, updatedState);
   });
@@ -92,10 +82,10 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
 describe(startingIn(states.WAIT_FOR_DEPOSIT_CONFIRMATION), () => {
   describe(whenActionArrives(actions.TRANSACTION_CONFIRMED), () => {
     // player A scenario
-    const state = startingState(states.waitForDepositConfirmation(defaultsWithTx));
+    const state = states.waitForDepositConfirmation(defaultsWithTx);
     // TODO: This needs to change
     const action = actions.transactionConfirmed(TX_HASH, WalletProcedure.DirectFunding);
-    const updatedState = depositingReducer(state, action);
+    const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesChannelFundingStatusTo(directFundingStates.SAFE_TO_DEPOSIT, updatedState);
   });
@@ -110,9 +100,9 @@ describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
       value: createDepositTxMock,
     });
 
-    const state = startingState(states.depositTransactionFailed(defaultsForB));
+    const state = states.depositTransactionFailed(defaultsForB);
     const action = actions.retryTransaction(channelId, WalletProcedure.DirectFunding);
-    const updatedState = depositingReducer(state, action);
+    const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_TRANSACTION_SENT, updatedState);
     itSendsThisTransaction(updatedState, mockTransactionOutboxItem);

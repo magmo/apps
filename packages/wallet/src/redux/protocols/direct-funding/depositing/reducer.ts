@@ -6,31 +6,31 @@ import * as actions from '../../../actions';
 import * as states from './state';
 import * as fundingStates from '../state';
 import { WalletProcedure } from '../../../types';
-import { ProtocolReducer, ProtocolStateWithSharedData } from '../../../protocols';
+import { ProtocolReducer, ProtocolStateWithSharedData, SharedData } from '../../../protocols';
 import { SideEffects } from '../../../outbox/state';
 import { accumulateSideEffects } from '../../../outbox';
 
 export const depositingReducer: ProtocolReducer<fundingStates.DirectFundingState> = (
-  state: ProtocolStateWithSharedData<states.Depositing>,
+  state: states.Depositing,
+  sharedData: SharedData,
   action: actions.WalletAction,
 ): ProtocolStateWithSharedData<fundingStates.DirectFundingState> => {
-  const { protocolState } = state;
-
-  switch (protocolState.depositStatus) {
+  switch (state.depositStatus) {
     case states.WAIT_FOR_TRANSACTION_SENT:
-      return applyUpdate(state, waitForTransactionSentReducer(protocolState, action));
+      return applyUpdate(state, sharedData, waitForTransactionSentReducer(state, action));
     case states.WAIT_FOR_DEPOSIT_APPROVAL:
-      return applyUpdate(state, waitForDepositApprovalReducer(protocolState, action));
+      return applyUpdate(state, sharedData, waitForDepositApprovalReducer(state, action));
     case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
-      return applyUpdate(state, waitForDepositConfirmationReducer(protocolState, action));
+      return applyUpdate(state, sharedData, waitForDepositConfirmationReducer(state, action));
     case states.DEPOSIT_TRANSACTION_FAILED:
-      return applyUpdate(state, depositTransactionFailedReducer(protocolState, action));
+      return applyUpdate(state, sharedData, depositTransactionFailedReducer(state, action));
   }
-  return unreachable(protocolState);
+  return unreachable(state);
 };
 
 function applyUpdate(
-  state: ProtocolStateWithSharedData<fundingStates.DirectFundingState>,
+  state: fundingStates.DirectFundingState,
+  sharedData: SharedData,
   updateData: { state: fundingStates.DirectFundingState; sideEffects?: SideEffects },
 ): ProtocolStateWithSharedData<fundingStates.DirectFundingState> {
   const { state: protocolState, sideEffects } = updateData;
@@ -38,8 +38,8 @@ function applyUpdate(
     ...state,
     protocolState,
     sharedData: {
-      ...state.sharedData,
-      outboxState: accumulateSideEffects(state.sharedData.outboxState, sideEffects),
+      ...sharedData,
+      outboxState: accumulateSideEffects(sharedData.outboxState, sideEffects),
     },
   };
 }

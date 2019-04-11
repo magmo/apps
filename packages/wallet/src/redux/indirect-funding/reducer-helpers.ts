@@ -209,7 +209,8 @@ export const updateDirectFundingStatus = (
   const updatedDirectFundingStore = directFundingStoreReducer(state.directFundingStore, action);
   newState.directFundingStore = updatedDirectFundingStore.state;
   const updatedDirectFundingState = directFundingStateReducer(
-    { protocolState: newState.directFundingStore[action.channelId], sharedData: EMPTY_SHARED_DATA },
+    newState.directFundingStore[action.channelId],
+    EMPTY_SHARED_DATA,
     action,
   );
   newState.directFundingStore[action.channelId] = updatedDirectFundingState.protocolState;

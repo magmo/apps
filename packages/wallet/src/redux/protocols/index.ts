@@ -16,7 +16,8 @@ export const EMPTY_SHARED_DATA: SharedData = {
 export type ProtocolState = IndirectFundingState | DirectFundingState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
-  state: ProtocolStateWithSharedData<T>,
+  protocolState: T,
+  sharedData: SharedData,
   action,
 ) => ProtocolStateWithSharedData<T>;
 
