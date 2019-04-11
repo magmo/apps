@@ -33,10 +33,10 @@ function itTransitionToStateType(state, type) {
 
 function itTransitionsChannelToStateType(
   state: ProtocolStateWithSharedData<states.PlayerBState>,
-  channelId: string,
+  channelIdToCheck: string,
   type,
 ) {
-  const channelState = state.sharedData.channelState.initializedChannels[channelId];
+  const channelState = state.sharedData.channelState.initializedChannels[channelIdToCheck];
   itTransitionsToChannelStateType(type, { state: channelState });
 }
 
