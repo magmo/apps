@@ -147,7 +147,7 @@ export type CommonAction =
   | CommitmentReceived
   | AdjudicatorEventAction;
 
-export type protocolAction = CommonAction;
+export type ProtocolAction = CommonAction;
 
 export function isTransactionAction(action: WalletAction): action is TransactionAction {
   return 'protocol' in action && action.protocol === WalletProtocol.TransactionSubmission;
