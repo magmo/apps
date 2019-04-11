@@ -150,8 +150,7 @@ export type CommonAction =
 export type protocolAction = CommonAction;
 
 export function isTransactionAction(action: WalletAction): action is TransactionAction {
-  // TODO: This is a weak check. We need to refactor these actions once we clean up the channel reducer and funding
-  return action.type.indexOf('TRANSACTION') > -1;
+  return 'protocol' in action && action.protocol === WalletProtocol.TransactionSubmission;
 }
 
 export function isprotocolAction(action: WalletAction): action is protocolAction {
