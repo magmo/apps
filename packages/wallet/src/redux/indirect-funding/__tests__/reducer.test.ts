@@ -33,7 +33,7 @@ describe("when the indirectFunding branch doesn't exist", () => {
   });
 });
 
-describe('when the indirectFunding branch exists', () => {
+describe.skip('when the indirectFunding branch exists', () => {
   describe('when in a player A state', () => {
     const player = PlayerIndex.A;
     it('delegates to the playerAReducer', () => {

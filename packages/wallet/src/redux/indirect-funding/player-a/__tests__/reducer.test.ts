@@ -3,11 +3,7 @@ import * as actions from '../../../actions';
 import { playerAReducer } from '../reducer';
 import * as channelStates from '../../../channel-state/state';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import {
-  itTransitionsProcedureToStateType,
-  itSendsThisMessage,
-  itTransitionsToChannelStateType,
-} from '../../../__tests__/helpers';
+import { itSendsThisMessage, itTransitionsToChannelStateType } from '../../../__tests__/helpers';
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { WalletProcedure } from '../../../types';
 import * as SigningUtil from '../../../../utils/signing-utils';
@@ -21,7 +17,9 @@ const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
 
 function itTransitionToStateType(state, type) {
-  itTransitionsProcedureToStateType('indirectFunding', state, type);
+  it(`transitions protocol state to ${type}`, () => {
+    expect(state.protocolState.type).toEqual(type);
+  });
 }
 function itTransitionsChannelToStateType(
   state: ProtocolStateWithSharedData<states.PlayerAState>,
@@ -30,12 +28,6 @@ function itTransitionsChannelToStateType(
 ) {
   const channelState = state.sharedData.channelState.initializedChannels[channelId];
   itTransitionsToChannelStateType(type, { state: channelState });
-}
-function itTransitionsFundingToType() {
-  it(`updates the direct funding status`, () => {
-    // TODO: Check the direct funding status on the state
-    return true;
-  });
 }
 
 const defaults = {
@@ -62,6 +54,21 @@ const ledgerChannelDefaults = {
   participants: testScenarios.ledgerChannel.participants as [string, string],
 };
 
+const defaultAppChannelState = channelStates.waitForFundingAndPostFundSetup({
+  ...defaults,
+  turnNum: 5,
+  lastCommitment: {
+    commitment: testScenarios.preFundCommitment1,
+    signature: '0x0',
+  },
+  penultimateCommitment: {
+    commitment: testScenarios.preFundCommitment2,
+    signature: '0x0',
+  },
+  funded: false,
+  address: defaults.participants[0],
+});
+
 const startingState = (
   protocolState: states.PlayerAState,
   ...channelStatuses: channelStates.ChannelStatus[]
@@ -84,11 +91,13 @@ Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validate
 
 describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   const { channelId } = defaults;
-
-  const state = startingState(states.waitForApproval({ channelId }));
+  const state = startingState(states.waitForApproval({ channelId }), defaultAppChannelState);
 
   describe(whenActionArrives(actions.indirectFunding.playerA.STRATEGY_APPROVED), () => {
-    const action = actions.indirectFunding.playerA.strategyApproved(channelId, '0x0');
+    const action = actions.indirectFunding.playerA.strategyApproved(
+      channelId,
+      ledgerChannelDefaults.libraryAddress,
+    );
     const updatedState = playerAReducer(state, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_PRE_FUND_SETUP_1);
@@ -111,6 +120,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   const state = startingState(
     states.waitForPreFundSetup1({ channelId, ledgerId }),
     ledgerChannelState,
+    defaultAppChannelState,
   );
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
@@ -128,7 +138,6 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
       ledgerId,
       channelStates.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
     );
-    itTransitionsFundingToType();
   });
 });
 

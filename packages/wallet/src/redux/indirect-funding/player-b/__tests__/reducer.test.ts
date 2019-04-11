@@ -5,7 +5,6 @@ import * as actions from '../../../actions';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { playerBReducer } from '../reducer';
 import {
-  itTransitionsProcedureToStateType,
   itSendsNoMessage,
   itSendsNoTransaction,
   itSendsThisMessage,
@@ -27,7 +26,9 @@ const startingIn = type => `starting in ${type}`;
 const whenActionArrives = type => `when ${type} arrives`;
 
 function itTransitionToStateType(state, type) {
-  itTransitionsProcedureToStateType('indirectFunding', state, type);
+  it(`transitions protocol state to ${type}`, () => {
+    expect(state.protocolState.type).toEqual(type);
+  });
 }
 
 function itTransitionsChannelToStateType(
