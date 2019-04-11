@@ -9,34 +9,41 @@ export type TransactionSubmissionState =
   | Success
   | Fail;
 
+export const START = 'Start';
+export const WAIT_FOR_SUBMISSION = 'WaitForSubmission';
+export const WAIT_FOR_CONFIRMATION = 'WaitForConfirmation';
+export const APPROVE_RETRY = 'ApproveRetry';
+export const FAIL = 'Fail';
+export const SUCCESS = 'Success';
+
 export interface Start {
-  type: 'Start';
+  type: typeof START;
   transaction: TransactionRequest;
 }
 
 export interface WaitForSubmission {
-  type: 'WaitForSubmission';
+  type: typeof WAIT_FOR_SUBMISSION;
   transaction: TransactionRequest;
 }
 
 export interface WaitForConfirmation {
-  type: 'WaitForConfirmation';
+  type: typeof WAIT_FOR_CONFIRMATION;
   transaction: TransactionRequest;
   transactionHash: string;
 }
 
 export interface ApproveRetry {
-  type: 'ApproveRetry';
+  type: typeof APPROVE_RETRY;
   transaction: TransactionRequest;
 }
 
 export interface Fail {
-  type: 'Fail';
+  type: typeof FAIL;
   reason: string;
 }
 
 export interface Success {
-  type: 'Success';
+  type: typeof SUCCESS;
 }
 
 // -------
@@ -44,7 +51,7 @@ export interface Success {
 // -------
 
 export function isTerminal(state: TransactionSubmissionState): state is Fail | Success {
-  return state.type === 'Fail' || state.type === 'Success';
+  return state.type === FAIL || state.type === SUCCESS;
 }
 
 // ------------
@@ -52,22 +59,22 @@ export function isTerminal(state: TransactionSubmissionState): state is Fail | S
 // ------------
 
 export function start(p: P<Start>): Start {
-  return { type: 'Start', transaction: p.transaction };
+  return { type: START, transaction: p.transaction };
 }
 
 export function waitForSubmission(p: P<WaitForSubmission>): WaitForSubmission {
-  return { type: 'WaitForSubmission', transaction: p.transaction };
+  return { type: WAIT_FOR_SUBMISSION, transaction: p.transaction };
 }
 
 export function approveRetry(p: P<ApproveRetry>): ApproveRetry {
-  return { type: 'ApproveRetry', transaction: p.transaction };
+  return { type: APPROVE_RETRY, transaction: p.transaction };
 }
 
 export function waitForConfirmation(p: P<WaitForConfirmation>): WaitForConfirmation {
   const { transaction, transactionHash } = p;
-  return { type: 'WaitForConfirmation', transaction, transactionHash };
+  return { type: WAIT_FOR_CONFIRMATION, transaction, transactionHash };
 }
 
 export function success(): Success {
-  return { type: 'Success' };
+  return { type: SUCCESS };
 }

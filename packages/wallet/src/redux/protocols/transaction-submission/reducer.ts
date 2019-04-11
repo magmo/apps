@@ -13,6 +13,10 @@ import {
   waitForConfirmation,
   success,
   start,
+  START,
+  WAIT_FOR_SUBMISSION,
+  WAIT_FOR_CONFIRMATION,
+  APPROVE_RETRY,
 } from './states';
 import { TransactionRequest } from 'ethers/providers';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -52,14 +56,14 @@ export function initialize(transaction: TransactionRequest, storage: Storage): R
 }
 
 function transactionSentToMetamask(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== 'Start') {
+  if (state.type !== START) {
     return { state, storage };
   }
   return { state: waitForSubmission(state), storage };
 }
 
 function transactionSubmissionFailed(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForSubmission') {
+  if (state.type !== WAIT_FOR_SUBMISSION) {
     return { state, storage };
   }
   return { state: approveRetry(state), storage };
@@ -71,8 +75,8 @@ function transactionSubmitted(
   transactionHash: string,
 ): ReturnVal {
   switch (state.type) {
-    case 'WaitForSubmission':
-    case 'Start': // just in case we didn't hear the TRANSACTION_SENT_TO_METAMASK
+    case WAIT_FOR_SUBMISSION:
+    case START: // just in case we didn't hear the TRANSACTION_SENT_TO_METAMASK
       return { state: waitForConfirmation({ ...state, transactionHash }), storage };
     default:
       return { state, storage };
@@ -81,9 +85,9 @@ function transactionSubmitted(
 
 function transactionConfirmed(state: TSState, storage: Storage): ReturnVal {
   switch (state.type) {
-    case 'WaitForConfirmation':
-    case 'WaitForSubmission': // in case we didn't hear the TRANSACTION_SUBMITTED
-    case 'Start': // in case we didn't hear the TRANSACTION_SENT_TO_METAMASK
+    case WAIT_FOR_CONFIRMATION:
+    case WAIT_FOR_SUBMISSION: // in case we didn't hear the TRANSACTION_SUBMITTED
+    case START: // in case we didn't hear the TRANSACTION_SENT_TO_METAMASK
       return { state: success(), storage };
     default:
       return { state, storage };
@@ -91,7 +95,7 @@ function transactionConfirmed(state: TSState, storage: Storage): ReturnVal {
 }
 
 function retryTransaction(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveRetry') {
+  if (state.type !== APPROVE_RETRY) {
     return { state, storage };
   }
   // TODO: queue transaction
