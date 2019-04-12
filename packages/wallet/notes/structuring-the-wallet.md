@@ -148,4 +148,60 @@ There needs to be some top level handler whose responsibility it is to trigger p
 For example:
 
 1. User app requests channel be funded: `FUNDING_REQUESTED`
-2. Top-level handler puts a new process in the `processStore` that runs the `Funding` protocol.
+2. Top-level handler dispatches a "new process" action in the `processStore` that runs the `Funding` protocol.
+
+## Creating a process
+
+### Actions
+
+There should be two types of actions: A "process" action, which extends `{ processId: string }`, and a "protocol" action, which extends `{ protocol: WalletProtocol }`.
+Actions shouldn't have both a `protocol` and `proccessId` property.
+
+The `processId` should be a deterministic and unique function of its inputs.
+(A good choice would be something like `${THE_PROCESS_PROTOCOL}_${THE_RELEVANT_CHANNEL_ID}`).
+
+### Reducers
+
+When the wallet reducer receives a protocol action, it creates a new process running that protocol, and calls the protocol's reducer (which should return a default state based on the action's data).
+
+When the wallet reducer receives a process action, it extracts the `protocolState` from the slot in the `processStore`, and calls the correct protocol reducer to update the `protocolState` (and shared data).
+
+### Reasoning
+
+Suppose protocol `B` is embedded in protocol `C`.
+Then it doesn't make sense for an action `a` that's meant to for the `B` protocol to have a `protocol: 'B'` property -- it will be routed to the protocol reducer for `C`, which will then route it to the protocol reducer for `B` _if the wallet is in a state where it should do that_.
+
+It also doesn't make sense for `a` to store `protocol: C` property -- this data is already on the process' state.
+
+The one time when it makes sense for `a` to store a protocol is if
+
+- we're not in a system where the process id is a function of the action's data
+- there is no process running with id `a.processId`
+
+In this case, when my wallet sends `a` to your wallet, your wallet understands this to mean
+
+> _start a process with id `a.processId`, running protocol `a.protocol`_
+
+By making the process id deterministic, we rule out the need for this, making actions easy to reason about:
+
+- any action with a `protocol` triggers a new process
+- any action with a `processId` is routed to an existing process
+
+ie. the wallet reducer can look something like this:
+
+```
+function walletReducer(state, action) {
+  if (isProtocolAction(action)) {
+    return getProtocolInitializer(action.protocol)(state, action)
+  } else if (isProcessAction(action)) {
+    const processState = state.processStore[action.processId]
+    return getProtocolReducer(processState.protocol)(
+      processState.protocolState,
+      sharedData(state),
+      action
+    )
+  }
+
+  return state;
+}
+```
