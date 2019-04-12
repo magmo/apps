@@ -90,8 +90,8 @@ const closeTransactionFailedReducer = (
         sideEffects: {
           transactionOutbox: {
             transactionRequest,
-            channelId: state.channelId,
-            protocol: WalletProtocol.Closing,
+            requestId: state.channelId,
+            processId: `closing.${state.channelId}`,
           },
         },
       };
@@ -215,8 +215,8 @@ const approveCloseOnChainReducer = (
         sideEffects: {
           transactionOutbox: {
             transactionRequest,
-            channelId: state.channelId,
-            protocol: WalletProtocol.Closing,
+            requestId: state.channelId,
+            processId: `closing.${state.channelId}`,
           },
         },
       };

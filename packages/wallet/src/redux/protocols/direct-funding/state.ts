@@ -2,7 +2,6 @@ import * as depositing from './depositing/state';
 import { DirectFundingRequested } from '../../internal/actions';
 import { bigNumberify } from 'ethers/utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
-import { WalletProtocol } from '../../types';
 import { ProtocolStateWithSharedData, SharedData } from '..';
 
 import { queueTransaction } from './reducer-helpers';
@@ -132,8 +131,8 @@ export function initialDirectFundingState(
   const transactionOutbox = alreadySafeToDeposit
     ? {
         transactionRequest: createDepositTransaction(action.channelId, action.requiredDeposit),
-        channelId,
-        protocol: WalletProtocol.DirectFunding,
+        requestId: channelId,
+        processId: `depositing.${channelId}`,
       }
     : undefined;
 

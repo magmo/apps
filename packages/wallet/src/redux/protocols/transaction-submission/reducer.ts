@@ -18,9 +18,9 @@ import {
   WAIT_FOR_CONFIRMATION,
   APPROVE_RETRY,
 } from './states';
-import { TransactionRequest } from 'ethers/providers';
 import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData } from '..';
+import { TransactionRequest } from 'ethers/providers';
 
 type Storage = SharedData;
 
@@ -50,9 +50,14 @@ export function transactionReducer(
   }
 }
 
-export function initialize(transaction: TransactionRequest, storage: Storage): ReturnVal {
+export function initialize(
+  transaction: TransactionRequest,
+  processId: string,
+  storage: Storage,
+): ReturnVal {
+  const requestId = 'something-unique'; // TODO
   // TODO: queue transaction
-  return { state: start({ transaction }), storage };
+  return { state: start({ transaction, processId, requestId }), storage };
 }
 
 function transactionSentToMetamask(state: TSState, storage: Storage): ReturnVal {

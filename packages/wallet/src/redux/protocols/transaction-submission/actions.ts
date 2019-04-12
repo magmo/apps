@@ -16,40 +16,40 @@ export const TRANSACTION_FINALIZED = 'WALLET.TRANSACTION_FINALIZED';
 
 export interface TransactionSentToMetamask extends BaseProcessAction {
   type: typeof TRANSACTION_SENT_TO_METAMASK;
-  channelId: string;
   processId: string;
+  requestId: string;
 }
 
 export interface TransactionSubmissionFailed extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMISSION_FAILED;
-  channelId: string;
+  requestId: string;
   processId: string;
   error: { message?: string; code };
 }
 
 export interface TransactionSubmitted extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMITTED;
-  channelId: string;
+  requestId: string;
   processId: string;
   transactionHash: string;
 }
 
 export interface TransactionConfirmed extends BaseProcessAction {
   type: typeof TRANSACTION_CONFIRMED;
-  channelId: string;
+  requestId: string;
   processId: string;
   contractAddress?: string;
 }
 
 export interface TransactionFinalized extends BaseProcessAction {
   type: typeof TRANSACTION_FINALIZED;
-  channelId: string;
+  requestId: string;
   processId: string;
 }
 
 export interface RetryTransaction extends BaseProcessAction {
   type: typeof RETRY_TRANSACTION;
-  channelId: string;
+  requestId: string;
   processId: string;
 }
 
@@ -58,59 +58,58 @@ export interface RetryTransaction extends BaseProcessAction {
 // --------
 
 export const transactionSentToMetamask = (
-  channelId: string,
   processId: string,
+  requestId: string,
 ): TransactionSentToMetamask => ({
   type: TRANSACTION_SENT_TO_METAMASK,
-  channelId,
   processId,
+  requestId,
 });
 
 export const transactionSubmissionFailed = (
-  channelId: string,
   processId: string,
+  requestId: string,
   error: { message?: string; code },
 ): TransactionSubmissionFailed => ({
   type: TRANSACTION_SUBMISSION_FAILED,
   error,
-  channelId,
+  requestId,
   processId,
 });
 
 export const transactionSubmitted = (
-  channelId: string,
   processId: string,
+  requestId: string,
   transactionHash: string,
 ): TransactionSubmitted => ({
   type: TRANSACTION_SUBMITTED,
-  channelId,
+  requestId,
   processId,
   transactionHash,
 });
 
 export const transactionConfirmed = (
-  channelId: string,
   processId: string,
+  requestId: string,
   contractAddress?: string,
 ): TransactionConfirmed => ({
   type: TRANSACTION_CONFIRMED,
-
-  channelId,
+  requestId,
   processId,
   contractAddress,
 });
 
 export const transactionFinalized = (
-  channelId: string,
   processId: string,
+  requestId: string,
 ): TransactionFinalized => ({
   type: TRANSACTION_FINALIZED,
-  channelId,
+  requestId,
   processId,
 });
 
-export const retryTransaction = (channelId: string, processId: string): RetryTransaction => ({
+export const retryTransaction = (requestId: string, processId: string): RetryTransaction => ({
   type: RETRY_TRANSACTION,
-  channelId,
+  requestId,
   processId,
 });
