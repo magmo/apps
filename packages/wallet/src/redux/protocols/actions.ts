@@ -6,7 +6,14 @@ export interface NewProcessAction {
 }
 
 export function createsNewProcess(action: WalletAction) {
-  return 'protocol' in action;
+  if ('protocol' in action) {
+    if ('processId in action') {
+      throw new Error('Action cannot have both protocol and processId');
+    }
+
+    return true;
+  }
+  return false;
 }
 
 export interface ProcessAction {
