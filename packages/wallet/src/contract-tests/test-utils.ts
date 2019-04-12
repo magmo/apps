@@ -210,6 +210,6 @@ export async function refuteChallenge(
 
 async function sendTransaction(provider, tx) {
   const signer = provider.getSigner();
-  const contractAddress = await getAdjudicatorContractAddress(provider);
+  const contractAddress = getAdjudicatorContractAddress();
   return await signer.sendTransaction({ ...tx, to: contractAddress });
 }

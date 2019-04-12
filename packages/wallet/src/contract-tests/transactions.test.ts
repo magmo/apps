@@ -55,7 +55,7 @@ describe('transactions', () => {
     expect(saga.next(provider).value).toEqual(put(transactionSentToMetamask(channelId, protocol)));
     saga.next();
     const signer = provider.getSigner();
-    const contractAddress = await getAdjudicatorContractAddress(provider);
+    const contractAddress = getAdjudicatorContractAddress();
     transactionToSend = { ...transactionToSend, to: contractAddress };
     const transactionReceipt = await signer.sendTransaction(transactionToSend);
 
