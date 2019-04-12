@@ -13,4 +13,5 @@ export const fundingRequested = (channelId: string, playerIndex: PlayerIndex) =>
 export type FundingRequested = ReturnType<typeof fundingRequested>;
 
 export { playerA, playerB };
-export type Action = FundingRequested | playerA.Action | playerB.Action | CommonAction;
+export type ProcessAction = playerA.Action | playerB.Action;
+export type Action = FundingRequested | ProcessAction | CommonAction;
