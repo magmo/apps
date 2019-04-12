@@ -111,7 +111,7 @@ const waitForDirectFunding = (
     let newProtocolState: states.PlayerBState = updatedStateAndSharedData.protocolState;
 
     if (directFundingIsComplete(newProtocolState)) {
-      newSharedData = confirmFundingForChannel(newSharedData, protocolState.ledgerId);
+      newSharedData = confirmFundingForChannel(newSharedData, protocolState.channelId);
       newProtocolState = states.waitForPostFundSetup0(updatedStateAndSharedData.protocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
     } else {
