@@ -53,7 +53,7 @@ const {
   channelId,
   ledgerId,
   ledgerChannel,
-  ledgerInitialDirectFundingStates,
+  ledgerDirectFundingStates,
   twoThree,
 } = scenarios;
 
@@ -150,15 +150,11 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
 describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     const total = twoThree.reduce(addHex);
-    const directFundingState = {
-      ...ledgerInitialDirectFundingStates.playerB,
-      channelId: ledgerId,
-    };
     const state = startingState(
       states.waitForDirectFunding({
         channelId,
         ledgerId,
-        directFundingState,
+        directFundingState: ledgerDirectFundingStates.playerB,
       }),
       channelStates.waitForFundingAndPostFundSetup(appChannelStateDefaults),
       channelStates.waitForFundingConfirmation(ledgerChannelStateDefaults),

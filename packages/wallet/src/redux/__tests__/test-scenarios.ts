@@ -250,7 +250,7 @@ const initialFundingState = (ourIndex: PlayerIndex, fundingRequestChannelId: str
   return directFundingStates.initialDirectFundingState(action, EMPTY_SHARED_DATA).protocolState;
 };
 
-export const ledgerInitialDirectFundingStates = {
+export const ledgerDirectFundingStates = {
   playerA: initialFundingState(PlayerIndex.A, channelID(ledgerChannel)),
   playerB: initialFundingState(PlayerIndex.B, channelID(ledgerChannel)),
 };

@@ -8,7 +8,7 @@ import * as walletStates from '../redux/state';
 import {
   bsAddress,
   bsPrivateKey,
-  ledgerInitialDirectFundingStates,
+  ledgerDirectFundingStates,
 } from '../redux/__tests__/test-scenarios';
 import { defaultParams } from './dummy-wallet-states';
 
@@ -19,7 +19,7 @@ export const playerBDefaults = {
   ourIndex: 1,
   address: bsAddress,
   privateKey: bsPrivateKey,
-  directFundingState: ledgerInitialDirectFundingStates.playerB,
+  directFundingState: ledgerDirectFundingStates.playerB,
 };
 
 /////////////////////

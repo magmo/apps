@@ -34,6 +34,7 @@ const defaults = {
   ...testScenarios,
   ourIndex: PlayerIndex.A,
   privateKey: testScenarios.asPrivateKey,
+  directFundingState: testScenarios.ledgerDirectFundingStates.playerA,
 };
 
 const ledgerChannelDefaults = {
@@ -142,16 +143,13 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
-  const { channelId, ledgerId } = defaults;
+  const { channelId, ledgerId, directFundingState } = defaults;
   const ledgerChannelState = channelStates.waitForFundingAndPostFundSetup({
     ...ledgerChannelDefaults,
     channelId: ledgerId,
   });
   const total = testScenarios.twoThree.reduce(addHex);
-  const directFundingState = {
-    ...testScenarios.ledgerInitialDirectFundingStates.playerA,
-    channelId: ledgerId,
-  };
+
   const state = startingState(
     states.waitForDirectFunding({ channelId, ledgerId, directFundingState }),
     ledgerChannelState,
