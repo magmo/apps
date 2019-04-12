@@ -5,7 +5,6 @@ import * as actions from '../../../../actions';
 import * as scenarios from '../../../../__tests__/test-scenarios';
 import { playerBReducer } from '../reducer';
 import {
-  itSendsNoMessage,
   itSendsNoTransaction,
   itSendsThisMessage,
   expectThisCommitmentSent,
@@ -141,7 +140,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
     const updatedState = playerBReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_DIRECT_FUNDING);
-    itSendsNoMessage(updatedState.sharedData);
+    expectThisCommitmentSent(updatedState.sharedData, ledgerCommitments.preFundCommitment1);
     itSendsNoTransaction(updatedState.sharedData);
   });
 });

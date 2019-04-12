@@ -5,25 +5,30 @@ import * as actions from '../../actions';
 import * as channelActions from '../../channel-state/actions';
 
 import { channelStateReducer } from '../../channel-state/reducer';
-import { accumulateSideEffects } from '../../outbox';
 import { Commitment } from 'fmg-core';
 import {
   composePostFundCommitment,
   composeLedgerUpdateCommitment,
 } from '../../../utils/commitment-utils';
 import { WalletProtocol } from '../../types';
-import { messageRelayRequested, WalletEvent } from 'magmo-wallet-client';
+import {
+  messageRelayRequested,
+  WalletEvent,
+  VALIDATION_SUCCESS,
+  SIGNATURE_SUCCESS,
+} from 'magmo-wallet-client';
 import { addHex } from '../../../utils/hex-utils';
 import { bigNumberify } from 'ethers/utils';
 import { ourTurn } from '../../../utils/reducer-utils';
 import { SharedData, ProtocolStateWithSharedData } from '../../protocols';
-import { queueMessage as queueMessageOutbox } from '../../outbox/state';
+import { queueMessage as queueMessageOutbox, SideEffects } from '../../outbox/state';
 import {
   DirectFundingState,
   initialDirectFundingState,
 } from '../../protocols/direct-funding/state';
 import { FundingAction } from '../../protocols/direct-funding/actions';
 import { directFundingStateReducer } from '../direct-funding/reducer';
+import { accumulateSideEffects } from '../../outbox';
 
 export const appChannelIsWaitingForFunding = (
   sharedData: SharedData,
@@ -169,7 +174,7 @@ export const requestDirectFunding = (
   sharedData: SharedData,
   ledgerChannelId: string,
 ): ProtocolStateWithSharedData<DirectFundingState> => {
-  const ledgerChannelState = selectors.getOpenedChannelState(sharedData, ledgerChannelId);
+  const ledgerChannelState = selectors.getChannelState(sharedData, ledgerChannelId);
   const { ourIndex } = ledgerChannelState;
   const { allocation } = ledgerChannelState.lastCommitment.commitment;
   const safeToDeposit = allocation.slice(0, ourIndex).reduce(addHex, '0x0');
@@ -184,6 +189,23 @@ export const requestDirectFunding = (
   );
   return initialDirectFundingState(action, sharedData);
 };
+
+const filterOutSignatureMessages = (sideEffects?: SideEffects): SideEffects | undefined => {
+  if (sideEffects && sideEffects.messageOutbox) {
+    let messageArray = Array.isArray(sideEffects.messageOutbox)
+      ? sideEffects.messageOutbox
+      : [sideEffects.messageOutbox];
+    messageArray = messageArray.filter(
+      walletEvent =>
+        walletEvent.type !== VALIDATION_SUCCESS && walletEvent.type !== SIGNATURE_SUCCESS,
+    );
+    return {
+      ...sideEffects,
+      messageOutbox: messageArray,
+    };
+  }
+  return sideEffects;
+};
 export const updateChannelState = (
   sharedData: SharedData,
   channelAction: actions.channel.ChannelAction,
@@ -191,11 +213,12 @@ export const updateChannelState = (
   const newSharedData = { ...sharedData };
   const updatedChannelState = channelStateReducer(newSharedData.channelState, channelAction);
   newSharedData.channelState = updatedChannelState.state;
+
+  // TODO: Currently we need to filter out signature/validation messages that are meant to the app
+  // This might change based on whether protocol reducers or channel reducers craft commitments
+  const filteredSideEffects = filterOutSignatureMessages(updatedChannelState.sideEffects);
   // App channel state may still generate side effects
-  newSharedData.outboxState = accumulateSideEffects(
-    newSharedData.outboxState,
-    updatedChannelState.sideEffects,
-  );
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, filteredSideEffects);
   return newSharedData;
 };
 

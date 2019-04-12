@@ -129,7 +129,7 @@ const waitForDirectFunding = (
     let newSharedData = updatedStateAndSharedData.sharedData;
     let newProtocolState: states.PlayerAState = updatedStateAndSharedData.protocolState;
 
-    if (directFundingIsComplete(protocolState)) {
+    if (directFundingIsComplete(newProtocolState)) {
       newSharedData = confirmFundingForChannel(sharedData, protocolState.ledgerId);
       newSharedData = createAndSendPostFundCommitment(newSharedData, protocolState.ledgerId);
       newProtocolState = states.waitForPostFundSetup1(updatedStateAndSharedData.protocolState);
@@ -154,7 +154,7 @@ const waitForPreFundSetup1Reducer = (
       );
 
       if (appChannelIsWaitingForFunding(newSharedData, protocolState.channelId)) {
-        return startDirectFunding(protocolState, sharedData);
+        return startDirectFunding(protocolState, newSharedData);
       }
       return { protocolState, sharedData: newSharedData };
     default:
