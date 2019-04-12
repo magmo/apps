@@ -1,5 +1,6 @@
 import { WalletProtocol } from '../types';
 import { WalletAction } from '../actions';
+import { ProcessAction as IndirectFundingProcessAction } from './indirect-funding/actions';
 
 export interface NewProcessAction {
   protocol: WalletProtocol;
@@ -16,10 +17,12 @@ export function createsNewProcess(action: WalletAction) {
   return false;
 }
 
-export interface ProcessAction {
+export interface BaseProcessAction {
   processId: string;
 }
 
-export function routesToProcess(action: WalletAction) {
+export type ProcessAction = IndirectFundingProcessAction;
+
+export function routesToProcess(action: WalletAction): action is ProcessAction {
   return 'processId' in action;
 }

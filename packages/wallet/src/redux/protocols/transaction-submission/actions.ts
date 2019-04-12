@@ -1,5 +1,5 @@
 import { WalletProtocol } from '../../types';
-import { ProcessAction } from '../actions';
+import { BaseProcessAction } from '../actions';
 
 export type TransactionAction =
   | TransactionSentToMetamask
@@ -15,13 +15,13 @@ export const TRANSACTION_CONFIRMED = 'WALLET.TRANSACTION_CONFIRMED';
 export const RETRY_TRANSACTION = 'WALLET.RETRY_TRANSACTION';
 export const TRANSACTION_FINALIZED = 'WALLET.TRANSACTION_FINALIZED';
 
-export interface TransactionSentToMetamask extends ProcessAction {
+export interface TransactionSentToMetamask extends BaseProcessAction {
   type: typeof TRANSACTION_SENT_TO_METAMASK;
   protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
-export interface TransactionSubmissionFailed extends ProcessAction {
+export interface TransactionSubmissionFailed extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMISSION_FAILED;
   protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
@@ -29,7 +29,7 @@ export interface TransactionSubmissionFailed extends ProcessAction {
   error: { message?: string; code };
 }
 
-export interface TransactionSubmitted extends ProcessAction {
+export interface TransactionSubmitted extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMITTED;
   protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
@@ -37,7 +37,7 @@ export interface TransactionSubmitted extends ProcessAction {
   transactionHash: string;
 }
 
-export interface TransactionConfirmed extends ProcessAction {
+export interface TransactionConfirmed extends BaseProcessAction {
   type: typeof TRANSACTION_CONFIRMED;
   protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
@@ -45,14 +45,14 @@ export interface TransactionConfirmed extends ProcessAction {
   contractAddress?: string;
 }
 
-export interface TransactionFinalized extends ProcessAction {
+export interface TransactionFinalized extends BaseProcessAction {
   type: typeof TRANSACTION_FINALIZED;
   protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
 
-export interface RetryTransaction extends ProcessAction {
+export interface RetryTransaction extends BaseProcessAction {
   type: typeof RETRY_TRANSACTION;
   protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
