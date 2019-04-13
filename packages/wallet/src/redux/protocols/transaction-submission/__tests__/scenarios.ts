@@ -63,7 +63,7 @@ export const happyPath = {
   confirmed,
 };
 
-export const retryAndAprove = {
+export const retryAndApprove = {
   ...props,
   // States
   waitForSubmission,

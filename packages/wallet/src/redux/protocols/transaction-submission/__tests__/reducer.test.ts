@@ -41,7 +41,7 @@ describe('happy-path scenario', () => {
 });
 
 describe('retry-and-approve scenario', () => {
-  const scenario = scenarios.retryAndAprove;
+  const scenario = scenarios.retryAndApprove;
   const storage = scenario.sharedData;
 
   describe('when in WaitForSubmission', () => {
