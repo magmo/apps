@@ -17,10 +17,6 @@ interface LedgerChannelExists extends BasePlayerAState {
   ledgerId: string;
 }
 
-interface DirectFundingExists extends LedgerChannelExists {
-  directFundingState: DirectFundingState;
-}
-
 export interface WaitForApproval extends BasePlayerAState {
   type: typeof WAIT_FOR_APPROVAL;
 }
@@ -29,8 +25,9 @@ export interface WaitForPreFundSetup1 extends LedgerChannelExists {
   type: typeof WAIT_FOR_PRE_FUND_SETUP_1;
 }
 
-export interface WaitForDirectFunding extends DirectFundingExists {
+export interface WaitForDirectFunding extends LedgerChannelExists {
   type: typeof WAIT_FOR_DIRECT_FUNDING;
+  directFundingState: DirectFundingState;
 }
 export interface WaitForPostFundSetup1 extends LedgerChannelExists {
   type: typeof WAIT_FOR_POST_FUND_SETUP_1;
