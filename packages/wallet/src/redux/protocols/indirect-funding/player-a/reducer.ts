@@ -132,7 +132,7 @@ const waitForDirectFunding = (
     if (directFundingIsComplete(newProtocolState)) {
       newSharedData = confirmFundingForChannel(sharedData, protocolState.ledgerId);
       newSharedData = createAndSendPostFundCommitment(newSharedData, protocolState.ledgerId);
-      newProtocolState = states.waitForPostFundSetup1(updatedStateAndSharedData.protocolState);
+      newProtocolState = states.waitForPostFundSetup1(newProtocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
     } else {
       return { sharedData, protocolState: newProtocolState };
