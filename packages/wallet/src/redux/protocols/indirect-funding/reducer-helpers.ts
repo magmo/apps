@@ -227,7 +227,6 @@ export const updateDirectFundingStatus = (
   sharedData: SharedData,
   action: FundingAction,
 ): ProtocolStateWithSharedData<DirectFundingState> => {
-  // TODO: Update the direct funding state
   return directFundingStateReducer(directFundingState, sharedData, action);
 };
 
