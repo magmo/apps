@@ -13,11 +13,11 @@ class TransactionSubmissionContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
     switch (state.type) {
-      case states.START:
+      case states.WAIT_FOR_SEND:
       case states.WAIT_FOR_SUBMISSION:
       case states.WAIT_FOR_CONFIRMATION:
       case states.APPROVE_RETRY:
-      case states.FAIL:
+      case states.FAILURE:
       case states.SUCCESS:
         return <div>Hello</div>;
       default:

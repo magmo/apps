@@ -27,7 +27,6 @@ import { depositContract } from './test-utils';
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { getAdjudicatorContractAddress } from '../utils/contract-utils';
 import { channelID } from 'fmg-core/lib/channel';
-import { WalletProtocol } from '../redux/types';
 
 jest.setTimeout(90000);
 
@@ -48,11 +47,12 @@ describe('transactions', () => {
   }
 
   async function testTransactionSender(transactionToSend) {
-    const protocol = WalletProtocol.DirectFunding;
-    const channelId = 'channelId';
-    const saga = transactionSender(transactionToSend, channelId, protocol);
+    const processId = 'processId';
+    const requestId = 'requestId';
+    const queuedTransaction = { transactionRequest: transactionToSend, processId, requestId };
+    const saga = transactionSender(queuedTransaction);
     saga.next();
-    expect(saga.next(provider).value).toEqual(put(transactionSent(channelId, protocol)));
+    expect(saga.next(provider).value).toEqual(put(transactionSent(processId, requestId)));
     saga.next();
     const signer = provider.getSigner();
     const contractAddress = await getAdjudicatorContractAddress(provider);
@@ -61,15 +61,15 @@ describe('transactions', () => {
 
     saga.next();
     expect(saga.next(transactionReceipt).value).toEqual(
-      put(transactionSubmitted(channelId, protocol, transactionReceipt.hash || '')),
+      put(transactionSubmitted(processId, requestId, transactionReceipt.hash || '')),
     );
     const confirmedTransaction = await transactionReceipt.wait();
     saga.next();
     expect(saga.next(confirmedTransaction).value).toEqual(
-      put(transactionConfirmed(channelId, protocol, confirmedTransaction.contractAddress)),
+      put(transactionConfirmed(processId, requestId, confirmedTransaction.contractAddress)),
     );
 
-    expect(saga.next().value).toEqual(put(transactionFinalized(channelId, protocol)));
+    expect(saga.next().value).toEqual(put(transactionFinalized(processId, requestId)));
     expect(saga.next().done).toBe(true);
   }
 
