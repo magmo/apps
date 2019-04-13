@@ -19,6 +19,7 @@ import {
   WAIT_FOR_SUBMISSION,
   WAIT_FOR_CONFIRMATION,
   APPROVE_RETRY,
+  failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData } from '..';
@@ -114,9 +115,9 @@ function transactionRetryApproved(state: TSState, storage: Storage): ReturnVal {
 }
 
 function transactionRetryDenied(state: TSState, storage: Storage): ReturnVal {
-  return { state, storage };
+  return { state: failure('User denied retry'), storage };
 }
 
 function transactionFailed(state: TSState, storage: Storage): ReturnVal {
-  return { state, storage };
+  return { state: failure('Transaction failed'), storage };
 }

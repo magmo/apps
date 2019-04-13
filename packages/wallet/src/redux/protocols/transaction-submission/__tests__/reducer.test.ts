@@ -1,7 +1,7 @@
 import * as scenarios from './scenarios';
 import { transactionReducer as reducer, initialize, ReturnVal } from '../reducer';
 
-describe('happy path scenario', () => {
+describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   const storage = scenario.sharedData;
 
@@ -37,6 +37,64 @@ describe('happy path scenario', () => {
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'Success');
+  });
+});
+
+describe('retry-and-approve scenario', () => {
+  const scenario = scenarios.retryAndAprove;
+  const storage = scenario.sharedData;
+
+  describe('when in WaitForSubmission', () => {
+    const state = scenario.waitForSubmission;
+    const action = scenario.submissionFailed;
+    const result = reducer(state, storage, action);
+
+    itTransitionsTo(result, 'ApproveRetry');
+  });
+
+  describe('when in ApproveRetry', () => {
+    const state = scenario.approveRetry;
+    const action = scenario.retryApproved;
+    const result = reducer(state, storage, action);
+
+    itTransitionsTo(result, 'WaitForSend');
+    // it increases the retry count
+  });
+});
+
+describe('retry-and-deny scenario', () => {
+  const scenario = scenarios.retryAndDeny;
+  const storage = scenario.sharedData;
+
+  describe('when in WaitForSubmission', () => {
+    const state = scenario.waitForSubmission;
+    const action = scenario.submissionFailed;
+    const result = reducer(state, storage, action);
+
+    itTransitionsTo(result, 'ApproveRetry');
+  });
+
+  describe('when in ApproveRetry', () => {
+    const state = scenario.approveRetry;
+    const action = scenario.retryDenied;
+    const result = reducer(state, storage, action);
+
+    itTransitionsTo(result, 'Failure');
+    // it sets the failure reason to ...
+  });
+});
+
+describe('transaction-failed scenario', () => {
+  const scenario = scenarios.transactionFailed;
+  const storage = scenario.sharedData;
+
+  describe('when in ApproveRetry', () => {
+    const state = scenario.waitForConfirmation;
+    const action = scenario.failed;
+    const result = reducer(state, storage, action);
+
+    itTransitionsTo(result, 'Failure');
+    // it sets the failure reason to ...
   });
 });
 
