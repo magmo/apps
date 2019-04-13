@@ -38,17 +38,9 @@ export function initializedReducer(
   action: actions.WalletAction,
 ): states.WalletState {
   if (createsNewProcess(action)) {
-    // TODO: Call the process creator
-    return state;
+    routeToNewProcessInitializer(state, action);
   } else if (routesToProcess(action)) {
-    const processState = state.processStore[action.processId];
-    if (!processState) {
-      // Log warning?
-      return state;
-    } else {
-      // TODO: Call the protocol's reducer
-      return state;
-    }
+    return routeToProtocolReducer(state, action);
   }
 
   // Default to combined reducer
@@ -60,6 +52,22 @@ export function initializedReducer(
     ...newState,
     outboxState: accumulateSideEffects(state.outboxState, sideEffects),
   };
+}
+
+function routeToProtocolReducer(state, action) {
+  // TODO: Call the protocol's reducer
+  const processState = state.processStore[action.processId];
+  if (!processState) {
+    // Log warning?
+    return state;
+  } else {
+    return state;
+  }
+}
+
+function routeToNewProcessInitializer(state, action) {
+  // TODO: Call the process creator
+  return state;
 }
 
 const combinedReducer = combineReducersWithSideEffects({
