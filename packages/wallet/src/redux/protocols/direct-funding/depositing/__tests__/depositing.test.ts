@@ -47,10 +47,10 @@ const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
 
 describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
-  describe(whenActionArrives(actions.TRANSACTION_SENT_TO_METAMASK), () => {
+  describe(whenActionArrives(actions.TRANSACTION_SENT), () => {
     // player A scenario
     const state = states.waitForTransactionSent(defaultsForA);
-    const action = actions.transactionSentToMetamask(channelId, WalletProtocol.DirectFunding);
+    const action = actions.transactionSent(channelId, WalletProtocol.DirectFunding);
     const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_APPROVAL, updatedState);
@@ -93,7 +93,7 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_CONFIRMATION), () => {
 
 // B
 describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
-  describe(whenActionArrives(actions.TRANSACTION_SENT_TO_METAMASK), () => {
+  describe(whenActionArrives(actions.TRANSACTION_SENT), () => {
     // player B scenario
     const createDepositTxMock = jest.fn(() => mockTransactionOutboxItem.transactionRequest);
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', {
@@ -101,7 +101,7 @@ describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
     });
 
     const state = states.depositTransactionFailed(defaultsForB);
-    const action = actions.retryTransaction(channelId, WalletProtocol.DirectFunding);
+    const action = actions.transactionRetryApproved(channelId, WalletProtocol.DirectFunding);
     const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_TRANSACTION_SENT, updatedState);

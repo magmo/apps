@@ -104,7 +104,7 @@ describe('when in TAKE_MOVE_IN_APP', () => {
 describe('when in INITIATE_RESPONSE', () => {
   const state = states.initiateResponse(defaults);
   describe('when the challenge response is initiated', () => {
-    const action = actions.transactionSentToMetamask(channelId, WalletProtocol.Responding);
+    const action = actions.transactionSent(channelId, WalletProtocol.Responding);
     const updatedState = respondingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_RESPONSE_SUBMISSION, updatedState);
   });
@@ -162,7 +162,7 @@ describe('when in ACKNOWLEDGE_CHALLENGE_COMPLETE', () => {
 describe('when in RESPONSE_TRANSACTION_FAILED', () => {
   const state = states.responseTransactionFailed(defaults);
   describe('when the transaction is retried', () => {
-    const action = actions.retryTransaction(channelId, WalletProtocol.Responding);
+    const action = actions.transactionRetryApproved(channelId, WalletProtocol.Responding);
     const createRespondTxMock = jest.fn();
     Object.defineProperty(TransactionGenerator, 'createRespondWithMoveTransaction', {
       value: createRespondTxMock,

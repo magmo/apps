@@ -155,7 +155,7 @@ describe('start in WaitForCloseInitiation', () => {
     userAddress: '0x0',
   });
   describe('action taken: transaction sent to metamask', () => {
-    const action = actions.transactionSentToMetamask(channelId, WalletProtocol.Closing);
+    const action = actions.transactionSent(channelId, WalletProtocol.Closing);
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
   });
@@ -200,7 +200,7 @@ describe('start in closeTransactionFailed', () => {
     const signVerMock = jest.fn();
     signVerMock.mockReturnValue('0x0');
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signVerMock });
-    const action = actions.retryTransaction(channelId, WalletProtocol.Responding);
+    const action = actions.transactionRetryApproved(channelId, WalletProtocol.Responding);
     const updatedState = closingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
     expect(createConcludeTxMock.mock.calls.length).toBe(1);

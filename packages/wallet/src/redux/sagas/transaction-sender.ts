@@ -9,7 +9,7 @@ export function* transactionSender(transaction: QueuedTransaction) {
   const provider: ethers.providers.JsonRpcProvider = yield call(getProvider);
   const signer = provider.getSigner();
   const { processId, requestId, transactionRequest } = transaction;
-  yield put(actions.transactionSentToMetamask(processId, requestId));
+  yield put(actions.transactionSent(processId, requestId));
   let transactionResult: TransactionResponse;
   try {
     const contractAddress = yield call(getAdjudicatorContractAddress, provider);

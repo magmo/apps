@@ -73,7 +73,7 @@ describe('when in INITIATE_CHALLENGE', () => {
   const state = states.waitForChallengeInitiation(defaults);
 
   describe('when a challenge is initiated', () => {
-    const action = actions.transactionSentToMetamask(channelId, WalletProtocol.Challenging);
+    const action = actions.transactionSent(channelId, WalletProtocol.Challenging);
     const updatedState = challengingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
@@ -107,7 +107,7 @@ describe('when in CHALLENGE_TRANSACTION_FAILED', () => {
     Object.defineProperty(TransactionGenerator, 'createForceMoveTransaction', {
       value: createChallengeTxMock,
     });
-    const action = actions.retryTransaction(channelId, WalletProtocol.Challenging);
+    const action = actions.transactionRetryApproved(channelId, WalletProtocol.Challenging);
     const updatedState = challengingReducer(state, action);
     itTransitionsToChannelStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
     expect(createChallengeTxMock.mock.calls.length).toBe(1);

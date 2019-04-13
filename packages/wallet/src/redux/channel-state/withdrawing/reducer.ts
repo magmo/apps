@@ -6,7 +6,6 @@ import { createTransferAndWithdrawTransaction } from '../../../utils/transaction
 import { signVerificationData } from '../../../utils/signing-utils';
 import { closeSuccess, hideWallet } from 'magmo-wallet-client/lib/wallet-events';
 import { StateWithSideEffects } from '../../utils';
-import { WalletProtocol } from '../../types';
 
 export const withdrawingReducer = (
   state: states.WithdrawingState,
@@ -43,7 +42,7 @@ const withdrawTransactionFailedReducer = (
   action: actions.WalletAction,
 ): StateWithSideEffects<states.ChannelStatus> => {
   switch (action.type) {
-    case actions.RETRY_TRANSACTION:
+    case actions.TRANSACTION_RETRY_APPROVED:
       const myAddress = state.participants[state.ourIndex];
       const myAmount = state.lastCommitment.commitment.allocation[state.ourIndex];
       // TODO: The sender could of changed since the transaction failed. We'll need to check for the updated address.
@@ -67,8 +66,8 @@ const withdrawTransactionFailedReducer = (
         sideEffects: {
           transactionOutbox: {
             transactionRequest,
-            channelId: state.channelId,
-            protocol: WalletProtocol.Withdrawing,
+            processId: `withdrawing.${state.channelId}`,
+            requestId: state.channelId,
           },
         },
       };
@@ -107,8 +106,8 @@ const approveWithdrawalReducer = (
         sideEffects: {
           transactionOutbox: {
             transactionRequest,
-            channelId: state.channelId,
-            protocol: WalletProtocol.Withdrawing,
+            processId: `withdrawing.${state.channelId}`,
+            requestId: state.channelId,
           },
         },
       };

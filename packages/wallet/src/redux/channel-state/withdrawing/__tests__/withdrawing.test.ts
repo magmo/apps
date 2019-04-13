@@ -96,7 +96,7 @@ describe('when in withdrawTransactionFailed', () => {
     Object.defineProperty(SigningUtil, 'signVerificationData', { value: signMock });
 
     const state = states.withdrawTransactionFailed(defaults);
-    const action = actions.retryTransaction(channelId, WalletProtocol.Withdrawing);
+    const action = actions.transactionRetryApproved(channelId, WalletProtocol.Withdrawing);
     const updatedState = withdrawingReducer(state, action);
 
     itTransitionsToChannelStateType(states.WAIT_FOR_WITHDRAWAL_INITIATION, updatedState);

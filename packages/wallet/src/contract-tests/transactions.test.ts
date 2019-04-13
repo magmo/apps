@@ -5,7 +5,7 @@ import { put } from 'redux-saga/effects';
 import {
   transactionConfirmed,
   transactionFinalized,
-  transactionSentToMetamask,
+  transactionSent,
   transactionSubmitted,
 } from '../redux/actions';
 import { transactionSender } from '../redux/sagas/transaction-sender';
@@ -52,7 +52,7 @@ describe('transactions', () => {
     const channelId = 'channelId';
     const saga = transactionSender(transactionToSend, channelId, protocol);
     saga.next();
-    expect(saga.next(provider).value).toEqual(put(transactionSentToMetamask(channelId, protocol)));
+    expect(saga.next(provider).value).toEqual(put(transactionSent(channelId, protocol)));
     saga.next();
     const signer = provider.getSigner();
     const contractAddress = await getAdjudicatorContractAddress(provider);

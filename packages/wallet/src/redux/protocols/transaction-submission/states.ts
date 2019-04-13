@@ -2,22 +2,22 @@ import { Properties as P } from '../../utils';
 import { TransactionRequest } from 'ethers/providers';
 
 export type TransactionSubmissionState =
-  | Start
+  | WaitForSend
   | WaitForSubmission
   | WaitForConfirmation
   | ApproveRetry
   | Success
-  | Fail;
+  | Failure;
 
-export const START = 'Start';
+export const WAIT_FOR_SEND = 'WaitForSend';
 export const WAIT_FOR_SUBMISSION = 'WaitForSubmission';
 export const WAIT_FOR_CONFIRMATION = 'WaitForConfirmation';
 export const APPROVE_RETRY = 'ApproveRetry';
-export const FAIL = 'Fail';
+export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
 
-export interface Start {
-  type: typeof START;
+export interface WaitForSend {
+  type: typeof WAIT_FOR_SEND;
   transaction: TransactionRequest;
   processId: string;
   requestId: string;
@@ -45,8 +45,8 @@ export interface ApproveRetry {
   requestId: string;
 }
 
-export interface Fail {
-  type: typeof FAIL;
+export interface Failure {
+  type: typeof FAILURE;
   reason: string;
 }
 
@@ -58,17 +58,17 @@ export interface Success {
 // Helpers
 // -------
 
-export function isTerminal(state: TransactionSubmissionState): state is Fail | Success {
-  return state.type === FAIL || state.type === SUCCESS;
+export function isTerminal(state: TransactionSubmissionState): state is Failure | Success {
+  return state.type === FAILURE || state.type === SUCCESS;
 }
 
 // ------------
 // Constructors
 // ------------
 
-export function start(p: P<Start>): Start {
+export function waitForSend(p: P<WaitForSend>): WaitForSend {
   const { transaction, processId, requestId } = p;
-  return { type: START, transaction, processId, requestId };
+  return { type: WAIT_FOR_SEND, transaction, processId, requestId };
 }
 
 export function waitForSubmission(p: P<WaitForSubmission>): WaitForSubmission {
@@ -88,4 +88,8 @@ export function waitForConfirmation(p: P<WaitForConfirmation>): WaitForConfirmat
 
 export function success(): Success {
   return { type: SUCCESS };
+}
+
+export function failure(reason: string): Failure {
+  return { type: FAILURE, reason };
 }
