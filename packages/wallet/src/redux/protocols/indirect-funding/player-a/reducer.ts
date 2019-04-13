@@ -24,6 +24,7 @@ import {
   initializeChannelState,
   updateDirectFundingStatus,
   requestDirectFunding,
+  directFundingIsComplete,
 } from '../reducer-helpers';
 import {
   composePreFundCommitment,
@@ -33,7 +34,6 @@ import { WalletEvent } from 'magmo-wallet-client';
 import { isfundingAction, FundingAction } from '../../direct-funding/actions';
 import { addHex } from '../../../../utils/hex-utils';
 import { ProtocolStateWithSharedData, SharedData } from '../../';
-import { CHANNEL_FUNDED } from '../../direct-funding/state';
 
 export function playerAReducer(
   protocolState: states.PlayerAState,
@@ -129,7 +129,7 @@ const waitForDirectFunding = (
     let newSharedData = updatedStateAndSharedData.sharedData;
     let newProtocolState: states.PlayerAState = updatedStateAndSharedData.protocolState;
 
-    if (directFundingIsComplete(newProtocolState)) {
+    if (directFundingIsComplete(newProtocolState.directFundingState)) {
       newSharedData = confirmFundingForChannel(sharedData, protocolState.ledgerId);
       newSharedData = createAndSendPostFundCommitment(newSharedData, protocolState.ledgerId);
       newProtocolState = states.waitForPostFundSetup1(newProtocolState);
@@ -222,9 +222,6 @@ const startDirectFunding = (
   return { protocolState: newProtocolState, sharedData: updatedSharedData };
 };
 
-const directFundingIsComplete = (protocolState: states.WaitForDirectFunding): boolean => {
-  return protocolState.directFundingState.channelFundingStatus === CHANNEL_FUNDED;
-};
 const createAndSendFinalUpdateCommitment = (
   sharedData: SharedData,
   appChannelId: string,

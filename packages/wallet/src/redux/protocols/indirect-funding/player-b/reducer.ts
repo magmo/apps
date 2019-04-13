@@ -19,6 +19,7 @@ import {
   createCommitmentMessageRelay,
   initializeChannelState,
   queueMessage,
+  directFundingIsComplete,
 } from '../reducer-helpers';
 import { ProtocolStateWithSharedData, SharedData } from '../../';
 import { FundingAction, isfundingAction } from '../../direct-funding/actions';
@@ -110,7 +111,7 @@ const waitForDirectFunding = (
     let newSharedData = updatedStateAndSharedData.sharedData;
     let newProtocolState: states.PlayerBState = updatedStateAndSharedData.protocolState;
 
-    if (directFundingIsComplete(newProtocolState)) {
+    if (directFundingIsComplete(newProtocolState.directFundingState)) {
       newSharedData = confirmFundingForChannel(newSharedData, protocolState.channelId);
       newProtocolState = states.waitForPostFundSetup0(updatedStateAndSharedData.protocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
@@ -222,10 +223,6 @@ const startDirectFunding = (
     directFundingState: directFundingProtocolState,
   });
   return { protocolState: newProtocolState, sharedData: updatedSharedData };
-};
-
-const directFundingIsComplete = (protocolState: states.WaitForDirectFunding): boolean => {
-  return protocolState.directFundingState.channelFundingStatus === CHANNEL_FUNDED;
 };
 
 const createLedgerChannel = (
