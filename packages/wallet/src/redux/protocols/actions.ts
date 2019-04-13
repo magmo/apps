@@ -8,7 +8,7 @@ export interface NewProcessAction {
 
 export function createsNewProcess(action: WalletAction) {
   if ('protocol' in action) {
-    if ('processId in action') {
+    if ('processId' in action) {
       throw new Error('Action cannot have both protocol and processId');
     }
 
