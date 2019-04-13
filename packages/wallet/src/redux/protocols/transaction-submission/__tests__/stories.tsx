@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 
 import * as scenarios from './scenarios';
 import { TransactionSubmission } from '..';
+import StatusBarLayout from '../../../../components/status-bar-layout';
+import Modal from 'react-modal';
 
 const fakeStore = state => ({
   dispatch: action => {
@@ -20,7 +22,19 @@ const fakeStore = state => ({
 });
 
 const render = container => () => {
-  return <Provider store={fakeStore({})}>{container}</Provider>;
+  // todo: rework this modal stuff
+  return (
+    <Provider store={fakeStore({})}>
+      <Modal
+        isOpen={true}
+        className={'wallet-content-center'}
+        overlayClassName={'wallet-overlay-center'}
+        ariaHideApp={false}
+      >
+        <StatusBarLayout>{container}</StatusBarLayout>
+      </Modal>
+    </Provider>
+  );
 };
 
 const happyPathStories = {
