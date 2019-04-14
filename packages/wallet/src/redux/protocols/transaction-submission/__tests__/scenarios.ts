@@ -14,7 +14,7 @@ import { EMPTY_SHARED_DATA } from '../..';
 // ---------
 const transaction = {};
 const processId = 'process-id.123';
-const requestId = 'request-id.123';
+const requestId = 'something-unique';
 const transactionHash = 'transaction-hash.123';
 const sharedData = EMPTY_SHARED_DATA;
 

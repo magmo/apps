@@ -1,18 +1,17 @@
 import * as scenarios from './scenarios';
 import { transactionReducer as reducer, initialize, ReturnVal } from '../reducer';
+import { TransactionRequest } from 'ethers/providers';
 
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   const storage = scenario.sharedData;
 
   describe('when initializing', () => {
-    const { transaction, processId } = scenario;
+    const { transaction, processId, requestId } = scenario;
     const result = initialize(transaction, processId, storage);
 
     itTransitionsTo(result, 'WaitForSend');
-    // it keeps the processId
-    // it sets a requestId
-    // it queues a transaction
+    itQueuesATransaction(result, transaction, processId, requestId);
   });
 
   describe('when in WaitForSend', () => {
@@ -56,8 +55,11 @@ describe('retry-and-approve scenario', () => {
     const state = scenario.approveRetry;
     const action = scenario.retryApproved;
     const result = reducer(state, storage, action);
+    const { transaction, processId, requestId } = scenario;
 
     itTransitionsTo(result, 'WaitForSend');
+    itQueuesATransaction(result, transaction, processId, requestId);
+
     // it increases the retry count
   });
 });
@@ -101,5 +103,17 @@ describe('transaction-failed scenario', () => {
 function itTransitionsTo(result: ReturnVal, type: string) {
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
+  });
+}
+
+function itQueuesATransaction(
+  result: ReturnVal,
+  transactionRequest: TransactionRequest,
+  processId: string,
+  requestId: string,
+) {
+  it('queues a transaction', () => {
+    const queuedTransaction = result.storage.outboxState.transactionOutbox[0];
+    expect(queuedTransaction).toEqual({ transactionRequest, processId, requestId });
   });
 }

@@ -24,6 +24,7 @@ import {
 import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData } from '..';
 import { TransactionRequest } from 'ethers/providers';
+import { queueTransaction } from '../../state';
 
 type Storage = SharedData;
 
@@ -63,7 +64,7 @@ export function initialize(
   storage: Storage,
 ): ReturnVal {
   const requestId = 'something-unique'; // TODO
-  // TODO: queue transaction
+  storage = queueTransaction(storage, transaction, processId, requestId);
   return { state: waitForSend({ transaction, processId, requestId }), storage };
 }
 
@@ -110,8 +111,9 @@ function transactionRetryApproved(state: TSState, storage: Storage): ReturnVal {
   if (state.type !== APPROVE_RETRY) {
     return { state, storage };
   }
-  // TODO: queue transaction
-  return { state: waitForSend(state), storage };
+  const { transaction, processId, requestId } = state;
+  storage = queueTransaction(storage, transaction, processId, requestId);
+  return { state: waitForSend({ transaction, processId, requestId }), storage };
 }
 
 function transactionRetryDenied(state: TSState, storage: Storage): ReturnVal {
