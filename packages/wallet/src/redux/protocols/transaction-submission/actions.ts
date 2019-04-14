@@ -21,50 +21,42 @@ export const TRANSACTION_FINALIZED = 'WALLET.TRANSACTION_FINALIZED'; // currentl
 export interface TransactionSent {
   type: typeof TRANSACTION_SENT;
   processId: string;
-  requestId: string;
 }
 
 export interface TransactionSubmissionFailed extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMISSION_FAILED;
   processId: string;
-  requestId: string;
   error: { message?: string; code };
 }
 
 export interface TransactionSubmitted extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMITTED;
   processId: string;
-  requestId: string;
   transactionHash: string;
 }
 
 export interface TransactionConfirmed extends BaseProcessAction {
   type: typeof TRANSACTION_CONFIRMED;
   processId: string;
-  requestId: string;
   contractAddress?: string;
 }
 
 export interface TransactionFinalized extends BaseProcessAction {
   type: typeof TRANSACTION_FINALIZED;
   processId: string;
-  requestId: string;
 }
 
 export interface TransactionRetryApproved {
   type: typeof TRANSACTION_RETRY_APPROVED;
-  requestId: string;
   processId: string;
 }
 export interface TransactionRetryDenied {
   type: typeof TRANSACTION_RETRY_DENIED;
-  requestId: string;
   processId: string;
 }
 
 export interface TransactionFailed {
   type: typeof TRANSACTION_FAILED;
-  requestId: string;
   processId: string;
 }
 
@@ -72,74 +64,54 @@ export interface TransactionFailed {
 // Creators
 // --------
 
-export const transactionSent = (processId: string, requestId: string): TransactionSent => ({
+export const transactionSent = (processId: string): TransactionSent => ({
   type: TRANSACTION_SENT,
   processId,
-  requestId,
 });
 
 export const transactionSubmissionFailed = (
   processId: string,
-  requestId: string,
   error: { message?: string; code },
 ): TransactionSubmissionFailed => ({
   type: TRANSACTION_SUBMISSION_FAILED,
   error,
-  requestId,
   processId,
 });
 
 export const transactionSubmitted = (
   processId: string,
-  requestId: string,
   transactionHash: string,
 ): TransactionSubmitted => ({
   type: TRANSACTION_SUBMITTED,
-  requestId,
   processId,
   transactionHash,
 });
 
 export const transactionConfirmed = (
   processId: string,
-  requestId: string,
   contractAddress?: string,
 ): TransactionConfirmed => ({
   type: TRANSACTION_CONFIRMED,
-  requestId,
   processId,
   contractAddress,
 });
 
-export const transactionFinalized = (
-  processId: string,
-  requestId: string,
-): TransactionFinalized => ({
+export const transactionFinalized = (processId: string): TransactionFinalized => ({
   type: TRANSACTION_FINALIZED,
-  requestId,
   processId,
 });
 
-export const transactionRetryApproved = (
-  processId: string,
-  requestId: string,
-): TransactionRetryApproved => ({
+export const transactionRetryApproved = (processId: string): TransactionRetryApproved => ({
   type: TRANSACTION_RETRY_APPROVED,
-  requestId,
   processId,
 });
 
-export const transactionRetryDenied = (
-  processId: string,
-  requestId: string,
-): TransactionRetryDenied => ({
+export const transactionRetryDenied = (processId: string): TransactionRetryDenied => ({
   type: TRANSACTION_RETRY_DENIED,
-  requestId,
   processId,
 });
 
-export const transactionFailed = (processId: string, requestId: string): TransactionFailed => ({
+export const transactionFailed = (processId: string): TransactionFailed => ({
   type: TRANSACTION_FAILED,
-  requestId,
   processId,
 });

@@ -67,7 +67,6 @@ const responseTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `responding.${state.channelId}`,
-            requestId: state.channelId,
           },
         },
       };
@@ -106,7 +105,6 @@ export const chooseResponseReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `responding.${state.channelId}`,
-            requestId: state.channelId,
           },
         },
       };
@@ -155,7 +153,6 @@ export const takeMoveInAppReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `responding.${state.channelId}`,
-            requestId: state.channelId,
           },
           displayOutbox: showWallet(),
         },

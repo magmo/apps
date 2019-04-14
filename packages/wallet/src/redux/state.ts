@@ -140,11 +140,10 @@ export function queueTransaction(
   state: SharedData,
   transaction: TransactionRequest,
   processId: string,
-  requestId: string,
 ): SharedData {
   return {
     ...state,
-    outboxState: queueTransactionOutbox(state.outboxState, transaction, processId, requestId),
+    outboxState: queueTransactionOutbox(state.outboxState, transaction, processId),
   };
 }
 

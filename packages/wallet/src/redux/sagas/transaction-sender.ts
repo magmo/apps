@@ -8,8 +8,8 @@ import { QueuedTransaction } from '../outbox';
 export function* transactionSender(transaction: QueuedTransaction) {
   const provider: ethers.providers.JsonRpcProvider = yield call(getProvider);
   const signer = provider.getSigner();
-  const { processId, requestId, transactionRequest } = transaction;
-  yield put(actions.transactionSent(processId, requestId));
+  const { processId, transactionRequest } = transaction;
+  yield put(actions.transactionSent(processId));
   let transactionResult: TransactionResponse;
   try {
     const contractAddress = yield call(getAdjudicatorContractAddress, provider);
@@ -18,21 +18,15 @@ export function* transactionSender(transaction: QueuedTransaction) {
       to: contractAddress,
     });
   } catch (err) {
-    yield put(actions.transactionSubmissionFailed(processId, requestId, err));
+    yield put(actions.transactionSubmissionFailed(processId, err));
     return;
   }
   yield put(
-    actions.transactionSubmitted(
-      processId,
-      requestId,
-      transactionResult.hash ? transactionResult.hash : '',
-    ),
+    actions.transactionSubmitted(processId, transactionResult.hash ? transactionResult.hash : ''),
   );
   const confirmedTransaction = yield call([transactionResult, transactionResult.wait]);
-  yield put(
-    actions.transactionConfirmed(processId, requestId, confirmedTransaction.contractAddress),
-  );
+  yield put(actions.transactionConfirmed(processId, confirmedTransaction.contractAddress));
   // TODO: Figure out how to wait for a transaction to be X blocks deep
   // yield call(transactionResult.wait, 5);
-  yield put(actions.transactionFinalized(processId, requestId));
+  yield put(actions.transactionFinalized(processId));
 }

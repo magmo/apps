@@ -92,7 +92,6 @@ const depositTransactionFailedReducer: DFReducer = (
             state.channelId,
             state.requestedYourContribution,
           ),
-          requestId: action.requestId,
           processId: WalletProtocol.DirectFunding,
         },
       };

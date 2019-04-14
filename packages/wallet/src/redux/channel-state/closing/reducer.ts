@@ -90,7 +90,6 @@ const closeTransactionFailedReducer = (
         sideEffects: {
           transactionOutbox: {
             transactionRequest,
-            requestId: state.channelId,
             processId: `closing.${state.channelId}`,
           },
         },
@@ -215,7 +214,6 @@ const approveCloseOnChainReducer = (
         sideEffects: {
           transactionOutbox: {
             transactionRequest,
-            requestId: state.channelId,
             processId: `closing.${state.channelId}`,
           },
         },

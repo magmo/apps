@@ -50,7 +50,7 @@ describe(startingIn(states.WAIT_FOR_TRANSACTION_SENT), () => {
   describe(whenActionArrives(actions.TRANSACTION_SENT), () => {
     // player A scenario
     const state = states.waitForTransactionSent(defaultsForA);
-    const action = actions.transactionSent(channelId, WalletProtocol.DirectFunding);
+    const action = actions.transactionSent(channelId);
     const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_APPROVAL, updatedState);
@@ -61,7 +61,7 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
   describe(whenActionArrives(actions.TRANSACTION_SUBMITTED), () => {
     // player A scenario
     const state = states.waitForDepositApproval(defaultsForA);
-    const action = actions.transactionSubmitted(channelId, WalletProtocol.DirectFunding, '0x0');
+    const action = actions.transactionSubmitted(channelId, '0x0');
     const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
@@ -70,7 +70,7 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_APPROVAL), () => {
   describe(whenActionArrives(actions.TRANSACTION_SUBMISSION_FAILED), () => {
     // player A scenario
     const state = states.waitForDepositApproval(defaultsForA);
-    const action = actions.transactionSubmissionFailed(channelId, WalletProtocol.DirectFunding, {
+    const action = actions.transactionSubmissionFailed(channelId, {
       code: '1234',
     });
     const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
@@ -101,7 +101,7 @@ describe(startingIn(states.DEPOSIT_TRANSACTION_FAILED), () => {
     });
 
     const state = states.depositTransactionFailed(defaultsForB);
-    const action = actions.transactionRetryApproved(channelId, WalletProtocol.DirectFunding);
+    const action = actions.transactionRetryApproved(channelId);
     const updatedState = depositingReducer(state, EMPTY_SHARED_DATA, action);
 
     itChangesDepositStatusTo(states.WAIT_FOR_TRANSACTION_SENT, updatedState);

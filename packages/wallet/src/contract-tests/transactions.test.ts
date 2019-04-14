@@ -48,11 +48,10 @@ describe('transactions', () => {
 
   async function testTransactionSender(transactionToSend) {
     const processId = 'processId';
-    const requestId = 'requestId';
-    const queuedTransaction = { transactionRequest: transactionToSend, processId, requestId };
+    const queuedTransaction = { transactionRequest: transactionToSend, processId };
     const saga = transactionSender(queuedTransaction);
     saga.next();
-    expect(saga.next(provider).value).toEqual(put(transactionSent(processId, requestId)));
+    expect(saga.next(provider).value).toEqual(put(transactionSent(processId)));
     saga.next();
     const signer = provider.getSigner();
     const contractAddress = await getAdjudicatorContractAddress(provider);
@@ -61,15 +60,15 @@ describe('transactions', () => {
 
     saga.next();
     expect(saga.next(transactionReceipt).value).toEqual(
-      put(transactionSubmitted(processId, requestId, transactionReceipt.hash || '')),
+      put(transactionSubmitted(processId, transactionReceipt.hash || '')),
     );
     const confirmedTransaction = await transactionReceipt.wait();
     saga.next();
     expect(saga.next(confirmedTransaction).value).toEqual(
-      put(transactionConfirmed(processId, requestId, confirmedTransaction.contractAddress)),
+      put(transactionConfirmed(processId, confirmedTransaction.contractAddress)),
     );
 
-    expect(saga.next().value).toEqual(put(transactionFinalized(processId, requestId)));
+    expect(saga.next().value).toEqual(put(transactionFinalized(processId)));
     expect(saga.next().done).toBe(true);
   }
 

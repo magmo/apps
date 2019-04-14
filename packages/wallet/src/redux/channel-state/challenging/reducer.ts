@@ -69,7 +69,6 @@ const challengeTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `challenging.${state.channelId}`,
-            requestId: state.channelId,
           },
         },
       };
@@ -98,7 +97,6 @@ const approveChallengeReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `challenging.${state.channelId}`,
-            requestId: state.channelId,
           },
         },
       };

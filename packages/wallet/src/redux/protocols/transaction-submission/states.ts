@@ -20,14 +20,12 @@ export interface WaitForSend {
   type: typeof WAIT_FOR_SEND;
   transaction: TransactionRequest;
   processId: string;
-  requestId: string;
 }
 
 export interface WaitForSubmission {
   type: typeof WAIT_FOR_SUBMISSION;
   transaction: TransactionRequest;
   processId: string;
-  requestId: string;
 }
 
 export interface WaitForConfirmation {
@@ -35,14 +33,12 @@ export interface WaitForConfirmation {
   transaction: TransactionRequest;
   transactionHash: string;
   processId: string;
-  requestId: string;
 }
 
 export interface ApproveRetry {
   type: typeof APPROVE_RETRY;
   transaction: TransactionRequest;
   processId: string;
-  requestId: string;
 }
 
 export interface Failure {
@@ -67,23 +63,23 @@ export function isTerminal(state: TransactionSubmissionState): state is Failure 
 // ------------
 
 export function waitForSend(p: P<WaitForSend>): WaitForSend {
-  const { transaction, processId, requestId } = p;
-  return { type: WAIT_FOR_SEND, transaction, processId, requestId };
+  const { transaction, processId } = p;
+  return { type: WAIT_FOR_SEND, transaction, processId };
 }
 
 export function waitForSubmission(p: P<WaitForSubmission>): WaitForSubmission {
-  const { transaction, requestId, processId } = p;
-  return { type: WAIT_FOR_SUBMISSION, transaction, processId, requestId };
+  const { transaction, processId } = p;
+  return { type: WAIT_FOR_SUBMISSION, transaction, processId };
 }
 
 export function approveRetry(p: P<ApproveRetry>): ApproveRetry {
-  const { transaction, processId, requestId } = p;
-  return { type: APPROVE_RETRY, transaction, processId, requestId };
+  const { transaction, processId } = p;
+  return { type: APPROVE_RETRY, transaction, processId };
 }
 
 export function waitForConfirmation(p: P<WaitForConfirmation>): WaitForConfirmation {
-  const { transaction, transactionHash, processId, requestId } = p;
-  return { type: WAIT_FOR_CONFIRMATION, transaction, transactionHash, processId, requestId };
+  const { transaction, transactionHash, processId } = p;
+  return { type: WAIT_FOR_CONFIRMATION, transaction, transactionHash, processId };
 }
 
 export function success(): Success {

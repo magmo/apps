@@ -11,7 +11,6 @@ export const EMPTY_OUTBOX_STATE: OutboxState = {
 export interface QueuedTransaction {
   transactionRequest: TransactionRequest;
   processId: string;
-  requestId: string;
 }
 export interface OutboxState {
   displayOutbox: DisplayAction[];
@@ -35,9 +34,8 @@ export function queueTransaction(
   state: OutboxState,
   transaction: TransactionRequest,
   processId: string,
-  requestId: string,
 ): OutboxState {
   return accumulateSideEffects(state, {
-    transactionOutbox: { transactionRequest: transaction, processId, requestId },
+    transactionOutbox: { transactionRequest: transaction, processId },
   });
 }

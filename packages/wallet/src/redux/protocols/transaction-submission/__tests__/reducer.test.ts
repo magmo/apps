@@ -7,11 +7,11 @@ describe('happy-path scenario', () => {
   const storage = scenario.sharedData;
 
   describe('when initializing', () => {
-    const { transaction, processId, requestId } = scenario;
+    const { transaction, processId } = scenario;
     const result = initialize(transaction, processId, storage);
 
     itTransitionsTo(result, 'WaitForSend');
-    itQueuesATransaction(result, transaction, processId, requestId);
+    itQueuesATransaction(result, transaction, processId);
   });
 
   describe('when in WaitForSend', () => {
@@ -55,10 +55,10 @@ describe('retry-and-approve scenario', () => {
     const state = scenario.approveRetry;
     const action = scenario.retryApproved;
     const result = reducer(state, storage, action);
-    const { transaction, processId, requestId } = scenario;
+    const { transaction, processId } = scenario;
 
     itTransitionsTo(result, 'WaitForSend');
-    itQueuesATransaction(result, transaction, processId, requestId);
+    itQueuesATransaction(result, transaction, processId);
 
     // it increases the retry count
   });
@@ -110,10 +110,9 @@ function itQueuesATransaction(
   result: ReturnVal,
   transactionRequest: TransactionRequest,
   processId: string,
-  requestId: string,
 ) {
   it('queues a transaction', () => {
     const queuedTransaction = result.storage.outboxState.transactionOutbox[0];
-    expect(queuedTransaction).toEqual({ transactionRequest, processId, requestId });
+    expect(queuedTransaction).toEqual({ transactionRequest, processId });
   });
 }

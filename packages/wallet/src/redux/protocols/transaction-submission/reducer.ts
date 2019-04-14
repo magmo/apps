@@ -63,9 +63,8 @@ export function initialize(
   processId: string,
   storage: Storage,
 ): ReturnVal {
-  const requestId = 'something-unique'; // TODO
-  storage = queueTransaction(storage, transaction, processId, requestId);
-  return { state: waitForSend({ transaction, processId, requestId }), storage };
+  storage = queueTransaction(storage, transaction, processId);
+  return { state: waitForSend({ transaction, processId }), storage };
 }
 
 function transactionSent(state: TSState, storage: Storage): ReturnVal {
@@ -111,9 +110,9 @@ function transactionRetryApproved(state: TSState, storage: Storage): ReturnVal {
   if (state.type !== APPROVE_RETRY) {
     return { state, storage };
   }
-  const { transaction, processId, requestId } = state;
-  storage = queueTransaction(storage, transaction, processId, requestId);
-  return { state: waitForSend({ transaction, processId, requestId }), storage };
+  const { transaction, processId } = state;
+  storage = queueTransaction(storage, transaction, processId);
+  return { state: waitForSend({ transaction, processId }), storage };
 }
 
 function transactionRetryDenied(state: TSState, storage: Storage): ReturnVal {

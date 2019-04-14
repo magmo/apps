@@ -67,7 +67,6 @@ const withdrawTransactionFailedReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `withdrawing.${state.channelId}`,
-            requestId: state.channelId,
           },
         },
       };
@@ -107,7 +106,6 @@ const approveWithdrawalReducer = (
           transactionOutbox: {
             transactionRequest,
             processId: `withdrawing.${state.channelId}`,
-            requestId: state.channelId,
           },
         },
       };

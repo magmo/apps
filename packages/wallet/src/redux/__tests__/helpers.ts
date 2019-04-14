@@ -83,7 +83,6 @@ export const itSendsThisTransaction = (state: SideEffectState, tx: QueuedTransac
       expect(item).toMatchObject({
         transactionRequest,
         processId: expect.any(String),
-        requestId: expect.any(String),
       }),
     );
   });
