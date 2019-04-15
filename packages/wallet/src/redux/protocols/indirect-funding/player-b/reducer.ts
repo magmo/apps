@@ -23,7 +23,6 @@ import {
 } from '../reducer-helpers';
 import { ProtocolStateWithSharedData, SharedData } from '../../';
 import { FundingAction, isfundingAction } from '../../direct-funding/actions';
-import { CHANNEL_FUNDED } from '../../direct-funding/state';
 import * as channelState from '../../../channel-state/state';
 import { Commitment } from 'fmg-core/lib/commitment';
 import { composePreFundCommitment } from '../../../../utils/commitment-utils';
