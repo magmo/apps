@@ -41,6 +41,15 @@ if (!process.env.TARGET_NETWORK_ID) {
   console.error('TARGET_NETWORK_ID is not a number. Please update your .env file and specify a number for TARGET_NETWORK_ID');
   process.exit(1);
 }
+if (!process.env.CONSENSUS_LIBRARY_ADDRESS) {
+  process.env.CONSENSUS_LIBRARY_ADDRESS = parseContractAddress(paths.preBuiltConsensusArtifact, process.env.TARGET_NETWORK_ID);
+}
+if (!process.env.ADJUDICATOR_ADDRESS) {
+  process.env.ADJUDICATOR_ADDRESS = parseContractAddress(paths.preBuiltAdjudicatorArtifact, process.env.TARGET_NETWORK_ID);
+}
+if (!process.env.ADJUDICATOR_ABI) {
+  process.env.ADJUDICATOR_ABI = parseABI(paths.preBuiltAdjudicatorArtifact);
+}
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {

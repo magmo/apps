@@ -63,11 +63,14 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
+const appPreBuiltContractArtifacts = resolveApp('contracts/pre-built-artifacts');
+const buildContracts = resolveApp('build/contracts');
+
 // config after eject: we're in ./config/
 module.exports = {
-  appPreBuiltContractArtifacts: resolveApp('contracts/pre-built-artifacts'),
+  appPreBuiltContractArtifacts,
+  buildContracts,
   appContracts: resolveApp('contracts'),
-  buildContracts: resolveApp('build/contracts'),
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
   appBuild: resolveApp('build'),
@@ -83,6 +86,10 @@ module.exports = {
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
+  preBuiltAdjudicatorArtifact: path.resolve(appPreBuiltContractArtifacts, 'NitroAdjudicator.json'),
+  preBuiltConsensusArtifact: path.resolve(appPreBuiltContractArtifacts, 'ConsensusApp.json'),
+  adjudicatorArtifact: path.resolve(buildContracts, 'NitroAdjudicator.json'),
+  consensusArtifact: path.resolve(buildContracts, 'ConsensusApp.json'),
 };
 
 module.exports.moduleFileExtensions = moduleFileExtensions;

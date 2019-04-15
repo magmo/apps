@@ -2,12 +2,11 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
-import { getNetworkId } from '../utils/contract-utils';
+import { NETWORK_ID } from '../constants';
 
 export class NetworkStatus extends React.PureComponent {
   render() {
-    const networkId = getNetworkId();
-    switch (networkId) {
+    switch (NETWORK_ID) {
       case 1:
         return (
           <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
@@ -41,7 +40,7 @@ export class NetworkStatus extends React.PureComponent {
         return (
           <div style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
             <FontAwesomeIcon icon={faDotCircle} style={{ color: 'black' }} />
-            &nbsp;&nbsp; Test Net ID:{networkId}
+            &nbsp;&nbsp; Test Net ID:{NETWORK_ID}
           </div>
         );
     }

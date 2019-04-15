@@ -1,7 +1,5 @@
 import { ethers } from 'ethers';
-
-import NitroAdjudicatorArtifact from '../../build/contracts/NitroAdjudicator.json';
-import ConsensusAppArtifact from '../../build/contracts/ConsensusApp.json';
+import { ADJUDICATOR_ADDRESS, NETWORK_ID, ADJUDICATOR_ABI } from '../constants';
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
@@ -9,45 +7,25 @@ export async function getProvider(): Promise<ethers.providers.Web3Provider> {
 
 export async function getAdjudicatorContract(provider) {
   await provider.ready;
-  const networkId = (await provider.getNetwork()).chainId;
-  const contractAddress = NitroAdjudicatorArtifact.networks[networkId].address;
-  return new ethers.Contract(contractAddress, getAdjudicatorInterface(), provider);
+  return new ethers.Contract(ADJUDICATOR_ADDRESS, getAdjudicatorInterface(), provider);
 }
 
 export function getAdjudicatorInterface(): ethers.utils.Interface {
-  return new ethers.utils.Interface(NitroAdjudicatorArtifact.abi);
-}
-
-export function getAdjudicatorContractAddress(): string {
-  return NitroAdjudicatorArtifact.networks[getNetworkId()].address;
-}
-
-export function getConsensusContractAddress(): string {
-  return ConsensusAppArtifact.networks[getNetworkId()].address;
-}
-
-export function getNetworkId(): number {
-  if (!!process.env.TARGET_NETWORK_ID) {
-    return parseInt(process.env.TARGET_NETWORK_ID, 10);
-  } else {
-    throw new Error('There is no target network ID specified.');
-  }
+  return new ethers.utils.Interface(JSON.parse(ADJUDICATOR_ABI));
 }
 
 export function isDevelopmentNetwork(): boolean {
-  const networkId = getNetworkId();
-
   return (
-    networkId > 8 && // various test nets
-    networkId !== 42 && // kovan
-    networkId !== 60 && // go chain
-    networkId !== 77 && // sokol
-    networkId !== 99 && // core
-    networkId !== 100 && // xDai
-    networkId !== 31337 && // go chain test
-    networkId !== 401697 && // tobalaba
-    networkId !== 7762959 && // musicoin
-    networkId !== 61717561 // aquachain
+    NETWORK_ID > 8 && // various test nets
+    NETWORK_ID !== 42 && // kovan
+    NETWORK_ID !== 60 && // go chain
+    NETWORK_ID !== 77 && // sokol
+    NETWORK_ID !== 99 && // core
+    NETWORK_ID !== 100 && // xDai
+    NETWORK_ID !== 31337 && // go chain test
+    NETWORK_ID !== 401697 && // tobalaba
+    NETWORK_ID !== 7762959 && // musicoin
+    NETWORK_ID !== 61717561 // aquachain
   );
 }
 
