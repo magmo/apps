@@ -9,6 +9,7 @@ This protocol handles launching a challenge on the blockchain. It includes:
 Out of scope (for now)
 
 - Halting the challenge in the case where the opponents move arrives between approval and transaction submission.
+- Chain reorgs (e.g. timeout on one fork vs. response on another)
 
 ## State machine
 
@@ -21,9 +22,10 @@ graph TD
   MT --> |No| WFT(WaitForTransaction)
   MT --> |Yes| AU(AcknowledgeUnnecessary)
   AU --> |ChallengeUneccessaryAcknowledged| SU((Unnecessary))
-  WFA --> |ChallengeDenied| F((Failure))
+  WFA --> |ChallengeDenied| AF(AcknowledgeFailure)
+  AF --> |FailureAcknowledged| F((Failure))
   WFT --> |TransactionSuccess| WFRT(WaitForResponseOrTimeout)
-  WFT --> |TransactionFailure| F
+  WFT --> |TransactionFailure| AF
   WFRT --> |BlockMined??| AT(AcknowledgeTimeout)
   AT --> |TimeoutAcknowledged| SC((Closed))
   WFRT --> |ChallengeResponseReceived| AR(AcknowledgeResponse)
