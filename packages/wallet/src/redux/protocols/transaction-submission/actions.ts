@@ -1,4 +1,3 @@
-import { WalletProtocol } from '../../types';
 import { BaseProcessAction } from '../actions';
 
 export type TransactionAction =
@@ -17,13 +16,12 @@ export const TRANSACTION_FINALIZED = 'WALLET.TRANSACTION_FINALIZED';
 
 export interface TransactionSentToMetamask extends BaseProcessAction {
   type: typeof TRANSACTION_SENT_TO_METAMASK;
-  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
+
 export interface TransactionSubmissionFailed extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMISSION_FAILED;
-  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
   error: { message?: string; code };
@@ -31,7 +29,6 @@ export interface TransactionSubmissionFailed extends BaseProcessAction {
 
 export interface TransactionSubmitted extends BaseProcessAction {
   type: typeof TRANSACTION_SUBMITTED;
-  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
   transactionHash: string;
@@ -39,7 +36,6 @@ export interface TransactionSubmitted extends BaseProcessAction {
 
 export interface TransactionConfirmed extends BaseProcessAction {
   type: typeof TRANSACTION_CONFIRMED;
-  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
   contractAddress?: string;
@@ -47,14 +43,12 @@ export interface TransactionConfirmed extends BaseProcessAction {
 
 export interface TransactionFinalized extends BaseProcessAction {
   type: typeof TRANSACTION_FINALIZED;
-  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
 
 export interface RetryTransaction extends BaseProcessAction {
   type: typeof RETRY_TRANSACTION;
-  protocol: WalletProtocol.TransactionSubmission;
   channelId: string;
   processId: string;
 }
@@ -68,7 +62,6 @@ export const transactionSentToMetamask = (
   processId: string,
 ): TransactionSentToMetamask => ({
   type: TRANSACTION_SENT_TO_METAMASK,
-  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
 });
@@ -79,7 +72,6 @@ export const transactionSubmissionFailed = (
   error: { message?: string; code },
 ): TransactionSubmissionFailed => ({
   type: TRANSACTION_SUBMISSION_FAILED,
-  protocol: WalletProtocol.TransactionSubmission,
   error,
   channelId,
   processId,
@@ -91,7 +83,6 @@ export const transactionSubmitted = (
   transactionHash: string,
 ): TransactionSubmitted => ({
   type: TRANSACTION_SUBMITTED,
-  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
   transactionHash,
@@ -103,7 +94,6 @@ export const transactionConfirmed = (
   contractAddress?: string,
 ): TransactionConfirmed => ({
   type: TRANSACTION_CONFIRMED,
-  protocol: WalletProtocol.TransactionSubmission,
 
   channelId,
   processId,
@@ -115,14 +105,12 @@ export const transactionFinalized = (
   processId: string,
 ): TransactionFinalized => ({
   type: TRANSACTION_FINALIZED,
-  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
 });
 
 export const retryTransaction = (channelId: string, processId: string): RetryTransaction => ({
   type: RETRY_TRANSACTION,
-  protocol: WalletProtocol.TransactionSubmission,
   channelId,
   processId,
 });
