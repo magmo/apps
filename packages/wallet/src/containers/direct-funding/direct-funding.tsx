@@ -13,7 +13,6 @@ import { WalletProtocol } from '../../redux/types';
 
 interface Props {
   directFundingState: directFundingStates.DirectFundingState;
-  channelId: string;
   fundingSuccessAcknowledged: () => void;
   fundingDeclinedAcknowledged: () => void;
   transactionRetryApprovedAction: (channelId: string, protocol: WalletProtocol) => void;
@@ -81,6 +80,6 @@ const mapDispatchToProps = {
 // why does it think that mapStateToProps can return undefined??
 
 export default connect(
-  (state: any) => ({ directFundingState: state.channelState.directFunding }),
+  () => ({}),
   mapDispatchToProps,
 )(DirectFundingContainer);
