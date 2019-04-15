@@ -26,9 +26,9 @@ const printHostingInstructions = require('react-dev-utils/printHostingInstructio
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
 const {
-  parseABI,
-  parseContractAddress,
-} = require('magmo-devtools');
+  getNetworkId,
+  setContractEnvironmentVariables
+} = require('./helpers');
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
@@ -38,22 +38,9 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
-if (!process.env.TARGET_NETWORK_ID) {
-  console.error('TARGET_NETWORK_ID is not defined. Please update your .env file and specify a TARGET_NETWORK_ID');
-  process.exit(1);
-} else if (process.env.TARGET_NETWORK_ID.length == 0 || isNaN(process.env.TARGET_NETWORK_ID)) {
-  console.error('TARGET_NETWORK_ID is not a number. Please update your .env file and specify a number for TARGET_NETWORK_ID');
-  process.exit(1);
-}
-if (!process.env.CONSENSUS_LIBRARY_ADDRESS) {
-  process.env.CONSENSUS_LIBRARY_ADDRESS = parseContractAddress(paths.preBuiltConsensusArtifact, process.env.TARGET_NETWORK_ID);
-}
-if (!process.env.ADJUDICATOR_ADDRESS) {
-  process.env.ADJUDICATOR_ADDRESS = parseContractAddress(paths.preBuiltAdjudicatorArtifact, process.env.TARGET_NETWORK_ID);
-}
-if (!process.env.ADJUDICATOR_ABI) {
-  process.env.ADJUDICATOR_ABI = parseABI(paths.preBuiltAdjudicatorArtifact);
-}
+
+const networkId = getNetworkId();
+setContractEnvironmentVariables(networkId, paths.appPreBuiltContractArtifacts);
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {

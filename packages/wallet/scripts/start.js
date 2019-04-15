@@ -37,9 +37,11 @@ const isInteractive = process.stdout.isTTY;
 const {
   deployContracts,
   startGanache,
-  parseABI,
-  parseContractAddress,
 } = require('magmo-devtools');
+const {
+  getNetworkId,
+  setContractEnvironmentVariables
+} = require('./helpers');
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -64,29 +66,15 @@ if (process.env.HOST) {
   console.log(`Learn more here: ${chalk.yellow('http://bit.ly/2mwWSwH')}`);
   console.log();
 }
+
+const networkId = getNetworkId();
+
 let argv = require('yargs').argv;
-if (!process.env.TARGET_NETWORK_ID) {
-  console.error('TARGET_NETWORK_ID is not defined. Please update your .env file and specify a TARGET_NETWORK_ID');
-  process.exit(1);
-} else if (process.env.TARGET_NETWORK_ID.length == 0 || isNaN(process.env.TARGET_NETWORK_ID)) {
-  console.error('TARGET_NETWORK_ID is not a number. Please update your .env file and specify a number for TARGET_NETWORK_ID');
-  process.exit(1);
-} else {
-  argv.i = parseInt(process.env.TARGET_NETWORK_ID);
-}
+argv.i = networkId;
 
 startGanache(argv).then(() => {
   deployContracts().then(value => {
-    if (!process.env.CONSENSUS_LIBRARY_ADDRESS) {
-      process.env.CONSENSUS_LIBRARY_ADDRESS = parseContractAddress(paths.consensusArtifact, process.env.TARGET_NETWORK_ID);
-      console.log(process.env.CONSENSUS_LIBRARY_ADDRESS);
-    }
-    if (!process.env.ADJUDICATOR_ADDRESS) {
-      process.env.ADJUDICATOR_ADDRESS = parseContractAddress(paths.adjudicatorArtifact, process.env.TARGET_NETWORK_ID);
-    }
-    if (!process.env.ADJUDICATOR_ABI) {
-      process.env.ADJUDICATOR_ABI = parseABI(paths.adjudicatorArtifact);
-    }
+    setContractEnvironmentVariables(networkId, paths.buildContracts);
 
     // We attempt to use the default port but if it is busy, we offer the user to
     // run on a different port. `choosePort()` Promise resolves to the next free port.
