@@ -1,9 +1,10 @@
 import { call, put } from 'redux-saga/effects';
 import * as actions from '../actions';
 import { ethers } from 'ethers';
-import { getProvider, getAdjudicatorContractAddress } from '../../utils/contract-utils';
+import { getProvider } from '../../utils/contract-utils';
 import { TransactionResponse, TransactionRequest } from 'ethers/providers';
 import { WalletProtocol } from '../types';
+import { ADJUDICATOR_ADDRESS } from '../../constants';
 
 export function* transactionSender(
   transaction: TransactionRequest,
@@ -15,10 +16,9 @@ export function* transactionSender(
   yield put(actions.transactionSentToMetamask(channelId, protocol));
   let transactionResult: TransactionResponse;
   try {
-    const contractAddress = yield call(getAdjudicatorContractAddress, provider);
     transactionResult = yield call([signer, signer.sendTransaction], {
       ...transaction,
-      to: contractAddress,
+      to: ADJUDICATOR_ADDRESS,
     });
   } catch (err) {
     yield put(actions.transactionSubmissionFailed(channelId, protocol, err));

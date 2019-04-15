@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 
 import NitroAdjudicatorArtifact from '../../build/contracts/NitroAdjudicator.json';
 import ConsensusAppArtifact from '../../build/contracts/ConsensusApp.json';
+
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
 }

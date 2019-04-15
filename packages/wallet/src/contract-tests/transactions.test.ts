@@ -25,9 +25,9 @@ import {
 
 import { depositContract } from './test-utils';
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
-import { getAdjudicatorContractAddress } from '../utils/contract-utils';
 import { channelID } from 'fmg-core/lib/channel';
 import { WalletProtocol } from '../redux/types';
+import { ADJUDICATOR_ADDRESS } from '../constants';
 
 jest.setTimeout(90000);
 
@@ -55,8 +55,7 @@ describe('transactions', () => {
     expect(saga.next(provider).value).toEqual(put(transactionSentToMetamask(channelId, protocol)));
     saga.next();
     const signer = provider.getSigner();
-    const contractAddress = getAdjudicatorContractAddress();
-    transactionToSend = { ...transactionToSend, to: contractAddress };
+    transactionToSend = { ...transactionToSend, to: ADJUDICATOR_ADDRESS };
     const transactionReceipt = await signer.sendTransaction(transactionToSend);
 
     saga.next();
