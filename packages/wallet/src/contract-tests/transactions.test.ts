@@ -57,7 +57,6 @@ describe('transactions', () => {
     transactionToSend = { ...transactionToSend, to: ADJUDICATOR_ADDRESS };
     const transactionReceipt = await signer.sendTransaction(transactionToSend);
 
-    saga.next();
     expect(saga.next(transactionReceipt).value).toEqual(
       put(transactionSubmitted(processId, transactionReceipt.hash || '')),
     );
