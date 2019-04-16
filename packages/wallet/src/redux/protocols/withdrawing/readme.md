@@ -25,7 +25,7 @@ graph LR
   WFT --> |TransactionSubmitted| WFAk(WaitForAcknowledgement)
   WFT --> |TransactionFailed| F((failure))
   WFAk --> |SuccessAcknowledged| S((success))
-  WFAp --> |Rejected| R((rejected))
+  WFAp --> |Rejected| F((failure))
 ```
 
 Notes:

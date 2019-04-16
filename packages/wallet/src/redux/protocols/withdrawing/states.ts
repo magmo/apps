@@ -5,8 +5,7 @@ export type WithdrawalState =
   | WaitForTransaction
   | WaitForAcknowledgement
   | Failure
-  | Success
-  | Rejected;
+  | Success;
 
 export const WAIT_FOR_APPROVAL = 'WaitforApproval';
 export const WAIT_FOR_TRANSACTION = 'WaitForTransaction';
@@ -46,16 +45,12 @@ export interface Failure {
   reason: string;
 }
 
-export interface Rejected {
-  type: typeof REJECTED;
-}
-
 // -------
 // Helpers
 // -------
 
-export function isTerminal(state: WithdrawalState): state is Failure | Success | Rejected {
-  return state.type === FAILURE || state.type === SUCCESS || state.type === REJECTED;
+export function isTerminal(state: WithdrawalState): state is Failure | Success {
+  return state.type === FAILURE || state.type === SUCCESS;
 }
 
 export function waitforApproval(properties: Properties<WaitForApproval>): WaitForApproval {
@@ -81,8 +76,4 @@ export function success(): Success {
 
 export function failure(reason: string): Failure {
   return { type: FAILURE, reason };
-}
-
-export function rejected(): Rejected {
-  return { type: REJECTED };
 }
