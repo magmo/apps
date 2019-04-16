@@ -46,6 +46,11 @@ export interface WaitForAdjudicator extends Shared {
   uid: string;
 }
 
+interface UnhandledAction {
+  processId: string;
+  [property: string]: any;
+}
+
 export interface Initialized extends Shared {
   type: typeof WALLET_INITIALIZED;
   uid: string;
@@ -53,6 +58,7 @@ export interface Initialized extends Shared {
   adjudicator: string;
   consensusLibrary: string;
   processStore: ProcessStore;
+  unhandledActions: UnhandledAction[];
   // procedure branches are optional, and exist precisely when that procedure is running
   indirectFunding?: indirectFunding.IndirectFundingState;
 }
@@ -101,7 +107,7 @@ export function waitForAdjudicator(params: Properties<WaitForAdjudicator>): Wait
 }
 
 export function initialized(params: Properties<Initialized>): Initialized {
-  const { uid, networkId, adjudicator, consensusLibrary, processStore } = params;
+  const { uid, networkId, adjudicator, consensusLibrary, processStore, unhandledActions } = params;
   return {
     ...shared(params),
     type: WALLET_INITIALIZED,
@@ -110,6 +116,7 @@ export function initialized(params: Properties<Initialized>): Initialized {
     adjudicator,
     consensusLibrary,
     processStore,
+    unhandledActions,
   };
 }
 

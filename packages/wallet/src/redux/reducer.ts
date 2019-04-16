@@ -102,6 +102,7 @@ const waitForAdjudicatorReducer = (
         networkId,
         consensusLibrary: '0x0FA5E',
         processStore: {},
+        unhandledActions: [],
       });
     default:
       return state;

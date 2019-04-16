@@ -22,6 +22,7 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
       networkId: 0,
       adjudicator: '',
       processStore,
+      unhandledActions: [],
     });
   };
 

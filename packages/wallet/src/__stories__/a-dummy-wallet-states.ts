@@ -57,6 +57,7 @@ const defaultInitialized: walletStates.Initialized = walletStates.initialized({
   consensusLibrary: '',
   processStore: {},
   directFundingStore: {},
+  unhandledActions: [],
 });
 
 ////////////////////////////////////////////////

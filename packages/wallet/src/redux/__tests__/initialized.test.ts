@@ -10,6 +10,7 @@ const defaults = {
   networkId: 1,
   consensusLibrary: '0x0',
   processStore: {},
+  unhandledActions: [],
 };
 
 const initializedState = states.initialized({ ...defaults });
