@@ -53,7 +53,7 @@ export function isTerminal(state: WithdrawalState): state is Failure | Success {
   return state.type === FAILURE || state.type === SUCCESS;
 }
 
-export function waitforApproval(properties: Properties<WaitForApproval>): WaitForApproval {
+export function waitForApproval(properties: Properties<WaitForApproval>): WaitForApproval {
   const { processId, withdrawalAmount } = properties;
   return { type: WAIT_FOR_APPROVAL, withdrawalAmount, processId };
 }
