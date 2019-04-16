@@ -21,7 +21,7 @@
     "postinstall": "rm -f node_modules/web3/index.d.ts",
     "storybook": "start-storybook -p 9001 -c .storybook",
     "test:contracts": "npx ganache-then-jest -c ./config/jest/jest.contracts.config.js --runInBand",
-    "": "rm -rf ./build/contracts"
+    "clearContracts": "rm -rf ./build/contracts"
   },
   "dependencies": {
     "@firebase/app-types": "^0.3.2",
