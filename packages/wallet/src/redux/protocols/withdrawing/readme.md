@@ -1,0 +1,33 @@
+# Withdrawing Protocol
+
+The purpose of this protocol is to withdraw funds from a directly funded channel.
+It covers:
+
+- Checking that a channel is closed.
+- Displaying to the user the funds allocated to them in the channel,
+- Getting approval from the user to proceed
+- Sending the withdraw + conclude to the blockchain
+- Getting acknowledgement from the user when done
+
+Out of scope (for the time being):
+
+- Retrying a transaction on failure.
+- Displaying an error message to the user on transaction failure.
+
+## State machine
+
+The protocol is implemented with the following state machine
+
+```mermaid
+graph LR
+  St((start)) --> WFAp(WaitForApproval)
+  WFAp --> |Approved| WFT(WaitForTransaction)
+  WFT --> |TransactionSubmitted| WFAk(WaitForAcknowledgement)
+  WFT --> |TransactionFailed| F((failure))
+  WFAk --> |SuccessAcknowledged| S((success))
+  WFAp --> |Rejected| R((rejected))
+```
+
+Notes:
+
+- In the code, all the withdrawal specific actions are prefixed with the word "Withdrawal"
