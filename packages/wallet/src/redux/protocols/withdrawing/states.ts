@@ -17,18 +17,22 @@ export const FAILURE = 'Failure';
 export interface WaitForApproval {
   type: typeof WAIT_FOR_APPROVAL;
   processId: string;
+  channelId: string;
   withdrawalAmount: string;
 }
 
 export interface WaitForTransaction {
   type: typeof WAIT_FOR_TRANSACTION;
   processId: string;
+  channelId: string;
   transactionSubmissionState: TransactionSubmissionState;
+  withdrawalAddress: string;
 }
 
 export interface WaitForAcknowledgement {
   type: typeof WAIT_FOR_ACKNOWLEDGEMENT;
   processId: string;
+  channelId: string;
 }
 
 export interface Failure {
@@ -54,20 +58,26 @@ export function isTerminal(state: WithdrawalState): state is Failure | Success {
 }
 
 export function waitForApproval(properties: Properties<WaitForApproval>): WaitForApproval {
-  const { processId, withdrawalAmount } = properties;
-  return { type: WAIT_FOR_APPROVAL, withdrawalAmount, processId };
+  const { processId, withdrawalAmount, channelId } = properties;
+  return { type: WAIT_FOR_APPROVAL, withdrawalAmount, processId, channelId };
 }
 
 export function waitForTransaction(properties: Properties<WaitForTransaction>): WaitForTransaction {
-  const { processId, transactionSubmissionState } = properties;
-  return { type: WAIT_FOR_TRANSACTION, transactionSubmissionState, processId };
+  const { processId, transactionSubmissionState, channelId, withdrawalAddress } = properties;
+  return {
+    type: WAIT_FOR_TRANSACTION,
+    transactionSubmissionState,
+    processId,
+    channelId,
+    withdrawalAddress,
+  };
 }
 
 export function waitForAcknowledgement(
   properties: Properties<WaitForAcknowledgement>,
 ): WaitForAcknowledgement {
-  const { processId } = properties;
-  return { type: WAIT_FOR_ACKNOWLEDGEMENT, processId };
+  const { processId, channelId } = properties;
+  return { type: WAIT_FOR_ACKNOWLEDGEMENT, processId, channelId };
 }
 
 export function success(): Success {
@@ -77,3 +87,9 @@ export function success(): Success {
 export function failure(reason: string): Failure {
   return { type: FAILURE, reason };
 }
+
+export const FAILURE_REASONS = {
+  TRANSACTION_FAILURE: 'Transaction failed',
+  CHANNEL_NOT_CLOSED: 'Channel not closed',
+  USER_REJECTED: 'User rejected',
+};

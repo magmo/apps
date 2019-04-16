@@ -11,6 +11,7 @@ import {
 } from '../../../channel-state/state';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { EMPTY_OUTBOX_STATE } from '../../../outbox/state';
+import { Wallet } from 'ethers';
 
 // To test all paths through the state machine we will use 4 different scenarios:
 //
@@ -74,11 +75,20 @@ const notClosedChannelState = {
 };
 
 const transaction = {};
+const withdrawalAddress = Wallet.createRandom().address;
 const processId = 'process-id.123';
 const sharedData: SharedData = { outboxState: EMPTY_OUTBOX_STATE, channelState };
 const withdrawalAmount = '0x05';
 const transactionSubmissionState = transactionScenarios.happyPath.waitForSubmission;
-const props = { transaction, processId, sharedData, withdrawalAmount, transactionSubmissionState };
+const props = {
+  transaction,
+  processId,
+  sharedData,
+  withdrawalAmount,
+  transactionSubmissionState,
+  channelId,
+  withdrawalAddress,
+};
 
 // ------
 // States
@@ -87,15 +97,15 @@ const waitForApproval = states.waitForApproval(props);
 const waitForTransaction = states.waitForTransaction(props);
 const waitForAcknowledgement = states.waitForAcknowledgement(props);
 const success = states.success();
-const transactionFailure = states.failure('User refused');
-const userRejectedFailure = states.failure('Transaction failed');
-const channelNotClosedFailure = states.failure('Channel not closed');
+const transactionFailure = states.failure(states.FAILURE_REASONS.TRANSACTION_FAILURE);
+const userRejectedFailure = states.failure(states.FAILURE_REASONS.USER_REJECTED);
+const channelNotClosedFailure = states.failure(states.FAILURE_REASONS.CHANNEL_NOT_CLOSED);
 
 // -------
 // Actions
 // -------
 
-const approved = actions.withdrawalApproved(processId);
+const approved = actions.withdrawalApproved(processId, channelId);
 const rejected = actions.withdrawalRejected(processId);
 const successAcknowledged = actions.withdrawalSuccessAcknowledged(processId);
 const transactionSent = transactionActions.transactionSent(processId);

@@ -14,6 +14,7 @@ export type WithdrawalAction =
 export interface WithdrawalApproved extends BaseProcessAction {
   type: typeof WITHDRAWAL_APPROVED;
   processId: string;
+  withdrawalAddress: string;
 }
 
 export interface WithdrawalRejected extends BaseProcessAction {
@@ -25,8 +26,12 @@ export interface WithdrawalSuccessAcknowledged extends BaseProcessAction {
   processId: string;
 }
 
-export const withdrawalApproved = (processId: string): WithdrawalApproved => ({
+export const withdrawalApproved = (
+  processId: string,
+  withdrawalAddress: string,
+): WithdrawalApproved => ({
   type: WITHDRAWAL_APPROVED as typeof WITHDRAWAL_APPROVED,
+  withdrawalAddress,
   processId,
 });
 
