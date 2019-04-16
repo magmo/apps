@@ -57,28 +57,42 @@ describe('withdrawal rejected scenario', () => {
     const action = scenario.rejected;
     const result = reducer(state, sharedData, action);
 
-    itFailsWithReason(result, scenario.userRejectedFailure.reason);
+    itTransitionsToFailure(result, scenario.userRejectedFailure);
   });
 });
 
 describe('transaction failed scenario', () => {
   const scenario = scenarios.failedTransaction;
-  const storage = scenario.sharedData;
+  const { sharedData } = scenario;
 
   describe(whenIn(states.WAIT_FOR_TRANSACTION), () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionFailed;
-    const result = reducer(state, storage, action);
-    itFailsWithReason(result, scenario.transactionFailure.reason);
+    const result = reducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.transactionFailure);
+  });
+});
+
+describe('channel not closed scenario', () => {
+  const scenario = scenarios.channelNotClosed;
+  const { sharedData } = scenario;
+
+  describe(whenIn(states.WAIT_FOR_APPROVAL), () => {
+    const state = scenario.waitForApproval;
+    const action = scenario.approved;
+    const result = reducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.channelNotClosedFailure);
   });
 });
 
 const whenIn = stage => `when in ${stage}`;
 
-const itFailsWithReason = (result: { protocolState: states.WithdrawalState }, reason) => {
-  itTransitionsTo(result, states.FAILURE);
-  it(`fails with ${reason}`, () => {
-    expect((result.protocolState as states.Failure).reason).toEqual(reason);
+const itTransitionsToFailure = (
+  result: { protocolState: states.WithdrawalState },
+  failure: states.Failure,
+) => {
+  it(`transitions to failure with reason ${failure.reason}`, () => {
+    expect(result.protocolState).toMatchObject(failure);
   });
 };
 const itTransitionsTo = (result: { protocolState: states.WithdrawalState }, type: string) => {

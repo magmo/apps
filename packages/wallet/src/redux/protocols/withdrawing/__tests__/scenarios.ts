@@ -1,12 +1,10 @@
 import * as states from '../states';
 import * as actions from '../actions';
 import * as transactionActions from '../../transaction-submission/actions';
-import { EMPTY_SHARED_DATA, SharedData } from '../..';
+import { SharedData } from '../..';
 import * as transactionScenarios from '../../transaction-submission/__tests__/scenarios';
 import {
   ChannelStatus,
-  WITHDRAWING,
-  APPROVE_WITHDRAWAL,
   RUNNING,
   WAIT_FOR_UPDATE,
   ChannelState,
@@ -14,11 +12,13 @@ import {
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { EMPTY_OUTBOX_STATE } from '../../../outbox/state';
 
-// To test all paths through the state machine we will use 3 different scenarios:
+// To test all paths through the state machine we will use 4 different scenarios:
 //
 // 1. Happy path: WaitForApproval -> WaitForTransaction -> WaitForAcknowledgement -> Success
 // 2. Withdrawal Rejected: WaitForApproval -> Failure
 // 3. Transaction failure: WaitForApproval -> WaitForTransaction -> Failure
+// 4. Channel not closed failure: WitForApproval -> Failure
+
 // ---------
 // Test data
 // ---------
@@ -32,6 +32,8 @@ const {
   channelNonce,
   concludeCommitment1,
   concludeCommitment2,
+  gameCommitment1,
+  gameCommitment2,
 } = testScenarios;
 
 const channelStatus: ChannelStatus = {
@@ -44,8 +46,8 @@ const channelStatus: ChannelStatus = {
   ourIndex: 0,
   participants,
   channelNonce,
-  turnNum: 10,
-  funded: false,
+  turnNum: concludeCommitment2.turnNum,
+  funded: true,
   lastCommitment: { commitment: concludeCommitment2, signature: '0x0' },
   penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
 };
@@ -54,6 +56,20 @@ const channelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
+  },
+};
+
+const notClosedChannelStatus = {
+  ...channelStatus,
+  lastCommitment: { commitment: gameCommitment2, signature: '0x0' },
+  penultimateCommitment: { commitment: gameCommitment1, signature: '0x0' },
+  turnNum: gameCommitment2.turnNum,
+};
+
+const notClosedChannelState = {
+  initializingChannels: {},
+  initializedChannels: {
+    [channelId]: notClosedChannelStatus,
   },
 };
 
@@ -73,6 +89,7 @@ const waitForAcknowledgement = states.waitForAcknowledgement(props);
 const success = states.success();
 const transactionFailure = states.failure('User refused');
 const userRejectedFailure = states.failure('Transaction failed');
+const channelNotClosedFailure = states.failure('Channel not closed');
 
 // -------
 // Actions
@@ -118,4 +135,14 @@ export const failedTransaction = {
   // Actions
   approved,
   transactionFailed,
+};
+
+export const channelNotClosed = {
+  ...props,
+  sharedData: { channelState: notClosedChannelState, outboxState: EMPTY_OUTBOX_STATE },
+  // States
+  waitForApproval,
+  channelNotClosedFailure,
+  // Actions
+  approved,
 };
