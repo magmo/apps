@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 import NitroAdjudicatorArtifact from '../../build/contracts/NitroAdjudicator.json';
-import ConsensusAppArtifact from '../../build/contracts/ConsensusApp.json';
+// import ConsensusAppArtifact from '../../build/contracts/ConsensusApp.json';
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
@@ -23,7 +23,7 @@ export function getAdjudicatorContractAddress(): string {
 }
 
 export function getConsensusContractAddress(): string {
-  return ConsensusAppArtifact.networks[getNetworkId()].address;
+  return 'fake-address'; // ConsensusAppArtifact.networks[getNetworkId()].address;
 }
 
 export function getNetworkId(): number {
