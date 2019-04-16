@@ -35,12 +35,12 @@ const render = container => () => {
 };
 
 const indirectFundingScreens = {
-  WaitForApproval: happyPath.states.waitForApproval,
-  WaitForPreFundSetup: happyPath.states.waitForPreFundSetup1,
-  WaitForDirectFunding: happyPath.states.waitForDirectFunding,
-  WaitForPostFundSetup: happyPath.states.waitForPostFundSetup1,
-  WaitForLedgerUpdate: happyPath.states.waitForLedgerUpdate1,
-  WaitForConsensus: happyPath.states.waitForLedgerUpdate1,
+  WaitForApproval: happyPath.states.waitForApproval.protocolState,
+  WaitForPreFundSetup: happyPath.states.waitForPreFundSetup1.protocolState,
+  WaitForDirectFunding: happyPath.states.waitForDirectFunding.protocolState,
+  WaitForPostFundSetup: happyPath.states.waitForPostFundSetup1.protocolState,
+  WaitForLedgerUpdate: happyPath.states.waitForLedgerUpdate1.protocolState,
+  WaitForConsensus: happyPath.states.waitForLedgerUpdate1.protocolState,
 };
 
 Object.keys(indirectFundingScreens).map(storyName => {

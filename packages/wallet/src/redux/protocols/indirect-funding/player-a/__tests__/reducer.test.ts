@@ -1,16 +1,16 @@
-import * as states from '../state';
-import * as actions from '../../../../actions';
-import { playerAReducer } from '../reducer';
-import * as channelStates from '../../../../channel-state/state';
-import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import { itSendsThisMessage, itTransitionsToChannelStateType } from '../../../../__tests__/helpers';
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
-import * as SigningUtil from '../../../../../utils/signing-utils';
-import {} from '../../../../__tests__/test-scenarios';
-import * as testScenarios from '../../../../__tests__/test-scenarios';
+import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { addHex } from '../../../../../utils/hex-utils';
+import * as SigningUtil from '../../../../../utils/signing-utils';
+import * as actions from '../../../../actions';
+import * as channelStates from '../../../../channel-state/state';
 import { ProtocolStateWithSharedData } from '../../../../protocols';
-import { EMPTY_OUTBOX_STATE } from '../../../../outbox/state';
+import { itSendsThisMessage, itTransitionsToChannelStateType } from '../../../../__tests__/helpers';
+import * as testScenarios from '../../../../__tests__/test-scenarios';
+import {} from '../../../../__tests__/test-scenarios';
+import { playerAReducer } from '../reducer';
+import * as states from '../state';
+import * as scenarios from './scenarios';
 
 const startingIn = stage => `start in ${stage}`;
 const whenActionArrives = action => `incoming action ${action}`;
@@ -54,44 +54,12 @@ const ledgerChannelDefaults = {
   participants: testScenarios.ledgerChannel.participants as [string, string],
 };
 
-const defaultAppChannelState = channelStates.waitForFundingAndPostFundSetup({
-  ...defaults,
-  turnNum: 5,
-  lastCommitment: {
-    commitment: testScenarios.preFundCommitment1,
-    signature: '0x0',
-  },
-  penultimateCommitment: {
-    commitment: testScenarios.preFundCommitment2,
-    signature: '0x0',
-  },
-  funded: false,
-  address: defaults.participants[0],
-});
-
-const startingState = (
-  protocolState: states.PlayerAState,
-  ...channelStatuses: channelStates.ChannelStatus[]
-): ProtocolStateWithSharedData<states.PlayerAState> => {
-  const channelState = { ...channelStates.EMPTY_CHANNEL_STATE };
-  for (const channelStatus of channelStatuses) {
-    channelState.initializedChannels[channelStatus.channelId] = channelStatus;
-  }
-  return {
-    protocolState,
-    sharedData: {
-      outboxState: EMPTY_OUTBOX_STATE,
-      channelState,
-    },
-  };
-};
-
 const validateMock = jest.fn().mockReturnValue(true);
 Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
 describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
   const { channelId } = defaults;
-  const state = startingState(states.waitForApproval({ channelId }), defaultAppChannelState);
+  const state = scenarios.happyPath.states.waitForApproval;
 
   describe(whenActionArrives(actions.indirectFunding.playerA.STRATEGY_APPROVED), () => {
     const action = actions.indirectFunding.playerA.strategyApproved(
@@ -112,16 +80,8 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
-  const { channelId, ledgerId } = defaults; // Add the ledger channel to state
-  const ledgerChannelState = channelStates.waitForPreFundSetup({
-    ...ledgerChannelDefaults,
-    channelId: ledgerId,
-  });
-  const state = startingState(
-    states.waitForPreFundSetup1({ channelId, ledgerId }),
-    ledgerChannelState,
-    defaultAppChannelState,
-  );
+  const { ledgerId } = defaults;
+  const state = scenarios.happyPath.states.waitForPreFundSetup1;
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
@@ -141,17 +101,10 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
-  const { channelId, ledgerId, directFundingState } = defaults;
-  const ledgerChannelState = channelStates.waitForFundingAndPostFundSetup({
-    ...ledgerChannelDefaults,
-    channelId: ledgerId,
-  });
+  const { ledgerId } = defaults;
   const total = testScenarios.twoThree.reduce(addHex);
 
-  const state = startingState(
-    states.waitForDirectFunding({ channelId, ledgerId, directFundingState }),
-    ledgerChannelState,
-  );
+  const state = scenarios.happyPath.states.waitForDirectFunding;
   // Add the ledger channel to state
 
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
@@ -168,18 +121,9 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
-  const { channelId, ledgerId } = defaults;
+  const { ledgerId } = defaults;
 
-  // Add the ledger channel to state
-  const ledgerChannelState = channelStates.aWaitForPostFundSetup({
-    ...ledgerChannelDefaults,
-    turnNum: 2,
-    channelId: ledgerId,
-  });
-  const state = startingState(
-    states.waitForPostFundSetup1({ channelId, ledgerId }),
-    ledgerChannelState,
-  );
+  const state = scenarios.happyPath.states.waitForPostFundSetup1;
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
       ledgerId,
@@ -198,17 +142,9 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
-  const { channelId, ledgerId } = defaults;
-  // Add the ledger channel to state
-  const ledgerChannelState = channelStates.waitForUpdate({
-    ...ledgerChannelDefaults,
-    turnNum: testScenarios.ledgerCommitments.postFundCommitment1.turnNum,
-    channelId: ledgerId,
-  });
-  const state = startingState(
-    states.waitForLedgerUpdate1({ channelId, ledgerId }),
-    ledgerChannelState,
-  );
+  const { ledgerId } = defaults;
+
+  const state = scenarios.happyPath.states.waitForLedgerUpdate1;
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
       ledgerId,

@@ -20,9 +20,8 @@ interface Props {
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { directFundingState, transactionRetryApprovedAction, channelId } = this.props;
-    const state = directFundingState[channelId];
-    const step = fundingStepByState(state);
+    const { directFundingState, transactionRetryApprovedAction } = this.props;
+    const step = fundingStepByState(directFundingState);
     if (
       directFundingStates.stateIsNotSafeToDeposit(directFundingState) ||
       directFundingStates.stateIsWaitForFundingConfirmation(directFundingState)
@@ -52,7 +51,10 @@ class DirectFundingContainer extends PureComponent<Props> {
             <TransactionFailed
               name="deposit"
               retryAction={() =>
-                transactionRetryApprovedAction(state.channelId, WalletProtocol.DirectFunding)
+                transactionRetryApprovedAction(
+                  directFundingState.channelId,
+                  WalletProtocol.DirectFunding,
+                )
               }
             />
           );
