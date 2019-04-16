@@ -19,11 +19,12 @@ export function getAdjudicatorInterface(): ethers.utils.Interface {
 }
 
 export function getAdjudicatorContractAddress(): string {
-  return NitroAdjudicatorArtifact.networks[getNetworkId()].address;
+  return 'fake-adjudicator-address';
+  // return NitroAdjudicatorArtifact.networks[getNetworkId()].address;
 }
 
 export function getConsensusContractAddress(): string {
-  return 'fake-address'; // ConsensusAppArtifact.networks[getNetworkId()].address;
+  return 'fake-consensus-game-address'; // ConsensusAppArtifact.networks[getNetworkId()].address;
 }
 
 export function getNetworkId(): number {
