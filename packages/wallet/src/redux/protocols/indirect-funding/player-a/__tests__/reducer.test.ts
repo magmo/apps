@@ -1,5 +1,4 @@
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
-import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { addHex } from '../../../../../utils/hex-utils';
 import * as SigningUtil from '../../../../../utils/signing-utils';
 import * as actions from '../../../../actions';
@@ -22,49 +21,26 @@ function itTransitionToStateType(state, type) {
 }
 function itTransitionsChannelToStateType(
   state: ProtocolStateWithSharedData<states.PlayerAState>,
-  channelId: string,
+  stateChannelId: string,
   type,
 ) {
-  const channelState = state.sharedData.channelState.initializedChannels[channelId];
+  const channelState = state.sharedData.channelState.initializedChannels[stateChannelId];
   itTransitionsToChannelStateType(type, { state: channelState });
 }
 
-const defaults = {
-  ...testScenarios,
-  ourIndex: PlayerIndex.A,
-  privateKey: testScenarios.asPrivateKey,
-  directFundingState: testScenarios.ledgerDirectFundingStates.playerA,
-};
-
-const ledgerChannelDefaults = {
-  ...defaults,
-  turnNum: 5,
-  lastCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
-    signature: '0x0',
-  },
-  penultimateCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
-    signature: '0x0',
-  },
-  funded: false,
-  address: testScenarios.ledgerChannel.participants[0],
-  channelNonce: testScenarios.ledgerChannel.nonce,
-  libraryAddress: testScenarios.ledgerChannel.channelType,
-  participants: testScenarios.ledgerChannel.participants as [string, string],
-};
+const channelId = testScenarios.channelId;
+const ledgerId = testScenarios.ledgerId;
 
 const validateMock = jest.fn().mockReturnValue(true);
 Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
 
 describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
-  const { channelId } = defaults;
   const state = scenarios.happyPath.states.waitForApproval;
 
   describe(whenActionArrives(actions.indirectFunding.playerA.STRATEGY_APPROVED), () => {
     const action = actions.indirectFunding.playerA.strategyApproved(
       channelId,
-      ledgerChannelDefaults.libraryAddress,
+      testScenarios.ledgerChannel.channelType,
     );
     const updatedState = playerAReducer(state.protocolState, state.sharedData, action);
 
@@ -80,7 +56,6 @@ describe(startingIn(states.WAIT_FOR_APPROVAL), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
-  const { ledgerId } = defaults;
   const state = scenarios.happyPath.states.waitForPreFundSetup1;
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
@@ -101,14 +76,12 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
-  const { ledgerId } = defaults;
   const total = testScenarios.twoThree.reduce(addHex);
 
   const state = scenarios.happyPath.states.waitForDirectFunding;
-  // Add the ledger channel to state
 
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
-    const action = actions.fundingReceivedEvent('processId', defaults.ledgerId, total, total);
+    const action = actions.fundingReceivedEvent('processId', ledgerId, total, total);
     const updatedState = playerAReducer(state.protocolState, state.sharedData, action);
 
     itTransitionToStateType(updatedState, states.WAIT_FOR_POST_FUND_SETUP_1);
@@ -121,8 +94,6 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
-  const { ledgerId } = defaults;
-
   const state = scenarios.happyPath.states.waitForPostFundSetup1;
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(
@@ -142,8 +113,6 @@ describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
-  const { ledgerId } = defaults;
-
   const state = scenarios.happyPath.states.waitForLedgerUpdate1;
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
     const action = actions.commitmentReceived(

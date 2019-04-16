@@ -7,16 +7,12 @@ import {
   ledgerDirectFundingStates,
   ledgerId,
 } from '../../../../__tests__/test-scenarios';
-import * as actions from '../actions';
 import * as states from '../state';
-
-const consensusLibrary = '0x0';
 
 const protocolStateDefaults = {
   channelId,
   ledgerId,
 };
-const actionProps = { channelId, consensusLibrary };
 
 const channelStateDefaults = {
   ourIndex: PlayerIndex.A,
@@ -33,11 +29,11 @@ const waitForFundingAppChannelState = channelStates.waitForFundingAndPostFundSet
   funded: false,
   turnNum: 5,
   lastCommitment: {
-    commitment: testScenarios.preFundCommitment1,
+    commitment: testScenarios.preFundCommitment2,
     signature: '0x0',
   },
   penultimateCommitment: {
-    commitment: testScenarios.preFundCommitment2,
+    commitment: testScenarios.preFundCommitment1,
     signature: '0x0',
   },
 });
@@ -108,10 +104,7 @@ const constructWalletState = (
   protocolState: states.PlayerAState,
   ...channelStatuses: channelStates.ChannelStatus[]
 ): ProtocolStateWithSharedData<states.PlayerAState> => {
-  const channelState = {
-    initializedChannels: {},
-    initializingChannels: {},
-  };
+  const channelState = channelStates.emptyChannelState();
   for (const channelStatus of channelStatuses) {
     channelState.initializedChannels[channelStatus.channelId] = { ...channelStatus };
   }
@@ -157,12 +150,7 @@ const waitForLedgerUpdate1 = constructWalletState(
   waitForUpdateLedgerChannelState,
 );
 
-// Happy path actions
-const strategyApproved = actions.strategyApproved(
-  actionProps.channelId,
-  actionProps.consensusLibrary,
-);
-
+// TODO: maybe add happy path actions later. But these would only be used by unit tests, so maybe the actions do not belong here.
 export const happyPath = {
   states: {
     waitForApproval,
@@ -171,7 +159,5 @@ export const happyPath = {
     waitForPostFundSetup1,
     waitForLedgerUpdate1,
   },
-  actions: {
-    strategyApproved,
-  },
+  actions: {},
 };
