@@ -36,3 +36,11 @@ export const getAdjudicatorWatcherProcessesForChannel = (
   }
   return processIds;
 };
+
+export const getRunningProcessIds = (state: walletStates.Initialized): string[] => {
+  return Object.keys(state.processStore);
+};
+
+export const getUnhandledActions = (state: walletStates.Initialized): any[] => {
+  return state.unhandledActions;
+};
