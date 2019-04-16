@@ -13,14 +13,16 @@ import { displaySender } from './display-sender';
 import { ganacheMiner } from './ganache-miner';
 import { adjudicatorLoader } from './adjudicator-loader';
 import { WALLET_INITIALIZED } from '../state';
+import { unhandledActionHandler } from './unhandled-action-handler';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
   let blockMiningWatcherProcess;
   let ganacheMinerProcess;
 
-  // always want the message listenter to be running
+  // We always want these sagas running
   yield fork(messageListener);
+  yield fork(unhandledActionHandler);
 
   // todo: restrict just to wallet actions
   const channel = yield actionChannel('*');
