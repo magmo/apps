@@ -16,6 +16,7 @@ import {
 } from '../transaction-submission/reducer';
 import { isTransactionAction } from '../transaction-submission/actions';
 import { SUCCESS, isTerminal, TransactionSubmissionState } from '../transaction-submission/states';
+import { unreachable } from '../../../utils/reducer-utils';
 
 export const initialize = (
   withdrawalAmount: string,
@@ -39,12 +40,25 @@ export const withdrawalReducer = (
       return waitForApprovalReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_TRANSACTION:
       return waitForTransactionReducer(protocolState, sharedData, action);
-    default:
+    case states.WAIT_FOR_ACKNOWLEDGEMENT:
+      return waitForAcknowledgementReducer(protocolState, sharedData, action);
+    case states.FAILURE:
+    case states.SUCCESS:
       return { protocolState, sharedData };
-    // TODO: unreachable(protocolState);
+    default:
+      return unreachable(protocolState);
   }
 };
-
+const waitForAcknowledgementReducer = (
+  protocolState: states.WaitForAcknowledgement,
+  sharedData: SharedData,
+  action: WithdrawalAction,
+): ProtocolStateWithSharedData<states.WithdrawalState> => {
+  if (action.type === actions.WITHDRAWAL_SUCCESS_ACKNOWLEDGED) {
+    return { protocolState: states.success(), sharedData };
+  }
+  return { protocolState, sharedData };
+};
 const waitForTransactionReducer = (
   protocolState: states.WaitForTransaction,
   sharedData: SharedData,
