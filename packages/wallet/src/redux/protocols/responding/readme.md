@@ -18,11 +18,11 @@ Out of scope (for the time being):
 
 ```mermaid
 graph LR
-  St((start)) --> WFR(WaitForResponse)
   St((start)) --> WFAp(WaitForApproval)
-  WFR -->|ResponseSelected| WFAp(WaitForApproval)
+  WFAp-->|Approve|WFT(WaitForTransaction)
+  WFAp-->|Approve|WFR(WaitForResponse)
+  WFR-->|ResponseProvided|WFT(WaitForTransaction)
   WFAp-->|Rejected|F((failure))
-  WFAp --> |Approved|WFT(WaitForTransaction)
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
   WFAc-->|Acknowledged|S((success))
   WFT --> |TransactionFailed| F((failure))
@@ -30,4 +30,6 @@ graph LR
 
 Notes:
 
-- The protocols initialize function determines if it can provide a response with the existing commitments the wallet knows about or if we need an external response.
+- On the `Approve` action we determine if we can refute/respond with an existing commitment.
+  - If we can we craft and send the transaction. (Transition to `WaitForTransaction`)
+  - If we can't we wait for a response to be provided to us.(Transition to `WaitForResponse`)
