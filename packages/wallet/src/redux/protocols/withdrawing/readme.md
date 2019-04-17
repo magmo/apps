@@ -13,6 +13,7 @@ Out of scope (for the time being):
 
 - Retrying a transaction on failure.
 - Displaying an error message to the user on transaction failure.
+- Checking if a finalized outcome exists on chain(This will probably require a new saga).
 
 ## State machine
 
