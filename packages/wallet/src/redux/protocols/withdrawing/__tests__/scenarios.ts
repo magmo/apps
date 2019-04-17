@@ -10,15 +10,8 @@ import {
   ChannelState,
 } from '../../../channel-state/state';
 import * as testScenarios from '../../../__tests__/test-scenarios';
-import { EMPTY_OUTBOX_STATE } from '../../../outbox/state';
 import { Wallet } from 'ethers';
-
-// To test all paths through the state machine we will use 4 different scenarios:
-//
-// 1. Happy path: WaitForApproval -> WaitForTransaction -> WaitForAcknowledgement -> Success
-// 2. Withdrawal Rejected: WaitForApproval -> Failure
-// 3. Transaction failure: WaitForApproval -> WaitForTransaction -> Failure
-// 4. Channel not closed failure: WitForApproval -> Failure
+import { emptyState } from '../../../state';
 
 // ---------
 // Test data
@@ -77,7 +70,7 @@ const notClosedChannelState = {
 const transaction = {};
 const withdrawalAddress = Wallet.createRandom().address;
 const processId = 'process-id.123';
-const sharedData: SharedData = { outboxState: EMPTY_OUTBOX_STATE, channelState };
+const sharedData: SharedData = { ...emptyState, channelState };
 const withdrawalAmount = '0x05';
 const transactionSubmissionState = transactionScenarios.happyPath.waitForConfirmation;
 const props = {
@@ -149,7 +142,7 @@ export const failedTransaction = {
 
 export const channelNotClosed = {
   ...props,
-  sharedData: { channelState: notClosedChannelState, outboxState: EMPTY_OUTBOX_STATE },
+  sharedData: { ...emptyState, channelState: notClosedChannelState },
   // States
   channelNotClosedFailure,
   // Actions
