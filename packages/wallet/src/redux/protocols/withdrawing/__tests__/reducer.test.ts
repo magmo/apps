@@ -13,8 +13,6 @@ Object.defineProperty(TransactionGenerator, 'createConcludeAndWithdrawTransactio
 });
 
 // Helpers
-const whenIn = stage => `when in ${stage}`;
-
 const itTransitionsToFailure = (
   result: { protocolState: states.WithdrawalState },
   failure: states.Failure,
@@ -49,7 +47,7 @@ describe('happy-path scenario', () => {
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
   });
 
-  describe(whenIn(states.WAIT_FOR_APPROVAL), () => {
+  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
     const state = scenario.waitForApproval;
     const action = scenario.approved;
     const result = reducer(state, sharedData, action);
@@ -58,7 +56,7 @@ describe('happy-path scenario', () => {
     itSendsConcludeAndWithdrawTransaction(result);
   });
 
-  describe(whenIn(states.WAIT_FOR_TRANSACTION), () => {
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionConfirmed;
     const result = reducer(state, sharedData, action);
@@ -66,7 +64,7 @@ describe('happy-path scenario', () => {
     itTransitionsTo(result, states.WAIT_FOR_ACKNOWLEDGEMENT);
   });
 
-  describe(whenIn(states.WAIT_FOR_ACKNOWLEDGEMENT), () => {
+  describe(`when in ${states.WAIT_FOR_ACKNOWLEDGEMENT}`, () => {
     const state = scenario.waitForAcknowledgement;
     const action = scenario.successAcknowledged;
     const result = reducer(state, sharedData, action);
@@ -79,7 +77,7 @@ describe('withdrawal rejected scenario', () => {
   const scenario = scenarios.withdrawalRejected;
   const { sharedData } = scenario;
 
-  describe(whenIn(states.WAIT_FOR_APPROVAL), () => {
+  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
     const state = scenario.waitForApproval;
     const action = scenario.rejected;
     const result = reducer(state, sharedData, action);
@@ -92,7 +90,7 @@ describe('transaction failed scenario', () => {
   const scenario = scenarios.failedTransaction;
   const { sharedData } = scenario;
 
-  describe(whenIn(states.WAIT_FOR_TRANSACTION), () => {
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionFailed;
     const result = reducer(state, sharedData, action);
@@ -104,10 +102,10 @@ describe('channel not closed scenario', () => {
   const scenario = scenarios.channelNotClosed;
   const { sharedData } = scenario;
 
-  describe(whenIn(states.WAIT_FOR_APPROVAL), () => {
-    const state = scenario.waitForApproval;
-    const action = scenario.approved;
-    const result = reducer(state, sharedData, action);
+  describe('when initializing', () => {
+    const { processId, withdrawalAmount, channelId } = scenario;
+    const result = initialize(withdrawalAmount, channelId, processId, sharedData);
+
     itTransitionsToFailure(result, scenario.channelNotClosedFailure);
   });
 });

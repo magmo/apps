@@ -97,9 +97,9 @@ const waitForApproval = states.waitForApproval(props);
 const waitForTransaction = states.waitForTransaction(props);
 const waitForAcknowledgement = states.waitForAcknowledgement(props);
 const success = states.success();
-const transactionFailure = states.failure(states.FAILURE_REASONS.TRANSACTION_FAILURE);
-const userRejectedFailure = states.failure(states.FAILURE_REASONS.USER_REJECTED);
-const channelNotClosedFailure = states.failure(states.FAILURE_REASONS.CHANNEL_NOT_CLOSED);
+const transactionFailure = states.failure(states.FailureReason.TransactionFailure);
+const userRejectedFailure = states.failure(states.FailureReason.UserRejected);
+const channelNotClosedFailure = states.failure(states.FailureReason.ChannelNotClosed);
 
 // -------
 // Actions
@@ -151,7 +151,6 @@ export const channelNotClosed = {
   ...props,
   sharedData: { channelState: notClosedChannelState, outboxState: EMPTY_OUTBOX_STATE },
   // States
-  waitForApproval,
   channelNotClosedFailure,
   // Actions
   approved,

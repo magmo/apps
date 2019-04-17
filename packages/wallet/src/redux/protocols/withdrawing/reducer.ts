@@ -24,6 +24,12 @@ export const initialize = (
   processId: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
+  if (!channelIsClosed(channelId, sharedData)) {
+    return {
+      protocolState: states.failure(states.FailureReason.ChannelNotClosed),
+      sharedData,
+    };
+  }
   return {
     protocolState: states.waitForApproval({ withdrawalAmount, processId, channelId }),
     sharedData,
@@ -89,12 +95,6 @@ const waitForApprovalReducer = (
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
   switch (action.type) {
     case actions.WITHDRAWAL_APPROVED:
-      if (!channelIsClosed(protocolState.channelId, sharedData)) {
-        return {
-          protocolState: states.failure(states.FAILURE_REASONS.CHANNEL_NOT_CLOSED),
-          sharedData,
-        };
-      }
       const { channelId, withdrawalAmount, processId } = protocolState;
       const { withdrawalAddress } = action;
       const transaction = createConcludeAndWithTransaction(
@@ -119,7 +119,7 @@ const waitForApprovalReducer = (
       };
     case actions.WITHDRAWAL_REJECTED:
       return {
-        protocolState: states.failure(states.FAILURE_REASONS.USER_REJECTED),
+        protocolState: states.failure(states.FailureReason.UserRejected),
         sharedData,
       };
     default:
@@ -139,7 +139,7 @@ const handleTransactionSubmissionComplete = (
     };
   } else {
     return {
-      protocolState: states.failure(states.FAILURE_REASONS.TRANSACTION_FAILURE),
+      protocolState: states.failure(states.FailureReason.TransactionFailure),
       sharedData,
     };
   }

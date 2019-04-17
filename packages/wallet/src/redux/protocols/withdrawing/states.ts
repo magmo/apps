@@ -79,12 +79,12 @@ export function success(): Success {
   return { type: SUCCESS };
 }
 
-export function failure(reason: string): Failure {
+export function failure(reason: FailureReason): Failure {
   return { type: FAILURE, reason };
 }
 
-export const FAILURE_REASONS = {
-  TRANSACTION_FAILURE: 'Transaction failed',
-  CHANNEL_NOT_CLOSED: 'Channel not closed',
-  USER_REJECTED: 'User rejected',
-};
+export const enum FailureReason {
+  TransactionFailure = 'Transaction failed',
+  ChannelNotClosed = 'Channel not closed',
+  UserRejected = 'User rejected',
+}

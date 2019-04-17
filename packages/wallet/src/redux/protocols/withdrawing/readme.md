@@ -21,6 +21,7 @@ The protocol is implemented with the following state machine
 
 ```mermaid
 graph LR
+  St((start)) --> F((failure))
   St((start)) --> WFAp(WaitForApproval)
   WFAp --> |Approved| WFT(WaitForTransaction)
   WFT --> |TransactionSubmitted| WFAk(WaitForAcknowledgement)
@@ -32,3 +33,11 @@ graph LR
 Notes:
 
 - In the code, all the withdrawal specific actions are prefixed with the word "Withdrawal"
+- If the channel is not closed we transition directly to the failure state.
+
+## Test Scenarios
+
+1. Happy path: WaitForApproval -> WaitForTransaction -> WaitForAcknowledgement -> Success
+2. Withdrawal Rejected: WaitForApproval -> Failure
+3. Transaction failure: WaitForApproval -> WaitForTransaction -> Failure
+4. Channel not closed failure: Initializes to Failure
