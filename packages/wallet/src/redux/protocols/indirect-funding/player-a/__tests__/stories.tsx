@@ -1,27 +1,14 @@
-import { storiesOf } from '@storybook/react';
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
 import IndirectFundingContainer from '../../../../../containers/indirect-funding/indirect-funding';
 import { happyPath } from './scenarios';
+import * as storybookUtils from '../../../../../__stories__/index';
 
-const fakeStore = state => ({
-  dispatch: action => {
-    alert(`Action ${action.type} triggered`);
-    return action;
-  },
-  getState: () => state,
-  subscribe: () => () => {
-    /* empty */
-  },
-  replaceReducer: () => {
-    /* empty */
-  },
-});
-
-const render = container => () => {
+const render = state => () => {
+  const container = <IndirectFundingContainer state={state} />;
   return (
-    <Provider store={fakeStore({})}>
+    <Provider store={storybookUtils.fakeStore({})}>
       <Modal
         isOpen={true}
         className={'wallet-content-center'}
@@ -43,10 +30,8 @@ const indirectFundingScreens = {
   WaitForConsensus: happyPath.states.waitForLedgerUpdate1.protocolState,
 };
 
-Object.keys(indirectFundingScreens).map(storyName => {
-  const state = indirectFundingScreens[storyName];
-  storiesOf('Indirect Funding Player A', module).add(
-    storyName,
-    render(<IndirectFundingContainer state={state} />),
-  );
-});
+storybookUtils.addStoriesFromCollection(
+  indirectFundingScreens,
+  'Indirect Funding Player A',
+  render,
+);

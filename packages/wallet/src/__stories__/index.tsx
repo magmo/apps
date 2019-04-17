@@ -5,20 +5,6 @@ import WalletContainer from '../containers/wallet';
 import '../index.scss';
 import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 
-const fakeStore = state => ({
-  dispatch: action => {
-    alert(`Action ${action.type} triggered`);
-    return action;
-  },
-  getState: () => state,
-  subscribe: () => () => {
-    /* empty */
-  },
-  replaceReducer: () => {
-    /* empty */
-  },
-});
-
 const walletStateRender = state => () => {
   return (
     <Provider store={fakeStore(state)}>
@@ -26,12 +12,6 @@ const walletStateRender = state => () => {
     </Provider>
   );
 };
-
-function addStoriesFromCollection(collection, chapter, renderer = walletStateRender) {
-  Object.keys(collection).map(storyName => {
-    storiesOf(chapter, module).add(storyName, renderer(collection[storyName]));
-  });
-}
 
 const WalletScreensNotInitialized = {
   WaitForLogIn: dummyWaitForLogin,
@@ -51,3 +31,23 @@ const NetworkStatuses = {
 addStoriesFromCollection(NetworkStatuses, 'Network Statuses');
 
 storiesOf('Landing Page', module).add('Landing Page', walletStateRender({}));
+
+export const fakeStore = state => ({
+  dispatch: action => {
+    alert(`Action ${action.type} triggered`);
+    return action;
+  },
+  getState: () => state,
+  subscribe: () => () => {
+    /* empty */
+  },
+  replaceReducer: () => {
+    /* empty */
+  },
+});
+
+export function addStoriesFromCollection(collection, chapter, renderer = walletStateRender) {
+  Object.keys(collection).map(storyName => {
+    storiesOf(chapter, module).add(storyName, renderer(collection[storyName]));
+  });
+}
