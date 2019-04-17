@@ -44,11 +44,6 @@ export interface Success {
   type: typeof SUCCESS;
 }
 
-export interface Failure {
-  type: typeof FAILURE;
-  reason: string;
-}
-
 // -------
 // Helpers
 // -------
