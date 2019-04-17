@@ -4,7 +4,7 @@ import * as states from './../state';
 import * as actions from './../actions';
 import * as scenarios from './test-scenarios';
 import { PlayerIndex } from '../types';
-import * as PlayerAReducer from '../protocols/indirect-funding/player-a/reducer';
+import * as IndirectFunding from '../protocols/indirect-funding/reducer';
 
 const { channelId } = scenarios;
 
@@ -35,7 +35,7 @@ describe('when the player initializes a channel', () => {
 describe('when a NewProcessAction arrives', () => {
   const action = actions.indirectFunding.fundingRequested(channelId, PlayerIndex.A);
   const initialize = jest.fn();
-  Object.defineProperty(PlayerAReducer, 'initialize', { value: initialize });
+  Object.defineProperty(IndirectFunding, 'initialize', { value: initialize });
 
   walletReducer(initializedState, action);
   expect(initialize).toHaveBeenCalledWith(action, states.EMPTY_SHARED_DATA);
