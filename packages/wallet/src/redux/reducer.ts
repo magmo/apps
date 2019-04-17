@@ -37,7 +37,7 @@ export function initializedReducer(
   action: actions.WalletAction,
 ): states.WalletState {
   if (createsNewProcess(action)) {
-    routeToNewProcessInitializer(state, action);
+    return routeToNewProcessInitializer(state, action);
   } else if (routesToProcess(action)) {
     return routeToProtocolReducer(state, action);
   }
@@ -70,7 +70,12 @@ function routeToNewProcessInitializer(
 ) {
   switch (action.type) {
     case actions.indirectFunding.FUNDING_REQUESTED:
-      return indirectFunding.initialize(action, states.sharedData(state));
+      const { protocolState, sharedData } = indirectFunding.initialize(
+        action,
+        states.sharedData(state),
+      );
+
+      return startProcess(state, sharedData, action, protocolState);
     default:
       return state;
     // TODO: Why is the discriminated union not working here?
@@ -100,3 +105,25 @@ const waitForLoginReducer = (
       return state;
   }
 };
+function startProcess(
+  state: states.Initialized,
+  sharedData: states.SharedData,
+  action: {
+    type: 'WALLET.INDIRECT_FUNDING.FUNDING_REQUESTED';
+    channelId: string;
+    playerIndex: import('/Users/andrewstewart/Code/magmo/apps/packages/wallet/src/redux/types').PlayerIndex;
+    protocol: import('/Users/andrewstewart/Code/magmo/apps/packages/wallet/src/redux/types').WalletProtocol;
+  },
+  protocolState:
+    | states.indirectFunding.playerA.WaitForApproval
+    | states.indirectFunding.playerB.WaitForApproval,
+): states.Initialized {
+  const newState = { ...state, ...sharedData };
+  const processId = action.channelId;
+  newState.processStore = {
+    ...newState.processStore,
+    [processId]: { processId, protocolState, channelsToMonitor: [] },
+  };
+
+  return newState;
+}

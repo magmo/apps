@@ -33,10 +33,19 @@ describe('when the player initializes a channel', () => {
 });
 
 describe('when a NewProcessAction arrives', () => {
+  const processId = channelId;
+
   const action = actions.indirectFunding.fundingRequested(channelId, PlayerIndex.A);
-  const initialize = jest.fn();
+  const initialize = jest.fn(() => ({
+    protocolState: 'protocolState',
+    sharedData: { prop: 'value' },
+  }));
   Object.defineProperty(IndirectFunding, 'initialize', { value: initialize });
 
-  walletReducer(initializedState, action);
+  const updatedState = walletReducer(initializedState, action);
   expect(initialize).toHaveBeenCalledWith(action, states.EMPTY_SHARED_DATA);
+
+  expect((updatedState as states.Initialized).processStore).toMatchObject({
+    [processId]: { protocolState: 'protocolState' },
+  });
 });
