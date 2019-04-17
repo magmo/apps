@@ -2,16 +2,6 @@ import * as states from '../states';
 import * as actions from '../actions';
 import * as tsScenarios from '../../transaction-submission/__tests__/scenarios';
 
-// To test all paths through the state machine we will use 5 different scenarios:
-//
-// 1. Opponent responds
-//      WaitForApproval -> WaitForTransaction -> WaitForResponseOrTimeout
-//        -> AcknowledgeResponse -> Open
-// 2. Challenge times out: WaitForResponseOrTimeout -> AcknowledgeTimeout -> Closed
-// 3. Challenge unnecessary: WaitForApproval -> AcknowledgeUnnecessary -> Unnecessary
-// 4. User denies challenge: WaitForApproval -> AcknowledgeFailure -> Failure
-// 5. Tranaction fails: WaitForTransaction -> AcknowledgeFailure -> Failure
-
 // --------
 // Defaults
 // --------
