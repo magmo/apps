@@ -1,7 +1,7 @@
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { emptyDisplayOutboxState } from '../../../../outbox/state';
 import * as channelStates from '../../../../channel-state/state';
-import { ProtocolStateWithSharedData, EMPTY_SHARED_DATA } from '../../../../protocols';
+import { ProtocolStateWithSharedData } from '../../../../protocols';
 import * as testScenarios from '../../../../__tests__/test-scenarios';
 import {
   channelId,
@@ -9,6 +9,7 @@ import {
   ledgerId,
 } from '../../../../__tests__/test-scenarios';
 import * as states from '../state';
+import { EMPTY_SHARED_DATA } from '../../../../state';
 
 const protocolStateDefaults = {
   channelId,

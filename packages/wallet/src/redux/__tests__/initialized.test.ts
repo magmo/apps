@@ -4,7 +4,7 @@ import * as states from './../state';
 import * as actions from './../actions';
 
 const defaults = {
-  ...states.emptyState,
+  ...states.EMPTY_SHARED_DATA,
   uid: 'uid',
   adjudicator: 'adjudicator',
   networkId: 1,

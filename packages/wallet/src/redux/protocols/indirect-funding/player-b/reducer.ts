@@ -21,13 +21,14 @@ import {
   queueMessage,
   directFundingIsComplete,
 } from '../reducer-helpers';
-import { ProtocolStateWithSharedData, SharedData } from '../../';
+import { ProtocolStateWithSharedData } from '../../';
 import { FundingAction, isfundingAction } from '../../direct-funding/actions';
 import * as channelState from '../../../channel-state/state';
 import { Commitment } from 'fmg-core/lib/commitment';
 import { composePreFundCommitment } from '../../../../utils/commitment-utils';
 import { PlayerIndex } from '../../../types';
 import * as selectors from '../../../selectors';
+import { SharedData } from '../../../state';
 
 export function playerBReducer(
   protocolState: states.PlayerBState,

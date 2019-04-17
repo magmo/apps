@@ -16,7 +16,7 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
       };
     }
     return walletStates.initialized({
-      ...walletStates.emptyState,
+      ...walletStates.EMPTY_SHARED_DATA,
       uid: '',
       consensusLibrary: '',
       networkId: 0,
