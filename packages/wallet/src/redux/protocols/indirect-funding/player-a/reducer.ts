@@ -35,6 +35,13 @@ import { isfundingAction, FundingAction } from '../../direct-funding/actions';
 import { addHex } from '../../../../utils/hex-utils';
 import { ProtocolStateWithSharedData, SharedData } from '../../';
 
+export function initialize(
+  action: actions.indirectFunding.FundingRequested,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.WaitForApproval> {
+  return { protocolState: states.waitForApproval(action), sharedData };
+}
+
 export function playerAReducer(
   protocolState: states.PlayerAState,
   sharedData: SharedData,

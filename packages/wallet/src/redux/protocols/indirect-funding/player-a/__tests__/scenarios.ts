@@ -1,7 +1,7 @@
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { emptyDisplayOutboxState } from '../../../../outbox/state';
 import * as channelStates from '../../../../channel-state/state';
-import { ProtocolStateWithSharedData } from '../../../../protocols';
+import { ProtocolStateWithSharedData, EMPTY_SHARED_DATA } from '../../../../protocols';
 import * as testScenarios from '../../../../__tests__/test-scenarios';
 import {
   channelId,
@@ -146,6 +146,8 @@ const waitForLedgerUpdate1 = constructWalletState(
   waitForUpdateLedgerChannelState,
 );
 
+const sharedData = EMPTY_SHARED_DATA;
+
 // TODO: maybe add happy path actions later. But these would only be used by unit tests, so maybe the actions do not belong here.
 export const happyPath = {
   states: {
@@ -156,4 +158,5 @@ export const happyPath = {
     waitForLedgerUpdate1,
   },
   actions: {},
+  sharedData,
 };
