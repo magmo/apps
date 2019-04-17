@@ -57,3 +57,21 @@ graph TD
   WFSP --> |Cancel| F((failure))
   WFSA --> |Cancel| F
 ```
+
+### Communication
+
+```mermaid
+sequenceDiagram
+  participant A as A's wallet
+  participant B as B's wallet
+
+  Note over A, B: Agree on strategy
+  A->>B: type: funding_proposed
+  B->>A: type: funding_approved
+  Note  over A, B: Run indirect funding
+  A->>B: type: strategy_communication
+  B->>A: type: strategy_communication
+  Note  over A, B: Exchange app PostFundSetup
+  A->>B: type: commitment_received
+  B->>A: type: commitment_received
+```
