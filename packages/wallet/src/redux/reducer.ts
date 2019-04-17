@@ -9,6 +9,7 @@ import { channelStateReducer } from './channel-state/reducer';
 import { combineReducersWithSideEffects } from './../utils/reducer-utils';
 import { createsNewProcess, routesToProcess } from './protocols/actions';
 import * as indirectFunding from './protocols/indirect-funding/reducer';
+import { PlayerIndex, WalletProtocol } from './types';
 
 const initialState = states.waitForLogin();
 
@@ -111,8 +112,8 @@ function startProcess(
   action: {
     type: 'WALLET.INDIRECT_FUNDING.FUNDING_REQUESTED';
     channelId: string;
-    playerIndex: import('/Users/andrewstewart/Code/magmo/apps/packages/wallet/src/redux/types').PlayerIndex;
-    protocol: import('/Users/andrewstewart/Code/magmo/apps/packages/wallet/src/redux/types').WalletProtocol;
+    playerIndex: PlayerIndex;
+    protocol: WalletProtocol;
   },
   protocolState:
     | states.indirectFunding.playerA.WaitForApproval
