@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import ApproveFunding from '../../../../components/indirect-funding/approve-funding';
-import { FundingStep } from '../../../../components/indirect-funding/funding-step';
+import ApproveFunding from '../components/approve-funding';
+import { FundingStep } from '../components/funding-step';
 import * as actions from '../player-a/actions';
 import * as indirectFundingPlayerB from './state';
 import { unreachable } from '../../../../utils/reducer-utils';
