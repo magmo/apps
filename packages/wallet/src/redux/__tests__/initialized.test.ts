@@ -33,7 +33,6 @@ describe('when the player initializes a channel', () => {
 });
 
 describe('when a NewProcessAction arrives', () => {
-  it("is routed to the protocol's initialize function", () => {});
   const action = actions.indirectFunding.fundingRequested(channelId, PlayerIndex.A);
   const initialize = jest.fn();
   Object.defineProperty(PlayerAReducer, 'initialize', { value: initialize });
