@@ -1,4 +1,5 @@
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
+import { emptyDisplayOutboxState } from '../../../../outbox/state';
 import * as channelStates from '../../../../channel-state/state';
 import { ProtocolStateWithSharedData } from '../../../../protocols';
 import * as testScenarios from '../../../../__tests__/test-scenarios';
@@ -106,7 +107,7 @@ const constructWalletState = (
   return {
     protocolState,
     sharedData: {
-      outboxState: { displayOutbox: [], messageOutbox: [], transactionOutbox: [] },
+      outboxState: emptyDisplayOutboxState(),
       channelState,
     },
   };
