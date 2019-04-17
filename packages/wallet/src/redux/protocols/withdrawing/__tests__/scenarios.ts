@@ -12,6 +12,7 @@ import {
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { Wallet } from 'ethers';
 import { emptyState } from '../../../state';
+import web3Utils from 'web3-utils';
 
 // ---------
 // Test data
@@ -71,7 +72,7 @@ const transaction = {};
 const withdrawalAddress = Wallet.createRandom().address;
 const processId = 'process-id.123';
 const sharedData: SharedData = { ...emptyState, channelState };
-const withdrawalAmount = '0x05';
+const withdrawalAmount = web3Utils.toWei('5');
 const transactionSubmissionState = transactionScenarios.happyPath.waitForConfirmation;
 const props = {
   transaction,
@@ -124,7 +125,7 @@ export const withdrawalRejected = {
   ...props,
   // States
   waitForApproval,
-  userRejectedFailure,
+  failure: userRejectedFailure,
   // Actions
   rejected,
 };
@@ -134,7 +135,7 @@ export const failedTransaction = {
   // States
   waitForApproval,
   waitForTransaction,
-  transactionFailure,
+  failure: transactionFailure,
   // Actions
   approved,
   transactionFailed,
@@ -144,7 +145,7 @@ export const channelNotClosed = {
   ...props,
   sharedData: { ...emptyState, channelState: notClosedChannelState },
   // States
-  channelNotClosedFailure,
+  failure: channelNotClosedFailure,
   // Actions
   approved,
 };

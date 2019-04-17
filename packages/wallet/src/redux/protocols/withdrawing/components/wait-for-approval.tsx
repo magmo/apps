@@ -49,18 +49,19 @@ export default class WaitForApproval extends React.PureComponent<Props, State> {
     return (
       <Fragment>
         <h1>Withdrawal Requested</h1>
-        <p>Do you wish to withdraw {formattedAmount} from this channel?</p>
-        <p>{formattedAmount} will be sent to your current metamask account:</p>
-        <input
-          disabled={true}
-          style={{ width: '95%' }}
-          type="text"
-          readOnly={true}
-          defaultValue={this.state.withdrawAddress}
-        />
-
-        <Button onClick={deny}>Deny</Button>
+        <div>
+          <p>Do you wish to withdraw {formattedAmount} from this channel?</p>
+          <p>{formattedAmount} will be sent to your current metamask account:</p>
+          <input
+            disabled={true}
+            style={{ width: '95%' }}
+            type="text"
+            readOnly={true}
+            defaultValue={this.state.withdrawAddress}
+          />
+        </div>
         <Button onClick={this.handleApprove}>Approve</Button>
+        <Button onClick={deny}>Deny</Button>
       </Fragment>
     );
   }

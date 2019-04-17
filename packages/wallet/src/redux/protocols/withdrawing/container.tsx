@@ -8,7 +8,7 @@ import * as actions from './actions';
 import WaitForApproval from './components/wait-for-approval';
 import Failure from '../shared-components/failure';
 import Success from '../shared-components/success';
-import Acknowledge from '../shared-components/Acknowledge';
+import Acknowledge from '../shared-components/acknowledge';
 
 interface Props {
   state: states.WithdrawalState;
@@ -19,7 +19,12 @@ interface Props {
 
 class WithdrawalContainer extends PureComponent<Props> {
   render() {
-    const { state, withdrawalApproved, withdrawalRejected, withdrawalSuccessAcknowledged } = this.props;
+    const {
+      state,
+      withdrawalApproved,
+      withdrawalRejected,
+      withdrawalSuccessAcknowledged,
+    } = this.props;
     switch (state.type) {
       case states.WAIT_FOR_APPROVAL:
         return (
@@ -37,15 +42,18 @@ class WithdrawalContainer extends PureComponent<Props> {
           />
         );
       case states.WAIT_FOR_ACKNOWLEDGEMENT:
-        return   <Acknowledge 
-        title="Withdraw Complete" 
-        description="You have successfully withdrawn your funds." 
-        acknowledge={()=>withdrawalSuccessAcknowledged(state.processId)} />;
+        return (
+          <Acknowledge
+            title="Withdraw Complete"
+            description="You have successfully withdrawn your funds."
+            acknowledge={() => withdrawalSuccessAcknowledged(state.processId)}
+          />
+        );
       case states.FAILURE:
-        return <Failure name='Withdraw' reason={state.reason} />;
+        return <Failure name="withdraw" reason={state.reason} />;
       case states.SUCCESS:
-        return <Success name='Withdraw' />
-        default:
+        return <Success name="withdraw" />;
+      default:
         return unreachable(state);
     }
   }

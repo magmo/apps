@@ -82,7 +82,7 @@ describe('withdrawal rejected scenario', () => {
     const action = scenario.rejected;
     const result = reducer(state, sharedData, action);
 
-    itTransitionsToFailure(result, scenario.userRejectedFailure);
+    itTransitionsToFailure(result, scenario.failure);
   });
 });
 
@@ -94,7 +94,7 @@ describe('transaction failed scenario', () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionFailed;
     const result = reducer(state, sharedData, action);
-    itTransitionsToFailure(result, scenario.transactionFailure);
+    itTransitionsToFailure(result, scenario.failure);
   });
 });
 
@@ -106,6 +106,6 @@ describe('channel not closed scenario', () => {
     const { processId, withdrawalAmount, channelId } = scenario;
     const result = initialize(withdrawalAmount, channelId, processId, sharedData);
 
-    itTransitionsToFailure(result, scenario.channelNotClosedFailure);
+    itTransitionsToFailure(result, scenario.failure);
   });
 });
