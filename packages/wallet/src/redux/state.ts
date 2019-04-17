@@ -75,7 +75,7 @@ export const EMPTY_SHARED_DATA: SharedData = {
   channelState: { initializedChannels: {}, initializingChannels: {} },
 };
 
-function sharedData(params: SharedData): SharedData {
+export function sharedData(params: SharedData): SharedData {
   const { outboxState, channelState } = params;
   return { outboxState, channelState };
 }
