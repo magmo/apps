@@ -2,6 +2,11 @@ import { walletReducer } from '../reducer';
 
 import * as states from './../state';
 import * as actions from './../actions';
+import * as scenarios from './test-scenarios';
+import { PlayerIndex } from '../types';
+import * as PlayerAReducer from '../protocols/indirect-funding/player-a/reducer';
+
+const { channelId } = scenarios;
 
 const defaults = {
   ...states.EMPTY_SHARED_DATA,
@@ -25,4 +30,14 @@ describe('when the player initializes a channel', () => {
       expect.any(String),
     );
   });
+});
+
+describe('when a NewProcessAction arrives', () => {
+  it("is routed to the protocol's initialize function", () => {});
+  const action = actions.indirectFunding.fundingRequested(channelId, PlayerIndex.A);
+  const initialize = jest.fn();
+  Object.defineProperty(PlayerAReducer, 'initialize', { value: initialize });
+
+  walletReducer(initializedState, action);
+  expect(initialize).toHaveBeenCalledWith(action, states.EMPTY_SHARED_DATA);
 });

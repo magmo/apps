@@ -8,6 +8,8 @@ import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { channelStateReducer } from './channel-state/reducer';
 import { combineReducersWithSideEffects } from './../utils/reducer-utils';
 import { createsNewProcess, routesToProcess } from './protocols/actions';
+import { PlayerIndex } from './types';
+import * as indirectFundingPlayerA from './protocols/indirect-funding/player-a/reducer';
 
 const initialState = states.waitForLogin();
 
@@ -63,9 +65,25 @@ function routeToProtocolReducer(state, action) {
   }
 }
 
-function routeToNewProcessInitializer(state, action) {
-  // TODO: Call the process creator
-  return state;
+function routeToNewProcessInitializer(
+  state: states.Initialized,
+  action: actions.protocol.NewProcessAction,
+) {
+  switch (action.type) {
+    case actions.indirectFunding.FUNDING_REQUESTED:
+      switch (action.playerIndex) {
+        case PlayerIndex.A:
+          return indirectFundingPlayerA.initialize(action, states.sharedData(state));
+        case PlayerIndex.B:
+          return state;
+        default:
+          return state;
+      }
+    default:
+      return state;
+    // TODO: Why is the discriminated union not working here?
+    // return unreachable(action);
+  }
 }
 
 const combinedReducer = combineReducersWithSideEffects({
