@@ -1,5 +1,6 @@
 import { TransactionSubmissionState } from '../transaction-submission/states';
 import { Properties } from '../../utils';
+import { Commitment } from 'fmg-core/lib/commitment';
 export type RespondingState =
   | WaitForApproval
   | WaitForTransaction
@@ -9,7 +10,8 @@ export type RespondingState =
   | Failure;
 
 export const enum FailureReason {
-  Generic = 'Oops',
+  TransactionFailure = 'Transaction failed',
+  UserRejected = 'User rejected',
 }
 
 export const WAIT_FOR_APPROVAL = 'WaitForApproval';
@@ -22,6 +24,7 @@ export const SUCCESS = 'Success';
 export interface WaitForApproval {
   type: typeof WAIT_FOR_APPROVAL;
   processId: string;
+  challengeCommitment: Commitment;
 }
 
 export interface WaitForTransaction {
@@ -61,8 +64,8 @@ export function isTerminal(state: RespondingState): state is Failure | Success {
 // -------
 
 export function waitForApproval(properties: Properties<WaitForApproval>): WaitForApproval {
-  const { processId } = properties;
-  return { type: WAIT_FOR_APPROVAL, processId };
+  const { processId, challengeCommitment } = properties;
+  return { type: WAIT_FOR_APPROVAL, processId, challengeCommitment };
 }
 
 export function waitForTransaction(properties: Properties<WaitForTransaction>): WaitForTransaction {
