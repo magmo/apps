@@ -14,6 +14,7 @@ const protocolStateDefaults = {
   ledgerId,
 };
 
+// Channel states for app channel
 const channelStateDefaults = {
   ourIndex: PlayerIndex.A,
   privateKey: testScenarios.asPrivateKey,
@@ -38,6 +39,7 @@ const waitForFundingAppChannelState = channelStates.waitForFundingAndPostFundSet
   },
 });
 
+// Channel states for the ledger channel
 const ledgerChannelDefaults = {
   channelId: ledgerId,
   libraryAddress: testScenarios.ledgerChannel.channelType,
@@ -48,10 +50,22 @@ const ledgerChannelDefaults = {
   privateKey: testScenarios.asPrivateKey,
 };
 
+const ledgerChannelPrefundCommitments = {
+  lastCommitment: {
+    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
+    signature: '0x0',
+  },
+  penultimateCommitment: {
+    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
+    signature: '0x0',
+  },
+};
+
 const waitForPrefundSetupLedgerChannelState = channelStates.waitForPreFundSetup({
   ...ledgerChannelDefaults,
   funded: false,
-  turnNum: 5,
+  // This turn number does not seem to matter for unit tests.
+  turnNum: 2,
   lastCommitment: {
     commitment: testScenarios.ledgerCommitments.preFundCommitment0,
     signature: '0x0',
@@ -61,43 +75,24 @@ const waitForPrefundSetupLedgerChannelState = channelStates.waitForPreFundSetup(
 const waitForFundingLedgerChannelState = channelStates.waitForFundingAndPostFundSetup({
   ...ledgerChannelDefaults,
   funded: false,
+  // This turn number does not seem to matter for unit tests.
   turnNum: 5,
-  lastCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
-    signature: '0x0',
-  },
-  penultimateCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
-    signature: '0x0',
-  },
+  ...ledgerChannelPrefundCommitments,
 });
 
 const waitForPostFundSetupLedgerChannelState = channelStates.aWaitForPostFundSetup({
   ...ledgerChannelDefaults,
   funded: false,
   turnNum: 2,
-  lastCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
-    signature: '0x0',
-  },
-  penultimateCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
-    signature: '0x0',
-  },
+  ...ledgerChannelPrefundCommitments,
 });
 
 const waitForUpdateLedgerChannelState = channelStates.waitForUpdate({
   ...ledgerChannelDefaults,
   funded: true,
   turnNum: testScenarios.ledgerCommitments.postFundCommitment1.turnNum,
-  lastCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment0,
-    signature: '0x0',
-  },
-  penultimateCommitment: {
-    commitment: testScenarios.ledgerCommitments.preFundCommitment1,
-    signature: '0x0',
-  },
+  // TODO: these commitments do not match the waitForUpdate state, but the unit tests still pass...
+  ...ledgerChannelPrefundCommitments,
 });
 
 const constructWalletState = (
@@ -117,7 +112,7 @@ const constructWalletState = (
   };
 };
 
-// Happy path states
+// Wallet happy path states
 const waitForApproval = constructWalletState(
   states.waitForApproval(protocolStateDefaults),
   waitForFundingAppChannelState,
