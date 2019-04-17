@@ -35,6 +35,7 @@ graph TD
 
   WFSC --> |Cancel| F((failure))
   WFSR --> |Cancel| F
+  WFSR --> |CanceledByB| F
 ```
 
 ### Player B
@@ -54,6 +55,8 @@ graph TD
 
   WFSA --> |StrategyRejected| WFSP
 
+  WFSP --> |CanceledByB| F
+  WFSA --> |CanceledByB| F
   WFSP --> |Cancel| F((failure))
   WFSA --> |Cancel| F
 ```
