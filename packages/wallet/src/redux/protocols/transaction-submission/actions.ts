@@ -1,4 +1,5 @@
 import { BaseProcessAction } from '../actions';
+import { WalletAction } from '../../actions';
 
 export type TransactionAction =
   | TransactionSent
@@ -7,7 +8,8 @@ export type TransactionAction =
   | TransactionConfirmed
   | TransactionRetryApproved
   | TransactionRetryDenied
-  | TransactionFailed;
+  | TransactionFailed
+  | TransactionFinalized;
 
 export const TRANSACTION_SENT = 'WALLET.TRANSACTION_SENT';
 export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED';
@@ -116,7 +118,7 @@ export const transactionFailed = (processId: string): TransactionFailed => ({
   processId,
 });
 
-export const isTransactionAction = (action: BaseProcessAction): action is TransactionAction => {
+export const isTransactionAction = (action: WalletAction): action is TransactionAction => {
   return (
     action.type === TRANSACTION_CONFIRMED ||
     action.type === TRANSACTION_FAILED ||
