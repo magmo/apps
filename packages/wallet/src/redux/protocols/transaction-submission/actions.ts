@@ -8,8 +8,7 @@ export type TransactionAction =
   | TransactionConfirmed
   | TransactionRetryApproved
   | TransactionRetryDenied
-  | TransactionFailed
-  | TransactionFinalized;
+  | TransactionFailed;
 
 export const TRANSACTION_SENT = 'WALLET.TRANSACTION_SENT';
 export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED';
@@ -122,7 +121,6 @@ export const isTransactionAction = (action: WalletAction): action is Transaction
   return (
     action.type === TRANSACTION_CONFIRMED ||
     action.type === TRANSACTION_FAILED ||
-    action.type === TRANSACTION_FINALIZED ||
     action.type === TRANSACTION_RETRY_APPROVED ||
     action.type === TRANSACTION_RETRY_DENIED ||
     action.type === TRANSACTION_SENT ||
