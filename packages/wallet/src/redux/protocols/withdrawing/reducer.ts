@@ -10,7 +10,12 @@ import {
 } from '../../../utils/transaction-generator';
 import { signVerificationData } from '../../../utils/signing-utils';
 import { TransactionRequest } from 'ethers/providers';
-import { initialize as initTransactionState } from '../transaction-submission/reducer';
+import {
+  initialize as initTransactionState,
+  transactionReducer,
+} from '../transaction-submission/reducer';
+import { isTransactionAction } from '../transaction-submission/actions';
+import { SUCCESS, isTerminal, TransactionSubmissionState } from '../transaction-submission/states';
 
 export const initialize = (
   withdrawalAmount: string,
@@ -32,9 +37,34 @@ export const withdrawalReducer = (
   switch (protocolState.type) {
     case states.WAIT_FOR_APPROVAL:
       return waitForApprovalReducer(protocolState, sharedData, action);
+    case states.WAIT_FOR_TRANSACTION:
+      return waitForTransactionReducer(protocolState, sharedData, action);
     default:
       return { protocolState, sharedData };
     // TODO: unreachable(protocolState);
+  }
+};
+
+const waitForTransactionReducer = (
+  protocolState: states.WaitForTransaction,
+  sharedData: SharedData,
+  action: WithdrawalAction,
+): ProtocolStateWithSharedData<states.WithdrawalState> => {
+  if (!isTransactionAction(action)) {
+    return { sharedData, protocolState };
+  }
+  const { storage: newSharedData, state: newTransactionState } = transactionReducer(
+    protocolState.transactionSubmissionState,
+    sharedData,
+    action,
+  );
+  if (!isTerminal(newTransactionState)) {
+    return {
+      sharedData: newSharedData,
+      protocolState: { ...protocolState, transactionSubmissionState: newTransactionState },
+    };
+  } else {
+    return handleTransactionSubmissionComplete(protocolState, newTransactionState, newSharedData);
   }
 };
 
@@ -83,9 +113,26 @@ const waitForApprovalReducer = (
   }
 };
 
+const handleTransactionSubmissionComplete = (
+  protocolState: states.WaitForTransaction,
+  transactionState: TransactionSubmissionState,
+  sharedData: SharedData,
+) => {
+  if (transactionState.type === SUCCESS) {
+    return {
+      protocolState: states.waitForAcknowledgement(protocolState),
+      sharedData,
+    };
+  } else {
+    return {
+      protocolState: states.failure(states.FAILURE_REASONS.TRANSACTION_FAILURE),
+      sharedData,
+    };
+  }
+};
+
 const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  states;
   const { lastCommitment, penultimateCommitment } = channelState;
   return (
     lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&

@@ -60,13 +60,13 @@ describe('happy-path scenario', () => {
 
   describe(whenIn(states.WAIT_FOR_TRANSACTION), () => {
     const state = scenario.waitForTransaction;
-    const action = scenario.transactionSent;
+    const action = scenario.transactionConfirmed;
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_ACKNOWLEDGEMENT);
   });
 
-  describe(whenIn(states.WAIT_FOR_TRANSACTION), () => {
+  describe(whenIn(states.WAIT_FOR_ACKNOWLEDGEMENT), () => {
     const state = scenario.waitForAcknowledgement;
     const action = scenario.successAcknowledged;
     const result = reducer(state, sharedData, action);

@@ -115,3 +115,16 @@ export const transactionFailed = (processId: string): TransactionFailed => ({
   type: TRANSACTION_FAILED,
   processId,
 });
+
+export const isTransactionAction = (action: BaseProcessAction): action is TransactionAction => {
+  return (
+    action.type === TRANSACTION_CONFIRMED ||
+    action.type === TRANSACTION_FAILED ||
+    action.type === TRANSACTION_FINALIZED ||
+    action.type === TRANSACTION_RETRY_APPROVED ||
+    action.type === TRANSACTION_RETRY_DENIED ||
+    action.type === TRANSACTION_SENT ||
+    action.type === TRANSACTION_SUBMISSION_FAILED ||
+    action.type === TRANSACTION_SUBMITTED
+  );
+};

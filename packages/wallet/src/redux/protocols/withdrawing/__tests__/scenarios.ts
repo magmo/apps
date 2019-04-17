@@ -79,7 +79,7 @@ const withdrawalAddress = Wallet.createRandom().address;
 const processId = 'process-id.123';
 const sharedData: SharedData = { outboxState: EMPTY_OUTBOX_STATE, channelState };
 const withdrawalAmount = '0x05';
-const transactionSubmissionState = transactionScenarios.happyPath.waitForSubmission;
+const transactionSubmissionState = transactionScenarios.happyPath.waitForConfirmation;
 const props = {
   transaction,
   processId,
@@ -108,7 +108,7 @@ const channelNotClosedFailure = states.failure(states.FAILURE_REASONS.CHANNEL_NO
 const approved = actions.withdrawalApproved(processId, channelId);
 const rejected = actions.withdrawalRejected(processId);
 const successAcknowledged = actions.withdrawalSuccessAcknowledged(processId);
-const transactionSent = transactionActions.transactionSent(processId);
+const transactionConfirmed = transactionActions.transactionConfirmed(processId);
 const transactionFailed = transactionActions.transactionFailed(processId);
 
 // ---------
@@ -123,7 +123,7 @@ export const happyPath = {
   success,
   // Actions
   approved,
-  transactionSent,
+  transactionConfirmed,
   successAcknowledged,
 };
 

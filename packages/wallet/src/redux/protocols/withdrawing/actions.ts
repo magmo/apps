@@ -1,5 +1,5 @@
 import { BaseProcessAction } from '../actions';
-import { TransactionAction } from '../../actions';
+import { TransactionAction } from '../transaction-submission/actions';
 
 export const WITHDRAWAL_APPROVED = 'WALLET.WITHDRAWAL_APPROVED';
 export const WITHDRAWAL_SUCCESS_ACKNOWLEDGED = 'WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
