@@ -21,6 +21,7 @@ Out of scope (for the time being):
   - Option 2: Allow the responding protocol to have two start points (WaitForOptionSelection or WaitForApproval)
   - Option 3: Separate responding into two different protocols. One that is responsible for submitting the provided response. One that is responsible for asking the user for a response.
   - Option 4: Always ask the user?
+  - Option 5: Responding protocol always responds if possible based on existing commitment. Otherwise it waits for a response.
 - Should we bother letting the user know there's a difference between `RespondWithExistingMove` and `Refute`? Only one of those options should be valid at a time (I think). We could just prevent the user with the option of selecting a move or having the Wallet auto respond.
 
 ## State machine (option 1)
