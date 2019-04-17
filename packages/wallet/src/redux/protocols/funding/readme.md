@@ -25,8 +25,8 @@ graph TD
 
   WFSC --> |StrategyChosen| WFSR(WaitForStrategyResponse)
   WFSR --> |StrategyApproved| WFF(WaitForFunding)
-  WFF --> |StrategyAction| WFF
-  WFF --> |StrategyAction| WFPFS(WaitForPostFundSetup)
+  WFF --> |FundingStrategyAction| WFF
+  WFF --> |FundingStrategyAction| WFPFS(WaitForPostFundSetup)
 
   WFPFS --> |CommitmentReceived| WFSConf(WaitForSuccessConfirmation)
   WFSConf --> |ConfirmSuccess| SS((success))
@@ -47,8 +47,8 @@ graph TD
   WFSP --> |StrategyProposed| WFSA(WaitForStrategyApproved)
 
   WFSA --> |StrategyApproved| WFF(WaitForFunding)
-  WFF --> |StrategyAction| WFF
-  WFF --> |StrategyAction| WFPFS(WaitForPostFundSetup)
+  WFF --> |FundingStrategyAction| WFF
+  WFF --> |FundingStrategyAction| WFPFS(WaitForPostFundSetup)
   WFPFS --> |CommitmentReceived| WFSC(WaitForSuccessConfirmation)
 
   WFSC --> |ConfirmSuccess| SS((success))
