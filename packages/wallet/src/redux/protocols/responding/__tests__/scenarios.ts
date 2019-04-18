@@ -1,4 +1,4 @@
-import * as states from '../states';
+import * as states from '../state';
 import * as actions from '../actions';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import * as transactionScenarios from '../../transaction-submission/__tests__/scenarios';
