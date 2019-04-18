@@ -51,6 +51,54 @@ describe('respond with existing move happy-path scenario', () => {
   });
 });
 
+describe('select response happy-path scenario', () => {
+  const scenario = scenarios.requireResponseHappyPath;
+  const { sharedData, processId } = scenario;
+
+  describe('when initializing', () => {
+    const { challengeCommitment } = scenario;
+    const result = initialize(challengeCommitment, processId, sharedData);
+
+    itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
+    itSetsChallengeCommitment(result, scenario.challengeCommitment);
+  });
+
+  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
+    const state = scenario.waitForApproval;
+    const action = scenario.approve;
+
+    const result = respondingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, states.WAIT_FOR_RESPONSE);
+  });
+
+  describe(`when in ${states.WAIT_FOR_RESPONSE}`, () => {
+    const state = scenario.waitForApproval;
+    const action = scenario.responseProvided;
+
+    const result = respondingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
+    itCallsRespondWithMoveWith(scenario.challengeCommitment);
+  });
+
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
+    const state = scenario.waitForTransaction;
+    const action = scenario.transactionConfirmed;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.WAIT_FOR_ACKNOWLEDGEMENT);
+  });
+
+  describe(`when in ${states.WAIT_FOR_ACKNOWLEDGEMENT}`, () => {
+    const state = scenario.waitForAcknowledgement;
+    const action = scenario.acknowledge;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.SUCCESS);
+  });
+});
+
 const itCallsRespondWithMoveWith = (challengeCommitment: Commitment) => {
   it('calls respond with move with the correct commitment', () => {
     expect(createRespondWithMoveMock).toHaveBeenCalledWith(

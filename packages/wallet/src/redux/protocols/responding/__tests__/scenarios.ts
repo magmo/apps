@@ -118,6 +118,7 @@ export const refuteHappyPath = {
 
 export const requireResponseHappyPath = {
   ...props,
+  challengeCommitment: gameCommitment1,
   // States
   waitForApproval: waitForApprovalRequiresResponse,
   waitForResponse,
