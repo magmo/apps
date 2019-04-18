@@ -91,6 +91,7 @@ const responseProvided = actions.responseProvided(processId, testScenarios.gameC
 // ---------
 export const respondWithExistingCommitmentHappyPath = {
   ...props,
+  challengeCommitment: gameCommitment1,
   // States
   waitForApproval: waitForApprovalRespond,
   waitForTransaction,
