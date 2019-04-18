@@ -4,7 +4,7 @@ import { TransactionSubmissionState } from '../transaction-submission';
 export type ChallengingState = NonTerminalState | TerminalState;
 
 export type NonTerminalState =
-  | WaitForApproval
+  | ApproveChallenge
   | WaitForTransaction
   | WaitForResponseOrTimeout
   | AcknowledgeTimeout
@@ -21,8 +21,8 @@ export type FailureReason =
   | 'LatestWhileApproving'
   | 'TransactionFailed';
 
-export interface WaitForApproval {
-  type: 'WaitForApproval';
+export interface ApproveChallenge {
+  type: 'ApproveChallenge';
   processId: string;
   channelId: string;
 }
@@ -80,7 +80,7 @@ export function isTerminal(state: ChallengingState): state is TerminalState {
 
 export function isNonTerminal(state: ChallengingState): state is NonTerminalState {
   return (
-    state.type === 'WaitForApproval' ||
+    state.type === 'ApproveChallenge' ||
     state.type === 'WaitForTransaction' ||
     state.type === 'WaitForResponseOrTimeout' ||
     state.type === 'AcknowledgeTimeout' ||
@@ -93,9 +93,9 @@ export function isNonTerminal(state: ChallengingState): state is NonTerminalStat
 // Creators
 // --------
 
-export function waitForApproval(p: P<WaitForApproval>): WaitForApproval {
+export function approveChallenge(p: P<ApproveChallenge>): ApproveChallenge {
   const { processId, channelId } = p;
-  return { type: 'WaitForApproval', processId, channelId };
+  return { type: 'ApproveChallenge', processId, channelId };
 }
 
 export function waitForTransaction(p: P<WaitForTransaction>): WaitForTransaction {

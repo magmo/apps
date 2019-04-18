@@ -19,7 +19,7 @@ The protocol is implemented with the following state machine
 ```mermaid
 graph TD
   S((start)) --> CE{Can<br/>challenge?}
-  CE --> |Yes| WFA(WaitForApproval)
+  CE --> |Yes| WFA(ApproveChallenge)
   WFA --> |CommitmentArrives| AF
   WFA --> |ChallengeApproved| WFT(WaitForTransaction)
   CE --> |No| AF
@@ -43,7 +43,7 @@ Note:
 
 To test all paths through the state machine we will use 5 different scenarios:
 
-1. **Opponent responds**: `WaitForApproval` -> `WaitForTransaction` -> `WaitForResponseOrTimeout`
+1. **Opponent responds**: `ApproveChallenge` -> `WaitForTransaction` -> `WaitForResponseOrTimeout`
    -> `AcknowledgeResponse` -> `Open`
 2. **Challenge times out**: `WaitForResponseOrTimeout` -> `AcknowledgeTimeout` -> `Closed`
 3. **Channel doesn't exist**: `AcknowledgeFailure` -> `Failure`
@@ -51,7 +51,7 @@ To test all paths through the state machine we will use 5 different scenarios:
 4. **Channel not fully open**: `AcknowledgeFailure` -> `Failure`
    - Challenge requested for channel which only has one state (two are needed to challenge).
 5. **Already have latest commitment**: `AcknowledgeFailure` -> `Failure`
-6. **User declines challenge**: `WaitForApproval` -> `AcknowledgeFailure` -> `Failure`
-7. **Receive commitment while approving**: `WaitForApproval` -> `AcknowledgeFailure`
+6. **User declines challenge**: `ApproveChallenge` -> `AcknowledgeFailure` -> `Failure`
+7. **Receive commitment while approving**: `ApproveChallenge` -> `AcknowledgeFailure`
    - The opponent's commitment arrives while the user is approving the challenge
 8. **Transaction fails**: `WaitForTransaction` -> `AcknowledgeFailure` -> `Failure`

@@ -2,7 +2,7 @@ import { ChallengingAction } from './actions';
 import {
   ChallengingState as CState,
   NonTerminalState as NonTerminalCState,
-  waitForApproval,
+  approveChallenge,
   waitForResponseOrTimeout,
   acknowledgeFailure as acknowledgeFailureState,
   FailureReason,
@@ -76,7 +76,7 @@ export function initialize(channelId: string, processId: string, storage: Storag
     // if it's our turn we don't need to challenge
     return { state: acknowledgeFailure(props, 'AlreadyHaveLatest'), storage };
   }
-  return { state: waitForApproval({ channelId, processId }), storage };
+  return { state: approveChallenge({ channelId, processId }), storage };
 }
 
 function handleTransactionAction(
@@ -105,7 +105,7 @@ function handleTransactionAction(
 }
 
 function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForApproval') {
+  if (state.type !== 'ApproveChallenge') {
     return { state, storage };
   }
   const channelState = getChannel(storage, state.channelId);
@@ -144,7 +144,7 @@ function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVa
 }
 
 function challengeDenied(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForApproval') {
+  if (state.type !== 'ApproveChallenge') {
     return { state, storage };
   }
 

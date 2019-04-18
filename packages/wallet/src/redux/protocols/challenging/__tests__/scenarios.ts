@@ -57,7 +57,7 @@ const defaults = { processId, channelId, storage: storage(theirTurn) };
 // ------
 // States
 // ------
-const waitForApproval = states.waitForApproval(defaults);
+const approveChallenge = states.approveChallenge(defaults);
 const waitForTransactionSuccess = states.waitForTransaction({
   ...defaults,
   transactionSubmission: tsPreSuccess,
@@ -93,7 +93,7 @@ const failureAcknowledged = actions.challengeFailureAcknowledged(processId);
 export const opponentResponds = {
   ...defaults,
   // states
-  waitForApproval,
+  approveChallenge,
   waitForTransaction: waitForTransactionSuccess,
   waitForResponseOrTimeout,
   acknowledgeResponse,
@@ -150,7 +150,7 @@ export const alreadyHaveLatest = {
 export const userDeclinesChallenge = {
   ...defaults,
   // states
-  waitForApproval,
+  approveChallenge,
   acknowledgeFailure: acknowledge('DeclinedByUser'),
   failure: failure('DeclinedByUser'),
   // actions
@@ -162,7 +162,7 @@ export const receiveCommitmentWhileApproving = {
   ...defaults,
   storage: storage(ourTurn),
   // states
-  waitForApproval,
+  approveChallenge,
   acknowledgeFailure: acknowledge('LatestWhileApproving'),
   failure: failure('LatestWhileApproving'),
   // actions

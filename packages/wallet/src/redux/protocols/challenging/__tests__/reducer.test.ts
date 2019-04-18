@@ -9,10 +9,10 @@ describe('opponent-responds scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'WaitForApproval');
+    itTransitionsTo(result, 'ApproveChallenge');
   });
-  describe('when in WaitForApproval', () => {
-    const state = scenario.waitForApproval;
+  describe('when in ApproveChallenge', () => {
+    const state = scenario.approveChallenge;
     const action = scenario.challengeApproved;
     const result = challengingReducer(state, storage, action);
 
@@ -132,8 +132,8 @@ describe('user-declines-challenge scenario', () => {
   const scenario = scenarios.userDeclinesChallenge;
   const { storage } = scenario;
 
-  describe('when in WaitForApproval', () => {
-    const state = scenario.waitForApproval;
+  describe('when in ApproveChallenge', () => {
+    const state = scenario.approveChallenge;
     const action = scenario.challengeDenied;
     const result = challengingReducer(state, storage, action);
 
@@ -154,8 +154,8 @@ describe('receive-commitment-while-approving scenario', () => {
   const scenario = scenarios.receiveCommitmentWhileApproving;
   const { storage } = scenario;
 
-  describe('when in WaitForApproval', () => {
-    const state = scenario.waitForApproval;
+  describe('when in ApproveChallenge', () => {
+    const state = scenario.approveChallenge;
     // note: we're triggering this off the user's acceptance, not the arrival of the update
     const action = scenario.challengeApproved;
     const result = challengingReducer(state, storage, action);
