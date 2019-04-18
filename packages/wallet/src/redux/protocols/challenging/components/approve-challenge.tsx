@@ -6,7 +6,7 @@ interface Props {
   deny: () => void;
 }
 
-export default class ApproveRetry extends React.PureComponent<Props> {
+export default class ApproveChallenge extends React.PureComponent<Props> {
   render() {
     const { approve, deny } = this.props;
     return (

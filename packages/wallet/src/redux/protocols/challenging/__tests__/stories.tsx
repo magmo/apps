@@ -24,7 +24,7 @@ const render = container => () => {
 };
 
 const opponentResponds = {
-  ApproveChallenge: scenarios.opponentResponds.ApproveChallenge,
+  ApproveChallenge: scenarios.opponentResponds.approveChallenge,
   WaitForTransaction: scenarios.opponentResponds.waitForTransaction,
   WaitForResponseOrTimeout: scenarios.opponentResponds.waitForResponseOrTimeout,
   AcknowledgeResponse: scenarios.opponentResponds.acknowledgeResponse,
@@ -48,7 +48,7 @@ const alreadyHaveLatest = {
 };
 
 const userDeclinesChallenge = {
-  ApproveChallenge: scenarios.userDeclinesChallenge.ApproveChallenge,
+  ApproveChallenge: scenarios.userDeclinesChallenge.approveChallenge,
   AcknowledgeFailure: scenarios.userDeclinesChallenge.acknowledgeFailure,
 };
 
