@@ -30,7 +30,7 @@ export interface ResponseProvided extends BaseProcessAction {
   commitment: Commitment;
 }
 
-export interface RespondSuccessAcknowledged {
+export interface RespondSuccessAcknowledged extends BaseProcessAction {
   type: typeof RESPOND_SUCCESS_ACKNOWLEDGED;
   processId: string;
 }

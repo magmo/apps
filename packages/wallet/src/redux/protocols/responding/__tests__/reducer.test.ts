@@ -157,7 +157,7 @@ describe('select response happy-path scenario', () => {
   });
 
   describe(`when in ${states.WAIT_FOR_RESPONSE}`, () => {
-    const state = scenario.waitForApproval;
+    const state = scenario.waitForResponse;
     const action = scenario.responseProvided;
 
     const result = respondingReducer(state, sharedData, action);

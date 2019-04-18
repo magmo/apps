@@ -8,8 +8,14 @@ import { channelID } from 'magmo-wallet-client/node_modules/fmg-core/lib/channel
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { PlayerIndex } from '../../types';
 import { TransactionRequest } from 'ethers/providers';
-import { initialize as initTransactionState } from '../transaction-submission/reducer';
+import {
+  initialize as initTransactionState,
+  transactionReducer,
+} from '../transaction-submission/reducer';
 import { SharedData } from '../../state';
+import * as SigningUtils from '../../../utils/signing-utils';
+import { isTransactionAction } from '../transaction-submission/actions';
+import { isTerminal, TransactionSubmissionState, SUCCESS } from '../transaction-submission/states';
 
 export const initialize = (
   processId: string,
@@ -31,13 +37,73 @@ export const respondingReducer = (
     case states.WAIT_FOR_APPROVAL:
       return waitForApprovalReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_ACKNOWLEDGEMENT:
+      return waitForAcknowledgementReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_RESPONSE:
+      return waitForResponseReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_TRANSACTION:
+      return waitForTransactionReducer(protocolState, sharedData, action);
     case states.SUCCESS:
     case states.FAILURE:
       return { protocolState, sharedData };
     default:
       return unreachable(protocolState);
+  }
+};
+
+const waitForTransactionReducer = (
+  protocolState: states.WaitForTransaction,
+  sharedData: SharedData,
+  action: actions.RespondingAction,
+): ProtocolStateWithSharedData<states.RespondingState> => {
+  if (!isTransactionAction(action)) {
+    return { sharedData, protocolState };
+  }
+  const { storage: newSharedData, state: newTransactionState } = transactionReducer(
+    protocolState.transactionSubmissionState,
+    sharedData,
+    action,
+  );
+  if (!isTerminal(newTransactionState)) {
+    return {
+      sharedData: newSharedData,
+      protocolState: { ...protocolState, transactionSubmissionState: newTransactionState },
+    };
+  } else {
+    return handleTransactionSubmissionComplete(protocolState, newTransactionState, newSharedData);
+  }
+};
+const waitForResponseReducer = (
+  protocolState: states.WaitForResponse,
+  sharedData: SharedData,
+  action: actions.RespondingAction,
+): ProtocolStateWithSharedData<states.RespondingState> => {
+  switch (action.type) {
+    case actions.RESPONSE_PROVIDED:
+      const { commitment } = action;
+      const signature = signCommitment(commitment, sharedData);
+      const transaction = TransactionGenerator.createRespondWithMoveTransaction(
+        commitment,
+        signature,
+      );
+      return transitionToWaitForTransaction(transaction, protocolState, sharedData);
+    default:
+      return { protocolState, sharedData };
+  }
+};
+
+const waitForAcknowledgementReducer = (
+  protocolState: states.WaitForAcknowledgement,
+  sharedData: SharedData,
+  action: actions.RespondingAction,
+): ProtocolStateWithSharedData<states.RespondingState> => {
+  switch (action.type) {
+    case actions.RESPOND_SUCCESS_ACKNOWLEDGED:
+      return {
+        protocolState: states.success(),
+        sharedData,
+      };
+    default:
+      return { protocolState, sharedData };
   }
 };
 
@@ -60,19 +126,8 @@ const waitForApprovalReducer = (
           challengeCommitment,
           sharedData,
         );
-        const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
-          transaction,
-          processId,
-          sharedData,
-        );
-        const newProtocolState = states.waitForTransaction({
-          ...protocolState,
-          transactionSubmissionState,
-        });
-        return {
-          protocolState: newProtocolState,
-          sharedData: newSharedData,
-        };
+
+        return transitionToWaitForTransaction(transaction, protocolState, sharedData);
       }
     case actions.RESPOND_REJECTED:
       return {
@@ -85,6 +140,51 @@ const waitForApprovalReducer = (
 };
 
 // helpers
+const handleTransactionSubmissionComplete = (
+  protocolState: states.WaitForTransaction,
+  transactionState: TransactionSubmissionState,
+  sharedData: SharedData,
+) => {
+  if (transactionState.type === SUCCESS) {
+    return {
+      protocolState: states.waitForAcknowledgement(protocolState),
+      sharedData,
+    };
+  } else {
+    return {
+      protocolState: states.failure(states.FailureReason.TransactionFailure),
+      sharedData,
+    };
+  }
+};
+
+const transitionToWaitForTransaction = (
+  transaction: TransactionRequest,
+  protocolState: states.WaitForResponse | states.WaitForApproval,
+  sharedData: SharedData,
+) => {
+  const { processId } = protocolState;
+  const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
+    transaction,
+    processId,
+    sharedData,
+  );
+  const newProtocolState = states.waitForTransaction({
+    ...protocolState,
+    transactionSubmissionState,
+  });
+  return {
+    protocolState: newProtocolState,
+    sharedData: newSharedData,
+  };
+};
+
+// TODO: Should we just expect a signature on the action?
+const signCommitment = (commitment: Commitment, sharedData: SharedData): string => {
+  const channelId = channelID(commitment.channel);
+  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
+  return SigningUtils.signCommitment(commitment, channelState.privateKey);
+};
 
 const craftResponseTransactionWithExistingCommitment = (
   processId: string,
