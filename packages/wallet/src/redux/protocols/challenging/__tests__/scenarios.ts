@@ -1,15 +1,57 @@
 import * as states from '../states';
 import * as actions from '../actions';
 import * as tsScenarios from '../../transaction-submission/__tests__/scenarios';
+import { EMPTY_SHARED_DATA } from '../..';
+import { setChannel } from '../../../state';
+import { ChannelStatus, waitForPreFundSetup, waitForUpdate } from '../../../channel-state/state';
+import * as channelScenarios from '../../../__tests__/test-scenarios';
+
+type Reason = states.FailureReason;
+
+// -----------------
+// Channel Scenarios
+// -----------------
+const { channelId, libraryAddress, channelNonce, participants } = channelScenarios;
+const channel = { channelId, libraryAddress, channelNonce, participants };
+const { asAddress: address, asPrivateKey: privateKey } = channelScenarios;
+const participant = { address, privateKey, ourIndex: 0 };
+const channelDefaults = { ...channel, ...participant };
+
+const turn0 = { commitment: channelScenarios.preFundCommitment1, signature: 'signature' };
+const turn18 = { commitment: channelScenarios.gameCommitment0, signature: 'signature' };
+const turn19 = { commitment: channelScenarios.gameCommitment1, signature: 'signature' };
+const turn20 = { commitment: channelScenarios.gameCommitment1, signature: 'signature' };
+
+const partiallyOpen = waitForPreFundSetup({
+  ...channelDefaults,
+  turnNum: 0,
+  lastCommitment: turn0,
+  funded: false,
+});
+const theirTurn = waitForUpdate({
+  ...channelDefaults,
+  turnNum: 19,
+  lastCommitment: turn19,
+  penultimateCommitment: turn18,
+  funded: true,
+});
+const ourTurn = waitForUpdate({
+  ...channelDefaults,
+  turnNum: 20,
+  lastCommitment: turn20,
+  penultimateCommitment: turn19,
+  funded: true,
+});
 
 // --------
 // Defaults
 // --------
 const processId = 'processId';
-const channelId = 'channelId';
 const tsPreSuccess = tsScenarios.happyPath.waitForConfirmation;
 const tsPreFailure = tsScenarios.transactionFailed.waitForConfirmation;
-const defaults = { processId, channelId };
+const storage = (channelState: ChannelStatus) => setChannel(EMPTY_SHARED_DATA, channelState);
+
+const defaults = { processId, channelId, storage: storage(theirTurn) };
 
 // ------
 // States
@@ -26,12 +68,10 @@ const waitForTransactionFailure = states.waitForTransaction({
 const waitForResponseOrTimeout = states.waitForResponseOrTimeout(defaults);
 const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
-const acknowledgeUnnecessary = states.acknowledgeUnnecessary(defaults);
-const acknowledgeFailure = states.acknowledgeFailure(defaults);
 const successOpen = states.successOpen();
 const successClosed = states.successClosed();
-const unnecessary = states.unnecessary();
-const failure = states.failure();
+const acknowledge = (reason: Reason) => states.acknowledgeFailure({ ...defaults, reason });
+const failure = (reason: Reason) => states.failure({ reason });
 
 // -------
 // Actions
@@ -76,34 +116,64 @@ export const challengeTimesOut = {
   timeoutAcknowledged,
 };
 
-export const challengeUnnecessary = {
+export const channelDoesntExist = {
   ...defaults,
+  storage: EMPTY_SHARED_DATA,
   // states
-  waitForApproval,
-  acknowledgeUnnecessary,
-  unnecessary,
+  acknowledgeFailure: acknowledge('ChannelDoesntExist'),
+  failure: failure('ChannelDoesntExist'),
   // actions
-  challengeApproved,
-  acknowledgedUnnecessary,
+  failureAcknowledged,
 };
 
-export const userDeniesChallenge = {
+export const channelNotFullyOpen = {
+  ...defaults,
+  storage: storage(partiallyOpen),
+  // states
+  acknowledgeFailure: acknowledge('NotFullyOpen'),
+  failure: failure('NotFullyOpen'),
+  // actions
+  failureAcknowledged,
+};
+
+export const alreadyHaveLatest = {
+  ...defaults,
+  storage: storage(ourTurn),
+  // states
+  acknowledgeFailure: acknowledge('AlreadyHaveLatest'),
+  failure: failure('AlreadyHaveLatest'),
+  // actions
+  failureAcknowledged,
+};
+
+export const userDeclinesChallenge = {
   ...defaults,
   // states
   waitForApproval,
-  acknowledgeFailure,
-  failure,
+  acknowledgeFailure: acknowledge('DeclinedByUser'),
+  failure: failure('DeclinedByUser'),
   // actions
   challengeDenied,
   failureAcknowledged,
+};
+
+export const receiveCommitmentWhileApproving = {
+  ...defaults,
+  // states
+  waitForApproval,
+  acknowledgeFailure: acknowledge('LatestWhileApproving'),
+  failure: failure('LatestWhileApproving'),
+  // actions
+  challengeApproved,
+  acknowledgedUnnecessary,
 };
 
 export const transactionFails = {
   ...defaults,
   // states
   waitForTransaction: waitForTransactionFailure,
-  acknowledgeFailure,
-  failure,
+  acknowledgeFailure: acknowledge('TransactionFailed'),
+  failure: failure('TransactionFailed'),
   // actions
   transactionFailureTrigger,
   failureAcknowledged,

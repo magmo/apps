@@ -77,6 +77,15 @@ export const preFundCommitment2: Commitment = {
   allocation: twoThree,
   destination: participants,
 };
+export const gameCommitment0: Commitment = {
+  channel,
+  commitmentCount: 2,
+  commitmentType: CommitmentType.App,
+  appAttributes: '0x0',
+  turnNum: 18,
+  allocation: ['0x05', '0x05'],
+  destination: [],
+};
 export const gameCommitment1: Commitment = {
   channel,
   commitmentCount: 2,
