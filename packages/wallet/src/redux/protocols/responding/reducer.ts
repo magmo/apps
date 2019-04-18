@@ -97,6 +97,7 @@ const craftResponseTransactionWithExistingCommitment = (
     lastSignature,
     penultimateSignature,
   } = getStoredCommitments(challengeCommitment, sharedData);
+
   if (canRefute(challengeCommitment, sharedData)) {
     if (canRefuteWithCommitment(lastCommitment, challengeCommitment)) {
       return TransactionGenerator.createRefuteTransaction(lastCommitment, lastSignature);
@@ -168,7 +169,7 @@ const canRefute = (challengeCommitment: Commitment, sharedData: SharedData) => {
 
 const canRefuteWithCommitment = (commitment: Commitment, challengeCommitment: Commitment) => {
   return (
-    commitment.turnNum > challengeCommitment.turnNum ||
+    commitment.turnNum > challengeCommitment.turnNum &&
     mover(commitment) === mover(challengeCommitment)
   );
 };
