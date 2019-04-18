@@ -4,6 +4,7 @@ import * as funding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
 import { WalletProtocol } from './types';
+import * as challenging from './protocols/challenging/actions';
 import { Commitment } from 'fmg-core';
 import { TransactionAction as TA } from './protocols/transaction-submission/actions';
 import { WithdrawalAction } from './protocols/withdrawing/actions';
@@ -162,6 +163,7 @@ export type WalletAction =
   | MessageSent
   | MetamaskLoadError
   | CommonAction
+  | challenging.ChallengingAction
   | channel.ChannelAction
   | internal.InternalAction
   | funding.FundingAction
