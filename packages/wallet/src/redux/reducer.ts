@@ -7,9 +7,9 @@ import { accumulateSideEffects } from './outbox';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { channelStateReducer } from './channel-state/reducer';
 import { combineReducersWithSideEffects } from './../utils/reducer-utils';
-import { createsNewProcess, routesToProcess } from './protocols/actions';
+import { createsNewProcess, routesToProcess, NewProcessAction } from './protocols/actions';
 import * as indirectFunding from './protocols/indirect-funding/reducer';
-import { PlayerIndex, WalletProtocol } from './types';
+import { ProtocolState } from './protocols';
 
 const initialState = states.waitForLogin();
 
@@ -109,15 +109,8 @@ const waitForLoginReducer = (
 function startProcess(
   state: states.Initialized,
   sharedData: states.SharedData,
-  action: {
-    type: 'WALLET.INDIRECT_FUNDING.FUNDING_REQUESTED';
-    channelId: string;
-    playerIndex: PlayerIndex;
-    protocol: WalletProtocol;
-  },
-  protocolState:
-    | states.indirectFunding.playerA.WaitForApproval
-    | states.indirectFunding.playerB.WaitForApproval,
+  action: NewProcessAction,
+  protocolState: ProtocolState,
 ): states.Initialized {
   const newState = { ...state, ...sharedData };
   const processId = action.channelId;
