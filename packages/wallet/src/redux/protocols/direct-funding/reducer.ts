@@ -1,14 +1,16 @@
-import * as states from './state';
-import * as actions from '../../actions';
-import * as depositingStates from './depositing/state';
-
-import { unreachable } from '../../../utils/reducer-utils';
-import { depositingReducer } from './depositing/reducer';
 import { bigNumberify } from 'ethers/utils';
+import { unreachable } from '../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
+import * as actions from '../../actions';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
-import { accumulateSideEffects } from '../../outbox';
 import { SharedData } from '../../state';
+import {
+  initialize as initTransactionState,
+  transactionReducer,
+} from '../transaction-submission/reducer';
+import * as states from './state';
+import { isTransactionAction } from '../transaction-submission/actions';
+import { isTerminal, SUCCESS } from '../transaction-submission/states';
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
 
@@ -29,19 +31,18 @@ export const directFundingStateReducer: DFReducer = (
     }
   }
 
-  if (states.stateIsNotSafeToDeposit(state)) {
-    return notSafeToDepositReducer(state, sharedData, action);
+  switch (state.channelFundingStatus) {
+    case states.NOT_SAFE_TO_DEPOSIT:
+      return notSafeToDepositReducer(state, sharedData, action);
+    case states.WAIT_FOR_DEPOSIT_TRANSACTION:
+      return waitForDepositTransactionReducer(state, sharedData, action);
+    case states.WAIT_FOR_FUNDING_CONFIRMATION:
+      return waitForFundingConfirmationReducer(state, sharedData, action);
+    case states.CHANNEL_FUNDED:
+      return channelFundedReducer(state, sharedData, action);
+    default:
+      return unreachable(state);
   }
-  if (states.stateIsDepositing(state)) {
-    return depositingReducer(state, sharedData, action);
-  }
-  if (states.stateIsWaitForFundingConfirmation(state)) {
-    return waitForFundingConfirmationReducer(state, sharedData, action);
-  }
-  if (states.stateIsChannelFunded(state)) {
-    return channelFundedReducer(state, sharedData, action);
-  }
-  return unreachable(state);
 };
 
 const notSafeToDepositReducer: DFReducer = (
@@ -55,23 +56,19 @@ const notSafeToDepositReducer: DFReducer = (
         action.channelId === state.channelId &&
         bigNumberify(action.totalForDestination).gte(state.safeToDepositLevel)
       ) {
-        const sideEffects = {
-          // TODO: This will be factored out as channel reducers should not be sending transactions itself
-          transactionOutbox: {
-            transactionRequest: createDepositTransaction(
-              state.channelId,
-              state.requestedYourContribution,
-            ),
-            processId: `direct-funding.${action.channelId}`, // temp fix
-            requestId: action.channelId,
-          },
-        };
+        const depositTransaction = createDepositTransaction(
+          state.channelId,
+          state.requestedYourContribution,
+        );
+
+        const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
+          depositTransaction,
+          `direct-funding.${action.channelId}`, // TODO: what is the correct way of fetching the process id?
+          sharedData,
+        );
         return {
-          protocolState: depositingStates.waitForTransactionSent({ ...state }),
-          sharedData: {
-            ...sharedData,
-            outboxState: accumulateSideEffects(sharedData.outboxState, sideEffects),
-          },
+          protocolState: states.waitForDepositTransaction(state, transactionSubmissionState),
+          sharedData: newSharedData,
         };
       } else {
         return { protocolState: state, sharedData };
@@ -80,6 +77,38 @@ const notSafeToDepositReducer: DFReducer = (
       return { protocolState: state, sharedData };
   }
 };
+
+const waitForDepositTransactionReducer: DFReducer = (
+  protocolState: states.WaitForDepositTransaction,
+  sharedData: SharedData,
+  action: actions.WalletAction,
+): ProtocolStateWithSharedData<states.DirectFundingState> => {
+  if (!isTransactionAction(action)) {
+    return { protocolState, sharedData };
+  }
+  const { storage: newSharedData, state: newTransactionState } = transactionReducer(
+    protocolState.transactionSubmissionState,
+    sharedData,
+    action,
+  );
+  if (!isTerminal(newTransactionState)) {
+    return {
+      sharedData: newSharedData,
+      protocolState: { ...protocolState, transactionSubmissionState: newTransactionState },
+    };
+  } else {
+    if (newTransactionState.type === SUCCESS) {
+      return {
+        protocolState: states.waitForFundingConfirmation(protocolState),
+        sharedData,
+      };
+    } else {
+      // TODO: treat the transaction failure case
+      return { protocolState, sharedData };
+    }
+  }
+};
+
 const waitForFundingConfirmationReducer: DFReducer = (
   state: states.WaitForFundingConfirmation,
   sharedData: SharedData,

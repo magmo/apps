@@ -135,9 +135,11 @@ export const itIncreasesTurnNumBy = (
   });
 };
 
-export function itChangesDepositStatusTo(status: string, state: { protocolState: any }) {
-  it(`changes depositStatus to ${status} `, () => {
-    expect(state.protocolState.depositStatus).toEqual(status);
+export function itChangesTransactionSubmissionStatusTo<
+  T extends { protocolState: { transactionSubmissionState: any } }
+>(status: string, state: T) {
+  it(`changes channelFundingStatus to ${status}`, () => {
+    expect(state.protocolState.transactionSubmissionState.type).toEqual(status);
   });
 }
 export function itChangesChannelFundingStatusTo<
