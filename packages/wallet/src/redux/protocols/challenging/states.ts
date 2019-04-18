@@ -1,16 +1,25 @@
 import { Properties as P } from '../../utils';
 import { TransactionSubmissionState } from '../transaction-submission';
 
-export type ChallengingState =
+export type ChallengingState = NonTerminalState | TerminalState;
+
+export type NonTerminalState =
   | WaitForApproval
   | WaitForTransaction
   | WaitForResponseOrTimeout
   | AcknowledgeTimeout
   | AcknowledgeResponse
-  | Unnecessary
-  | SuccessOpen
-  | SuccessClosed
-  | Failure;
+  | AcknowledgeFailure;
+
+export type TerminalState = SuccessOpen | SuccessClosed | Failure;
+
+export type FailureReason =
+  | 'ChannelDoesntExist'
+  | 'NotFullyOpen'
+  | 'DeclinedByUser'
+  | 'AlreadyHaveLatest'
+  | 'LatestWhileApproving'
+  | 'TransactionFailed';
 
 export interface WaitForApproval {
   type: 'WaitForApproval';
@@ -41,26 +50,16 @@ export interface AcknowledgeFailure {
   type: 'AcknowledgeFailure';
   processId: string;
   channelId: string;
+  reason: FailureReason;
 }
-
-export interface AcknowledgeUnnecessary {
-  type: 'AcknowledgeUnnecessary';
-  processId: string;
-  channelId: string;
-}
-
 export interface AcknowledgeResponse {
   type: 'AcknowledgeResponse';
   processId: string;
   channelId: string;
 }
-
 export interface Failure {
   type: 'Failure';
-}
-
-export interface Unnecessary {
-  type: 'Unnecessary';
+  reason: FailureReason;
 }
 
 export interface SuccessOpen {
@@ -69,6 +68,25 @@ export interface SuccessOpen {
 
 export interface SuccessClosed {
   type: 'SuccessClosed';
+}
+
+// -------
+// Helpers
+// -------
+
+export function isTerminal(state: ChallengingState): state is TerminalState {
+  return state.type === 'Failure' || state.type === 'SuccessOpen' || state.type === 'SuccessClosed';
+}
+
+export function isNonTerminal(state: ChallengingState): state is NonTerminalState {
+  return (
+    state.type === 'WaitForApproval' ||
+    state.type === 'WaitForTransaction' ||
+    state.type === 'WaitForResponseOrTimeout' ||
+    state.type === 'AcknowledgeTimeout' ||
+    state.type === 'AcknowledgeFailure' ||
+    state.type === 'AcknowledgeResponse'
+  );
 }
 
 // --------
@@ -100,22 +118,14 @@ export function acknowledgeTimeout(p: P<AcknowledgeTimeout>): AcknowledgeTimeout
   return { type: 'AcknowledgeTimeout', processId, channelId };
 }
 
-export function acknowledgeUnnecessary(p: P<AcknowledgeUnnecessary>): AcknowledgeUnnecessary {
-  const { processId, channelId } = p;
-  return { type: 'AcknowledgeUnnecessary', processId, channelId };
-}
-
 export function acknowledgeFailure(p: P<AcknowledgeFailure>): AcknowledgeFailure {
-  const { processId, channelId } = p;
-  return { type: 'AcknowledgeFailure', processId, channelId };
+  const { processId, channelId, reason } = p;
+  return { type: 'AcknowledgeFailure', processId, channelId, reason };
 }
 
-export function failure(): Failure {
-  return { type: 'Failure' };
-}
-
-export function unnecessary(): Unnecessary {
-  return { type: 'Unnecessary' };
+export function failure(p: P<Failure>): Failure {
+  const { reason } = p;
+  return { type: 'Failure', reason };
 }
 
 export function successClosed(): SuccessClosed {
