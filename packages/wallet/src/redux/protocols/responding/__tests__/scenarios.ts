@@ -2,7 +2,7 @@ import * as states from '../state';
 import * as actions from '../actions';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import * as transactionScenarios from '../../transaction-submission/__tests__/scenarios';
-import { emptyState } from '../../../state';
+import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 
 import {
   ChannelStatus,
@@ -10,7 +10,6 @@ import {
   WAIT_FOR_UPDATE,
   ChannelState,
 } from '../../../channel-state/state';
-import { SharedData } from '../..';
 import * as transactionActions from '../../transaction-submission/actions';
 
 // ---------
@@ -66,7 +65,7 @@ const refuteChannelState = {
 };
 const transactionSubmissionState = transactionScenarios.happyPath.waitForConfirmation;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...emptyState, channelState };
+const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelState };
 const props = { processId, transactionSubmissionState, sharedData };
 
 // ------

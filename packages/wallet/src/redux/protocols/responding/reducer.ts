@@ -1,5 +1,5 @@
 import { Commitment } from 'fmg-core/lib/commitment';
-import { SharedData, ProtocolStateWithSharedData } from '..';
+import { ProtocolStateWithSharedData } from '..';
 import * as states from './state';
 import * as actions from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -9,6 +9,7 @@ import * as TransactionGenerator from '../../../utils/transaction-generator';
 import { PlayerIndex } from '../../types';
 import { TransactionRequest } from 'ethers/providers';
 import { initialize as initTransactionState } from '../transaction-submission/reducer';
+import { SharedData } from '../../state';
 
 export const initialize = (
   processId: string,
