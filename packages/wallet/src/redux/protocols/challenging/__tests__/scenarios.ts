@@ -164,8 +164,7 @@ export const receiveCommitmentWhileApproving = {
   acknowledgeFailure: acknowledge('LatestWhileApproving'),
   failure: failure('LatestWhileApproving'),
   // actions
-  challengeApproved,
-  acknowledgedUnnecessary,
+  failureAcknowledged,
 };
 
 export const transactionFails = {
