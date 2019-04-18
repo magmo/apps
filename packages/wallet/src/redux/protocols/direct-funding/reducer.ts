@@ -31,7 +31,7 @@ export const directFundingStateReducer: DFReducer = (
     }
   }
 
-  switch (state.channelFundingStatus) {
+  switch (state.type) {
     case states.NOT_SAFE_TO_DEPOSIT:
       return notSafeToDepositReducer(state, sharedData, action);
     case states.WAIT_FOR_DEPOSIT_TRANSACTION:

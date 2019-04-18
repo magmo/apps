@@ -1,10 +1,7 @@
 import { addHex } from '../../../../utils/hex-utils';
 import * as actions from '../../../actions';
 import { EMPTY_SHARED_DATA } from '../../../state';
-import {
-  itChangesChannelFundingStatusTo,
-  itChangesTransactionSubmissionStatusTo,
-} from '../../../__tests__/helpers';
+import { itTransitionsToStateType } from '../../../__tests__/helpers';
 import * as globalTestScenarios from '../../../__tests__/test-scenarios';
 import { directFundingStateReducer } from '../reducer';
 import * as states from '../state';
@@ -32,7 +29,7 @@ describe(startingIn('any state'), () => {
           TOTAL_REQUIRED,
         );
         const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
-        itChangesChannelFundingStatusTo(states.CHANNEL_FUNDED, updatedState);
+        itTransitionsToStateType(states.CHANNEL_FUNDED, updatedState);
       });
       describe('when the channel is still not funded', () => {
         const state = scenarios.happyPathB.states.notSafeToDeposit;
@@ -43,7 +40,7 @@ describe(startingIn('any state'), () => {
           YOUR_DEPOSIT_B,
         );
         const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
-        itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, updatedState);
+        itTransitionsToStateType(states.NOT_SAFE_TO_DEPOSIT, updatedState);
       });
     });
 
@@ -56,7 +53,7 @@ describe(startingIn('any state'), () => {
         TOTAL_REQUIRED,
       );
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
-      itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, updatedState);
+      itTransitionsToStateType(states.NOT_SAFE_TO_DEPOSIT, updatedState);
     });
   });
 });
@@ -74,10 +71,11 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
       );
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
-      itChangesChannelFundingStatusTo(states.WAIT_FOR_DEPOSIT_TRANSACTION, updatedState);
+      itTransitionsToStateType(states.WAIT_FOR_DEPOSIT_TRANSACTION, updatedState);
       itChangesTransactionSubmissionStatusTo(
         transactionSubmissionStates.WAIT_FOR_SEND,
-        updatedState as any,
+        ((updatedState.protocolState as any) as states.WaitForDepositTransaction)
+          .transactionSubmissionState,
       );
     });
 
@@ -86,7 +84,7 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
       const action = actions.fundingReceivedEvent(channelId, channelId, '0x', '0x');
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
-      itChangesChannelFundingStatusTo(states.NOT_SAFE_TO_DEPOSIT, updatedState);
+      itTransitionsToStateType(states.NOT_SAFE_TO_DEPOSIT, updatedState);
     });
   });
 });
@@ -103,7 +101,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_CONFIRMATION), () => {
       );
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
-      itChangesChannelFundingStatusTo(states.CHANNEL_FUNDED, updatedState);
+      itTransitionsToStateType(states.CHANNEL_FUNDED, updatedState);
     });
 
     describe('when it is still not fully funded', () => {
@@ -111,7 +109,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_CONFIRMATION), () => {
       const action = actions.fundingReceivedEvent(channelId, channelId, '0x', YOUR_DEPOSIT_A);
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
-      itChangesChannelFundingStatusTo(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
+      itTransitionsToStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
     });
 
     describe('when it is for the wrong channel', () => {
@@ -124,7 +122,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_CONFIRMATION), () => {
       );
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
-      itChangesChannelFundingStatusTo(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
+      itTransitionsToStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
     });
   });
 });
@@ -134,3 +132,12 @@ describe(startingIn(states.CHANNEL_FUNDED), () => {
     expect.assertions(1);
   });
 });
+
+function itChangesTransactionSubmissionStatusTo(
+  status: string,
+  state: transactionSubmissionStates.TransactionSubmissionState,
+) {
+  it(`changes transaction submission state to ${status}`, () => {
+    expect(state.type).toEqual(status);
+  });
+}

@@ -33,7 +33,7 @@ import { accumulateSideEffects } from '../../outbox';
 import { SharedData, setChannel } from '../../state';
 
 export const directFundingIsComplete = (directFundingState: DirectFundingState): boolean => {
-  return directFundingState.channelFundingStatus === CHANNEL_FUNDED;
+  return directFundingState.type === CHANNEL_FUNDED;
 };
 
 export const appChannelIsWaitingForFunding = (

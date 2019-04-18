@@ -15,6 +15,7 @@ NSD-->TSSM(TransactionSubmissionStateMachine)
 ST-->TSSM
 TSSM-->WFFC(WaitForFundingConfirmation)
 WFFC-->CF(ChannelFunded)
+ST-->CF
 CF-->SC((Success))
 ```
 

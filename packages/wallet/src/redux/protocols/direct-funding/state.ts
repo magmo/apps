@@ -5,6 +5,7 @@ import { DirectFundingRequested } from '../../internal/actions';
 import { SharedData } from '../../state';
 import { initialize as initTransactionState } from '../transaction-submission/reducer';
 import { TransactionSubmissionState } from '../transaction-submission/states';
+import { Properties } from '../../utils';
 
 // ChannelFundingStatus
 export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
@@ -20,28 +21,28 @@ export type ChannelFundingStatus =
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface BaseDirectFundingState {
   safeToDepositLevel: string;
-  channelFundingStatus: ChannelFundingStatus;
+  type: ChannelFundingStatus;
   requestedTotalFunds: string;
   requestedYourContribution: string;
   channelId: string;
   ourIndex: number;
 }
 export interface NotSafeToDeposit extends BaseDirectFundingState {
-  channelFundingStatus: typeof NOT_SAFE_TO_DEPOSIT;
+  type: typeof NOT_SAFE_TO_DEPOSIT;
 }
 export interface WaitForDepositTransaction extends BaseDirectFundingState {
-  channelFundingStatus: typeof WAIT_FOR_DEPOSIT_TRANSACTION;
+  type: typeof WAIT_FOR_DEPOSIT_TRANSACTION;
   transactionSubmissionState: TransactionSubmissionState;
 }
 export interface WaitForFundingConfirmation extends BaseDirectFundingState {
-  channelFundingStatus: typeof WAIT_FOR_FUNDING_CONFIRMATION;
+  type: typeof WAIT_FOR_FUNDING_CONFIRMATION;
 }
 export interface ChannelFunded extends BaseDirectFundingState {
-  channelFundingStatus: typeof CHANNEL_FUNDED;
+  type: typeof CHANNEL_FUNDED;
 }
 // constructors
-export function baseDirectFundingState<T extends BaseDirectFundingState>(
-  params: T,
+export function baseDirectFundingState(
+  params: Properties<BaseDirectFundingState>,
 ): BaseDirectFundingState {
   const {
     requestedTotalFunds,
@@ -49,7 +50,7 @@ export function baseDirectFundingState<T extends BaseDirectFundingState>(
     channelId,
     ourIndex,
     safeToDepositLevel,
-    channelFundingStatus,
+    type: channelFundingStatus,
   } = params;
   return {
     requestedTotalFunds,
@@ -57,37 +58,37 @@ export function baseDirectFundingState<T extends BaseDirectFundingState>(
     channelId,
     ourIndex,
     safeToDepositLevel,
-    channelFundingStatus,
+    type: channelFundingStatus,
   };
 }
-export function notSafeToDeposit<T extends BaseDirectFundingState>(params: T): NotSafeToDeposit {
+export function notSafeToDeposit(params: Properties<BaseDirectFundingState>): NotSafeToDeposit {
   return {
     ...baseDirectFundingState(params),
-    channelFundingStatus: NOT_SAFE_TO_DEPOSIT,
+    type: NOT_SAFE_TO_DEPOSIT,
   };
 }
-export function waitForDepositTransaction<T extends BaseDirectFundingState>(
-  params: T,
+export function waitForDepositTransaction(
+  params: Properties<BaseDirectFundingState>,
   transactionSubmissionState: TransactionSubmissionState,
 ): WaitForDepositTransaction {
   return {
     ...baseDirectFundingState(params),
-    channelFundingStatus: WAIT_FOR_DEPOSIT_TRANSACTION,
+    type: WAIT_FOR_DEPOSIT_TRANSACTION,
     transactionSubmissionState,
   };
 }
 export function waitForFundingConfirmation<T extends BaseDirectFundingState>(
-  params: T,
+  params: Properties<BaseDirectFundingState>,
 ): WaitForFundingConfirmation {
   return {
     ...baseDirectFundingState(params),
-    channelFundingStatus: WAIT_FOR_FUNDING_CONFIRMATION,
+    type: WAIT_FOR_FUNDING_CONFIRMATION,
   };
 }
-export function channelFunded<T extends BaseDirectFundingState>(params: T): ChannelFunded {
+export function channelFunded(params: Properties<BaseDirectFundingState>): ChannelFunded {
   return {
     ...baseDirectFundingState(params),
-    channelFundingStatus: CHANNEL_FUNDED,
+    type: CHANNEL_FUNDED,
   };
 }
 export type DirectFundingState =
@@ -113,8 +114,6 @@ export function initialDirectFundingState(
         channelId,
         ourIndex,
         safeToDepositLevel,
-        // TODO: this is redundant
-        channelFundingStatus: CHANNEL_FUNDED,
       }),
       sharedData,
     };
@@ -136,8 +135,6 @@ export function initialDirectFundingState(
           channelId,
           ourIndex,
           safeToDepositLevel,
-          // TODO: this is redundant
-          channelFundingStatus: WAIT_FOR_DEPOSIT_TRANSACTION,
         },
         transactionSubmissionState,
       ),
@@ -152,8 +149,6 @@ export function initialDirectFundingState(
       channelId,
       ourIndex,
       safeToDepositLevel,
-      // TODO: this is redundant
-      channelFundingStatus: NOT_SAFE_TO_DEPOSIT,
     }),
     sharedData,
   };
