@@ -8,17 +8,21 @@ import * as TransactionGenerator from '../../../../utils/transaction-generator';
 // Mocks
 const mockTransaction = { to: '0xabc' };
 const createRespondWithMoveMock = jest.fn().mockReturnValue(mockTransaction);
+const refuteMock = jest.fn().mockReturnValue(mockTransaction);
 Object.defineProperty(TransactionGenerator, 'createRespondWithMoveTransaction', {
   value: createRespondWithMoveMock,
 });
+Object.defineProperty(TransactionGenerator, 'createRefuteTransaction', {
+  value: refuteMock,
+});
 
 describe('respond with existing move happy-path scenario', () => {
-  const scenario = scenarios.respondWithExistingCommitmentHappyPath;
+  const scenario = scenarios.refuteHappyPath;
   const { sharedData, processId } = scenario;
 
   describe('when initializing', () => {
     const { challengeCommitment } = scenario;
-    const result = initialize(challengeCommitment, processId, sharedData);
+    const result = initialize(processId, sharedData, challengeCommitment);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
     itSetsChallengeCommitment(result, scenario.challengeCommitment);
@@ -31,7 +35,7 @@ describe('respond with existing move happy-path scenario', () => {
     const result = respondingReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
-    itCallsRespondWithMoveWith(scenario.challengeCommitment);
+    itCallsRefuteWith(scenario.refuteCommitment);
   });
 
   describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
@@ -56,11 +60,10 @@ describe('select response happy-path scenario', () => {
   const { sharedData, processId } = scenario;
 
   describe('when initializing', () => {
-    const { challengeCommitment } = scenario;
-    const result = initialize(challengeCommitment, processId, sharedData);
+    const result = initialize(processId, sharedData);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
-    itSetsChallengeCommitment(result, scenario.challengeCommitment);
+    expect((result.protocolState as states.WaitForApproval).challengeCommitment).toBeUndefined();
   });
 
   describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
@@ -79,7 +82,7 @@ describe('select response happy-path scenario', () => {
     const result = respondingReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
-    itCallsRespondWithMoveWith(scenario.challengeCommitment);
+    itCallsRespondWithMoveWith(scenario.responseCommitment);
   });
 
   describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
@@ -99,6 +102,42 @@ describe('select response happy-path scenario', () => {
   });
 });
 
+describe('user declines scenario', () => {
+  const scenario = scenarios.userDeclines;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
+    const state = scenario.waitForApproval;
+    const action = scenario.reject;
+
+    const result = respondingReducer(state, sharedData, action);
+
+    itTransitionsToFailure(result, scenario.failure);
+  });
+});
+
+describe('user declines scenario', () => {
+  const scenario = scenarios.transactionFails;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
+    const state = scenario.waitForTransaction;
+    const action = scenario.transactionFailed;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.failure);
+  });
+});
+
+const itTransitionsToFailure = (
+  result: { protocolState: states.RespondingState },
+  failure: states.Failure,
+) => {
+  it(`transitions to failure with reason ${failure.reason}`, () => {
+    expect(result.protocolState).toMatchObject(failure);
+  });
+};
+
 const itCallsRespondWithMoveWith = (challengeCommitment: Commitment) => {
   it('calls respond with move with the correct commitment', () => {
     expect(createRespondWithMoveMock).toHaveBeenCalledWith(
@@ -107,6 +146,13 @@ const itCallsRespondWithMoveWith = (challengeCommitment: Commitment) => {
     );
   });
 };
+
+const itCallsRefuteWith = (refuteCommitment: Commitment) => {
+  it('calls refute with the correct commitment', () => {
+    expect(refuteMock).toHaveBeenCalledWith(refuteCommitment, jasmine.any(Object));
+  });
+};
+
 const itTransitionsTo = (result: { protocolState: states.RespondingState }, type: string) => {
   it(`transitions to ${type}`, () => {
     expect(result.protocolState.type).toEqual(type);

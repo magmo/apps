@@ -27,6 +27,7 @@ const {
   alternativeGameCommitment2,
   gameCommitment1,
   gameCommitment2,
+  gameCommitment3,
 } = testScenarios;
 
 const channelStatus: ChannelStatus = {
@@ -92,6 +93,7 @@ const responseProvided = actions.responseProvided(processId, testScenarios.gameC
 export const respondWithExistingCommitmentHappyPath = {
   ...props,
   challengeCommitment: gameCommitment1,
+  responseCommitment: gameCommitment2,
   // States
   waitForApproval: waitForApprovalRespond,
   waitForTransaction,
@@ -105,6 +107,8 @@ export const respondWithExistingCommitmentHappyPath = {
 
 export const refuteHappyPath = {
   ...props,
+  challengeCommitment: alternativeGameCommitment2,
+  refuteCommitment: gameCommitment2,
   // States
   waitForApproval: waitForApprovalRefute,
   waitForTransaction,
@@ -118,7 +122,8 @@ export const refuteHappyPath = {
 
 export const requireResponseHappyPath = {
   ...props,
-  challengeCommitment: gameCommitment1,
+  challengeCommitment: gameCommitment2,
+  responseCommitment: gameCommitment3,
   // States
   waitForApproval: waitForApprovalRequiresResponse,
   waitForResponse,

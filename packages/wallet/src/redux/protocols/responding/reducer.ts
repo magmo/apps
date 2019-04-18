@@ -3,9 +3,9 @@ import { SharedData, ProtocolStateWithSharedData } from '..';
 import * as states from './state';
 import * as actions from './actions';
 export const initialize = (
-  challengeCommitment: Commitment,
   processId: string,
   sharedData: SharedData,
+  challengeCommitment?: Commitment,
 ): ProtocolStateWithSharedData<states.RespondingState> => {
   return {
     protocolState: states.waitForApproval({ processId, challengeCommitment }),

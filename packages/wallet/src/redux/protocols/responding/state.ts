@@ -24,7 +24,7 @@ export const SUCCESS = 'Success';
 export interface WaitForApproval {
   type: typeof WAIT_FOR_APPROVAL;
   processId: string;
-  challengeCommitment: Commitment;
+  challengeCommitment?: Commitment;
 }
 
 export interface WaitForTransaction {
