@@ -24,7 +24,6 @@ const {
   libraryAddress,
   participants,
   channelNonce,
-  alternativeGameCommitment2,
   gameCommitment1,
   gameCommitment2,
   gameCommitment3,
@@ -45,10 +44,24 @@ const channelStatus: ChannelStatus = {
   penultimateCommitment: { commitment: gameCommitment1, signature: '0x0' },
   turnNum: gameCommitment2.turnNum,
 };
+
 const channelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
+  },
+};
+
+const refuteChannelStatus = {
+  ...channelStatus,
+  lastCommitment: { commitment: gameCommitment3, signature: '0x0' },
+  penultimateCommitment: { commitment: gameCommitment2, signature: '0x0' },
+  turnNum: gameCommitment2.turnNum,
+};
+const refuteChannelState = {
+  initializingChannels: {},
+  initializedChannels: {
+    [channelId]: refuteChannelStatus,
   },
 };
 const transactionSubmissionState = transactionScenarios.happyPath.waitForConfirmation;
@@ -61,7 +74,7 @@ const props = { processId, transactionSubmissionState, sharedData };
 // ------
 const waitForApprovalRefute = states.waitForApproval({
   ...props,
-  challengeCommitment: alternativeGameCommitment2,
+  challengeCommitment: gameCommitment1,
 });
 const waitForApprovalRespond = states.waitForApproval({
   ...props,
@@ -69,7 +82,7 @@ const waitForApprovalRespond = states.waitForApproval({
 });
 const waitForApprovalRequiresResponse = states.waitForApproval({
   ...props,
-  challengeCommitment: gameCommitment2,
+  challengeCommitment: gameCommitment3,
 });
 const waitForTransaction = states.waitForTransaction(props);
 const waitForAcknowledgement = states.waitForAcknowledgement(props);
@@ -107,8 +120,9 @@ export const respondWithExistingCommitmentHappyPath = {
 
 export const refuteHappyPath = {
   ...props,
-  challengeCommitment: alternativeGameCommitment2,
-  refuteCommitment: gameCommitment2,
+  sharedData: { ...props.sharedData, channelState: refuteChannelState },
+  challengeCommitment: gameCommitment1,
+  refuteCommitment: gameCommitment3,
   // States
   waitForApproval: waitForApprovalRefute,
   waitForTransaction,

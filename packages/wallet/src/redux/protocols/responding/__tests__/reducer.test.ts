@@ -60,7 +60,7 @@ describe('select response happy-path scenario', () => {
   const { sharedData, processId } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(processId, sharedData);
+    const result = initialize(processId, sharedData, scenario.challengeCommitment);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
     expect((result.protocolState as states.WaitForApproval).challengeCommitment).toBeUndefined();
@@ -129,6 +129,7 @@ describe('user declines scenario', () => {
   });
 });
 
+// helpers
 const itTransitionsToFailure = (
   result: { protocolState: states.RespondingState },
   failure: states.Failure,
