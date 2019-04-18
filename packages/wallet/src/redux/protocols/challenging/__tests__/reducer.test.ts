@@ -154,10 +154,16 @@ describe('receive-commitment-while-approving scenario', () => {
   const scenario = scenarios.receiveCommitmentWhileApproving;
   const { storage } = scenario;
 
-  describe.skip('when in WaitForApproval', () => {
-    // how is this going to work? what's the action that causes this?
-    // itTransitionsTo AcknowledgeFailure
+  describe('when in WaitForApproval', () => {
+    const state = scenario.waitForApproval;
+    // note: we're triggering this off the user's acceptance, not the arrival of the update
+    const action = scenario.challengeApproved;
+    const result = challengingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'AcknowledgeFailure');
+    itHasFailureReason(result, 'LatestWhileApproving');
   });
+
   describe('when in AcknowledgeFailure', () => {
     const state = scenario.acknowledgeFailure;
     const action = scenario.failureAcknowledged;

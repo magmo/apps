@@ -158,11 +158,13 @@ export const userDeclinesChallenge = {
 
 export const receiveCommitmentWhileApproving = {
   ...defaults,
+  storage: storage(ourTurn),
   // states
   waitForApproval,
   acknowledgeFailure: acknowledge('LatestWhileApproving'),
   failure: failure('LatestWhileApproving'),
   // actions
+  challengeApproved,
   failureAcknowledged,
 };
 

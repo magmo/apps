@@ -8,7 +8,8 @@ This protocol handles launching a challenge on the blockchain. It includes:
 
 Out of scope (for now)
 
-- Halting the challenge in the case where the opponents move arrives between approval and transaction submission.
+- Halting the challenge in the case where the opponent's commitment arrives between approval and transaction submission.
+- Interrupting the "ApproveChallenge" screen if the opponent's commitment arrives during approval. (Instead, the user will be informed after they approve the challenge.)
 - Chain reorgs (e.g. timeout on one fork vs. response on another)
 
 ## State machine
