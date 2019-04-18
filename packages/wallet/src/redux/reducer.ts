@@ -10,6 +10,7 @@ import { combineReducersWithSideEffects } from './../utils/reducer-utils';
 import { createsNewProcess, routesToProcess, NewProcessAction } from './protocols/actions';
 import * as indirectFunding from './protocols/indirect-funding/reducer';
 import { ProtocolState } from './protocols';
+import { WalletProtocol } from './types';
 
 const initialState = states.waitForLogin();
 
@@ -54,15 +55,44 @@ export function initializedReducer(
   };
 }
 
-function routeToProtocolReducer(state, action) {
-  // TODO: Call the protocol's reducer
+function routeToProtocolReducer(state: states.Initialized, action: actions.protocol.ProcessAction) {
   const processState = state.processStore[action.processId];
   if (!processState) {
     // Log warning?
     return state;
   } else {
-    return state;
+    switch (processState.protocol) {
+      case WalletProtocol.IndirectFunding:
+        const { protocolState, sharedData } = indirectFunding.indirectFundingReducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+
+        return updatedState(state, sharedData, processState, protocolState);
+
+      default:
+        // TODO: This should return unreachable(state), but right now, only some protocols are
+        // "whitelisted" to run as a top-level process, which means we can't
+        // exhaust all options
+        return state;
+    }
   }
+}
+
+function updatedState(
+  state: states.Initialized,
+  sharedData: states.SharedData,
+  processState: states.ProcessState,
+  protocolState: states.indirectFunding.IndirectFundingState,
+) {
+  const newState = { ...state, sharedData };
+  const newProcessState = { ...processState, protocolState };
+  newState.processStore = {
+    ...newState.processStore,
+    [processState.processId]: newProcessState,
+  };
+  return newState;
 }
 
 function routeToNewProcessInitializer(
@@ -114,9 +144,10 @@ function startProcess(
 ): states.Initialized {
   const newState = { ...state, ...sharedData };
   const processId = action.channelId;
+  const { protocol } = action;
   newState.processStore = {
     ...newState.processStore,
-    [processId]: { processId, protocolState, channelsToMonitor: [] },
+    [processId]: { processId, protocolState, channelsToMonitor: [], protocol },
   };
 
   return newState;

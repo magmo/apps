@@ -16,6 +16,7 @@ import * as indirectFunding from './protocols/indirect-funding/state';
 import { accumulateSideEffects } from './outbox';
 import { WalletEvent } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
+import { WalletProtocol } from './types';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -57,6 +58,7 @@ export interface ProcessStore {
 }
 export interface ProcessState {
   processId: string;
+  protocol: WalletProtocol;
   protocolState: any;
   channelsToMonitor: string[];
 }
