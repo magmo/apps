@@ -1,8 +1,7 @@
 import * as states from '../states';
 import * as actions from '../actions';
 import * as tsScenarios from '../../transaction-submission/__tests__/scenarios';
-import { EMPTY_SHARED_DATA } from '../..';
-import { setChannel } from '../../../state';
+import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
 import { ChannelStatus, waitForPreFundSetup, waitForUpdate } from '../../../channel-state/state';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
 
@@ -17,29 +16,31 @@ const { asAddress: address, asPrivateKey: privateKey } = channelScenarios;
 const participant = { address, privateKey, ourIndex: 0 };
 const channelDefaults = { ...channel, ...participant };
 
-const turn0 = { commitment: channelScenarios.preFundCommitment1, signature: 'signature' };
-const turn18 = { commitment: channelScenarios.gameCommitment0, signature: 'signature' };
-const turn19 = { commitment: channelScenarios.gameCommitment1, signature: 'signature' };
-const turn20 = { commitment: channelScenarios.gameCommitment1, signature: 'signature' };
+const {
+  signedCommitment0,
+  signedCommitment19,
+  signedCommitment20,
+  signedCommitment21,
+} = channelScenarios;
 
 const partiallyOpen = waitForPreFundSetup({
   ...channelDefaults,
   turnNum: 0,
-  lastCommitment: turn0,
+  lastCommitment: signedCommitment0,
   funded: false,
 });
 const theirTurn = waitForUpdate({
   ...channelDefaults,
-  turnNum: 19,
-  lastCommitment: turn19,
-  penultimateCommitment: turn18,
+  turnNum: 20,
+  lastCommitment: signedCommitment20,
+  penultimateCommitment: signedCommitment19,
   funded: true,
 });
 const ourTurn = waitForUpdate({
   ...channelDefaults,
-  turnNum: 20,
-  lastCommitment: turn20,
-  penultimateCommitment: turn19,
+  turnNum: 21,
+  lastCommitment: signedCommitment21,
+  penultimateCommitment: signedCommitment20,
   funded: true,
 });
 
@@ -78,6 +79,7 @@ const failure = (reason: Reason) => states.failure({ reason });
 // -------
 const challengeApproved = actions.challengeApproved(processId);
 const challengeDenied = actions.challengeDenied(processId);
+const challengeTimedOut = actions.challengeTimedOut(processId);
 const transactionSuccessTrigger = tsScenarios.happyPath.confirmed;
 const transactionFailureTrigger = tsScenarios.transactionFailed.failed;
 const responseReceived = actions.challengeResponseReceived(processId);
@@ -111,7 +113,7 @@ export const challengeTimesOut = {
   acknowledgeTimeout,
   successClosed,
   // actions
-  // todo: action to trigger timeout
+  challengeTimedOut,
   timeoutAcknowledged,
 };
 

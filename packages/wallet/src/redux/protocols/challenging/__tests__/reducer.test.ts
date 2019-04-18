@@ -9,14 +9,14 @@ describe('opponent-responds scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'waitForApproval');
+    itTransitionsTo(result, 'WaitForApproval');
   });
   describe('when in WaitForApproval', () => {
     const state = scenario.waitForApproval;
     const action = scenario.challengeApproved;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'waitForTransaction');
+    itTransitionsTo(result, 'WaitForTransaction');
     // it initializes the transaction state machine
   });
 
@@ -25,7 +25,7 @@ describe('opponent-responds scenario', () => {
     const action = scenario.transactionSuccessTrigger;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'waitForResponseOrTimeout');
+    itTransitionsTo(result, 'WaitForResponseOrTimeout');
   });
 
   describe('when in WaitForResponseOrTimeout', () => {
@@ -49,11 +49,11 @@ describe('challenge-times-out scenario', () => {
   const scenario = scenarios.challengeTimesOut;
   const { storage } = scenario;
 
-  describe.skip('when in WaitForResponseOrTimeout', () => {
-    //   const state = scenario.waitForResponseOrTimeout;
-    //   const action = scenario.; //todo
-    //   const result = challengingReducer(state, storage, action);
-    //   itTransitionsTo(result, 'AcknowledgeTimeout');
+  describe('when in WaitForResponseOrTimeout', () => {
+    const state = scenario.waitForResponseOrTimeout;
+    const action = scenario.challengeTimedOut;
+    const result = challengingReducer(state, storage, action);
+    itTransitionsTo(result, 'AcknowledgeTimeout');
   });
 
   describe('when in AcknowledgeTimeout', () => {
@@ -137,7 +137,7 @@ describe('user-declines-challenge scenario', () => {
     const action = scenario.challengeDenied;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'acknowledgeFailure');
+    itTransitionsTo(result, 'AcknowledgeFailure');
     itHasFailureReason(result, 'DeclinedByUser');
   });
   describe('when in AcknowledgeFailure', () => {
@@ -179,8 +179,8 @@ describe('transaction-fails scenario', () => {
   const { storage } = scenario;
 
   describe('when in WaitForTransaction', () => {
-    const state = scenario.acknowledgeFailure;
-    const action = scenario.failureAcknowledged;
+    const state = scenario.waitForTransaction;
+    const action = scenario.transactionFailureTrigger;
     const result = challengingReducer(state, storage, action);
 
     itTransitionsTo(result, 'AcknowledgeFailure');
