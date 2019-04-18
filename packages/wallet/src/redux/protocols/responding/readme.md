@@ -17,14 +17,15 @@ Out of scope (for the time being):
 ## State machine
 
 ```mermaid
-graph LR
+graph TD
   St((start)) --> WFAp(WaitForApproval)
-  WFAp-->|Approve|WFT(WaitForTransaction)
-  WFAp-->|Approve|WFR(WaitForResponse)
-  WFR-->|ResponseProvided|WFT(WaitForTransaction)
-  WFAp-->|Rejected|F((failure))
+  WFAp--> |Approve| HC{Commitment<br/>exists?}
+  HC --> |Yes| WFT(WaitForTransaction)
+  HC --> |No| WFR(WaitForResponse)
+  WFR-->|ResponseProvided| WFT(WaitForTransaction)
+  WFAp-->|Rejected| F((failure))
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
-  WFAc-->|Acknowledged|S((success))
+  WFAc-->|Acknowledged| S((success))
   WFT --> |TransactionFailed| F((failure))
 ```
 
