@@ -6,7 +6,6 @@ import {
   waitForApproval,
   waitForResponseOrTimeout,
   acknowledgeFailure,
-  acknowledgeUnnecessary,
 } from './states';
 import { unreachable, ourTurn } from '../../../utils/reducer-utils';
 import { SharedData } from '..';
@@ -39,8 +38,6 @@ export function challengingReducer(
       return challengeApproved(state, storage);
     case actions.CHALLENGE_DENIED:
       return challengeDenied(state, storage);
-    case actions.ACKNOWLEDGED_CHALLENGE_UNNECESSARY:
-      return acknowledgedChallengeUnnecessary(state, storage);
     case actions.CHALLENGE_RESPONSE_RECEIVED:
       return challengeResponseRecieved(state, storage);
     case actions.CHALLENGE_TIMED_OUT:
@@ -117,10 +114,6 @@ function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVa
 }
 
 function challengeDenied(state: NonTerminalCState, storage: Storage): ReturnVal {
-  return { state, storage };
-}
-
-function acknowledgedChallengeUnnecessary(state: NonTerminalCState, storage: Storage): ReturnVal {
   return { state, storage };
 }
 

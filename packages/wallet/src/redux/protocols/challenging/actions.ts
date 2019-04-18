@@ -1,7 +1,6 @@
 export type ChallengingAction =
   | ChallengeApproved
   | ChallengeDenied
-  | AcknowledgedChallengeUnnecessary
   | ChallengeResponseReceived
   | ChallengeTimedOut
   | ChallengeTimeoutAcknowledged
@@ -13,7 +12,6 @@ export type ChallengingAction =
 // ------------
 export const CHALLENGE_APPROVED = 'CHALLENGE.APPROVED';
 export const CHALLENGE_DENIED = 'CHALLENGE.DENIED';
-export const ACKNOWLEDGED_CHALLENGE_UNNECESSARY = 'CHALLENGE.ACKNOWLEDGED_UNNECESSARY';
 export const CHALLENGE_RESPONSE_RECEIVED = 'CHALLENGE.RESPONSE_RECEIVED';
 export const CHALLENGE_TIMED_OUT = 'CHALLENGE.TIMED_OUT';
 export const CHALLENGE_TIMEOUT_ACKNOWLEDGED = 'CHALLENGE.TIMEOUT_ACKNOWLEDGED';
@@ -30,11 +28,6 @@ export interface ChallengeApproved {
 
 export interface ChallengeDenied {
   type: typeof CHALLENGE_DENIED;
-  processId: string;
-}
-
-export interface AcknowledgedChallengeUnnecessary {
-  type: typeof ACKNOWLEDGED_CHALLENGE_UNNECESSARY;
   processId: string;
 }
 
@@ -73,13 +66,6 @@ export const challengeApproved = (processId: string): ChallengeApproved => ({
 
 export const challengeDenied = (processId: string): ChallengeDenied => ({
   type: CHALLENGE_DENIED,
-  processId,
-});
-
-export const acknowledgedChallengeUnnecessary = (
-  processId: string,
-): AcknowledgedChallengeUnnecessary => ({
-  type: ACKNOWLEDGED_CHALLENGE_UNNECESSARY,
   processId,
 });
 

@@ -83,7 +83,6 @@ const transactionFailureTrigger = tsScenarios.transactionFailed.failed;
 const responseReceived = actions.challengeResponseReceived(processId);
 const responseAcknowledged = actions.challengeResponseAcknowledged(processId);
 const timeoutAcknowledged = actions.challengeTimeoutAcknowledged(processId);
-const acknowledgedUnnecessary = actions.acknowledgedChallengeUnnecessary(processId);
 const failureAcknowledged = actions.challengeFailureAcknowledged(processId);
 
 // -------
