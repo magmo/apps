@@ -26,7 +26,7 @@ class RespondingContainer extends PureComponent<Props> {
         return (
           <Acknowledge
             title="Response Complete"
-            description="You have successfully responsed to the challenge."
+            description="You have successfully responded to the challenge."
             acknowledge={() => respondSuccessAcknowledged(state.processId)}
           />
         );
