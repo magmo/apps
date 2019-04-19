@@ -79,13 +79,7 @@ export const commitmentReceived = (
 export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
 
 export const CHALLENGE_CREATED_EVENT = 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT';
-export const challengeCreatedEvent = (
-  processId: string,
-  channelId: string,
-  commitment: Commitment,
-  finalizedAt,
-) => ({
-  processId,
+export const challengeCreatedEvent = (channelId: string, commitment: Commitment, finalizedAt) => ({
   channelId,
   commitment,
   finalizedAt,
