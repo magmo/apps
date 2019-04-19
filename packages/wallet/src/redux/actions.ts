@@ -151,7 +151,15 @@ export type AdjudicatorEventAction =
   | ChallengeExpiredEvent;
 
 export type CommonAction = MessageReceived | CommitmentReceived | AdjudicatorEventAction;
-export type ProtocolAction = CommonAction | FundingAction | TransactionAction;
+export type ProtocolAction =
+  | CommonAction
+  | FundingAction
+  | TransactionAction
+  | challenging.ChallengingAction
+  | directFunding.FundingAction
+  | indirectFunding.Action
+  | WithdrawalAction
+  | RespondingAction;
 
 export { internal, channel, directFunding as funding, indirectFunding, protocol };
 
@@ -162,11 +170,6 @@ export type WalletAction =
   | LoggedIn
   | MessageSent
   | MetamaskLoadError
-  | CommonAction
-  | challenging.ChallengingAction
+  | ProtocolAction
   | channel.ChannelAction
-  | internal.InternalAction
-  | directFunding.FundingAction
-  | indirectFunding.Action
-  | WithdrawalAction
-  | RespondingAction;
+  | internal.InternalAction;
