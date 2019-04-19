@@ -54,8 +54,8 @@ const postFundSetupArrived = walletActions.commitmentReceived(
 const successConfirmed = actions.fundingSuccessAcknowledged(processId);
 
 const strategyRejected = actions.strategyRejected(processId);
-const cancelled = actions.cancelled(processId, PlayerIndex.A);
-const cancelledByOpponent = actions.cancelled(processId, PlayerIndex.B);
+const cancelledByA = actions.cancelled(processId, PlayerIndex.A);
+const cancelledByB = actions.cancelled(processId, PlayerIndex.B);
 
 // ---------
 // Scenarios
@@ -85,20 +85,22 @@ export const rejectedStrategy = {
   strategyRejected,
 };
 
-export const cancelledByA = {
-  ...props,
-  // States
-  waitForStrategyResponse,
-  failure,
-  // Actions
-  cancelled,
-};
-
-export const cancelledByB = {
+export const cancelledByUser = {
   ...props,
   // States
   waitForStrategyChoice,
+  waitForStrategyResponse,
+  failure,
+  // Actions
+  cancelledByA,
+};
+
+export const cancelledByOpponent = {
+  ...props,
+  // States
+  waitForStrategyChoice,
+  waitForStrategyResponse,
   failure2,
   // Actions
-  cancelledByOpponent,
+  cancelledByB,
 };
