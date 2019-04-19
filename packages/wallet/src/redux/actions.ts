@@ -1,5 +1,6 @@
 import * as internal from './internal/actions';
 import * as channel from './channel-state/actions';
+import { FundingAction } from './protocols/funding/actions';
 import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
@@ -149,13 +150,8 @@ export type AdjudicatorEventAction =
   | FundingReceivedEvent
   | ChallengeExpiredEvent;
 
-export type CommonAction =
-  | TransactionAction
-  | MessageReceived
-  | CommitmentReceived
-  | AdjudicatorEventAction;
-
-export type ProtocolAction = CommonAction;
+export type CommonAction = MessageReceived | CommitmentReceived | AdjudicatorEventAction;
+export type ProtocolAction = CommonAction | FundingAction | TransactionAction;
 
 export { internal, channel, directFunding as funding, indirectFunding, protocol };
 
