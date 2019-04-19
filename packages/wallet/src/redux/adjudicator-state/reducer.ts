@@ -3,7 +3,6 @@ import {
   clearChallenge,
   markAsFinalized,
   addToBalance,
-  getAdjudicatorChannelState,
   setChallenge,
 } from './state';
 import * as actions from '../actions';
@@ -11,11 +10,11 @@ import { unreachable } from '../../utils/reducer-utils';
 
 export const adjudicatorStateReducer = (
   state: AdjudicatorState,
-  action: actions.BlockMined | actions.AdjudicatorEventAction,
+  action: actions.AdjudicatorEventAction,
 ) => {
   switch (action.type) {
-    case actions.BLOCK_MINED:
-      return blockMinedReducer(state, action);
+    case actions.CHALLENGE_EXPIRED_EVENT:
+      return challengeExpiredReducer(state, action);
     case actions.FUNDING_RECEIVED_EVENT:
       return fundingReceivedEventReducer(state, action);
     case actions.CONCLUDED_EVENT:
@@ -58,22 +57,14 @@ const fundingReceivedEventReducer = (
   addToBalance(state, channelId, action.amount);
 };
 
-const blockMinedReducer = (state: AdjudicatorState, action: actions.BlockMined) => {
+const challengeExpiredReducer = (
+  state: AdjudicatorState,
+  action: actions.ChallengeExpiredEvent,
+) => {
   let newState = { ...state };
-  // Update all challenges that are expired
-  for (const channelId of Object.keys(state)) {
-    if (challengeIsExpired(state, channelId, action.block.timestamp)) {
-      newState = clearChallenge(newState, channelId);
-      newState = markAsFinalized(newState, channelId);
-    }
-  }
-  return newState;
-};
+  const { channelId } = action;
+  newState = clearChallenge(newState, channelId);
+  newState = markAsFinalized(newState, channelId);
 
-const challengeIsExpired = (state: AdjudicatorState, channelId: string, blockTimestamp: number) => {
-  const channelState = getAdjudicatorChannelState(state, channelId);
-  if (!channelState) {
-    return false;
-  }
-  return channelState.challenge && channelState.challenge.expiresAt <= blockTimestamp;
+  return newState;
 };

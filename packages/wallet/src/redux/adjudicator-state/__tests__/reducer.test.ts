@@ -34,50 +34,19 @@ describe('adjudicator state reducer', () => {
     });
   });
 
-  describe('when a block mined event is received', () => {
-    const channel1 = '0x1';
-    const channel2 = '0x2';
-    const channel3 = '0x3';
-    const beforeBlockTime = 1;
-    const blockTime = 2;
-    const afterBlockTime = 3;
-
+  describe('when a challenge expired event is received', () => {
     const state = {
-      [channel1]: createChallengeState(channel1, beforeBlockTime),
-      [channel2]: createChallengeState(channel2, blockTime),
-      [channel3]: createChallengeState(channel3, afterBlockTime),
+      [channelId]: createChallengeState(channelId, 123),
     };
-    const action = actions.blockMined({
-      timestamp: blockTime,
-      number: blockTime,
-    });
+    const action = actions.challengeExpiredEvent('0x0', channelId, 1);
     const updatedState = adjudicatorStateReducer(state, action);
-    describe('for a challenge that expires before the block time', () => {
-      it('expires the challenge', () => {
-        expect(updatedState[channel1].challenge).toBeUndefined();
-      });
 
-      it('marks a channel as finalized', () => {
-        expect(updatedState[channel1].finalized).toEqual(true);
-      });
+    it('clears the challenge', () => {
+      expect(updatedState[channelId].challenge).toBeUndefined();
     });
-    describe('for a challenge that expires at the block time', () => {
-      it('expires the challenge', () => {
-        expect(updatedState[channel2].challenge).toBeUndefined();
-      });
 
-      it('marks a channel as finalized', () => {
-        expect(updatedState[channel2].finalized).toEqual(true);
-      });
-    });
-    describe('for a challenge that expires after the block time', () => {
-      it('does not expire the challenge', () => {
-        expect(updatedState[channel3].challenge).toBeDefined();
-      });
-
-      it('does not mark a channel as finalized', () => {
-        expect(updatedState[channel3].finalized).toEqual(false);
-      });
+    it('marks the challenge as finalized', () => {
+      expect(updatedState[channelId].finalized).toBe(true);
     });
   });
 
