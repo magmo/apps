@@ -1,7 +1,13 @@
-import { AdjudicatorState, AdjudicatorChannelState } from './state';
+import {
+  AdjudicatorState,
+  clearChallenge,
+  markAsFinalized,
+  addToBalance,
+  getAdjudicatorChannelState,
+  setChallenge,
+} from './state';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
-import { bigNumberify } from 'ethers/utils';
 
 export const adjudicatorStateReducer = (
   state: AdjudicatorState,
@@ -28,10 +34,8 @@ const challengeCreatedEventReducer = (
   state: AdjudicatorState,
   action: actions.ChallengeCreatedEvent,
 ) => {
-  const { channelId } = action;
-  const channelAdjudicatorState = state[channelId];
-  const challenge = { challengeCommitment: action.commitment, expiresAt: action.finalizedAt };
-  return { ...state, [channelId]: { ...channelAdjudicatorState, challenge } };
+  const challenge = { expiresAt: action.finalizedAt, challengeCommitment: action.commitment };
+  return setChallenge(state, action.channelId, challenge);
 };
 
 const challengeRespondedReducer = (
@@ -39,44 +43,36 @@ const challengeRespondedReducer = (
   action: actions.RefutedEvent | actions.RespondWithMoveEvent,
 ) => {
   const { channelId } = action;
-  const channelAdjudicatorState = state[channelId];
-  return { ...state, [channelId]: { ...channelAdjudicatorState, challenge: undefined } };
+  return clearChallenge(state, channelId);
 };
 
 const concludedEventReducer = (state: AdjudicatorState, action: actions.ConcludedEvent) => {
   const { channelId } = action;
-  const channelAdjudicatorState = state[channelId];
-  return { ...state, [channelId]: { ...channelAdjudicatorState, concluded: true } };
+  return markAsFinalized(state, channelId);
 };
 const fundingReceivedEventReducer = (
   state: AdjudicatorState,
   action: actions.FundingReceivedEvent,
 ) => {
   const { channelId } = action;
-  const channelAdjudicatorState = state[channelId];
-  const newBalance = bigNumberify(channelAdjudicatorState.balance).add(action.amount);
-  const newChannelAdjudicatorState = { ...channelAdjudicatorState, balance: newBalance };
-  return { ...state, [channelId]: newChannelAdjudicatorState };
+  addToBalance(state, channelId, action.amount);
 };
 
 const blockMinedReducer = (state: AdjudicatorState, action: actions.BlockMined) => {
   let newState = { ...state };
   // Update all challenges that are expired
   for (const channelId of Object.keys(state)) {
-    const channelAdjudicatorState = newState[channelId];
-    if (challengeIsExpired(channelAdjudicatorState, action.block.timestamp)) {
-      newState = { ...newState, [channelId]: { ...channelAdjudicatorState, challenge: undefined } };
+    if (challengeIsExpired(state, channelId, action.block.timestamp)) {
+      newState = clearChallenge(newState, channelId);
     }
   }
   return newState;
 };
 
-const challengeIsExpired = (
-  adjudicatorChannelState: AdjudicatorChannelState,
-  blockTimestamp: number,
-) => {
-  return (
-    adjudicatorChannelState.challenge &&
-    adjudicatorChannelState.challenge.expiresAt < blockTimestamp
-  );
+const challengeIsExpired = (state: AdjudicatorState, channelId: string, blockTimestamp: number) => {
+  const channelState = getAdjudicatorChannelState(state, channelId);
+  if (!channelState) {
+    return false;
+  }
+  return channelState.challenge && channelState.challenge.expiresAt < blockTimestamp;
 };
