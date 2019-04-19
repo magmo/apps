@@ -104,7 +104,6 @@ export const gameCommitment2: Commitment = {
   allocation: [],
   destination: [],
 };
-<<<<<<< HEAD
 export const signedCommitment20 = {
   commitment: gameCommitment2,
   signature: signCommitment(gameCommitment2, asPrivateKey),
@@ -118,9 +117,7 @@ export const alternativeGameCommitment2: Commitment = {
   allocation: [],
   destination: [],
 };
-=======
 
->>>>>>> Fix up some of the responding states
 export const gameCommitment3: Commitment = {
   channel,
   commitmentCount: 3,
