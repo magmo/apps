@@ -25,23 +25,26 @@ const defaultsForB: states.DirectFundingState = {
   safeToDepositLevel: YOUR_DEPOSIT_A,
 };
 
-export const happyPathA = {
-  states: {
-    notSafeToDeposit: states.notSafeToDeposit(defaultsForA),
-    waitForDepositTransaction: states.waitForDepositTransaction(
-      defaultsForA,
-      transactionSubmissionScenarios.happyPath.waitForSend,
-    ),
-    waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForA),
-    channelFunded: states.channelFunded(defaultsForA),
-  },
+export const aDepositsBDepositsAHappyStates = {
+  notSafeToDeposit: states.notSafeToDeposit(defaultsForA),
+  waitForDepositTransactionStart: states.waitForDepositTransaction(
+    defaultsForA,
+    transactionSubmissionScenarios.happyPath.waitForSend,
+  ),
+  waitForDepositTransactionEnd: states.waitForDepositTransaction(
+    defaultsForA,
+    transactionSubmissionScenarios.happyPath.waitForConfirmation,
+  ),
+  waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForA),
+  channelFunded: states.channelFunded(defaultsForA),
 };
 
-export const happyPathB = {
-  states: {
-    notSafeToDeposit: states.notSafeToDeposit(defaultsForB),
-    // waitForDepositTransaction: states.waitForDepositTransaction(defaultsForB),
-    waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForB),
-    channelFunded: states.channelFunded(defaultsForB),
-  },
+export const aDepositsBDepositsBHappyStates = {
+  notSafeToDeposit: states.notSafeToDeposit(defaultsForB),
+  waitForDepositTransaction: states.waitForDepositTransaction(
+    defaultsForB,
+    transactionSubmissionScenarios.happyPath.waitForSend,
+  ),
+  waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForB),
+  channelFunded: states.channelFunded(defaultsForB),
 };

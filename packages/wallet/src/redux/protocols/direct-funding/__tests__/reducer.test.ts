@@ -21,7 +21,7 @@ describe(startingIn('any state'), () => {
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     describe("When it's for the correct channel", () => {
       describe('when the channel is now funded', () => {
-        const state = scenarios.happyPathA.states.notSafeToDeposit;
+        const state = scenarios.aDepositsBDepositsAHappyStates.notSafeToDeposit;
         const action = actions.fundingReceivedEvent(
           channelId,
           channelId,
@@ -32,7 +32,7 @@ describe(startingIn('any state'), () => {
         itTransitionsToStateType(states.CHANNEL_FUNDED, updatedState);
       });
       describe('when the channel is still not funded', () => {
-        const state = scenarios.happyPathB.states.notSafeToDeposit;
+        const state = scenarios.aDepositsBDepositsBHappyStates.notSafeToDeposit;
         const action = actions.fundingReceivedEvent(
           channelId,
           channelId,
@@ -45,7 +45,7 @@ describe(startingIn('any state'), () => {
     });
 
     describe("When it's for another channels", () => {
-      const state = scenarios.happyPathA.states.notSafeToDeposit;
+      const state = scenarios.aDepositsBDepositsAHappyStates.notSafeToDeposit;
       const action = actions.fundingReceivedEvent(
         channelId,
         '0xf00',
@@ -62,7 +62,7 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
   // player B scenario
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     describe('when it is now safe to deposit', () => {
-      const state = scenarios.happyPathB.states.notSafeToDeposit;
+      const state = scenarios.aDepositsBDepositsBHappyStates.notSafeToDeposit;
       const action = actions.fundingReceivedEvent(
         channelId,
         channelId,
@@ -80,7 +80,7 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
     });
 
     describe('when it is still not safe to deposit', () => {
-      const state = scenarios.happyPathB.states.notSafeToDeposit;
+      const state = scenarios.aDepositsBDepositsBHappyStates.notSafeToDeposit;
       const action = actions.fundingReceivedEvent(channelId, channelId, '0x', '0x');
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
@@ -89,10 +89,20 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
   });
 });
 
+describe(startingIn(states.WAIT_FOR_DEPOSIT_TRANSACTION), () => {
+  describe('incoming action is transaction confirmed', () => {
+    const state = scenarios.aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd;
+    const action = actions.transactionConfirmed(channelId);
+
+    const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
+    itTransitionsToStateType(states.WAIT_FOR_FUNDING_CONFIRMATION, updatedState);
+  });
+});
+
 describe(startingIn(states.WAIT_FOR_FUNDING_CONFIRMATION), () => {
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     describe('when it is now fully funded', () => {
-      const state = scenarios.happyPathB.states.waitForFundingConfirmation;
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingConfirmation;
       const action = actions.fundingReceivedEvent(
         channelId,
         channelId,
@@ -105,7 +115,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_CONFIRMATION), () => {
     });
 
     describe('when it is still not fully funded', () => {
-      const state = scenarios.happyPathB.states.waitForFundingConfirmation;
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingConfirmation;
       const action = actions.fundingReceivedEvent(channelId, channelId, '0x', YOUR_DEPOSIT_A);
       const updatedState = directFundingStateReducer(state, EMPTY_SHARED_DATA, action);
 
@@ -113,7 +123,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_CONFIRMATION), () => {
     });
 
     describe('when it is for the wrong channel', () => {
-      const state = scenarios.happyPathB.states.waitForFundingConfirmation;
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingConfirmation;
       const action = actions.fundingReceivedEvent(
         channelId,
         '0 xf00',

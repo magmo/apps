@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
 import DirectFundingContainer from '../container';
-import { happyPathA } from './scenarios';
+import { aDepositsBDepositsAHappyStates } from './scenarios';
 import * as storybookUtils from '../../../../__stories__/index';
 
 const render = state => () => {
@@ -22,10 +22,11 @@ const render = state => () => {
 };
 
 const directFundingScreens = {
-  NotSafeToDeposit: happyPathA.states.notSafeToDeposit,
-  WaitForTransactionSubmission: happyPathA.states.waitForDepositTransaction,
-  WaitForFundingConfirmation: happyPathA.states.waitForFundingConfirmation,
-  ChannelFunded: happyPathA.states.channelFunded,
+  NotSafeToDeposit: aDepositsBDepositsAHappyStates.notSafeToDeposit,
+  WaitForTransactionSubmissionStart: aDepositsBDepositsAHappyStates.waitForDepositTransactionStart,
+  WaitForTransactionSubmissionEnd: aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd,
+  WaitForFundingConfirmation: aDepositsBDepositsAHappyStates.waitForFundingConfirmation,
+  ChannelFunded: aDepositsBDepositsAHappyStates.channelFunded,
 };
 
 storybookUtils.addStoriesFromCollection(directFundingScreens, 'Direct Funding Happy Path', render);
