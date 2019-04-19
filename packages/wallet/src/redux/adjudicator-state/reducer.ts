@@ -64,8 +64,10 @@ const blockMinedReducer = (state: AdjudicatorState, action: actions.BlockMined) 
   for (const channelId of Object.keys(state)) {
     if (challengeIsExpired(state, channelId, action.block.timestamp)) {
       newState = clearChallenge(newState, channelId);
+      newState = markAsFinalized(newState, channelId);
     }
   }
+
   return newState;
 };
 
@@ -74,5 +76,5 @@ const challengeIsExpired = (state: AdjudicatorState, channelId: string, blockTim
   if (!channelState) {
     return false;
   }
-  return channelState.challenge && channelState.challenge.expiresAt < blockTimestamp;
+  return channelState.challenge && channelState.challenge.expiresAt <= blockTimestamp;
 };
