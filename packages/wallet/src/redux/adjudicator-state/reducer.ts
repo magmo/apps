@@ -67,7 +67,6 @@ const blockMinedReducer = (state: AdjudicatorState, action: actions.BlockMined) 
       newState = markAsFinalized(newState, channelId);
     }
   }
-
   return newState;
 };
 
