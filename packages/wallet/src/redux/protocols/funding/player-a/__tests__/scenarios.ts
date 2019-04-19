@@ -1,7 +1,10 @@
 import * as states from '../states';
 import * as actions from '../actions';
-import { EMPTY_SHARED_DATA } from '../../../../state';
 import { PlayerIndex } from '../../../../types';
+
+import { EMPTY_SHARED_DATA } from '../../../../state';
+import * as walletActions from '../../../../actions';
+import * as walletScenarios from '../../../../__tests__/test-scenarios';
 
 // To test all paths through the state machine we will use 4 different scenarios:
 //
@@ -22,6 +25,7 @@ import { PlayerIndex } from '../../../../types';
 // ---------
 const processId = 'process-id.123';
 const sharedData = EMPTY_SHARED_DATA;
+const { ledgerCommitments } = walletScenarios;
 
 const props = { processId, sharedData, fundingState: 'funding state' as 'funding state' };
 
@@ -42,6 +46,13 @@ const failure2 = states.failure('Opponent refused');
 // -------
 const strategyChosen = actions.strategyChosen(processId);
 const strategyApproved = actions.strategyApproved(processId);
+const postFundSetupArrived = walletActions.commitmentReceived(
+  processId,
+  ledgerCommitments.postFundCommitment1,
+  'Signature',
+);
+const successConfirmed = actions.fundingSuccessAcknowledged(processId);
+
 const strategyRejected = actions.strategyRejected(processId);
 const cancelled = actions.cancelled(processId, PlayerIndex.A);
 const cancelledByOpponent = actions.cancelled(processId, PlayerIndex.B);
@@ -61,6 +72,8 @@ export const happyPath = {
   // Actions
   strategyChosen,
   strategyApproved,
+  postFundSetupArrived,
+  successConfirmed,
 };
 
 export const rejectedStrategy = {
