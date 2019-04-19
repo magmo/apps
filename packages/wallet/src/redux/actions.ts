@@ -161,8 +161,6 @@ export type ProtocolAction =
   | WithdrawalAction
   | RespondingAction;
 
-export { internal, channel, directFunding as funding, indirectFunding, protocol };
-
 export type WalletAction =
   | AdjudicatorKnown
   | BlockMined
@@ -173,3 +171,18 @@ export type WalletAction =
   | ProtocolAction
   | channel.ChannelAction
   | internal.InternalAction;
+
+function isCommonAction(action: WalletAction): action is CommonAction {
+  return (
+    [
+      MESSAGE_RECEIVED,
+      COMMITMENT_RECEIVED,
+      CHALLENGE_CREATED_EVENT,
+      CONCLUDED_EVENT,
+      REFUTED_EVENT,
+      RESPOND_WITH_MOVE_EVENT,
+      FUNDING_RECEIVED_EVENT,
+    ].indexOf(action.type) >= 0
+  );
+}
+export { internal, channel, directFunding as funding, indirectFunding, protocol, isCommonAction };
