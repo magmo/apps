@@ -1,6 +1,7 @@
 import { addHex } from '../../../../utils/hex-utils';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import * as states from '../state';
+import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__/scenarios';
 
 const { channelId, twoThree } = scenarios;
 
@@ -27,7 +28,10 @@ const defaultsForB: states.DirectFundingState = {
 export const happyPathA = {
   states: {
     notSafeToDeposit: states.notSafeToDeposit(defaultsForA),
-    // waitForDepositTransaction: states.waitForDepositTransaction(defaultsForA),
+    waitForDepositTransaction: states.waitForDepositTransaction(
+      defaultsForA,
+      transactionSubmissionScenarios.happyPath.waitForSend,
+    ),
     waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForA),
     channelFunded: states.channelFunded(defaultsForA),
   },

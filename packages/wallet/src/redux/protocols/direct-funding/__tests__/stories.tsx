@@ -23,7 +23,7 @@ const render = state => () => {
 
 const directFundingScreens = {
   NotSafeToDeposit: happyPathA.states.notSafeToDeposit,
-  // WaitForTransactionSubmission: happyPathA.states.waitForTransactionSubmission,
+  WaitForTransactionSubmission: happyPathA.states.waitForDepositTransaction,
   WaitForFundingConfirmation: happyPathA.states.waitForFundingConfirmation,
   ChannelFunded: happyPathA.states.channelFunded,
 };
