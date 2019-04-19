@@ -1,6 +1,7 @@
 import * as states from '../states';
 import * as actions from '../actions';
 import { EMPTY_SHARED_DATA } from '../../../../state';
+import { PlayerIndex } from '../../../../types';
 
 // To test all paths through the state machine we will use 4 different scenarios:
 //
@@ -10,9 +11,11 @@ import { EMPTY_SHARED_DATA } from '../../../../state';
 //             -> WaitForPostFundSetup
 //             -> WaitForSuccessConfirmation
 //             -> Success
-// 2. Strategy rejected
-// 3. Cancelled
-// 3. CancelledByOpponent
+//
+// 2. WaitForStrategyApproval --> |StrategyRejected| WaitForStrategyProposal
+//
+// 3. WaitForStrategyProposal --> |Cancelled| Failure
+// 4. WaitForStrategyApproval --> |Cancelled| Failure
 
 // ---------
 // Test data
@@ -40,8 +43,8 @@ const failure2 = states.failure('Opponent refused');
 const strategyProposed = actions.strategyProposed(processId);
 const strategyApproved = actions.strategyApproved(processId);
 const strategyRejected = actions.strategyRejected(processId);
-const cancelled = actions.cancelled(processId);
-const cancelledByOpponent = actions.cancelledByOpponent(processId);
+const cancelled = actions.cancelled(processId, PlayerIndex.B);
+const cancelledByOpponent = actions.cancelled(processId, PlayerIndex.A);
 
 // ---------
 // Scenarios
@@ -72,7 +75,6 @@ export const rejectedStrategy = {
 export const cancelledByA = {
   ...props,
   // States
-  waitForStrategyProposal,
   waitForStrategyApproval,
   failure,
   // Actions
@@ -83,7 +85,6 @@ export const cancelledByB = {
   ...props,
   // States
   waitForStrategyProposal,
-  waitForStrategyApproval,
   failure2,
   // Actions
   cancelledByOpponent,

@@ -1,4 +1,5 @@
 import { BaseProcessAction } from '../../actions';
+import { PlayerIndex } from '../../../types';
 
 export type FundingAction = StrategyProposed | StrategyApproved | StrategyRejected;
 
@@ -22,10 +23,7 @@ export interface StrategyRejected extends BaseProcessAction {
 
 export interface Cancelled extends BaseProcessAction {
   type: typeof CANCELLED;
-}
-
-export interface CancelledByOpponent extends BaseProcessAction {
-  type: typeof CANCELLED_BY_OPPONENT;
+  by: PlayerIndex;
 }
 
 // --------
@@ -47,12 +45,8 @@ export const strategyRejected = (processId: string): StrategyRejected => ({
   processId,
 });
 
-export const cancelled = (processId: string): Cancelled => ({
+export const cancelled = (processId: string, by: PlayerIndex): Cancelled => ({
   type: CANCELLED,
   processId,
-});
-
-export const cancelledByOpponent = (processId: string): CancelledByOpponent => ({
-  type: CANCELLED_BY_OPPONENT,
-  processId,
+  by,
 });
