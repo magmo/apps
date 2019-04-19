@@ -11,10 +11,10 @@ TODO: add action names for transitions.
 ```mermaid
 graph LR
 ST((Start))-->NSD(NotSafeToDeposit)
-NSD-->TSSM(TransactionSubmissionStateMachine)
+NSD-->|FUNDING_RECEIVED|TSSM(TransactionSubmissionStateMachine)
 ST-->TSSM
 TSSM-->WFFC(WaitForFundingConfirmation)
-WFFC-->CF(ChannelFunded)
+WFFC-->|FUNDING_RECEIVED|CF(ChannelFunded)
 ST-->CF
 CF-->SC((Success))
 ```
