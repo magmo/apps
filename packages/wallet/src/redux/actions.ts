@@ -1,6 +1,6 @@
 import * as internal from './internal/actions';
 import * as channel from './channel-state/actions';
-import * as funding from './protocols/direct-funding/actions';
+import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
 import * as challenging from './protocols/challenging/actions';
@@ -157,7 +157,7 @@ export type CommonAction =
 
 export type ProtocolAction = CommonAction;
 
-export { internal, channel, funding, indirectFunding, protocol };
+export { internal, channel, directFunding as funding, indirectFunding, protocol };
 
 export type WalletAction =
   | AdjudicatorKnown
@@ -170,7 +170,7 @@ export type WalletAction =
   | challenging.ChallengingAction
   | channel.ChannelAction
   | internal.InternalAction
-  | funding.FundingAction
+  | directFunding.FundingAction
   | indirectFunding.Action
   | WithdrawalAction
   | RespondingAction;
