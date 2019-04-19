@@ -2,6 +2,7 @@ import { Properties as P } from '../../utils';
 import { TransactionSubmissionState } from '../transaction-submission';
 
 export type ChallengingState = NonTerminalState | TerminalState;
+export type ChallengingStateType = ChallengingState['type'];
 
 export type NonTerminalState =
   | ApproveChallenge

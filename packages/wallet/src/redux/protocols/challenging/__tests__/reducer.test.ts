@@ -1,6 +1,6 @@
 import * as scenarios from './scenarios';
 import { challengingReducer, initialize, ReturnVal } from '../reducer';
-import { FailureReason } from '../states';
+import { FailureReason, ChallengingStateType } from '../states';
 
 describe('opponent-responds scenario', () => {
   const scenario = scenarios.opponentResponds;
@@ -197,7 +197,7 @@ describe('transaction-fails scenario', () => {
   });
 });
 
-function itTransitionsTo(result: ReturnVal, type: string) {
+function itTransitionsTo(result: ReturnVal, type: ChallengingStateType) {
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
   });
