@@ -5,13 +5,8 @@ export interface AdjudicatorState {
 }
 export interface AdjudicatorChannelState {
   balance: string;
-  outcome?: {
-    allocation: string[];
-    destination: string[];
-  };
+  concluded: boolean;
   challenge?: {
-    allocation: string[];
-    destination: string[];
     expiresAt: number;
     challengeCommitment: Commitment;
   };
