@@ -8,11 +8,9 @@ import { eventChannel } from 'redux-saga';
 export function* challengeWatcher() {
   const provider = yield getProvider();
   const blockMinedChannel = yield createBlockMinedEventChannel(provider);
-
   while (true) {
     const blockNumber = yield take(blockMinedChannel);
     const block = yield provider.getBlock(blockNumber);
-
     const adjudicatorState: AdjudicatorState = yield select(selectors.getAdjudicatorState);
 
     for (const channelId of Object.keys(adjudicatorState)) {
@@ -21,14 +19,16 @@ export function* challengeWatcher() {
           selectors.getAdjudicatorWatcherProcessesForChannel,
           channelId,
         );
-        yield dispatchChallengeExpiredActions(channelId, processIdsToAlert, block.timestamp);
+        for (const processId of processIdsToAlert) {
+          yield put(actions.challengeExpiredEvent(processId, channelId, block.timestamp));
+        }
       }
     }
   }
 }
 
 function* createBlockMinedEventChannel(provider) {
-  eventChannel(emit => {
+  return eventChannel(emit => {
     provider.on('block', blockNumber => {
       emit(blockNumber);
     });
@@ -37,16 +37,6 @@ function* createBlockMinedEventChannel(provider) {
       provider.removeAllListeners('block');
     };
   });
-}
-
-function* dispatchChallengeExpiredActions(
-  channelId: string,
-  processIds: string[],
-  timestamp: number,
-) {
-  for (const processId of processIds) {
-    yield put(actions.challengeExpiredEvent(processId, channelId, timestamp));
-  }
 }
 
 function challengeIsExpired(state: AdjudicatorState, channelId: string, blockTimestamp: number) {
