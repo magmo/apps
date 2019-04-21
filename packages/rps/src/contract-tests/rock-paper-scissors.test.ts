@@ -18,6 +18,7 @@ describe('Rock paper Scissors', () => {
 
   let postFundSetupB: RPSCommitment;
   let propose: RPSCommitment;
+  let propose2: RPSCommitment;
   let accept: RPSCommitment;
   let reveal: RPSCommitment;
   let resting: RPSCommitment;
@@ -33,8 +34,8 @@ describe('Rock paper Scissors', () => {
     const scenario = scenarios.build(libraryAddress, account1.address, account2.address);
     postFundSetupB = scenario.postFundSetupB;
     propose = scenario.propose;
+    propose2 = scenario.propose2;
     accept = scenario.accept;
-
     reveal = scenario.reveal;
     resting = scenario.resting;
   });
@@ -80,6 +81,21 @@ describe('Rock paper Scissors', () => {
           asEthersObject(coreCommitment2),
         ),
       'The stake should be the same between commitments',
+    );
+  });
+
+  it('disallows transitions where resolution changes incorrectly', async () => {
+    reveal.stake = bigNumberify(88).toHexString();
+    const coreCommitment1 = asCoreCommitment(postFundSetupB);
+    const coreCommitment2 = asCoreCommitment(propose2);
+    expect.assertions(1);
+    await expectRevert(
+      () =>
+        rpsContract.validTransition(
+          asEthersObject(coreCommitment1),
+          asEthersObject(coreCommitment2),
+        ),
+      'The resolution for player A must be the same between commitments',
     );
   });
 });

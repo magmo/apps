@@ -273,6 +273,13 @@ export function build(
       aWeapon,
       salt,
     }),
+    propose2: commitmentHelper.proposeFromSalt({
+      ...baseWithBuyIn,
+      turnNum: 4,
+      allocation: fourSix,
+      aWeapon,
+      salt,
+    }),
     accept: commitmentHelper.accept({
       ...baseWithBuyIn,
       turnNum: 5,
