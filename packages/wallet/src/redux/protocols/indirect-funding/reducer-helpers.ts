@@ -25,7 +25,7 @@ import { queueMessage as queueMessageOutbox, SideEffects } from '../../outbox/st
 import {
   DirectFundingState,
   initialDirectFundingState,
-  CHANNEL_FUNDED,
+  FUNDING_SUCCESS,
 } from '../../protocols/direct-funding/state';
 import { FundingAction } from '../../protocols/direct-funding/actions';
 import { directFundingStateReducer } from '../direct-funding/reducer';
@@ -33,7 +33,7 @@ import { accumulateSideEffects } from '../../outbox';
 import { SharedData, setChannel } from '../../state';
 
 export const directFundingIsComplete = (directFundingState: DirectFundingState): boolean => {
-  return directFundingState.type === CHANNEL_FUNDED;
+  return directFundingState.type === FUNDING_SUCCESS;
 };
 
 export const appChannelIsWaitingForFunding = (

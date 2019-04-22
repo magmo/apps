@@ -6,17 +6,19 @@ The direct funding protocol is one of the funding protocols, which means that th
 
 The protocol implements the following state machine:
 
-TODO: add action names for transitions.
-
 ```mermaid
 graph LR
 ST((Start))-->NSD(NotSafeToDeposit)
-NSD-->|FUNDING_RECEIVED|TSSM(WaitForDepositTransaction)
-ST-->TSSM
-TSSM-->WFFC(WaitForFundingConfirmation)
-WFFC-->|FUNDING_RECEIVED|CF(ChannelFunded)
-ST-->CF
-CF-->SC((Success))
+NSD-->|FUNDING_RECEIVED|WFDT(WaitForDepositTransaction)
+ST-->WFDT
+WFDT-->|TRANSACTION_SUCCESS|WFFCPF(WaitForFundingConfirmationAndPostFund)
+WFDT-->|FUNDING_RECEIVED|WFFCPF
+WFDT-->|COMMITMENT_RECEIVED|WFFCPF
+WFDT-->|TRANSACTION_FAILURE|F((Failure))
+WFFCPF-->|FUNDING_RECEIVED|WFFCPF
+WFFCPF-->|COMMITMENT_RECEIVED|WFFCPF
+WFFCPF-->|FUNDING_RECEIVED + COMMITMENT_RECEIVED|CF((ChannelFunded))
+ST-->WFFC
 ```
 
 ## Not covered by protocol for now

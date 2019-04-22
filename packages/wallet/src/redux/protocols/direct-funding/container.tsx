@@ -19,8 +19,8 @@ class DirectFundingContainer extends PureComponent<Props> {
     const { directFundingState } = this.props;
     switch (directFundingState.type) {
       case directFundingStates.NOT_SAFE_TO_DEPOSIT:
-      case directFundingStates.WAIT_FOR_FUNDING_CONFIRMATION:
-      case directFundingStates.CHANNEL_FUNDED:
+      case directFundingStates.WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP:
+      case directFundingStates.FUNDING_SUCCESS:
         return <FundingStep directFundingState={directFundingState} />;
       case directFundingStates.WAIT_FOR_DEPOSIT_TRANSACTION:
         return (

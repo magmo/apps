@@ -10,14 +10,14 @@ import { Properties } from '../../utils';
 // ChannelFundingStatus
 export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
 export const WAIT_FOR_DEPOSIT_TRANSACTION = 'WAIT_FOR_DEPOSIT_TRANSACTION';
-export const WAIT_FOR_FUNDING_CONFIRMATION = 'WAIT_FOR_FUNDING_CONFIRMATION';
-export const CHANNEL_FUNDED = 'CHANNEL_FUNDED';
+export const WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP = 'WAIT_FOR_FUNDING_CONFIRMATION';
+export const FUNDING_SUCCESS = 'CHANNEL_FUNDED';
 // Funding status
 export type ChannelFundingStatus =
   | typeof NOT_SAFE_TO_DEPOSIT
   | typeof WAIT_FOR_DEPOSIT_TRANSACTION
-  | typeof WAIT_FOR_FUNDING_CONFIRMATION
-  | typeof CHANNEL_FUNDED;
+  | typeof WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP
+  | typeof FUNDING_SUCCESS;
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface BaseDirectFundingState {
   safeToDepositLevel: string;
@@ -34,11 +34,13 @@ export interface WaitForDepositTransaction extends BaseDirectFundingState {
   type: typeof WAIT_FOR_DEPOSIT_TRANSACTION;
   transactionSubmissionState: TransactionSubmissionState;
 }
-export interface WaitForFundingConfirmation extends BaseDirectFundingState {
-  type: typeof WAIT_FOR_FUNDING_CONFIRMATION;
+export interface WaitForFundingConfirmationAndPostFundSetup extends BaseDirectFundingState {
+  type: typeof WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP;
+  channelFunded: boolean;
+  postFundSetupReceived: boolean;
 }
-export interface ChannelFunded extends BaseDirectFundingState {
-  type: typeof CHANNEL_FUNDED;
+export interface FundingSuccess extends BaseDirectFundingState {
+  type: typeof FUNDING_SUCCESS;
 }
 // constructors
 export function baseDirectFundingState(
@@ -77,25 +79,33 @@ export function waitForDepositTransaction(
     transactionSubmissionState,
   };
 }
-export function waitForFundingConfirmation<T extends BaseDirectFundingState>(
+
+interface ConditionalParams {
+  channelFunded: boolean;
+  postFundSetupReceived: boolean;
+}
+export function waitForFundingConfirmationAndPostFundSetup<T extends BaseDirectFundingState>(
   params: Properties<BaseDirectFundingState>,
-): WaitForFundingConfirmation {
+  conditionalParams: ConditionalParams,
+): WaitForFundingConfirmationAndPostFundSetup {
   return {
     ...baseDirectFundingState(params),
-    type: WAIT_FOR_FUNDING_CONFIRMATION,
+    channelFunded: conditionalParams.channelFunded,
+    postFundSetupReceived: conditionalParams.postFundSetupReceived,
+    type: WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP,
   };
 }
-export function channelFunded(params: Properties<BaseDirectFundingState>): ChannelFunded {
+export function fundingSuccess(params: Properties<BaseDirectFundingState>): FundingSuccess {
   return {
     ...baseDirectFundingState(params),
-    type: CHANNEL_FUNDED,
+    type: FUNDING_SUCCESS,
   };
 }
 export type DirectFundingState =
   | NotSafeToDeposit
   | WaitForDepositTransaction
-  | WaitForFundingConfirmation
-  | ChannelFunded;
+  | WaitForFundingConfirmationAndPostFundSetup
+  | FundingSuccess;
 
 export function initialDirectFundingState(
   action: DirectFundingRequested,
@@ -108,7 +118,7 @@ export function initialDirectFundingState(
 
   if (alreadyFunded) {
     return {
-      protocolState: channelFunded({
+      protocolState: fundingSuccess({
         requestedTotalFunds: totalFundingRequired,
         requestedYourContribution: requiredDeposit,
         channelId,

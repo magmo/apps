@@ -1,3 +1,5 @@
+// TODO: post fund messages are moving to player A reducer
+/*
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { addHex } from '../../../../../utils/hex-utils';
 import * as SigningUtil from '../../../../../utils/signing-utils';
@@ -131,4 +133,4 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
     playerAReducer(state.protocolState, state.sharedData, action);
     // TODO: We need a "finished" state to test against
   });
-});
+});*/

@@ -1,4 +1,5 @@
-import * as states from '../state';
+// TODO: post fund messages are moving to direct funding
+/*import * as states from '../state';
 import * as channelStates from '../../../../channel-state/state';
 import * as actions from '../../../../actions';
 
@@ -256,4 +257,4 @@ describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
       channelStates.B_WAIT_FOR_POST_FUND_SETUP,
     );
   });
-});
+});*/

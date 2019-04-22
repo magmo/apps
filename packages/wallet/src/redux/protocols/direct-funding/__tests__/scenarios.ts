@@ -35,8 +35,8 @@ export const aDepositsBDepositsAHappyStates = {
     defaultsForA,
     transactionSubmissionScenarios.happyPath.waitForConfirmation,
   ),
-  waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForA),
-  channelFunded: states.channelFunded(defaultsForA),
+  waitForFundingConfirmation: states.waitForFundingConfirmationAndPostFundSetup(defaultsForA),
+  channelFunded: states.fundingSuccess(defaultsForA),
 };
 
 export const aDepositsBDepositsBHappyStates = {
@@ -45,6 +45,6 @@ export const aDepositsBDepositsBHappyStates = {
     defaultsForB,
     transactionSubmissionScenarios.happyPath.waitForSend,
   ),
-  waitForFundingConfirmation: states.waitForFundingConfirmation(defaultsForB),
-  channelFunded: states.channelFunded(defaultsForB),
+  waitForFundingConfirmation: states.waitForFundingConfirmationAndPostFundSetup(defaultsForB),
+  channelFunded: states.fundingSuccess(defaultsForB),
 };
