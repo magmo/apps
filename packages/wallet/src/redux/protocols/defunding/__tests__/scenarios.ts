@@ -7,6 +7,8 @@ import {
   WAIT_FOR_UPDATE,
   ChannelState,
 } from '../../../channel-state/state';
+import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
+
 const processId = 'process-id.123';
 
 const {
@@ -59,7 +61,7 @@ const notClosedChannelState = {
   },
 };
 
-const directlyFundedFundingState = {
+const directlyFundedFundingState: FundingState = {
   [testScenarios.channelId]: {
     directlyFunded: true,
   },
@@ -106,23 +108,35 @@ const withdrawalFailure = states.failure('Withdrawal Failure');
 const ledgerDefundingFailure = states.failure('Ledger De-funding Failure');
 
 export const directlyFundingChannelHappyPath = {
+  processId,
   // States
   waitForWithdrawalStart,
   waitForWithdrawalSuccess,
   success,
+  // actions
+  withdrawalSuccessAction: withdrawalScenarios.happyPath.transactionConfirmed,
   // Shared data
-  directlyFundedFundingState,
-  channelState,
+  sharedData: {
+    ...EMPTY_SHARED_DATA,
+    fundingState: directlyFundedFundingState,
+    channelState,
+  },
 };
 
 export const indirectlyFundingChannelHappyPath = {
+  processId,
   // States
   waitForLedgerDefundingStart,
   waitForLedgerDefundingSuccess,
   success,
+  // actions
+  ledgerDefundingSuccessAction: withdrawalScenarios.happyPath.transactionConfirmed,
   // Shared data
-  indirectlyFundedFundingState,
-  channelState,
+  sharedData: {
+    ...EMPTY_SHARED_DATA,
+    fundingState: indirectlyFundedFundingState,
+    channelState,
+  },
 };
 
 export const channelNotClosed = {
@@ -130,9 +144,12 @@ export const channelNotClosed = {
   waitForWithdrawalStart,
   waitForWithdrawalSuccess,
   failure: channelNotClosedFailure,
-  // Shared Data
-  directlyFundedFundingState,
-  notClosedChannelState,
+  // Shared data
+  sharedData: {
+    ...EMPTY_SHARED_DATA,
+    fundingState: directlyFundedFundingState,
+    channelState: notClosedChannelState,
+  },
 };
 
 export const directlyFundingFailure = {
@@ -140,9 +157,14 @@ export const directlyFundingFailure = {
   waitForWithdrawalStart,
   waitForWithdrawalFailure,
   failure: withdrawalFailure,
-  // Shared Data
-  directlyFundedFundingState,
-  channelState,
+  // actions
+  withdrawalFailureAction: withdrawalScenarios.withdrawalRejected.rejected,
+  // shared data
+  sharedData: {
+    ...EMPTY_SHARED_DATA,
+    fundingState: directlyFundedFundingState,
+    channelState,
+  },
 };
 
 export const indirectlyFundingFailure = {
@@ -150,7 +172,12 @@ export const indirectlyFundingFailure = {
   waitForLedgerDefundingStart,
   waitForLedgerDefundingFailure,
   failure: ledgerDefundingFailure,
+  // actions
+  ledgerDefundingFailureAction: withdrawalScenarios.failedTransaction.transactionFailed,
   // Shared data
-  indirectlyFundedFundingState,
-  channelState,
+  sharedData: {
+    ...EMPTY_SHARED_DATA,
+    fundingState: indirectlyFundedFundingState,
+    channelState,
+  },
 };
