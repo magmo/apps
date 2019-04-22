@@ -72,34 +72,18 @@ const indirectlyFundedFundingState = {
     fundingChannel: '0x0',
   },
 };
-const waitForWithdrawalStart = states.waitForWithdrawal({
+const waitForWithdrawal = states.waitForWithdrawal({
   processId,
-  withdrawalState: withdrawalScenarios.happyPath.waitForApproval,
+  withdrawalState: withdrawalScenarios.happyPath.waitForAcknowledgement,
 });
-
-const waitForWithdrawalSuccess = states.waitForWithdrawal({
-  processId,
-  withdrawalState: withdrawalScenarios.happyPath.success,
-});
-
 const waitForWithdrawalFailure = states.waitForWithdrawal({
   processId,
-  withdrawalState: withdrawalScenarios.failedTransaction.failure,
+  withdrawalState: withdrawalScenarios.withdrawalRejected.waitForApproval,
 });
 
-const waitForLedgerDefundingStart = states.waitForLedgerDefunding({
-  processId,
-  ledgerDefundingState: 'InProgress',
-});
-
-const waitForLedgerDefundingSuccess = states.waitForLedgerDefunding({
+const waitForLedgerDefunding = states.waitForLedgerDefunding({
   processId,
   ledgerDefundingState: 'Success',
-});
-
-const waitForLedgerDefundingFailure = states.waitForLedgerDefunding({
-  processId,
-  ledgerDefundingState: 'Failure',
 });
 
 const success = states.success();
@@ -109,12 +93,12 @@ const ledgerDefundingFailure = states.failure('Ledger De-funding Failure');
 
 export const directlyFundingChannelHappyPath = {
   processId,
+  channelId,
   // States
-  waitForWithdrawalStart,
-  waitForWithdrawalSuccess,
+  waitForWithdrawal,
   success,
   // actions
-  withdrawalSuccessAction: withdrawalScenarios.happyPath.transactionConfirmed,
+  withdrawalSuccessAction: withdrawalScenarios.happyPath.successAcknowledged,
   // Shared data
   sharedData: {
     ...EMPTY_SHARED_DATA,
@@ -125,9 +109,9 @@ export const directlyFundingChannelHappyPath = {
 
 export const indirectlyFundingChannelHappyPath = {
   processId,
+  channelId,
   // States
-  waitForLedgerDefundingStart,
-  waitForLedgerDefundingSuccess,
+  waitForLedgerDefunding,
   success,
   // actions
   ledgerDefundingSuccessAction: withdrawalScenarios.happyPath.transactionConfirmed,
@@ -140,9 +124,10 @@ export const indirectlyFundingChannelHappyPath = {
 };
 
 export const channelNotClosed = {
+  processId,
+  channelId,
   // States
-  waitForWithdrawalStart,
-  waitForWithdrawalSuccess,
+  waitForWithdrawal,
   failure: channelNotClosedFailure,
   // Shared data
   sharedData: {
@@ -153,9 +138,10 @@ export const channelNotClosed = {
 };
 
 export const directlyFundingFailure = {
+  processId,
+  channelId,
   // States
-  waitForWithdrawalStart,
-  waitForWithdrawalFailure,
+  waitForWithdrawal: waitForWithdrawalFailure,
   failure: withdrawalFailure,
   // actions
   withdrawalFailureAction: withdrawalScenarios.withdrawalRejected.rejected,
@@ -168,9 +154,10 @@ export const directlyFundingFailure = {
 };
 
 export const indirectlyFundingFailure = {
+  processId,
+  channelId,
   // States
-  waitForLedgerDefundingStart,
-  waitForLedgerDefundingFailure,
+  waitForLedgerDefunding,
   failure: ledgerDefundingFailure,
   // actions
   ledgerDefundingFailureAction: withdrawalScenarios.failedTransaction.transactionFailed,
