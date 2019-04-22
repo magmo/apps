@@ -1,8 +1,10 @@
 import { addHex } from '../../../../utils/hex-utils';
+import * as globalActions from '../../../actions';
 import * as channelStates from '../../../channel-state/state';
 import { emptyDisplayOutboxState } from '../../../outbox/state';
 import { ProtocolStateWithSharedData } from '../../../protocols';
 import { PlayerIndex } from '../../../types';
+import * as globalTestScenarios from '../../../__tests__/test-scenarios';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__/scenarios';
@@ -94,9 +96,16 @@ export const aDepositsBDepositsAHappyStates = {
     ),
     waitForFundingChannelState,
   ),
-  waitForFundingConfirmation: constructWalletState(
+  waitForFundingAndPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup(defaultsForA, {
       channelFunded: false,
+      postFundSetupReceived: false,
+    }),
+    waitForFundingChannelState,
+  ),
+  waitForPostFundSetup: constructWalletState(
+    states.waitForFundingAndPostFundSetup(defaultsForB, {
+      channelFunded: true,
       postFundSetupReceived: false,
     }),
     waitForFundingChannelState,
@@ -127,9 +136,16 @@ export const aDepositsBDepositsBHappyStates = {
     ),
     waitForFundingChannelState,
   ),
-  waitForFundingConfirmation: constructWalletState(
+  waitForFundingAndPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup(defaultsForB, {
       channelFunded: false,
+      postFundSetupReceived: false,
+    }),
+    waitForFundingChannelState,
+  ),
+  waitForPostFundSetup: constructWalletState(
+    states.waitForFundingAndPostFundSetup(defaultsForB, {
+      channelFunded: true,
       postFundSetupReceived: false,
     }),
     waitForFundingChannelState,
@@ -138,5 +154,18 @@ export const aDepositsBDepositsBHappyStates = {
     states.fundingSuccess(defaultsForB),
     // TODO: this is an incorrect channel state
     waitForFundingChannelState,
+  ),
+};
+
+export const actions = {
+  postFundSetup0: globalActions.commitmentReceived(
+    channelId,
+    globalTestScenarios.postFundCommitment1,
+    '0x0',
+  ),
+  postFundSetup1: globalActions.commitmentReceived(
+    channelId,
+    globalTestScenarios.postFundCommitment2,
+    '0x0',
   ),
 };

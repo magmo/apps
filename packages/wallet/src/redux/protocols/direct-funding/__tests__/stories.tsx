@@ -28,7 +28,7 @@ const directFundingScreens = {
   WaitForTransactionSubmissionEnd:
     aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd.protocolState,
   WaitForFundingConfirmation:
-    aDepositsBDepositsAHappyStates.waitForFundingConfirmation.protocolState,
+    aDepositsBDepositsAHappyStates.waitForFundingAndPostFundSetup.protocolState,
   ChannelFunded: aDepositsBDepositsAHappyStates.fundingSuccess.protocolState,
 };
 

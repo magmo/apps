@@ -97,19 +97,35 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
 });
 
 describe(startingIn(states.WAIT_FOR_DEPOSIT_TRANSACTION), () => {
-  describe('incoming action is transaction confirmed', () => {
+  describe(whenActionArrives(actions.TRANSACTION_CONFIRMED), () => {
     const state = scenarios.aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd;
     const action = actions.transactionConfirmed(channelId);
 
     const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
     itTransitionsToStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
   });
+
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    const state = scenarios.aDepositsBDepositsBHappyStates.waitForDepositTransactionEnd;
+
+    const updatedState = directFundingStateReducer(
+      state.protocolState,
+      state.sharedData,
+      scenarios.actions.postFundSetup0,
+    );
+    itTransitionsToStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+    const protocolState = updatedState.protocolState;
+    if (protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+      expect(protocolState.channelFunded).toBeFalsy();
+      expect(protocolState.postFundSetupReceived).toBeTruthy();
+    }
+  });
 });
 
 describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     describe('when it is now fully funded', () => {
-      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingConfirmation;
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingAndPostFundSetup;
       const action = actions.fundingReceivedEvent(
         channelId,
         channelId,
@@ -122,7 +138,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
     });
 
     describe('when it is still not fully funded', () => {
-      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingConfirmation;
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingAndPostFundSetup;
       const action = actions.fundingReceivedEvent(channelId, channelId, '0x', YOUR_DEPOSIT_A);
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
@@ -130,7 +146,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
     });
 
     describe('when it is for the wrong channel', () => {
-      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingConfirmation;
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingAndPostFundSetup;
       const action = actions.fundingReceivedEvent(
         channelId,
         '0 xf00',
@@ -140,6 +156,58 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
       itTransitionsToStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+    });
+  });
+
+  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+    describe('Player B: channel is funded', () => {
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForPostFundSetup;
+      const updatedState = directFundingStateReducer(
+        state.protocolState,
+        state.sharedData,
+        scenarios.actions.postFundSetup0,
+      );
+      itTransitionsToStateType(states.FUNDING_SUCCESS, updatedState);
+    });
+
+    describe('Player B: channel is not funded', () => {
+      const state = scenarios.aDepositsBDepositsBHappyStates.waitForFundingAndPostFundSetup;
+      const updatedState = directFundingStateReducer(
+        state.protocolState,
+        state.sharedData,
+        scenarios.actions.postFundSetup0,
+      );
+      itTransitionsToStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+      const protocolState = updatedState.protocolState;
+      if (protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+        expect(protocolState.channelFunded).toBeFalsy();
+        expect(protocolState.postFundSetupReceived).toBeTruthy();
+      }
+    });
+
+    describe('Player A: channel is funded', () => {
+      const state = scenarios.aDepositsBDepositsAHappyStates.waitForPostFundSetup;
+      const updatedState = directFundingStateReducer(
+        state.protocolState,
+        state.sharedData,
+        scenarios.actions.postFundSetup0,
+      );
+      itTransitionsToStateType(states.FUNDING_SUCCESS, updatedState);
+    });
+
+    describe('Player A: channel is not funded', () => {
+      const state = scenarios.aDepositsBDepositsAHappyStates.waitForFundingAndPostFundSetup;
+      const updatedState = directFundingStateReducer(
+        state.protocolState,
+        state.sharedData,
+        scenarios.actions.postFundSetup0,
+      );
+      itTransitionsToStateType(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP, updatedState);
+      const protocolState = updatedState.protocolState;
+      if (protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+        expect(protocolState.channelFunded).toBeFalsy();
+        expect(protocolState.postFundSetupReceived).toBeFalsy();
+      }
     });
   });
 });
