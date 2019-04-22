@@ -32,7 +32,7 @@ graph TD
 
 ## Scenarios
 
-To test all paths through the state machine we will use 5 different scenarios:
+To test all paths through the state machine we will use 3 different scenarios:
 
 1. **Happy path**: `Start` -> `ConfirmResignation` -> `WaitForOpponentConclude` -> `AcknowledgeChannelClosed` -> `Defund` -> `Success`
 2. **Resignation not possible**: `Start` -> `ResignationImpossible` -> `Failure`
