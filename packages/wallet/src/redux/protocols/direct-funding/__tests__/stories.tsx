@@ -22,11 +22,14 @@ const render = state => () => {
 };
 
 const directFundingScreens = {
-  NotSafeToDeposit: aDepositsBDepositsAHappyStates.notSafeToDeposit,
-  WaitForTransactionSubmissionStart: aDepositsBDepositsAHappyStates.waitForDepositTransactionStart,
-  WaitForTransactionSubmissionEnd: aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd,
-  WaitForFundingConfirmation: aDepositsBDepositsAHappyStates.waitForFundingConfirmation,
-  ChannelFunded: aDepositsBDepositsAHappyStates.fundingSuccess,
+  NotSafeToDeposit: aDepositsBDepositsAHappyStates.notSafeToDeposit.protocolState,
+  WaitForTransactionSubmissionStart:
+    aDepositsBDepositsAHappyStates.waitForDepositTransactionStart.protocolState,
+  WaitForTransactionSubmissionEnd:
+    aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd.protocolState,
+  WaitForFundingConfirmation:
+    aDepositsBDepositsAHappyStates.waitForFundingConfirmation.protocolState,
+  ChannelFunded: aDepositsBDepositsAHappyStates.fundingSuccess.protocolState,
 };
 
 storybookUtils.addStoriesFromCollection(directFundingScreens, 'Direct Funding Happy Path', render);
