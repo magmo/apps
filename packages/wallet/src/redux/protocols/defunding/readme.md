@@ -15,8 +15,8 @@ graph TD
   S((start))-->ICC{Is Channel Closed}
   ICC-->|No|F((failure))
   ICC-->|Yes|ID{Is Direct Channel}
-  ID-->|Yes|WP((Withdrawing Protocol))
-  ID -->|No|LDP((Ledger De-funding Protocol))
+  ID-->|Yes|WP(Wait for Withdrawal)
+  ID -->|No|LDP(Wait for Ledger De-funding)
   WP-->|Withdrawal protocol success|Su((success))
   LDP-->|Ledger de-funding protocol success|Su((success))
   WP-->|Withdrawal protocol failure|F((failure))
@@ -29,8 +29,8 @@ graph TD
 
 ## Scenarios
 
-1. **Directly Funded Channel Happy Path** - Start -> Is Channel Closed -> Yes-> Is Direct Channel -> Yes -> Withdrawing Protocol->Withdrawal Protocol Complete -> Success
-2. **Ledger Funded Channel Happy Path** - Start -> Is Channel Closed -> Yes-> Is Direct Channel -> No -> Ledger de-funding Protocol->Ledger de-funding Protocol Complete -> Success
+1. **Directly Funded Channel Happy Path** - Start -> Is Channel Closed -> Yes-> Is Direct Channel -> Yes -> Wait for Withdrawal->Withdrawal Protocol Complete -> Success
+2. **Ledger Funded Channel Happy Path** - Start -> Is Channel Closed -> Yes-> Is Direct Channel -> No -> Wait for Ledger de-funding -> Ledger de-funding Protocol Complete -> Success
 3. **Channel Not Closed** - Start -> Is Channel Closed -> No -> Failure
-4. **Withdrawal Failure** - Start -> Is Channel Closed -> Yes -> Is Direct Channel -> Yes -> Withdrawing Protocol-> Withdrawal Protocol Failure -> Failure
-5. **Ledger de-funding Failure** - Start -> Is Channel Closed -> Yes-> Is Direct Channel -> No -> Ledger de-funding Protocol->Ledger de-funding Protocol Failure -> Failure
+4. **Withdrawal Failure** - Start -> Is Channel Closed -> Yes -> Is Direct Channel -> Yes -> Wait for Withdrawal-> Withdrawal Protocol Failure -> Failure
+5. **Ledger de-funding Failure** - Start -> Is Channel Closed -> Yes-> Is Direct Channel -> No ->Wait for Ledger de-funding->Ledger de-funding Protocol Failure -> Failure
