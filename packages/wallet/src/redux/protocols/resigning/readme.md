@@ -22,12 +22,12 @@ graph TD
   S((start)) --> CR{My turn?}
   CR  --> |Yes| CC(ConfirmResignation)
   CR  --> |No| RC(ResignationImpossible)
-  CC  --> |ConcludeSent| WOC(WaitForOpponentConclude)
-  WOC --> |ConcludeReceived| ACC(AcknowledgeChannelClosed)
-  ACC --> |DefundChosen| D(Defund)
-  D   --> |Defunded| SS
-  ACC --> |DefundNotChosen| SS((success))
-  RC  --> |AcknowledgedResignationImpossible| F((failure))
+  CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
+  WOC --> |CONCLUDE.RECEIVED| ACC(AcknowledgeChannelClosed)
+  ACC --> |DEFUND.CHOSEN| D(Defund)
+  D   --> |DEFUNDED| SS
+  ACC --> |DEFUND.NOT.CHOSEN| SS((success))
+  RC  --> |ACKNOWLEDGE.RESIGNATION.IMPOSSIBLE| F((failure))
 ```
 
 ## Scenarios
