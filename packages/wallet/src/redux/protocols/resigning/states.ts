@@ -4,18 +4,24 @@ export type ResigningState = NonTerminalState | TerminalState;
 export type ResigningStateType = ResigningState['type'];
 
 export type NonTerminalState = 
-    | ConfirmResignation
+    | AcknowledgeResignationImpossible
+    | ApproveResignation
     | WaitForOpponentConclude
     | AcknowledgeChannelClosed
-    | Defund
+    | WaitForDefund
 
 export type TerminalState = Success | Failure;
 
 export type FailureReason =
   | 'NotYourTurn';
 
-export interface ConfirmResignation {
-    type: 'ConfirmResignation';
+
+export interface AcknowledgeResignationImpossible {
+    type: 'AcknowledgeResignationImpossible';
+    processId: string;
+}
+  export interface ApproveResignation {
+    type: 'ApproveResignation';
     processId: string;
 }
 
@@ -29,8 +35,8 @@ export interface AcknowledgeChannelClosed {
     processId: string;
 }
 
-export interface Defund {
-    type: 'Defund';
+export interface WaitForDefund {
+    type: 'WaitForDefund';
     processId: string;
 }
 
@@ -62,10 +68,14 @@ export function isTerminal(state: ResigningState): state is Failure | Success {
 // ------------
 // Constructors
 // ------------
+export function acknowledgeResignationImpossible(p: P<AcknowledgeResignationImpossible>): AcknowledgeResignationImpossible {
+  const { processId } = p;
+  return { type: 'AcknowledgeResignationImpossible', processId};
+}
 
-export function confirmResignation(p: P<ConfirmResignation>): ConfirmResignation {
+export function approveResignation(p: P<ApproveResignation>): ApproveResignation {
     const { processId } = p;
-    return { type: 'ConfirmResignation', processId};
+    return { type: 'ApproveResignation', processId};
 }
 
 export function waitForOpponentConclude(p: P<WaitForOpponentConclude>): WaitForOpponentConclude {
@@ -78,9 +88,9 @@ export function acknowledgeChannelClosed(p: P<AcknowledgeChannelClosed>): Acknow
     return { type: 'AcknowledgeChannelClosed', processId};
 }
 
-export function defund(p: P<Defund>): Defund {
+export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {
     const { processId } = p;
-    return { type: 'Defund', processId};
+    return { type: 'WaitForDefund', processId};
 }
 
 export function success(): Success {

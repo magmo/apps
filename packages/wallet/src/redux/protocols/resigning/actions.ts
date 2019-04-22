@@ -1,6 +1,6 @@
 export type ResignationAction = 
     | ConcludeSent
-    | AcknowledgedResignationImpossible
+    | ResignationImpossibleAcknowledged
     | ConcludeReceived
     | DefundChosen
     | DefundNotChosen
@@ -10,8 +10,8 @@ export interface ConcludeSent {
     processId: string;
 }
 
-export interface AcknowledgedResignationImpossible {
-    type: 'ACKNOWLEDGE.RESIGNATION.IMPOSSIBLE';
+export interface ResignationImpossibleAcknowledged {
+    type: 'RESIGNATION.IMPOSSIBLE.ACKNOWLEDGED';
     processId: string;
 }
 
@@ -45,9 +45,9 @@ ConcludeSent => ({
     processId,
 });
 
-export const acknowledgedResignationImpossible = (processId: string):
-AcknowledgedResignationImpossible => ({
-    type: 'ACKNOWLEDGE.RESIGNATION.IMPOSSIBLE',
+export const resignationImpossibleAcknowledged = (processId: string):
+ResignationImpossibleAcknowledged => ({
+    type: 'RESIGNATION.IMPOSSIBLE.ACKNOWLEDGED',
     processId,
 });
 
