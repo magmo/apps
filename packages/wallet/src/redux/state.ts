@@ -69,7 +69,7 @@ export interface ProcessState {
 }
 
 export interface FundingState {
-  [channelId: string]: FundingState;
+  [channelId: string]: ChannelFundingState;
 }
 
 export interface ChannelFundingState {
