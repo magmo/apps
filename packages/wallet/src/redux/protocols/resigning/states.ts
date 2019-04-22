@@ -1,12 +1,19 @@
 import { Properties as P } from '../../utils';
 
-export type ResignationState = 
+export type ResigningState = NonTerminalState | TerminalState;
+export type ResigningStateType = ResigningState['type'];
+
+export type NonTerminalState = 
     | ConfirmResignation
     | WaitForOpponentConclude
     | AcknowledgeChannelClosed
     | Defund
-    | Failure
-    | Success;
+
+export type TerminalState = Success | Failure;
+
+export type FailureReason =
+  | 'NotYourTurn';
+
 export interface ConfirmResignation {
     type: 'ConfirmResignation';
     processId: string;
@@ -29,7 +36,7 @@ export interface Defund {
 
 export interface Failure {
     type: 'Failure';
-    reason: string;
+    reason: FailureReason;
   }
   
   export interface Success {
@@ -40,15 +47,15 @@ export interface Failure {
 // Helpers
 // -------
 
-export function isTerminal(state: ResignationState): state is Failure | Success {
+export function isTerminal(state: ResigningState): state is Failure | Success {
     return state.type === 'Failure' || state.type === 'Success';
   }
   
-  export function isSuccess(state: ResignationState): state is Success {
+  export function isSuccess(state: ResigningState): state is Success {
     return state.type === 'Success';
   }
   
-  export function isFailure(state: ResignationState): state is Failure {
+  export function isFailure(state: ResigningState): state is Failure {
     return state.type === 'Failure';
   }
 
@@ -80,6 +87,7 @@ export function success(): Success {
     return { type: 'Success' };
   }
   
-  export function failure(reason: string): Failure {
+  export function failure(p: P<Failure>): Failure {
+    const { reason } = p;
     return { type: 'Failure', reason };
   }

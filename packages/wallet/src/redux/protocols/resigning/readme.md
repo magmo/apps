@@ -27,7 +27,7 @@ graph TD
   ACC --> |DefundChosen| D(Defund)
   D   --> |Defunded| SS
   ACC --> |DefundNotChosen| SS((success))
-  RC  --> |Acknowledge| F((failure))
+  RC  --> |AcknowledgedResignationImpossible| F((failure))
 ```
 
 ## Scenarios
