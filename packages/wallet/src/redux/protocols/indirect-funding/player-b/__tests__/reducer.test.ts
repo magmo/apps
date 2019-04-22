@@ -1,5 +1,4 @@
-// TODO: post fund messages are moving to direct funding
-/*import * as states from '../state';
+import * as states from '../state';
 import * as channelStates from '../../../../channel-state/state';
 import * as actions from '../../../../actions';
 
@@ -144,8 +143,9 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_0), () => {
   });
 });
 
+// TODO: post fund messages are moving to direct funding
 describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
-  describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
+  it.skip(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     const total = twoThree.reduce(addHex);
     const state = startingState(
       states.waitForDirectFunding({
@@ -257,4 +257,4 @@ describe(startingIn(states.WAIT_FOR_CONSENSUS), () => {
       channelStates.B_WAIT_FOR_POST_FUND_SETUP,
     );
   });
-});*/
+});

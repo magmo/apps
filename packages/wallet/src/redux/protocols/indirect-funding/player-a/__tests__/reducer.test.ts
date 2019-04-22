@@ -1,5 +1,5 @@
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
-// import { addHex } from '../../../../../utils/hex-utils';
+import { addHex } from '../../../../../utils/hex-utils';
 import * as SigningUtil from '../../../../../utils/signing-utils';
 import * as actions from '../../../../actions';
 import * as channelStates from '../../../../channel-state/state';
@@ -83,7 +83,8 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   });
 });
 
-/*describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
+// TODO: fails now that direct funding includes post fund messages
+it.skip(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   const total = testScenarios.twoThree.reduce(addHex);
 
   const state = scenarios.happyPath.states.waitForDirectFunding;
@@ -99,7 +100,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
       channelStates.A_WAIT_FOR_POST_FUND_SETUP,
     );
   });
-});*/
+});
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
   const state = scenarios.happyPath.states.waitForPostFundSetup1;
