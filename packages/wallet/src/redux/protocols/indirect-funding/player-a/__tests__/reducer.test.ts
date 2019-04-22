@@ -1,7 +1,5 @@
-// TODO: post fund messages are moving to player A reducer
-/*
 import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
-import { addHex } from '../../../../../utils/hex-utils';
+// import { addHex } from '../../../../../utils/hex-utils';
 import * as SigningUtil from '../../../../../utils/signing-utils';
 import * as actions from '../../../../actions';
 import * as channelStates from '../../../../channel-state/state';
@@ -85,7 +83,7 @@ describe(startingIn(states.WAIT_FOR_PRE_FUND_SETUP_1), () => {
   });
 });
 
-describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
+/*describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
   const total = testScenarios.twoThree.reduce(addHex);
 
   const state = scenarios.happyPath.states.waitForDirectFunding;
@@ -101,7 +99,7 @@ describe(startingIn(states.WAIT_FOR_DIRECT_FUNDING), () => {
       channelStates.A_WAIT_FOR_POST_FUND_SETUP,
     );
   });
-});
+});*/
 
 describe(startingIn(states.WAIT_FOR_POST_FUND_SETUP_1), () => {
   const state = scenarios.happyPath.states.waitForPostFundSetup1;
@@ -133,4 +131,4 @@ describe(startingIn(states.WAIT_FOR_LEDGER_UPDATE_1), () => {
     playerAReducer(state.protocolState, state.sharedData, action);
     // TODO: We need a "finished" state to test against
   });
-});*/
+});

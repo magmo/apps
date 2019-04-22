@@ -10,13 +10,13 @@ import { Properties } from '../../utils';
 // ChannelFundingStatus
 export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
 export const WAIT_FOR_DEPOSIT_TRANSACTION = 'WAIT_FOR_DEPOSIT_TRANSACTION';
-export const WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP = 'WAIT_FOR_FUNDING_CONFIRMATION';
+export const WAIT_FOR_FUNDING_AND_POST_FUND_SETUP = 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP';
 export const FUNDING_SUCCESS = 'CHANNEL_FUNDED';
 // Funding status
 export type ChannelFundingStatus =
   | typeof NOT_SAFE_TO_DEPOSIT
   | typeof WAIT_FOR_DEPOSIT_TRANSACTION
-  | typeof WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP
+  | typeof WAIT_FOR_FUNDING_AND_POST_FUND_SETUP
   | typeof FUNDING_SUCCESS;
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface BaseDirectFundingState {
@@ -34,8 +34,8 @@ export interface WaitForDepositTransaction extends BaseDirectFundingState {
   type: typeof WAIT_FOR_DEPOSIT_TRANSACTION;
   transactionSubmissionState: TransactionSubmissionState;
 }
-export interface WaitForFundingConfirmationAndPostFundSetup extends BaseDirectFundingState {
-  type: typeof WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP;
+export interface WaitForFundingAndPostFundSetup extends BaseDirectFundingState {
+  type: typeof WAIT_FOR_FUNDING_AND_POST_FUND_SETUP;
   channelFunded: boolean;
   postFundSetupReceived: boolean;
 }
@@ -84,15 +84,15 @@ interface ConditionalParams {
   channelFunded: boolean;
   postFundSetupReceived: boolean;
 }
-export function waitForFundingConfirmationAndPostFundSetup<T extends BaseDirectFundingState>(
+export function waitForFundingAndPostFundSetup<T extends BaseDirectFundingState>(
   params: Properties<BaseDirectFundingState>,
   conditionalParams: ConditionalParams,
-): WaitForFundingConfirmationAndPostFundSetup {
+): WaitForFundingAndPostFundSetup {
   return {
     ...baseDirectFundingState(params),
     channelFunded: conditionalParams.channelFunded,
     postFundSetupReceived: conditionalParams.postFundSetupReceived,
-    type: WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP,
+    type: WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
   };
 }
 export function fundingSuccess(params: Properties<BaseDirectFundingState>): FundingSuccess {
@@ -104,7 +104,7 @@ export function fundingSuccess(params: Properties<BaseDirectFundingState>): Fund
 export type DirectFundingState =
   | NotSafeToDeposit
   | WaitForDepositTransaction
-  | WaitForFundingConfirmationAndPostFundSetup
+  | WaitForFundingAndPostFundSetup
   | FundingSuccess;
 
 export function initialDirectFundingState(

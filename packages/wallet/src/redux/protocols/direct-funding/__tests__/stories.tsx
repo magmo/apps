@@ -26,7 +26,7 @@ const directFundingScreens = {
   WaitForTransactionSubmissionStart: aDepositsBDepositsAHappyStates.waitForDepositTransactionStart,
   WaitForTransactionSubmissionEnd: aDepositsBDepositsAHappyStates.waitForDepositTransactionEnd,
   WaitForFundingConfirmation: aDepositsBDepositsAHappyStates.waitForFundingConfirmation,
-  ChannelFunded: aDepositsBDepositsAHappyStates.channelFunded,
+  ChannelFunded: aDepositsBDepositsAHappyStates.fundingSuccess,
 };
 
 storybookUtils.addStoriesFromCollection(directFundingScreens, 'Direct Funding Happy Path', render);

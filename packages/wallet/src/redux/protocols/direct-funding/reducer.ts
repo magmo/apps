@@ -33,13 +33,17 @@ export const directFundingStateReducer: DFReducer = (
     }
   }
 
+  if (action.type === actions.COMMITMENT_RECEIVED) {
+    return commitmentReceivedReducer(state, sharedData, action);
+  }
+
   switch (state.type) {
     case states.NOT_SAFE_TO_DEPOSIT:
       return notSafeToDepositReducer(state, sharedData, action);
     case states.WAIT_FOR_DEPOSIT_TRANSACTION:
       return waitForDepositTransactionReducer(state, sharedData, action);
-    case states.WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP:
-      return waitForFundingConfirmationAndPostFundSetupReducer(state, sharedData, action);
+    case states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
+      return waitForFundingAndPostFundSetupReducer(state, sharedData, action);
     case states.FUNDING_SUCCESS:
       return channelFundedReducer(state, sharedData, action);
     default:
@@ -56,9 +60,8 @@ const fundingReceiveEventReducer: DFReducer = (
   // If we are player A, the channel is now funded, so we should send the PostFundSetup
   if (state.ourIndex === PlayerIndex.A) {
     const newSharedData = createAndSendPostFundCommitment(sharedData, state.channelId);
-
     return {
-      protocolState: states.waitForFundingConfirmationAndPostFundSetup(state, {
+      protocolState: states.waitForFundingAndPostFundSetup(state, {
         channelFunded: true,
         postFundSetupReceived: false,
       }),
@@ -67,10 +70,7 @@ const fundingReceiveEventReducer: DFReducer = (
   }
 
   // Player B case
-  if (
-    state.type === states.WAIT_FOR_FUNDING_CONFIRMATION_AND_POST_FUND_SETUP &&
-    state.postFundSetupReceived
-  ) {
+  if (state.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP && state.postFundSetupReceived) {
     // TODO: Need to send post fund setup for player B
     return {
       protocolState: states.fundingSuccess(state),
@@ -78,12 +78,50 @@ const fundingReceiveEventReducer: DFReducer = (
     };
   }
   return {
-    protocolState: states.waitForFundingConfirmationAndPostFundSetup(state, {
+    protocolState: states.waitForFundingAndPostFundSetup(state, {
       channelFunded: true,
       postFundSetupReceived: false,
     }),
     sharedData,
   };
+};
+
+const commitmentReceivedReducer: DFReducer = (
+  protocolState: states.DirectFundingState,
+  sharedData: SharedData,
+  action: actions.CommitmentReceived,
+): ProtocolStateWithSharedData<states.DirectFundingState> => {
+  const newSharedData = updateChannelState(sharedData, action);
+
+  if (protocolState.ourIndex === PlayerIndex.A) {
+    if (
+      protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
+      protocolState.channelFunded
+    ) {
+      return { protocolState: states.fundingSuccess(protocolState), sharedData: newSharedData };
+    } else {
+      // In this case: Player B sent a PostFund commitment before Player A sent a PostFund commitment.
+      // Ignore the Player B PostFund commitment.
+      return { protocolState, sharedData };
+    }
+  }
+
+  // Player B logic
+  if (
+    protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
+    protocolState.channelFunded
+  ) {
+    // TODO: need to send PostFund setup
+    return { protocolState: states.fundingSuccess(protocolState), sharedData: newSharedData };
+  } else {
+    return {
+      protocolState: states.waitForFundingAndPostFundSetup(protocolState, {
+        channelFunded: false,
+        postFundSetupReceived: true,
+      }),
+      sharedData: newSharedData,
+    };
+  }
 };
 
 // State reducers
@@ -125,21 +163,6 @@ const waitForDepositTransactionReducer: DFReducer = (
   sharedData: SharedData,
   action: actions.WalletAction,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  if (action.type === actions.COMMITMENT_RECEIVED) {
-    // Player B scenario:
-    // - transaction success has NOT arrived.
-    // - funding received event has NOT arrived
-    // - Abandon waiting for the transaction since Player A thinks that the channel is funded.
-    const updatedSharedData = updateChannelState(sharedData, action);
-    return {
-      protocolState: states.waitForFundingConfirmationAndPostFundSetup(protocolState, {
-        channelFunded: false,
-        postFundSetupReceived: true,
-      }),
-      sharedData: updatedSharedData,
-    };
-  }
-
   if (!isTransactionAction(action)) {
     return { protocolState, sharedData };
   }
@@ -156,7 +179,7 @@ const waitForDepositTransactionReducer: DFReducer = (
   } else {
     if (newTransactionState.type === SUCCESS) {
       return {
-        protocolState: states.waitForFundingConfirmationAndPostFundSetup(protocolState, {
+        protocolState: states.waitForFundingAndPostFundSetup(protocolState, {
           channelFunded: false,
           postFundSetupReceived: false,
         }),
@@ -169,38 +192,12 @@ const waitForDepositTransactionReducer: DFReducer = (
   }
 };
 
-const waitForFundingConfirmationAndPostFundSetupReducer: DFReducer = (
-  state: states.WaitForFundingConfirmationAndPostFundSetup,
+const waitForFundingAndPostFundSetupReducer: DFReducer = (
+  protocolState: states.WaitForFundingAndPostFundSetup,
   sharedData: SharedData,
   action: actions.WalletAction,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
-      const newSharedData = updateChannelState(sharedData, action);
-
-      if (state.ourIndex === PlayerIndex.A) {
-        // If we are player A, we waited for channel funding to send our PostFundSetup.
-        // The following will not work if player B sends a preemptive PostFundSetup commitment
-        return { protocolState: states.fundingSuccess(state), sharedData: newSharedData };
-      }
-
-      // Player B logic
-      if (state.channelFunded) {
-        // TOO: need to send PostFund setup
-        return { protocolState: states.fundingSuccess(state), sharedData: newSharedData };
-      }
-      return {
-        protocolState: states.waitForFundingConfirmationAndPostFundSetup(state, {
-          channelFunded: false,
-          postFundSetupReceived: true,
-        }),
-        sharedData: newSharedData,
-      };
-      break;
-    default:
-      return { protocolState: state, sharedData };
-  }
-  return { protocolState: state, sharedData };
+  return { protocolState, sharedData };
 };
 const channelFundedReducer: DFReducer = (
   state: states.FundingSuccess,
