@@ -79,7 +79,6 @@ export function waitForDepositTransaction(
     transactionSubmissionState,
   };
 }
-
 export const waitForFundingAndPostFundSetup: Constructor<
   WaitForFundingAndPostFundSetup
 > = params => {

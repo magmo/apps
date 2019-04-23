@@ -1,17 +1,12 @@
 import { bigNumberify } from 'ethers/utils';
-import { Commitment } from 'fmg-core';
-import { messageRelayRequested } from 'magmo-wallet-client';
 import { composePostFundCommitment } from '../../../utils/commitment-utils';
 import { unreachable } from '../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 import * as actions from '../../actions';
-import * as channelActions from '../../channel-state/actions';
-import * as channelStates from '../../channel-state/state';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import * as selectors from '../../selectors';
 import { SharedData } from '../../state';
 import { WalletProtocol, PlayerIndex } from '../../types';
-import { updateChannelState } from '../reducer-helpers';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
@@ -19,6 +14,15 @@ import {
 } from '../transaction-submission/reducer';
 import { isTerminal, isSuccess } from '../transaction-submission/states';
 import * as states from './state';
+import { createCommitmentMessageRelay, theirAddress } from '../reducer-helpers';
+
+/* Note on PostFund commitment exchange:
+ After the protocol refactor, the PostFund commitments are created and sent by funding protocols: 
+ indirect funding and direct funding protocols. Before the refactor, the PostFund commitments
+ were created and sent by the channel state reducer. Until the channel state reducer is 
+ refactored, there will be duplicate PostFund commitments.
+ For context, refer to https://zube.io/magmo/apps/c/716.
+ */
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
 
@@ -53,16 +57,18 @@ export const directFundingStateReducer: DFReducer = (
 
 // Action reducers
 const fundingReceiveEventReducer: DFReducer = (
-  state: states.DirectFundingState,
+  protocolState: states.DirectFundingState,
   sharedData: SharedData,
   action: actions.FundingReceivedEvent,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
+  // TODO[Channel state side effect]: update funding level for the channel.
+
   // If we are player A, the channel is now funded, so we should send the PostFundSetup
-  if (state.ourIndex === PlayerIndex.A) {
-    const newSharedData = createAndSendPostFundCommitment(sharedData, state.channelId);
+  if (protocolState.ourIndex === PlayerIndex.A) {
+    const newSharedData = createAndSendPostFundCommitment(sharedData, protocolState.channelId);
     return {
       protocolState: states.waitForFundingAndPostFundSetup({
-        ...state,
+        ...protocolState,
         channelFunded: true,
         postFundSetupReceived: false,
       }),
@@ -71,16 +77,19 @@ const fundingReceiveEventReducer: DFReducer = (
   }
 
   // Player B case
-  if (state.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP && state.postFundSetupReceived) {
-    // TODO: Need to send post fund setup for player B
+  if (
+    protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
+    protocolState.postFundSetupReceived
+  ) {
+    const newSharedData = createAndSendPostFundCommitment(sharedData, protocolState.channelId);
     return {
-      protocolState: states.fundingSuccess(state),
-      sharedData,
+      protocolState: states.fundingSuccess(protocolState),
+      sharedData: newSharedData,
     };
   }
   return {
     protocolState: states.waitForFundingAndPostFundSetup({
-      ...state,
+      ...protocolState,
       channelFunded: true,
       postFundSetupReceived: false,
     }),
@@ -93,14 +102,13 @@ const commitmentReceivedReducer: DFReducer = (
   sharedData: SharedData,
   action: actions.CommitmentReceived,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  const newSharedData = updateChannelState(sharedData, action);
-
   if (protocolState.ourIndex === PlayerIndex.A) {
     if (
       protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
       protocolState.channelFunded
     ) {
-      return { protocolState: states.fundingSuccess(protocolState), sharedData: newSharedData };
+      // TODO[Channel state side effect]: use channel state reducer to validate and store incoming commitment.
+      return { protocolState: states.fundingSuccess(protocolState), sharedData };
     } else {
       // In this case: Player B sent a PostFund commitment before Player A sent a PostFund commitment.
       // Ignore the Player B PostFund commitment.
@@ -113,7 +121,8 @@ const commitmentReceivedReducer: DFReducer = (
     protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
     protocolState.channelFunded
   ) {
-    // TODO: need to send PostFund setup
+    // TODO[Channel state side effect]: use channel state reducer to validate and store incoming commitment.
+    const newSharedData = createAndSendPostFundCommitment(sharedData, protocolState.channelId);
     return { protocolState: states.fundingSuccess(protocolState), sharedData: newSharedData };
   } else {
     return {
@@ -122,7 +131,7 @@ const commitmentReceivedReducer: DFReducer = (
         channelFunded: false,
         postFundSetupReceived: true,
       }),
-      sharedData: newSharedData,
+      sharedData,
     };
   }
 };
@@ -227,38 +236,22 @@ const createAndSendPostFundCommitment = (sharedData: SharedData, channelId: stri
     channelState.privateKey,
   );
 
-  let newSharedData = updateChannelState(
-    sharedData,
-    // TODO: this might not be the correct action to use
-    channelActions.ownCommitmentReceived(commitment),
-  );
+  // TODO[Channel state side effect]: use channel state reducer to sign and store own commitment.
 
-  newSharedData = {
-    ...newSharedData,
+  const newSharedData = {
+    ...sharedData,
     outboxState: {
-      ...newSharedData.outboxState,
+      ...sharedData.outboxState,
       messageOutbox: [
-        createCommitmentMessageRelay(theirAddress(channelState), channelId, commitment, signature),
+        createCommitmentMessageRelay(
+          WalletProtocol.DirectFunding,
+          theirAddress(channelState),
+          channelId,
+          commitment,
+          signature,
+        ),
       ],
     },
   };
   return newSharedData;
 };
-
-const createCommitmentMessageRelay = (
-  to: string,
-  processId: string,
-  commitment: Commitment,
-  signature: string,
-) => {
-  const payload = {
-    protocol: WalletProtocol.DirectFunding,
-    data: { commitment, signature, processId },
-  };
-  return messageRelayRequested(to, payload);
-};
-
-function theirAddress(channelState: channelStates.OpenedState) {
-  const theirIndex = (channelState.ourIndex + 1) % channelState.participants.length;
-  return channelState.participants[theirIndex];
-}
