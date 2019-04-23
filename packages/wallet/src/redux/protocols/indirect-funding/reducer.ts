@@ -6,21 +6,24 @@ import { ProtocolStateWithSharedData, ProtocolReducer } from '../';
 import { playerAReducer, initialize as initializeA } from './player-a/reducer';
 import { playerBReducer, initialize as initializeB } from './player-b/reducer';
 import { SharedData } from '../../state';
+import { ChannelStatus } from '../../channel-state/state';
+
+type ReturnVal = ProtocolStateWithSharedData<indirectFundingState.IndirectFundingState>;
 
 export function initialize(
-  channelId: string,
-  playerIndex: PlayerIndex,
+  channel: ChannelStatus,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<
-  indirectFundingState.playerA.WaitForApproval | indirectFundingState.playerB.WaitForApproval
-> {
-  switch (playerIndex) {
+  consensusLibrary: string, // todo: make a global constant
+): ReturnVal {
+  const { ourIndex } = channel;
+  switch (ourIndex) {
     case PlayerIndex.A:
-      return initializeA(channelId, sharedData);
+      return initializeA(channel, sharedData, consensusLibrary);
     case PlayerIndex.B:
-      return initializeB(channelId, sharedData);
+      return initializeB(channel, sharedData);
     default:
-      return unreachable(playerIndex);
+      // todo: this should never happen
+      return unreachable(ourIndex);
   }
 }
 

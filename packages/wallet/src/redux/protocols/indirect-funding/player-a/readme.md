@@ -1,4 +1,4 @@
-## Player A Indirect Funding Protocol
+# Indirect Funding Protocol for Player A
 
 ### State Machine
 
