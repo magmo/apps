@@ -8,10 +8,16 @@ import * as helpers from '../reducer-helpers';
 import * as channelActions from '../../channel-state/actions';
 import { getChannelState } from '../../selectors';
 import { unreachable } from '../../../utils/reducer-utils';
+import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
+import { PlayerIndex } from '../../types';
+import { createCommitmentMessageRelay } from '../indirect-funding/reducer-helpers';
+import { signCommitment } from '../../../utils/signing-utils';
 
 export const initialize = (
   processId: string,
   channelId: string,
+  proposedAllocation: string[],
+  proposedDestination: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   if (!helpers.channelIsClosed(channelId, sharedData)) {
@@ -22,10 +28,21 @@ export const initialize = (
   }
   let newSharedData = { ...sharedData };
   if (helpers.isFirstPlayer(channelId, sharedData)) {
-    newSharedData = craftFirstLedgerUpdate(newSharedData);
+    newSharedData = craftAndSendLegerUpdate(
+      newSharedData,
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+    );
   }
   return {
-    protocolState: states.waitForLedgerUpdate({ processId, channelId }),
+    protocolState: states.waitForLedgerUpdate({
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+    }),
     sharedData: newSharedData,
   };
 };
@@ -80,15 +97,27 @@ const waitForLedgerUpdateReducer = (
       sharedData: newSharedData,
     };
   }
-
+  const { processId, channelId, proposedAllocation, proposedDestination } = protocolState;
   if (helpers.isFirstPlayer(protocolState.channelId, newSharedData)) {
-    newSharedData = craftFinalLedgerUpdate(newSharedData);
+    newSharedData = craftFinalLedgerUpdate(
+      newSharedData,
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+    );
     return {
       protocolState: states.success(),
       sharedData: newSharedData,
     };
   } else {
-    newSharedData = craftResponseLedgerUpdate(newSharedData);
+    newSharedData = craftAndSendLegerUpdate(
+      newSharedData,
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+    );
     return {
       protocolState: states.waitForFinalLedgerUpdate(protocolState),
       sharedData: newSharedData,
@@ -116,15 +145,81 @@ const validTransition = (
   return getChannelState(sharedData, channelId).lastCommitment.commitment === commitment;
 };
 
-// TODO: Craft these
-const craftFirstLedgerUpdate = (sharedData: SharedData): SharedData => {
-  return sharedData;
+const craftAndSendLegerUpdate = (
+  sharedData: SharedData,
+  processId: string,
+  channelId: string,
+  proposedAllocation: string[],
+  proposedDestination: string[],
+): SharedData => {
+  const channelState = getChannelState(sharedData, channelId);
+  const appAttributes = bytesFromAppAttributes({
+    consensusCounter: channelState.ourIndex,
+    proposedAllocation,
+    proposedDestination,
+  });
+  const lastCommitment = channelState.lastCommitment.commitment;
+
+  const newCommitment: Commitment = {
+    ...lastCommitment,
+    commitmentCount: channelState.ourIndex,
+    turnNum: lastCommitment.turnNum + 1,
+    appAttributes,
+  };
+
+  return receiveAndSendUpdateCommitment(sharedData, processId, channelId, newCommitment);
 };
 
-const craftResponseLedgerUpdate = (sharedData: SharedData): SharedData => {
-  return sharedData;
+const craftFinalLedgerUpdate = (
+  sharedData: SharedData,
+  processId: string,
+  channelId: string,
+  proposedAllocation: string[],
+  proposedDestination: string[],
+): SharedData => {
+  const channelState = getChannelState(sharedData, channelId);
+  const appAttributes = bytesFromAppAttributes({
+    consensusCounter: 0,
+    proposedAllocation,
+    proposedDestination,
+  });
+  const lastCommitment = channelState.lastCommitment.commitment;
+
+  const newCommitment: Commitment = {
+    ...lastCommitment,
+    commitmentCount: 0,
+    turnNum: lastCommitment.turnNum + 1,
+    appAttributes,
+    allocation: proposedAllocation,
+    destination: proposedDestination,
+  };
+
+  return receiveAndSendUpdateCommitment(sharedData, processId, channelId, newCommitment);
 };
 
-const craftFinalLedgerUpdate = (sharedData: SharedData): SharedData => {
-  return sharedData;
+const receiveAndSendUpdateCommitment = (
+  sharedData: SharedData,
+  processId: string,
+  channelId: string,
+  commitment: Commitment,
+) => {
+  const channelState = getChannelState(sharedData, channelId);
+  const newSharedData = helpers.updateChannelState(
+    sharedData,
+    channelActions.ownCommitmentReceived(commitment),
+  );
+
+  const newSignature = signCommitment(commitment, channelState.privateKey);
+
+  // Send out the commitment to the opponent
+  newSharedData.outboxState.messageOutbox = [
+    createCommitmentMessageRelay(
+      channelState.participants[PlayerIndex.B],
+      processId,
+      commitment,
+      newSignature,
+    ),
+  ];
+
+  return newSharedData;
 };

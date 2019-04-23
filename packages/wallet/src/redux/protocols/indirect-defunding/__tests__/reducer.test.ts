@@ -4,7 +4,13 @@ import * as scenarios from './scenarios';
 import { Commitment } from 'magmo-wallet-client/node_modules/fmg-core';
 import { ProtocolStateWithSharedData } from '../..';
 import { expectThisCommitmentSent } from '../../../__tests__/helpers';
+import * as SigningUtil from '../../../../utils/signing-utils';
 
+// Mocks
+const validateMock = jest.fn().mockReturnValue(true);
+Object.defineProperty(SigningUtil, 'validCommitmentSignature', { value: validateMock });
+
+// Helper functions
 const itTransitionsTo = (
   result: { protocolState: states.IndirectDefundingState },
   type: string,
@@ -31,12 +37,20 @@ export const itSendsThisCommitment = (
     expectThisCommitmentSent(state.sharedData, commitment);
   });
 };
+
+// Tests
 describe('player A happy path', () => {
   const scenario = scenarios.playerAHappyPath;
-  const { processId, channelId, sharedData } = scenario;
+  const { processId, channelId, sharedData, proposedAllocation, proposedDestination } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(processId, channelId, sharedData);
+    const result = initialize(
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+      sharedData.initializingSharedData,
+    );
     itTransitionsTo(result, states.WAIT_FOR_LEDGER_UPDATE);
     itSendsThisCommitment(result, scenario.firstUpdateCommitment);
   });
@@ -44,7 +58,11 @@ describe('player A happy path', () => {
   describe(`when in ${states.WAIT_FOR_LEDGER_UPDATE}`, () => {
     const state = scenario.states.waitForLedgerUpdate;
     const action = scenario.actions.commitmentReceived;
-    const result = indirectDefundingReducer(state, sharedData, action);
+    const result = indirectDefundingReducer(
+      state,
+      sharedData.waitForLedgerUpdateSharedData,
+      action,
+    );
 
     itSendsThisCommitment(result, scenario.secondUpdateCommitment);
     itTransitionsTo(result, states.SUCCESS);
@@ -53,10 +71,16 @@ describe('player A happy path', () => {
 
 describe('player B happy path', () => {
   const scenario = scenarios.playerBHappyPath;
-  const { processId, channelId, sharedData } = scenario;
+  const { processId, channelId, proposedAllocation, proposedDestination, sharedData } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(processId, channelId, sharedData);
+    const result = initialize(
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+      sharedData,
+    );
     itTransitionsTo(result, states.WAIT_FOR_LEDGER_UPDATE);
     itSendsThisCommitment(result, scenario.updateCommitment);
   });
@@ -81,10 +105,16 @@ describe('player B happy path', () => {
 
 describe('not defundable', () => {
   const scenario = scenarios.notDefundable;
-  const { processId, channelId, sharedData } = scenario;
+  const { processId, channelId, proposedAllocation, proposedDestination, sharedData } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(processId, channelId, sharedData);
+    const result = initialize(
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+      sharedData,
+    );
     itTransitionsToFailure(result, scenario.states.failure);
   });
 });

@@ -38,10 +38,25 @@ const channelStatus: ChannelStatus = {
   penultimateCommitment: { commitment: ledgerCommitments.ledgerUpdate1, signature: '0x0' },
 };
 
-const playerAChannelState: ChannelState = {
+const playerAStartChannelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
+  },
+};
+
+const playerAWaitForCommitmentChannelState: ChannelState = {
+  initializingChannels: {},
+  initializedChannels: {
+    [channelId]: {
+      ...channelStatus,
+      lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate2, signature: '0x0' },
+      penultimateCommitment: {
+        commitment: ledgerCommitments.ledgerDefundUpdate1,
+        signature: '0x0',
+      },
+      turnNum: ledgerCommitments.ledgerDefundUpdate2.turnNum,
+    },
   },
 };
 
@@ -67,11 +82,18 @@ const notClosedAdjudicatorState: AdjudicatorState = {
   },
 };
 
-const playerASharedData: SharedData = {
+const playerAStartSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerAChannelState,
+  channelState: playerAStartChannelState,
 };
+
+const playerAWaitForUpdateSharedData: SharedData = {
+  ...EMPTY_SHARED_DATA,
+  adjudicatorState,
+  channelState: playerAWaitForCommitmentChannelState,
+};
+
 const playerBSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
@@ -81,8 +103,13 @@ const playerBSharedData: SharedData = {
 const notDefundableSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState: notClosedAdjudicatorState,
-  channelState: playerAChannelState,
+  channelState: playerAStartChannelState,
 };
+
+const {
+  allocation: proposedAllocation,
+  destination: proposedDestination,
+} = ledgerCommitments.ledgerDefundUpdate3;
 
 // Actions
 const playerACommitmentReceived = actions.commitmentReceived(
@@ -108,8 +135,18 @@ const invalidCommitmentReceived = actions.commitmentReceived(
 );
 
 // Indirect Defunding States
-const waitForLedgerUpdate = states.waitForLedgerUpdate({ processId, channelId });
-const waitForFinalLedgerUpdate = states.waitForFinalLedgerUpdate({ processId, channelId });
+const waitForLedgerUpdate = states.waitForLedgerUpdate({
+  processId,
+  channelId,
+  proposedAllocation,
+  proposedDestination,
+});
+const waitForFinalLedgerUpdate = states.waitForFinalLedgerUpdate({
+  processId,
+  channelId,
+  proposedAllocation,
+  proposedDestination,
+});
 const notDefundableFailure = states.failure('Channel Not Closed');
 const invalidCommitmentFailure = states.failure('Received Invalid Commitment');
 
@@ -117,6 +154,8 @@ const invalidCommitmentFailure = states.failure('Received Invalid Commitment');
 export const playerAHappyPath = {
   processId,
   channelId,
+  proposedAllocation,
+  proposedDestination,
   firstUpdateCommitment: ledgerCommitments.ledgerDefundUpdate1,
   secondUpdateCommitment: ledgerCommitments.ledgerDefundUpdate3,
   states: {
@@ -125,12 +164,17 @@ export const playerAHappyPath = {
   actions: {
     commitmentReceived: playerACommitmentReceived,
   },
-  sharedData: playerASharedData,
+  sharedData: {
+    initializingSharedData: playerAStartSharedData,
+    waitForLedgerUpdateSharedData: playerAWaitForUpdateSharedData,
+  },
 };
 
 export const playerBHappyPath = {
   processId,
   channelId,
+  proposedAllocation,
+  proposedDestination,
   updateCommitment: ledgerCommitments.ledgerDefundUpdate2,
 
   states: {
@@ -147,6 +191,8 @@ export const playerBHappyPath = {
 export const notDefundable = {
   processId,
   channelId,
+  proposedAllocation,
+  proposedDestination,
   sharedData: notDefundableSharedData,
   states: {
     failure: notDefundableFailure,
@@ -156,7 +202,9 @@ export const notDefundable = {
 export const playerAInvalidCommitment = {
   processId,
   channelId,
-  sharedData: playerASharedData,
+  proposedAllocation,
+  proposedDestination,
+  sharedData: playerAStartSharedData,
   states: {
     waitForLedgerUpdate,
     failure: invalidCommitmentFailure,
@@ -169,6 +217,8 @@ export const playerAInvalidCommitment = {
 export const playerBInvalidFirstCommitment = {
   processId,
   channelId,
+  proposedAllocation,
+  proposedDestination,
   sharedData: playerBSharedData,
   states: {
     waitForLedgerUpdate,
@@ -182,6 +232,8 @@ export const playerBInvalidFirstCommitment = {
 export const playerBInvalidFinalCommitment = {
   processId,
   channelId,
+  proposedAllocation,
+  proposedDestination,
   sharedData: playerBSharedData,
   states: {
     waitForLedgerUpdate,
