@@ -1,12 +1,13 @@
 import { Properties as P } from '../../../utils';
 
-export type FundingState =
+export type OngoingFundingState =
   | WaitForStrategyChoice
   | WaitForStrategyResponse
   | WaitForFunding
-  | WaitForSuccessConfirmation
-  | Success
-  | Failure;
+  | WaitForSuccessConfirmation;
+
+export type TerminalFundingState = Success | Failure;
+export type FundingState = OngoingFundingState | TerminalFundingState;
 
 export const WAIT_FOR_STRATEGY_CHOICE = 'WaitForStrategyChoice';
 export const WAIT_FOR_STRATEGY_RESPONSE = 'WaitForStrategyResponse';
@@ -51,7 +52,7 @@ export interface Success {
 // Helpers
 // -------
 
-export function isTerminal(state: FundingState): state is Failure | Success {
+export function isTerminal(state: FundingState): state is TerminalFundingState {
   return state.type === FAILURE || state.type === SUCCESS;
 }
 
