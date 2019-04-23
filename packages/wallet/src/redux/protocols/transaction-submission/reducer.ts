@@ -16,10 +16,6 @@ import {
   waitForConfirmation,
   success,
   waitForSend,
-  WAIT_FOR_SEND,
-  WAIT_FOR_SUBMISSION,
-  WAIT_FOR_CONFIRMATION,
-  APPROVE_RETRY,
   failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -68,14 +64,14 @@ export function initialize(
 }
 
 function transactionSent(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== WAIT_FOR_SEND) {
+  if (state.type !== 'WaitForSend') {
     return { state, storage };
   }
   return { state: waitForSubmission(state), storage };
 }
 
 function transactionSubmissionFailed(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== WAIT_FOR_SUBMISSION) {
+  if (state.type !== 'WaitForSubmission') {
     return { state, storage };
   }
   return { state: approveRetry(state), storage };
@@ -87,8 +83,8 @@ function transactionSubmitted(
   transactionHash: string,
 ): ReturnVal {
   switch (state.type) {
-    case WAIT_FOR_SUBMISSION:
-    case WAIT_FOR_SEND: // just in case we didn't hear the TRANSACTION_SENT
+    case 'WaitForSubmission':
+    case 'WaitForSend': // just in case we didn't hear the TRANSACTION_SENT
       return { state: waitForConfirmation({ ...state, transactionHash }), storage };
     default:
       return { state, storage };
@@ -97,9 +93,9 @@ function transactionSubmitted(
 
 function transactionConfirmed(state: NonTerminalTSState, storage: Storage): ReturnVal {
   switch (state.type) {
-    case WAIT_FOR_CONFIRMATION:
-    case WAIT_FOR_SUBMISSION: // in case we didn't hear the TRANSACTION_SUBMITTED
-    case WAIT_FOR_SEND: // in case we didn't hear the TRANSACTION_SENT
+    case 'WaitForConfirmation':
+    case 'WaitForSubmission': // in case we didn't hear the TRANSACTION_SUBMITTED
+    case 'WaitForSend': // in case we didn't hear the TRANSACTION_SENT
       return { state: success(), storage };
     default:
       return { state, storage };
@@ -107,7 +103,7 @@ function transactionConfirmed(state: NonTerminalTSState, storage: Storage): Retu
 }
 
 function transactionRetryApproved(state: NonTerminalTSState, storage: Storage): ReturnVal {
-  if (state.type !== APPROVE_RETRY) {
+  if (state.type !== 'ApproveRetry') {
     return { state, storage };
   }
   const { transaction, processId } = state;

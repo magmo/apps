@@ -9,13 +9,6 @@ export type NonTerminalTransactionSubmissionState =
   | WaitForConfirmation
   | ApproveRetry;
 
-export const WAIT_FOR_SEND = 'WaitForSend';
-export const WAIT_FOR_SUBMISSION = 'WaitForSubmission';
-export const WAIT_FOR_CONFIRMATION = 'WaitForConfirmation';
-export const APPROVE_RETRY = 'ApproveRetry';
-export const FAILURE = 'Failure';
-export const SUCCESS = 'Success';
-
 export interface WaitForSend {
   type: 'WaitForSend';
   transaction: TransactionRequest;
@@ -23,31 +16,31 @@ export interface WaitForSend {
 }
 
 export interface WaitForSubmission {
-  type: typeof WAIT_FOR_SUBMISSION;
+  type: 'WaitForSubmission';
   transaction: TransactionRequest;
   processId: string;
 }
 
 export interface WaitForConfirmation {
-  type: typeof WAIT_FOR_CONFIRMATION;
+  type: 'WaitForConfirmation';
   transaction: TransactionRequest;
   transactionHash: string;
   processId: string;
 }
 
 export interface ApproveRetry {
-  type: typeof APPROVE_RETRY;
+  type: 'ApproveRetry';
   transaction: TransactionRequest;
   processId: string;
 }
 
 export interface Failure {
-  type: typeof FAILURE;
+  type: 'Failure';
   reason: string;
 }
 
 export interface Success {
-  type: typeof SUCCESS;
+  type: 'Success';
 }
 
 // -------
@@ -55,15 +48,15 @@ export interface Success {
 // -------
 
 export function isTerminal(state: TransactionSubmissionState): state is Failure | Success {
-  return state.type === FAILURE || state.type === SUCCESS;
+  return state.type === 'Failure' || state.type === 'Success';
 }
 
 export function isSuccess(state: TransactionSubmissionState): state is Success {
-  return state.type === SUCCESS;
+  return state.type === 'Success';
 }
 
 export function isFailure(state: TransactionSubmissionState): state is Failure {
-  return state.type === FAILURE;
+  return state.type === 'Failure';
 }
 
 // ------------
@@ -74,28 +67,28 @@ type Constructor<T> = (p: P<T>) => T;
 
 export const waitForSend: Constructor<WaitForSend> = p => {
   const { transaction, processId } = p;
-  return { type: WAIT_FOR_SEND, transaction, processId };
+  return { type: 'WaitForSend', transaction, processId };
 };
 
 export const waitForSubmission: Constructor<WaitForSubmission> = p => {
   const { transaction, processId } = p;
-  return { type: WAIT_FOR_SUBMISSION, transaction, processId };
+  return { type: 'WaitForSubmission', transaction, processId };
 };
 
 export const approveRetry: Constructor<ApproveRetry> = p => {
   const { transaction, processId } = p;
-  return { type: APPROVE_RETRY, transaction, processId };
+  return { type: 'ApproveRetry', transaction, processId };
 };
 
 export const waitForConfirmation: Constructor<WaitForConfirmation> = p => {
   const { transaction, transactionHash, processId } = p;
-  return { type: WAIT_FOR_CONFIRMATION, transaction, transactionHash, processId };
+  return { type: 'WaitForConfirmation', transaction, transactionHash, processId };
 };
 
 export function success(): Success {
-  return { type: SUCCESS };
+  return { type: 'Success' };
 }
 
 export function failure(reason: string): Failure {
-  return { type: FAILURE, reason };
+  return { type: 'Failure', reason };
 }

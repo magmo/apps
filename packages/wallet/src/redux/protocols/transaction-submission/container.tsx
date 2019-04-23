@@ -3,7 +3,6 @@ import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { NonTerminalTransactionSubmissionState } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
-import * as states from './states';
 import WaitForConfirmation from './components/wait-for-confirmation';
 import WaitForSubmission from './components/wait-for-submission';
 import { NETWORK_ID } from '../../../constants';
@@ -21,10 +20,10 @@ class TransactionSubmissionContainer extends PureComponent<Props> {
   render() {
     const { state, transactionName, transactionRetryApproved, transactionRetryDenied } = this.props;
     switch (state.type) {
-      case states.WAIT_FOR_SEND:
-      case states.WAIT_FOR_SUBMISSION:
+      case 'WaitForSend':
+      case 'WaitForSubmission':
         return <WaitForSubmission name={transactionName} />;
-      case states.WAIT_FOR_CONFIRMATION:
+      case 'WaitForConfirmation':
         return (
           <WaitForConfirmation
             name={transactionName}
@@ -32,7 +31,7 @@ class TransactionSubmissionContainer extends PureComponent<Props> {
             networkId={NETWORK_ID}
           />
         );
-      case states.APPROVE_RETRY:
+      case 'ApproveRetry':
         return (
           <ApproveRetry
             name={transactionName}
