@@ -98,14 +98,16 @@ export const aDepositsBDepositsAHappyStates = {
     waitForFundingChannelState,
   ),
   waitForFundingAndPostFundSetup: constructWalletState(
-    states.waitForFundingAndPostFundSetup(defaultsForA, {
+    states.waitForFundingAndPostFundSetup({
+      ...defaultsForA,
       channelFunded: false,
       postFundSetupReceived: false,
     }),
     waitForFundingChannelState,
   ),
   waitForPostFundSetup: constructWalletState(
-    states.waitForFundingAndPostFundSetup(defaultsForB, {
+    states.waitForFundingAndPostFundSetup({
+      ...defaultsForB,
       channelFunded: true,
       postFundSetupReceived: false,
     }),
@@ -138,14 +140,16 @@ export const aDepositsBDepositsBHappyStates = {
     waitForFundingChannelState,
   ),
   waitForFundingAndPostFundSetup: constructWalletState(
-    states.waitForFundingAndPostFundSetup(defaultsForB, {
+    states.waitForFundingAndPostFundSetup({
+      ...defaultsForB,
       channelFunded: false,
       postFundSetupReceived: false,
     }),
     waitForFundingChannelState,
   ),
   waitForPostFundSetup: constructWalletState(
-    states.waitForFundingAndPostFundSetup(defaultsForB, {
+    states.waitForFundingAndPostFundSetup({
+      ...defaultsForB,
       channelFunded: true,
       postFundSetupReceived: false,
     }),

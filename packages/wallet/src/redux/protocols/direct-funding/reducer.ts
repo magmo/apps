@@ -61,7 +61,8 @@ const fundingReceiveEventReducer: DFReducer = (
   if (state.ourIndex === PlayerIndex.A) {
     const newSharedData = createAndSendPostFundCommitment(sharedData, state.channelId);
     return {
-      protocolState: states.waitForFundingAndPostFundSetup(state, {
+      protocolState: states.waitForFundingAndPostFundSetup({
+        ...state,
         channelFunded: true,
         postFundSetupReceived: false,
       }),
@@ -78,7 +79,8 @@ const fundingReceiveEventReducer: DFReducer = (
     };
   }
   return {
-    protocolState: states.waitForFundingAndPostFundSetup(state, {
+    protocolState: states.waitForFundingAndPostFundSetup({
+      ...state,
       channelFunded: true,
       postFundSetupReceived: false,
     }),
@@ -115,7 +117,8 @@ const commitmentReceivedReducer: DFReducer = (
     return { protocolState: states.fundingSuccess(protocolState), sharedData: newSharedData };
   } else {
     return {
-      protocolState: states.waitForFundingAndPostFundSetup(protocolState, {
+      protocolState: states.waitForFundingAndPostFundSetup({
+        ...protocolState,
         channelFunded: false,
         postFundSetupReceived: true,
       }),
@@ -179,7 +182,8 @@ const waitForDepositTransactionReducer: DFReducer = (
   } else {
     if (isSuccess(newTransactionState)) {
       return {
-        protocolState: states.waitForFundingAndPostFundSetup(protocolState, {
+        protocolState: states.waitForFundingAndPostFundSetup({
+          ...protocolState,
           channelFunded: false,
           postFundSetupReceived: false,
         }),

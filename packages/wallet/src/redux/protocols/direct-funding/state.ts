@@ -5,7 +5,7 @@ import { DirectFundingRequested } from '../../internal/actions';
 import { SharedData } from '../../state';
 import { initialize as initTransactionState } from '../transaction-submission/reducer';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
-import { Properties } from '../../utils';
+import { Properties, Constructor } from '../../utils';
 
 // ChannelFundingStatus
 export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
@@ -80,21 +80,16 @@ export function waitForDepositTransaction(
   };
 }
 
-interface ConditionalParams {
-  channelFunded: boolean;
-  postFundSetupReceived: boolean;
-}
-export function waitForFundingAndPostFundSetup(
-  params: Properties<BaseDirectFundingState>,
-  conditionalParams: ConditionalParams,
-): WaitForFundingAndPostFundSetup {
+export const waitForFundingAndPostFundSetup: Constructor<
+  WaitForFundingAndPostFundSetup
+> = params => {
   return {
     ...baseDirectFundingState(params),
-    channelFunded: conditionalParams.channelFunded,
-    postFundSetupReceived: conditionalParams.postFundSetupReceived,
+    channelFunded: params.channelFunded,
+    postFundSetupReceived: params.postFundSetupReceived,
     type: WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
   };
-}
+};
 export function fundingSuccess(params: Properties<BaseDirectFundingState>): FundingSuccess {
   return {
     ...baseDirectFundingState(params),
