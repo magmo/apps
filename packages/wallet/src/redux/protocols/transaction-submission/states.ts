@@ -1,4 +1,4 @@
-import { Properties as P } from '../../utils';
+import { Constructor } from '../../utils';
 import { TransactionRequest } from 'ethers/providers';
 
 export type TransactionSubmissionState = NonTerminalTransactionSubmissionState | Success | Failure;
@@ -64,8 +64,6 @@ export function isFailure(state: TransactionSubmissionState): state is Failure {
 // ------------
 // Constructors
 // ------------
-
-type Constructor<T> = (p: P<T>) => T;
 
 export const waitForSend: Constructor<WaitForSend> = p => {
   const { transaction, processId } = p;
