@@ -117,12 +117,17 @@ describe('Rock paper Scissors', () => {
     );
   });
 
-
   // The following scenario is highly notional, since the situation should (and is) prevented from occuring at the Propose stage
   it('Reverts an underflow via SafeMath', async () => {
     reveal.stake = accept.stake = bigNumberify(20).toHexString();
-    accept.allocation = [bigNumberify(0).toHexString(), bigNumberify(0).toHexString()] as [string, string];
-    reveal.allocation = [bigNumberify(40).toHexString(), bigNumberify(0).toHexString()] as [string, string];
+    accept.allocation = [bigNumberify(0).toHexString(), bigNumberify(0).toHexString()] as [
+      string,
+      string
+    ];
+    reveal.allocation = [bigNumberify(40).toHexString(), bigNumberify(0).toHexString()] as [
+      string,
+      string
+    ];
 
     const coreCommitment1 = asCoreCommitment(accept);
     const coreCommitment2 = asCoreCommitment(reveal);
