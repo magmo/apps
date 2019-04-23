@@ -1,13 +1,13 @@
 import { Properties as P } from '../../utils';
 import { TransactionRequest } from 'ethers/providers';
 
-export type TransactionSubmissionState =
+export type TransactionSubmissionState = NonTerminalTransactionSubmissionState | Success | Failure;
+
+export type NonTerminalTransactionSubmissionState =
   | WaitForSend
   | WaitForSubmission
   | WaitForConfirmation
-  | ApproveRetry
-  | Success
-  | Failure;
+  | ApproveRetry;
 
 export const WAIT_FOR_SEND = 'WaitForSend';
 export const WAIT_FOR_SUBMISSION = 'WaitForSubmission';
@@ -17,7 +17,7 @@ export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
 
 export interface WaitForSend {
-  type: typeof WAIT_FOR_SEND;
+  type: 'WaitForSend';
   transaction: TransactionRequest;
   processId: string;
 }

@@ -10,6 +10,7 @@ import {
 } from './actions';
 import {
   TransactionSubmissionState as TSState,
+  NonTerminalTransactionSubmissionState as NonTerminalTSState,
   waitForSubmission,
   approveRetry,
   waitForConfirmation,
@@ -33,7 +34,7 @@ export interface ReturnVal {
 }
 // call it storage?
 export function transactionReducer(
-  state: TSState,
+  state: NonTerminalTSState,
   storage: SharedData,
   action: TransactionAction,
 ): ReturnVal {
@@ -61,7 +62,7 @@ export function initialize(
   transaction: TransactionRequest,
   processId: string,
   storage: Storage,
-): ReturnVal {
+): { state: NonTerminalTSState; storage: SharedData } {
   storage = queueTransaction(storage, transaction, processId);
   return { state: waitForSend({ transaction, processId }), storage };
 }
@@ -81,7 +82,7 @@ function transactionSubmissionFailed(state: TSState, storage: Storage): ReturnVa
 }
 
 function transactionSubmitted(
-  state: TSState,
+  state: NonTerminalTSState,
   storage: Storage,
   transactionHash: string,
 ): ReturnVal {
@@ -94,7 +95,7 @@ function transactionSubmitted(
   }
 }
 
-function transactionConfirmed(state: TSState, storage: Storage): ReturnVal {
+function transactionConfirmed(state: NonTerminalTSState, storage: Storage): ReturnVal {
   switch (state.type) {
     case WAIT_FOR_CONFIRMATION:
     case WAIT_FOR_SUBMISSION: // in case we didn't hear the TRANSACTION_SUBMITTED
@@ -105,7 +106,7 @@ function transactionConfirmed(state: TSState, storage: Storage): ReturnVal {
   }
 }
 
-function transactionRetryApproved(state: TSState, storage: Storage): ReturnVal {
+function transactionRetryApproved(state: NonTerminalTSState, storage: Storage): ReturnVal {
   if (state.type !== APPROVE_RETRY) {
     return { state, storage };
   }
@@ -114,10 +115,10 @@ function transactionRetryApproved(state: TSState, storage: Storage): ReturnVal {
   return { state: waitForSend({ transaction, processId }), storage };
 }
 
-function transactionRetryDenied(state: TSState, storage: Storage): ReturnVal {
+function transactionRetryDenied(state: NonTerminalTSState, storage: Storage): ReturnVal {
   return { state: failure('User denied retry'), storage };
 }
 
-function transactionFailed(state: TSState, storage: Storage): ReturnVal {
+function transactionFailed(state: NonTerminalTSState, storage: Storage): ReturnVal {
   return { state: failure('Transaction failed'), storage };
 }
