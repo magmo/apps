@@ -32,6 +32,3 @@ function addStories(scenario, chapter) {
     storiesOf(chapter, module).add(key, render(<Resigning state={scenario.states[key]} />));
   });
 }
-
-
-
