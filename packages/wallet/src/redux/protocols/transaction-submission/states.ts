@@ -70,25 +70,27 @@ export function isFailure(state: TransactionSubmissionState): state is Failure {
 // Constructors
 // ------------
 
-export function waitForSend(p: P<WaitForSend>): WaitForSend {
+type Constructor<T> = (p: P<T>) => T;
+
+export const waitForSend: Constructor<WaitForSend> = p => {
   const { transaction, processId } = p;
   return { type: WAIT_FOR_SEND, transaction, processId };
-}
+};
 
-export function waitForSubmission(p: P<WaitForSubmission>): WaitForSubmission {
+export const waitForSubmission: Constructor<WaitForSubmission> = p => {
   const { transaction, processId } = p;
   return { type: WAIT_FOR_SUBMISSION, transaction, processId };
-}
+};
 
-export function approveRetry(p: P<ApproveRetry>): ApproveRetry {
+export const approveRetry: Constructor<ApproveRetry> = p => {
   const { transaction, processId } = p;
   return { type: APPROVE_RETRY, transaction, processId };
-}
+};
 
-export function waitForConfirmation(p: P<WaitForConfirmation>): WaitForConfirmation {
+export const waitForConfirmation: Constructor<WaitForConfirmation> = p => {
   const { transaction, transactionHash, processId } = p;
   return { type: WAIT_FOR_CONFIRMATION, transaction, transactionHash, processId };
-}
+};
 
 export function success(): Success {
   return { type: SUCCESS };
