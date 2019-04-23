@@ -16,7 +16,8 @@ It covers:
 graph TD
   St((start))-->DF{Defundable?}
   DF --> |No| F((Failure))
-  DF --> |Yes| WFU(WaitForLedgerUpdate1)
+  DF -->|Yes|SC[SendLedgerUpdate0]
+ SC-->WFU(WaitForLedgerUpdate)
   WFU --> |"CommitmentReceived(Accept)"| Su((Success))
   WFU --> |"CommitmentReceived(Reject)"| F
 ```
@@ -27,15 +28,13 @@ graph TD
 graph TD
   St((start))-->DF{Defundable?}
   DF --> |No| F((Failure))
-  DF --> |Yes| WFU(WaitForLedgerUpdate0)
-  WFU --> |CommitmentReceived| Su((Success))
+  DF --> |Yes| WFU(WaitForLedgerUpdate)
+  WFU-->|"CommitmentReceived(Accept)"|SC[SendLedgerUpdate1]
+SC-->S((success))
+   WFU --> |"CommitmentReceived(Reject)"| F
 ```
 
 Notes:
 
-- Currently doesn't handle the case where one player approves, one player declines
-
-## Open Questions
-
-1. Is this a top-level protocol? If so what closes the channel?
-2. Can we rely on this being performed co-operatively?
+- SendLedgerUpdate0/1 are not states but indicate when the ledger update is sent.
+- A single reducer implements both the player A and B state machine.
