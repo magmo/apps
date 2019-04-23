@@ -61,6 +61,15 @@ const adjudicatorState: AdjudicatorState = {
     balance: '0x0',
   },
 };
+
+const notClosedAdjudicatorState: AdjudicatorState = {
+  [channelId]: {
+    finalized: false,
+    channelId,
+    balance: '0x0',
+  },
+};
+
 const playerASharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
@@ -71,6 +80,13 @@ const playerBSharedData: SharedData = {
   adjudicatorState,
   channelState: playerBChannelState,
 };
+
+const notDefundableSharedData: SharedData = {
+  ...EMPTY_SHARED_DATA,
+  adjudicatorState: notClosedAdjudicatorState,
+  channelState: playerAChannelState,
+};
+
 const playerACommitmentReceived = actions.commitmentReceived(
   processId,
   ledgerCommitments.ledgerDefundUpdate2,
@@ -89,6 +105,7 @@ const playerBFinalCommitmentReceived = actions.commitmentReceived(
 
 const waitForLedgerUpdate = states.waitForLedgerUpdate({ processId, channelId });
 const waitForFinalLedgerUpdate = states.waitForFinalLedgerUpdate({ processId, channelId });
+const notDefundableFailure = states.failure('Channel Not Closed');
 
 export const playerAHappyPath = {
   processId,
@@ -118,4 +135,13 @@ export const playerBHappyPath = {
     finalCommitmentReceived: playerBFinalCommitmentReceived,
   },
   sharedData: playerBSharedData,
+};
+
+export const notDefundable = {
+  processId,
+  channelId,
+  sharedData: notDefundableSharedData,
+  states: {
+    failure: notDefundableFailure,
+  },
 };

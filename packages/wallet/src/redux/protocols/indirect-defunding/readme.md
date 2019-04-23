@@ -47,8 +47,7 @@ Notes:
 
 1. **Happy Path - Player A** Start->WaitForLedgerUpdate->Success
 2. **Happy Path - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Success
-3. **Not De-fundable - Player A** Start->Failure
-4. **Not De-fundable - Player B** Start->Failure
-5. **Commitment Rejected - Player A** Start->WaitForLedgerUpdate->Failure
-6. **First Commitment Rejected - Player B** Start->WaitForLedgerUpdate->Failure
-7. **Final Commitment Rejected - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Failure
+3. **Not De-fundable** Start->Failure
+4. **Commitment Rejected - Player A** Start->WaitForLedgerUpdate->Failure
+5. **First Commitment Rejected - Player B** Start->WaitForLedgerUpdate->Failure
+6. **Final Commitment Rejected - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Failure

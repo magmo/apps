@@ -78,3 +78,13 @@ describe('player B happy path', () => {
     itTransitionsTo(result, states.SUCCESS);
   });
 });
+
+describe('not defundable', () => {
+  const scenario = scenarios.notDefundable;
+  const { processId, channelId, sharedData } = scenario;
+
+  describe('when initializing', () => {
+    const result = initialize(processId, channelId, sharedData);
+    itTransitionsToFailure(result, scenario.states.failure);
+  });
+});

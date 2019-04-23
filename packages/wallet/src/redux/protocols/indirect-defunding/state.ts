@@ -4,7 +4,8 @@ export const WAIT_FOR_LEDGER_UPDATE = 'WaitForLedgerUpdate';
 export const WAIT_FOR_FINAL_LEDGER_UPDATE = 'WaitForFinalLedgerUpdate';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
-export type FailureReason = 'Received Invalid Commitment';
+
+export type FailureReason = 'Received Invalid Commitment' | 'Channel Not Closed';
 
 export type IndirectDefundingState =
   | WaitForLedgerUpdate
@@ -45,15 +46,15 @@ export function isTerminal(state: IndirectDefundingState): state is Failure | Su
 export function waitForLedgerUpdate(
   properties: Properties<WaitForLedgerUpdate>,
 ): WaitForLedgerUpdate {
-  const { processId } = properties;
-  return { type: WAIT_FOR_LEDGER_UPDATE, processId };
+  const { processId, channelId } = properties;
+  return { type: WAIT_FOR_LEDGER_UPDATE, processId, channelId };
 }
 
 export function waitForFinalLedgerUpdate(
   properties: Properties<WaitForFinalLedgerUpdate>,
 ): WaitForFinalLedgerUpdate {
-  const { processId } = properties;
-  return { type: WAIT_FOR_FINAL_LEDGER_UPDATE, processId };
+  const { processId, channelId } = properties;
+  return { type: WAIT_FOR_FINAL_LEDGER_UPDATE, processId, channelId };
 }
 
 export function success(): Success {
