@@ -14,19 +14,19 @@ const channelDefaults = { ...channel, ...participant };
 import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
 
 const {
-    // signedCommitment19,
+    signedCommitment19,
     signedCommitment20,
     signedCommitment21,
 } = channelScenarios;
 
 
-// const theirTurn = waitForUpdate({
-//   ...channelDefaults,
-//   turnNum: 20,
-//   lastCommitment: signedCommitment20,
-//   penultimateCommitment: signedCommitment19,
-//   funded: true,
-// });
+const theirTurn = waitForUpdate({
+  ...channelDefaults,
+  turnNum: 20,
+  lastCommitment: signedCommitment20,
+  penultimateCommitment: signedCommitment19,
+  funded: true,
+});
 const ourTurn = waitForUpdate({
   ...channelDefaults,
   turnNum: 21,
@@ -41,7 +41,7 @@ const ourTurn = waitForUpdate({
 const processId = 'processId';
 const storage = (channelState: ChannelStatus) => setChannel(EMPTY_SHARED_DATA, channelState);
 
-const defaults = { processId, channelId, storage: storage(ourTurn) };
+const defaults = { processId, channelId };
 
 // ------
 // States
@@ -51,6 +51,9 @@ const waitForOpponentConclude = states.waitForOpponentConclude(defaults);
 const acknowledgeChannelClosed= states.acknowledgeChannelClosed(defaults);
 const waitForDefund = states.waitForDefund(defaults);
 const success = states.success();
+const acknowledgeResignationImpossible = states.acknowledgeResignationImpossible;
+const failure = states.failure({reason: 'NotYourTurn'});
+
 
 // -------
 // Actions
@@ -59,12 +62,15 @@ const concludeSent = actions.concludeSent(processId);
 const concludeReceived = actions.concludeSent(processId);
 const defundChosen = actions.concludeSent(processId);
 const defunded = actions.concludeSent(processId);
+const resignationImpossibleAcknowledged = actions.resignationImpossibleAcknowledged(processId);
+const defundNotChosen = actions.defundChosen(processId);
 
 // -------
 // Scenarios
 // -------
 export const happyPath = {
     ...defaults,
+    storage: storage(ourTurn),
     // states
     approveResignation,
     waitForOpponentConclude,
@@ -76,4 +82,24 @@ export const happyPath = {
     concludeReceived,
     defundChosen,
     defunded,
+  };
+
+  export const resignationNotPossible = {
+    ...defaults,
+    storage: storage(theirTurn),
+    // states
+    acknowledgeResignationImpossible,
+    failure,
+    // actions
+    resignationImpossibleAcknowledged,
+  };
+
+  export const closedButNotDefunded = {
+    ...defaults,
+    storage: storage(ourTurn),
+    // states
+    acknowledgeChannelClosed,
+    success,
+    // actions
+    defundNotChosen,
   };

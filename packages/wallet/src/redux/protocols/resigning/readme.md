@@ -35,6 +35,6 @@ graph TD
 To test all paths through the state machine we will use 3 different scenarios:
 
 1. **Happy path**: `ApproveResignation` -> `WaitForOpponentConclude` -> `AcknowledgeChannelClosed` -> `WaitForDefund` -> `Success`
-2. **Resignation not possible**: `ResignationImpossible` -> `Failure`
+2. **Resignation not possible**: `AcknowledgeResignationImpossible` -> `Failure`
 3. **Closed but not defunded**: `AcknowledgeChannelClosed` -> `Success`
 
