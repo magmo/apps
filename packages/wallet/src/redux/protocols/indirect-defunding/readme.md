@@ -27,15 +27,18 @@ graph TD
 ```mermaid
 graph TD
   St((start))-->WFAp(WaitForApproval)
-  WFAp-->|Approve|WFL
+  WFAp-->|Approve|WFL(WaitForLedgerUpdate)
   WFAp-->|Rejected|F((failure))
   WFL-->SLU[SendLedgerUpdate]
-  SLU-->|WFAc(WaitForAcknowledgement)
+  SLU-->WFAc(WaitForAcknowledgement)
   WFAc-->|Acknowledged|S((success))
 ```
 
 Notes:
 
-## Scenarios
+- Currently doesn't handle the case where one player approves, one player declines
 
-1. **Happy Path** Start->
+## Open Questions
+
+1. Is this a top-level protocol? If so what closes the channel?
+2. Can we rely on this being performed co-operatively?
