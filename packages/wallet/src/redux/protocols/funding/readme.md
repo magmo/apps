@@ -26,9 +26,8 @@ graph TD
   WFSC --> |StrategyChosen| WFSR(WaitForStrategyResponse)
   WFSR --> |StrategyApproved| WFF(WaitForFunding)
   WFF --> |FundingStrategyAction| WFF
-  WFF --> |FundingStrategyAction| WFPFS(WaitForPostFundSetup)
+  WFF --> |FundingStrategyAction| WFSConf(WaitForSuccessConfirmation)
 
-  WFPFS --> |CommitmentReceived| WFSConf(WaitForSuccessConfirmation)
   WFSConf --> |ConfirmSuccess| SS((success))
 
   WFSR --> |StrategyRejected| WFSC
@@ -48,8 +47,7 @@ graph TD
 
   WFSA --> |StrategyApproved| WFF(WaitForFunding)
   WFF --> |FundingStrategyAction| WFF
-  WFF --> |FundingStrategyAction| WFPFS(WaitForPostFundSetup)
-  WFPFS --> |CommitmentReceived| WFSC(WaitForSuccessConfirmation)
+  WFF --> |FundingStrategyAction| WFSC(WaitForSuccessConfirmation)
 
   WFSC --> |ConfirmSuccess| SS((success))
 
@@ -74,7 +72,4 @@ sequenceDiagram
   Note  over A, B: Run indirect funding
   A->>B: type: strategy_communication
   B->>A: type: strategy_communication
-  Note  over A, B: Exchange app PostFundSetup
-  A->>B: type: commitment_received
-  B->>A: type: commitment_received
 ```
