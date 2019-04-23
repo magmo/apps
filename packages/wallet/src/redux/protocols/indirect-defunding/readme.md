@@ -16,9 +16,10 @@ It covers:
 graph TD
   St((start))-->DF{Defundable?}
   DF --> |No| F((Failure))
-  DF -->|Yes|SC[SendLedgerUpdate0]
- SC-->WFU(WaitForLedgerUpdate)
-  WFU --> |"CommitmentReceived(Accept)"| Su((Success))
+  DF -->|Yes|SC0[SendLedgerUpdate0]
+  SC0-->WFU(WaitForLedgerUpdate)
+  WFU --> |"CommitmentReceived(Accept)"|SC1[SendLedgerUpdate2]
+  SC1-->S((success))
   WFU --> |"CommitmentReceived(Reject)"| F
 ```
 
@@ -29,12 +30,25 @@ graph TD
   St((start))-->DF{Defundable?}
   DF --> |No| F((Failure))
   DF --> |Yes| WFU(WaitForLedgerUpdate)
-  WFU-->|"CommitmentReceived(Accept)"|SC[SendLedgerUpdate1]
-SC-->S((success))
-   WFU --> |"CommitmentReceived(Reject)"| F
+  WFU-->|"CommitmentReceived(Accept)"|SC1[SendLedgerUpdate1]
+  WFU --> |"CommitmentReceived(Reject)"| F
+  SC1-->WFFU(WaitForFinalLedgerUpdate)
+  WFFU-->|"CommitmentReceived(Accept)"|S((success))
+  WFFU-->|"CommitmentReceived(Reject)"|F
+
 ```
 
 Notes:
 
 - SendLedgerUpdate0/1 are not states but indicate when the ledger update is sent.
 - A single reducer implements both the player A and B state machine.
+
+## Scenarios
+
+1. **Happy Path - Player A** Start->WaitForLedgerUpdate->Success
+2. **Happy Path - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Success
+3. **Not De-fundable - Player A** Start->Failure
+4. **Not De-fundable - Player B** Start->Failure
+5. **Commitment Rejected - Player A** Start->WaitForLedgerUpdate->Failure
+6. **First Commitment Rejected - Player B** Start->WaitForLedgerUpdate->Failure
+7. **Final Commitment Rejected - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Failure
