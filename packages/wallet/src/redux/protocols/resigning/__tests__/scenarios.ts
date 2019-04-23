@@ -84,11 +84,11 @@ export const resignationNotPossible = {
   ...defaults,
   storage: storage(theirTurn),
   states: {
-  acknowledgeResignationImpossible,
-  failure,
+    acknowledgeResignationImpossible,
+    failure,
   },
   actions: {
-  resignationImpossibleAcknowledged,
+    resignationImpossibleAcknowledged,
   },
 };
 
@@ -96,10 +96,10 @@ export const closedButNotDefunded = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
-  waitForDefund,
-  success,
+    waitForDefund,
+    success,
   },
   actions: {
-  defundNotChosen,
+    defundNotChosen,
   },
 };
