@@ -11,7 +11,8 @@ On success, it should send `FUNDING_SUCCESS` to the app.
 
 Out of scope (for now):
 
-Supporting protocols other than indirect funding
+- Supporting protocols other than indirect funding
+- Recovering from a partially successful process
 
 ## State machine
 
