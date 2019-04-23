@@ -29,6 +29,7 @@ const constructWalletState = (
     protocolState,
     sharedData: {
       outboxState: emptyDisplayOutboxState(),
+      fundingState: {},
       channelState,
       adjudicatorState: {},
     },
