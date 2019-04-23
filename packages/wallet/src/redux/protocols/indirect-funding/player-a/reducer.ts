@@ -36,20 +36,14 @@ import { addHex } from '../../../../utils/hex-utils';
 import { ProtocolStateWithSharedData } from '../../';
 import { SharedData } from '../../../state';
 import { IndirectFundingState } from '../state';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../..//constants';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 
-export function initialize(
-  channel: channelState.ChannelStatus,
-  sharedData: SharedData,
-  consensusLibrary: string, // todo: this should be a global constant
-): ReturnVal {
+export function initialize(channel: channelState.ChannelStatus, sharedData: SharedData): ReturnVal {
   const channelId = channel.channelId;
 
-  const { ledgerChannelState, preFundSetupMessage } = createLedgerChannel(
-    consensusLibrary,
-    channel,
-  );
+  const { ledgerChannelState, preFundSetupMessage } = createLedgerChannel(channel);
   sharedData = initializeChannelState(sharedData, ledgerChannelState);
   sharedData = queueMessage(sharedData, preFundSetupMessage);
 
@@ -297,13 +291,12 @@ const createAndSendFirstUpdateCommitment = (
 };
 
 const createLedgerChannel = (
-  consensusLibrary: string,
   appChannelState: channelState.ChannelStatus,
 ): { ledgerChannelState: channelState.WaitForPreFundSetup; preFundSetupMessage: WalletEvent } => {
   // 1. Determine ledger channel properties
   const nonce = 4; // TODO: Make random
   const { participants, address, privateKey } = appChannelState;
-  const channelType = consensusLibrary;
+  const channelType = CONSENSUS_LIBRARY_ADDRESS;
   const ledgerChannel: Channel = { channelType, nonce, participants };
   const ledgerChannelId = channelID(ledgerChannel);
   const { allocation, destination } = appChannelState.lastCommitment.commitment;

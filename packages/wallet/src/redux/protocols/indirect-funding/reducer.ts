@@ -10,15 +10,11 @@ import { ChannelStatus } from '../../channel-state/state';
 
 type ReturnVal = ProtocolStateWithSharedData<indirectFundingState.IndirectFundingState>;
 
-export function initialize(
-  channel: ChannelStatus,
-  sharedData: SharedData,
-  consensusLibrary: string, // todo: make a global constant
-): ReturnVal {
+export function initialize(channel: ChannelStatus, sharedData: SharedData): ReturnVal {
   const { ourIndex } = channel;
   switch (ourIndex) {
     case PlayerIndex.A:
-      return initializeA(channel, sharedData, consensusLibrary);
+      return initializeA(channel, sharedData);
     case PlayerIndex.B:
       return initializeB(channel, sharedData);
     default:
