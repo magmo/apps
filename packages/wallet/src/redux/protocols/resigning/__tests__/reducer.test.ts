@@ -15,9 +15,8 @@ describe('happy path scenario', () => {
     const state = scenario.approveResignation;
     const action = scenario.concludeSent;
     const result = resigningReducer(state, storage, action);
-
+    // TODO check that the conclude has actually been sent
     itTransitionsTo(result, 'WaitForOpponentConclude');
-    // it initializes the transaction state machine
   });
 
   describe('when in WaitForOpponentConclude', () => {

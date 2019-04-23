@@ -53,11 +53,11 @@ const failure = states.failure({ reason: 'NotYourTurn' });
 // Actions
 // -------
 const concludeSent = actions.concludeSent(processId);
-const concludeReceived = actions.concludeSent(processId);
-const defundChosen = actions.concludeSent(processId);
-const defunded = actions.concludeSent(processId);
+const concludeReceived = actions.concludeReceived(processId);
+const defundChosen = actions.defundChosen(processId);
+const defunded = actions.defunded(processId);
 const resignationImpossibleAcknowledged = actions.resignationImpossibleAcknowledged(processId);
-const defundNotChosen = actions.defundChosen(processId);
+const defundNotChosen = actions.defundNotChosen(processId);
 
 // -------
 // Scenarios
