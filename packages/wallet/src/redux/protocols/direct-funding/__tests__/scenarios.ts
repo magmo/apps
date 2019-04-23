@@ -63,7 +63,7 @@ const waitForFundingChannelState = channelStates.waitForFundingAndPostFundSetup(
 
 // Direct funding state machine states
 const defaultsForA: states.DirectFundingState = {
-  processId: `direct-funding.${channelId}`,
+  processId: `processId.${channelId}`,
   requestedTotalFunds: TOTAL_REQUIRED,
   requestedYourContribution: YOUR_DEPOSIT_A,
   channelId,
