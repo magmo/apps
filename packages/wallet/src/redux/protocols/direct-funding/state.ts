@@ -43,9 +43,7 @@ export interface FundingSuccess extends BaseDirectFundingState {
   type: typeof FUNDING_SUCCESS;
 }
 // constructors
-export function baseDirectFundingState(
-  params: Properties<BaseDirectFundingState>,
-): BaseDirectFundingState {
+export const baseDirectFundingState: Constructor<BaseDirectFundingState> = params => {
   const {
     requestedTotalFunds,
     requestedYourContribution,
@@ -62,13 +60,13 @@ export function baseDirectFundingState(
     safeToDepositLevel,
     type: channelFundingStatus,
   };
-}
-export function notSafeToDeposit(params: Properties<BaseDirectFundingState>): NotSafeToDeposit {
+};
+export const notSafeToDeposit: Constructor<NotSafeToDeposit> = params => {
   return {
     ...baseDirectFundingState(params),
     type: NOT_SAFE_TO_DEPOSIT,
   };
-}
+};
 export function waitForDepositTransaction(
   params: Properties<WaitForDepositTransaction>,
 ): WaitForDepositTransaction {
@@ -89,12 +87,12 @@ export const waitForFundingAndPostFundSetup: Constructor<
     type: WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
   };
 };
-export function fundingSuccess(params: Properties<BaseDirectFundingState>): FundingSuccess {
+export const fundingSuccess: Constructor<FundingSuccess> = params => {
   return {
     ...baseDirectFundingState(params),
     type: FUNDING_SUCCESS,
   };
-}
+};
 export type DirectFundingState =
   | NotSafeToDeposit
   | WaitForDepositTransaction
