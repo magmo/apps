@@ -14,24 +14,21 @@ It covers:
 
 ```mermaid
 graph TD
-  St((start))-->WFAp(WaitForApproval)
-  WFAp-->|Approve|SLU[SendLedgerUpdate]
-  WFAp-->|Rejected|F((failure))
-  SLU-->WFL(WaitForLedgerUpdate)
-  WFL-->|LedgerUpdateReceived|WFAc(WaitForAcknowledgement)
-  WFAc-->|Acknowledged|S((success))
+  St((start))-->DF{Defundable?}
+  DF --> |No| F((Failure))
+  DF --> |Yes| WFU(WaitForLedgerUpdate1)
+  WFU --> |"CommitmentReceived(Accept)"| Su((Success))
+  WFU --> |"CommitmentReceived(Reject)"| F
 ```
 
 ### Player B State machine
 
 ```mermaid
 graph TD
-  St((start))-->WFAp(WaitForApproval)
-  WFAp-->|Approve|WFL(WaitForLedgerUpdate)
-  WFAp-->|Rejected|F((failure))
-  WFL-->SLU[SendLedgerUpdate]
-  SLU-->WFAc(WaitForAcknowledgement)
-  WFAc-->|Acknowledged|S((success))
+  St((start))-->DF{Defundable?}
+  DF --> |No| F((Failure))
+  DF --> |Yes| WFU(WaitForLedgerUpdate0)
+  WFU --> |CommitmentReceived| Su((Success))
 ```
 
 Notes:
