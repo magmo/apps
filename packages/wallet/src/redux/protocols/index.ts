@@ -5,6 +5,7 @@ import { SharedData } from '../state';
 import { RespondingState } from './responding/state';
 import { FundingState } from './funding/states';
 import { DefundingState } from './defunding/state';
+import { IndirectDefundingState } from './indirect-defunding/state';
 
 export type ProtocolState =
   | IndirectFundingState
@@ -12,7 +13,8 @@ export type ProtocolState =
   | WithdrawalState
   | RespondingState
   | FundingState
-  | DefundingState;
+  | DefundingState
+  | IndirectDefundingState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
   protocolState: T,

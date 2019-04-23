@@ -14,10 +14,12 @@ export type IndirectDefundingState =
 export interface WaitForLedgerUpdate {
   type: typeof WAIT_FOR_LEDGER_UPDATE;
   processId: string;
+  channelId: string;
 }
 export interface WaitForFinalLedgerUpdate {
   type: typeof WAIT_FOR_FINAL_LEDGER_UPDATE;
   processId: string;
+  channelId: string;
 }
 
 export interface Failure {

@@ -1,3 +1,3 @@
 import { CommitmentReceived } from '../../actions';
 
-export type IndirectFundingAction = CommitmentReceived;
+export type IndirectDefundingAction = CommitmentReceived;
