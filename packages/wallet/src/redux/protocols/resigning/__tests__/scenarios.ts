@@ -46,7 +46,7 @@ const waitForOpponentConclude = states.waitForOpponentConclude(defaults);
 const acknowledgeChannelClosed = states.acknowledgeChannelClosed(defaults);
 const waitForDefund = states.waitForDefund(defaults);
 const success = states.success();
-const acknowledgeResignationImpossible = states.acknowledgeResignationImpossible;
+const acknowledgeResignationImpossible = states.acknowledgeResignationImpossible(defaults);
 const failure = states.failure({ reason: 'NotYourTurn' });
 
 // -------
@@ -92,7 +92,7 @@ export const closedButNotDefunded = {
   ...defaults,
   storage: storage(ourTurn),
   // states
-  acknowledgeChannelClosed,
+  waitForDefund,
   success,
   // actions
   defundNotChosen,

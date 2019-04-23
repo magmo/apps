@@ -25,9 +25,23 @@ const render = container => () => {
 
 const happyPath = {
   ApproveResignation: scenarios.happyPath.approveResignation,
+  WaitForOpponentConclude: scenarios.happyPath.waitForOpponentConclude,
+  AcknowledgeChannelClosed: scenarios.happyPath.acknowledgeChannelClosed,
+  WaitForDefund: scenarios.happyPath.waitForDefund,
+};
+
+const resignationNotPossible = {
+  AcknowledgeResignationImpossible:
+    scenarios.resignationNotPossible.acknowledgeResignationImpossible,
+};
+
+const closedButNotDefunded = {
+  WaitForDefund: scenarios.closedButNotDefunded.waitForDefund,
 };
 
 addStories(happyPath, 'Resigning / Happy Path');
+addStories(resignationNotPossible, 'Resigning / Resignation Not Possible');
+addStories(closedButNotDefunded, 'Resigning / Closed But Not Defunded');
 
 function addStories(collection, chapter) {
   Object.keys(collection).map(storyName => {
