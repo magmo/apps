@@ -17,8 +17,11 @@ describe('Rock paper Scissors', () => {
   let rpsContract;
 
   let postFundSetupB: RPSCommitment;
+  let postFundSetupB2: RPSCommitment;
   let propose: RPSCommitment;
   let propose2: RPSCommitment;
+  let propose3: RPSCommitment;
+
   let accept: RPSCommitment;
   let reveal: RPSCommitment;
   let resting: RPSCommitment;
@@ -33,8 +36,10 @@ describe('Rock paper Scissors', () => {
     const account2 = ethers.Wallet.createRandom();
     const scenario = scenarios.build(libraryAddress, account1.address, account2.address);
     postFundSetupB = scenario.postFundSetupB;
+    postFundSetupB2 = scenario.postFundSetupB2;
     propose = scenario.propose;
     propose2 = scenario.propose2;
+    propose3 = scenario.propose3;
     accept = scenario.accept;
     reveal = scenario.reveal;
     resting = scenario.resting;
@@ -84,8 +89,7 @@ describe('Rock paper Scissors', () => {
     );
   });
 
-  it('disallows transitions where resolution changes incorrectly', async () => {
-    reveal.stake = bigNumberify(88).toHexString();
+  it('disallows transitions where the allocations changes incorrectly', async () => {
     const coreCommitment1 = asCoreCommitment(postFundSetupB);
     const coreCommitment2 = asCoreCommitment(propose2);
     expect.assertions(1);
@@ -95,7 +99,21 @@ describe('Rock paper Scissors', () => {
           asEthersObject(coreCommitment1),
           asEthersObject(coreCommitment2),
         ),
-      'The resolution for player A must be the same between commitments',
+      'The allocation for player A must be the same between commitments',
+    );
+  });
+
+  it('disallows a stake that the players cannot afford', async () => {
+    const coreCommitment1 = asCoreCommitment(postFundSetupB2);
+    const coreCommitment2 = asCoreCommitment(propose3);
+    expect.assertions(1);
+    await expectRevert(
+      () =>
+        rpsContract.validTransition(
+          asEthersObject(coreCommitment1),
+          asEthersObject(coreCommitment2),
+        ),
+      'The allocation for player A must not fall below the stake.',
     );
   });
 });

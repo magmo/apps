@@ -260,6 +260,13 @@ export function build(
       allocation: fiveFive,
       commitmentCount: 1,
     }),
+    postFundSetupB2: commitmentHelper.postFundSetupB({
+      ...baseWithBuyIn,
+      turnNum: 3,
+      allocation: fiveFive,
+      commitmentCount: 1,
+      roundBuyIn: bigNumberify(100).toHexString(),
+    }),
     aWeapon,
     salt,
     preCommit,
@@ -279,6 +286,14 @@ export function build(
       allocation: fourSix,
       aWeapon,
       salt,
+    }),
+    propose3: commitmentHelper.proposeFromSalt({
+      ...baseWithBuyIn,
+      turnNum: 4,
+      allocation: fiveFive,
+      aWeapon,
+      salt,
+      roundBuyIn: bigNumberify(100).toHexString(),
     }),
     accept: commitmentHelper.accept({
       ...baseWithBuyIn,
