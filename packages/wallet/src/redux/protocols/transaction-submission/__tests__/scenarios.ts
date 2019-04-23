@@ -21,8 +21,8 @@ const waitForSend2 = states.waitForSubmission(props);
 const waitForConfirmation = states.waitForConfirmation(props);
 const success = states.success();
 const approveRetry = states.approveRetry(props);
-const failure = states.failure('User refused');
-const failure2 = states.failure('Transaction failed');
+const failure = states.failure('UserDeclinedRetry');
+const failure2 = states.failure('TransactionFailed');
 
 // -------
 // Actions

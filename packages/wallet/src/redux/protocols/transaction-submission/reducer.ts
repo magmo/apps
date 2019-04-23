@@ -112,9 +112,9 @@ function transactionRetryApproved(state: NonTerminalTSState, storage: Storage): 
 }
 
 function transactionRetryDenied(state: NonTerminalTSState, storage: Storage): ReturnVal {
-  return { state: failure('User denied retry'), storage };
+  return { state: failure('UserDeclinedRetry'), storage };
 }
 
 function transactionFailed(state: NonTerminalTSState, storage: Storage): ReturnVal {
-  return { state: failure('Transaction failed'), storage };
+  return { state: failure('TransactionFailed'), storage };
 }

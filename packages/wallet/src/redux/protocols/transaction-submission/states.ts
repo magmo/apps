@@ -9,6 +9,8 @@ export type NonTerminalTransactionSubmissionState =
   | WaitForConfirmation
   | ApproveRetry;
 
+export type FailureReason = 'TransactionFailed' | 'UserDeclinedRetry';
+
 export interface WaitForSend {
   type: 'WaitForSend';
   transaction: TransactionRequest;
@@ -36,7 +38,7 @@ export interface ApproveRetry {
 
 export interface Failure {
   type: 'Failure';
-  reason: string;
+  reason: FailureReason;
 }
 
 export interface Success {
@@ -89,6 +91,6 @@ export function success(): Success {
   return { type: 'Success' };
 }
 
-export function failure(reason: string): Failure {
+export function failure(reason: FailureReason): Failure {
   return { type: 'Failure', reason };
 }
