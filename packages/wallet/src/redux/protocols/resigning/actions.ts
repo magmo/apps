@@ -1,4 +1,4 @@
-export type ResignationAction = 
+export type ResigningAction = 
     | ConcludeSent
     | ResignationImpossibleAcknowledged
     | ConcludeReceived
