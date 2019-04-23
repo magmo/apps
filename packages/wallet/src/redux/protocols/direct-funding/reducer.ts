@@ -11,6 +11,7 @@ import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import * as selectors from '../../selectors';
 import { SharedData } from '../../state';
 import { WalletProtocol, PlayerIndex } from '../../types';
+// TODO: should not use any indirect funding helpers
 import { updateChannelState } from '../indirect-funding/reducer-helpers';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
@@ -225,6 +226,7 @@ const createAndSendPostFundCommitment = (sharedData: SharedData, channelId: stri
 
   let newSharedData = updateChannelState(
     sharedData,
+    // TODO: this might not be the correct action to use
     channelActions.ownCommitmentReceived(commitment),
   );
 

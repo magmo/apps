@@ -1,3 +1,9 @@
+/* 
+TODO Remaining work:
+- Check outgoing postfund messages.
+- Transaction failure testing.  
+ */
+
 import { addHex } from '../../../../utils/hex-utils';
 import * as actions from '../../../actions';
 import { itTransitionsToStateType } from '../../../__tests__/helpers';
