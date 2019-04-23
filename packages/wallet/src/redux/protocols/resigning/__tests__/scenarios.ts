@@ -65,35 +65,41 @@ const defundNotChosen = actions.defundNotChosen(processId);
 export const happyPath = {
   ...defaults,
   storage: storage(ourTurn),
-  // states
-  approveResignation,
-  waitForOpponentConclude,
-  acknowledgeChannelClosed,
-  waitForDefund,
-  success,
-  // actions
-  concludeSent,
-  concludeReceived,
-  defundChosen,
-  defunded,
+  states: {
+    approveResignation,
+    waitForOpponentConclude,
+    acknowledgeChannelClosed,
+    waitForDefund,
+    success,
+  },
+  actions: {
+    concludeSent,
+    concludeReceived,
+    defundChosen,
+    defunded,
+  },
 };
 
 export const resignationNotPossible = {
   ...defaults,
   storage: storage(theirTurn),
-  // states
+  states: {
   acknowledgeResignationImpossible,
   failure,
-  // actions
+  },
+  actions: {
   resignationImpossibleAcknowledged,
+  },
 };
 
 export const closedButNotDefunded = {
   ...defaults,
   storage: storage(ourTurn),
-  // states
+  states: {
   waitForDefund,
   success,
-  // actions
+  },
+  actions: {
   defundNotChosen,
+  },
 };

@@ -24,19 +24,19 @@ const render = container => () => {
 };
 
 const happyPath = {
-  ApproveResignation: scenarios.happyPath.approveResignation,
-  WaitForOpponentConclude: scenarios.happyPath.waitForOpponentConclude,
-  AcknowledgeChannelClosed: scenarios.happyPath.acknowledgeChannelClosed,
-  WaitForDefund: scenarios.happyPath.waitForDefund,
+  ApproveResignation: scenarios.happyPath.states.approveResignation,
+  WaitForOpponentConclude: scenarios.happyPath.states.waitForOpponentConclude,
+  AcknowledgeChannelClosed: scenarios.happyPath.states.acknowledgeChannelClosed,
+  WaitForDefund: scenarios.happyPath.states.waitForDefund,
 };
 
 const resignationNotPossible = {
   AcknowledgeResignationImpossible:
-    scenarios.resignationNotPossible.acknowledgeResignationImpossible,
+    scenarios.resignationNotPossible.states.acknowledgeResignationImpossible,
 };
 
 const closedButNotDefunded = {
-  WaitForDefund: scenarios.closedButNotDefunded.waitForDefund,
+  WaitForDefund: scenarios.closedButNotDefunded.states.waitForDefund,
 };
 
 addStories(happyPath, 'Resigning / Happy Path');
