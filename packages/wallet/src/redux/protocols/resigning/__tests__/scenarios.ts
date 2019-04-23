@@ -13,12 +13,7 @@ import { ChannelStatus, waitForUpdate } from '../../../channel-state/state';
 const channelDefaults = { ...channel, ...participant };
 import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
 
-const {
-    signedCommitment19,
-    signedCommitment20,
-    signedCommitment21,
-} = channelScenarios;
-
+const { signedCommitment19, signedCommitment20, signedCommitment21 } = channelScenarios;
 
 const theirTurn = waitForUpdate({
   ...channelDefaults,
@@ -48,12 +43,11 @@ const defaults = { processId, channelId };
 // ------
 const approveResignation = states.approveResignation(defaults);
 const waitForOpponentConclude = states.waitForOpponentConclude(defaults);
-const acknowledgeChannelClosed= states.acknowledgeChannelClosed(defaults);
+const acknowledgeChannelClosed = states.acknowledgeChannelClosed(defaults);
 const waitForDefund = states.waitForDefund(defaults);
 const success = states.success();
 const acknowledgeResignationImpossible = states.acknowledgeResignationImpossible;
-const failure = states.failure({reason: 'NotYourTurn'});
-
+const failure = states.failure({ reason: 'NotYourTurn' });
 
 // -------
 // Actions
@@ -69,37 +63,37 @@ const defundNotChosen = actions.defundChosen(processId);
 // Scenarios
 // -------
 export const happyPath = {
-    ...defaults,
-    storage: storage(ourTurn),
-    // states
-    approveResignation,
-    waitForOpponentConclude,
-    acknowledgeChannelClosed,
-    waitForDefund,
-    success,
-    // actions
-    concludeSent,
-    concludeReceived,
-    defundChosen,
-    defunded,
-  };
+  ...defaults,
+  storage: storage(ourTurn),
+  // states
+  approveResignation,
+  waitForOpponentConclude,
+  acknowledgeChannelClosed,
+  waitForDefund,
+  success,
+  // actions
+  concludeSent,
+  concludeReceived,
+  defundChosen,
+  defunded,
+};
 
-  export const resignationNotPossible = {
-    ...defaults,
-    storage: storage(theirTurn),
-    // states
-    acknowledgeResignationImpossible,
-    failure,
-    // actions
-    resignationImpossibleAcknowledged,
-  };
+export const resignationNotPossible = {
+  ...defaults,
+  storage: storage(theirTurn),
+  // states
+  acknowledgeResignationImpossible,
+  failure,
+  // actions
+  resignationImpossibleAcknowledged,
+};
 
-  export const closedButNotDefunded = {
-    ...defaults,
-    storage: storage(ourTurn),
-    // states
-    acknowledgeChannelClosed,
-    success,
-    // actions
-    defundNotChosen,
-  };
+export const closedButNotDefunded = {
+  ...defaults,
+  storage: storage(ourTurn),
+  // states
+  acknowledgeChannelClosed,
+  success,
+  // actions
+  defundNotChosen,
+};
