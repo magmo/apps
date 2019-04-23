@@ -1,6 +1,6 @@
 import * as scenarios from './scenarios';
-import { resigningReducer, initialize, ReturnVal } from '../reducer';
-import { ResigningStateType } from '../states';
+import { concludingReducer, initialize, ReturnVal } from '../reducer';
+import { ConcludingStateType } from '../states';
 
 describe('happy path scenario', () => {
   const scenario = scenarios.happyPath;
@@ -9,12 +9,12 @@ describe('happy path scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'ApproveResignation');
+    itTransitionsTo(result, 'ApproveConcluding');
   });
-  describe('when in ApproveResignation', () => {
-    const state = scenario.states.approveResignation;
+  describe('when in ApproveConcluding', () => {
+    const state = scenario.states.approveConcluding;
     const action = scenario.actions.concludeSent;
-    const result = resigningReducer(state, storage, action);
+    const result = concludingReducer(state, storage, action);
     // TODO check that the conclude has actually been sent
     itTransitionsTo(result, 'WaitForOpponentConclude');
   });
@@ -22,15 +22,15 @@ describe('happy path scenario', () => {
   describe('when in WaitForOpponentConclude', () => {
     const state = scenario.states.waitForOpponentConclude;
     const action = scenario.actions.concludeReceived;
-    const result = resigningReducer(state, storage, action);
+    const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeChannelClosed');
+    itTransitionsTo(result, 'AcknowledgeChannelConcluded');
   });
 
-  describe('when in AcknowledgeChannelClosed', () => {
-    const state = scenario.states.acknowledgeChannelClosed;
+  describe('when in AcknowledgeChannelConcluded', () => {
+    const state = scenario.states.acknowledgeChannelConcluded;
     const action = scenario.actions.defundChosen;
-    const result = resigningReducer(state, storage, action);
+    const result = concludingReducer(state, storage, action);
 
     itTransitionsTo(result, 'WaitForDefund');
   });
@@ -38,13 +38,13 @@ describe('happy path scenario', () => {
   describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund;
     const action = scenario.actions.defunded;
-    const result = resigningReducer(state, storage, action);
+    const result = concludingReducer(state, storage, action);
 
     itTransitionsTo(result, 'Success');
   });
 });
 
-function itTransitionsTo(result: ReturnVal, type: ResigningStateType) {
+function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
   });

@@ -1,36 +1,36 @@
 import {
-  ResigningState as RState,
-  NonTerminalState as NonTerminalRState,
-  approveResignation,
+  ConcludingState as CState,
+  NonTerminalState as NonTerminalCState,
+  approveConcluding,
   failure,
-  acknowledgeResignationImpossible,
+  acknowledgeConcludingImpossible,
   waitForOpponentConclude,
-  acknowledgeChannelClosed,
+  acknowledgeChannelConcluded,
   waitForDefund,
   success,
 } from './states';
-import { ResigningAction } from './actions';
+import { ConcludingAction } from './actions';
 import { unreachable, ourTurn } from '../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../state';
 
 type Storage = SharedData;
 
 export interface ReturnVal {
-  state: RState;
+  state: CState;
   storage: Storage;
 }
 
-export function resigningReducer(
-  state: NonTerminalRState,
+export function concludingReducer(
+  state: NonTerminalCState,
   storage: SharedData,
-  action: ResigningAction,
+  action: ConcludingAction,
 ): ReturnVal {
   switch (action.type) {
-    case 'RESIGNING.CANCELLED':
-      return resigningCancelled(state, storage);
+    case 'CONCLUDING.CANCELLED':
+      return concludingCancelled(state, storage);
     case 'CONCLUDE.SENT':
       return concludeSent(state, storage);
-    case 'RESIGNATION.IMPOSSIBLE.ACKNOWLEDGED':
+    case 'CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED':
       return resignationImpossibleAcknowledged(state, storage);
     case 'CONCLUDE.RECEIVED':
       return concludeReceived(state, storage);
@@ -52,27 +52,27 @@ export function initialize(channelId: string, processId: string, storage: Storag
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
-    return { state: approveResignation({ channelId, processId }), storage };
+    return { state: approveConcluding({ channelId, processId }), storage };
   } else {
-    return { state: acknowledgeResignationImpossible({ channelId, processId }), storage };
+    return { state: acknowledgeConcludingImpossible({ channelId, processId }), storage };
   }
 }
 
-function resigningCancelled(state: NonTerminalRState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveResignation') {
+function concludingCancelled(state: NonTerminalCState, storage: Storage): ReturnVal {
+  if (state.type !== 'ApproveConcluding') {
     return { state, storage };
   }
   return { state: failure({ reason: 'ResignCancelled' }), storage };
 }
-function resignationImpossibleAcknowledged(state: NonTerminalRState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeResignationImpossible') {
+function resignationImpossibleAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
+  if (state.type !== 'AcknowledgeConcludingImpossible') {
     return { state, storage };
   }
   return { state: failure({ reason: 'NotYourTurn' }), storage };
 }
 
-function concludeSent(state: NonTerminalRState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveResignation') {
+function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
+  if (state.type !== 'ApproveConcluding') {
     return { state, storage };
   }
   return { state: waitForOpponentConclude(state), storage };
@@ -80,28 +80,28 @@ function concludeSent(state: NonTerminalRState, storage: Storage): ReturnVal {
   // TODO send to opponent
 }
 
-function concludeReceived(state: NonTerminalRState, storage: Storage): ReturnVal {
+function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'WaitForOpponentConclude') {
     return { state, storage };
   }
-  return { state: acknowledgeChannelClosed(state), storage };
+  return { state: acknowledgeChannelConcluded(state), storage };
 }
 
-function defundChosen(state: NonTerminalRState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeChannelClosed') {
+function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
+  if (state.type !== 'AcknowledgeChannelConcluded') {
     return { state, storage };
   }
   return { state: waitForDefund(state), storage };
 }
 
-function defundNotChosen(state: NonTerminalRState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeChannelClosed') {
+function defundNotChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
+  if (state.type !== 'AcknowledgeChannelConcluded') {
     return { state, storage };
   }
   return { state: success(), storage };
 }
 
-function defunded(state: NonTerminalRState, storage: Storage): ReturnVal {
+function defunded(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'WaitForDefund') {
     return { state, storage };
   }

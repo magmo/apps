@@ -10,11 +10,9 @@ export default class ApproveDefunding extends React.PureComponent<Props> {
     const { approve } = this.props;
     return (
       <Fragment>
-        <h1>Channel closed</h1>
+        <h1>Channel concluded</h1>
 
         <p>Do you want to defund this channel?</p>
-
-        {/* <Button onClick={deny}>No</Button> */}
         <Button onClick={approve}>Defund</Button>
       </Fragment>
     );

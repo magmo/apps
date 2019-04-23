@@ -2,7 +2,7 @@ import { storiesOf } from '@storybook/react';
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
-import { Resigning } from '..';
+import { Concluding } from '..';
 import { fakeStore } from '../../../../__stories__/index';
 import StatusBarLayout from '../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
@@ -23,12 +23,12 @@ const render = container => () => {
   );
 };
 
-addStories(scenarios.happyPath, 'Resigning / Happy Path');
-addStories(scenarios.resignationNotPossible, 'Resigning / Resignation Not Possible');
-addStories(scenarios.closedButNotDefunded, 'Resigning / Closed But Not Defunded');
+addStories(scenarios.happyPath, 'Concluding / Happy Path');
+addStories(scenarios.resignationNotPossible, 'Concluding / Concluding Not Possible');
+addStories(scenarios.closedButNotDefunded, 'Concluding / Closed But Not Defunded');
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {
-    storiesOf(chapter, module).add(key, render(<Resigning state={scenario.states[key]} />));
+    storiesOf(chapter, module).add(key, render(<Concluding state={scenario.states[key]} />));
   });
 }

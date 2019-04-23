@@ -41,12 +41,12 @@ const defaults = { processId, channelId };
 // ------
 // States
 // ------
-const approveResignation = states.approveResignation(defaults);
+const approveConcluding = states.approveConcluding(defaults);
 const waitForOpponentConclude = states.waitForOpponentConclude(defaults);
-const acknowledgeChannelClosed = states.acknowledgeChannelClosed(defaults);
+const acknowledgeChannelConcluded = states.acknowledgeChannelConcluded(defaults);
 const waitForDefund = states.waitForDefund(defaults);
 const success = states.success();
-const acknowledgeResignationImpossible = states.acknowledgeResignationImpossible(defaults);
+const acknowledgeConcludingImpossible = states.acknowledgeConcludingImpossible(defaults);
 const failure = states.failure({ reason: 'NotYourTurn' });
 
 // -------
@@ -66,9 +66,9 @@ export const happyPath = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
-    approveResignation,
+    approveConcluding,
     waitForOpponentConclude,
-    acknowledgeChannelClosed,
+    acknowledgeChannelConcluded,
     waitForDefund,
     success,
   },
@@ -84,7 +84,7 @@ export const resignationNotPossible = {
   ...defaults,
   storage: storage(theirTurn),
   states: {
-    acknowledgeResignationImpossible,
+    acknowledgeConcludingImpossible,
     failure,
   },
   actions: {

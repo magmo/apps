@@ -6,7 +6,7 @@ export default class WaitForOpponentConclude extends React.PureComponent {
       <Fragment>
         <h1>Waiting for opponent...</h1>
 
-        <p>They will agree to close the channel.</p>
+        <p>They will agree to conclude the channel.</p>
       </Fragment>
     );
   }

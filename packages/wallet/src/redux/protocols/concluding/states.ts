@@ -1,25 +1,25 @@
 import { Properties as P } from '../../utils';
 
-export type ResigningState = NonTerminalState | TerminalState;
-export type ResigningStateType = ResigningState['type'];
+export type ConcludingState = NonTerminalState | TerminalState;
+export type ConcludingStateType = ConcludingState['type'];
 
 export type NonTerminalState =
-  | AcknowledgeResignationImpossible
-  | ApproveResignation
+  | AcknowledgeConcludingImpossible
+  | ApproveConcluding
   | WaitForOpponentConclude
-  | AcknowledgeChannelClosed
+  | AcknowledgeChannelConcluded
   | WaitForDefund;
 
 export type TerminalState = Success | Failure;
 
 export type FailureReason = 'NotYourTurn' | 'ChannelDoesntExist' | 'ResignCancelled';
 
-export interface AcknowledgeResignationImpossible {
-  type: 'AcknowledgeResignationImpossible';
+export interface AcknowledgeConcludingImpossible {
+  type: 'AcknowledgeConcludingImpossible';
   processId: string;
 }
-export interface ApproveResignation {
-  type: 'ApproveResignation';
+export interface ApproveConcluding {
+  type: 'ApproveConcluding';
   processId: string;
 }
 
@@ -28,8 +28,8 @@ export interface WaitForOpponentConclude {
   processId: string;
 }
 
-export interface AcknowledgeChannelClosed {
-  type: 'AcknowledgeChannelClosed';
+export interface AcknowledgeChannelConcluded {
+  type: 'AcknowledgeChannelConcluded';
   processId: string;
 }
 
@@ -51,31 +51,31 @@ export interface Success {
 // Helpers
 // -------
 
-export function isTerminal(state: ResigningState): state is Failure | Success {
+export function isTerminal(state: ConcludingState): state is Failure | Success {
   return state.type === 'Failure' || state.type === 'Success';
 }
 
-export function isSuccess(state: ResigningState): state is Success {
+export function isSuccess(state: ConcludingState): state is Success {
   return state.type === 'Success';
 }
 
-export function isFailure(state: ResigningState): state is Failure {
+export function isFailure(state: ConcludingState): state is Failure {
   return state.type === 'Failure';
 }
 
 // ------------
 // Constructors
 // ------------
-export function acknowledgeResignationImpossible(
-  p: P<AcknowledgeResignationImpossible>,
-): AcknowledgeResignationImpossible {
+export function acknowledgeConcludingImpossible(
+  p: P<AcknowledgeConcludingImpossible>,
+): AcknowledgeConcludingImpossible {
   const { processId } = p;
-  return { type: 'AcknowledgeResignationImpossible', processId };
+  return { type: 'AcknowledgeConcludingImpossible', processId };
 }
 
-export function approveResignation(p: P<ApproveResignation>): ApproveResignation {
+export function approveConcluding(p: P<ApproveConcluding>): ApproveConcluding {
   const { processId } = p;
-  return { type: 'ApproveResignation', processId };
+  return { type: 'ApproveConcluding', processId };
 }
 
 export function waitForOpponentConclude(p: P<WaitForOpponentConclude>): WaitForOpponentConclude {
@@ -83,9 +83,9 @@ export function waitForOpponentConclude(p: P<WaitForOpponentConclude>): WaitForO
   return { type: 'WaitForOpponentConclude', processId };
 }
 
-export function acknowledgeChannelClosed(p: P<AcknowledgeChannelClosed>): AcknowledgeChannelClosed {
+export function acknowledgeChannelConcluded(p: P<AcknowledgeChannelConcluded>): AcknowledgeChannelConcluded {
   const { processId } = p;
-  return { type: 'AcknowledgeChannelClosed', processId };
+  return { type: 'AcknowledgeChannelConcluded', processId };
 }
 
 export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {
