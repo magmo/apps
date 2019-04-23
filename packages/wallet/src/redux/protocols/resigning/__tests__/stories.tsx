@@ -23,29 +23,15 @@ const render = container => () => {
   );
 };
 
-const happyPath = {
-  ApproveResignation: scenarios.happyPath.states.approveResignation,
-  WaitForOpponentConclude: scenarios.happyPath.states.waitForOpponentConclude,
-  AcknowledgeChannelClosed: scenarios.happyPath.states.acknowledgeChannelClosed,
-  WaitForDefund: scenarios.happyPath.states.waitForDefund,
-};
+addStories(scenarios.happyPath, 'Resigning / Happy Path');
+addStories(scenarios.resignationNotPossible, 'Resigning / Resignation Not Possible');
+addStories(scenarios.closedButNotDefunded, 'Resigning / Closed But Not Defunded');
 
-const resignationNotPossible = {
-  AcknowledgeResignationImpossible:
-    scenarios.resignationNotPossible.states.acknowledgeResignationImpossible,
-};
-
-const closedButNotDefunded = {
-  WaitForDefund: scenarios.closedButNotDefunded.states.waitForDefund,
-};
-
-addStories(happyPath, 'Resigning / Happy Path');
-addStories(resignationNotPossible, 'Resigning / Resignation Not Possible');
-addStories(closedButNotDefunded, 'Resigning / Closed But Not Defunded');
-
-function addStories(collection, chapter) {
-  Object.keys(collection).map(storyName => {
-    const state = collection[storyName];
-    storiesOf(chapter, module).add(storyName, render(<Resigning state={state} />));
+function addStories(scenario, chapter) {
+  Object.keys(scenario.states).forEach(key => {
+    storiesOf(chapter, module).add(key, render(<Resigning state={scenario.states[key]} />));
   });
 }
+
+
+
