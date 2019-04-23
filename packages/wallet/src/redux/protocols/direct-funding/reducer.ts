@@ -11,8 +11,7 @@ import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import * as selectors from '../../selectors';
 import { SharedData } from '../../state';
 import { WalletProtocol, PlayerIndex } from '../../types';
-// TODO: should not use any indirect funding helpers
-import { updateChannelState } from '../indirect-funding/reducer-helpers';
+import { updateChannelState } from '../reducer-helpers';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
