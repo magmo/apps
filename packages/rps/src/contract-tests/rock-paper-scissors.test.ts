@@ -89,7 +89,7 @@ describe('Rock paper Scissors', () => {
     );
   });
 
-  it('disallows transitions where the allocations changes incorrectly', async () => {
+  it('disallows transitions where the allocations change incorrectly', async () => {
     const coreCommitment1 = asCoreCommitment(postFundSetupB);
     const coreCommitment2 = asCoreCommitment(propose2);
     expect.assertions(1);
@@ -115,5 +115,25 @@ describe('Rock paper Scissors', () => {
         ),
       'The allocation for player A must not fall below the stake.',
     );
+  });
+
+
+  // The following scenario is highly notional, since the situation should (and is) prevented from occuring at the Propose stage
+  it('Reverts an underflow via SafeMath', async () => {
+    reveal.stake = accept.stake = bigNumberify(20).toHexString();
+    accept.allocation = [bigNumberify(0).toHexString(), bigNumberify(0).toHexString()] as [string, string];
+    reveal.allocation = [bigNumberify(40).toHexString(), bigNumberify(0).toHexString()] as [string, string];
+
+    const coreCommitment1 = asCoreCommitment(accept);
+    const coreCommitment2 = asCoreCommitment(reveal);
+    expect.assertions(1);
+    await expectRevert(
+      () =>
+        rpsContract.validTransition(
+          asEthersObject(coreCommitment1),
+          asEthersObject(coreCommitment2),
+        ),
+      'revert',
+    ); // Note that SafeMath does not have revert messages
   });
 });

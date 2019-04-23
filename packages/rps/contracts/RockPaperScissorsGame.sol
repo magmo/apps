@@ -3,8 +3,10 @@ pragma experimental ABIEncoderV2;
 
 import "fmg-core/contracts/Commitment.sol";
 import "./RockPaperScissorsCommitment.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract RockPaperScissorsGame {
+    using SafeMath for uint256;
     // The following transitions are allowed:
     //
     // Start -> RoundProposed
@@ -116,8 +118,8 @@ contract RockPaperScissorsGame {
     stakeUnchanged(oldCommitment, newCommitment)
     {
         // a will have to reveal, so remove the stake beforehand
-        require(newCommitment.allocation[0] == oldCommitment.allocation[0] - oldCommitment.stake,"Allocation for player A should be decremented by 1 stake from the previous commitment.");
-        require(newCommitment.allocation[1] == oldCommitment.allocation[1] + oldCommitment.stake,"Allocation for player B should be incremented by 1 stake from the previous commitment.");
+        require(newCommitment.allocation[0] == oldCommitment.allocation[0].sub(oldCommitment.stake),"Allocation for player A should be decremented by 1 stake from the previous commitment.");
+        require(newCommitment.allocation[1] == oldCommitment.allocation[1].add(oldCommitment.stake),"Allocation for player B should be incremented by 1 stake from the previous commitment.");
         require(newCommitment.preCommit == oldCommitment.preCommit,"Precommit should be the same as the previous commitment.");
     }
 
@@ -138,8 +140,8 @@ contract RockPaperScissorsGame {
         // calculate winnings
         (aWinnings, bWinnings) = winnings(newCommitment.aWeapon, newCommitment.bWeapon, newCommitment.stake);
 
-        require(newCommitment.allocation[0] == oldCommitment.allocation[0] + aWinnings,"Player A's allocation should be updated with the winnings.");
-        require(newCommitment.allocation[1] == oldCommitment.allocation[1] - 2 * oldCommitment.stake + bWinnings,"Player B's allocation should be updated with the winnings.");
+        require(newCommitment.allocation[0] == oldCommitment.allocation[0].add(aWinnings),"Player A's allocation should be updated with the winnings.");
+        require(newCommitment.allocation[1] == oldCommitment.allocation[1].sub(oldCommitment.stake.mul(2)).add(bWinnings),"Player B's allocation should be updated with the winnings.");
     }
 
     function validateRevealToStart(RockPaperScissorsCommitment.RPSCommitmentStruct memory oldCommitment, RockPaperScissorsCommitment.RPSCommitmentStruct memory newCommitment)
