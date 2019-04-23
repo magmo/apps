@@ -88,3 +88,39 @@ describe('not defundable', () => {
     itTransitionsToFailure(result, scenario.states.failure);
   });
 });
+
+describe('player A invalid commitment', () => {
+  const scenario = scenarios.playerAInvalidCommitment;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_LEDGER_UPDATE}`, () => {
+    const state = scenario.states.waitForLedgerUpdate;
+    const action = scenario.actions.commitmentReceived;
+    const result = indirectDefundingReducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.states.failure);
+  });
+});
+
+describe('player B invalid first commitment', () => {
+  const scenario = scenarios.playerBInvalidFirstCommitment;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_LEDGER_UPDATE}`, () => {
+    const state = scenario.states.waitForLedgerUpdate;
+    const action = scenario.actions.firstCommitmentReceived;
+    const result = indirectDefundingReducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.states.failure);
+  });
+});
+
+describe('player B invalid final commitment', () => {
+  const scenario = scenarios.playerBInvalidFinalCommitment;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_FINAL_LEDGER_UPDATE}`, () => {
+    const state = scenario.states.waitForFinalLedgerUpdate;
+    const action = scenario.actions.finalCommitmentReceived;
+    const result = indirectDefundingReducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.states.failure);
+  });
+});

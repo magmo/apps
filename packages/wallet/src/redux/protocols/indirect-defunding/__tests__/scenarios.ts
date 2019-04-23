@@ -5,16 +5,13 @@ import {
   RUNNING,
   WAIT_FOR_UPDATE,
   ChannelState,
-  setChannel,
-  emptyChannelState,
-  FINALIZED,
 } from '../../../channel-state/state';
-import { EMPTY_SHARED_DATA, SharedData, FundingState } from '../../../state';
+import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import * as actions from '../../../actions';
 import { AdjudicatorState } from '../../../adjudicator-state/state';
 
+// Various state propties
 const processId = 'processid.123';
-
 const {
   asAddress: address,
   asPrivateKey: privateKey,
@@ -87,6 +84,7 @@ const notDefundableSharedData: SharedData = {
   channelState: playerAChannelState,
 };
 
+// Actions
 const playerACommitmentReceived = actions.commitmentReceived(
   processId,
   ledgerCommitments.ledgerDefundUpdate2,
@@ -103,10 +101,19 @@ const playerBFinalCommitmentReceived = actions.commitmentReceived(
   '0x0',
 );
 
+const invalidCommitmentReceived = actions.commitmentReceived(
+  processId,
+  ledgerCommitments.preFundCommitment0,
+  '0x0',
+);
+
+// Indirect Defunding States
 const waitForLedgerUpdate = states.waitForLedgerUpdate({ processId, channelId });
 const waitForFinalLedgerUpdate = states.waitForFinalLedgerUpdate({ processId, channelId });
 const notDefundableFailure = states.failure('Channel Not Closed');
+const invalidCommitmentFailure = states.failure('Received Invalid Commitment');
 
+// Scenarios
 export const playerAHappyPath = {
   processId,
   channelId,
@@ -143,5 +150,46 @@ export const notDefundable = {
   sharedData: notDefundableSharedData,
   states: {
     failure: notDefundableFailure,
+  },
+};
+
+export const playerAInvalidCommitment = {
+  processId,
+  channelId,
+  sharedData: playerASharedData,
+  states: {
+    waitForLedgerUpdate,
+    failure: invalidCommitmentFailure,
+  },
+  actions: {
+    commitmentReceived: invalidCommitmentReceived,
+  },
+};
+
+export const playerBInvalidFirstCommitment = {
+  processId,
+  channelId,
+  sharedData: playerBSharedData,
+  states: {
+    waitForLedgerUpdate,
+    failure: invalidCommitmentFailure,
+  },
+  actions: {
+    firstCommitmentReceived: invalidCommitmentReceived,
+  },
+};
+
+export const playerBInvalidFinalCommitment = {
+  processId,
+  channelId,
+  sharedData: playerBSharedData,
+  states: {
+    waitForLedgerUpdate,
+    waitForFinalLedgerUpdate,
+    failure: invalidCommitmentFailure,
+  },
+  actions: {
+    firstCommitmentReceived: playerBFirstCommitmentReceived,
+    finalCommitmentReceived: invalidCommitmentReceived,
   },
 };
