@@ -1,16 +1,12 @@
 import { Properties as P } from '../../../utils';
 import { DirectFundingState } from '../../direct-funding/state';
-import { IndirectFundingState } from '../state';
+import { NonTerminalIndirectFundingState } from '../state';
 
-export type PlayerBState = TerminalState | NonTerminalState;
-
-export type NonTerminalState =
+export type PlayerBState =
   | BWaitForPreFundSetup0
   | BWaitForDirectFunding
   | BWaitForLedgerUpdate0
   | BWaitForPostFundSetup0;
-
-export type TerminalState = Success | Failure;
 
 export interface BWaitForPreFundSetup0 {
   type: 'BWaitForPreFundSetup0';
@@ -34,26 +30,16 @@ export interface BWaitForPostFundSetup0 {
   ledgerId: string;
 }
 
-export interface Success {
-  type: 'Success';
-}
-
-export interface Failure {
-  type: 'Failure';
-}
-
 // -------
 // Helpers
 // -------
 
-export function isPlayerBState(state: IndirectFundingState): state is PlayerBState {
+export function isPlayerBState(state: NonTerminalIndirectFundingState): state is PlayerBState {
   return (
     state.type === 'BWaitForPreFundSetup0' ||
     state.type === 'BWaitForDirectFunding' ||
     state.type === 'BWaitForPostFundSetup0' ||
-    state.type === 'BWaitForLedgerUpdate0' ||
-    state.type === 'Success' ||
-    state.type === 'Failure'
+    state.type === 'BWaitForLedgerUpdate0'
   );
 }
 
@@ -84,12 +70,4 @@ export function bWaitForPostFundSetup0(params: P<BWaitForPostFundSetup0>): BWait
 export function bWaitForLedgerUpdate0(params: P<BWaitForLedgerUpdate0>): BWaitForLedgerUpdate0 {
   const { channelId, ledgerId } = params;
   return { type: 'BWaitForLedgerUpdate0', channelId, ledgerId };
-}
-
-export function success(): Success {
-  return { type: 'Success' };
-}
-
-export function failure(): Failure {
-  return { type: 'Failure' };
 }

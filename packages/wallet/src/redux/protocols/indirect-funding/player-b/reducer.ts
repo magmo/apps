@@ -1,5 +1,5 @@
-import * as states from './state';
-import { NonTerminalState as NonTerminalPlayerBState } from './state';
+import * as states from '../state';
+import { PlayerBState } from '../state';
 
 import * as actions from '../../../actions';
 
@@ -39,7 +39,7 @@ export function initialize(channel: channelState.ChannelStatus, sharedData: Shar
 }
 
 export function playerBReducer(
-  protocolState: NonTerminalPlayerBState,
+  protocolState: PlayerBState,
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ReturnVal {
@@ -100,7 +100,7 @@ const waitForDirectFunding = (
     );
 
     let newSharedData = updatedStateAndSharedData.sharedData;
-    let newProtocolState: NonTerminalPlayerBState = updatedStateAndSharedData.protocolState;
+    let newProtocolState: PlayerBState = updatedStateAndSharedData.protocolState;
 
     if (directFundingIsComplete(newProtocolState.directFundingState)) {
       newSharedData = confirmFundingForChannel(newSharedData, protocolState.channelId);
@@ -169,7 +169,7 @@ const updateStateWithDirectFundingAction = (
     action,
   );
   const newSharedData = directFundingResult.sharedData;
-  const newProtocolState: NonTerminalPlayerBState = states.bWaitForDirectFunding({
+  const newProtocolState: PlayerBState = states.bWaitForDirectFunding({
     ...protocolState,
     directFundingState: directFundingResult.protocolState,
   });
