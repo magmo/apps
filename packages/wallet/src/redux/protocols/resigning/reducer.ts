@@ -26,6 +26,8 @@ export function resigningReducer(
   action: ResigningAction,
 ): ReturnVal {
   switch (action.type) {
+    case 'RESIGNING.CANCELLED':
+      return resigningCancelled(state, storage);
     case 'CONCLUDE.SENT':
       return concludeSent(state, storage);
     case 'RESIGNATION.IMPOSSIBLE.ACKNOWLEDGED':
@@ -56,6 +58,12 @@ export function initialize(channelId: string, processId: string, storage: Storag
   }
 }
 
+function resigningCancelled(state: NonTerminalRState, storage: Storage): ReturnVal {
+  if (state.type !== 'ApproveResignation') {
+    return { state, storage };
+  }
+  return { state: failure({ reason: 'ResignCancelled' }), storage };
+}
 function resignationImpossibleAcknowledged(state: NonTerminalRState, storage: Storage): ReturnVal {
   if (state.type !== 'AcknowledgeResignationImpossible') {
     return { state, storage };

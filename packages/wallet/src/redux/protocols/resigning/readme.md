@@ -19,15 +19,18 @@ The protocol is implemented with the following state machine
 
 ```mermaid
 graph TD
-  S((start)) --> CR{My turn?}
+  S((start)) --> E{Channel Exists?}
+  E --> |No| F1((failure))
+  E --> |Yes| CR{My turn?}
   CR  --> |Yes| CC(ApproveResignation)
   CR  --> |No| RC(AcknowledgeResignationImpossible)
+  CC  --> |CANCEL| F2((failure))
   CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
   WOC --> |CONCLUDE.RECEIVED| ACC(AcknowledgeChannelClosed)
   ACC --> |DEFUND.CHOSEN| D(WaitForDefund)
-  D   --> |DEFUNDED| SS
-  ACC --> |DEFUND.NOT.CHOSEN| SS((success))
-  RC  --> |RESIGNATION.IMPOSSIBLE.ACKNOWLEDGED| F((failure))
+  D   --> |DEFUND.SUCCEEDED| SS((success))
+  D   --> |DEFUND.FAILED| F3((failure))
+  RC  --> |RESIGNATION.IMPOSSIBLE.ACKNOWLEDGED| F4((failure))
 ```
 
 ## Scenarios
