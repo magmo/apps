@@ -174,6 +174,7 @@ export const receiveLedgerCommitment = (
 // STATE UPDATERS
 // Global state updaters
 export const requestDirectFunding = (
+  processId: string,
   sharedData: SharedData,
   ledgerChannelId: string,
 ): ProtocolStateWithSharedData<DirectFundingState> => {
@@ -184,6 +185,7 @@ export const requestDirectFunding = (
   const totalFundingRequested = allocation.reduce(addHex);
   const depositAmount = allocation[ourIndex];
   const action = actions.internal.directFundingRequested(
+    processId,
     ledgerChannelId,
     safeToDeposit,
     totalFundingRequested,

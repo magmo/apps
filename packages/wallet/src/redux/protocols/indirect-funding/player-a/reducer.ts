@@ -219,10 +219,15 @@ const startDirectFunding = (
   protocolState: states.WaitForPreFundSetup1,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.WaitForDirectFunding> => {
+  // TODO: indirect funding state should store the processId
   const {
     protocolState: directFundingProtocolState,
     sharedData: updatedSharedData,
-  } = requestDirectFunding(sharedData, protocolState.ledgerId);
+  } = requestDirectFunding(
+    `processId:${protocolState.channelId}`,
+    sharedData,
+    protocolState.ledgerId,
+  );
   const newProtocolState = states.waitForDirectFunding({
     ...protocolState,
     directFundingState: directFundingProtocolState,

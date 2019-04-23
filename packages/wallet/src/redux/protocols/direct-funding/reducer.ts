@@ -155,7 +155,7 @@ const notSafeToDepositReducer: DFReducer = (
 
         const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
           depositTransaction,
-          `direct-funding.${action.channelId}`, // TODO: what is the correct way of fetching the process id?
+          state.processId,
           sharedData,
         );
         return {

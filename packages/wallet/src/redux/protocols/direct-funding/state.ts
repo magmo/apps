@@ -20,6 +20,7 @@ export type ChannelFundingStatus =
   | typeof FUNDING_SUCCESS;
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface BaseDirectFundingState {
+  processId: string;
   safeToDepositLevel: string;
   type: ChannelFundingStatus;
   requestedTotalFunds: string;
@@ -45,6 +46,7 @@ export interface FundingSuccess extends BaseDirectFundingState {
 // constructors
 export const baseDirectFundingState: Constructor<BaseDirectFundingState> = params => {
   const {
+    processId,
     requestedTotalFunds,
     requestedYourContribution,
     channelId,
@@ -53,6 +55,7 @@ export const baseDirectFundingState: Constructor<BaseDirectFundingState> = param
     type: channelFundingStatus,
   } = params;
   return {
+    processId,
     requestedTotalFunds,
     requestedYourContribution,
     channelId,
@@ -111,6 +114,7 @@ export function initialDirectFundingState(
   if (alreadyFunded) {
     return {
       protocolState: fundingSuccess({
+        processId: action.processId,
         requestedTotalFunds: totalFundingRequired,
         requestedYourContribution: requiredDeposit,
         channelId,
@@ -125,12 +129,13 @@ export function initialDirectFundingState(
     const depositTransaction = createDepositTransaction(action.channelId, action.requiredDeposit);
     const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
-      `direct-funding.${action.channelId}`, // TODO: what is the correct way of fetching the process id?
+      action.processId,
       sharedData,
     );
 
     return {
       protocolState: waitForDepositTransaction({
+        processId: action.processId,
         requestedTotalFunds: totalFundingRequired,
         requestedYourContribution: requiredDeposit,
         channelId,
@@ -144,6 +149,7 @@ export function initialDirectFundingState(
 
   return {
     protocolState: notSafeToDeposit({
+      processId: action.processId,
       requestedTotalFunds: totalFundingRequired,
       requestedYourContribution: requiredDeposit,
       channelId,

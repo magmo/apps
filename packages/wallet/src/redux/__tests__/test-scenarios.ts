@@ -263,6 +263,7 @@ const initialFundingState = (ourIndex: PlayerIndex, fundingRequestChannelId: str
   const requiredDeposit = twoThree[ourIndex];
 
   const action = actions.internal.directFundingRequested(
+    `processId:${fundingRequestChannelId}`,
     fundingRequestChannelId,
     safeToDepositLevel,
     total,
