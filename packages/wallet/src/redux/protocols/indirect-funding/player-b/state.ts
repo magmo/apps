@@ -1,95 +1,95 @@
-import { Properties } from '../../../utils';
-import { PlayerIndex } from '../../../types';
+import { Properties as P } from '../../../utils';
 import { DirectFundingState } from '../../direct-funding/state';
+import { IndirectFundingState } from '../state';
 
-export const WAIT_FOR_APPROVAL = 'WAIT_FOR_APPROVAL';
-export const WAIT_FOR_PRE_FUND_SETUP_0 = 'WAIT_FOR_PRE_FUND_SETUP_0';
-export const WAIT_FOR_DIRECT_FUNDING = 'WAIT_FOR_DIRECT_FUNDING';
-export const WAIT_FOR_POST_FUND_SETUP_0 = 'WAIT_FOR_POST_FUND_SETUP_0';
-export const WAIT_FOR_LEDGER_UPDATE_0 = 'WAIT_FOR_LEDGER_UPDATE_0';
-export const WAIT_FOR_CONSENSUS = 'WAIT_FOR_CONSENSUS';
+export type PlayerBState = TerminalState | NonTerminalState;
 
-interface BasePlayerBState {
+export type NonTerminalState =
+  | BWaitForPreFundSetup0
+  | BWaitForDirectFunding
+  | BWaitForLedgerUpdate0
+  | BWaitForPostFundSetup0;
+
+export type TerminalState = Success | Failure;
+
+export interface BWaitForPreFundSetup0 {
+  type: 'BWaitForPreFundSetup0';
   channelId: string;
-  player: PlayerIndex.B;
 }
 
-interface LedgerChannelExists extends BasePlayerBState {
+export interface BWaitForDirectFunding {
+  type: 'BWaitForDirectFunding';
+  channelId: string;
+  ledgerId: string;
+  directFundingState: DirectFundingState;
+}
+export interface BWaitForLedgerUpdate0 {
+  type: 'BWaitForLedgerUpdate0';
+  channelId: string;
+  ledgerId: string;
+}
+export interface BWaitForPostFundSetup0 {
+  type: 'BWaitForPostFundSetup0';
+  channelId: string;
   ledgerId: string;
 }
 
-export interface WaitForApproval extends BasePlayerBState {
-  type: typeof WAIT_FOR_APPROVAL;
+export interface Success {
+  type: 'Success';
 }
 
-export interface WaitForPreFundSetup0 extends BasePlayerBState {
-  type: typeof WAIT_FOR_PRE_FUND_SETUP_0;
+export interface Failure {
+  type: 'Failure';
 }
 
-export interface WaitForDirectFunding extends LedgerChannelExists {
-  type: typeof WAIT_FOR_DIRECT_FUNDING;
-  directFundingState: DirectFundingState;
-}
-export interface WaitForPostFundSetup0 extends LedgerChannelExists {
-  type: typeof WAIT_FOR_POST_FUND_SETUP_0;
-}
-export interface WaitForLedgerUpdate0 extends LedgerChannelExists {
-  type: typeof WAIT_FOR_LEDGER_UPDATE_0;
+// -------
+// Helpers
+// -------
+
+export function isPlayerBState(state: IndirectFundingState): state is PlayerBState {
+  return (
+    state.type === 'BWaitForPreFundSetup0' ||
+    state.type === 'BWaitForDirectFunding' ||
+    state.type === 'BWaitForPostFundSetup0' ||
+    state.type === 'BWaitForLedgerUpdate0' ||
+    state.type === 'Success' ||
+    state.type === 'Failure'
+  );
 }
 
-export interface WaitForConsensus extends LedgerChannelExists {
-  type: typeof WAIT_FOR_CONSENSUS;
-}
+// --------
+// Creators
+// --------
 
-export type PlayerBState =
-  | WaitForApproval
-  | WaitForPreFundSetup0
-  | WaitForDirectFunding
-  | WaitForPostFundSetup0
-  | WaitForLedgerUpdate0
-  | WaitForConsensus;
-
-export function waitForApproval(params: Properties<WaitForApproval>): WaitForApproval {
+export function bWaitForPreFundSetup0(params: P<BWaitForPreFundSetup0>): BWaitForPreFundSetup0 {
   const { channelId } = params;
-
-  return { type: WAIT_FOR_APPROVAL, player: PlayerIndex.B, channelId };
+  return { type: 'BWaitForPreFundSetup0', channelId };
 }
 
-export function waitForPreFundSetup0(
-  params: Properties<WaitForPreFundSetup0>,
-): WaitForPreFundSetup0 {
-  const { channelId } = params;
-  return { type: WAIT_FOR_PRE_FUND_SETUP_0, player: PlayerIndex.B, channelId };
-}
-
-export function waitForDirectFunding(
-  params: Properties<WaitForDirectFunding>,
-): WaitForDirectFunding {
+export function bWaitForDirectFunding(params: P<BWaitForDirectFunding>): BWaitForDirectFunding {
   const { channelId, ledgerId, directFundingState } = params;
   return {
-    type: WAIT_FOR_DIRECT_FUNDING,
-    player: PlayerIndex.B,
+    type: 'BWaitForDirectFunding',
     channelId,
     ledgerId,
     directFundingState,
   };
 }
 
-export function waitForPostFundSetup0(
-  params: Properties<WaitForPostFundSetup0>,
-): WaitForPostFundSetup0 {
+export function bWaitForPostFundSetup0(params: P<BWaitForPostFundSetup0>): BWaitForPostFundSetup0 {
   const { channelId, ledgerId } = params;
-  return { type: WAIT_FOR_POST_FUND_SETUP_0, player: PlayerIndex.B, channelId, ledgerId };
+  return { type: 'BWaitForPostFundSetup0', channelId, ledgerId };
 }
 
-export function waitForLedgerUpdate0(
-  params: Properties<WaitForLedgerUpdate0>,
-): WaitForLedgerUpdate0 {
+export function bWaitForLedgerUpdate0(params: P<BWaitForLedgerUpdate0>): BWaitForLedgerUpdate0 {
   const { channelId, ledgerId } = params;
-  return { type: WAIT_FOR_LEDGER_UPDATE_0, player: PlayerIndex.B, channelId, ledgerId };
+  return { type: 'BWaitForLedgerUpdate0', channelId, ledgerId };
 }
 
-export function waitForConsensus(params: Properties<WaitForConsensus>): WaitForConsensus {
-  const { channelId, ledgerId } = params;
-  return { type: WAIT_FOR_CONSENSUS, player: PlayerIndex.B, channelId, ledgerId };
+export function success(): Success {
+  return { type: 'Success' };
+}
+
+export function failure(): Failure {
+  return { type: 'Failure' };
 }

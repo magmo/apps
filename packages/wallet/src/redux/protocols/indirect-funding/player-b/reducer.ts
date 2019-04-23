@@ -1,4 +1,5 @@
 import * as states from './state';
+import { NonTerminalState as NonTerminalPlayerBState } from './state';
 
 import * as actions from '../../../actions';
 
@@ -10,7 +11,6 @@ import {
   receiveOpponentLedgerCommitment,
   safeToSendLedgerUpdate,
   createAndSendUpdateCommitment,
-  ledgerChannelFundsAppChannel,
   confirmFundingForChannel,
   receiveLedgerCommitment,
   updateDirectFundingStatus,
@@ -29,55 +29,39 @@ import { composePreFundCommitment } from '../../../../utils/commitment-utils';
 import { PlayerIndex } from '../../../types';
 import * as selectors from '../../../selectors';
 import { SharedData } from '../../../state';
+import { IndirectFundingState } from '../state';
 
-export function initialize(
-  channelId: string,
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<states.WaitForApproval> {
-  return { protocolState: states.waitForApproval({ channelId }), sharedData };
+type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
+
+export function initialize(channel: channelState.ChannelStatus, sharedData: SharedData): ReturnVal {
+  const { channelId } = channel;
+  return { protocolState: states.bWaitForPreFundSetup0({ channelId }), sharedData };
 }
 
 export function playerBReducer(
-  protocolState: states.PlayerBState,
+  protocolState: NonTerminalPlayerBState,
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> {
+): ReturnVal {
   switch (protocolState.type) {
-    case states.WAIT_FOR_APPROVAL:
-      return waitForApproval(protocolState, sharedData, action);
-    case states.WAIT_FOR_PRE_FUND_SETUP_0:
+    case 'BWaitForPreFundSetup0':
       return waitForPreFundSetup0(protocolState, sharedData, action);
-    case states.WAIT_FOR_DIRECT_FUNDING:
+    case 'BWaitForDirectFunding':
       return waitForDirectFunding(protocolState, sharedData, action);
-    case states.WAIT_FOR_POST_FUND_SETUP_0:
-      return waitForPostFundSetup0(protocolState, sharedData, action);
-    case states.WAIT_FOR_LEDGER_UPDATE_0:
+    case 'BWaitForLedgerUpdate0':
       return waitForLedgerUpdate0(protocolState, sharedData, action);
-    case states.WAIT_FOR_CONSENSUS:
-      return waitForConsensus(protocolState, sharedData, action);
+    case 'BWaitForPostFundSetup0':
+      return waitForPostFundSetup0(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);
   }
 }
 
-const waitForApproval = (
-  protocolState: states.WaitForApproval,
-  sharedData: SharedData,
-  action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> => {
-  switch (action.type) {
-    case actions.indirectFunding.playerB.STRATEGY_PROPOSED:
-      return { protocolState: states.waitForPreFundSetup0(protocolState), sharedData };
-    default:
-      return { protocolState, sharedData };
-  }
-};
-
 const waitForPreFundSetup0 = (
-  protocolState: states.WaitForPreFundSetup0,
+  protocolState: states.BWaitForPreFundSetup0,
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> => {
+): ReturnVal => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
@@ -102,10 +86,10 @@ const waitForPreFundSetup0 = (
 };
 
 const waitForDirectFunding = (
-  protocolState: states.WaitForDirectFunding,
+  protocolState: states.BWaitForDirectFunding,
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> => {
+): ReturnVal => {
   if (!isDirectFundingAction(action)) {
     return { sharedData, protocolState };
   } else {
@@ -116,11 +100,11 @@ const waitForDirectFunding = (
     );
 
     let newSharedData = updatedStateAndSharedData.sharedData;
-    let newProtocolState: states.PlayerBState = updatedStateAndSharedData.protocolState;
+    let newProtocolState: NonTerminalPlayerBState = updatedStateAndSharedData.protocolState;
 
     if (directFundingIsComplete(newProtocolState.directFundingState)) {
       newSharedData = confirmFundingForChannel(newSharedData, protocolState.channelId);
-      newProtocolState = states.waitForPostFundSetup0(updatedStateAndSharedData.protocolState);
+      newProtocolState = states.bWaitForPostFundSetup0(updatedStateAndSharedData.protocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
     } else {
       return { sharedData, protocolState: newProtocolState };
@@ -129,10 +113,10 @@ const waitForDirectFunding = (
 };
 
 const waitForPostFundSetup0 = (
-  protocolState: states.WaitForPostFundSetup0,
+  protocolState: states.BWaitForPostFundSetup0,
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> => {
+): ReturnVal => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       // The ledger channel is in the `FUNDING` stage, so we have to use the
@@ -140,7 +124,7 @@ const waitForPostFundSetup0 = (
       // helper
       // Note that the channelStateReducer currently sends the post fund setup message
       const newSharedData = receiveLedgerCommitment(sharedData, action);
-      const newProtocolState = states.waitForLedgerUpdate0(protocolState);
+      const newProtocolState = states.success();
       return { protocolState: newProtocolState, sharedData: newSharedData };
     default:
       return { protocolState, sharedData };
@@ -148,10 +132,10 @@ const waitForPostFundSetup0 = (
 };
 
 const waitForLedgerUpdate0 = (
-  protocolState: states.WaitForLedgerUpdate0,
+  protocolState: states.BWaitForLedgerUpdate0,
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> => {
+): ReturnVal => {
   switch (action.type) {
     case actions.COMMITMENT_RECEIVED:
       let newSharedData = receiveOpponentLedgerCommitment(
@@ -165,30 +149,8 @@ const waitForLedgerUpdate0 = (
           protocolState.channelId,
           protocolState.ledgerId,
         );
-        const newProtocolState = states.waitForConsensus(protocolState);
+        const newProtocolState = states.bWaitForPostFundSetup0(protocolState);
         return { protocolState: newProtocolState, sharedData: newSharedData };
-      }
-      return { protocolState, sharedData: newSharedData };
-    default:
-      return { protocolState, sharedData };
-  }
-};
-const waitForConsensus = (
-  protocolState: states.WaitForConsensus,
-  sharedData: SharedData,
-  action: actions.indirectFunding.Action,
-): ProtocolStateWithSharedData<states.PlayerBState> => {
-  switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
-      let newSharedData = receiveOpponentLedgerCommitment(
-        sharedData,
-        action.commitment,
-        action.signature,
-      );
-      if (
-        ledgerChannelFundsAppChannel(newSharedData, protocolState.channelId, protocolState.ledgerId)
-      ) {
-        newSharedData = confirmFundingForChannel(newSharedData, protocolState.channelId);
       }
       return { protocolState, sharedData: newSharedData };
     default:
@@ -198,16 +160,16 @@ const waitForConsensus = (
 
 const updateStateWithDirectFundingAction = (
   action: FundingAction,
-  protocolState: states.WaitForDirectFunding,
+  protocolState: states.BWaitForDirectFunding,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.WaitForDirectFunding> => {
+): ProtocolStateWithSharedData<states.BWaitForDirectFunding> => {
   const directFundingResult = updateDirectFundingStatus(
     protocolState.directFundingState,
     sharedData,
     action,
   );
   const newSharedData = directFundingResult.sharedData;
-  const newProtocolState: states.PlayerBState = states.waitForDirectFunding({
+  const newProtocolState: NonTerminalPlayerBState = states.bWaitForDirectFunding({
     ...protocolState,
     directFundingState: directFundingResult.protocolState,
   });
@@ -215,17 +177,16 @@ const updateStateWithDirectFundingAction = (
 };
 
 const startDirectFunding = (
-  protocolState: states.WaitForPreFundSetup0,
+  protocolState: states.BWaitForPreFundSetup0,
   ledgerId: string,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.WaitForDirectFunding> => {
-  // TODO: indirect funding state should store the process id.
+): ProtocolStateWithSharedData<states.BWaitForDirectFunding> => {
   const {
     protocolState: directFundingProtocolState,
     sharedData: updatedSharedData,
   } = requestDirectFunding(`processId:${protocolState.channelId}`, sharedData, ledgerId);
 
-  const newProtocolState = states.waitForDirectFunding({
+  const newProtocolState = states.bWaitForDirectFunding({
     ...protocolState,
     ledgerId,
     directFundingState: directFundingProtocolState,
