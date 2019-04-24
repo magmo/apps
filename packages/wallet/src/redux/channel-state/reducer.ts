@@ -228,12 +228,17 @@ const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState
   if (action.type === actions.CHANNEL_INITIALIZED) {
     return { state };
   }
+  // TODO: Figure out which actions should be allowed here
+  if (
+    action.type !== actions.OPPONENT_COMMITMENT_RECEIVED &&
+    action.type !== actions.OWN_COMMITMENT_RECEIVED
+  ) {
+    return { state };
+  }
 
   // If an action has a channelId/commitment we update the channel state for that channel
   let channelId = data.appChannelId;
-  if ('channelId' in action) {
-    channelId = action.channelId;
-  } else if ('commitment' in action) {
+  if ('commitment' in action) {
     channelId = channelID(action.commitment.channel);
   }
 
