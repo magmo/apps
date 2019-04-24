@@ -27,7 +27,7 @@ class ConcludingContainer extends PureComponent<Props> {
         return (
           <Acknowledge
             title="Concluding Not Possible"
-            description="You must wait until it is your turn, or else challenge the other player if they are unresponsive."
+            description="You must wait until it is your turn; or else challenge the other player if they are unresponsive."
             acknowledge={() => acknowledgeConcludingImpossible(state.processId)}
           />
         );
@@ -38,7 +38,9 @@ class ConcludingContainer extends PureComponent<Props> {
       case 'WaitForDefund':
         return <WaitForDefunding />;
       case 'ApproveConcluding':
-        return <ApproveConcluding deny={() => deny(processId)} approve={() => approve(processId)} />;
+        return (
+          <ApproveConcluding deny={() => deny(processId)} approve={() => approve(processId)} />
+        );
       default:
         return unreachable(state);
     }

@@ -83,7 +83,9 @@ export function waitForOpponentConclude(p: P<WaitForOpponentConclude>): WaitForO
   return { type: 'WaitForOpponentConclude', processId };
 }
 
-export function acknowledgeChannelConcluded(p: P<AcknowledgeChannelConcluded>): AcknowledgeChannelConcluded {
+export function acknowledgeChannelConcluded(
+  p: P<AcknowledgeChannelConcluded>,
+): AcknowledgeChannelConcluded {
   const { processId } = p;
   return { type: 'AcknowledgeChannelConcluded', processId };
 }

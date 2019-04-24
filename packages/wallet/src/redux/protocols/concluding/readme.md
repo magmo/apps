@@ -7,11 +7,12 @@ It covers:
 - Asking user to confirm the resignation (probably displaying the current outcome)
 - Formulating the conclude state and sending to the opponent
 - Waiting for a conclude from the opponent
-- Acknowledge channel closed (giving the option to defund)
+- Acknowledge channel concluded (giving the option to defund)
 
 Out of scope (for the time being):
 
 - Giving the option to launch a challenge if the conclude doesn't arrive
+- Allowing the user to not choose to not defund
 
 ## State machine
 
@@ -19,32 +20,42 @@ The protocol is implemented with the following state machine
 
 ```mermaid
 graph TD
-  S((start)) --> E{Channel Exists?}
-  E --> |No| F1((failure))
-  E --> |Yes| CR{My turn?}
-  CR  --> |Yes| CC(ApproveConcluding)
-  CR  --> |No| RC(AcknowledgeConcludingImpossible)
-  CC  --> |CANCEL| F2((failure))
+  S((Start)) --> E{Channel Exists?}
+  E --> |No| F1((Failure))
+  E --> |Yes| MT{My turn?}
+  MT  --> |Yes| CC(ApproveConcluding)
+  MT  --> |No| RC(AcknowledgeConcludingImpossible)
+  CC  --> |CANCEL| F2((Failure))
   CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
   WOC --> |CONCLUDE.RECEIVED| ACC(AcknowledgeChannelConcluded)
   ACC --> |DEFUND.CHOSEN| D(WaitForDefund)
-  D   --> |DEFUND.SUCCEEDED| SS((success))
-  D   --> |DEFUND.FAILED| F3((failure))
-  RC  --> |CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED| F4((failure))
+  D   --> |DEFUND.SUCCEEDED| SS((Success))
+  D   --> |DEFUND.FAILED| F3((Failure))
+  RC  --> |CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED| F4((Failure))
+  style S  fill:#efdd20
+  style E  fill:#efdd20
+  style MT fill:#efdd20
+  style SS fill:#58ef21
+  style F1 fill:#f45941
+  style F2 fill:#f45941
+  style F3 fill:#f45941
+  style F4 fill:#f45941
 ```
 
 ## Scenarios
 
-To test all paths through the state machine we will use 3 different scenarios:
+To test all paths through the state machine we will use 2 different scenarios:
 
 1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `Success`
-2. **Concluding not possible**: `AcknowledgeConcludingImpossible` -> `Failure`
-3. **Closed but not defunded**: `AcknowledgeChannelConcluded` -> `Success`
+2. **Channel doesnt exits** `Failure`
+3. **Concluding not possible**: `AcknowledgeConcludingImpossible` -> `Failure`
+4. **Conclusion cancelled** `ApproveConcluding` -> `Failure`
+5. **Defund failed** `WaitForDefund` -> `Failure`
 
 # Terminology
-Use "Conclude" / "Concluding" everywhere, here. In an application, you might choose to Resign, or you (or an opponent) might run out of funds. In these cases, according to the wallet you are concluding the channel. 
 
-For now we will avoid "Resigning", "Closing" and so on. 
+Use "Conclude" / "Concluding" everywhere, here. In an application, you might choose to Resign, or you (or an opponent) might run out of funds. In these cases, according to the wallet you are concluding the channel.
 
-We will also include the `Defunding` protocol as an optional subprotocol of `Concluding`. If `Defunding` fails, `Concluding` will still be considered successful. 
+For now we will avoid "Resigning", "Closing" and so on.
 
+We will also include the `Defunding` protocol as an optional subprotocol of `Concluding`. If `Defunding` fails, `Concluding` will still be considered to have also failed.
