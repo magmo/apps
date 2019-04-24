@@ -9,7 +9,7 @@ import { SharedData, queueMessage } from '../../../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { PlayerIndex } from '../../../types';
-import { fundingFailure } from 'magmo-wallet-client';
+import { fundingFailure, messageRelayRequested } from 'magmo-wallet-client';
 
 type EmbeddedAction = IndirectFundingAction;
 
@@ -53,8 +53,14 @@ function strategyChosen(
   if (state.type !== states.WAIT_FOR_STRATEGY_CHOICE) {
     return { protocolState: state, sharedData };
   }
+  const { processId, opponentAddress } = state;
   const { strategy } = action;
-  return { protocolState: states.waitForStrategyResponse({ ...state, strategy }), sharedData };
+  const payload = { processId, data: { strategy } };
+  const message = messageRelayRequested(opponentAddress, payload);
+  return {
+    protocolState: states.waitForStrategyResponse({ ...state, strategy }),
+    sharedData: queueMessage(sharedData, message),
+  };
 }
 
 function strategyApproved(
