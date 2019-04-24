@@ -8,6 +8,7 @@ import * as states from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { PlayerIndex } from '../../../types';
 import { Strategy } from '..';
+import ChooseStrategy from '../../../../components/funding/choose-strategy';
 
 interface Props {
   state: states.OngoingFundingState;
@@ -21,9 +22,16 @@ interface Props {
 class FundingContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
+    const { processId } = state;
 
     switch (state.type) {
       case states.WAIT_FOR_STRATEGY_CHOICE:
+        return (
+          <ChooseStrategy
+            strategyChosen={(strategy: Strategy) => actions.strategyChosen(processId, strategy)}
+            cancelled={() => actions.cancelled(processId, PlayerIndex.B)}
+          />
+        );
       case states.WAIT_FOR_STRATEGY_RESPONSE:
       case states.WAIT_FOR_FUNDING:
       case states.WAIT_FOR_SUCCESS_CONFIRMATION:
