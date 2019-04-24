@@ -9,7 +9,7 @@ import * as channelActions from '../../channel-state/actions';
 import { getChannelState } from '../../selectors';
 import { unreachable } from '../../../utils/reducer-utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
-import { PlayerIndex } from '../../types';
+import { PlayerIndex, WalletProtocol } from '../../types';
 import { createCommitmentMessageRelay } from '../indirect-funding/reducer-helpers';
 import { signCommitment } from '../../../utils/signing-utils';
 
@@ -228,6 +228,7 @@ const receiveAndSendUpdateCommitment = (
   // Send out the commitment to the opponent
   newSharedData.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
+      WalletProtocol.IndirectDefunding,
       channelState.participants[ourIndex],
       processId,
       commitment,
