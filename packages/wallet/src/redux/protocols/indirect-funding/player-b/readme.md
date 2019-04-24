@@ -5,12 +5,12 @@
 ```mermaid
   graph TD
   linkStyle default interpolate basis
-    WFPrF0(WaitForPreFundL0) -->|ReceiveCommitment| WFDF(WaitForDirectFunding)
+    WFPrF0(WaitForPreFundL0) -->|CommitmentReceived| WFDF(WaitForDirectFunding)
     WFDF -->|FundingAction| WFDF
     WFDF -->|Success| WFLU0(WaitForLedgerUpdate0)
     WFDF -->|Failure| F((Failure))
-    WFLU0 --> |ReceiveCommitment| WFPoF0(WaitForPostFund0)
-    WFPoF0 --> |ReceiveCommitment| S((Success))
+    WFLU0 --> |CommitmentReceived| WFPoF0(WaitForPostFund0)
+    WFPoF0 --> |CommitmentReceived| S((Success))
 ```
 
 ### Scenarios

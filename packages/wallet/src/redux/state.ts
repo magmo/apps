@@ -3,6 +3,7 @@ import {
   emptyDisplayOutboxState,
   SideEffects,
   queueMessage as queueMessageOutbox,
+  getLastMessage as getLastMessageFromOutbox,
   queueTransaction as queueTransactionOutbox,
 } from './outbox/state';
 import {
@@ -138,6 +139,10 @@ export function getChannel(state: SharedData, channelId: string): ChannelStatus 
 
 export function queueMessage(state: SharedData, message: WalletEvent): SharedData {
   return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
+}
+
+export function getLastMessage(state: SharedData): WalletEvent | undefined {
+  return getLastMessageFromOutbox(state.outboxState);
 }
 
 export function queueTransaction(
