@@ -1,6 +1,6 @@
 import { Properties as P } from '../../utils';
 
-export type ConcludingState = NonTerminalState | TerminalState;
+export type ConcludingState = NonTerminalState | PreTerminalState | TerminalState;
 export type ConcludingStateType = ConcludingState['type'];
 
 export type NonTerminalState =
@@ -8,7 +8,17 @@ export type NonTerminalState =
   | ApproveConcluding
   | WaitForOpponentConclude
   | AcknowledgeChannelConcluded
-  | WaitForDefund;
+  | AcknowledgeChannelDoesntExist
+  | AcknowledgeDefundFailed
+  | WaitForDefund
+  | AcknowledgeChannelDoesntExist
+  | AcknowledgeDefundFailed
+  | AcknowledgeConcludingImpossible;
+
+export type PreTerminalState =
+  | AcknowledgeChannelDoesntExist
+  | AcknowledgeDefundFailed
+  | AcknowledgeConcludingImpossible;
 
 export type TerminalState = Success | Failure;
 
@@ -34,6 +44,16 @@ export interface WaitForOpponentConclude {
 
 export interface AcknowledgeChannelConcluded {
   type: 'AcknowledgeChannelConcluded';
+  processId: string;
+}
+
+export interface AcknowledgeChannelDoesntExist {
+  type: 'AcknowledgeChannelDoesntExist';
+  processId: string;
+}
+
+export interface AcknowledgeDefundFailed {
+  type: 'AcknowledgeDefundFailed';
   processId: string;
 }
 
@@ -92,6 +112,18 @@ export function acknowledgeChannelConcluded(
 ): AcknowledgeChannelConcluded {
   const { processId } = p;
   return { type: 'AcknowledgeChannelConcluded', processId };
+}
+
+export function acknowledgeChannelDoesntExist(
+  p: P<AcknowledgeChannelDoesntExist>,
+): AcknowledgeChannelDoesntExist {
+  const { processId } = p;
+  return { type: 'AcknowledgeChannelDoesntExist', processId };
+}
+
+export function acknowledgeDefundFailed(p: P<AcknowledgeDefundFailed>): AcknowledgeDefundFailed {
+  const { processId } = p;
+  return { type: 'AcknowledgeDefundFailed', processId };
 }
 
 export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {

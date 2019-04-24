@@ -45,10 +45,19 @@ describe('[ Happy path ] scenario', () => {
 });
 
 describe('[ Channel doesnt exist ] scenario', () => {
-  const { processId, storage } = scenarios.channelDoesntExist;
+  const scenario = scenarios.channelDoesntExist;
+  const { processId, storage } = scenario;
 
   describe('when initializing', () => {
     const result = initialize('NotInitializedChannelId', processId, storage);
+
+    itTransitionsTo(result, 'AcknowledgeChannelDoesntExist');
+  });
+
+  describe('when in AcknowledgeChannelDoesntExist', () => {
+    const state = scenario.states.acknowledgeChannelDoesntExist;
+    const action = scenario.actions.acknowledged;
+    const result = concludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'ChannelDoesntExist');
   });
@@ -93,6 +102,14 @@ describe('[ Defunding Failed ] scenario', () => {
   describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund;
     const action = scenario.actions.defundFailed;
+    const result = concludingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'AcknowledgeDefundFailed');
+  });
+
+  describe('when inAcknowledgeDefundFailed', () => {
+    const state = scenario.states.acknowledgeDefundFailed;
+    const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'DefundFailed');

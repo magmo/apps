@@ -8,6 +8,8 @@ import {
   acknowledgeChannelConcluded,
   waitForDefund,
   success,
+  acknowledgeChannelDoesntExist,
+  acknowledgeDefundFailed,
 } from './states';
 import { ConcludingAction } from './actions';
 import { unreachable, ourTurn } from '../../../utils/reducer-utils';
@@ -42,6 +44,8 @@ export function concludingReducer(
       return defundFailed(state, storage);
     case 'DEFUNDED':
       return defunded(state, storage);
+    case 'ACKNOWLEDGED':
+      return acknowledged(state, storage);
     default:
       return unreachable(action);
   }
@@ -50,7 +54,7 @@ export function concludingReducer(
 export function initialize(channelId: string, processId: string, storage: Storage): ReturnVal {
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
-    return { state: failure({ reason: 'ChannelDoesntExist' }), storage };
+    return { state: acknowledgeChannelDoesntExist({ processId }), storage };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
@@ -78,28 +82,29 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
 
-  const channelId = storage.channelState.activeAppChannelId as string;
-  // DANGER this asserts that there is a channelId
-  // TODO deal with the case where it does not exist.
+  if (storage.channelState.activeAppChannelId) {
+    const channelId = storage.channelState.activeAppChannelId;
 
-  const channelState = getChannel(storage, channelId) as ChannelStatus;
+    const channelState = getChannel(storage, channelId) as ChannelStatus;
 
-  const {
-    concludeCommitment,
-    commitmentSignature,
-    sendCommitmentAction,
-  } = composeConcludeCommitment(channelState);
+    const {
+      concludeCommitment,
+      commitmentSignature,
+      sendCommitmentAction,
+    } = composeConcludeCommitment(channelState);
 
-  return {
-    state: waitForOpponentConclude({
-      ...state,
-      turnNum: concludeCommitment.turnNum,
-      penultimateCommitment: storage.channelState.initializedChannels.lastCommitment,
-      lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
-    }),
-    sideEffects: { messageOutbox: sendCommitmentAction },
-    storage,
-  };
+    return {
+      state: waitForOpponentConclude({
+        ...state,
+        turnNum: concludeCommitment.turnNum,
+        penultimateCommitment: storage.channelState.initializedChannels.lastCommitment,
+        lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
+      }),
+      sideEffects: { messageOutbox: sendCommitmentAction },
+      storage,
+    };
+  }
+  return { state: waitForOpponentConclude({ ...state }), storage };
   // TODO craft conclude commitment
   // TODO send to opponent
 }
@@ -122,7 +127,7 @@ function defundFailed(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'WaitForDefund') {
     return { state, storage };
   }
-  return { state: failure({ reason: 'DefundFailed' }), storage };
+  return { state: acknowledgeDefundFailed({ ...state }), storage };
 }
 
 function defunded(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -130,4 +135,15 @@ function defunded(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
   return { state: success(), storage };
+}
+
+function acknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
+  switch (state.type) {
+    case 'AcknowledgeChannelDoesntExist':
+      return { state: failure({ reason: 'ChannelDoesntExist' }), storage };
+    case 'AcknowledgeDefundFailed':
+      return { state: failure({ reason: 'DefundFailed' }), storage };
+    default:
+      return { state, storage };
+  }
 }

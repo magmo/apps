@@ -47,6 +47,8 @@ const acknowledgeChannelConcluded = states.acknowledgeChannelConcluded(defaults)
 const waitForDefund = states.waitForDefund(defaults);
 const success = states.success();
 const acknowledgeConcludingImpossible = states.acknowledgeConcludingImpossible(defaults);
+const acknowledgeChannelDoesntExist = states.acknowledgeChannelDoesntExist(defaults);
+const acknowledgeDefundFailed = states.acknowledgeDefundFailed(defaults);
 
 // -------
 // Actions
@@ -58,6 +60,7 @@ const defunded = actions.defunded(processId);
 const concludingImpossibleAcknowledged = actions.resignationImpossibleAcknowledged(processId);
 const defundFailed = actions.defundFailed(processId);
 const cancelled = actions.cancelled(processId);
+const acknowledged = actions.acknowledged(processId);
 
 // -------
 // Scenarios
@@ -84,7 +87,11 @@ export const channelDoesntExist = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
+    acknowledgeChannelDoesntExist,
     failure: states.failure({ reason: 'ChannelDoesntExist' }),
+  },
+  actions: {
+    acknowledged,
   },
 };
 
@@ -117,9 +124,11 @@ export const defundingFailed = {
   storage: storage(ourTurn),
   states: {
     waitForDefund,
+    acknowledgeDefundFailed,
     failure: states.failure({ reason: 'DefundFailed' }),
   },
   actions: {
     defundFailed,
+    acknowledged,
   },
 };

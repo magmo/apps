@@ -16,11 +16,19 @@ interface Props {
   deny: (processId: string) => void;
   acknowledgeConcludingImpossible: (processId: string) => void;
   defund: (processId: string) => void;
+  acknowledge: (processId: string) => void;
 }
 
 class ConcludingContainer extends PureComponent<Props> {
   render() {
-    const { state, deny, approve, acknowledgeConcludingImpossible, defund } = this.props;
+    const {
+      state,
+      deny,
+      approve,
+      acknowledgeConcludingImpossible,
+      defund,
+      acknowledge,
+    } = this.props;
     const processId = state.processId;
     switch (state.type) {
       case 'AcknowledgeConcludingImpossible':
@@ -41,6 +49,22 @@ class ConcludingContainer extends PureComponent<Props> {
         return (
           <ApproveConcluding deny={() => deny(processId)} approve={() => approve(processId)} />
         );
+      case 'AcknowledgeDefundFailed':
+        return (
+          <Acknowledge
+            title="Defunding failed"
+            description="You weren't able to defund the channel"
+            acknowledge={() => acknowledge(state.processId)}
+          />
+        );
+      case 'AcknowledgeChannelDoesntExist':
+        return (
+          <Acknowledge
+            title="Concluding failed"
+            description="The channel does not exist."
+            acknowledge={() => acknowledge(state.processId)}
+          />
+        );
       default:
         return unreachable(state);
     }
@@ -52,6 +76,7 @@ const mapDispatchToProps = {
   deny: actions.cancelled,
   acknowledgeConcludingImpossible: actions.resignationImpossibleAcknowledged,
   defund: actions.defundChosen,
+  acknowledge: actions.acknowledged,
 };
 
 export const Concluding = connect(
