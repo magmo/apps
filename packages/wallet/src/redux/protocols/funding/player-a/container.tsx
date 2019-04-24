@@ -9,6 +9,8 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { PlayerIndex } from '../../../types';
 import { Strategy } from '..';
 import ChooseStrategy from '../../../../components/funding/choose-strategy';
+import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
+import AcknowledgeX from '../../../../components/acknowledge-x';
 
 interface Props {
   state: states.OngoingFundingState;
@@ -33,9 +35,19 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.WAIT_FOR_STRATEGY_RESPONSE:
+        return <WaitForOtherPlayer name={'strategy response'} />;
       case states.WAIT_FOR_FUNDING:
+        // TODO: embed the funding container
+        return <div />;
       case states.WAIT_FOR_SUCCESS_CONFIRMATION:
-        return <div>Hello World From Player A Funding</div>;
+        return (
+          <AcknowledgeX
+            title="Channel funded!"
+            action={() => actions.fundingSuccessAcknowledged(processId)}
+            description="You have successfully funded your channel"
+            actionTitle="Ok!"
+          />
+        );
       default:
         return unreachable(state);
     }
