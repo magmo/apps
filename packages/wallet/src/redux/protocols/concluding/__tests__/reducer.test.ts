@@ -90,7 +90,7 @@ describe('[ Defunding Failed ] scenario', () => {
   const scenario = scenarios.defundingFailed;
   const { storage } = scenario;
 
-  describe('when in ApproveConcluding', () => {
+  describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund;
     const action = scenario.actions.defundFailed;
     const result = concludingReducer(state, storage, action);

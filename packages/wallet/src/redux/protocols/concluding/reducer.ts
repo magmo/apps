@@ -36,8 +36,8 @@ export function concludingReducer(
       return concludeReceived(state, storage);
     case 'DEFUND.CHOSEN':
       return defundChosen(state, storage);
-    case 'DEFUND.NOT.CHOSEN':
-      return defundNotChosen(state, storage);
+    case 'DEFUND.FAILED':
+      return defundFailed(state, storage);
     case 'DEFUNDED':
       return defunded(state, storage);
     default:
@@ -94,11 +94,11 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
   return { state: waitForDefund(state), storage };
 }
 
-function defundNotChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeChannelConcluded') {
+function defundFailed(state: NonTerminalCState, storage: Storage): ReturnVal {
+  if (state.type !== 'WaitForDefund') {
     return { state, storage };
   }
-  return { state: success(), storage };
+  return { state: failure({ reason: 'DefundFailed' }), storage };
 }
 
 function defunded(state: NonTerminalCState, storage: Storage): ReturnVal {

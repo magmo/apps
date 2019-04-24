@@ -32,7 +32,7 @@ export interface DefundChosen {
 }
 
 export interface DefundFailed {
-  type: 'DEFUND.NOT.CHOSEN';
+  type: 'DEFUND.FAILED';
   processId: string;
 }
 
@@ -73,7 +73,7 @@ export const defundChosen = (processId: string): DefundChosen => ({
 });
 
 export const defundFailed = (processId: string): DefundFailed => ({
-  type: 'DEFUND.NOT.CHOSEN',
+  type: 'DEFUND.FAILED',
   processId,
 });
 
