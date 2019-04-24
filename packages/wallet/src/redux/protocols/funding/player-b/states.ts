@@ -1,4 +1,5 @@
 import { Properties as P } from '../../../utils';
+import { Strategy } from '..';
 
 export type FundingState =
   | WaitForStrategyProposal
@@ -30,6 +31,7 @@ export interface WaitForStrategyProposal extends BaseState {
 export interface WaitForStrategyApproval extends BaseState {
   type: typeof WAIT_FOR_STRATEGY_APPROVAL;
   targetChannelId: string;
+  strategy: Strategy;
 }
 
 export interface WaitForFunding extends BaseState {
@@ -72,8 +74,14 @@ export function waitForStrategyProposal(p: P<WaitForStrategyProposal>): WaitForS
 }
 
 export function waitForStrategyApproval(p: P<WaitForStrategyApproval>): WaitForStrategyApproval {
-  const { processId, opponentAddress, targetChannelId } = p;
-  return { type: WAIT_FOR_STRATEGY_APPROVAL, processId, opponentAddress, targetChannelId };
+  const { processId, opponentAddress, targetChannelId, strategy } = p;
+  return {
+    type: WAIT_FOR_STRATEGY_APPROVAL,
+    processId,
+    opponentAddress,
+    targetChannelId,
+    strategy,
+  };
 }
 
 export function waitForFunding(p: P<WaitForFunding>): WaitForFunding {
