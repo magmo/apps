@@ -72,7 +72,7 @@ const waitForFinalLedgerUpdateReducer = (
   if (action.type !== COMMITMENT_RECEIVED) {
     return { protocolState, sharedData };
   }
-  let newSharedData = receiveLedgerCommitment(sharedData, action.commitment, action.signature);
+  const newSharedData = receiveLedgerCommitment(sharedData, action.commitment, action.signature);
   if (!validTransition(sharedData, protocolState.channelId, action.commitment)) {
     return {
       protocolState: states.failure('Received Invalid Commitment'),
@@ -91,7 +91,7 @@ const waitForLedgerUpdateReducer = (
   }
 
   let newSharedData = receiveLedgerCommitment(sharedData, action.commitment, action.signature);
-  if (!validTransition(sharedData, protocolState.channelId, action.commitment)) {
+  if (!validTransition(newSharedData, protocolState.channelId, action.commitment)) {
     return {
       protocolState: states.failure('Received Invalid Commitment'),
       sharedData: newSharedData,
@@ -167,7 +167,13 @@ const craftAndSendLegerUpdate = (
     appAttributes,
   };
 
-  return receiveAndSendUpdateCommitment(sharedData, processId, channelId, newCommitment);
+  return receiveAndSendUpdateCommitment(
+    sharedData,
+    processId,
+    channelId,
+    newCommitment,
+    channelState.ourIndex,
+  );
 };
 
 const craftFinalLedgerUpdate = (
@@ -194,7 +200,13 @@ const craftFinalLedgerUpdate = (
     destination: proposedDestination,
   };
 
-  return receiveAndSendUpdateCommitment(sharedData, processId, channelId, newCommitment);
+  return receiveAndSendUpdateCommitment(
+    sharedData,
+    processId,
+    channelId,
+    newCommitment,
+    PlayerIndex.A,
+  );
 };
 
 const receiveAndSendUpdateCommitment = (
@@ -202,6 +214,7 @@ const receiveAndSendUpdateCommitment = (
   processId: string,
   channelId: string,
   commitment: Commitment,
+  ourIndex: PlayerIndex,
 ) => {
   const channelState = getChannelState(sharedData, channelId);
   const newSharedData = helpers.updateChannelState(
@@ -214,7 +227,7 @@ const receiveAndSendUpdateCommitment = (
   // Send out the commitment to the opponent
   newSharedData.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
-      channelState.participants[PlayerIndex.B],
+      channelState.participants[ourIndex],
       processId,
       commitment,
       newSignature,

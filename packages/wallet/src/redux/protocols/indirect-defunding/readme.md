@@ -10,7 +10,7 @@ It covers:
 
 ## State machine
 
-### Player B State machine
+### Player A State machine
 
 ```mermaid
 graph TD
@@ -23,7 +23,7 @@ graph TD
   WFU --> |"CommitmentReceived(Reject)"| F
 ```
 
-### Player A State machine
+### Player B State machine
 
 ```mermaid
 graph TD
@@ -45,13 +45,13 @@ Notes:
 
 Assumptions:
 
-- We assume that Player A was responsible for the original set of ledger updates to fund the channel. Due to the current consensus algorithm if player A proposed a consensus (to fund the channel), player B must propose the next consensus (to de-fund the channel).
+- It is Player A's turn to make the next ledger update.
 
 ## Scenarios
 
-1. **Happy Path - Player B** Start->WaitForLedgerUpdate->Success
-2. **Happy Path - Player A** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Success
+1. **Happy Path - Player A** Start->WaitForLedgerUpdate->Success
+2. **Happy Path - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Success
 3. **Not De-fundable** Start->Failure
-4. **Commitment Rejected - Player B** Start->WaitForLedgerUpdate->Failure
-5. **First Commitment Rejected - Player A** Start->WaitForLedgerUpdate->Failure
-6. **Final Commitment Rejected - Player A** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Failure
+4. **Commitment Rejected - Player A** Start->WaitForLedgerUpdate->Failure
+5. **First Commitment Rejected - Player B** Start->WaitForLedgerUpdate->Failure
+6. **Final Commitment Rejected - Player B** Start->WaitForLedgerUpdate->WaitForFinalLedgerUpdate->Failure

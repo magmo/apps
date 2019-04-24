@@ -79,16 +79,15 @@ describe('player B happy path', () => {
       channelId,
       proposedAllocation,
       proposedDestination,
-      sharedData,
+      sharedData.initializingSharedData,
     );
     itTransitionsTo(result, states.WAIT_FOR_LEDGER_UPDATE);
-    itSendsThisCommitment(result, scenario.updateCommitment);
   });
 
   describe(`when in ${states.WAIT_FOR_LEDGER_UPDATE}`, () => {
     const state = scenario.states.waitForLedgerUpdate;
     const action = scenario.actions.firstCommitmentReceived;
-    const result = indirectDefundingReducer(state, sharedData, action);
+    const result = indirectDefundingReducer(state, sharedData.initializingSharedData, action);
 
     itSendsThisCommitment(result, scenario.updateCommitment);
     itTransitionsTo(result, states.WAIT_FOR_FINAL_LEDGER_UPDATE);
@@ -97,7 +96,7 @@ describe('player B happy path', () => {
   describe(`when in ${states.WAIT_FOR_FINAL_LEDGER_UPDATE}`, () => {
     const state = scenario.states.waitForFinalLedgerUpdate;
     const action = scenario.actions.finalCommitmentReceived;
-    const result = indirectDefundingReducer(state, sharedData, action);
+    const result = indirectDefundingReducer(state, sharedData.waitForFinalUpdateSharedData, action);
 
     itTransitionsTo(result, states.SUCCESS);
   });

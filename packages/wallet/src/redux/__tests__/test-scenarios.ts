@@ -255,25 +255,32 @@ export const ledgerCommitments = {
     commitmentType: CommitmentType.App,
     turnNum: 6,
   },
-  ledgerDefundUpdate1: {
+  ledgerUpdate3: {
     ...allocatesToChannelAttrs,
-    appAttributes: ledgerAppAttributes(0),
+    appAttributes: ledgerAppAttributes(1, allocatesToChannel, [channelId]),
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
     turnNum: 7,
   },
-  ledgerDefundUpdate2: {
+  ledgerDefundUpdate0: {
+    ...allocatesToChannelAttrs,
+    appAttributes: ledgerAppAttributes(0),
+    commitmentCount: 0,
+    commitmentType: CommitmentType.App,
+    turnNum: 8,
+  },
+  ledgerDefundUpdate1: {
     ...allocatesToChannelAttrs,
     appAttributes: ledgerAppAttributes(1),
     commitmentCount: 1,
     commitmentType: CommitmentType.App,
-    turnNum: 8,
+    turnNum: 9,
   },
-  ledgerDefundUpdate3: {
+  ledgerDefundUpdate2: {
     ...ledgerChannelAttrs,
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    turnNum: 9,
+    turnNum: 10,
   },
 };
 

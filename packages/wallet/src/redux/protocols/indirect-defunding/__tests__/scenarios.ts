@@ -10,32 +10,32 @@ import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import * as actions from '../../../actions';
 import { AdjudicatorState } from '../../../adjudicator-state/state';
 
-// Various state propties
+// Various state properties
 const processId = 'processid.123';
 const {
   asAddress: address,
   asPrivateKey: privateKey,
-  channelId,
-  libraryAddress,
   participants,
-  channelNonce,
   ledgerCommitments,
+  ledgerId,
+  ledgerLibraryAddress,
 } = testScenarios;
 
+const channelId = ledgerId;
 const channelStatus: ChannelStatus = {
   address,
   privateKey,
   stage: RUNNING,
   type: WAIT_FOR_UPDATE,
   channelId,
-  libraryAddress,
+  libraryAddress: ledgerLibraryAddress,
   participants,
-  channelNonce,
+  channelNonce: 0,
   funded: true,
   ourIndex: 0,
-  turnNum: ledgerCommitments.ledgerUpdate2.turnNum,
-  lastCommitment: { commitment: ledgerCommitments.ledgerUpdate2, signature: '0x0' },
-  penultimateCommitment: { commitment: ledgerCommitments.ledgerUpdate1, signature: '0x0' },
+  turnNum: ledgerCommitments.ledgerUpdate3.turnNum,
+  lastCommitment: { commitment: ledgerCommitments.ledgerUpdate3, signature: '0x0' },
+  penultimateCommitment: { commitment: ledgerCommitments.ledgerUpdate2, signature: '0x0' },
 };
 
 const playerAStartChannelState: ChannelState = {
@@ -50,22 +50,41 @@ const playerAWaitForCommitmentChannelState: ChannelState = {
   initializedChannels: {
     [channelId]: {
       ...channelStatus,
-      lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate2, signature: '0x0' },
+      lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate1, signature: '0x0' },
       penultimateCommitment: {
-        commitment: ledgerCommitments.ledgerDefundUpdate1,
+        commitment: ledgerCommitments.ledgerDefundUpdate0,
         signature: '0x0',
       },
-      turnNum: ledgerCommitments.ledgerDefundUpdate2.turnNum,
+      turnNum: ledgerCommitments.ledgerDefundUpdate1.turnNum,
     },
   },
 };
 
-const playerBChannelState: ChannelState = {
+const playerBStartChannelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
-    [channelId]: { ...channelStatus, ourIndex: 1 },
+    [channelId]: {
+      ...channelStatus,
+      ourIndex: 1,
+    },
   },
 };
+
+const playerBWaitForCommitmentChannelState: ChannelState = {
+  initializingChannels: {},
+  initializedChannels: {
+    [channelId]: {
+      ...channelStatus,
+      lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate1, signature: '0x0' },
+      penultimateCommitment: {
+        commitment: ledgerCommitments.ledgerDefundUpdate0,
+        signature: '0x0',
+      },
+      turnNum: ledgerCommitments.ledgerDefundUpdate1.turnNum,
+    },
+  },
+};
+
 const adjudicatorState: AdjudicatorState = {
   [channelId]: {
     finalized: true,
@@ -94,10 +113,16 @@ const playerAWaitForUpdateSharedData: SharedData = {
   channelState: playerAWaitForCommitmentChannelState,
 };
 
-const playerBSharedData: SharedData = {
+const playerBStartSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerBChannelState,
+  channelState: playerBStartChannelState,
+};
+
+const playerBWaitForFinalUpdateSharedData = {
+  ...EMPTY_SHARED_DATA,
+  adjudicatorState,
+  channelState: playerBWaitForCommitmentChannelState,
 };
 
 const notDefundableSharedData: SharedData = {
@@ -109,22 +134,22 @@ const notDefundableSharedData: SharedData = {
 const {
   allocation: proposedAllocation,
   destination: proposedDestination,
-} = ledgerCommitments.ledgerDefundUpdate3;
+} = ledgerCommitments.ledgerDefundUpdate2;
 
 // Actions
 const playerACommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.ledgerDefundUpdate2,
+  ledgerCommitments.ledgerDefundUpdate1,
   '0x0',
 );
 const playerBFirstCommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.ledgerDefundUpdate2,
+  ledgerCommitments.ledgerDefundUpdate0,
   '0x0',
 );
 const playerBFinalCommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.ledgerDefundUpdate3,
+  ledgerCommitments.ledgerDefundUpdate2,
   '0x0',
 );
 
@@ -156,8 +181,8 @@ export const playerAHappyPath = {
   channelId,
   proposedAllocation,
   proposedDestination,
-  firstUpdateCommitment: ledgerCommitments.ledgerDefundUpdate1,
-  secondUpdateCommitment: ledgerCommitments.ledgerDefundUpdate3,
+  firstUpdateCommitment: ledgerCommitments.ledgerDefundUpdate0,
+  secondUpdateCommitment: ledgerCommitments.ledgerDefundUpdate2,
   states: {
     waitForLedgerUpdate,
   },
@@ -175,7 +200,7 @@ export const playerBHappyPath = {
   channelId,
   proposedAllocation,
   proposedDestination,
-  updateCommitment: ledgerCommitments.ledgerDefundUpdate2,
+  updateCommitment: ledgerCommitments.ledgerDefundUpdate1,
 
   states: {
     waitForLedgerUpdate,
@@ -185,7 +210,10 @@ export const playerBHappyPath = {
     firstCommitmentReceived: playerBFirstCommitmentReceived,
     finalCommitmentReceived: playerBFinalCommitmentReceived,
   },
-  sharedData: playerBSharedData,
+  sharedData: {
+    initializingSharedData: playerBStartSharedData,
+    waitForFinalUpdateSharedData: playerBWaitForFinalUpdateSharedData,
+  },
 };
 
 export const notDefundable = {
@@ -219,7 +247,7 @@ export const playerBInvalidFirstCommitment = {
   channelId,
   proposedAllocation,
   proposedDestination,
-  sharedData: playerBSharedData,
+  sharedData: playerBStartSharedData,
   states: {
     waitForLedgerUpdate,
     failure: invalidCommitmentFailure,
@@ -234,7 +262,7 @@ export const playerBInvalidFinalCommitment = {
   channelId,
   proposedAllocation,
   proposedDestination,
-  sharedData: playerBSharedData,
+  sharedData: playerBStartSharedData,
   states: {
     waitForLedgerUpdate,
     waitForFinalLedgerUpdate,
