@@ -1,12 +1,13 @@
 import { Properties as P } from '../../../utils';
 
-export type FundingState =
+export type OngoingFundingState =
   | WaitForStrategyProposal
   | WaitForStrategyApproval
   | WaitForFunding
-  | WaitForSuccessConfirmation
-  | Success
-  | Failure;
+  | WaitForSuccessConfirmation;
+
+export type TerminalFundingState = Success | Failure;
+export type FundingState = OngoingFundingState | TerminalFundingState;
 
 export const WAIT_FOR_STRATEGY_PROPOSAL = 'WaitForStrategyProposal';
 export const WAIT_FOR_STRATEGY_APPROVAL = 'WaitForStrategyApproval';
