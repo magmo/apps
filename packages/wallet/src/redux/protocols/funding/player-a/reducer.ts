@@ -53,7 +53,8 @@ function strategyChosen(
   if (state.type !== states.WAIT_FOR_STRATEGY_CHOICE) {
     return { protocolState: state, sharedData };
   }
-  return { protocolState: states.waitForStrategyResponse(state), sharedData };
+  const { strategy } = action;
+  return { protocolState: states.waitForStrategyResponse({ ...state, strategy }), sharedData };
 }
 
 function strategyApproved(
