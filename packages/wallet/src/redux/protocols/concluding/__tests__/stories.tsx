@@ -28,6 +28,8 @@ addStories(scenarios.concludingNotPossible, 'Concluding / Concluding Impossible'
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {
-    storiesOf(chapter, module).add(key, render(<Concluding state={scenario.states[key]} />));
+    if (scenario.states[key].type !== 'Success' && scenario.states[key].type !== 'Failure') {
+      storiesOf(chapter, module).add(key, render(<Concluding state={scenario.states[key]} />));
+    }
   });
 }
