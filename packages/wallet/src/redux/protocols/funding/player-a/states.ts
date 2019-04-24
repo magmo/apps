@@ -17,32 +17,32 @@ export const WAIT_FOR_SUCCESS_CONFIRMATION = 'WaitForSuccessConfirmation';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
 
-export interface WaitForStrategyChoice {
+interface BaseState {
+  processId: string;
+  opponentAddress: string;
+}
+
+export interface WaitForStrategyChoice extends BaseState {
   type: typeof WAIT_FOR_STRATEGY_CHOICE;
   targetChannelId: string;
-  processId: string;
 }
 
-export interface WaitForStrategyResponse {
+export interface WaitForStrategyResponse extends BaseState {
   type: typeof WAIT_FOR_STRATEGY_RESPONSE;
   targetChannelId: string;
-  processId: string;
 }
 
-export interface WaitForFunding {
+export interface WaitForFunding extends BaseState {
   type: typeof WAIT_FOR_FUNDING;
-  processId: string;
   fundingState: 'funding state';
 }
 
-export interface WaitForPostFundSetup {
+export interface WaitForPostFundSetup extends BaseState {
   type: typeof WAIT_FOR_POSTFUND_SETUP;
-  processId: string;
 }
 
-export interface WaitForSuccessConfirmation {
+export interface WaitForSuccessConfirmation extends BaseState {
   type: typeof WAIT_FOR_SUCCESS_CONFIRMATION;
-  processId: string;
 }
 
 export interface Failure {
@@ -67,30 +67,30 @@ export function isTerminal(state: FundingState): state is Failure | Success {
 // ------------
 
 export function waitForStrategyChoice(p: P<WaitForStrategyChoice>): WaitForStrategyChoice {
-  const { processId, targetChannelId } = p;
-  return { type: WAIT_FOR_STRATEGY_CHOICE, processId, targetChannelId };
+  const { processId, opponentAddress, targetChannelId } = p;
+  return { type: WAIT_FOR_STRATEGY_CHOICE, processId, targetChannelId, opponentAddress };
 }
 
 export function waitForStrategyResponse(p: P<WaitForStrategyResponse>): WaitForStrategyResponse {
-  const { processId, targetChannelId } = p;
-  return { type: WAIT_FOR_STRATEGY_RESPONSE, processId, targetChannelId };
+  const { processId, opponentAddress, targetChannelId } = p;
+  return { type: WAIT_FOR_STRATEGY_RESPONSE, processId, opponentAddress, targetChannelId };
 }
 
 export function waitForFunding(p: P<WaitForFunding>): WaitForFunding {
-  const { processId, fundingState } = p;
-  return { type: WAIT_FOR_FUNDING, processId, fundingState };
+  const { processId, opponentAddress, fundingState } = p;
+  return { type: WAIT_FOR_FUNDING, processId, opponentAddress, fundingState };
 }
 
 export function waitForPostFundSetup(p: P<WaitForPostFundSetup>): WaitForPostFundSetup {
-  const { processId } = p;
-  return { type: WAIT_FOR_POSTFUND_SETUP, processId };
+  const { processId, opponentAddress } = p;
+  return { type: WAIT_FOR_POSTFUND_SETUP, processId, opponentAddress };
 }
 
 export function waitForSuccessConfirmation(
   p: P<WaitForSuccessConfirmation>,
 ): WaitForSuccessConfirmation {
-  const { processId } = p;
-  return { type: WAIT_FOR_SUCCESS_CONFIRMATION, processId };
+  const { processId, opponentAddress } = p;
+  return { type: WAIT_FOR_SUCCESS_CONFIRMATION, processId, opponentAddress };
 }
 
 export function success(): Success {

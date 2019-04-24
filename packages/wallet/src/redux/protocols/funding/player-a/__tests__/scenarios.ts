@@ -22,12 +22,15 @@ import { EMPTY_SHARED_DATA } from '../../../../state';
 // ---------
 const processId = 'process-id.123';
 const sharedData = EMPTY_SHARED_DATA;
+const targetChannelId = '0x123';
+const opponentAddress = '0xf00';
 
 const props = {
   processId,
   sharedData,
   fundingState: 'funding state' as 'funding state',
-  targetChannelId: '0x123',
+  targetChannelId,
+  opponentAddress,
 };
 
 // ----
