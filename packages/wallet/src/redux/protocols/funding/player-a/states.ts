@@ -1,19 +1,18 @@
 import { Properties as P } from '../../../utils';
 import { Strategy } from '..';
 
-export type FundingState =
+export type OngoingFundingState =
   | WaitForStrategyChoice
   | WaitForStrategyResponse
   | WaitForFunding
-  | WaitForPostFundSetup
-  | WaitForSuccessConfirmation
-  | Success
-  | Failure;
+  | WaitForSuccessConfirmation;
+
+export type TerminalFundingState = Success | Failure;
+export type FundingState = OngoingFundingState | TerminalFundingState;
 
 export const WAIT_FOR_STRATEGY_CHOICE = 'WaitForStrategyChoice';
 export const WAIT_FOR_STRATEGY_RESPONSE = 'WaitForStrategyResponse';
 export const WAIT_FOR_FUNDING = 'WaitForFunding';
-export const WAIT_FOR_POSTFUND_SETUP = 'WaitForPostFundSetup';
 export const WAIT_FOR_SUCCESS_CONFIRMATION = 'WaitForSuccessConfirmation';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
@@ -39,10 +38,6 @@ export interface WaitForFunding extends BaseState {
   fundingState: 'funding state';
 }
 
-export interface WaitForPostFundSetup extends BaseState {
-  type: typeof WAIT_FOR_POSTFUND_SETUP;
-}
-
 export interface WaitForSuccessConfirmation extends BaseState {
   type: typeof WAIT_FOR_SUCCESS_CONFIRMATION;
 }
@@ -60,7 +55,7 @@ export interface Success {
 // Helpers
 // -------
 
-export function isTerminal(state: FundingState): state is Failure | Success {
+export function isTerminal(state: FundingState): state is TerminalFundingState {
   return state.type === FAILURE || state.type === SUCCESS;
 }
 
@@ -87,11 +82,6 @@ export function waitForStrategyResponse(p: P<WaitForStrategyResponse>): WaitForS
 export function waitForFunding(p: P<WaitForFunding>): WaitForFunding {
   const { processId, opponentAddress, fundingState } = p;
   return { type: WAIT_FOR_FUNDING, processId, opponentAddress, fundingState };
-}
-
-export function waitForPostFundSetup(p: P<WaitForPostFundSetup>): WaitForPostFundSetup {
-  const { processId, opponentAddress } = p;
-  return { type: WAIT_FOR_POSTFUND_SETUP, processId, opponentAddress };
 }
 
 export function waitForSuccessConfirmation(

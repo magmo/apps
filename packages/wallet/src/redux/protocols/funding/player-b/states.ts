@@ -1,19 +1,18 @@
 import { Properties as P } from '../../../utils';
 import { Strategy } from '..';
 
-export type FundingState =
+export type OngoingFundingState =
   | WaitForStrategyProposal
   | WaitForStrategyApproval
   | WaitForFunding
-  | WaitForPostFundSetup
-  | WaitForSuccessConfirmation
-  | Success
-  | Failure;
+  | WaitForSuccessConfirmation;
+
+export type TerminalFundingState = Success | Failure;
+export type FundingState = OngoingFundingState | TerminalFundingState;
 
 export const WAIT_FOR_STRATEGY_PROPOSAL = 'WaitForStrategyProposal';
 export const WAIT_FOR_STRATEGY_APPROVAL = 'WaitForStrategyApproval';
 export const WAIT_FOR_FUNDING = 'WaitForFunding';
-export const WAIT_FOR_POSTFUND_SETUP = 'WaitForPostFundSetup';
 export const WAIT_FOR_SUCCESS_CONFIRMATION = 'WaitForSuccessConfirmation';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
@@ -37,10 +36,6 @@ export interface WaitForStrategyApproval extends BaseState {
 export interface WaitForFunding extends BaseState {
   type: typeof WAIT_FOR_FUNDING;
   fundingState: 'funding state';
-}
-
-export interface WaitForPostFundSetup extends BaseState {
-  type: typeof WAIT_FOR_POSTFUND_SETUP;
 }
 
 export interface WaitForSuccessConfirmation extends BaseState {
@@ -87,11 +82,6 @@ export function waitForStrategyApproval(p: P<WaitForStrategyApproval>): WaitForS
 export function waitForFunding(p: P<WaitForFunding>): WaitForFunding {
   const { processId, opponentAddress, fundingState } = p;
   return { type: WAIT_FOR_FUNDING, processId, opponentAddress, fundingState };
-}
-
-export function waitForPostFundSetup(p: P<WaitForPostFundSetup>): WaitForPostFundSetup {
-  const { processId, opponentAddress } = p;
-  return { type: WAIT_FOR_POSTFUND_SETUP, processId, opponentAddress };
 }
 
 export function waitForSuccessConfirmation(
