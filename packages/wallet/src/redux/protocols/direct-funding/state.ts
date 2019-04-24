@@ -5,21 +5,25 @@ import { DirectFundingRequested } from '../../internal/actions';
 import { SharedData } from '../../state';
 import { initialize as initTransactionState } from '../transaction-submission/reducer';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
-import { Properties } from '../../utils';
+import { Properties, Constructor } from '../../utils';
 
 // ChannelFundingStatus
 export const NOT_SAFE_TO_DEPOSIT = 'NOT_SAFE_TO_DEPOSIT';
 export const WAIT_FOR_DEPOSIT_TRANSACTION = 'WAIT_FOR_DEPOSIT_TRANSACTION';
 export const WAIT_FOR_FUNDING_AND_POST_FUND_SETUP = 'WAIT_FOR_FUNDING_AND_POST_FUND_SETUP';
 export const FUNDING_SUCCESS = 'CHANNEL_FUNDED';
+export const FUNDING_FAILURE = 'FUNDING_FAILURE';
 // Funding status
 export type ChannelFundingStatus =
   | typeof NOT_SAFE_TO_DEPOSIT
   | typeof WAIT_FOR_DEPOSIT_TRANSACTION
   | typeof WAIT_FOR_FUNDING_AND_POST_FUND_SETUP
-  | typeof FUNDING_SUCCESS;
+  | typeof FUNDING_SUCCESS
+  | typeof FUNDING_FAILURE;
+
 export const DIRECT_FUNDING = 'FUNDING_TYPE.DIRECT';
 export interface BaseDirectFundingState {
+  processId: string;
   safeToDepositLevel: string;
   type: ChannelFundingStatus;
   requestedTotalFunds: string;
@@ -42,11 +46,15 @@ export interface WaitForFundingAndPostFundSetup extends BaseDirectFundingState {
 export interface FundingSuccess extends BaseDirectFundingState {
   type: typeof FUNDING_SUCCESS;
 }
+
+export interface FundingFailure extends BaseDirectFundingState {
+  type: typeof FUNDING_FAILURE;
+}
+
 // constructors
-export function baseDirectFundingState(
-  params: Properties<BaseDirectFundingState>,
-): BaseDirectFundingState {
+export const baseDirectFundingState: Constructor<BaseDirectFundingState> = params => {
   const {
+    processId,
     requestedTotalFunds,
     requestedYourContribution,
     channelId,
@@ -55,6 +63,7 @@ export function baseDirectFundingState(
     type: channelFundingStatus,
   } = params;
   return {
+    processId,
     requestedTotalFunds,
     requestedYourContribution,
     channelId,
@@ -62,13 +71,13 @@ export function baseDirectFundingState(
     safeToDepositLevel,
     type: channelFundingStatus,
   };
-}
-export function notSafeToDeposit(params: Properties<BaseDirectFundingState>): NotSafeToDeposit {
+};
+export const notSafeToDeposit: Constructor<NotSafeToDeposit> = params => {
   return {
     ...baseDirectFundingState(params),
     type: NOT_SAFE_TO_DEPOSIT,
   };
-}
+};
 export function waitForDepositTransaction(
   params: Properties<WaitForDepositTransaction>,
 ): WaitForDepositTransaction {
@@ -79,33 +88,36 @@ export function waitForDepositTransaction(
     transactionSubmissionState,
   };
 }
-
-interface ConditionalParams {
-  channelFunded: boolean;
-  postFundSetupReceived: boolean;
-}
-export function waitForFundingAndPostFundSetup(
-  params: Properties<BaseDirectFundingState>,
-  conditionalParams: ConditionalParams,
-): WaitForFundingAndPostFundSetup {
+export const waitForFundingAndPostFundSetup: Constructor<
+  WaitForFundingAndPostFundSetup
+> = params => {
   return {
     ...baseDirectFundingState(params),
-    channelFunded: conditionalParams.channelFunded,
-    postFundSetupReceived: conditionalParams.postFundSetupReceived,
+    channelFunded: params.channelFunded,
+    postFundSetupReceived: params.postFundSetupReceived,
     type: WAIT_FOR_FUNDING_AND_POST_FUND_SETUP,
   };
-}
-export function fundingSuccess(params: Properties<BaseDirectFundingState>): FundingSuccess {
+};
+export const fundingSuccess: Constructor<FundingSuccess> = params => {
   return {
     ...baseDirectFundingState(params),
     type: FUNDING_SUCCESS,
   };
-}
+};
+
+export const fundingFailure: Constructor<FundingFailure> = params => {
+  return {
+    ...baseDirectFundingState(params),
+    type: FUNDING_FAILURE,
+  };
+};
+
 export type DirectFundingState =
   | NotSafeToDeposit
   | WaitForDepositTransaction
   | WaitForFundingAndPostFundSetup
-  | FundingSuccess;
+  | FundingSuccess
+  | FundingFailure;
 
 export function initialDirectFundingState(
   action: DirectFundingRequested,
@@ -119,6 +131,7 @@ export function initialDirectFundingState(
   if (alreadyFunded) {
     return {
       protocolState: fundingSuccess({
+        processId: action.processId,
         requestedTotalFunds: totalFundingRequired,
         requestedYourContribution: requiredDeposit,
         channelId,
@@ -133,12 +146,13 @@ export function initialDirectFundingState(
     const depositTransaction = createDepositTransaction(action.channelId, action.requiredDeposit);
     const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
-      `direct-funding.${action.channelId}`, // TODO: what is the correct way of fetching the process id?
+      action.processId,
       sharedData,
     );
 
     return {
       protocolState: waitForDepositTransaction({
+        processId: action.processId,
         requestedTotalFunds: totalFundingRequired,
         requestedYourContribution: requiredDeposit,
         channelId,
@@ -152,6 +166,7 @@ export function initialDirectFundingState(
 
   return {
     protocolState: notSafeToDeposit({
+      processId: action.processId,
       requestedTotalFunds: totalFundingRequired,
       requestedYourContribution: requiredDeposit,
       channelId,
