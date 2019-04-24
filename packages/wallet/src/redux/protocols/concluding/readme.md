@@ -44,7 +44,7 @@ graph TD
 
 ## Scenarios
 
-To test all paths through the state machine we will use 2 different scenarios:
+We will use the following scenarios for testing:
 
 1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `Success`
 2. **Channel doesnt exist** `Failure`
