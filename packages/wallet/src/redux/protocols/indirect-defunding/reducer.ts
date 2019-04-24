@@ -73,7 +73,7 @@ const waitForFinalLedgerUpdateReducer = (
     return { protocolState, sharedData };
   }
   const newSharedData = receiveLedgerCommitment(sharedData, action.commitment, action.signature);
-  if (!validTransition(sharedData, protocolState.channelId, action.commitment)) {
+  if (!validTransition(newSharedData, protocolState.channelId, action.commitment)) {
     return {
       protocolState: states.failure('Received Invalid Commitment'),
       sharedData: newSharedData,
@@ -81,6 +81,7 @@ const waitForFinalLedgerUpdateReducer = (
   }
   return { protocolState: states.success(), sharedData: newSharedData };
 };
+
 const waitForLedgerUpdateReducer = (
   protocolState: states.WaitForLedgerUpdate,
   sharedData: SharedData,
