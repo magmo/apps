@@ -1,8 +1,8 @@
 import * as scenarios from './scenarios';
 import { concludingReducer, initialize, ReturnVal } from '../reducer';
-import { ConcludingStateType } from '../states';
+import { ConcludingStateType, FailureReason } from '../states';
 
-describe('happy path scenario', () => {
+describe('[ Happy path ] scenario', () => {
   const scenario = scenarios.happyPath;
   const { channelId, processId, storage } = scenario;
 
@@ -44,8 +44,72 @@ describe('happy path scenario', () => {
   });
 });
 
+describe('[ Channel doesnt exist ] scenario', () => {
+  const { processId, storage } = scenarios.channelDoesntExist;
+
+  describe('when initializing', () => {
+    const result = initialize('NotInitializedChannelId', processId, storage);
+
+    itTransitionsToFailure(result, 'ChannelDoesntExist');
+  });
+});
+
+describe('[ Concluding Not Possible ] scenario', () => {
+  const scenario = scenarios.concludingNotPossible;
+  const { channelId, processId, storage } = scenario;
+
+  describe('when initializing', () => {
+    const result = initialize(channelId, processId, storage);
+
+    itTransitionsTo(result, 'AcknowledgeConcludingImpossible');
+  });
+
+  describe('when in AcknowledgeConcludingImpossible', () => {
+    const state = scenario.states.acknowledgeConcludingImpossible;
+    const action = scenario.actions.concludingImpossibleAcknowledged;
+    const result = concludingReducer(state, storage, action);
+
+    itTransitionsToFailure(result, 'NotYourTurn');
+  });
+});
+
+describe('[ Concluding Cancelled ] scenario', () => {
+  const scenario = scenarios.concludingCancelled;
+  const { storage } = scenario;
+
+  describe('when in ApproveConcluding', () => {
+    const state = scenario.states.approveConcluding;
+    const action = scenario.actions.cancelled;
+    const result = concludingReducer(state, storage, action);
+
+    itTransitionsToFailure(result, 'ConcludeCancelled');
+  });
+});
+
+describe('[ Defunding Failed ] scenario', () => {
+  const scenario = scenarios.defundingFailed;
+  const { storage } = scenario;
+
+  describe('when in ApproveConcluding', () => {
+    const state = scenario.states.waitForDefund;
+    const action = scenario.actions.defundFailed;
+    const result = concludingReducer(state, storage, action);
+
+    itTransitionsToFailure(result, 'DefundFailed');
+  });
+});
+
 function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
+  });
+}
+
+function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
+  it(`transitions to Failure with reason ${reason}`, () => {
+    expect(result.state.type).toEqual('Failure');
+    if (result.state.type === 'Failure') {
+      expect(result.state.reason).toEqual(reason);
+    }
   });
 }

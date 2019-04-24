@@ -4,7 +4,7 @@ export type ConcludingAction =
   | ConcludingImpossibleAcknowledged
   | ConcludeReceived
   | DefundChosen
-  | DefundNotChosen
+  | DefundFailed
   | Defunded;
 export interface Cancelled {
   type: 'CONCLUDING.CANCELLED';
@@ -31,7 +31,7 @@ export interface DefundChosen {
   processId: string;
 }
 
-export interface DefundNotChosen {
+export interface DefundFailed {
   type: 'DEFUND.NOT.CHOSEN';
   processId: string;
 }
@@ -72,7 +72,7 @@ export const defundChosen = (processId: string): DefundChosen => ({
   processId,
 });
 
-export const defundNotChosen = (processId: string): DefundNotChosen => ({
+export const defundFailed = (processId: string): DefundFailed => ({
   type: 'DEFUND.NOT.CHOSEN',
   processId,
 });

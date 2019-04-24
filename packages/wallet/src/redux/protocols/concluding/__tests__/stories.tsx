@@ -24,8 +24,7 @@ const render = container => () => {
 };
 
 addStories(scenarios.happyPath, 'Concluding / Happy Path');
-addStories(scenarios.resignationNotPossible, 'Concluding / Concluding Not Possible');
-addStories(scenarios.closedButNotDefunded, 'Concluding / Closed But Not Defunded');
+addStories(scenarios.concludingNotPossible, 'Concluding / Concluding Impossible');
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {

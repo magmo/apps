@@ -47,7 +47,6 @@ const acknowledgeChannelConcluded = states.acknowledgeChannelConcluded(defaults)
 const waitForDefund = states.waitForDefund(defaults);
 const success = states.success();
 const acknowledgeConcludingImpossible = states.acknowledgeConcludingImpossible(defaults);
-const failure = states.failure({ reason: 'NotYourTurn' });
 
 // -------
 // Actions
@@ -56,8 +55,9 @@ const concludeSent = actions.concludeSent(processId);
 const concludeReceived = actions.concludeReceived(processId);
 const defundChosen = actions.defundChosen(processId);
 const defunded = actions.defunded(processId);
-const resignationImpossibleAcknowledged = actions.resignationImpossibleAcknowledged(processId);
-const defundNotChosen = actions.defundNotChosen(processId);
+const concludingImpossibleAcknowledged = actions.resignationImpossibleAcknowledged(processId);
+const defundFailed = actions.defundFailed(processId);
+const cancelled = actions.cancelled(processId);
 
 // -------
 // Scenarios
@@ -80,26 +80,46 @@ export const happyPath = {
   },
 };
 
-export const resignationNotPossible = {
+export const channelDoesntExist = {
+  ...defaults,
+  storage: storage(ourTurn),
+  states: {
+    failure: states.failure({ reason: 'ChannelDoesntExist' }),
+  },
+};
+
+export const concludingNotPossible = {
   ...defaults,
   storage: storage(theirTurn),
   states: {
     acknowledgeConcludingImpossible,
-    failure,
+    failure: states.failure({ reason: 'NotYourTurn' }),
   },
   actions: {
-    resignationImpossibleAcknowledged,
+    concludingImpossibleAcknowledged,
   },
 };
 
-export const closedButNotDefunded = {
+export const concludingCancelled = {
+  ...defaults,
+  storage: storage(ourTurn),
+  states: {
+    approveConcluding,
+    failure: states.failure({ reason: 'ConcludeCancelled' }),
+  },
+  actions: {
+    cancelled,
+  },
+};
+
+export const defundingFailed = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
     waitForDefund,
-    success,
+    failure: states.failure({ reason: 'DefundFailed' }),
   },
   actions: {
-    defundNotChosen,
+    defundFailed,
   },
 };

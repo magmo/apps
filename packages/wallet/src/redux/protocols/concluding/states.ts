@@ -12,7 +12,11 @@ export type NonTerminalState =
 
 export type TerminalState = Success | Failure;
 
-export type FailureReason = 'NotYourTurn' | 'ChannelDoesntExist' | 'ResignCancelled';
+export type FailureReason =
+  | 'NotYourTurn'
+  | 'ChannelDoesntExist'
+  | 'ConcludeCancelled'
+  | 'DefundFailed';
 
 export interface AcknowledgeConcludingImpossible {
   type: 'AcknowledgeConcludingImpossible';

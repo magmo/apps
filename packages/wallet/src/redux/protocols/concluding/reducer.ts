@@ -62,7 +62,7 @@ function concludingCancelled(state: NonTerminalCState, storage: Storage): Return
   if (state.type !== 'ApproveConcluding') {
     return { state, storage };
   }
-  return { state: failure({ reason: 'ResignCancelled' }), storage };
+  return { state: failure({ reason: 'ConcludeCancelled' }), storage };
 }
 function resignationImpossibleAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'AcknowledgeConcludingImpossible') {

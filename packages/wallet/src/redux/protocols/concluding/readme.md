@@ -25,7 +25,7 @@ graph TD
   E --> |Yes| MT{My turn?}
   MT  --> |Yes| CC(ApproveConcluding)
   MT  --> |No| RC(AcknowledgeConcludingImpossible)
-  CC  --> |CANCEL| F2((Failure))
+  CC  --> |CANCELLED| F2((Failure))
   CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
   WOC --> |CONCLUDE.RECEIVED| ACC(AcknowledgeChannelConcluded)
   ACC --> |DEFUND.CHOSEN| D(WaitForDefund)
@@ -47,9 +47,9 @@ graph TD
 To test all paths through the state machine we will use 2 different scenarios:
 
 1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `Success`
-2. **Channel doesnt exits** `Failure`
+2. **Channel doesnt exist** `Failure`
 3. **Concluding not possible**: `AcknowledgeConcludingImpossible` -> `Failure`
-4. **Conclusion cancelled** `ApproveConcluding` -> `Failure`
+4. **Concluding cancelled** `ApproveConcluding` -> `Failure`
 5. **Defund failed** `WaitForDefund` -> `Failure`
 
 # Terminology
