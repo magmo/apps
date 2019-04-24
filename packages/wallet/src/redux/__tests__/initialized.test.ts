@@ -5,6 +5,7 @@ import * as actions from './../actions';
 import * as scenarios from './test-scenarios';
 import { PlayerIndex, WalletProtocol } from '../types';
 import * as IndirectFunding from '../protocols/indirect-funding/reducer';
+import { fundingRequested } from '../protocols/actions';
 
 const { channelId } = scenarios;
 
@@ -33,7 +34,7 @@ describe('when the player initializes a channel', () => {
 describe('when a NewProcessAction arrives', () => {
   const processId = channelId;
 
-  const action = actions.indirectFunding.fundingRequested(channelId, PlayerIndex.A);
+  const action = fundingRequested(channelId, PlayerIndex.A);
   const initialize = jest.fn(() => ({
     protocolState: 'protocolState',
     sharedData: { prop: 'value' },

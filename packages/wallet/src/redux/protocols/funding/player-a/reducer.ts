@@ -13,6 +13,10 @@ import { fundingFailure } from 'magmo-wallet-client';
 
 type EmbeddedAction = IndirectFundingAction;
 
+export function initialize(sharedData: SharedData, processId: string, channelId: string) {
+  return states.waitForStrategyChoice({ processId, targetChannelId: channelId });
+}
+
 export function fundingReducer(
   state: states.FundingState,
   sharedData: SharedData,
