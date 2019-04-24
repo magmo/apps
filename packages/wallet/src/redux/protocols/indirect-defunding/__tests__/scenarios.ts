@@ -22,7 +22,7 @@ const {
 } = testScenarios;
 
 const channelId = ledgerId;
-const channelStatus: ChannelStatus = {
+const baseChannelStatus: ChannelStatus = {
   address,
   privateKey,
   stage: RUNNING,
@@ -41,7 +41,7 @@ const channelStatus: ChannelStatus = {
 const playerAStartChannelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
-    [channelId]: channelStatus,
+    [channelId]: baseChannelStatus,
   },
 };
 
@@ -49,7 +49,7 @@ const playerAWaitForCommitmentChannelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: {
-      ...channelStatus,
+      ...baseChannelStatus,
       lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate1, signature: '0x0' },
       penultimateCommitment: {
         commitment: ledgerCommitments.ledgerDefundUpdate0,
@@ -64,17 +64,18 @@ const playerBStartChannelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: {
-      ...channelStatus,
+      ...baseChannelStatus,
       ourIndex: 1,
     },
   },
 };
 
-const playerBWaitForCommitmentChannelState: ChannelState = {
+const playerBWaitForFinalCommitmentChannelState: ChannelState = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: {
-      ...channelStatus,
+      ...baseChannelStatus,
+      ourIndex: 1,
       lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate1, signature: '0x0' },
       penultimateCommitment: {
         commitment: ledgerCommitments.ledgerDefundUpdate0,
@@ -122,7 +123,7 @@ const playerBStartSharedData: SharedData = {
 const playerBWaitForFinalUpdateSharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerBWaitForCommitmentChannelState,
+  channelState: playerBWaitForFinalCommitmentChannelState,
 };
 
 const notDefundableSharedData: SharedData = {
