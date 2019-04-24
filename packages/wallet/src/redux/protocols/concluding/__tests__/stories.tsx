@@ -6,6 +6,7 @@ import { Concluding } from '..';
 import { fakeStore } from '../../../../__stories__/index';
 import StatusBarLayout from '../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
+import { isTerminal } from '../../responding/state';
 
 const render = container => () => {
   // todo: rework this modal stuff
@@ -33,7 +34,7 @@ addStories(scenarios.defundingFailed, 'Concluding / Defund failed');
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {
-    if (scenario.states[key].type !== 'Success' && scenario.states[key].type !== 'Failure') {
+    if (!isTerminal(scenario.states[key])) {
       storiesOf(chapter, module).add(key, render(<Concluding state={scenario.states[key]} />));
     }
   });
