@@ -12,12 +12,14 @@ import {
 import { ConcludingAction } from './actions';
 import { unreachable, ourTurn } from '../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../state';
-
+import { composeConcludeCommitment } from '../../../utils/commitment-utils';
+import { ChannelStatus } from '../../channel-state/state';
 type Storage = SharedData;
 
 export interface ReturnVal {
   state: CState;
   storage: Storage;
+  sideEffects?;
 }
 
 export function concludingReducer(
@@ -75,7 +77,29 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'ApproveConcluding') {
     return { state, storage };
   }
-  return { state: waitForOpponentConclude(state), storage };
+
+  const channelId = storage.channelState.activeAppChannelId as string;
+  // DANGER this asserts that there is a channelId
+  // TODO deal with the case where it does not exist.
+
+  const channelState = getChannel(storage, channelId) as ChannelStatus;
+
+  const {
+    concludeCommitment,
+    commitmentSignature,
+    sendCommitmentAction,
+  } = composeConcludeCommitment(channelState);
+
+  return {
+    state: waitForOpponentConclude({
+      ...state,
+      turnNum: concludeCommitment.turnNum,
+      penultimateCommitment: storage.channelState.initializedChannels.lastCommitment,
+      lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
+    }),
+    sideEffects: { messageOutbox: sendCommitmentAction },
+    storage,
+  };
   // TODO craft conclude commitment
   // TODO send to opponent
 }
