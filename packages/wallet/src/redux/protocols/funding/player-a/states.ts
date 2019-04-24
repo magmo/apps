@@ -1,4 +1,5 @@
 import { Properties as P } from '../../../utils';
+import { ProtocolState } from '../..';
 
 export type OngoingFundingState =
   | WaitForStrategyChoice
@@ -51,6 +52,17 @@ export interface Success {
 // -------
 // Helpers
 // -------
+
+export function isFundingState(state: ProtocolState): state is FundingState {
+  return (
+    state.type === WAIT_FOR_FUNDING ||
+    state.type === WAIT_FOR_STRATEGY_CHOICE ||
+    state.type === WAIT_FOR_STRATEGY_RESPONSE ||
+    state.type === WAIT_FOR_SUCCESS_CONFIRMATION ||
+    state.type === SUCCESS ||
+    state.type === FAILURE
+  );
+}
 
 export function isTerminal(state: FundingState): state is TerminalFundingState {
   return state.type === FAILURE || state.type === SUCCESS;

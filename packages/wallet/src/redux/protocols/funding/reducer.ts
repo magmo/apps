@@ -7,7 +7,7 @@ import { initialize as initializeB, fundingReducer as playerBReducer } from './p
 import { PlayerIndex } from '../../types';
 import { unreachable } from '../../../utils/reducer-utils';
 import { Action as IndirectFundingAction } from '../indirect-funding/actions';
-
+import * as playerAStates from './player-a/states';
 export function initialize(
   sharedData: SharedData,
   channelId: string,
@@ -16,9 +16,9 @@ export function initialize(
 ): ProtocolStateWithSharedData<states.FundingState> {
   switch (playerIndex) {
     case PlayerIndex.A:
-      return { protocolState: initializeA(sharedData, processId, channelId), sharedData };
+      return initializeA(sharedData, processId, channelId);
     case PlayerIndex.B:
-      return { protocolState: initializeB(sharedData, processId, channelId), sharedData };
+      return initializeB(sharedData, processId, channelId);
     default:
       return unreachable(playerIndex);
   }
@@ -29,7 +29,7 @@ export const fundingReducer: ProtocolReducer<states.FundingState> = (
   sharedData: SharedData,
   action: actions.FundingAction | IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> => {
-  if (states.isPlayerAFundingState(protocolState)) {
+  if (playerAStates.isFundingState(protocolState)) {
     if (!actions.isPlayerAFundingAction(action)) {
       return { protocolState, sharedData };
     }
