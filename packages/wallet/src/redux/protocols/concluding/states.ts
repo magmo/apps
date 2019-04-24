@@ -1,4 +1,4 @@
-import { Properties as P } from '../../utils';
+import { Constructor } from '../../utils';
 
 export type ConcludingState = NonTerminalState | PreTerminalState | TerminalState;
 export type ConcludingStateType = ConcludingState['type'];
@@ -90,52 +90,46 @@ export function isFailure(state: ConcludingState): state is Failure {
 // ------------
 // Constructors
 // ------------
-export function acknowledgeConcludingImpossible(
-  p: P<AcknowledgeConcludingImpossible>,
-): AcknowledgeConcludingImpossible {
+export const acknowledgeConcludingImpossible: Constructor<AcknowledgeConcludingImpossible> = p => {
   const { processId } = p;
   return { type: 'AcknowledgeConcludingImpossible', processId };
-}
+};
 
-export function approveConcluding(p: P<ApproveConcluding>): ApproveConcluding {
+export const approveConcluding: Constructor<ApproveConcluding> = p => {
   const { processId } = p;
   return { type: 'ApproveConcluding', processId };
-}
+};
 
-export function waitForOpponentConclude(p: P<WaitForOpponentConclude>): WaitForOpponentConclude {
+export const waitForOpponentConclude: Constructor<WaitForOpponentConclude> = p => {
   const { processId } = p;
   return { type: 'WaitForOpponentConclude', processId };
-}
+};
 
-export function acknowledgeChannelConcluded(
-  p: P<AcknowledgeChannelConcluded>,
-): AcknowledgeChannelConcluded {
+export const acknowledgeChannelConcluded: Constructor<AcknowledgeChannelConcluded> = p => {
   const { processId } = p;
   return { type: 'AcknowledgeChannelConcluded', processId };
-}
+};
 
-export function acknowledgeChannelDoesntExist(
-  p: P<AcknowledgeChannelDoesntExist>,
-): AcknowledgeChannelDoesntExist {
+export const acknowledgeChannelDoesntExist: Constructor<AcknowledgeChannelDoesntExist> = p => {
   const { processId } = p;
   return { type: 'AcknowledgeChannelDoesntExist', processId };
-}
+};
 
-export function acknowledgeDefundFailed(p: P<AcknowledgeDefundFailed>): AcknowledgeDefundFailed {
+export const acknowledgeDefundFailed: Constructor<AcknowledgeDefundFailed> = p => {
   const { processId } = p;
   return { type: 'AcknowledgeDefundFailed', processId };
-}
+};
 
-export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {
+export const waitForDefund: Constructor<WaitForDefund> = p => {
   const { processId } = p;
   return { type: 'WaitForDefund', processId };
-}
+};
 
 export function success(): Success {
   return { type: 'Success' };
 }
 
-export function failure(p: P<Failure>): Failure {
+export const failure: Constructor<Failure> = p => {
   const { reason } = p;
   return { type: 'Failure', reason };
-}
+};
