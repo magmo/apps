@@ -3,7 +3,7 @@ import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudi
 import { PlayerIndex } from '../redux/types';
 import { signCommitment } from './signing-utils';
 import { Channel } from 'fmg-core';
-import { SignedCommitment } from '../redux/channel-store/shared/state';
+import { SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
 import { ChannelState } from '../redux/channel-store/state';
 
