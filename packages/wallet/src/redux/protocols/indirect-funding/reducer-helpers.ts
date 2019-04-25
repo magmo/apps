@@ -202,7 +202,7 @@ export const updateDirectFundingStatus = (
 
 export const initializeChannelState = (
   sharedData: SharedData,
-  channelState: channelStates.ChannelStatus,
+  channelState: channelStates.ChannelState,
 ): SharedData => {
   return setChannel(sharedData, channelState);
 };

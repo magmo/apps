@@ -7,7 +7,7 @@ import {
 } from './outbox/state';
 import {
   ChannelStore,
-  ChannelStatus,
+  ChannelState,
   setChannel as setChannelInStore,
   emptyChannelStore,
 } from './channel-store/state';
@@ -120,7 +120,7 @@ export function initialized(params: Properties<Initialized>): Initialized {
 // Getters and setters
 // -------------------
 
-export function getChannelStatus(state: WalletState, channelId: string): ChannelStatus {
+export function getChannelStatus(state: WalletState, channelId: string): ChannelState {
   return state.channelStore.initializedChannels[channelId];
 }
 
@@ -128,11 +128,11 @@ export function setSideEffects(state: Initialized, sideEffects: SideEffects): In
   return { ...state, outboxState: accumulateSideEffects(state.outboxState, sideEffects) };
 }
 
-export function setChannel(state: SharedData, channel: ChannelStatus): SharedData {
+export function setChannel(state: SharedData, channel: ChannelState): SharedData {
   return { ...state, channelStore: setChannelInStore(state.channelStore, channel) };
 }
 
-export function getChannel(state: SharedData, channelId: string): ChannelStatus | undefined {
+export function getChannel(state: SharedData, channelId: string): ChannelState | undefined {
   return state.channelStore.initializedChannels[channelId];
 }
 

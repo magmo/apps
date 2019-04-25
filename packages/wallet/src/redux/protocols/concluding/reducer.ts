@@ -15,7 +15,7 @@ import { ConcludingAction } from './actions';
 import { unreachable, ourTurn } from '../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../state';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
-import { ChannelStatus } from '../../channel-store/state';
+import { ChannelState } from '../../channel-store/state';
 type Storage = SharedData;
 
 export interface ReturnVal {
@@ -85,7 +85,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (storage.channelStore.activeAppChannelId) {
     const channelId = storage.channelStore.activeAppChannelId;
 
-    const channelState = getChannel(storage, channelId) as ChannelStatus;
+    const channelState = getChannel(storage, channelId) as ChannelState;
 
     const {
       concludeCommitment,

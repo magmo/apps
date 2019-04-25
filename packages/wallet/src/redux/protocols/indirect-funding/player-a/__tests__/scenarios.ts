@@ -99,7 +99,7 @@ const waitForUpdateLedgerChannelState = channelStates.waitForUpdate({
 
 const constructWalletState = (
   protocolState: states.PlayerAState,
-  ...channelStatuses: channelStates.ChannelStatus[]
+  ...channelStatuses: channelStates.ChannelState[]
 ): ProtocolStateWithSharedData<states.PlayerAState> => {
   const channelState = channelStates.emptyChannelStore();
   for (const channelStatus of channelStatuses) {

@@ -5,7 +5,7 @@ import { signCommitment } from './signing-utils';
 import { Channel } from 'fmg-core';
 import { SignedCommitment } from '../redux/channel-store/shared/state';
 import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
-import { ChannelStatus } from '../redux/channel-store/state';
+import { ChannelState } from '../redux/channel-store/state';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,
@@ -108,7 +108,7 @@ export const composePreFundCommitment = (
   return { commitment, signature };
 };
 
-export const composeConcludeCommitment = (channelState: ChannelStatus) => {
+export const composeConcludeCommitment = (channelState: ChannelState) => {
   const commitmentCount =
     channelState.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
 

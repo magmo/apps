@@ -100,7 +100,7 @@ const ledgerChannelStateDefaults = {
 
 const startingState = (
   protocolState: states.PlayerBState,
-  ...channelStatuses: channelStates.ChannelStatus[]
+  ...channelStatuses: channelStates.ChannelState[]
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
   const channelState = { ...channelStates.emptyChannelStore() };
   for (const channelStatus of channelStatuses) {

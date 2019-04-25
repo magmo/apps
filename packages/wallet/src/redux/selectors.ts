@@ -1,4 +1,4 @@
-import { OpenedState, OPENING, ChannelStatus } from './channel-store/state';
+import { OpenedState, OPENING, ChannelState } from './channel-store/state';
 import * as walletStates from './state';
 import { SharedData, FundingState } from './state';
 import { WalletProtocol } from './types';
@@ -11,7 +11,7 @@ export const getOpenedChannelState = (state: SharedData, channelId: string): Ope
   return channelStatus;
 };
 
-export const getChannelState = (state: SharedData, channelId: string): ChannelStatus => {
+export const getChannelState = (state: SharedData, channelId: string): ChannelState => {
   const channelStatus = state.channelStore.initializedChannels[channelId];
   if (!channelStatus) {
     throw new Error(`Could not find any initialized channel state for channel ${channelId}.`);

@@ -265,10 +265,10 @@ const initializedChannels: ReducerWithSideEffects<states.InitializedChannels> = 
   return { state: { ...state, [channelId]: newState }, sideEffects: outboxState };
 };
 
-export const initializedChannelStatusReducer: ReducerWithSideEffects<states.ChannelStatus> = (
-  state: states.ChannelStatus,
+export const initializedChannelStatusReducer: ReducerWithSideEffects<states.ChannelState> = (
+  state: states.ChannelState,
   action: actions.ChannelAction,
-): StateWithSideEffects<states.ChannelStatus> => {
+): StateWithSideEffects<states.ChannelState> => {
   const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
   if (conclusionStateFromOwnRequest) {
     return {
@@ -311,7 +311,7 @@ const combinedReducer = combineReducersWithSideEffects({
 });
 
 const receivedValidOwnConclusionRequest = (
-  state: states.ChannelStatus,
+  state: states.ChannelState,
   action: actions.ChannelAction,
 ): states.ApproveConclude | null => {
   if (state.stage !== states.FUNDING && state.stage !== states.RUNNING) {
@@ -324,7 +324,7 @@ const receivedValidOwnConclusionRequest = (
 };
 
 const receivedValidOpponentConclusionRequest = (
-  state: states.ChannelStatus,
+  state: states.ChannelState,
   action: actions.ChannelAction,
 ): states.AcknowledgeConclude | null => {
   if (state.stage !== states.FUNDING && state.stage !== states.RUNNING) {

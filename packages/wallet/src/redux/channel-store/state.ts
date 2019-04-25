@@ -6,13 +6,13 @@ import { RespondingState } from './responding/state';
 import { WithdrawingState } from './withdrawing/state';
 import { ClosingState } from './closing/state';
 
-export interface InitializingChannelStatus {
+export interface InitializingChannelState {
   address: string;
   privateKey: string;
 }
 
 export interface InitializingChannels {
-  [participantAddress: string]: InitializingChannelStatus;
+  [participantAddress: string]: InitializingChannelState;
 }
 
 export type OpenedState =
@@ -23,10 +23,10 @@ export type OpenedState =
   | WithdrawingState
   | ClosingState;
 
-export type ChannelStatus = OpeningState | OpenedState;
+export type ChannelState = OpeningState | OpenedState;
 
 export interface InitializedChannels {
-  [channelId: string]: ChannelStatus;
+  [channelId: string]: ChannelState;
 }
 export interface ChannelStore {
   initializingChannels: InitializingChannels;
@@ -42,7 +42,7 @@ export function emptyChannelStore(): ChannelStore {
 // Getters and setters
 // -------------------
 
-export function setChannel(channelStore: ChannelStore, channel: ChannelStatus): ChannelStore {
+export function setChannel(channelStore: ChannelStore, channel: ChannelState): ChannelStore {
   const channelId = channel.channelId;
   const initializedChannels = { ...channelStore.initializedChannels, [channelId]: channel };
   return { ...channelStore, initializedChannels };

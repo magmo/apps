@@ -35,7 +35,7 @@ const defaultChannelOpen: sharedStates.ChannelOpen = {
   turnNum: 1,
 };
 
-const defaultChannelStatus: channelStates.ChannelStatus = fundingStates.waitForFundingAndPostFundSetup(
+const defaultChannelStatus: channelStates.ChannelState = fundingStates.waitForFundingAndPostFundSetup(
   {
     ...defaultChannelOpen,
   },

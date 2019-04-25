@@ -19,7 +19,7 @@ export const TOTAL_REQUIRED = twoThree.reduce(addHex);
 // Helpers
 const constructWalletState = (
   protocolState: states.DirectFundingState,
-  ...channelStatuses: channelStates.ChannelStatus[]
+  ...channelStatuses: channelStates.ChannelState[]
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
   const channelState = channelStates.emptyChannelStore();
   for (const channelStatus of channelStatuses) {
