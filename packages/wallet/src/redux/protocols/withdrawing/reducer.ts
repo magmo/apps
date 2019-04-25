@@ -8,7 +8,7 @@ import {
   createConcludeAndWithdrawTransaction,
   ConcludeAndWithdrawArgs,
 } from '../../../utils/transaction-generator';
-import { signVerificationData } from '../../../utils/signing-utils';
+import { signVerificationData } from '../../../domain';
 import { TransactionRequest } from 'ethers/providers';
 import {
   initialize as initTransactionState,

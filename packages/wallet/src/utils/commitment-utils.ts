@@ -1,11 +1,11 @@
 import { Commitment, CommitmentType } from '../domain';
 import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { PlayerIndex } from '../redux/types';
-import { signCommitment } from './signing-utils';
+import { signCommitment } from '../domain';
 import { Channel } from 'fmg-core';
 import { SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
-import { ChannelState } from '../redux/channel-store';
+import { ChannelState } from '../redux/channel-store/state';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,

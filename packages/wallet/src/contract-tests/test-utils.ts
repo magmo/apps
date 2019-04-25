@@ -7,7 +7,7 @@ import {
   createRefuteTransaction,
   createRespondWithMoveTransaction,
 } from '../utils/transaction-generator';
-import { signCommitment } from '../utils/signing-utils';
+import { signCommitment } from '../domain';
 import testGameArtifact from '../../build/contracts/TestGame.json';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';

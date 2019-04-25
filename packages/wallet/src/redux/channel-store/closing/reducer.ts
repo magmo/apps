@@ -7,7 +7,7 @@ import {
   signCommitment,
   signVerificationData,
   validCommitmentSignature,
-} from '../../../utils/signing-utils';
+} from '../../../domain';
 import {
   closeSuccess,
   concludeSuccess,
