@@ -22,7 +22,7 @@ describe('when the player initializes a channel', () => {
   const action = actions.channel.channelInitialized();
   const updatedState = walletReducer(initializedState, action);
 
-  it('applies the channel reducer', async () => {
+  it.skip('applies the channel reducer', async () => {
     const ids = Object.keys(updatedState.channelStore.initializingChannels);
     expect(ids.length).toEqual(1);
     expect(updatedState.channelStore.initializingChannels[ids[0]].privateKey).toEqual(
