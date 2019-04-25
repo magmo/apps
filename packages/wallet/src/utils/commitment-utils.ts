@@ -1,4 +1,4 @@
-import { Commitment, CommitmentType } from '../domain';
+import { Commitment, CommitmentType, signCommitment2 } from '../domain';
 import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { PlayerIndex } from '../redux/types';
 import { signCommitment } from '../domain';
@@ -52,9 +52,8 @@ export const composeLedgerUpdateCommitment = (
     destination,
     appAttributes,
   };
-  const signature = signCommitment(commitment, privateKey);
 
-  return { commitment, signature };
+  return signCommitment2(commitment, privateKey);
 };
 
 export const composePostFundCommitment = (
@@ -78,9 +77,8 @@ export const composePostFundCommitment = (
     destination,
     appAttributes,
   };
-  const signature = signCommitment(commitment, privateKey);
 
-  return { commitment, signature };
+  return signCommitment2(commitment, privateKey);
 };
 export const composePreFundCommitment = (
   channel: Channel,
@@ -103,9 +101,7 @@ export const composePreFundCommitment = (
     destination,
     appAttributes,
   };
-  const signature = signCommitment(commitment, privateKey);
-
-  return { commitment, signature };
+  return signCommitment2(commitment, privateKey);
 };
 
 export const composeConcludeCommitment = (channelState: ChannelState) => {
