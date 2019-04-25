@@ -20,7 +20,7 @@ const defaultSharedData = emptySharedData;
 
 describe('when intialize is called', () => {
   it('works as player A', () => {
-    const updatedState = initialize(channelId, PlayerIndex.A, defaultSharedData);
+    const updatedState = initialize(channelId, defaultSharedData);
 
     expect(updatedState.protocolState).toMatchObject({
       type: states.indirectFunding.playerA.WAIT_FOR_APPROVAL,
@@ -28,7 +28,7 @@ describe('when intialize is called', () => {
   });
 
   it('works as player B', () => {
-    const updatedState = initialize(channelId, PlayerIndex.B, defaultSharedData);
+    const updatedState = initialize(channelId, defaultSharedData);
     expect(updatedState.protocolState).toMatchObject({
       type: states.indirectFunding.playerB.WAIT_FOR_APPROVAL,
     });

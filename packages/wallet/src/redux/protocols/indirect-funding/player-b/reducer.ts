@@ -12,7 +12,6 @@ import {
   safeToSendLedgerUpdate,
   createAndSendUpdateCommitment,
   confirmFundingForChannel,
-  receiveLedgerCommitment,
   updateDirectFundingStatus,
   requestDirectFunding,
   receiveOwnLedgerCommitment,
@@ -145,19 +144,22 @@ const waitForPostFundSetup0 = (
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ReturnVal => {
-  switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
-      // The ledger channel is in the `FUNDING` stage, so we have to use the
-      // `receiveLedgerCommitment` helper and not the `receiveOpponentLedgerCommitment`
-      // helper
-      // Note that the channelStateReducer currently sends the post fund setup message
-      const commitment = action.commitment;
-      sharedData = respondWithPreFundSetup(protocolState.channelId, commitment, sharedData);
-      const newProtocolState = states.success();
-      return { protocolState: newProtocolState, sharedData: newSharedData };
-    default:
-      return { protocolState, sharedData };
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    return { protocolState, sharedData };
   }
+  // extract the commitment
+  // send it to the channel store?
+  // craft the postFundSetup1
+  // check that the channelStore will sign it
+
+  // if yes
+  //    put state in outbox
+  //    transition the state to success
+
+  const commitment = action.commitment;
+  sharedData = respondWithPreFundSetup(protocolState.channelId, commitment, sharedData);
+  const newProtocolState = states.success();
+  return { protocolState: newProtocolState, sharedData };
 };
 
 const updateStateWithDirectFundingAction = (
@@ -276,7 +278,6 @@ const respondWithPostFundSetup = (
 
   // Send the message to the opponent.
   const preFundSetupMessage = createCommitmentMessageRelay(
-    WalletProtocol.IndirectFunding,
     appChannelState.participants[PlayerIndex.B],
     appChannelState.channelId,
     commitment,
