@@ -4,7 +4,7 @@ import * as states from './../state';
 import * as actions from './../actions';
 import * as scenarios from './test-scenarios';
 import { PlayerIndex, WalletProtocol } from '../types';
-import * as IndirectFunding from '../protocols/indirect-funding/reducer';
+import * as Funding from '../protocols/funding/reducer';
 import { fundingRequested } from '../protocols/actions';
 
 const { channelId } = scenarios;
@@ -39,10 +39,15 @@ describe('when a NewProcessAction arrives', () => {
     protocolState: 'protocolState',
     sharedData: { prop: 'value' },
   }));
-  Object.defineProperty(IndirectFunding, 'initialize', { value: initialize });
+  Object.defineProperty(Funding, 'initialize', { value: initialize });
 
   const updatedState = walletReducer(initializedState, action);
-  expect(initialize).toHaveBeenCalledWith(action, states.EMPTY_SHARED_DATA);
+  expect(initialize).toHaveBeenCalledWith(
+    states.EMPTY_SHARED_DATA,
+    action.channelId,
+    processId,
+    action.playerIndex,
+  );
 
   expect((updatedState as states.Initialized).processStore).toMatchObject({
     [processId]: { protocolState: 'protocolState' },
@@ -54,7 +59,7 @@ describe('when a ProcessAction arrives', () => {
   const protocolState = {};
   const processState: states.ProcessState = {
     processId,
-    protocol: WalletProtocol.IndirectFunding,
+    protocol: WalletProtocol.Funding,
     channelsToMonitor: [],
     protocolState,
   };
@@ -65,7 +70,7 @@ describe('when a ProcessAction arrives', () => {
     protocolState: 'protocolState',
     sharedData: 'sharedData ',
   }));
-  Object.defineProperty(IndirectFunding, 'indirectFundingReducer', {
+  Object.defineProperty(Funding, 'fundingReducer', {
     value: indirectFundingReducer,
   });
 

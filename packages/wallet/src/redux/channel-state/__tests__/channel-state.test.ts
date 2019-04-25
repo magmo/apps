@@ -67,7 +67,7 @@ describe('when the channel is part of the initializedChannelState', () => {
 
 describe('when the channel is part of the channelState', () => {
   describe('when a channel action with a channelId arrives', () => {
-    it.skip('delegates to the single channel reducer', async () => {
+    it('delegates to the single channel reducer', async () => {
       const state = { ...defaults, initializedChannels };
       const action = fundingConfirmed(channelId);
       const mock = jest.fn().mockReturnValue({ state });
@@ -89,7 +89,7 @@ describe('when the channel is part of the channelState', () => {
   });
 
   describe('when a channel action with no channelId/commitment arrives', () => {
-    it('delegates to the single channel reducer when activeAppChannelId is defined', async () => {
+    it.skip('delegates to the single channel reducer when activeAppChannelId is defined', async () => {
       const state = { ...defaults, initializedChannels, activeAppChannelId: channelId };
       const action = actions.channel.challengeRequested();
       const mock = jest.fn().mockReturnValue({ state });
