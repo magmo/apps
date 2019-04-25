@@ -33,8 +33,8 @@ import { IndirectFundingState } from '../state';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 
-export function initialize(channel: channelState.ChannelStatus, sharedData: SharedData): ReturnVal {
-  const { channelId } = channel;
+export function initialize(channelId: string, sharedData: SharedData): ReturnVal {
+  // todo: check that channel exists?
   return { protocolState: states.bWaitForPreFundSetup0({ channelId }), sharedData };
 }
 
@@ -66,6 +66,7 @@ const waitForPreFundSetup0 = (
     case actions.COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
 
+      // todo: check the properties of the created ledger channel
       let newSharedData = createLedgerChannel(
         protocolState.channelId,
         sharedData,
@@ -104,30 +105,11 @@ const waitForDirectFunding = (
 
     if (directFundingIsComplete(newProtocolState.directFundingState)) {
       newSharedData = confirmFundingForChannel(newSharedData, protocolState.channelId);
-      newProtocolState = states.bWaitForPostFundSetup0(updatedStateAndSharedData.protocolState);
+      newProtocolState = states.bWaitForLedgerUpdate0(updatedStateAndSharedData.protocolState);
       return { protocolState: newProtocolState, sharedData: newSharedData };
     } else {
       return { sharedData, protocolState: newProtocolState };
     }
-  }
-};
-
-const waitForPostFundSetup0 = (
-  protocolState: states.BWaitForPostFundSetup0,
-  sharedData: SharedData,
-  action: actions.indirectFunding.Action,
-): ReturnVal => {
-  switch (action.type) {
-    case actions.COMMITMENT_RECEIVED:
-      // The ledger channel is in the `FUNDING` stage, so we have to use the
-      // `receiveLedgerCommitment` helper and not the `receiveOpponentLedgerCommitment`
-      // helper
-      // Note that the channelStateReducer currently sends the post fund setup message
-      const newSharedData = receiveLedgerCommitment(sharedData, action);
-      const newProtocolState = states.success();
-      return { protocolState: newProtocolState, sharedData: newSharedData };
-    default:
-      return { protocolState, sharedData };
   }
 };
 
@@ -153,6 +135,26 @@ const waitForLedgerUpdate0 = (
         return { protocolState: newProtocolState, sharedData: newSharedData };
       }
       return { protocolState, sharedData: newSharedData };
+    default:
+      return { protocolState, sharedData };
+  }
+};
+
+const waitForPostFundSetup0 = (
+  protocolState: states.BWaitForPostFundSetup0,
+  sharedData: SharedData,
+  action: actions.indirectFunding.Action,
+): ReturnVal => {
+  switch (action.type) {
+    case actions.COMMITMENT_RECEIVED:
+      // The ledger channel is in the `FUNDING` stage, so we have to use the
+      // `receiveLedgerCommitment` helper and not the `receiveOpponentLedgerCommitment`
+      // helper
+      // Note that the channelStateReducer currently sends the post fund setup message
+      const commitment = action.commitment;
+      sharedData = respondWithPreFundSetup(protocolState.channelId, commitment, sharedData);
+      const newProtocolState = states.success();
+      return { protocolState: newProtocolState, sharedData: newSharedData };
     default:
       return { protocolState, sharedData };
   }
@@ -244,6 +246,37 @@ const respondWithPreFundSetup = (
 
   // Send the message to the opponent.
   const preFundSetupMessage = createCommitmentMessageRelay(
+    appChannelState.participants[PlayerIndex.B],
+    appChannelState.channelId,
+    commitment,
+    signature,
+  );
+  return queueMessage(newSharedData, preFundSetupMessage);
+};
+
+const respondWithPostFundSetup = (
+  appChannelId: string,
+  incomingCommitment: Commitment,
+  sharedData: SharedData,
+): SharedData => {
+  const appChannelState = selectors.getOpenedChannelState(sharedData, appChannelId);
+  const { channel, allocation, destination } = incomingCommitment;
+  // Create the commitment
+  const preFundSetupCommitment = composePreFundCommitment(
+    channel,
+    allocation,
+    destination,
+    appChannelState.ourIndex,
+    appChannelState.privateKey,
+  );
+  const { commitment, signature } = preFundSetupCommitment;
+
+  // Update ledger channel state with commitment.
+  const newSharedData = receiveOwnLedgerCommitment(sharedData, commitment);
+
+  // Send the message to the opponent.
+  const preFundSetupMessage = createCommitmentMessageRelay(
+    WalletProtocol.IndirectFunding,
     appChannelState.participants[PlayerIndex.B],
     appChannelState.channelId,
     commitment,

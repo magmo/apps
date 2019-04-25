@@ -11,8 +11,12 @@ import {
   bWaitForLedgerUpdate0,
   bWaitForPostFundSetup0,
 } from '../state';
-import { ChannelStatus, waitForUpdate } from '../../../../channel-state/state';
-import { SharedData, setChannel, EMPTY_SHARED_DATA } from 'src/redux/state';
+import {
+  ChannelStatus,
+  waitForUpdate,
+  waitForFundingAndPostFundSetup,
+} from '../../../../channel-state/state';
+import { SharedData, setChannel, EMPTY_SHARED_DATA } from '../../../../state';
 
 import {
   preSuccessStateB,
@@ -24,7 +28,6 @@ import {
 // -----------
 // Commitments
 // -----------
-
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const ledgerLibraryAddress = '0x' + '2'.repeat(40);
 export const channelNonce = 4;
@@ -79,7 +82,14 @@ function channelFromCommitments(
   if (turnNum <= 1) {
     funded = false;
   }
-  return waitForUpdate({
+  let channelConstructor;
+  if (turnNum === 1 || turnNum === 2) {
+    channelConstructor = waitForFundingAndPostFundSetup;
+  } else {
+    channelConstructor = waitForUpdate;
+  }
+
+  return channelConstructor({
     channelId,
     libraryAddress,
     channelNonce,
@@ -157,6 +167,7 @@ const postFund0Received = globalActions.commitmentReceived(
 );
 
 export const happyPath = {
+  initialParams: { store: waitForPreFundL0.store, channelId },
   waitForPreFundL0: { state: waitForPreFundL0, action: preFundL0Received, reply: ledger1 },
   waitForDirectFunding: { state: waitForDirectFunding, action: successTriggerB },
   waitForLedgerUpdate0: {
@@ -227,7 +238,7 @@ function appState(params: AppStateParams): SignedCommitment {
   return { commitment, signature: signCommitment(commitment, privateKey) };
 }
 
-const ledgerAppAttributes = (consensusCounter, balances: Balance[] = twoThree) => {
+function ledgerAppAttributes(consensusCounter, balances: Balance[] = twoThree) {
   const proposedAllocation = balances.map(b => b.wei);
   const proposedDestination = balances.map(b => b.address);
   return bytesFromAppAttributes({
@@ -235,7 +246,7 @@ const ledgerAppAttributes = (consensusCounter, balances: Balance[] = twoThree) =
     proposedDestination,
     consensusCounter,
   });
-};
+}
 
 interface LedgerStateParams {
   turnNum: number;
@@ -253,12 +264,13 @@ function ledgerState(params: LedgerStateParams): SignedCommitment {
   const allocation = balances.map(b => b.wei);
   const destination = balances.map(b => b.address);
   const { commitmentCount, commitmentType } = typeAndCount(turnNum, isFinal);
+  const appAttributes = ledgerAppAttributes(consensusCounter, proposedBalances);
   const commitment = {
     channel: ledgerChannel,
     commitmentCount,
     commitmentType,
     turnNum,
-    appAttributes: ledgerAppAttributes(consensusCounter, proposedBalances),
+    appAttributes,
     allocation,
     destination,
   };

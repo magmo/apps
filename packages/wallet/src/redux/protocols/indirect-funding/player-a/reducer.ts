@@ -200,7 +200,7 @@ const updateStateWithDirectFundingAction = (
 const startDirectFunding = (
   protocolState: states.AWaitForPreFundSetup1,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.WaitForDirectFunding> => {
+): ProtocolStateWithSharedData<states.AWaitForDirectFunding> => {
   // TODO: indirect funding state should store the processId
   const {
     protocolState: directFundingProtocolState,
