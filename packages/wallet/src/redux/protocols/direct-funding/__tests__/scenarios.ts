@@ -21,7 +21,7 @@ const constructWalletState = (
   protocolState: states.DirectFundingState,
   ...channelStatuses: channelStates.ChannelStatus[]
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  const channelState = channelStates.emptyChannelState();
+  const channelState = channelStates.emptyChannelStore();
   for (const channelStatus of channelStatuses) {
     channelState.initializedChannels[channelStatus.channelId] = { ...channelStatus };
   }

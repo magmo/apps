@@ -101,7 +101,7 @@ const constructWalletState = (
   protocolState: states.PlayerAState,
   ...channelStatuses: channelStates.ChannelStatus[]
 ): ProtocolStateWithSharedData<states.PlayerAState> => {
-  const channelState = channelStates.emptyChannelState();
+  const channelState = channelStates.emptyChannelStore();
   for (const channelStatus of channelStatuses) {
     channelState.initializedChannels[channelStatus.channelId] = { ...channelStatus };
   }

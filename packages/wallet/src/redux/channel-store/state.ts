@@ -34,7 +34,7 @@ export interface ChannelStore {
   activeAppChannelId?: string;
 }
 
-export function emptyChannelState(): ChannelStore {
+export function emptyChannelStore(): ChannelStore {
   return { initializedChannels: {}, initializingChannels: {} };
 }
 

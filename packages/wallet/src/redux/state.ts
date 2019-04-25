@@ -9,7 +9,7 @@ import {
   ChannelStore,
   ChannelStatus,
   setChannel as setChannelInStore,
-  emptyChannelState,
+  emptyChannelStore,
 } from './channel-store/state';
 import { Properties } from './utils';
 import * as indirectFunding from './protocols/indirect-funding/state';
@@ -89,7 +89,7 @@ export function indirectFundingOngoing(state: Initialized): state is IndirectFun
 // ------------
 export const EMPTY_SHARED_DATA: SharedData = {
   outboxState: emptyDisplayOutboxState(),
-  channelStore: emptyChannelState(),
+  channelStore: emptyChannelStore(),
   adjudicatorState: {},
   fundingState: {},
 };

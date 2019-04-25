@@ -102,7 +102,7 @@ const startingState = (
   protocolState: states.PlayerBState,
   ...channelStatuses: channelStates.ChannelStatus[]
 ): ProtocolStateWithSharedData<states.PlayerBState> => {
-  const channelState = { ...channelStates.emptyChannelState() };
+  const channelState = { ...channelStates.emptyChannelStore() };
   for (const channelStatus of channelStatuses) {
     channelState.initializedChannels[channelStatus.channelId] = channelStatus;
   }
