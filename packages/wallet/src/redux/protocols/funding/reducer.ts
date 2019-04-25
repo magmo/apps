@@ -8,17 +8,22 @@ import { PlayerIndex } from '../../types';
 import { unreachable } from '../../../utils/reducer-utils';
 import { Action as IndirectFundingAction } from '../indirect-funding/actions';
 import * as playerAStates from './player-a/states';
+import * as selectors from '../../selectors';
+
 export function initialize(
   sharedData: SharedData,
   channelId: string,
   processId: string,
   playerIndex: PlayerIndex,
 ): ProtocolStateWithSharedData<states.FundingState> {
+  // TODO: We probably want to handle this in the root reducer
+  const channelState = selectors.getChannelState(sharedData, channelId);
+  const opponentAddress = channelState.participants[playerIndex];
   switch (playerIndex) {
     case PlayerIndex.A:
-      return initializeA(sharedData, processId, channelId);
+      return initializeA(sharedData, processId, channelId, opponentAddress);
     case PlayerIndex.B:
-      return initializeB(sharedData, processId, channelId);
+      return initializeB(sharedData, processId, channelId, opponentAddress);
     default:
       return unreachable(playerIndex);
   }

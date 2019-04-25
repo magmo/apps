@@ -18,9 +18,14 @@ export function initialize(
   sharedData: SharedData,
   processId: string,
   channelId: string,
+  opponentAddress: string,
 ): ProtocolStateWithSharedData<states.FundingState> {
   return {
-    protocolState: states.waitForStrategyProposal({ processId, targetChannelId: channelId }),
+    protocolState: states.waitForStrategyProposal({
+      processId,
+      targetChannelId: channelId,
+      opponentAddress,
+    }),
     sharedData: showWallet(sharedData),
   };
 }
