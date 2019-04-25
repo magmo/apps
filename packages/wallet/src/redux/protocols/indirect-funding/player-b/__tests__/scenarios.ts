@@ -77,7 +77,7 @@ function channelFromCommitments(
   penultimateCommitment: SignedCommitment,
   lastCommitment: SignedCommitment,
 ): ChannelStatus {
-  const { turnNum } = lastCommitment.commitment;
+  const { turnNum, channel: thisChannel } = lastCommitment.commitment;
   let funded = true;
   if (turnNum <= 1) {
     funded = false;
@@ -90,9 +90,9 @@ function channelFromCommitments(
   }
 
   return channelConstructor({
-    channelId,
+    channelId: channelID(thisChannel),
     libraryAddress,
-    channelNonce,
+    channelNonce: lastCommitment.commitment.channel.nonce,
     funded,
     participants,
     address: bsAddress,
@@ -200,7 +200,7 @@ function typeAndCount(
     commitmentType = CommitmentType.PreFundSetup;
   } else if (turnNum < 4) {
     commitmentCount = turnNum - 2;
-    commitmentType = CommitmentType.PreFundSetup;
+    commitmentType = CommitmentType.PostFundSetup;
   } else {
     commitmentType = CommitmentType.App;
     commitmentCount = 0;

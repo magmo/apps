@@ -18,7 +18,7 @@ import {
   ledgerChannelFundsAppChannel,
   confirmFundingForChannel,
   createCommitmentMessageRelay,
-  receiveOwnLedgerCommitment,
+  receiveOwnCommitment,
   receiveLedgerCommitment,
   queueMessage,
   initializeChannelState,
@@ -239,7 +239,7 @@ const createAndSendFinalUpdateCommitment = (
   );
 
   // Update our ledger channel with the latest commitment
-  const newSharedData = receiveOwnLedgerCommitment(sharedData, commitment);
+  const newSharedData = receiveOwnCommitment(sharedData, commitment);
 
   // Send out the commitment to the opponent
   newSharedData.outboxState.messageOutbox = [
@@ -276,7 +276,7 @@ const createAndSendFirstUpdateCommitment = (
   );
 
   // Update our ledger channel with the latest commitment
-  const newSharedData = receiveOwnLedgerCommitment(sharedData, commitment);
+  const newSharedData = receiveOwnCommitment(sharedData, commitment);
 
   // Send out the commitment to the opponent
   newSharedData.outboxState.messageOutbox = [

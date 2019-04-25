@@ -81,7 +81,7 @@ export const createAndSendPostFundCommitment = (
     ledgerChannelState.privateKey,
   );
 
-  newSharedData = receiveOwnLedgerCommitment(newSharedData, commitment);
+  newSharedData = receiveOwnCommitment(newSharedData, commitment);
 
   newSharedData.outboxState.messageOutbox = [
     createCommitmentMessageRelay(
@@ -118,7 +118,7 @@ export const createAndSendUpdateCommitment = (
   );
 
   // Update our ledger channel with the latest commitment
-  const newSharedState = receiveOwnLedgerCommitment(sharedData, commitment);
+  const newSharedState = receiveOwnCommitment(sharedData, commitment);
 
   // Send out the commitment to the opponent
   newSharedState.outboxState.messageOutbox = [
@@ -143,7 +143,7 @@ export const createAndSendUpdateCommitment = (
 // This needs to be considered when deciding what action to pass to the channelState
 // reducer
 
-export const receiveOwnLedgerCommitment = (
+export const receiveOwnCommitment = (
   sharedData: SharedData,
   commitment: Commitment,
 ): SharedData => {
