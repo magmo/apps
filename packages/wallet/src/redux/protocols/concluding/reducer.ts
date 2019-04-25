@@ -82,8 +82,8 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
 
-  if (storage.channelState.activeAppChannelId) {
-    const channelId = storage.channelState.activeAppChannelId;
+  if (storage.channelStore.activeAppChannelId) {
+    const channelId = storage.channelStore.activeAppChannelId;
 
     const channelState = getChannel(storage, channelId) as ChannelStatus;
 
@@ -97,7 +97,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
       state: waitForOpponentConclude({
         ...state,
         turnNum: concludeCommitment.turnNum,
-        penultimateCommitment: storage.channelState.initializedChannels.lastCommitment,
+        penultimateCommitment: storage.channelStore.initializedChannels.lastCommitment,
         lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
       }),
       sideEffects: { messageOutbox: sendCommitmentAction },

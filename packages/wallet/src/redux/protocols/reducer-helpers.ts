@@ -13,8 +13,8 @@ export const updateChannelState = (
   channelAction: actions.channel.ChannelAction,
 ): SharedData => {
   const newSharedData = { ...sharedData };
-  const updatedChannelState = channelStateReducer(newSharedData.channelState, channelAction);
-  newSharedData.channelState = updatedChannelState.state;
+  const updatedChannelState = channelStateReducer(newSharedData.channelStore, channelAction);
+  newSharedData.channelStore = updatedChannelState.state;
   // TODO: Currently we need to filter out signature/validation messages that are meant to the app
   // This might change based on whether protocol reducers or channel reducers craft commitments
   const filteredSideEffects = filterOutSignatureMessages(updatedChannelState.sideEffects);

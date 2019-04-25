@@ -52,7 +52,7 @@ const defaultChannelState: channelStates.ChannelStore = {
 
 const defaultInitialized: walletStates.Initialized = walletStates.initialized({
   ...defaultParams,
-  channelState: defaultChannelState,
+  channelStore: defaultChannelState,
   outboxState: emptyDisplayOutboxState(),
   adjudicatorState: {},
   processStore: {},

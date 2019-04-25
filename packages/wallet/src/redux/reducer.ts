@@ -120,7 +120,7 @@ function routeToNewProcessInitializer(
 }
 
 const combinedReducer = combineReducersWithSideEffects({
-  channelState: channelStateReducer,
+  channelStore: channelStateReducer,
 });
 
 const waitForLoginReducer = (

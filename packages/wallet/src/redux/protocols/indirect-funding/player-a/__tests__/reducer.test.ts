@@ -24,7 +24,7 @@ function itTransitionsChannelToStateType(
   stateChannelId: string,
   type,
 ) {
-  const channelState = state.sharedData.channelState.initializedChannels[stateChannelId];
+  const channelState = state.sharedData.channelStore.initializedChannels[stateChannelId];
   itTransitionsToChannelStateType(type, { state: channelState });
 }
 

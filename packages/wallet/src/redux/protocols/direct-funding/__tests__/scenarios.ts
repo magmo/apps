@@ -30,7 +30,7 @@ const constructWalletState = (
     sharedData: {
       outboxState: emptyDisplayOutboxState(),
       fundingState: {},
-      channelState,
+      channelStore: channelState,
       adjudicatorState: {},
     },
   };

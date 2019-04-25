@@ -11,7 +11,7 @@ import { emptyChannelState } from '../../../channel-store/state';
 const { channelId } = scenarios;
 const emptySharedData = {
   outboxState: emptyDisplayOutboxState(),
-  channelState: emptyChannelState(),
+  channelStore: emptyChannelState(),
   adjudicatorState: {},
   fundingState: {},
 };

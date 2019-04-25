@@ -65,7 +65,7 @@ const refuteChannelState = {
 };
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelState };
+const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore: channelState };
 const props = { processId, transactionSubmissionState, sharedData };
 
 // ------
