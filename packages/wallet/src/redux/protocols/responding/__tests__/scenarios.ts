@@ -8,7 +8,7 @@ import {
   ChannelStatus,
   RUNNING,
   WAIT_FOR_UPDATE,
-  ChannelState,
+  ChannelStore,
 } from '../../../channel-state/state';
 import * as transactionActions from '../../transaction-submission/actions';
 
@@ -44,7 +44,7 @@ const channelStatus: ChannelStatus = {
   turnNum: gameCommitment2.turnNum,
 };
 
-const channelState: ChannelState = {
+const channelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,

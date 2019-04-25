@@ -32,10 +32,10 @@ import { WalletAction, COMMITMENT_RECEIVED } from '../actions';
 import { Commitment } from 'fmg-core';
 import { FUNDING_CONFIRMED } from '../internal/actions';
 
-export const channelStateReducer: ReducerWithSideEffects<states.ChannelState> = (
-  state: states.ChannelState,
+export const channelStateReducer: ReducerWithSideEffects<states.ChannelStore> = (
+  state: states.ChannelStore,
   action: WalletAction,
-): StateWithSideEffects<states.ChannelState> => {
+): StateWithSideEffects<states.ChannelStore> => {
   const newState = { ...state };
   if (actions.isReceiveFirstCommitment(action) && !channelIsInitialized(action.commitment, state)) {
     return handleFirstCommmit(state, action);
@@ -69,9 +69,9 @@ const initializingChannels: ReducerWithSideEffects<states.InitializingChannelSta
 
 type CommitmentReceived = actions.OwnCommitmentReceived | actions.OpponentCommitmentReceived;
 const handleFirstCommmit = (
-  state: states.ChannelState,
+  state: states.ChannelStore,
   action: CommitmentReceived,
-): StateWithSideEffects<states.ChannelState> => {
+): StateWithSideEffects<states.ChannelStore> => {
   // We manually select and move the initializing channel into the initializedChannelState
   // before applying the combined reducer, so that the address and private key is in the
   // right slot (by its channelId)
@@ -356,7 +356,7 @@ const receivedValidOpponentConclusionRequest = (
   });
 };
 
-const channelIsInitialized = (commitment: Commitment, state: states.ChannelState): boolean => {
+const channelIsInitialized = (commitment: Commitment, state: states.ChannelStore): boolean => {
   const channelId = channelID(commitment.channel);
   return channelId in state.initializedChannels;
 };

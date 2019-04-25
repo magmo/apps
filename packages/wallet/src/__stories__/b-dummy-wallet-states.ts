@@ -45,7 +45,7 @@ const defaultInitializedChannelState: channelStates.InitializedChannelState = {
   channelId: defaultChannelStatus,
 };
 
-const defaultChannelState: channelStates.ChannelState = {
+const defaultChannelState: channelStates.ChannelStore = {
   initializingChannels: {},
   initializedChannels: defaultInitializedChannelState,
 };

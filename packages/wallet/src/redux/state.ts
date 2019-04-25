@@ -6,7 +6,7 @@ import {
   queueTransaction as queueTransactionOutbox,
 } from './outbox/state';
 import {
-  ChannelState,
+  ChannelStore,
   ChannelStatus,
   setChannel as setChannelInStore,
   emptyChannelState,
@@ -33,7 +33,7 @@ export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 // ------
 
 export interface SharedData {
-  channelState: ChannelState;
+  channelState: ChannelStore;
   outboxState: OutboxState;
   adjudicatorState: AdjudicatorState;
   fundingState: FundingState;

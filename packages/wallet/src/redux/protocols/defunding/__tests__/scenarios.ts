@@ -5,7 +5,7 @@ import {
   ChannelStatus,
   RUNNING,
   WAIT_FOR_UPDATE,
-  ChannelState,
+  ChannelStore,
 } from '../../../channel-state/state';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
 
@@ -40,7 +40,7 @@ const channelStatus: ChannelStatus = {
   penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
 };
 
-const channelState: ChannelState = {
+const channelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,

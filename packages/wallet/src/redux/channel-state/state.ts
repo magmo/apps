@@ -28,13 +28,13 @@ export type ChannelStatus = OpeningState | OpenedState;
 export interface InitializedChannelState {
   [channelId: string]: ChannelStatus;
 }
-export interface ChannelState {
+export interface ChannelStore {
   initializingChannels: InitializingChannelState;
   initializedChannels: InitializedChannelState;
   activeAppChannelId?: string;
 }
 
-export function emptyChannelState(): ChannelState {
+export function emptyChannelState(): ChannelStore {
   return { initializedChannels: {}, initializingChannels: {} };
 }
 
@@ -42,13 +42,13 @@ export function emptyChannelState(): ChannelState {
 // Getters and setters
 // -------------------
 
-export function setChannel(channelStore: ChannelState, channel: ChannelStatus): ChannelState {
+export function setChannel(channelStore: ChannelStore, channel: ChannelStatus): ChannelStore {
   const channelId = channel.channelId;
   const initializedChannels = { ...channelStore.initializedChannels, [channelId]: channel };
   return { ...channelStore, initializedChannels };
 }
 
-export function getChannel(channelStore: ChannelState, channelId: string) {
+export function getChannel(channelStore: ChannelStore, channelId: string) {
   return channelStore.initializedChannels[channelId];
 }
 

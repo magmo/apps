@@ -6,7 +6,7 @@ import {
   ChannelStatus,
   RUNNING,
   WAIT_FOR_UPDATE,
-  ChannelState,
+  ChannelStore,
 } from '../../../channel-state/state';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { Wallet } from 'ethers';
@@ -46,7 +46,7 @@ const channelStatus: ChannelStatus = {
   penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
 };
 
-const channelState: ChannelState = {
+const channelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
