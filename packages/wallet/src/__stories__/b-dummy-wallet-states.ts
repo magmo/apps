@@ -41,7 +41,7 @@ const defaultChannelStatus: channelStates.ChannelStatus = fundingStates.waitForF
   },
 );
 
-const defaultInitializedChannelState: channelStates.InitializedChannelState = {
+const defaultInitializedChannelState: channelStates.InitializedChannels = {
   channelId: defaultChannelStatus,
 };
 

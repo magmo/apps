@@ -11,7 +11,7 @@ export interface InitializingChannelStatus {
   privateKey: string;
 }
 
-export interface InitializingChannelState {
+export interface InitializingChannels {
   [participantAddress: string]: InitializingChannelStatus;
 }
 
@@ -25,12 +25,12 @@ export type OpenedState =
 
 export type ChannelStatus = OpeningState | OpenedState;
 
-export interface InitializedChannelState {
+export interface InitializedChannels {
   [channelId: string]: ChannelStatus;
 }
 export interface ChannelStore {
-  initializingChannels: InitializingChannelState;
-  initializedChannels: InitializedChannelState;
+  initializingChannels: InitializingChannels;
+  initializedChannels: InitializedChannels;
   activeAppChannelId?: string;
 }
 

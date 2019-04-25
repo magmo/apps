@@ -46,10 +46,10 @@ export const channelStateReducer: ReducerWithSideEffects<states.ChannelStore> = 
   });
 };
 
-const initializingChannels: ReducerWithSideEffects<states.InitializingChannelState> = (
-  state: states.InitializingChannelState,
+const initializingChannels: ReducerWithSideEffects<states.InitializingChannels> = (
+  state: states.InitializingChannels,
   action: actions.ChannelAction,
-): StateWithSideEffects<states.InitializingChannelState> => {
+): StateWithSideEffects<states.InitializingChannels> => {
   if (action.type !== actions.CHANNEL_INITIALIZED) {
     return { state };
   }
@@ -221,11 +221,11 @@ const handleFirstCommmit = (
   }
 };
 
-const initializedChannels: ReducerWithSideEffects<states.InitializedChannelState> = (
-  state: states.InitializedChannelState,
+const initializedChannels: ReducerWithSideEffects<states.InitializedChannels> = (
+  state: states.InitializedChannels,
   action: actions.ChannelAction,
   data: { appChannelId: string },
-): StateWithSideEffects<states.InitializedChannelState> => {
+): StateWithSideEffects<states.InitializedChannels> => {
   if (action.type === actions.CHANNEL_INITIALIZED) {
     return { state };
   }
