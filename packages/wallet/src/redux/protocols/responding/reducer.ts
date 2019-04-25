@@ -1,4 +1,4 @@
-import { Commitment } from 'fmg-core/lib/commitment';
+import { Commitment } from '../../../domain';
 import { ProtocolStateWithSharedData } from '..';
 import * as states from './state';
 import * as actions from './actions';

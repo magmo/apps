@@ -3,7 +3,7 @@ import * as states from './states';
 import * as actions from './actions';
 import { WithdrawalAction } from './actions';
 import * as selectors from '../../selectors';
-import { CommitmentType } from 'fmg-core/lib/commitment';
+import { CommitmentType } from '../../../domain';
 import {
   createConcludeAndWithdrawTransaction,
   ConcludeAndWithdrawArgs,

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { CommitmentType, Commitment, Channel } from 'fmg-core';
+import { CommitmentType, Commitment } from '../domain';
 import {
   createDepositTransaction,
   createForceMoveTransaction,
@@ -56,7 +56,7 @@ export async function createChallenge(
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = {
+  const channel = {
     channelType: libraryAddress,
     nonce: channelNonce,
     participants: [participantA.address, participantB.address],
@@ -104,7 +104,7 @@ export async function concludeGame(
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = {
+  const channel = {
     channelType: libraryAddress,
     nonce: channelNonce,
     participants: [participantA.address, participantB.address],
@@ -152,7 +152,7 @@ export async function respondWithMove(
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = {
+  const channel = {
     channelType: libraryAddress,
     nonce: channelNonce,
     participants: [participantA.address, participantB.address],
@@ -185,7 +185,7 @@ export async function refuteChallenge(
   const network = await provider.getNetwork();
   const networkId = network.chainId;
   const libraryAddress = getLibraryAddress(networkId);
-  const channel: Channel = {
+  const channel = {
     channelType: libraryAddress,
     nonce: channelNonce,
     participants: [participantA.address, participantB.address],
