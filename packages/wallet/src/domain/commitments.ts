@@ -13,6 +13,7 @@ export interface SignedCommitment {
 // Helpers
 // -------
 
+// temporary name while we remove the old signCommitment method
 export function signCommitment2(commitment: Commitment, privateKey: string): SignedCommitment {
   return { commitment, signature: signCommitmentUtil(commitment, privateKey) };
 }
