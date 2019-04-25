@@ -1,8 +1,8 @@
 import { Commitment } from 'fmg-core';
 import { messageRelayRequested, SIGNATURE_SUCCESS, VALIDATION_SUCCESS } from 'magmo-wallet-client';
-import * as channelStates from '../channel-state/state';
+import * as channelStates from '../channel-store/state';
 import * as actions from '../actions';
-import { channelStateReducer } from '../channel-state/reducer';
+import { channelStateReducer } from '../channel-store/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { SideEffects } from '../outbox/state';
 import { SharedData } from '../state';

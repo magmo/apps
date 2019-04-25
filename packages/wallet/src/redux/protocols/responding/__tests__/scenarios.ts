@@ -9,7 +9,7 @@ import {
   RUNNING,
   WAIT_FOR_UPDATE,
   ChannelStore,
-} from '../../../channel-state/state';
+} from '../../../channel-store/state';
 import * as transactionActions from '../../transaction-submission/actions';
 
 // ---------

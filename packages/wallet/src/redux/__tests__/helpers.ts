@@ -1,4 +1,4 @@
-import { ChannelStatus } from '../channel-state/state';
+import { ChannelStatus } from '../channel-store/state';
 import { StateWithSideEffects } from '../utils';
 import { Commitment } from 'fmg-core';
 import { QueuedTransaction, OutboxState } from '../outbox/state';

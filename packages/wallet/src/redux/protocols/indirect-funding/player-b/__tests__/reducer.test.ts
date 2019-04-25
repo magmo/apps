@@ -1,5 +1,5 @@
 import * as states from '../state';
-import * as channelStates from '../../../../channel-state/state';
+import * as channelStates from '../../../../channel-store/state';
 import * as actions from '../../../../actions';
 
 import * as scenarios from '../../../../__tests__/test-scenarios';

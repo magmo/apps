@@ -6,7 +6,7 @@ import {
   RUNNING,
   WAIT_FOR_UPDATE,
   ChannelStore,
-} from '../../../channel-state/state';
+} from '../../../channel-store/state';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
 
 const processId = 'process-id.123';

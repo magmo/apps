@@ -7,7 +7,7 @@ import {
   RUNNING,
   WAIT_FOR_UPDATE,
   ChannelStore,
-} from '../../../channel-state/state';
+} from '../../../channel-store/state';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { Wallet } from 'ethers';
 import { EMPTY_SHARED_DATA, SharedData } from '../../../state';

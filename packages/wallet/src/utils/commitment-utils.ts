@@ -3,9 +3,9 @@ import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudi
 import { PlayerIndex } from '../redux/types';
 import { signCommitment } from './signing-utils';
 import { Channel } from 'fmg-core';
-import { SignedCommitment } from '../redux/channel-state/shared/state';
+import { SignedCommitment } from '../redux/channel-store/shared/state';
 import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
-import { ChannelStatus } from '../redux/channel-state/state';
+import { ChannelStatus } from '../redux/channel-store/state';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,

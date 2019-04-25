@@ -2,7 +2,7 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import * as states from '../redux/channel-state/state';
+import * as states from '../redux/channel-store/state';
 import FundingContainer from './funding';
 import RespondingContainer from './responding';
 import ChallengingContainer from './challenging';

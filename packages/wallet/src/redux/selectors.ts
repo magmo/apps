@@ -1,4 +1,4 @@
-import { OpenedState, OPENING, ChannelStatus } from './channel-state/state';
+import { OpenedState, OPENING, ChannelStatus } from './channel-store/state';
 import * as walletStates from './state';
 import { SharedData, FundingState } from './state';
 import { WalletProtocol } from './types';

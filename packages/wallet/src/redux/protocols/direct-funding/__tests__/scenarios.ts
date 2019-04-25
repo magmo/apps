@@ -1,6 +1,6 @@
 import { addHex } from '../../../../utils/hex-utils';
 import * as globalActions from '../../../actions';
-import * as channelStates from '../../../channel-state/state';
+import * as channelStates from '../../../channel-store/state';
 import { emptyDisplayOutboxState } from '../../../outbox/state';
 import { ProtocolStateWithSharedData } from '../../../protocols';
 import { PlayerIndex } from '../../../types';

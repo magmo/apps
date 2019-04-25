@@ -1,7 +1,7 @@
 import { IndirectFundingState } from 'src/redux/protocols/indirect-funding/state';
-import * as fundingStates from '../redux/channel-state/funding/state';
-import * as sharedStates from '../redux/channel-state/shared/state';
-import * as channelStates from '../redux/channel-state/state';
+import * as fundingStates from '../redux/channel-store/funding/state';
+import * as sharedStates from '../redux/channel-store/shared/state';
+import * as channelStates from '../redux/channel-store/state';
 import * as indirectFundingPlayerB from '../redux/protocols/indirect-funding/player-b/state';
 import { emptyDisplayOutboxState } from '../redux/outbox/state';
 import * as walletStates from '../redux/state';

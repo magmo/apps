@@ -15,7 +15,7 @@ import { ConcludingAction } from './actions';
 import { unreachable, ourTurn } from '../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../state';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
-import { ChannelStatus } from '../../channel-state/state';
+import { ChannelStatus } from '../../channel-store/state';
 type Storage = SharedData;
 
 export interface ReturnVal {
