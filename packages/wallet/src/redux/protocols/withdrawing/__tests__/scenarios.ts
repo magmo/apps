@@ -41,7 +41,7 @@ const channelStatus: ChannelState = {
   penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
 };
 
-const channelState: ChannelStore = {
+const channelStore: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
@@ -65,7 +65,7 @@ const notClosedChannelState = {
 const transaction = {};
 const withdrawalAddress = Wallet.createRandom().address;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore: channelState };
+const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
 const withdrawalAmount = web3Utils.toWei('5');
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const props = {
@@ -137,7 +137,7 @@ export const failedTransaction = {
 
 export const channelNotClosed = {
   ...props,
-  sharedData: { ...EMPTY_SHARED_DATA, channelState: notClosedChannelState },
+  sharedData: { ...EMPTY_SHARED_DATA, channelStore: notClosedChannelState },
   // States
   failure: channelNotClosedFailure,
   // Actions

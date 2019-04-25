@@ -35,7 +35,7 @@ const channelStatus: ChannelState = {
   penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
 };
 
-const channelState: ChannelStore = {
+const channelStore: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
@@ -98,7 +98,7 @@ export const directlyFundingChannelHappyPath = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: directlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
 
@@ -114,7 +114,7 @@ export const indirectlyFundingChannelHappyPath = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: indirectlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
 
@@ -128,7 +128,7 @@ export const channelNotClosed = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: directlyFundedFundingState,
-    channelState: notClosedChannelState,
+    channelStore: notClosedChannelState,
   },
 };
 
@@ -144,7 +144,7 @@ export const directlyFundingFailure = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: directlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
 
@@ -160,6 +160,6 @@ export const indirectlyFundingFailure = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: indirectlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };

@@ -39,7 +39,7 @@ const channelStatus: ChannelState = {
   turnNum: gameCommitment2.turnNum,
 };
 
-const channelState: ChannelStore = {
+const channelStore: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
@@ -60,7 +60,7 @@ const refuteChannelState = {
 };
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore: channelState };
+const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
 const props = { processId, transactionSubmissionState, sharedData };
 
 // ------
@@ -114,7 +114,7 @@ export const respondWithExistingCommitmentHappyPath = {
 
 export const refuteHappyPath = {
   ...props,
-  sharedData: { ...props.sharedData, channelState: refuteChannelState },
+  sharedData: { ...props.sharedData, channelStore: refuteChannelState },
   challengeCommitment: gameCommitment1,
   refuteCommitment: gameCommitment3,
   // States
