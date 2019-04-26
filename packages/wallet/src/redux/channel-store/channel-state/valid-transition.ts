@@ -1,5 +1,5 @@
 import { ChannelState } from './states';
-import { Commitment, getChannelId } from 'src/domain';
+import { Commitment, getChannelId } from '../../../domain';
 
 export function validTransition(state: ChannelState, commitment: Commitment): boolean {
   return (
