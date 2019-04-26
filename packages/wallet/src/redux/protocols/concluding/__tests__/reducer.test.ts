@@ -24,11 +24,11 @@ describe('[ Happy path ] scenario', () => {
     const action = scenario.actions.concludeReceived;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeChannelConcluded');
+    itTransitionsTo(result, 'AcknowledgeConcludeReceived');
   });
 
-  describe('when in AcknowledgeChannelConcluded', () => {
-    const state = scenario.states.acknowledgeChannelConcluded;
+  describe('when in AcknowledgeConcludeReceived', () => {
+    const state = scenario.states.acknowledgeConcludeReceived;
     const action = scenario.actions.defundChosen;
     const result = concludingReducer(state, storage, action);
 
@@ -37,6 +37,14 @@ describe('[ Happy path ] scenario', () => {
 
   describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund;
+    const action = scenario.actions.defunded;
+    const result = concludingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'AcknowledgeSuccess');
+  });
+
+  describe('when in AcknowledgeSuccess', () => {
+    const state = scenario.states.acknowledgeSuccess;
     const action = scenario.actions.defunded;
     const result = concludingReducer(state, storage, action);
 
@@ -51,11 +59,11 @@ describe('[ Channel doesnt exist ] scenario', () => {
   describe('when initializing', () => {
     const result = initialize('NotInitializedChannelId', processId, storage);
 
-    itTransitionsTo(result, 'AcknowledgeChannelDoesntExist');
+    itTransitionsToAcknowledgeFailure(result, 'ChannelDoesntExist');
   });
 
-  describe('when in AcknowledgeChannelDoesntExist', () => {
-    const state = scenario.states.acknowledgeChannelDoesntExist;
+  describe('when in AcknowledgeFailure', () => {
+    const state = scenario.states.acknowledgeFailure;
     const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
 
@@ -70,12 +78,12 @@ describe('[ Concluding Not Possible ] scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'AcknowledgeConcludingImpossible');
+    itTransitionsToAcknowledgeFailure(result, 'NotYourTurn');
   });
 
-  describe('when in AcknowledgeConcludingImpossible', () => {
-    const state = scenario.states.acknowledgeConcludingImpossible;
-    const action = scenario.actions.concludingImpossibleAcknowledged;
+  describe('when in AcknowledgeFailure', () => {
+    const state = scenario.states.acknowledgeFailure;
+    const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
@@ -104,10 +112,10 @@ describe('[ Defunding Failed ] scenario', () => {
     const action = scenario.actions.defundFailed;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeDefundFailed');
+    itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
   });
 
-  describe('when inAcknowledgeDefundFailed', () => {
+  describe('when in AcknowledgeDefundFailed', () => {
     const state = scenario.states.acknowledgeDefundFailed;
     const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
@@ -126,6 +134,15 @@ function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
     expect(result.state.type).toEqual('Failure');
     if (result.state.type === 'Failure') {
+      expect(result.state.reason).toEqual(reason);
+    }
+  });
+}
+
+function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
+  it(`transitions to Failure with reason ${reason}`, () => {
+    expect(result.state.type).toEqual('AcknowledgeFailure');
+    if (result.state.type === 'AcknowledgeFailure') {
       expect(result.state.reason).toEqual(reason);
     }
   });

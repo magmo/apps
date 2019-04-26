@@ -89,7 +89,7 @@ export const waitForOpponentConclude: Constructor<WaitForOpponentConclude> = p =
   return { type: 'WaitForOpponentConclude', processId };
 };
 
-export const AcknowledgeConcludeReceived: Constructor<AcknowledgeConcludeReceived> = p => {
+export const acknowledgeConcludeReceived: Constructor<AcknowledgeConcludeReceived> = p => {
   const { processId } = p;
   return { type: 'AcknowledgeConcludeReceived', processId };
 };
