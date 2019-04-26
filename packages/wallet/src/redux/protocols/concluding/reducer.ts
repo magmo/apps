@@ -141,11 +141,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
   }
   // initialize defunding state machine
 
-  const protocolStateWithSharedData = initializeDefunding(
-    state.processId,
-    storage.channelStore.activeAppChannelId,
-    storage,
-  );
+  const protocolStateWithSharedData = initializeDefunding(state.processId, 'channelId', storage);
   const defundingState = protocolStateWithSharedData.protocolState;
   return { state: waitForDefund({ ...state, defundingState }), storage };
 }
