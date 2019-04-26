@@ -36,43 +36,6 @@ export const postFundSetupReceived = (data: string, signature: string) => ({
 });
 export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
 
-export const CHALLENGE_APPROVED = 'WALLET.CHANNEL.CHALLENGE_APPROVED';
-export const challengeApproved = () => ({
-  type: CHALLENGE_APPROVED as typeof CHALLENGE_APPROVED,
-});
-export type ChallengeApproved = ReturnType<typeof challengeApproved>;
-
-export const CHALLENGE_REJECTED = 'WALLET.CHANNEL.CHALLENGE_REJECTED';
-export const challengeRejected = () => ({
-  type: CHALLENGE_REJECTED as typeof CHALLENGE_REJECTED,
-});
-export type ChallengeRejected = ReturnType<typeof challengeRejected>;
-
-export const CHALLENGE_REQUESTED = 'WALLET.CHANNEL.CHALLENGE_REQUESTED';
-export const challengeRequested = () => ({
-  type: CHALLENGE_REQUESTED as typeof CHALLENGE_REQUESTED,
-});
-export type ChallengeRequested = ReturnType<typeof challengeRequested>;
-
-export const CHALLENGE_RESPONSE_RECEIVED = 'WALLET.CHANNEL.CHALLENGE_RESPONSE_RECEIVED';
-export const challengeResponseReceived = (data: string) => ({
-  type: CHALLENGE_RESPONSE_RECEIVED as typeof CHALLENGE_RESPONSE_RECEIVED,
-  data,
-});
-export type ChallengeResponseReceived = ReturnType<typeof challengeResponseReceived>;
-
-export const CHALLENGE_TIME_OUT_ACKNOWLEDGED = 'WALLET.CHANNEL.CHALLENGE_TIME_OUT_ACKNOWLEDGED';
-export const challengedTimedOutAcknowledged = () => ({
-  type: CHALLENGE_TIME_OUT_ACKNOWLEDGED as typeof CHALLENGE_TIME_OUT_ACKNOWLEDGED,
-});
-export type ChallengeTimeoutAcknowledged = ReturnType<typeof challengedTimedOutAcknowledged>;
-
-export const CHALLENGE_RESPONSE_ACKNOWLEDGED = 'WALLET.CHANNEL.CHALLENGE_RESPONSE_ACKNOWLEDGED';
-export const challengeResponseAcknowledged = () => ({
-  type: CHALLENGE_RESPONSE_ACKNOWLEDGED as typeof CHALLENGE_RESPONSE_ACKNOWLEDGED,
-});
-export type ChallengeResponseAcknowledged = ReturnType<typeof challengeResponseAcknowledged>;
-
 export const CHALLENGE_ACKNOWLEDGED = 'WALLET.CHANNEL.CHALLENGE_ACKNOWLEDGED';
 export const challengeAcknowledged = () => ({
   type: CHALLENGE_ACKNOWLEDGED as typeof CHALLENGE_ACKNOWLEDGED,
@@ -174,14 +137,7 @@ export type ApproveClose = ReturnType<typeof approveClose>;
 export type ChannelAction =  // TODO: Some of these actions probably also belong in a FundingAction type
   | ApproveClose
   | ChallengeAcknowledged
-  | ChallengeApproved
-  | ChallengeCommitmentReceived
   | ChallengeCompletionAcknowledged
-  | ChallengeRejected
-  | ChallengeRequested
-  | ChallengeResponseAcknowledged
-  | ChallengeResponseReceived
-  | ChallengeTimeoutAcknowledged
   | ClosedOnChainAcknowledged
   | CloseSuccessAcknowledged
   | ConcludeApproved
