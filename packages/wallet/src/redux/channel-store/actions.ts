@@ -28,24 +28,6 @@ export const opponentCommitmentReceived = (commitment: Commitment, signature: st
 });
 export type OpponentCommitmentReceived = ReturnType<typeof opponentCommitmentReceived>;
 
-export const FUNDING_REQUESTED = 'WALLET.CHANNEL.FUNDING_REQUESTED';
-export const fundingRequested = () => ({
-  type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
-});
-export type FundingRequested = ReturnType<typeof fundingRequested>;
-
-export const FUNDING_SUCCESS_ACKNOWLEDGED = 'WALLET.CHANNEL.FUNDING_SUCCESS_ACKNOWLEDGED';
-export const fundingSuccessAcknowledged = () => ({
-  type: FUNDING_SUCCESS_ACKNOWLEDGED as typeof FUNDING_SUCCESS_ACKNOWLEDGED,
-});
-export type FundingSuccessAcknowledged = ReturnType<typeof fundingSuccessAcknowledged>;
-
-export const FUNDING_DECLINED_ACKNOWLEDGED = 'WALLET.CHANNEL.FUNDING_DECLINED_ACKNOWLEDGED';
-export const fundingDeclinedAcknowledged = () => ({
-  type: FUNDING_DECLINED_ACKNOWLEDGED as typeof FUNDING_DECLINED_ACKNOWLEDGED,
-});
-export type FundingDeclinedAcknowledged = ReturnType<typeof fundingDeclinedAcknowledged>;
-
 export const POST_FUND_SETUP_RECEIVED = 'WALLET.CHANNEL.POST_FUND_SETUP_RECEIVED'; // when X blocks deep
 export const postFundSetupReceived = (data: string, signature: string) => ({
   type: POST_FUND_SETUP_RECEIVED as typeof POST_FUND_SETUP_RECEIVED,
@@ -205,9 +187,6 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | ConcludeApproved
   | ConcludeRejected
   | ConcludeRequested
-  | FundingDeclinedAcknowledged
-  | FundingRequested
-  | FundingSuccessAcknowledged
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
   | PostFundSetupReceived
