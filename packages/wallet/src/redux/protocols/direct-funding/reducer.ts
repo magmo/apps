@@ -62,14 +62,17 @@ const fundingReceiveEventReducer: DFReducer = (
 
   // If we are player A, the channel is now funded, so we should send the PostFundSetup
   if (protocolState.ourIndex === PlayerIndex.A) {
-    const newSharedData = createAndSendPostFundCommitment(sharedData, protocolState.channelId);
+    const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
+      sharedData,
+      protocolState.channelId,
+    );
     return {
       protocolState: states.waitForFundingAndPostFundSetup({
         ...protocolState,
         channelFunded: true,
         postFundSetupReceived: false,
       }),
-      sharedData: newSharedData,
+      sharedData: sharedDataWithOwnCommitment,
     };
   }
 
@@ -78,10 +81,13 @@ const fundingReceiveEventReducer: DFReducer = (
     protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
     protocolState.postFundSetupReceived
   ) {
-    const newSharedData = createAndSendPostFundCommitment(sharedData, protocolState.channelId);
+    const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
+      sharedData,
+      protocolState.channelId,
+    );
     return {
       protocolState: states.fundingSuccess(protocolState),
-      sharedData: newSharedData,
+      sharedData: sharedDataWithOwnCommitment,
     };
   }
   return {
@@ -113,8 +119,11 @@ const commitmentReceivedReducer: DFReducer = (
           'Direct funding protocol, commitmentReceivedReducer: unable to validate commitment',
         );
       }
-      const newSharedData = setChannelStore(sharedData, checkResult.store);
-      return { protocolState: states.fundingSuccess(protocolState), sharedData: newSharedData };
+      const sharedDataWithReceivedCommitment = setChannelStore(sharedData, checkResult.store);
+      return {
+        protocolState: states.fundingSuccess(protocolState),
+        sharedData: sharedDataWithReceivedCommitment,
+      };
     } else {
       // In this case: Player B sent a PostFund commitment before Player A sent a PostFund commitment.
       // Ignore the Player B PostFund commitment.
@@ -175,14 +184,13 @@ const notSafeToDepositReducer: DFReducer = (
           state.requestedYourContribution,
         );
 
-        const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
-          depositTransaction,
-          state.processId,
-          sharedData,
-        );
+        const {
+          storage: sharedDataWithTransactionState,
+          state: transactionSubmissionState,
+        } = initTransactionState(depositTransaction, state.processId, sharedData);
         return {
           protocolState: states.waitForDepositTransaction({ ...state, transactionSubmissionState }),
-          sharedData: newSharedData,
+          sharedData: sharedDataWithTransactionState,
         };
       } else {
         return { protocolState: state, sharedData };
@@ -200,14 +208,13 @@ const waitForDepositTransactionReducer: DFReducer = (
   if (!isTransactionAction(action)) {
     return { protocolState, sharedData };
   }
-  const { storage: newSharedData, state: newTransactionState } = transactionReducer(
-    protocolState.transactionSubmissionState,
-    sharedData,
-    action,
-  );
+  const {
+    storage: sharedDataWithTransactionUpdate,
+    state: newTransactionState,
+  } = transactionReducer(protocolState.transactionSubmissionState, sharedData, action);
   if (!isTerminal(newTransactionState)) {
     return {
-      sharedData: newSharedData,
+      sharedData: sharedDataWithTransactionUpdate,
       protocolState: { ...protocolState, transactionSubmissionState: newTransactionState },
     };
   } else {
@@ -258,14 +265,14 @@ const createAndSendPostFundCommitment = (sharedData: SharedData, channelId: stri
 
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
-    const newSharedData = setChannelStore(sharedData, signResult.store);
+    const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
     const messageRelay = createCommitmentMessageRelay(
       theirAddress(channelState),
       channelId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
     );
-    return queueMessage(newSharedData, messageRelay);
+    return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {
     throw new Error(
       `Direct funding protocol, createAndSendPostFundCommitment, unable to sign commitment: ${
