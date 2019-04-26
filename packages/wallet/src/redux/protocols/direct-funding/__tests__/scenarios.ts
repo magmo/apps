@@ -8,7 +8,7 @@ import * as scenarios from '../../../__tests__/test-scenarios';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__';
 import * as states from '../state';
-import { channelFromCommitments } from 'src/redux/channel-store/channel-state/__tests__';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 
 const { channelId, twoThree } = scenarios;
 
@@ -45,10 +45,10 @@ const waitForFundingChannelState = channelFromCommitments(
 );
 
 const receivedPostFund0ChannelState = channelFromCommitments(
+  testScenarios.signedCommitment1,
   testScenarios.signedCommitment2,
-  testScenarios.signedCommitment3,
-  globalTestScenarios.asAddress,
-  globalTestScenarios.asPrivateKey,
+  globalTestScenarios.bsAddress,
+  globalTestScenarios.bsPrivateKey,
 );
 
 // Direct funding state machine states

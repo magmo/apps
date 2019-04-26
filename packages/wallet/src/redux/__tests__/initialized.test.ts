@@ -29,15 +29,19 @@ describe('when a NewProcessAction arrives', () => {
   Object.defineProperty(Funding, 'initialize', { value: initialize });
 
   const updatedState = walletReducer(initializedState, action);
-  expect(initialize).toHaveBeenCalledWith(
-    states.EMPTY_SHARED_DATA,
-    action.channelId,
-    processId,
-    action.playerIndex,
-  );
+  it('calls initialize', () => {
+    expect(initialize).toHaveBeenCalledWith(
+      states.EMPTY_SHARED_DATA,
+      action.channelId,
+      processId,
+      action.playerIndex,
+    );
+  });
 
-  expect((updatedState as states.Initialized).processStore).toMatchObject({
-    [processId]: { protocolState: 'protocolState' },
+  it('stores the process in the process store', () => {
+    expect((updatedState as states.Initialized).processStore).toMatchObject({
+      [processId]: { protocolState: 'protocolState' },
+    });
   });
 });
 
@@ -62,9 +66,11 @@ describe('when a ProcessAction arrives', () => {
   });
 
   walletReducer(state, action);
-  expect(indirectFundingReducer).toHaveBeenCalledWith(
-    protocolState,
-    states.EMPTY_SHARED_DATA,
-    action,
-  );
+  it('calls the correct reducer', () => {
+    expect(indirectFundingReducer).toHaveBeenCalledWith(
+      protocolState,
+      states.EMPTY_SHARED_DATA,
+      action,
+    );
+  });
 });
