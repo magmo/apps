@@ -13,12 +13,10 @@ interface PartiallyOpenChannelState {
   turnNum: number;
   lastCommitment: SignedCommitment;
   funded: boolean;
-  type: string;
 }
 
 export interface OpenChannelState extends PartiallyOpenChannelState {
   penultimateCommitment: SignedCommitment;
-  type: string;
 }
 
 // -------

@@ -4,7 +4,7 @@ import * as testScenarios from '../../../__tests__/test-scenarios';
 import * as transactionScenarios from '../../transaction-submission/__tests__';
 import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 
-import { ChannelState, WAIT_FOR_UPDATE, ChannelStore } from '../../../channel-store';
+import { ChannelState, ChannelStore } from '../../../channel-store';
 import * as transactionActions from '../../transaction-submission/actions';
 
 // ---------
@@ -26,7 +26,6 @@ const {
 const channelStatus: ChannelState = {
   address,
   privateKey,
-  type: WAIT_FOR_UPDATE,
   channelId,
   libraryAddress,
   ourIndex: 0,

@@ -95,30 +95,12 @@ export const itSendsNoTransaction = (state: SideEffectState) => {
   });
 };
 
-export const itTransitionsToChannelStateType = (
-  type,
-  state: StateWithSideEffects<ChannelState>,
-) => {
-  it(`transitions to ${type}`, () => {
-    expect(state.state.type).toEqual(type);
-  });
-};
-
 export const itTransitionsToStateType = (
   type,
   protocolStateWithSharedData: ProtocolStateWithSharedData<{ type: any }>,
 ) => {
   it(`transitions to ${type}`, () => {
     expect(protocolStateWithSharedData.protocolState.type).toEqual(type);
-  });
-};
-
-export const itDoesntTransition = (
-  oldState: ChannelState,
-  newState: StateWithSideEffects<ChannelState>,
-) => {
-  it(`doesn't transition`, () => {
-    expect(newState.state.type).toEqual(oldState.type);
   });
 };
 
