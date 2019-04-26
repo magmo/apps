@@ -1,5 +1,5 @@
 import * as states from './state';
-import * as channelState from '../../../channel-store/state';
+import * as channelState from '../../../channel-store';
 
 import * as actions from '../../../actions';
 
@@ -35,6 +35,7 @@ import { isDirectFundingAction, FundingAction } from '../../direct-funding/actio
 import { addHex } from '../../../../utils/hex-utils';
 import { ProtocolStateWithSharedData } from '../../';
 import { SharedData } from '../../../state';
+import { OpenChannelState } from '../../../channel-store';
 
 export function initialize(
   channelId: string,
@@ -310,7 +311,7 @@ const createAndSendFirstUpdateCommitment = (
 
 const createLedgerChannel = (
   consensusLibrary: string,
-  appChannelState: channelState.OpenedState,
+  appChannelState: OpenChannelState,
 ): { ledgerChannelState: channelState.WaitForPreFundSetup; preFundSetupMessage: WalletEvent } => {
   // 1. Determine ledger channel properties
   const nonce = 4; // TODO: Make random

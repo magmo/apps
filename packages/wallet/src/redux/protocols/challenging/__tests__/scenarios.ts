@@ -2,7 +2,7 @@ import * as states from '../states';
 import * as actions from '../actions';
 import * as tsScenarios from '../../transaction-submission/__tests__';
 import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
-import { ChannelState, waitForPreFundSetup, waitForUpdate } from '../../../channel-store/state';
+import { ChannelState, waitForPreFundSetup, waitForUpdate } from '../../../channel-store';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
 
 type Reason = states.FailureReason;

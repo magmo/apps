@@ -1,4 +1,4 @@
-import { ChannelState } from '../channel-store/state';
+import { ChannelState } from '../channel-store';
 import { StateWithSideEffects } from '../utils';
 import { Commitment } from '../../domain';
 import { QueuedTransaction, OutboxState } from '../outbox/state';

@@ -2,7 +2,7 @@ import { MESSAGE_RELAY_REQUESTED } from 'magmo-wallet-client';
 import { addHex } from '../../../../../utils/hex-utils';
 import * as SigningUtil from '../../../../../domain';
 import * as actions from '../../../../actions';
-import * as channelStates from '../../../../channel-store/state';
+import * as channelStates from '../../../../channel-store';
 import { ProtocolStateWithSharedData } from '../../../../protocols';
 import { itSendsThisMessage, itTransitionsToChannelStateType } from '../../../../__tests__/helpers';
 import * as testScenarios from '../../../../__tests__/test-scenarios';

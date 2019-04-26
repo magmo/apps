@@ -1,6 +1,7 @@
-import { OpeningState } from './opening/state';
 import { RunningState } from './running/state';
 import { FundingState } from './funding/state';
+
+import { ChannelState } from './channel-state';
 
 export interface InitializingChannelState {
   address: string;
@@ -12,8 +13,6 @@ export interface InitializingChannels {
 }
 
 export type OpenedState = FundingState | RunningState;
-
-export type ChannelState = OpeningState | OpenedState;
 
 export interface InitializedChannels {
   [channelId: string]: ChannelState;

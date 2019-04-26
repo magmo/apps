@@ -23,7 +23,7 @@ import {
 } from '../reducer-helpers';
 import { ProtocolStateWithSharedData } from '../../';
 import { FundingAction, isDirectFundingAction } from '../../direct-funding/actions';
-import * as channelState from '../../../channel-store/state';
+import * as channelState from '../../../channel-store';
 import { Commitment } from '../../../../domain';
 import { composePreFundCommitment } from '../../../../utils/commitment-utils';
 import { PlayerIndex } from '../../../types';

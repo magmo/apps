@@ -7,7 +7,7 @@ import * as playerB from '../player-b/reducer';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { PlayerIndex } from '../../../types';
 import { emptyDisplayOutboxState } from '../../../outbox/state';
-import { emptyChannelStore } from '../../../channel-store/state';
+import { emptyChannelStore } from '../../../channel-store';
 const { channelId } = scenarios;
 const emptySharedData = {
   outboxState: emptyDisplayOutboxState(),

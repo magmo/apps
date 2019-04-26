@@ -1,4 +1,4 @@
-import { ChannelState } from '../redux/channel-store/state';
+import { ChannelState } from '../redux/channel-store';
 import { accumulateSideEffects } from '../redux/outbox';
 import { SideEffects } from 'src/redux/outbox/state';
 import { WalletAction } from 'src/redux/actions';

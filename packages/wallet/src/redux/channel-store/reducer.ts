@@ -93,8 +93,8 @@ export function checkAndStore(
     // do I need to do any checks? seems like no?
     // I guess I need to make sure I'm a participant and set my participant number
     // just create a channel from the commitment?
-
-    store = setChannel(store, channel);
+    // store = setChannel(store, channel);
+    return { isSuccess: true, store };
   }
 
   if (!isSafeTransition(store, channel, commitment)) {
