@@ -101,8 +101,8 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
 
-  if (storage.activeAppChannelId) {
-    const channelId = storage.activeAppChannelId;
+  if (storage.channelStore.activeAppChannelId) {
+    const channelId = storage.channelStore.activeAppChannelId;
 
     const channelState = getChannel(storage, channelId) as ChannelState;
 
@@ -116,7 +116,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
       state: waitForOpponentConclude({
         ...state,
         turnNum: concludeCommitment.turnNum,
-        penultimateCommitment: storage.channelStore[channelId].lastCommitment,
+        penultimateCommitment: storage.channelStore.initializedChannels.lastCommitment,
         lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
       }),
       sideEffects: { messageOutbox: sendCommitmentAction },
@@ -140,8 +140,12 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
   // initialize defunding state machine
-  // TODO get proper channelId
-  const protocolStateWithSharedData = initializeDefunding(state.processId, 'channelId', storage);
+
+  const protocolStateWithSharedData = initializeDefunding(
+    state.processId,
+    storage.channelStore.activeAppChannelId,
+    storage,
+  );
   const defundingState = protocolStateWithSharedData.protocolState;
   return { state: waitForDefund({ ...state, defundingState }), storage };
 }

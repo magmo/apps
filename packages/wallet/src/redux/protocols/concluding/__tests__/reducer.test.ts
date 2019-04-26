@@ -37,7 +37,7 @@ describe('[ Happy path ]', () => {
 
   describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund;
-    const action = scenario.actions.defundSucceeded;
+    const action = scenario.actions.successTrigger;
     const result = concludingReducer(state, storage, action);
 
     itTransitionsTo(result, 'AcknowledgeSuccess');
@@ -108,8 +108,8 @@ describe('[ Defunding Failed ]', () => {
   const { storage } = scenario;
 
   describe('when in WaitForDefund', () => {
-    const state = scenario.states.waitForDefund;
-    const action = scenario.actions.defundFailed;
+    const state = scenario.states.waitForDefund2;
+    const action = scenario.actions.failureTrigger;
     const result = concludingReducer(state, storage, action);
 
     itTransitionsToAcknowledgeFailure(result, 'DefundFailed');

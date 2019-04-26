@@ -1,4 +1,10 @@
 import * as states from '../states';
+import {
+  preSuccessState,
+  preFailureState,
+  successTrigger,
+  failureTrigger,
+} from '../../defunding/__tests__';
 import * as actions from '../actions';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
 
@@ -33,7 +39,8 @@ const defaults = { processId, channelId };
 const approveConcluding = states.approveConcluding(defaults);
 const waitForOpponentConclude = states.waitForOpponentConclude(defaults);
 const acknowledgeConcludeReceived = states.acknowledgeConcludeReceived(defaults);
-const waitForDefund = states.waitForDefund(defaults);
+const waitForDefund = states.waitForDefund({ ...defaults, defundingState: preSuccessState });
+const waitForDefund2 = states.waitForDefund({ ...defaults, defundingState: preFailureState });
 const acknowledgeSuccess = states.acknowledgeSuccess(defaults);
 const success = states.success();
 
@@ -43,9 +50,7 @@ const success = states.success();
 const concludeSent = actions.concludeSent(processId);
 const concludeReceived = actions.concludeReceived(processId);
 const defundChosen = actions.defundChosen(processId);
-const defundSucceeded = actions.defundSucceeded(processId);
 const concludingImpossibleAcknowledged = actions.acknowledged(processId);
-const defundFailed = actions.defundFailed(processId);
 const cancelled = actions.cancelled(processId);
 const acknowledged = actions.acknowledged(processId);
 
@@ -67,7 +72,7 @@ export const happyPath = {
     concludeSent,
     concludeReceived,
     defundChosen,
-    defundSucceeded,
+    successTrigger,
     acknowledged,
   },
 };
@@ -113,7 +118,7 @@ export const defundingFailed = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
-    waitForDefund,
+    waitForDefund2,
     acknowledgeFailure: states.acknowledgeFailure({
       ...defaults,
       reason: 'DefundFailed',
@@ -121,7 +126,7 @@ export const defundingFailed = {
     failure: states.failure({ reason: 'DefundFailed' }),
   },
   actions: {
-    defundFailed,
     acknowledged,
+    failureTrigger,
   },
 };
