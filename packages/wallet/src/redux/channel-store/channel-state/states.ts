@@ -16,7 +16,7 @@ interface PartiallyOpenChannelState {
   type: string;
 }
 
-interface OpenChannelState extends PartiallyOpenChannelState {
+export interface OpenChannelState extends PartiallyOpenChannelState {
   penultimateCommitment: SignedCommitment;
   type: string;
 }
@@ -40,4 +40,14 @@ export function ourTurn(state: ChannelState) {
   const { turnNum, participants, ourIndex } = state;
   const numParticipants = participants.length;
   return turnNum % numParticipants !== ourIndex;
+}
+
+export function isFullyOpen(state: ChannelState): state is OpenChannelState {
+  return 'penultimateCommitment' in state;
+}
+
+export function theirAddress(state: ChannelState): string {
+  const { participants, ourIndex } = state;
+  const theirIndex = 1 - ourIndex; // todo: only two player channels
+  return participants[theirIndex];
 }

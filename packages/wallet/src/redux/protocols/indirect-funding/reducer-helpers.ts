@@ -9,7 +9,7 @@ import { addHex } from '../../../utils/hex-utils';
 import { ourTurn } from '../../../utils/reducer-utils';
 import * as actions from '../../actions';
 import * as channelActions from '../../channel-store/actions';
-import * as channelStates from '../../channel-store/state';
+import * as channelStates from '../../channel-store';
 import { queueMessage as queueMessageOutbox } from '../../outbox/state';
 import { ProtocolStateWithSharedData } from '../../protocols';
 import { FundingAction } from '../../protocols/direct-funding/actions';
@@ -24,9 +24,9 @@ import { directFundingStateReducer } from '../direct-funding/reducer';
 import {
   confirmFundingForChannel,
   createCommitmentMessageRelay,
-  theirAddress,
   updateChannelState,
 } from '../reducer-helpers';
+import { theirAddress } from '../../channel-store';
 
 export { confirmFundingForChannel, createCommitmentMessageRelay };
 
