@@ -1,4 +1,4 @@
-import { ChannelStore, getChannel, setChannel } from './state';
+import { ChannelStore, getChannel, setChannel, setInitializingChannel } from './state';
 
 import { ReducerWithSideEffects } from '../../utils/reducer-utils';
 import { StateWithSideEffects } from '../utils';
@@ -12,17 +12,43 @@ import {
 } from '../../domain';
 import { pushCommitment, ChannelState } from './channel-state/states';
 import { validTransition } from './channel-state';
+import * as channelActions from './actions';
+import { ethers } from 'ethers';
 
 export const channelStateReducer: ReducerWithSideEffects<ChannelStore> = (
   state: ChannelStore,
   action: WalletAction,
 ): StateWithSideEffects<ChannelStore> => {
+  switch (action.type) {
+    case channelActions.CREATE_CHANNEL:
+      return { state: createNewInitializingChannel(state) };
+    case channelActions.OPPONENT_COMMITMENT_RECEIVED:
+      const { commitment, signature } = action;
+      const checkResult = checkAndStore(state, { commitment, signature });
+      // TODO Handle failure cases
+      if (checkResult.isSuccess) {
+        return { state: checkResult.store };
+      }
+      break;
+    case channelActions.OWN_COMMITMENT_RECEIVED:
+      const signResult = signAndStore(state, action.commitment);
+      // TODO Handle failure cases
+      if (signResult.isSuccess) {
+        return { state: signResult.store };
+      }
+      break;
+  }
   return { state };
 };
 
 // -----------------
 // NEW FUNCTIONALITY
 // -----------------
+
+function createNewInitializingChannel(store: ChannelStore) {
+  const { address, privateKey } = ethers.Wallet.createRandom();
+  return setInitializingChannel(store, { address, privateKey });
+}
 
 interface SignSuccess {
   isSuccess: true;
