@@ -40,8 +40,6 @@ class DirectFundingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  fundingApproved: actions.channel.fundingApproved,
-  fundingRejected: actions.channel.fundingRejected,
   fundingSuccessAcknowledged: actions.channel.fundingSuccessAcknowledged,
   fundingDeclinedAcknowledged: actions.channel.fundingDeclinedAcknowledged,
   transactionRetryApprovedAction: actions.transactionRetryApproved,

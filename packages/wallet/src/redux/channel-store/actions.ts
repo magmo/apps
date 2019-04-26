@@ -34,18 +34,6 @@ export const fundingRequested = () => ({
 });
 export type FundingRequested = ReturnType<typeof fundingRequested>;
 
-export const FUNDING_APPROVED = 'WALLET.CHANNEL.FUNDING_APPROVED';
-export const fundingApproved = () => ({
-  type: FUNDING_APPROVED as typeof FUNDING_APPROVED,
-});
-export type FundingApproved = ReturnType<typeof fundingApproved>;
-
-export const FUNDING_REJECTED = 'WALLET.CHANNEL.FUNDING_REJECTED';
-export const fundingRejected = () => ({
-  type: FUNDING_REJECTED as typeof FUNDING_REJECTED,
-});
-export type FundingRejected = ReturnType<typeof fundingRejected>;
-
 export const FUNDING_SUCCESS_ACKNOWLEDGED = 'WALLET.CHANNEL.FUNDING_SUCCESS_ACKNOWLEDGED';
 export const fundingSuccessAcknowledged = () => ({
   type: FUNDING_SUCCESS_ACKNOWLEDGED as typeof FUNDING_SUCCESS_ACKNOWLEDGED,
@@ -217,9 +205,7 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | ConcludeApproved
   | ConcludeRejected
   | ConcludeRequested
-  | FundingApproved
   | FundingDeclinedAcknowledged
-  | FundingRejected
   | FundingRequested
   | FundingSuccessAcknowledged
   | OpponentCommitmentReceived
