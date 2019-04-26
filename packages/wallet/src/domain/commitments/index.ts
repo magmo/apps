@@ -1,5 +1,5 @@
 import { Commitment as C, CommitmentType as CT } from 'fmg-core';
-import { validCommitmentSignature, signCommitment as signCommitmentUtil } from './signing-utils';
+import { validCommitmentSignature, signCommitment as signCommitmentUtil } from '../signing-utils';
 import { channelID } from 'fmg-core/lib/channel';
 
 export type Commitment = C;

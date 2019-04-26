@@ -1,10 +1,23 @@
-import * as states from './state';
+import * as states from '../state';
+import { PlayerBState } from '../state';
+
+import * as actions from '../../../actions';
+
 import { ProtocolStateWithSharedData } from '../../';
 import { SharedData } from '../../../state';
+import { IndirectFundingState } from '../state';
 
-export function initialize(
-  channelId: string,
+type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
+
+export function initialize(channelId: string, sharedData: SharedData): ReturnVal {
+  // todo: check that channel exists?
+  return { protocolState: states.bWaitForPreFundSetup0({ channelId }), sharedData };
+}
+
+export function playerBReducer(
+  protocolState: PlayerBState,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.WaitForApproval> {
-  return { protocolState: states.waitForApproval({ channelId }), sharedData };
+  action: actions.indirectFunding.Action,
+): ReturnVal {
+  return { protocolState, sharedData };
 }

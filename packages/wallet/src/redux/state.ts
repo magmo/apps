@@ -4,11 +4,13 @@ import {
   SideEffects,
   queueMessage as queueMessageOutbox,
   queueTransaction as queueTransactionOutbox,
+  getLastMessage as getLastMessageFromOutbox,
 } from './outbox/state';
 import {
   ChannelStore,
   ChannelState,
   setChannel as setChannelInStore,
+  setChannels as setChannelsInStore,
   emptyChannelStore,
 } from './channel-store';
 import { Properties } from './utils';
@@ -136,6 +138,10 @@ export function setChannel(state: SharedData, channel: ChannelState): SharedData
   return { ...state, channelStore: setChannelInStore(state.channelStore, channel) };
 }
 
+export function setChannels(state: SharedData, channels: ChannelState[]): SharedData {
+  return { ...state, channelStore: setChannelsInStore(state.channelStore, channels) };
+}
+
 export function getChannel(state: SharedData, channelId: string): ChannelState | undefined {
   return state.channelStore[channelId];
 }
@@ -146,6 +152,10 @@ export function queueMessage(state: SharedData, message: WalletEvent): SharedDat
 
 export function setChannelStore(state: SharedData, channelStore: ChannelStore): SharedData {
   return { ...state, channelStore };
+}
+
+export function getLastMessage(state: SharedData): WalletEvent | undefined {
+  return getLastMessageFromOutbox(state.outboxState);
 }
 
 export function queueTransaction(
