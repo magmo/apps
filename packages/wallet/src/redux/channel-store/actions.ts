@@ -36,50 +36,7 @@ export const postFundSetupReceived = (data: string, signature: string) => ({
 });
 export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
 
-export const CONCLUDE_REQUESTED = 'WALLET.CHANNEL.CONCLUDE_REQUESTED';
-export const concludeRequested = () => ({
-  type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
-});
-export type ConcludeRequested = ReturnType<typeof concludeRequested>;
-
-export const CONCLUDE_APPROVED = 'WALLET.CHANNEL.CONCLUDE_APPROVED';
-export const concludeApproved = () => ({
-  type: CONCLUDE_APPROVED as typeof CONCLUDE_APPROVED,
-});
-export type ConcludeApproved = ReturnType<typeof concludeApproved>;
-
-export const CONCLUDE_REJECTED = 'WALLET.CHANNEL.CONCLUDE_REJECTED';
-export const concludeRejected = () => ({
-  type: CONCLUDE_REJECTED as typeof CONCLUDE_REJECTED,
-});
-export type ConcludeRejected = ReturnType<typeof concludeRejected>;
-
-export const CLOSE_SUCCESS_ACKNOWLEDGED = 'WALLET.CHANNEL.CLOSE_SUCCESS_ACKNOWLEDGED';
-export const closeSuccessAcknowledged = () => ({
-  type: CLOSE_SUCCESS_ACKNOWLEDGED as typeof CLOSE_SUCCESS_ACKNOWLEDGED,
-});
-export type CloseSuccessAcknowledged = ReturnType<typeof closeSuccessAcknowledged>;
-
-export const CLOSED_ON_CHAIN_ACKNOWLEDGED = 'WALLET.CHANNEL.CLOSED_ON_CHAIN_ACKNOWLEDGED';
-export const closedOnChainAcknowledged = () => ({
-  type: CLOSED_ON_CHAIN_ACKNOWLEDGED as typeof CLOSED_ON_CHAIN_ACKNOWLEDGED,
-});
-export type ClosedOnChainAcknowledged = ReturnType<typeof closedOnChainAcknowledged>;
-
-export const APPROVE_CLOSE = 'WALLET.CHANNEL.APPROVE_CLOSE';
-export const approveClose = (withdrawAddress: string) => ({
-  type: APPROVE_CLOSE as typeof APPROVE_CLOSE,
-  withdrawAddress,
-});
-export type ApproveClose = ReturnType<typeof approveClose>;
-
 export type ChannelAction =  // TODO: Some of these actions probably also belong in a FundingAction type
-  | ApproveClose
-  | ClosedOnChainAcknowledged
-  | CloseSuccessAcknowledged
-  | ConcludeApproved
-  | ConcludeRejected
-  | ConcludeRequested
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
   | PostFundSetupReceived
