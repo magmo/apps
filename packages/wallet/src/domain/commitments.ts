@@ -1,5 +1,6 @@
 import { Commitment as C, CommitmentType as CT } from 'fmg-core';
 import { validCommitmentSignature, signCommitment as signCommitmentUtil } from './signing-utils';
+import { channelID } from 'fmg-core/lib/channel';
 
 export type Commitment = C;
 export const CommitmentType = CT;
@@ -29,4 +30,8 @@ export function hasValidSignature(signedCommitment: SignedCommitment): boolean {
   const { commitment, signature } = signedCommitment;
   const address = getTurnTaker(commitment);
   return validCommitmentSignature(commitment, signature, address);
+}
+
+export function getChannelId(commitment: Commitment): string {
+  return channelID(commitment.channel);
 }
