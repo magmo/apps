@@ -11,7 +11,7 @@ export type NonTerminalState =
   | AcknowledgeSuccess
   | WaitForDefund;
 
-export type PreTerminalState = AcknowledgeFailure;
+export type PreTerminalState = AcknowledgeSuccess | AcknowledgeFailure;
 
 export type TerminalState = Success | Failure;
 

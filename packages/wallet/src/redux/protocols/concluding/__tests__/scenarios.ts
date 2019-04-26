@@ -55,7 +55,7 @@ const acknowledgeDefundFailed = states.acknowledgeFailure({
 const concludeSent = actions.concludeSent(processId);
 const concludeReceived = actions.concludeReceived(processId);
 const defundChosen = actions.defundChosen(processId);
-const defunded = actions.defunded(processId);
+const defundSucceeded = actions.defundSucceeded(processId);
 const concludingImpossibleAcknowledged = actions.acknowledged(processId);
 const defundFailed = actions.defundFailed(processId);
 const cancelled = actions.cancelled(processId);
@@ -79,7 +79,8 @@ export const happyPath = {
     concludeSent,
     concludeReceived,
     defundChosen,
-    defunded,
+    defundSucceeded,
+    acknowledged,
   },
 };
 

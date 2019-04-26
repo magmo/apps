@@ -3,13 +3,12 @@ import {
   NonTerminalState as NonTerminalCState,
   approveConcluding,
   failure,
-  acknowledgeConcludingImpossible,
   waitForOpponentConclude,
-  acknowledgeChannelConcluded,
   waitForDefund,
   success,
-  acknowledgeChannelDoesntExist,
-  acknowledgeDefundFailed,
+  acknowledgeSuccess,
+  acknowledgeFailure,
+  acknowledgeConcludeReceived,
 } from './states';
 import { ConcludingAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -34,16 +33,14 @@ export function concludingReducer(
       return concludingCancelled(state, storage);
     case 'CONCLUDE.SENT':
       return concludeSent(state, storage);
-    case 'CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED':
-      return resignationImpossibleAcknowledged(state, storage);
     case 'CONCLUDE.RECEIVED':
       return concludeReceived(state, storage);
     case 'DEFUND.CHOSEN':
       return defundChosen(state, storage);
     case 'DEFUND.FAILED':
       return defundFailed(state, storage);
-    case 'DEFUNDED':
-      return defunded(state, storage);
+    case 'DEFUND.SUCCEEDED':
+      return defundSucceeded(state, storage);
     case 'ACKNOWLEDGED':
       return acknowledged(state, storage);
     default:
@@ -54,13 +51,13 @@ export function concludingReducer(
 export function initialize(channelId: string, processId: string, storage: Storage): ReturnVal {
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
-    return { state: acknowledgeChannelDoesntExist({ processId }), storage };
+    return { state: acknowledgeFailure({ processId, reason: 'ChannelDoesntExist' }), storage };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return { state: approveConcluding({ channelId, processId }), storage };
   } else {
-    return { state: acknowledgeConcludingImpossible({ channelId, processId }), storage };
+    return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
   }
 }
 
@@ -69,12 +66,6 @@ function concludingCancelled(state: NonTerminalCState, storage: Storage): Return
     return { state, storage };
   }
   return { state: failure({ reason: 'ConcludeCancelled' }), storage };
-}
-function resignationImpossibleAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeConcludingImpossible') {
-    return { state, storage };
-  }
-  return { state: failure({ reason: 'NotYourTurn' }), storage };
 }
 
 function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -113,11 +104,11 @@ function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal
   if (state.type !== 'WaitForOpponentConclude') {
     return { state, storage };
   }
-  return { state: acknowledgeChannelConcluded(state), storage };
+  return { state: acknowledgeConcludeReceived(state), storage };
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeChannelConcluded') {
+  if (state.type !== 'AcknowledgeConcludeReceived') {
     return { state, storage };
   }
   return { state: waitForDefund(state), storage };
@@ -127,22 +118,22 @@ function defundFailed(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'WaitForDefund') {
     return { state, storage };
   }
-  return { state: acknowledgeDefundFailed({ ...state }), storage };
+  return { state: acknowledgeFailure({ ...state, reason: 'DefundFailed' }), storage };
 }
 
-function defunded(state: NonTerminalCState, storage: Storage): ReturnVal {
+function defundSucceeded(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'WaitForDefund') {
     return { state, storage };
   }
-  return { state: success(), storage };
+  return { state: acknowledgeSuccess({ ...state }), storage };
 }
 
-function acknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
+function acknowledged(state: CState, storage: Storage): ReturnVal {
   switch (state.type) {
-    case 'AcknowledgeChannelDoesntExist':
-      return { state: failure({ reason: 'ChannelDoesntExist' }), storage };
-    case 'AcknowledgeDefundFailed':
-      return { state: failure({ reason: 'DefundFailed' }), storage };
+    case 'AcknowledgeSuccess':
+      return { state: success(), storage };
+    case 'AcknowledgeFailure':
+      return { state: failure({ reason: state.reason }), storage };
     default:
       return { state, storage };
   }

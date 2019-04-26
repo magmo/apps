@@ -26,7 +26,7 @@ graph TD
   E --> |Yes| MT{My turn?}
   MT  --> |Yes| CC(ApproveConcluding)
   MT  --> |No| AF(AcknowledgeFailure)
-  CC  --> |CANCELLED| F
+  CC  --> |CONCLUDING.CANCELLED| F
   CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
   WOC --> |CONCLUDE.RECEIVED| ACR(AcknowledgeConcludeReceived)
   ACR --> |DEFUND.CHOSEN| D(WaitForDefund)
@@ -45,10 +45,10 @@ graph TD
 We will use the following scenarios for testing:
 
 1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `Success`
-2. **Channel doesnt exist** `Failure`
-3. **Concluding not possible**: `AcknowledgeConcludingImpossible` -> `Failure`
+2. **Channel doesnt exist** `AcknowledgeFailure` -> `Failure`
+3. **Concluding not possible**: `AcknowledgeFailure` -> `Failure`
 4. **Concluding cancelled** `ApproveConcluding` -> `Failure`
-5. **Defund failed** `WaitForDefund` -> `Failure`
+5. **Defund failed** `WaitForDefund` -> `AcknowledgeFailure` -> `Failure`
 
 # Terminology
 
