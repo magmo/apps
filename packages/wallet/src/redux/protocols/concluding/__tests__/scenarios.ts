@@ -36,18 +36,6 @@ const acknowledgeConcludeReceived = states.acknowledgeConcludeReceived(defaults)
 const waitForDefund = states.waitForDefund(defaults);
 const acknowledgeSuccess = states.acknowledgeSuccess(defaults);
 const success = states.success();
-const acknowledgeConcludingImpossible = states.acknowledgeFailure({
-  ...defaults,
-  reason: 'NotYourTurn',
-});
-const acknowledgeChannelDoesntExist = states.acknowledgeFailure({
-  ...defaults,
-  reason: 'ChannelDoesntExist',
-});
-const acknowledgeDefundFailed = states.acknowledgeFailure({
-  ...defaults,
-  reason: 'DefundFailed',
-});
 
 // -------
 // Actions
@@ -88,7 +76,6 @@ export const channelDoesntExist = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
-    acknowledgeChannelDoesntExist,
     acknowledgeFailure: states.acknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
     failure: states.failure({ reason: 'ChannelDoesntExist' }),
   },
@@ -101,7 +88,6 @@ export const concludingNotPossible = {
   ...defaults,
   storage: storage(theirTurn),
   states: {
-    acknowledgeConcludingImpossible,
     acknowledgeFailure: states.acknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
     failure: states.failure({ reason: 'NotYourTurn' }),
   },
@@ -128,7 +114,10 @@ export const defundingFailed = {
   storage: storage(ourTurn),
   states: {
     waitForDefund,
-    acknowledgeDefundFailed,
+    acknowledgeFailure: states.acknowledgeFailure({
+      ...defaults,
+      reason: 'DefundFailed',
+    }),
     failure: states.failure({ reason: 'DefundFailed' }),
   },
   actions: {

@@ -116,7 +116,7 @@ describe('[ Defunding Failed ]', () => {
   });
 
   describe('when in AcknowledgeFailure', () => {
-    const state = scenario.states.acknowledgeDefundFailed;
+    const state = scenario.states.acknowledgeFailure;
     const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
 

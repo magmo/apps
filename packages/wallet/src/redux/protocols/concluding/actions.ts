@@ -16,11 +16,6 @@ export interface ConcludeSent {
   processId: string;
 }
 
-export interface ConcludingImpossibleAcknowledged {
-  type: 'CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED';
-  processId: string;
-}
-
 export interface ConcludeReceived {
   type: 'CONCLUDE.RECEIVED';
   processId: string;
