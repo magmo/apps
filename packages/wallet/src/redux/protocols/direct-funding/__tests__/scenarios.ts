@@ -37,19 +37,27 @@ const constructWalletState = (
 };
 
 // Channel states
-const waitForFundingChannelState = channelFromCommitments(
+const aWaitForFundingChannelState = channelFromCommitments(
   testScenarios.signedCommitment0,
   testScenarios.signedCommitment1,
   globalTestScenarios.asAddress,
   globalTestScenarios.asPrivateKey,
 );
 
-const receivedPostFund0ChannelState = channelFromCommitments(
+// Channel states
+const bWaitForFundingChannelState = channelFromCommitments(
+  testScenarios.signedCommitment0,
+  testScenarios.signedCommitment1,
+  globalTestScenarios.bsAddress,
+  globalTestScenarios.bsPrivateKey,
+);
+
+/*const receivedPostFund0ChannelState = channelFromCommitments(
   testScenarios.signedCommitment1,
   testScenarios.signedCommitment2,
   globalTestScenarios.bsAddress,
   globalTestScenarios.bsPrivateKey,
-);
+);*/
 
 // Direct funding state machine states
 const defaultsForA: states.DirectFundingState = {
@@ -72,21 +80,21 @@ const defaultsForB: states.DirectFundingState = {
 export const aDepositsBDepositsAHappyStates = {
   notSafeToDeposit: constructWalletState(
     states.notSafeToDeposit(defaultsForA),
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
   waitForDepositTransactionStart: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.initialState,
     }),
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
   waitForDepositTransactionEnd: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
     }),
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
   waitForFundingAndPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
@@ -94,62 +102,63 @@ export const aDepositsBDepositsAHappyStates = {
       channelFunded: false,
       postFundSetupReceived: false,
     }),
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
   waitForPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
-      ...defaultsForB,
+      ...defaultsForA,
       channelFunded: true,
       postFundSetupReceived: false,
     }),
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
   fundingSuccess: constructWalletState(
     states.fundingSuccess(defaultsForA),
     // TODO: this is an incorrect channel state
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
 };
 
 export const aDepositsBDepositsBHappyStates = {
   notSafeToDeposit: constructWalletState(
     states.notSafeToDeposit(defaultsForB),
-    waitForFundingChannelState,
+    bWaitForFundingChannelState,
   ),
   waitForDepositTransactionStart: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForB,
       transactionSubmissionState: transactionSubmissionScenarios.initialState,
     }),
-    waitForFundingChannelState,
+    bWaitForFundingChannelState,
   ),
   waitForDepositTransactionEnd: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForB,
       transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
     }),
-    waitForFundingChannelState,
+    bWaitForFundingChannelState,
   ),
   waitForFundingAndPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
       ...defaultsForB,
       channelFunded: false,
       postFundSetupReceived: false,
+      turnNum: 1,
     }),
-    waitForFundingChannelState,
+    bWaitForFundingChannelState,
   ),
   waitForPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
       ...defaultsForB,
       channelFunded: true,
       postFundSetupReceived: false,
+      turnNum: 1,
     }),
-    receivedPostFund0ChannelState,
+    bWaitForFundingChannelState,
   ),
   fundingSuccess: constructWalletState(
     states.fundingSuccess(defaultsForB),
-    // TODO: this is an incorrect channel state
-    waitForFundingChannelState,
+    bWaitForFundingChannelState,
   ),
 };
 
@@ -159,26 +168,24 @@ export const transactionFails = {
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.preFailureState,
     }),
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
   failureTrigger: transactionSubmissionScenarios.failureTrigger,
 
   failure: constructWalletState(
     states.fundingFailure(defaultsForA),
     // TODO: this is an incorrect channel state
-    waitForFundingChannelState,
+    aWaitForFundingChannelState,
   ),
 };
 
 export const actions = {
   postFundSetup0: globalActions.commitmentReceived(
     channelId,
-    globalTestScenarios.postFundCommitment0,
-    '0x0',
+    globalTestScenarios.signedCommitment2,
   ),
   postFundSetup1: globalActions.commitmentReceived(
     channelId,
-    globalTestScenarios.postFundCommitment1,
-    '0x0',
+    globalTestScenarios.signedCommitment3,
   ),
 };
