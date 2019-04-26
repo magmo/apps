@@ -37,14 +37,14 @@ const constructWalletState = (
 };
 
 // Channel states
-const aWaitForFundingChannelState = channelFromCommitments(
+const aHasBothPrefundsChannelState = channelFromCommitments(
   testScenarios.signedCommitment0,
   testScenarios.signedCommitment1,
   globalTestScenarios.asAddress,
   globalTestScenarios.asPrivateKey,
 );
 
-const bWaitForFundingChannelState = channelFromCommitments(
+const bHasBothPrefundsChannelState = channelFromCommitments(
   testScenarios.signedCommitment0,
   testScenarios.signedCommitment1,
   globalTestScenarios.bsAddress,
@@ -76,24 +76,24 @@ const defaultsForB: states.DirectFundingState = {
   safeToDepositLevel: YOUR_DEPOSIT_A,
 };
 
-export const aDepositsBDepositsAHappyStates = {
+export const aEachDepositsInSequenceHappyStates = {
   notSafeToDeposit: constructWalletState(
     states.notSafeToDeposit(defaultsForA),
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
   waitForDepositTransactionStart: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.initialState,
     }),
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
   waitForDepositTransactionEnd: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
     }),
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
   waitForFundingAndPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
@@ -101,7 +101,7 @@ export const aDepositsBDepositsAHappyStates = {
       channelFunded: false,
       postFundSetupReceived: false,
     }),
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
   waitForPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
@@ -114,28 +114,28 @@ export const aDepositsBDepositsAHappyStates = {
   fundingSuccess: constructWalletState(
     states.fundingSuccess(defaultsForA),
     // TODO: this is an incorrect channel state
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
 };
 
-export const aDepositsBDepositsBHappyStates = {
+export const bEachDepositsInSequenceHappyStates = {
   notSafeToDeposit: constructWalletState(
     states.notSafeToDeposit(defaultsForB),
-    bWaitForFundingChannelState,
+    bHasBothPrefundsChannelState,
   ),
   waitForDepositTransactionStart: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForB,
       transactionSubmissionState: transactionSubmissionScenarios.initialState,
     }),
-    bWaitForFundingChannelState,
+    bHasBothPrefundsChannelState,
   ),
   waitForDepositTransactionEnd: constructWalletState(
     states.waitForDepositTransaction({
       ...defaultsForB,
       transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
     }),
-    bWaitForFundingChannelState,
+    bHasBothPrefundsChannelState,
   ),
   waitForFundingAndPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
@@ -143,7 +143,7 @@ export const aDepositsBDepositsBHappyStates = {
       channelFunded: false,
       postFundSetupReceived: false,
     }),
-    bWaitForFundingChannelState,
+    bHasBothPrefundsChannelState,
   ),
   waitForPostFundSetup: constructWalletState(
     states.waitForFundingAndPostFundSetup({
@@ -151,11 +151,11 @@ export const aDepositsBDepositsBHappyStates = {
       channelFunded: true,
       postFundSetupReceived: false,
     }),
-    bWaitForFundingChannelState,
+    bHasBothPrefundsChannelState,
   ),
   fundingSuccess: constructWalletState(
     states.fundingSuccess(defaultsForB),
-    bWaitForFundingChannelState,
+    bHasBothPrefundsChannelState,
   ),
 };
 
@@ -165,14 +165,14 @@ export const transactionFails = {
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.preFailureState,
     }),
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
   failureTrigger: transactionSubmissionScenarios.failureTrigger,
 
   failure: constructWalletState(
     states.fundingFailure(defaultsForA),
     // TODO: this is an incorrect channel state
-    aWaitForFundingChannelState,
+    aHasBothPrefundsChannelState,
   ),
 };
 
