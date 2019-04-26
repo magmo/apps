@@ -36,31 +36,6 @@ export const postFundSetupReceived = (data: string, signature: string) => ({
 });
 export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
 
-export const WITHDRAWAL_REQUESTED = 'WALLET.CHANNEL.WITHDRAWAL_REQUESTED';
-export const withdrawalRequested = () => ({
-  type: WITHDRAWAL_REQUESTED as typeof WITHDRAWAL_REQUESTED,
-});
-export type WithdrawalRequested = ReturnType<typeof withdrawalRequested>;
-
-export const WITHDRAWAL_APPROVED = 'WALLET.CHANNEL.WITHDRAWAL_APPROVED';
-export const withdrawalApproved = (destinationAddress: string) => ({
-  type: WITHDRAWAL_APPROVED as typeof WITHDRAWAL_APPROVED,
-  destinationAddress,
-});
-export type WithdrawalApproved = ReturnType<typeof withdrawalApproved>;
-
-export const WITHDRAWAL_REJECTED = 'WALLET.CHANNEL.WITHDRAWAL_REJECTED';
-export const withdrawalRejected = () => ({
-  type: WITHDRAWAL_REJECTED as typeof WITHDRAWAL_REJECTED,
-});
-export type WithdrawalRejected = ReturnType<typeof withdrawalRejected>;
-
-export const WITHDRAWAL_SUCCESS_ACKNOWLEDGED = 'WALLET.CHANNEL.WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
-export const withdrawalSuccessAcknowledged = () => ({
-  type: WITHDRAWAL_SUCCESS_ACKNOWLEDGED as typeof WITHDRAWAL_SUCCESS_ACKNOWLEDGED,
-});
-export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
-
 export const CONCLUDE_REQUESTED = 'WALLET.CHANNEL.CONCLUDE_REQUESTED';
 export const concludeRequested = () => ({
   type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
@@ -108,10 +83,6 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
   | PostFundSetupReceived
-  | WithdrawalApproved
-  | WithdrawalRejected
-  | WithdrawalRequested
-  | WithdrawalSuccessAcknowledged
   | walletActions.CommonAction
   | walletActions.internal.InternalChannelAction;
 
