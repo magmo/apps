@@ -36,42 +36,6 @@ export const postFundSetupReceived = (data: string, signature: string) => ({
 });
 export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
 
-export const CHALLENGE_ACKNOWLEDGED = 'WALLET.CHANNEL.CHALLENGE_ACKNOWLEDGED';
-export const challengeAcknowledged = () => ({
-  type: CHALLENGE_ACKNOWLEDGED as typeof CHALLENGE_ACKNOWLEDGED,
-});
-export type ChallengeAcknowledged = ReturnType<typeof challengeAcknowledged>;
-
-export const RESPOND_WITH_EXISTING_MOVE_CHOSEN = 'WALLET.CHANNEL.RESPOND_WITH_EXISTING_MOVE_CHOSEN';
-export const respondWithExistingMoveChosen = () => ({
-  type: RESPOND_WITH_EXISTING_MOVE_CHOSEN as typeof RESPOND_WITH_EXISTING_MOVE_CHOSEN,
-});
-export type RespondWithExistingMoveChosen = ReturnType<typeof respondWithExistingMoveChosen>;
-
-export const RESPOND_WITH_MOVE_CHOSEN = 'WALLET.CHANNEL.RESPOND_WITH_MOVE_CHOSEN';
-export const respondWithMoveChosen = () => ({
-  type: RESPOND_WITH_MOVE_CHOSEN as typeof RESPOND_WITH_MOVE_CHOSEN,
-});
-export type RespondWithMoveChosen = ReturnType<typeof respondWithMoveChosen>;
-
-export const RESPOND_WITH_REFUTE_CHOSEN = 'WALLET.CHANNEL.RESPOND_WITH_REFUTE_CHOSEN';
-export const respondWithRefuteChosen = () => ({
-  type: RESPOND_WITH_REFUTE_CHOSEN as typeof RESPOND_WITH_REFUTE_CHOSEN,
-});
-export type RespondWithRefuteChosen = ReturnType<typeof respondWithRefuteChosen>;
-
-export const TAKE_MOVE_IN_APP_ACKNOWLEDGED = 'WALLET.CHANNEL.TAKE_MOVE_IN_APP_ACKNOWLEDGED';
-export const takeMoveInAppAcknowledged = (COMMITMENT: string, signature: string) => ({
-  type: TAKE_MOVE_IN_APP_ACKNOWLEDGED as typeof TAKE_MOVE_IN_APP_ACKNOWLEDGED,
-});
-export type TakeMoveInAppAcknowledged = ReturnType<typeof takeMoveInAppAcknowledged>;
-
-export const CHALLENGE_COMPLETION_ACKNOWLEDGED = 'WALLET.CHANNEL.CHALLENGE_COMPLETION_ACKNOWLEDGED';
-export const challengeCompletionAcknowledged = () => ({
-  type: CHALLENGE_COMPLETION_ACKNOWLEDGED as typeof CHALLENGE_COMPLETION_ACKNOWLEDGED,
-});
-export type ChallengeCompletionAcknowledged = ReturnType<typeof challengeCompletionAcknowledged>;
-
 export const WITHDRAWAL_REQUESTED = 'WALLET.CHANNEL.WITHDRAWAL_REQUESTED';
 export const withdrawalRequested = () => ({
   type: WITHDRAWAL_REQUESTED as typeof WITHDRAWAL_REQUESTED,
@@ -136,8 +100,6 @@ export type ApproveClose = ReturnType<typeof approveClose>;
 
 export type ChannelAction =  // TODO: Some of these actions probably also belong in a FundingAction type
   | ApproveClose
-  | ChallengeAcknowledged
-  | ChallengeCompletionAcknowledged
   | ClosedOnChainAcknowledged
   | CloseSuccessAcknowledged
   | ConcludeApproved
@@ -146,10 +108,6 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
   | PostFundSetupReceived
-  | RespondWithExistingMoveChosen
-  | RespondWithMoveChosen
-  | RespondWithRefuteChosen
-  | TakeMoveInAppAcknowledged
   | WithdrawalApproved
   | WithdrawalRejected
   | WithdrawalRequested
