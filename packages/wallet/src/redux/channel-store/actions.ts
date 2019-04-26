@@ -16,8 +16,15 @@ export const opponentCommitmentReceived = (commitment: Commitment, signature: st
 });
 export type OpponentCommitmentReceived = ReturnType<typeof opponentCommitmentReceived>;
 
+export const CREATE_CHANNEL = 'CREATE_CHANNEL';
+export const createChannel = () => ({
+  type: CREATE_CHANNEL as typeof CREATE_CHANNEL,
+});
+export type CreateChannel = ReturnType<typeof createChannel>;
+
 export type ChannelAction =  // TODO: Some of these actions probably also belong in a FundingAction type
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
+  | CreateChannel
   | walletActions.CommonAction
   | walletActions.internal.InternalChannelAction;
