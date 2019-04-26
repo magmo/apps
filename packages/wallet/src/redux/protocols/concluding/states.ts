@@ -1,5 +1,5 @@
 import { Constructor } from '../../utils';
-
+import { DefundingState } from '../defunding';
 export type ConcludingState = NonTerminalState | PreTerminalState | TerminalState;
 export type ConcludingStateType = ConcludingState['type'];
 
@@ -48,6 +48,7 @@ export interface AcknowledgeConcludeReceived {
 export interface WaitForDefund {
   type: 'WaitForDefund';
   processId: string;
+  defundingState: DefundingState;
 }
 
 export interface Failure {
@@ -105,8 +106,8 @@ export const acknowledgeFailure: Constructor<AcknowledgeFailure> = p => {
 };
 
 export const waitForDefund: Constructor<WaitForDefund> = p => {
-  const { processId } = p;
-  return { type: 'WaitForDefund', processId };
+  const { processId, defundingState } = p;
+  return { type: 'WaitForDefund', processId, defundingState };
 };
 
 export function success(): Success {

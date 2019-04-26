@@ -15,7 +15,10 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../state';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
 import { ChannelState, ourTurn } from '../../channel-store';
+import { DefundingAction, isDefundingAction } from '../defunding/actions';
+import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
 type Storage = SharedData;
+import { isSuccess, isFailure } from '../defunding/states';
 
 export interface ReturnVal {
   state: CState;
@@ -26,8 +29,11 @@ export interface ReturnVal {
 export function concludingReducer(
   state: NonTerminalCState,
   storage: SharedData,
-  action: ConcludingAction,
+  action: ConcludingAction | DefundingAction,
 ): ReturnVal {
+  if (isDefundingAction(action)) {
+    return handleDefundingAction(state, storage, action);
+  }
   switch (action.type) {
     case 'CONCLUDING.CANCELLED':
       return concludingCancelled(state, storage);
@@ -37,10 +43,6 @@ export function concludingReducer(
       return concludeReceived(state, storage);
     case 'DEFUND.CHOSEN':
       return defundChosen(state, storage);
-    case 'DEFUND.FAILED':
-      return defundFailed(state, storage);
-    case 'DEFUND.SUCCEEDED':
-      return defundSucceeded(state, storage);
     case 'ACKNOWLEDGED':
       return acknowledged(state, storage);
     default:
@@ -59,6 +61,32 @@ export function initialize(channelId: string, processId: string, storage: Storag
   } else {
     return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
   }
+}
+
+function handleDefundingAction(
+  state: NonTerminalCState,
+  storage: Storage,
+  action: DefundingAction,
+): ReturnVal {
+  if (state.type !== 'WaitForDefund') {
+    return { state, storage };
+  }
+  const defundingState1 = state.defundingState;
+
+  const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
+  const defundingState2 = protocolStateWithSharedData.protocolState;
+  // const transactionState = retVal.state;
+
+  if (isSuccess(defundingState2)) {
+    state = acknowledgeSuccess(state);
+  } else if (isFailure(defundingState2)) {
+    state = acknowledgeFailure({ ...state, reason: 'DefundFailed' });
+  } else {
+    // update the transaction state?
+    // state = { ...state, transactionSubmission: transactionState };
+  }
+
+  return { state, storage };
 }
 
 function concludingCancelled(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -111,21 +139,11 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'AcknowledgeConcludeReceived') {
     return { state, storage };
   }
-  return { state: waitForDefund(state), storage };
-}
-
-function defundFailed(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForDefund') {
-    return { state, storage };
-  }
-  return { state: acknowledgeFailure({ ...state, reason: 'DefundFailed' }), storage };
-}
-
-function defundSucceeded(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForDefund') {
-    return { state, storage };
-  }
-  return { state: acknowledgeSuccess({ ...state }), storage };
+  // initialize defunding state machine
+  // TODO get proper channelId
+  const protocolStateWithSharedData = initializeDefunding(state.processId, 'channelId', storage);
+  const defundingState = protocolStateWithSharedData.protocolState;
+  return { state: waitForDefund({ ...state, defundingState }), storage };
 }
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {

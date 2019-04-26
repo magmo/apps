@@ -30,14 +30,29 @@ graph TD
   CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
   WOC --> |CONCLUDE.RECEIVED| ACR(AcknowledgeConcludeReceived)
   ACR --> |DEFUND.CHOSEN| D(WaitForDefund)
-  D   --> |DEFUND.SUCCEEDED| AS(AcknowledgeSuccess)
+  D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   AS -->  |ACKNOWLEDGED| SS((Success))
-  D   --> |DEFUND.FAILED| AF(AcknowledgeFailure)
+  D   --> |defunding protocol failed| AF(AcknowledgeFailure)
   style S  fill:#efdd20
   style E  fill:#efdd20
   style MT fill:#efdd20
   style SS fill:#58ef21
   style F  fill:#f45941
+  style D stroke:#333,stroke-width:4px
+```
+
+Key:
+
+```mermaid
+graph TD
+L{Flow Logic} --> NT1(Non-Terminal States)
+NT1 --> C
+C(Call child reducer) -->|child return status| NT2
+NT2(More Non-Terminal States) --> |ACTION| T
+T((Terminal States))
+  style T  fill:#efdd20
+  style L fill:#efdd20
+  style C stroke:#333,stroke-width:4px
 ```
 
 ## Scenarios
