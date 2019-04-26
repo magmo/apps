@@ -16,7 +16,7 @@ import * as channelActions from './actions';
 import { ethers } from 'ethers';
 import { channelInitializationSuccess } from 'magmo-wallet-client';
 
-export const channelStateReducer: ReducerWithSideEffects<ChannelStore> = (
+export const channelStoreReducer: ReducerWithSideEffects<ChannelStore> = (
   state: ChannelStore,
   action: WalletAction,
 ): StateWithSideEffects<ChannelStore> => {

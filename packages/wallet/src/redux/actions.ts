@@ -1,11 +1,11 @@
 import * as internal from './internal/actions';
 import * as channel from './channel-store/actions';
-import { FundingAction } from './protocols/funding/actions';
 import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
 import * as challenging from './protocols/challenging/actions';
 import { Commitment, SignedCommitment } from '../domain';
+import { FundingAction } from './protocols/funding/actions';
 import {
   TransactionAction as TA,
   isTransactionAction as isTA,
