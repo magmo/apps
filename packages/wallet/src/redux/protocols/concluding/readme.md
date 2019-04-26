@@ -21,19 +21,18 @@ The protocol is implemented with the following state machine
 ```mermaid
 graph TD
   S((Start)) --> E{Channel Exists?}
-  E --> |No| ACDE(AcknowledgeChannelDoesntExist)
-  ACDE -->|ACKNOWLEDGED| F((Failure))
+  E --> |No| AF(AcknowledgeFailure)
+  AF -->|ACKNOWLEDGED| F((Failure))
   E --> |Yes| MT{My turn?}
   MT  --> |Yes| CC(ApproveConcluding)
-  MT  --> |No| RC(AcknowledgeConcludingImpossible)
+  MT  --> |No| AF(AcknowledgeFailure)
   CC  --> |CANCELLED| F
   CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
-  WOC --> |CONCLUDE.RECEIVED| ACC(AcknowledgeChannelConcluded)
-  ACC --> |DEFUND.CHOSEN| D(WaitForDefund)
-  D   --> |DEFUND.SUCCEEDED| SS((Success))
-  D   --> |DEFUND.FAILED| ADF(AcknowledgeDefundFailed)
-  ADF -->|ACKNOWLEDGED| F((Failure))
-  RC  --> |CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED| F
+  WOC --> |CONCLUDE.RECEIVED| ACR(AcknowledgeConcludeReceived)
+  ACR --> |DEFUND.CHOSEN| D(WaitForDefund)
+  D   --> |DEFUND.SUCCEEDED| AS(AcknowledgeSuccess)
+  AS -->  |ACKNOWLEDGED| SS((Success))
+  D   --> |DEFUND.FAILED| AF(AcknowledgeFailure)
   style S  fill:#efdd20
   style E  fill:#efdd20
   style MT fill:#efdd20

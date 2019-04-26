@@ -1,7 +1,6 @@
 export type ConcludingAction =
   | Cancelled
   | ConcludeSent
-  | ConcludingImpossibleAcknowledged
   | ConcludeReceived
   | DefundChosen
   | DefundFailed
@@ -58,13 +57,6 @@ export const cancelled = (processId: string): Cancelled => ({
 
 export const concludeSent = (processId: string): ConcludeSent => ({
   type: 'CONCLUDE.SENT',
-  processId,
-});
-
-export const resignationImpossibleAcknowledged = (
-  processId: string,
-): ConcludingImpossibleAcknowledged => ({
-  type: 'CONCLUDING.IMPOSSIBLE.ACKNOWLEDGED',
   processId,
 });
 

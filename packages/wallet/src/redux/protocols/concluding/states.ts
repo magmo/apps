@@ -4,21 +4,14 @@ export type ConcludingState = NonTerminalState | PreTerminalState | TerminalStat
 export type ConcludingStateType = ConcludingState['type'];
 
 export type NonTerminalState =
-  | AcknowledgeConcludingImpossible
   | ApproveConcluding
   | WaitForOpponentConclude
-  | AcknowledgeChannelConcluded
-  | AcknowledgeChannelDoesntExist
-  | AcknowledgeDefundFailed
-  | WaitForDefund
-  | AcknowledgeChannelDoesntExist
-  | AcknowledgeDefundFailed
-  | AcknowledgeConcludingImpossible;
+  | AcknowledgeConcludeReceived
+  | AcknowledgeFailure
+  | AcknowledgeSuccess
+  | WaitForDefund;
 
-export type PreTerminalState =
-  | AcknowledgeChannelDoesntExist
-  | AcknowledgeDefundFailed
-  | AcknowledgeConcludingImpossible;
+export type PreTerminalState = AcknowledgeFailure;
 
 export type TerminalState = Success | Failure;
 
@@ -28,8 +21,13 @@ export type FailureReason =
   | 'ConcludeCancelled'
   | 'DefundFailed';
 
-export interface AcknowledgeConcludingImpossible {
-  type: 'AcknowledgeConcludingImpossible';
+export interface AcknowledgeSuccess {
+  type: 'AcknowledgeSuccess';
+  processId: string;
+}
+export interface AcknowledgeFailure {
+  type: 'AcknowledgeFailure';
+  reason: FailureReason;
   processId: string;
 }
 export interface ApproveConcluding {
@@ -42,18 +40,8 @@ export interface WaitForOpponentConclude {
   processId: string;
 }
 
-export interface AcknowledgeChannelConcluded {
-  type: 'AcknowledgeChannelConcluded';
-  processId: string;
-}
-
-export interface AcknowledgeChannelDoesntExist {
-  type: 'AcknowledgeChannelDoesntExist';
-  processId: string;
-}
-
-export interface AcknowledgeDefundFailed {
-  type: 'AcknowledgeDefundFailed';
+export interface AcknowledgeConcludeReceived {
+  type: 'AcknowledgeConcludeReceived';
   processId: string;
 }
 
@@ -90,10 +78,6 @@ export function isFailure(state: ConcludingState): state is Failure {
 // ------------
 // Constructors
 // ------------
-export const acknowledgeConcludingImpossible: Constructor<AcknowledgeConcludingImpossible> = p => {
-  const { processId } = p;
-  return { type: 'AcknowledgeConcludingImpossible', processId };
-};
 
 export const approveConcluding: Constructor<ApproveConcluding> = p => {
   const { processId } = p;
@@ -105,19 +89,19 @@ export const waitForOpponentConclude: Constructor<WaitForOpponentConclude> = p =
   return { type: 'WaitForOpponentConclude', processId };
 };
 
-export const acknowledgeChannelConcluded: Constructor<AcknowledgeChannelConcluded> = p => {
+export const AcknowledgeConcludeReceived: Constructor<AcknowledgeConcludeReceived> = p => {
   const { processId } = p;
-  return { type: 'AcknowledgeChannelConcluded', processId };
+  return { type: 'AcknowledgeConcludeReceived', processId };
 };
 
-export const acknowledgeChannelDoesntExist: Constructor<AcknowledgeChannelDoesntExist> = p => {
-  const { processId } = p;
-  return { type: 'AcknowledgeChannelDoesntExist', processId };
+export const acknowledgeSuccess: Constructor<AcknowledgeSuccess> = p => {
+  const { processId, reason } = p;
+  return { type: 'AcknowledgeSuccess', processId, reason };
 };
 
-export const acknowledgeDefundFailed: Constructor<AcknowledgeDefundFailed> = p => {
-  const { processId } = p;
-  return { type: 'AcknowledgeDefundFailed', processId };
+export const acknowledgeFailure: Constructor<AcknowledgeFailure> = p => {
+  const { processId, reason } = p;
+  return { type: 'AcknowledgeFailure', processId, reason };
 };
 
 export const waitForDefund: Constructor<WaitForDefund> = p => {
