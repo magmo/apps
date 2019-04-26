@@ -18,14 +18,6 @@ import { createCommitmentMessageRelay } from '../reducer-helpers';
 import { theirAddress } from '../../channel-store';
 import * as channelStoreReducer from '../../channel-store/reducer';
 
-/* Note on PostFund commitment exchange:
- After the protocol refactor, the PostFund commitments are created and sent by funding protocols: 
- indirect funding and direct funding protocols. Before the refactor, the PostFund commitments
- were created and sent by the channel state reducer. Until the channel state reducer is 
- refactored, there will be duplicate PostFund commitments.
- For context, refer to https://zube.io/magmo/apps/c/716.
- */
-
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
 
 export const directFundingStateReducer: DFReducer = (
@@ -145,9 +137,9 @@ const commitmentReceivedReducer: DFReducer = (
       );
     }
 
-    const shareDataWithReceivedCommitment = setChannelStore(sharedData, checkResult.store);
+    const sharedDataWithReceivedCommitment = setChannelStore(sharedData, checkResult.store);
     const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
-      shareDataWithReceivedCommitment,
+      sharedDataWithReceivedCommitment,
       protocolState.channelId,
     );
     return {

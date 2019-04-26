@@ -1,8 +1,3 @@
-/* 
-TODO Remaining work:
-- Check outgoing postfund messages.
-*/
-
 import * as actions from '../../../actions';
 import * as globalTestScenarios from '../../../__tests__/test-scenarios';
 import { directFundingStateReducer } from '../reducer';
@@ -201,7 +196,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
       const updatedState = directFundingStateReducer(
         state.protocolState,
         state.sharedData,
-        scenarios.actions.postFundSetup0,
+        scenarios.actions.postFundSetup1,
       );
       itTransitionsTo(updatedState, states.FUNDING_SUCCESS);
     });

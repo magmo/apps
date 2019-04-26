@@ -44,7 +44,6 @@ const aWaitForFundingChannelState = channelFromCommitments(
   globalTestScenarios.asPrivateKey,
 );
 
-// Channel states
 const bWaitForFundingChannelState = channelFromCommitments(
   testScenarios.signedCommitment0,
   testScenarios.signedCommitment1,
@@ -52,12 +51,12 @@ const bWaitForFundingChannelState = channelFromCommitments(
   globalTestScenarios.bsPrivateKey,
 );
 
-/*const receivedPostFund0ChannelState = channelFromCommitments(
+const aHasPostFund0ChannelState = channelFromCommitments(
   testScenarios.signedCommitment1,
   testScenarios.signedCommitment2,
   globalTestScenarios.bsAddress,
   globalTestScenarios.bsPrivateKey,
-);*/
+);
 
 // Direct funding state machine states
 const defaultsForA: states.DirectFundingState = {
@@ -110,7 +109,7 @@ export const aDepositsBDepositsAHappyStates = {
       channelFunded: true,
       postFundSetupReceived: false,
     }),
-    aWaitForFundingChannelState,
+    aHasPostFund0ChannelState,
   ),
   fundingSuccess: constructWalletState(
     states.fundingSuccess(defaultsForA),
@@ -143,7 +142,6 @@ export const aDepositsBDepositsBHappyStates = {
       ...defaultsForB,
       channelFunded: false,
       postFundSetupReceived: false,
-      turnNum: 1,
     }),
     bWaitForFundingChannelState,
   ),
@@ -152,7 +150,6 @@ export const aDepositsBDepositsBHappyStates = {
       ...defaultsForB,
       channelFunded: true,
       postFundSetupReceived: false,
-      turnNum: 1,
     }),
     bWaitForFundingChannelState,
   ),
