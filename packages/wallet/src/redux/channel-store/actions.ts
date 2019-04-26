@@ -13,13 +13,6 @@ export const ownCommitmentReceived = (commitment: Commitment) => ({
 });
 export type OwnCommitmentReceived = ReturnType<typeof ownCommitmentReceived>;
 
-export const CHALLENGE_COMMITMENT_RECEIVED = 'WALLET.CHANNEL.CHALLENGE_COMMITMENT_RECEIVED';
-export const challengeCommitmentReceived = (commitment: Commitment) => ({
-  type: CHALLENGE_COMMITMENT_RECEIVED as typeof CHALLENGE_COMMITMENT_RECEIVED,
-  commitment,
-});
-export type ChallengeCommitmentReceived = ReturnType<typeof challengeCommitmentReceived>;
-
 export const OPPONENT_COMMITMENT_RECEIVED = 'WALLET.CHANNEL.OPPONENT_COMMITMENT_RECEIVED';
 export const opponentCommitmentReceived = (commitment: Commitment, signature: string) => ({
   type: OPPONENT_COMMITMENT_RECEIVED as typeof OPPONENT_COMMITMENT_RECEIVED,
@@ -28,18 +21,9 @@ export const opponentCommitmentReceived = (commitment: Commitment, signature: st
 });
 export type OpponentCommitmentReceived = ReturnType<typeof opponentCommitmentReceived>;
 
-export const POST_FUND_SETUP_RECEIVED = 'WALLET.CHANNEL.POST_FUND_SETUP_RECEIVED'; // when X blocks deep
-export const postFundSetupReceived = (data: string, signature: string) => ({
-  type: POST_FUND_SETUP_RECEIVED as typeof POST_FUND_SETUP_RECEIVED,
-  data,
-  signature,
-});
-export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
-
 export type ChannelAction =  // TODO: Some of these actions probably also belong in a FundingAction type
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
-  | PostFundSetupReceived
   | walletActions.CommonAction
   | walletActions.internal.InternalChannelAction;
 
