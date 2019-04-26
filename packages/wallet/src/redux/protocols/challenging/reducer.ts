@@ -13,7 +13,7 @@ import {
   successOpen,
   failure,
 } from './states';
-import { unreachable, ourTurn } from '../../../utils/reducer-utils';
+import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
@@ -22,7 +22,7 @@ import { transactionReducer, initialize as initializeTransaction } from '../tran
 import { isSuccess, isFailure } from '../transaction-submission/states';
 import { getChannel } from '../../state';
 import { createForceMoveTransaction } from '../../../utils/transaction-generator';
-import { isFullyOpen } from '../../channel-store';
+import { isFullyOpen, ourTurn } from '../../channel-store';
 
 type Storage = SharedData;
 

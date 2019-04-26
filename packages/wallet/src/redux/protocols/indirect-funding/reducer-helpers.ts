@@ -6,7 +6,6 @@ import {
   composePostFundCommitment,
 } from '../../../utils/commitment-utils';
 import { addHex } from '../../../utils/hex-utils';
-import { ourTurn } from '../../../utils/reducer-utils';
 import * as actions from '../../actions';
 import * as channelActions from '../../channel-store/actions';
 import * as channelStates from '../../channel-store';
@@ -26,7 +25,7 @@ import {
   createCommitmentMessageRelay,
   updateChannelState,
 } from '../reducer-helpers';
-import { theirAddress } from '../../channel-store';
+import { theirAddress, ourTurn } from '../../channel-store';
 
 export { confirmFundingForChannel, createCommitmentMessageRelay };
 

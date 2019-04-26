@@ -35,3 +35,11 @@ export function hasValidSignature(signedCommitment: SignedCommitment): boolean {
 export function getChannelId(commitment: Commitment): string {
   return channelID(commitment.channel);
 }
+
+function incrementTurnNum(commitment: Commitment): Commitment {
+  return { ...commitment, turnNum: commitment.turnNum + 1 };
+}
+
+export function constructConclude(commitment: Commitment): Commitment {
+  return { ...incrementTurnNum(commitment), commitmentType: CommitmentType.Conclude };
+}

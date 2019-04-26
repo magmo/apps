@@ -1,4 +1,3 @@
-import { ChannelState } from '../redux/channel-store';
 import { accumulateSideEffects } from '../redux/outbox';
 import { SideEffects } from 'src/redux/outbox/state';
 import { WalletAction } from 'src/redux/actions';
@@ -7,13 +6,6 @@ import { StateWithSideEffects } from 'src/redux/utils';
 export function unreachable(x: never) {
   return x;
 }
-
-export const ourTurn = (state: ChannelState) => {
-  if (!('turnNum' in state)) {
-    return false;
-  }
-  return state.turnNum % 2 !== state.ourIndex;
-};
 
 export type ReducersMapObject<Tree = any, A extends WalletAction = WalletAction> = {
   [Branch in keyof Tree]: ReducerWithSideEffects<Tree[Branch], A>
