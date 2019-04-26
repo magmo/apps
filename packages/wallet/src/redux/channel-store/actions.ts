@@ -1,12 +1,6 @@
 import { Commitment } from '../../domain';
 import * as walletActions from '../actions';
 
-export const CHANNEL_INITIALIZED = 'WALLET.CHANNEL.CHANNEL_INITIALIZED';
-export const channelInitialized = () => ({
-  type: CHANNEL_INITIALIZED as typeof CHANNEL_INITIALIZED,
-});
-export type ChannelInitialized = ReturnType<typeof channelInitialized>;
-
 export const CREATE_CHANNEL_REQUEST = ''; // send over opponent addresses, gameLibrary
 // return nonce etc.
 export const JOIN_CHANNEL_REQUEST = '';
@@ -218,7 +212,6 @@ export type ChannelAction =  // TODO: Some of these actions probably also belong
   | ChallengeResponseAcknowledged
   | ChallengeResponseReceived
   | ChallengeTimeoutAcknowledged
-  | ChannelInitialized
   | ClosedOnChainAcknowledged
   | CloseSuccessAcknowledged
   | ConcludeApproved

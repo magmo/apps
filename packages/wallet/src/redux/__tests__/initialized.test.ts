@@ -18,19 +18,6 @@ const defaults = {
 
 const initializedState = states.initialized({ ...defaults });
 
-describe('when the player initializes a channel', () => {
-  const action = actions.channel.channelInitialized();
-  const updatedState = walletReducer(initializedState, action);
-
-  it.skip('applies the channel reducer', async () => {
-    const ids = Object.keys(updatedState.channelStore.initializingChannels);
-    expect(ids.length).toEqual(1);
-    expect(updatedState.channelStore.initializingChannels[ids[0]].privateKey).toEqual(
-      expect.any(String),
-    );
-  });
-});
-
 describe('when a NewProcessAction arrives', () => {
   const processId = channelId;
 
