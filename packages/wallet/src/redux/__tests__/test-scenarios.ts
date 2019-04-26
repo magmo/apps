@@ -1,7 +1,6 @@
 import { Channel, CommitmentType, Commitment } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
-import { waitForPreFundSetup } from '../channel-store';
 import * as states from '../state';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { addHex } from '../../utils/hex-utils';
@@ -9,6 +8,7 @@ import * as directFundingStates from '../../redux/protocols/direct-funding/state
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import * as actions from '../actions';
 import { signCommitment, signCommitment2 } from '../../domain';
+import { ChannelState } from '../channel-store';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const ledgerLibraryAddress = '0x' + '2'.repeat(40);
@@ -152,19 +152,21 @@ export const concludeCommitment2: Commitment = {
   destination: [],
 };
 
+const initializedChannel: ChannelState = {
+  channelId,
+  libraryAddress,
+  ourIndex: 0,
+  participants,
+  channelNonce,
+  funded: false,
+  address: asAddress,
+  privateKey: asPrivateKey,
+  lastCommitment: { commitment: preFundCommitment0, signature: 'signature' },
+  turnNum: 0,
+};
+
 export const initializedChannelState = {
-  [channelId]: waitForPreFundSetup({
-    channelId,
-    libraryAddress,
-    ourIndex: 0,
-    participants,
-    channelNonce,
-    funded: false,
-    address: asAddress,
-    privateKey: asPrivateKey,
-    lastCommitment: { commitment: preFundCommitment0, signature: 'signature' },
-    turnNum: 0,
-  }),
+  [channelId]: initializedChannel,
 };
 export const initializingChannelState = {
   [asAddress]: { address: asAddress, privateKey: asPrivateKey },

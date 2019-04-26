@@ -1,5 +1,3 @@
-import { RunningState } from './running/state';
-
 import { ChannelState } from './channel-state';
 
 export interface InitializingChannelState {
@@ -10,8 +8,6 @@ export interface InitializingChannelState {
 export interface InitializingChannels {
   [participantAddress: string]: InitializingChannelState;
 }
-
-export type OpenedState = RunningState;
 
 export interface InitializedChannels {
   [channelId: string]: ChannelState;
@@ -39,6 +35,3 @@ export function setChannel(store: ChannelStore, channel: ChannelState): ChannelS
 export function getChannel(store: ChannelStore, channelId: string): ChannelState | undefined {
   return store.initializedChannels[channelId];
 }
-
-export * from './opening/state';
-export * from './running/state';

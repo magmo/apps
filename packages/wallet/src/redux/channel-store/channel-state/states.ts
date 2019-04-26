@@ -2,7 +2,7 @@ import { SignedCommitment } from '../../../domain';
 
 export type ChannelState = PartiallyOpenChannelState | OpenChannelState;
 
-interface PartiallyOpenChannelState {
+export interface PartiallyOpenChannelState {
   address: string;
   privateKey: string;
   channelId: string;
