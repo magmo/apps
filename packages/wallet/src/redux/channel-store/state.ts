@@ -32,14 +32,14 @@ export function emptyChannelStore(): ChannelStore {
 // Getters and setters
 // -------------------
 
-export function setChannel(channelStore: ChannelStore, channel: ChannelState): ChannelStore {
+export function setChannel(store: ChannelStore, channel: ChannelState): ChannelStore {
   const channelId = channel.channelId;
-  const initializedChannels = { ...channelStore.initializedChannels, [channelId]: channel };
-  return { ...channelStore, initializedChannels };
+  const initializedChannels = { ...store.initializedChannels, [channelId]: channel };
+  return { ...store, initializedChannels };
 }
 
-export function getChannel(channelStore: ChannelStore, channelId: string) {
-  return channelStore.initializedChannels[channelId];
+export function getChannel(store: ChannelStore, channelId: string): ChannelState | undefined {
+  return store.initializedChannels[channelId];
 }
 
 export * from './opening/state';
