@@ -17,7 +17,7 @@ const participant = { address, privateKey, ourIndex: 0 };
 const channelDefaults = { ...channel, ...participant };
 
 const {
-  signedCommitment0,
+  signedCommitment2,
   signedCommitment19,
   signedCommitment20,
   signedCommitment21,
@@ -26,7 +26,7 @@ const {
 const partiallyOpen = waitForPreFundSetup({
   ...channelDefaults,
   turnNum: 0,
-  lastCommitment: signedCommitment0,
+  lastCommitment: signedCommitment2,
   funded: false,
 });
 const theirTurn = waitForUpdate({
