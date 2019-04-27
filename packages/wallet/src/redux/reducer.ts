@@ -8,10 +8,10 @@ import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protoc
 import * as challengeProtocol from './protocols/challenging';
 import * as concludeProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
-import { FundingState } from './protocols/funding/states';
 import * as challengeResponseProtocol from './protocols/responding';
 import * as states from './state';
 import { WalletProtocol } from './types';
+import { FundingState } from './protocols/funding/states';
 
 const initialState = states.waitForLogin();
 
@@ -89,17 +89,26 @@ function updatedState(
   return newState;
 }
 
+function getProcessId(action: NewProcessAction): string {
+  if ('channelId' in action) {
+    return action.channelId;
+  }
+  return 'application';
+}
+
 function initializeNewProtocol(
   state: states.Initialized,
   action: actions.protocol.NewProcessAction,
 ): { protocolState: ProtocolState; sharedData: states.SharedData } {
-  const { channelId } = action;
-  const processId = action.channelId;
+  const processId = getProcessId(action);
   const incomingSharedData = states.sharedData(state);
   switch (action.type) {
-    case actions.protocol.FUNDING_REQUESTED:
+    case actions.protocol.FUNDING_REQUESTED: {
+      const { channelId } = action;
       return fundProtocol.initialize(incomingSharedData, channelId, processId, action.playerIndex);
+    }
     case actions.protocol.CONCLUDE_REQUESTED: {
+      const { channelId } = action;
       const { state: protocolState, storage: sharedData } = concludeProtocol.initialize(
         channelId,
         processId,
@@ -108,6 +117,7 @@ function initializeNewProtocol(
       return { protocolState, sharedData };
     }
     case actions.protocol.CREATE_CHALLENGE_REQUESTED: {
+      const { channelId } = action;
       const { state: protocolState, storage: sharedData } = challengeProtocol.initialize(
         channelId,
         processId,
@@ -126,7 +136,7 @@ function routeToNewProcessInitializer(
   state: states.Initialized,
   action: actions.protocol.NewProcessAction,
 ): states.Initialized {
-  const processId = action.channelId;
+  const processId = getProcessId(action);
   const { protocolState, sharedData } = initializeNewProtocol(state, action);
   return startProcess(state, sharedData, action, protocolState, processId);
 }

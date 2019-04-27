@@ -1,4 +1,5 @@
 export const enum WalletProtocol {
+  Application = 'Application',
   DirectFunding = 'DirectFunding',
   IndirectFunding = 'IndirectFunding',
   Challenging = 'Challenging',
