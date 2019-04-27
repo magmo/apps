@@ -5,8 +5,10 @@ import { SharedData } from '../state';
 import { RespondingState } from './responding/state';
 import { FundingState } from './funding/states';
 import { DefundingState } from './defunding/state';
+import { ApplicationState } from './application/state';
 
 export type ProtocolState =
+  | ApplicationState
   | IndirectFundingState
   | DirectFundingState
   | WithdrawalState
