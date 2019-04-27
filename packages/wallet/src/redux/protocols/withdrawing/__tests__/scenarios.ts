@@ -40,7 +40,6 @@ const channelStatus: ChannelState = {
 };
 
 const channelStore: ChannelStore = {
-  initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
   },
