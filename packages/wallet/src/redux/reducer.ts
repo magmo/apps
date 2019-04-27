@@ -105,6 +105,7 @@ function routeToNewProcessInitializer(
     case actions.protocol.CONCLUDE_REQUESTED:
     case actions.protocol.CREATE_CHALLENGE_REQUESTED:
     case actions.protocol.RESPOND_TO_CHALLENGE_REQUESTED:
+    case actions.protocol.INITIALIZE_CHANNEL:
       return state;
     default:
       return unreachable(action);

@@ -20,6 +20,9 @@ export function* messageListener() {
     const action = messageEvent.data;
     switch (messageEvent.data.type) {
       // Events that need a new process
+      case incoming.INITIALIZE_CHANNEL_REQUEST:
+        yield put(actions.protocol.initializeChannel());
+        break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.protocol.concludeRequested(action.channelId));
         break;
@@ -36,9 +39,6 @@ export function* messageListener() {
       // Events that do not need a new process
       case incoming.INITIALIZE_REQUEST:
         yield put(actions.loggedIn(action.userId));
-        break;
-      case incoming.INITIALIZE_CHANNEL_REQUEST:
-        yield put(actions.channel.createChannel());
         break;
       case incoming.SIGN_COMMITMENT_REQUEST:
         yield put(actions.channel.ownCommitmentReceived(action.commitment));
