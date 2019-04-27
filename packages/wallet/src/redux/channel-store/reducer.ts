@@ -1,4 +1,4 @@
-import { ChannelStore, getChannel, setChannel, setInitializingChannel } from './state';
+import { ChannelStore, getChannel, setChannel } from './state';
 
 import { ReducerWithSideEffects } from '../../utils/reducer-utils';
 import { StateWithSideEffects } from '../utils';
@@ -13,16 +13,12 @@ import {
 import { pushCommitment, ChannelState } from './channel-state/states';
 import { validTransition } from './channel-state';
 import * as channelActions from './actions';
-import { ethers } from 'ethers';
-import { channelInitializationSuccess } from 'magmo-wallet-client';
 
 export const channelStoreReducer: ReducerWithSideEffects<ChannelStore> = (
   state: ChannelStore,
   action: WalletAction,
 ): StateWithSideEffects<ChannelStore> => {
   switch (action.type) {
-    case channelActions.CREATE_CHANNEL:
-      return createNewInitializingChannel(state);
     case channelActions.OPPONENT_COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
       const checkResult = checkAndStore(state, { commitment, signature });
@@ -45,12 +41,6 @@ export const channelStoreReducer: ReducerWithSideEffects<ChannelStore> = (
 // -----------------
 // NEW FUNCTIONALITY
 // -----------------
-
-function createNewInitializingChannel(store: ChannelStore) {
-  const { address, privateKey } = ethers.Wallet.createRandom();
-  const state = setInitializingChannel(store, { address, privateKey });
-  return { state, sideEffects: { messageOutbox: channelInitializationSuccess(address) } };
-}
 
 interface SignSuccess {
   isSuccess: true;
