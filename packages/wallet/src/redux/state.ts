@@ -37,6 +37,7 @@ export interface SharedData {
   outboxState: OutboxState;
   adjudicatorState: AdjudicatorState;
   fundingState: FundingState;
+  activeAppChannelId?: string;
 }
 
 export interface WaitForLogin extends SharedData {
@@ -52,6 +53,7 @@ export interface Initialized extends SharedData {
   uid: string;
   processStore: ProcessStore;
   currentProcessId?: string;
+  activeAppChannelId?: string;
 }
 
 // TODO: Once these are fleshed out they should be moved to their own file.
@@ -85,8 +87,20 @@ export const EMPTY_SHARED_DATA: SharedData = {
 };
 
 export function sharedData(params: SharedData): SharedData {
-  const { outboxState, channelStore: channelState, adjudicatorState, fundingState } = params;
-  return { outboxState, channelStore: channelState, adjudicatorState, fundingState };
+  const {
+    outboxState,
+    channelStore: channelState,
+    adjudicatorState,
+    fundingState,
+    activeAppChannelId,
+  } = params;
+  return {
+    outboxState,
+    channelStore: channelState,
+    adjudicatorState,
+    fundingState,
+    activeAppChannelId,
+  };
 }
 
 export function waitForLogin(): WaitForLogin {

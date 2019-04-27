@@ -15,7 +15,6 @@ export interface InitializedChannels {
 export interface ChannelStore {
   initializingChannels: InitializingChannels;
   initializedChannels: InitializedChannels;
-  activeAppChannelId?: string;
 }
 
 export function emptyChannelStore(): ChannelStore {

@@ -82,8 +82,8 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
 
-  if (storage.channelStore.activeAppChannelId) {
-    const channelId = storage.channelStore.activeAppChannelId;
+  if (storage.activeAppChannelId) {
+    const channelId = storage.activeAppChannelId;
 
     const channelState = getChannel(storage, channelId) as ChannelState;
 

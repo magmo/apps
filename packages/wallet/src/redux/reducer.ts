@@ -131,6 +131,7 @@ const waitForLoginReducer = (
       return state;
   }
 };
+
 function startProcess(
   state: states.Initialized,
   sharedData: states.SharedData,
