@@ -52,9 +52,6 @@ export interface Initialized extends SharedData {
   uid: string;
   processStore: ProcessStore;
   currentProcessId?: string;
-  // TODO: This is obsolete now that we have ProcessStore
-  // This should be deleted once we clean up the code still using this
-  indirectFunding?: indirectFunding.IndirectFundingState;
 }
 
 // TODO: Once these are fleshed out they should be moved to their own file.
@@ -75,13 +72,6 @@ export interface FundingState {
 export interface ChannelFundingState {
   directlyFunded: boolean;
   fundingChannel?: string;
-}
-
-export interface IndirectFundingOngoing extends Initialized {
-  indirectFunding: indirectFunding.IndirectFundingState;
-}
-export function indirectFundingOngoing(state: Initialized): state is IndirectFundingOngoing {
-  return state.indirectFunding ? true : false;
 }
 
 // ------------
