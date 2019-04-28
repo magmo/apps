@@ -5,15 +5,12 @@ export interface InitializingChannelState {
   privateKey: string;
 }
 
-export interface InitializedChannels {
-  [channelId: string]: ChannelState;
-}
 export interface ChannelStore {
-  initializedChannels: InitializedChannels;
+  [channelId: string]: ChannelState;
 }
 
 export function emptyChannelStore(): ChannelStore {
-  return { initializedChannels: {} };
+  return {};
 }
 
 // -------------------
@@ -22,10 +19,9 @@ export function emptyChannelStore(): ChannelStore {
 
 export function setChannel(store: ChannelStore, channel: ChannelState): ChannelStore {
   const channelId = channel.channelId;
-  const initializedChannels = { ...store.initializedChannels, [channelId]: channel };
-  return { ...store, initializedChannels };
+  return { ...store, [channelId]: channel };
 }
 
 export function getChannel(store: ChannelStore, channelId: string): ChannelState | undefined {
-  return store.initializedChannels[channelId];
+  return store[channelId];
 }

@@ -34,9 +34,7 @@ const channelStatus: ChannelState = {
 };
 
 const channelStore: ChannelStore = {
-  initializedChannels: {
-    [channelId]: channelStatus,
-  },
+  [channelId]: channelStatus,
 };
 
 const notClosedChannelStatus = {
@@ -47,10 +45,7 @@ const notClosedChannelStatus = {
 };
 
 const notClosedChannelState = {
-  initializingChannels: {},
-  initializedChannels: {
-    [channelId]: notClosedChannelStatus,
-  },
+  [channelId]: notClosedChannelStatus,
 };
 
 const directlyFundedFundingState: FundingState = {
