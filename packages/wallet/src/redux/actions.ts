@@ -4,6 +4,7 @@ import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
 import * as challenging from './protocols/challenging/actions';
+import * as application from './protocols/application/actions';
 import { FundingAction } from './protocols/funding/actions';
 import { Commitment } from '../domain';
 import {
@@ -158,7 +159,8 @@ export type ProtocolAction =
   | directFunding.FundingAction
   | indirectFunding.Action
   | WithdrawalAction
-  | RespondingAction;
+  | RespondingAction
+  | application.ApplicationAction;
 
 export type WalletAction =
   | AdjudicatorKnown
@@ -186,4 +188,12 @@ function isCommonAction(action: WalletAction): action is CommonAction {
     ].indexOf(action.type) >= 0
   );
 }
-export { internal, channel, directFunding as funding, indirectFunding, protocol, isCommonAction };
+export {
+  internal,
+  channel,
+  directFunding as funding,
+  indirectFunding,
+  protocol,
+  isCommonAction,
+  application,
+};

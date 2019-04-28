@@ -3,6 +3,7 @@ import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
 
 import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
+import * as application from '../protocols/application/reducer';
 
 export function* messageListener() {
   const postMessageEventChannel = eventChannel(emitter => {
@@ -41,10 +42,21 @@ export function* messageListener() {
         yield put(actions.loggedIn(action.userId));
         break;
       case incoming.SIGN_COMMITMENT_REQUEST:
-        yield put(actions.channel.ownCommitmentReceived(action.commitment));
+        yield put(
+          actions.application.ownCommitmentReceived(
+            application.APPLICATION_PROCESS_ID,
+            action.commitment,
+          ),
+        );
         break;
       case incoming.VALIDATE_COMMITMENT_REQUEST:
-        yield put(actions.channel.opponentCommitmentReceived(action.commitment, action.signature));
+        yield put(
+          actions.application.opponentCommitmentReceived(
+            application.APPLICATION_PROCESS_ID,
+            action.commitment,
+            action.signature,
+          ),
+        );
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(handleIncomingMessage(action));

@@ -7,6 +7,7 @@ import { accumulateSideEffects } from './outbox';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
 import { NewProcessAction, isNewProcessAction, isProtocolAction } from './protocols/actions';
 import * as funding from './protocols/funding/reducer';
+import * as application from './protocols/application/reducer';
 import { ProtocolState } from './protocols';
 import { WalletProtocol } from './types';
 import { FundingState } from './protocols/funding/states';
@@ -38,6 +39,7 @@ export function initializedReducer(
   action: actions.WalletAction,
 ): states.WalletState {
   // TODO: We will need to update SharedData here first
+
   if (isNewProcessAction(action)) {
     return routeToNewProcessInitializer(state, action);
   } else if (isProtocolAction(action)) {
@@ -105,8 +107,20 @@ function routeToNewProcessInitializer(
     case actions.protocol.CONCLUDE_REQUESTED:
     case actions.protocol.CREATE_CHALLENGE_REQUESTED:
     case actions.protocol.RESPOND_TO_CHALLENGE_REQUESTED:
-    case actions.protocol.INITIALIZE_CHANNEL:
       return state;
+    case actions.protocol.INITIALIZE_CHANNEL:
+      const {
+        protocolState: applicationState,
+        sharedData: applicationSharedData,
+      } = application.initialize(states.sharedData(state));
+      return startProcess(
+        state,
+        applicationSharedData,
+        action,
+        applicationState,
+        application.APPLICATION_PROCESS_ID,
+      );
+
     default:
       return unreachable(action);
   }
@@ -131,7 +145,6 @@ const waitForLoginReducer = (
       return state;
   }
 };
-
 function startProcess(
   state: states.Initialized,
   sharedData: states.SharedData,
@@ -145,7 +158,9 @@ function startProcess(
     ...newState.processStore,
     [processId]: { processId, protocolState, channelsToMonitor: [], protocol },
   };
-  // TODO: Right now any new processId get sets to the current process Id. We might need to be smarter about this in the future.
+  // TODO: Right now any new processId get sets to the current process Id.
+  // We probably need a priority queue so some protocols can override another
+  // IE: Responding to a challenge is higher priority than funding.
   newState.currentProcessId = processId;
 
   return newState;
