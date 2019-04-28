@@ -3,6 +3,12 @@ import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
 
 import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
+import {
+  ownCommitmentReceived,
+  opponentCommitmentReceived,
+} from '../protocols/application/actions';
+import { channelID, Channel } from 'fmg-core/lib/channel';
+import { WalletProtocol } from '../types';
 
 export function* messageListener() {
   const postMessageEventChannel = eventChannel(emitter => {
@@ -43,10 +49,22 @@ export function* messageListener() {
         yield put(actions.loggedIn(action.userId));
         break;
       case incoming.SIGN_COMMITMENT_REQUEST:
-        yield put(actions.channel.ownCommitmentReceived(action.commitment));
+        yield put(
+          ownCommitmentReceived(
+            getProcessId(WalletProtocol.Application, action.commitment),
+            action.commitment,
+          ),
+        );
         break;
       case incoming.VALIDATE_COMMITMENT_REQUEST:
-        yield put(actions.channel.opponentCommitmentReceived(action.commitment, action.signature));
+        const { commitment, signature } = action;
+        yield put(
+          opponentCommitmentReceived(
+            getProcessId(WalletProtocol.Application, commitment.channel),
+            commitment,
+            signature,
+          ),
+        );
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(handleIncomingMessage(action));
@@ -54,6 +72,10 @@ export function* messageListener() {
       default:
     }
   }
+}
+
+function getProcessId(protocol: WalletProtocol, channel: Channel): string {
+  return `${protocol}-${channelID(channel)}`;
 }
 
 function handleIncomingMessage(action: incoming.ReceiveMessage) {
