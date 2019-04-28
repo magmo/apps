@@ -62,7 +62,7 @@ export const initializingApplication = {
   },
 };
 
-export const startingChannel = {
+export const startingApplication = {
   ...defaults,
   storage: { ...EMPTY_SHARED_DATA },
   states: {
