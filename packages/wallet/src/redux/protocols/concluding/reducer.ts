@@ -97,7 +97,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
       state: waitForOpponentConclude({
         ...state,
         turnNum: concludeCommitment.turnNum,
-        penultimateCommitment: storage.channelStore.lastCommitment, // TODO: Fix me
+        penultimateCommitment: storage.channelStore[channelId].lastCommitment,
         lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
       }),
       sideEffects: { messageOutbox: sendCommitmentAction },
