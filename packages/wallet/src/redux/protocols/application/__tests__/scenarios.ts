@@ -15,6 +15,7 @@ const {
   signedCommitment19,
   signedCommitment20,
   signedCommitment21,
+  signedCommitment22,
   preFundCommitment0,
 } = channelScenarios;
 const theirTurn = channelFromCommitments(
@@ -46,7 +47,7 @@ const initializeChannel = protocolActions.initializeChannel();
 const receivePreFundSetup = actions.ownCommitmentReceived(processId, preFundCommitment0);
 const receiveOurCommitment = actions.ownCommitmentReceived(
   processId,
-  signedCommitment20.commitment,
+  signedCommitment22.commitment,
 );
 const { commitment, signature } = signedCommitment21;
 const receiveTheirCommitment = actions.opponentCommitmentReceived(processId, commitment, signature);

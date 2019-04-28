@@ -130,6 +130,21 @@ export const signedCommitment21 = {
   commitment: gameCommitment3,
   signature: signCommitment(gameCommitment3, bsPrivateKey),
 };
+
+export const gameCommitment4: Commitment = {
+  channel,
+  commitmentCount: 4,
+  commitmentType: CommitmentType.App,
+  appAttributes: '0x0',
+  turnNum: 22,
+  allocation: [],
+  destination: [],
+};
+export const signedCommitment22 = {
+  commitment: gameCommitment4,
+  signature: signCommitment(gameCommitment4, bsPrivateKey),
+};
+
 export const concludeCommitment1: Commitment = {
   channel,
   commitmentCount: 0,
