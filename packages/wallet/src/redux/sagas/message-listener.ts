@@ -28,13 +28,15 @@ export function* messageListener() {
         yield put(actions.protocol.concludeRequested(action.channelId));
         break;
       case incoming.CREATE_CHALLENGE_REQUEST:
-        yield put(actions.protocol.createChallengeRequested(action.channelId));
+        yield put(actions.protocol.createChallengeRequested(action.channelId, action.commitment));
         break;
       case incoming.FUNDING_REQUEST:
         yield put(actions.protocol.fundingRequested(action.channelId, action.playerIndex));
         break;
       case incoming.RESPOND_TO_CHALLENGE:
-        yield put(actions.protocol.respondToChallengeRequested(action.commitment));
+        yield put(
+          actions.protocol.respondToChallengeRequested(action.channelId, action.commitment),
+        );
         break;
 
       // Events that do not need a new process
@@ -72,7 +74,10 @@ function handleIncomingMessage(action: incoming.ReceiveMessage) {
   const { data, processId } = messagePayload;
 
   if ('commitment' in data) {
-    return actions.commitmentReceived(processId, data.commitment, data.signature);
+    return actions.commitmentReceived(processId, {
+      commitment: data.commitment,
+      signature: data.signature,
+    });
   } else if ('type' in data) {
     // TODO: It would be nice if eventually every message simply wrapped an action
     return data;

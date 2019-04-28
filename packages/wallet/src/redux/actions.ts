@@ -1,4 +1,3 @@
-import * as internal from './internal/actions';
 import * as channel from './channel-store/actions';
 import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
@@ -6,7 +5,7 @@ import * as protocol from './protocols/actions';
 import * as challenging from './protocols/challenging/actions';
 import * as application from './protocols/application/actions';
 import { FundingAction } from './protocols/funding/actions';
-import { Commitment } from '../domain';
+import { Commitment, SignedCommitment } from '../domain';
 import {
   TransactionAction as TA,
   isTransactionAction as isTA,
@@ -68,15 +67,10 @@ export const messageReceived = (processId: string, data: Message) => ({
 export type MessageReceived = ReturnType<typeof messageReceived>;
 
 export const COMMITMENT_RECEIVED = 'WALLET.COMMON.COMMITMENT_RECEIVED';
-export const commitmentReceived = (
-  processId: string,
-  commitment: Commitment,
-  signature: string,
-) => ({
+export const commitmentReceived = (processId: string, signedCommitment: SignedCommitment) => ({
   type: COMMITMENT_RECEIVED as typeof COMMITMENT_RECEIVED,
   processId,
-  commitment,
-  signature,
+  signedCommitment,
 });
 export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
 
@@ -172,7 +166,6 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | internal.InternalAction
   | ChallengeCreatedEvent;
 
 function isCommonAction(action: WalletAction): action is CommonAction {
@@ -189,7 +182,6 @@ function isCommonAction(action: WalletAction): action is CommonAction {
   );
 }
 export {
-  internal,
   channel,
   directFunding as funding,
   indirectFunding,

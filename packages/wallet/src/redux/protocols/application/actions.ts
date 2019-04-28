@@ -1,40 +1,24 @@
 import { Commitment } from '../../../domain';
 
-export type ApplicationAction = OwnCommitmentReceived | OpponentCommitmentReceived;
-
-export interface OwnCommitmentReceived {
-  type: 'APPLICATION.OWN_COMMITMENT_RECEIVED';
-  processId: string;
-  commitment: Commitment;
-}
-
-export interface OpponentCommitmentReceived {
-  type: 'APPLICATION.OPPONENT_COMMITMENT_RECEIVED';
-  processId: string;
-  commitment: Commitment;
-  signature: string;
-}
-
-// --------
-// Creators
-// --------
-
-export const ownCommitmentReceived = (
-  processId: string,
-  commitment: Commitment,
-): OwnCommitmentReceived => ({
-  type: 'APPLICATION.OWN_COMMITMENT_RECEIVED',
+export const OWN_COMMITMENT_RECEIVED = 'WALLET.APPLICATION.OWN_COMMITMENT_RECEIVED';
+export const ownCommitmentReceived = (processId: string, commitment: Commitment) => ({
+  type: OWN_COMMITMENT_RECEIVED as typeof OWN_COMMITMENT_RECEIVED,
   processId,
   commitment,
 });
+export type OwnCommitmentReceived = ReturnType<typeof ownCommitmentReceived>;
 
+export const OPPONENT_COMMITMENT_RECEIVED = 'WALLET.APPLICATION.OPPONENT_COMMITMENT_RECEIVED';
 export const opponentCommitmentReceived = (
   processId: string,
   commitment: Commitment,
   signature: string,
-): OpponentCommitmentReceived => ({
-  type: 'APPLICATION.OPPONENT_COMMITMENT_RECEIVED',
+) => ({
+  type: OPPONENT_COMMITMENT_RECEIVED as typeof OPPONENT_COMMITMENT_RECEIVED,
   processId,
   commitment,
   signature,
 });
+export type OpponentCommitmentReceived = ReturnType<typeof opponentCommitmentReceived>;
+
+export type ApplicationAction = OpponentCommitmentReceived | OwnCommitmentReceived;

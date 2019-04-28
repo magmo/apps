@@ -1,14 +1,16 @@
-import * as states from './state';
-
-import * as actions from './actions';
-import { unreachable } from '../utils/reducer-utils';
-import { clearOutbox } from './outbox/reducer';
-import { accumulateSideEffects } from './outbox';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
-import { NewProcessAction, isNewProcessAction, isProtocolAction } from './protocols/actions';
-import * as funding from './protocols/funding/reducer';
-import * as application from './protocols/application/reducer';
+import { unreachable } from '../utils/reducer-utils';
+import * as actions from './actions';
+import { accumulateSideEffects } from './outbox';
+import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
+import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
+import * as applicationProtocol from './protocols/application';
+import * as challengeProtocol from './protocols/challenging';
+import * as concludeProtocol from './protocols/concluding';
+import * as fundProtocol from './protocols/funding';
+import * as challengeResponseProtocol from './protocols/responding';
+import * as states from './state';
 import { WalletProtocol } from './types';
 import { FundingState } from './protocols/funding/states';
 
@@ -57,7 +59,7 @@ function routeToProtocolReducer(state: states.Initialized, action: actions.Proto
   } else {
     switch (processState.protocol) {
       case WalletProtocol.Funding:
-        const { protocolState, sharedData } = funding.fundingReducer(
+        const { protocolState, sharedData } = fundProtocol.reducer(
           processState.protocolState,
           states.sharedData(state),
           action,
@@ -89,41 +91,58 @@ function updatedState(
   return newState;
 }
 
+function getProcessId(action: NewProcessAction): string {
+  if ('channelId' in action) {
+    return action.channelId;
+  }
+  return 'application';
+}
+
+function initializeNewProtocol(
+  state: states.Initialized,
+  action: actions.protocol.NewProcessAction,
+): { protocolState: ProtocolState; sharedData: states.SharedData } {
+  const processId = getProcessId(action);
+  const incomingSharedData = states.sharedData(state);
+  switch (action.type) {
+    case actions.protocol.FUNDING_REQUESTED: {
+      const { channelId } = action;
+      return fundProtocol.initialize(incomingSharedData, channelId, processId, action.playerIndex);
+    }
+    case actions.protocol.CONCLUDE_REQUESTED: {
+      const { channelId } = action;
+      const { state: protocolState, storage: sharedData } = concludeProtocol.initialize(
+        channelId,
+        processId,
+        incomingSharedData,
+      );
+      return { protocolState, sharedData };
+    }
+    case actions.protocol.CREATE_CHALLENGE_REQUESTED: {
+      const { channelId } = action;
+      const { state: protocolState, storage: sharedData } = challengeProtocol.initialize(
+        channelId,
+        processId,
+        incomingSharedData,
+      );
+      return { protocolState, sharedData };
+    }
+    case actions.protocol.RESPOND_TO_CHALLENGE_REQUESTED:
+      return challengeResponseProtocol.initialize(processId, incomingSharedData, action.commitment);
+    case actions.protocol.INITIALIZE_CHANNEL:
+      return applicationProtocol.initialize(incomingSharedData);
+    default:
+      return unreachable(action);
+  }
+}
+
 function routeToNewProcessInitializer(
   state: states.Initialized,
   action: actions.protocol.NewProcessAction,
 ): states.Initialized {
-  switch (action.type) {
-    case actions.protocol.FUNDING_REQUESTED:
-      const processId = action.channelId;
-      const { protocolState, sharedData } = funding.initialize(
-        states.sharedData(state),
-        processId,
-        action.channelId,
-        action.playerIndex,
-      );
-
-      return startProcess(state, sharedData, action, protocolState, processId);
-    case actions.protocol.CONCLUDE_REQUESTED:
-    case actions.protocol.CREATE_CHALLENGE_REQUESTED:
-    case actions.protocol.RESPOND_TO_CHALLENGE_REQUESTED:
-      return state;
-    case actions.protocol.INITIALIZE_CHANNEL:
-      const {
-        protocolState: applicationState,
-        sharedData: applicationSharedData,
-      } = application.initialize(states.sharedData(state));
-      return startProcess(
-        state,
-        applicationSharedData,
-        action,
-        applicationState,
-        application.APPLICATION_PROCESS_ID,
-      );
-
-    default:
-      return unreachable(action);
-  }
+  const processId = getProcessId(action);
+  const { protocolState, sharedData } = initializeNewProtocol(state, action);
+  return startProcess(state, sharedData, action, protocolState, processId);
 }
 
 const waitForLoginReducer = (
@@ -145,6 +164,7 @@ const waitForLoginReducer = (
       return state;
   }
 };
+
 function startProcess(
   state: states.Initialized,
   sharedData: states.SharedData,

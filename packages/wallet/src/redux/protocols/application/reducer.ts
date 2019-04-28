@@ -1,4 +1,4 @@
-import { SharedData } from '../../state';
+import { SharedData, queueMessage } from '../../state';
 import * as states from './state';
 import * as actions from './actions';
 import { ProtocolStateWithSharedData } from '..';
@@ -7,6 +7,7 @@ import { updateChannelState } from '../reducer-helpers';
 import * as channelActions from '../../channel-store/actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { channelID } from 'fmg-core/lib/channel';
+import { channelInitializationSuccess } from 'magmo-wallet-client';
 
 // TODO: Right now we're using a fixed application ID
 // since we're not too concerned with handling multiple running app channels.
@@ -17,9 +18,10 @@ export function initialize(
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
   const { privateKey, address } = ethers.Wallet.createRandom();
+  const newSharedData = queueMessage(sharedData, channelInitializationSuccess(address));
   return {
     protocolState: states.addressKnown(address, privateKey),
-    sharedData,
+    sharedData: newSharedData,
   };
 }
 

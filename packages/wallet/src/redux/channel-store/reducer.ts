@@ -2,7 +2,6 @@ import { ChannelStore, getChannel, setChannel } from './state';
 
 import { ReducerWithSideEffects } from '../../utils/reducer-utils';
 import { StateWithSideEffects } from '../utils';
-import { WalletAction } from '../actions';
 import {
   SignedCommitment,
   Commitment,
@@ -16,7 +15,7 @@ import * as channelActions from './actions';
 
 export const channelStoreReducer: ReducerWithSideEffects<ChannelStore> = (
   state: ChannelStore,
-  action: WalletAction,
+  action: channelActions.ChannelAction,
 ): StateWithSideEffects<ChannelStore> => {
   switch (action.type) {
     case channelActions.OPPONENT_COMMITMENT_RECEIVED:
@@ -64,7 +63,7 @@ export function signAndStore(store: ChannelStore, commitment: Commitment): SignR
   if (!channel) {
     return { isSuccess: false, reason: 'ChannelDoesntExist' };
   }
-  const signedCommitment = signCommitment2(commitment, channel.address);
+  const signedCommitment = signCommitment2(commitment, channel.privateKey);
 
   // this next check is weird. It'll check whether it was our turn.
   // Maybe this should be done as part of signCommitment2
@@ -120,9 +119,9 @@ export function checkAndStore(
   }
 
   channel = pushCommitment(channel, signedCommitment);
+  store = setChannel(store, channel);
 
-  // todo
-  return { isSuccess: false };
+  return { isSuccess: true, store };
 }
 
 // Currently just checks for validTransition
