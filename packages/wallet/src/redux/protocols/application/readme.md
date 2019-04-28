@@ -11,6 +11,8 @@ It should never fail.
 
 How does this process reach a terminal state?
 
+- One solution is to dispatch an application actiuon when the message listener gets the `CONCLUDE_CHANNEL_REQUEST`
+
 ## State machine
 
 The protocol is implemented with the following state machine.
