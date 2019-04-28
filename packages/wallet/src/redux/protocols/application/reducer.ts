@@ -3,11 +3,16 @@ import * as states from './state';
 import * as actions from './actions';
 import { ProtocolStateWithSharedData } from '..';
 import * as ethers from 'ethers';
-import { updateChannelState } from '../reducer-helpers';
-import * as channelActions from '../../channel-store/actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { channelID } from 'fmg-core/lib/channel';
-import { channelInitializationSuccess } from 'magmo-wallet-client';
+import {
+  channelInitializationSuccess,
+  validationSuccess,
+  signatureSuccess,
+  signatureFailure,
+  validationFailure,
+} from 'magmo-wallet-client';
+import { signAndStore, checkAndStore } from '../../channel-store/reducer';
 
 // TODO: Right now we're using a fixed application ID
 // since we're not too concerned with handling multiple running app channels.
@@ -56,16 +61,27 @@ const updateChannelStateWithCommitment = (
   switch (action.type) {
     case actions.OPPONENT_COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
-      return updateChannelState(
-        sharedData,
-        channelActions.opponentCommitmentReceived(commitment, signature),
-      );
+      const validateResult = checkAndStore(sharedData.channelStore, { commitment, signature });
+      if (!validateResult.isSuccess) {
+        // TODO: Currently checkAndStore doesn't contain any validation messages
+        // We might want to return a more descriptive message to the app?
+        return queueMessage(sharedData, validationFailure('InvalidSignature'));
+      } else {
+        const updatedSharedData = { ...sharedData, channelStore: validateResult.store };
+        return queueMessage(updatedSharedData, validationSuccess());
+      }
       break;
     case actions.OWN_COMMITMENT_RECEIVED:
-      return updateChannelState(
-        sharedData,
-        channelActions.ownCommitmentReceived(action.commitment),
-      );
+      const signResult = signAndStore(sharedData.channelStore, action.commitment);
+      if (!signResult.isSuccess) {
+        return queueMessage(sharedData, signatureFailure('Other', signResult.reason));
+      } else {
+        const updatedSharedData = { ...sharedData, channelStore: signResult.store };
+        return queueMessage(
+          updatedSharedData,
+          signatureSuccess(signResult.signedCommitment.signature),
+        );
+      }
       break;
     default:
       return unreachable(action);
