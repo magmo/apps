@@ -1,10 +1,5 @@
 import { ChannelState } from './channel-state';
 
-export interface InitializingChannelState {
-  address: string;
-  privateKey: string;
-}
-
 export interface ChannelStore {
   [channelId: string]: ChannelState;
 }

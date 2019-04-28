@@ -9,7 +9,7 @@ import {
   getChannelId,
   hasValidSignature,
 } from '../../domain';
-import { pushCommitment, ChannelState } from './channel-state/states';
+import { pushCommitment, ChannelState, initializeChannel } from './channel-state/states';
 import { validTransition } from './channel-state';
 import * as channelActions from './actions';
 
@@ -54,6 +54,45 @@ interface SignFailure {
 
 type SignFailureReason = 'ChannelDoesntExist' | 'TransitionUnsafe' | 'NotOurTurn';
 type SignResult = SignSuccess | SignFailure;
+// TODO: These methods could probably be part of signAndStore/checkAndStore but that means
+// that the address/privateKey would be required when calling them.
+// That would make them difficult to use from other protocols.
+export function signAndInitialize(
+  store: ChannelStore,
+  commitment: Commitment,
+  address: string,
+  privateKey: string,
+): SignResult {
+  const signedCommitment = signCommitment2(commitment, privateKey);
+  if (!hasValidSignature(signedCommitment)) {
+    return { isSuccess: false, reason: 'NotOurTurn' };
+  }
+  if (signedCommitment.commitment.turnNum !== 0) {
+    return { isSuccess: false, reason: 'ChannelDoesntExist' };
+  }
+  const channel = initializeChannel(signedCommitment, address, privateKey);
+  store = setChannel(store, channel);
+
+  return { isSuccess: true, signedCommitment, store };
+}
+
+export function checkAndInitialize(
+  store: ChannelStore,
+  signedCommitment: SignedCommitment,
+  address: string,
+  privateKey: string,
+): CheckResult {
+  if (signedCommitment.commitment.turnNum !== 0) {
+    return { isSuccess: false };
+  }
+  if (!hasValidSignature(signedCommitment)) {
+    return { isSuccess: false };
+  }
+  const channel = initializeChannel(signedCommitment, address, privateKey);
+  store = setChannel(store, channel);
+
+  return { isSuccess: true, store };
+}
 
 // Signs and stores a commitment from our own app or wallet.
 // Doesn't work for the first state - the channel must already exist.

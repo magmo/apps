@@ -2,26 +2,17 @@ import * as scenarios from './scenarios';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
 import { itSendsThisMessage } from '../../../__tests__/helpers';
+import { initialize, applicationReducer } from '../reducer';
+import { VALIDATION_SUCCESS, SIGNATURE_SUCCESS } from 'magmo-wallet-client';
 
 function whenIn(state) {
   return `when in ${state}`;
 }
 
-function reducer(state, sharedData, action) {
-  return { protocolState: state, sharedData };
-}
-
 describe('initializing the application', () => {
-  const scenario = scenarios.receivingOurCommitment;
-  const sharedData = scenario.storage;
-
-  describe(whenIn(states.ONGOING), () => {
-    const state = scenario.states.ongoing;
-    const action = scenario.actions.receiveOurCommitment;
-    const result = reducer(state, sharedData, action);
-
-    itTransitionsTo(result, states.ONGOING);
-  });
+  const scenario = scenarios.initializingApplication;
+  const result = initialize(scenario.storage);
+  itTransitionsTo(result, states.ADDRESS_KNOWN);
 });
 
 describe('starting the application', () => {
@@ -31,10 +22,10 @@ describe('starting the application', () => {
   describe(whenIn(states.ADDRESS_KNOWN), () => {
     const state = scenario.states.addressKnown;
     const action = scenario.actions.receivePreFundSetup;
-    const result = reducer(state, sharedData, action);
+    const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.ONGOING);
-    itSendsThisMessage(result, 'VALIDATION SUCCESS');
+    itSendsThisMessage(result, SIGNATURE_SUCCESS);
   });
 });
 
@@ -42,13 +33,13 @@ describe('signing a commitment', () => {
   const scenario = scenarios.receivingOurCommitment;
   const sharedData = scenario.storage;
 
-  describe(whenIn(states.ADDRESS_KNOWN), () => {
+  describe(whenIn(states.ONGOING), () => {
     const state = scenario.states.ongoing;
     const action = scenario.actions.receiveOurCommitment;
-    const result = reducer(state, sharedData, action);
+    const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.ONGOING);
-    itSendsThisMessage(result, 'SIGNATURE SUCCESS');
+    itSendsThisMessage(result, SIGNATURE_SUCCESS);
   });
 });
 
@@ -56,13 +47,13 @@ describe('validating a commitment', () => {
   const scenario = scenarios.receivingTheirCommitment;
   const sharedData = scenario.storage;
 
-  describe(whenIn(states.ADDRESS_KNOWN), () => {
+  describe(whenIn(states.ONGOING), () => {
     const state = scenario.states.ongoing;
     const action = scenario.actions.receiveTheirCommitment;
-    const result = reducer(state, sharedData, action);
+    const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.ONGOING);
-    itSendsThisMessage(result, 'VALIDATION SUCCESS');
+    itSendsThisMessage(result, VALIDATION_SUCCESS);
   });
 });
 

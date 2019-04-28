@@ -12,7 +12,14 @@ import {
   signatureFailure,
   validationFailure,
 } from 'magmo-wallet-client';
-import { signAndStore, checkAndStore } from '../../channel-store/reducer';
+import {
+  checkAndStore,
+  checkAndInitialize,
+  signAndInitialize,
+  signAndStore,
+} from '../../channel-store/reducer';
+import { ADDRESS_KNOWN } from './states';
+import { Commitment } from '../../../domain';
 
 // TODO: Right now we're using a fixed application ID
 // since we're not too concerned with handling multiple running app channels.
@@ -35,10 +42,60 @@ export function applicationReducer(
   sharedData: SharedData,
   action: actions.ApplicationAction,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
-  return {
-    protocolState: updateProtocolState(protocolState, action),
-    sharedData: updateChannelStateWithCommitment(sharedData, action),
-  };
+  switch (action.type) {
+    case actions.OPPONENT_COMMITMENT_RECEIVED:
+      return opponentCommitmentReceivedReducer(protocolState, sharedData, action);
+    case actions.OWN_COMMITMENT_RECEIVED:
+      return ownCommitmentReceivedReducer(protocolState, sharedData, action);
+    default:
+      return unreachable(action);
+  }
+}
+
+function ownCommitmentReceivedReducer(
+  protocolState: states.ApplicationState,
+  sharedData: SharedData,
+  action: actions.OwnCommitmentReceived,
+): ProtocolStateWithSharedData<states.ApplicationState> {
+  const signResult = signAndUpdate(action.commitment, protocolState, sharedData);
+  if (!signResult.isSuccess) {
+    return {
+      sharedData: queueMessage(sharedData, signatureFailure('Other', signResult.reason)),
+      protocolState,
+    };
+  } else {
+    const updatedSharedData = { ...sharedData, channelStore: signResult.store };
+    return {
+      sharedData: queueMessage(
+        updatedSharedData,
+        signatureSuccess(signResult.signedCommitment.signature),
+      ),
+      protocolState: updateProtocolState(protocolState, action),
+    };
+  }
+}
+
+function opponentCommitmentReceivedReducer(
+  protocolState: states.ApplicationState,
+  sharedData: SharedData,
+  action: actions.OpponentCommitmentReceived,
+): ProtocolStateWithSharedData<states.ApplicationState> {
+  const { commitment, signature } = action;
+  const validateResult = validateAndUpdate(commitment, signature, protocolState, sharedData);
+  if (!validateResult.isSuccess) {
+    // TODO: Currently checkAndStore doesn't contain any validation messages
+    // We might want to return a more descriptive message to the app?
+    return {
+      sharedData: queueMessage(sharedData, validationFailure('InvalidSignature')),
+      protocolState,
+    };
+  } else {
+    const updatedSharedData = { ...sharedData, channelStore: validateResult.store };
+    return {
+      sharedData: queueMessage(updatedSharedData, validationSuccess()),
+      protocolState: updateProtocolState(protocolState, action),
+    };
+  }
 }
 
 const updateProtocolState = (
@@ -54,36 +111,32 @@ const updateProtocolState = (
   return states.ongoing(channelId);
 };
 
-const updateChannelStateWithCommitment = (
+const validateAndUpdate = (
+  commitment: Commitment,
+  signature: string,
+  state: states.ApplicationState,
   sharedData: SharedData,
-  action: actions.ApplicationAction,
-): SharedData => {
-  switch (action.type) {
-    case actions.OPPONENT_COMMITMENT_RECEIVED:
-      const { commitment, signature } = action;
-      const validateResult = checkAndStore(sharedData.channelStore, { commitment, signature });
-      if (!validateResult.isSuccess) {
-        // TODO: Currently checkAndStore doesn't contain any validation messages
-        // We might want to return a more descriptive message to the app?
-        return queueMessage(sharedData, validationFailure('InvalidSignature'));
-      } else {
-        const updatedSharedData = { ...sharedData, channelStore: validateResult.store };
-        return queueMessage(updatedSharedData, validationSuccess());
-      }
-      break;
-    case actions.OWN_COMMITMENT_RECEIVED:
-      const signResult = signAndStore(sharedData.channelStore, action.commitment);
-      if (!signResult.isSuccess) {
-        return queueMessage(sharedData, signatureFailure('Other', signResult.reason));
-      } else {
-        const updatedSharedData = { ...sharedData, channelStore: signResult.store };
-        return queueMessage(
-          updatedSharedData,
-          signatureSuccess(signResult.signedCommitment.signature),
-        );
-      }
-      break;
-    default:
-      return unreachable(action);
+) => {
+  if (state.type === ADDRESS_KNOWN) {
+    return checkAndInitialize(
+      sharedData.channelStore,
+      { commitment, signature },
+      state.address,
+      state.privateKey,
+    );
+  } else {
+    return checkAndStore(sharedData.channelStore, { commitment, signature });
+  }
+};
+
+const signAndUpdate = (
+  commitment: Commitment,
+  state: states.ApplicationState,
+  sharedData: SharedData,
+) => {
+  if (state.type === ADDRESS_KNOWN) {
+    return signAndInitialize(sharedData.channelStore, commitment, state.address, state.privateKey);
+  } else {
+    return signAndStore(sharedData.channelStore, commitment);
   }
 };
