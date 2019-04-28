@@ -39,10 +39,6 @@ export const filterOutSignatureMessages = (sideEffects?: SideEffects): SideEffec
   return sideEffects;
 };
 
-export const confirmFundingForChannel = (sharedData: SharedData, channelId: string): SharedData => {
-  return updateChannelState(sharedData, actions.internal.fundingConfirmed(channelId));
-};
-
 export const createCommitmentMessageRelay = (
   to: string,
   processId: string,
