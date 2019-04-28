@@ -1,4 +1,4 @@
-import * as states from '../state';
+import * as states from '../states';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
 import * as protocolActions from '../../actions';
 import * as actions from '../actions';
@@ -54,7 +54,7 @@ const receiveTheirCommitment = actions.opponentCommitmentReceived(processId, com
 // -------
 // Scenarios
 // -------
-export const initializingAChannel = {
+export const initializingApplication = {
   ...defaults,
   storage: { ...EMPTY_SHARED_DATA },
   actions: {

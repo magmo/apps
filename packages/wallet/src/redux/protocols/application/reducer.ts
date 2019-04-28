@@ -1,4 +1,4 @@
-import * as states from './state';
+import * as states from './states';
 import { ProtocolStateWithSharedData } from '../';
 import { SharedData, queueMessage } from '../../state';
 import { ethers } from 'ethers';

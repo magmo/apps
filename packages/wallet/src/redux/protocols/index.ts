@@ -7,7 +7,7 @@ import { FundingState } from './funding/states';
 import { IndirectFundingState } from './indirect-funding/state';
 import { RespondingState } from './responding/state';
 import { WithdrawalState } from './withdrawing/states';
-import { ApplicationState } from './application/state';
+import { ApplicationState } from './application/states';
 
 export type ProtocolState =
   | ApplicationState
