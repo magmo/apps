@@ -174,7 +174,8 @@ function startProcess(
     ...newState.processStore,
     [processId]: { processId, protocolState, channelsToMonitor: [], protocol },
   };
-  // TODO: Right now any new processId get sets to the current process Id. We might need to be smarter about this in the future.
+  // TODO: Right now any new processId get sets to the current process Id.
+  // We might need to be smarter about this in the future.
   newState.currentProcessId = processId;
 
   return newState;
