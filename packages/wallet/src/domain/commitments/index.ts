@@ -4,6 +4,7 @@ import { channelID } from 'fmg-core/lib/channel';
 
 export type Commitment = C;
 export const CommitmentType = CT;
+export type CommitmentType = CT;
 
 export interface SignedCommitment {
   commitment: Commitment;
