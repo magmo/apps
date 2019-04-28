@@ -125,7 +125,7 @@ export function initialized(params: Properties<Initialized>): Initialized {
 // -------------------
 
 export function getChannelStatus(state: WalletState, channelId: string): ChannelState {
-  return state.channelStore.initializedChannels[channelId];
+  return state.channelStore[channelId];
 }
 
 export function setSideEffects(state: Initialized, sideEffects: SideEffects): Initialized {
@@ -137,7 +137,7 @@ export function setChannel(state: SharedData, channel: ChannelState): SharedData
 }
 
 export function getChannel(state: SharedData, channelId: string): ChannelState | undefined {
-  return state.channelStore.initializedChannels[channelId];
+  return state.channelStore[channelId];
 }
 
 export function queueMessage(state: SharedData, message: WalletEvent): SharedData {
