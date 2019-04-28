@@ -2,7 +2,6 @@ import { ChannelStore, getChannel, setChannel } from './state';
 
 import { ReducerWithSideEffects } from '../../utils/reducer-utils';
 import { StateWithSideEffects } from '../utils';
-import { WalletAction } from '../actions';
 import {
   SignedCommitment,
   Commitment,
@@ -16,7 +15,7 @@ import * as channelActions from './actions';
 
 export const channelStoreReducer: ReducerWithSideEffects<ChannelStore> = (
   state: ChannelStore,
-  action: WalletAction,
+  action: channelActions.ChannelAction,
 ): StateWithSideEffects<ChannelStore> => {
   switch (action.type) {
     case channelActions.OPPONENT_COMMITMENT_RECEIVED:
