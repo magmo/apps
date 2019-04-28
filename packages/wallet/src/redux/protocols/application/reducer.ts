@@ -54,14 +54,14 @@ const updateChannelStateWithCommitment = (
   action: actions.ApplicationAction,
 ): SharedData => {
   switch (action.type) {
-    case 'APPLICATION.OPPONENT_COMMITMENT_RECEIVED':
+    case actions.OPPONENT_COMMITMENT_RECEIVED:
       const { commitment, signature } = action;
       return updateChannelState(
         sharedData,
         channelActions.opponentCommitmentReceived(commitment, signature),
       );
       break;
-    case 'APPLICATION.OWN_COMMITMENT_RECEIVED':
+    case actions.OWN_COMMITMENT_RECEIVED:
       return updateChannelState(
         sharedData,
         channelActions.ownCommitmentReceived(action.commitment),
