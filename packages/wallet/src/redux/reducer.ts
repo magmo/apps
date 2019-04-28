@@ -5,6 +5,7 @@ import { accumulateSideEffects } from './outbox';
 import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
 import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
+import * as applicationProtocol from './protocols/application';
 import * as challengeProtocol from './protocols/challenging';
 import * as concludeProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
@@ -127,6 +128,8 @@ function initializeNewProtocol(
     }
     case actions.protocol.RESPOND_TO_CHALLENGE_REQUESTED:
       return challengeResponseProtocol.initialize(processId, incomingSharedData, action.commitment);
+    case actions.protocol.INITIALIZE_CHANNEL:
+      return applicationProtocol.initialize(incomingSharedData);
     default:
       return unreachable(action);
   }

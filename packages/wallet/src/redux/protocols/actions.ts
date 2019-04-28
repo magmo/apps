@@ -46,11 +46,14 @@ export const respondToChallengeRequested = (channelId: string, commitment: Commi
 export type RespondToChallengeRequested = ReturnType<typeof respondToChallengeRequested>;
 
 export type NewProcessAction =
-  // | InitializeChannel // TODO: Add this back
-  FundingRequested | ConcludeRequested | CreateChallengeRequested | RespondToChallengeRequested;
+  | InitializeChannel
+  | FundingRequested
+  | ConcludeRequested
+  | CreateChallengeRequested
+  | RespondToChallengeRequested;
 export function isNewProcessAction(action: WalletAction): action is NewProcessAction {
   return (
-    // action.type === INITIALIZE_CHANNEL || // TODO: Add this back
+    action.type === INITIALIZE_CHANNEL ||
     action.type === FUNDING_REQUESTED ||
     action.type === CONCLUDE_REQUESTED ||
     action.type === CREATE_CHALLENGE_REQUESTED ||
