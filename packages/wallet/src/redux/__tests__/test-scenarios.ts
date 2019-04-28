@@ -4,9 +4,6 @@ import { bigNumberify } from 'ethers/utils';
 import * as states from '../state';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { addHex } from '../../utils/hex-utils';
-import * as directFundingStates from '../../redux/protocols/direct-funding/state';
-import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import * as actions from '../actions';
 import { signCommitment, signCommitment2 } from '../../domain';
 import { ChannelState } from '../channel-store';
 
@@ -258,27 +255,4 @@ export const ledgerCommitments = {
     commitmentType: CommitmentType.App,
     turnNum: 6,
   },
-};
-
-// Direct funding states
-const initialFundingState = (ourIndex: PlayerIndex, fundingRequestChannelId: string) => {
-  const total = twoThree.reduce(addHex);
-  const safeToDepositLevel = ourIndex === PlayerIndex.A ? '0x0' : twoThree[1];
-  const requiredDeposit = twoThree[ourIndex];
-
-  const action = actions.internal.directFundingRequested(
-    `processId:${fundingRequestChannelId}`,
-    fundingRequestChannelId,
-    safeToDepositLevel,
-    total,
-    requiredDeposit,
-    ourIndex,
-  );
-  return directFundingStates.initialDirectFundingState(action, states.EMPTY_SHARED_DATA)
-    .protocolState;
-};
-
-export const ledgerDirectFundingStates = {
-  playerA: initialFundingState(PlayerIndex.A, channelID(ledgerChannel)),
-  playerB: initialFundingState(PlayerIndex.B, channelID(ledgerChannel)),
 };
