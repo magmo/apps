@@ -1,4 +1,3 @@
-import * as internal from './internal/actions';
 import * as channel from './channel-store/actions';
 import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
@@ -165,7 +164,6 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | internal.InternalAction
   | ChallengeCreatedEvent;
 
 function isCommonAction(action: WalletAction): action is CommonAction {
@@ -181,4 +179,4 @@ function isCommonAction(action: WalletAction): action is CommonAction {
     ].indexOf(action.type) >= 0
   );
 }
-export { internal, channel, directFunding as funding, indirectFunding, protocol, isCommonAction };
+export { channel, directFunding as funding, indirectFunding, protocol, isCommonAction };
