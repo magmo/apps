@@ -133,7 +133,6 @@ interface CheckFailure {
 type CheckResult = CheckSuccess | CheckFailure;
 
 // For use with a signed commitment received from an opponent.
-// Will create a channel if turnNum=0 and channel doesn't already exist.
 export function checkAndStore(
   store: ChannelStore,
   signedCommitment: SignedCommitment,
@@ -146,11 +145,7 @@ export function checkAndStore(
   let channel = getChannel(store, channelId);
 
   if (!channel) {
-    // do I need to do any checks? seems like no?
-    // I guess I need to make sure I'm a participant and set my participant number
-    // just create a channel from the commitment?
-    // store = setChannel(store, channel);
-    return { isSuccess: true, store };
+    return { isSuccess: false };
   }
 
   if (!isSafeTransition(store, channel, commitment)) {
