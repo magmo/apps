@@ -9,6 +9,7 @@ export const enum WalletProtocol {
   DirectFunding = 'DirectFunding',
   IndirectFunding = 'IndirectFunding',
   TransactionSubmission = 'TransactionSubmission',
+  IndirectDefunding = 'IndirectDefunding',
 }
 
 export const enum PlayerIndex {
