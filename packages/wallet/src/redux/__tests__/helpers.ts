@@ -1,6 +1,6 @@
-import { ChannelStatus } from '../channel-state/state';
+import { ChannelState } from '../channel-store';
 import { StateWithSideEffects } from '../utils';
-import { Commitment } from 'fmg-core';
+import { Commitment } from '../../domain';
 import { QueuedTransaction, OutboxState } from '../outbox/state';
 import { SharedData } from '../state';
 import { ProtocolStateWithSharedData } from '../protocols';
@@ -95,15 +95,6 @@ export const itSendsNoTransaction = (state: SideEffectState) => {
   });
 };
 
-export const itTransitionsToChannelStateType = (
-  type,
-  state: StateWithSideEffects<ChannelStatus>,
-) => {
-  it(`transitions to ${type}`, () => {
-    expect(state.state.type).toEqual(type);
-  });
-};
-
 export const itTransitionsToStateType = (
   type,
   protocolStateWithSharedData: ProtocolStateWithSharedData<{ type: any }>,
@@ -113,19 +104,10 @@ export const itTransitionsToStateType = (
   });
 };
 
-export const itDoesntTransition = (
-  oldState: ChannelStatus,
-  newState: StateWithSideEffects<ChannelStatus>,
-) => {
-  it(`doesn't transition`, () => {
-    expect(newState.state.type).toEqual(oldState.type);
-  });
-};
-
 export const itIncreasesTurnNumBy = (
   increase: number,
-  oldState: ChannelStatus,
-  newState: StateWithSideEffects<ChannelStatus>,
+  oldState: ChannelState,
+  newState: StateWithSideEffects<ChannelState>,
 ) => {
   it(`increases the turnNum by ${increase}`, () => {
     if (!('turnNum' in newState.state) || !('turnNum' in oldState)) {

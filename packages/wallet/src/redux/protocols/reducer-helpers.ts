@@ -1,23 +1,22 @@
-import { Commitment } from 'fmg-core';
+import { Commitment } from '../../domain';
 import { messageRelayRequested, SIGNATURE_SUCCESS, VALIDATION_SUCCESS } from 'magmo-wallet-client';
-import * as channelStates from '../channel-state/state';
 import * as actions from '../actions';
-import { channelStateReducer } from '../channel-state/reducer';
+import { channelStateReducer } from '../channel-store/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { SideEffects } from '../outbox/state';
 import { SharedData } from '../state';
-import { WalletProtocol } from '../types';
 import * as selectors from '../selectors';
 import { PlayerIndex } from '../types';
 import { CommitmentType } from 'fmg-core/lib/commitment';
+import * as magmoWalletClient from 'magmo-wallet-client';
 
 export const updateChannelState = (
   sharedData: SharedData,
   channelAction: actions.channel.ChannelAction,
 ): SharedData => {
   const newSharedData = { ...sharedData };
-  const updatedChannelState = channelStateReducer(newSharedData.channelState, channelAction);
-  newSharedData.channelState = updatedChannelState.state;
+  const updatedChannelState = channelStateReducer(newSharedData.channelStore, channelAction);
+  newSharedData.channelStore = updatedChannelState.state;
   // TODO: Currently we need to filter out signature/validation messages that are meant to the app
   // This might change based on whether protocol reducers or channel reducers craft commitments
   const filteredSideEffects = filterOutSignatureMessages(updatedChannelState.sideEffects);
@@ -48,22 +47,32 @@ export const confirmFundingForChannel = (sharedData: SharedData, channelId: stri
 };
 
 export const createCommitmentMessageRelay = (
-  protocol: WalletProtocol,
   to: string,
   processId: string,
   commitment: Commitment,
   signature: string,
 ) => {
   const payload = {
-    protocol,
+    processId,
     data: { commitment, signature, processId },
   };
   return messageRelayRequested(to, payload);
 };
 
-export function theirAddress(channelState: channelStates.OpenedState) {
-  const theirIndex = (channelState.ourIndex + 1) % channelState.participants.length;
-  return channelState.participants[theirIndex];
+export function showWallet(sharedData: SharedData): SharedData {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    displayOutbox: magmoWalletClient.showWallet(),
+  });
+  return newSharedData;
+}
+
+export function hideWallet(sharedData: SharedData): SharedData {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    displayOutbox: magmoWalletClient.hideWallet(),
+  });
+  return newSharedData;
 }
 
 export const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {

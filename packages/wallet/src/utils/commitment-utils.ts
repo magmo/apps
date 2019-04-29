@@ -1,12 +1,11 @@
-import { Commitment, CommitmentType } from 'magmo-wallet-client/node_modules/fmg-core';
+import { Commitment, CommitmentType, signCommitment2 } from '../domain';
 import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { PlayerIndex } from '../redux/types';
-import { signCommitment } from './signing-utils';
+import { signCommitment } from '../domain';
 import { Channel } from 'fmg-core';
-import { SignedCommitment } from '../redux/channel-state/shared/state';
+import { SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
-import { WalletProtocol } from '../redux/types';
-import { ChannelStatus } from '../redux/channel-state/state';
+import { ChannelState } from '../redux/channel-store';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,
@@ -53,16 +52,14 @@ export const composeLedgerUpdateCommitment = (
     destination,
     appAttributes,
   };
-  const signature = signCommitment(commitment, privateKey);
 
-  return { commitment, signature };
+  return signCommitment2(commitment, privateKey);
 };
 
 export const composePostFundCommitment = (
   lastCommitment: Commitment,
   ourIndex: PlayerIndex,
-  privateKey: string,
-): SignedCommitment => {
+): Commitment => {
   const {
     channel,
     turnNum: previousTurnNum,
@@ -79,9 +76,8 @@ export const composePostFundCommitment = (
     destination,
     appAttributes,
   };
-  const signature = signCommitment(commitment, privateKey);
 
-  return { commitment, signature };
+  return commitment;
 };
 export const composePreFundCommitment = (
   channel: Channel,
@@ -104,12 +100,10 @@ export const composePreFundCommitment = (
     destination,
     appAttributes,
   };
-  const signature = signCommitment(commitment, privateKey);
-
-  return { commitment, signature };
+  return signCommitment2(commitment, privateKey);
 };
 
-export const composeConcludeCommitment = (channelState: ChannelStatus) => {
+export const composeConcludeCommitment = (channelState: ChannelState) => {
   const commitmentCount =
     channelState.lastCommitment.commitment.commitmentType === CommitmentType.Conclude ? 1 : 0;
 
@@ -126,7 +120,6 @@ export const composeConcludeCommitment = (channelState: ChannelStatus) => {
     channelState.participants[1 - channelState.ourIndex],
     {
       processId: channelState.channelId,
-      protocol: WalletProtocol.DirectFunding,
       data: {
         concludeCommitment,
         commitmentSignature,

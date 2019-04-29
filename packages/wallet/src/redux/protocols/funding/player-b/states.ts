@@ -1,48 +1,46 @@
 import { Properties as P } from '../../../utils';
+import { ProtocolState } from '../..';
+import { Strategy } from '..';
 
-export type FundingState =
+export type OngoingFundingState =
   | WaitForStrategyProposal
   | WaitForStrategyApproval
   | WaitForFunding
-  | WaitForPostFundSetup
-  | WaitForSuccessConfirmation
-  | Success
-  | Failure;
+  | WaitForSuccessConfirmation;
+
+export type TerminalFundingState = Success | Failure;
+export type FundingState = OngoingFundingState | TerminalFundingState;
 
 export const WAIT_FOR_STRATEGY_PROPOSAL = 'WaitForStrategyProposal';
 export const WAIT_FOR_STRATEGY_APPROVAL = 'WaitForStrategyApproval';
 export const WAIT_FOR_FUNDING = 'WaitForFunding';
-export const WAIT_FOR_POSTFUND_SETUP = 'WaitForPostFundSetup';
 export const WAIT_FOR_SUCCESS_CONFIRMATION = 'WaitForSuccessConfirmation';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
 
-export interface WaitForStrategyProposal {
+interface BaseState {
+  processId: string;
+  opponentAddress: string;
+}
+
+export interface WaitForStrategyProposal extends BaseState {
   type: typeof WAIT_FOR_STRATEGY_PROPOSAL;
   targetChannelId: string;
-  processId: string;
 }
 
-export interface WaitForStrategyApproval {
+export interface WaitForStrategyApproval extends BaseState {
   type: typeof WAIT_FOR_STRATEGY_APPROVAL;
   targetChannelId: string;
-  processId: string;
+  strategy: Strategy;
 }
 
-export interface WaitForFunding {
+export interface WaitForFunding extends BaseState {
   type: typeof WAIT_FOR_FUNDING;
-  processId: string;
   fundingState: 'funding state';
 }
 
-export interface WaitForPostFundSetup {
-  type: typeof WAIT_FOR_POSTFUND_SETUP;
-  processId: string;
-}
-
-export interface WaitForSuccessConfirmation {
+export interface WaitForSuccessConfirmation extends BaseState {
   type: typeof WAIT_FOR_SUCCESS_CONFIRMATION;
-  processId: string;
 }
 
 export interface Failure {
@@ -61,36 +59,47 @@ export interface Success {
 export function isTerminal(state: FundingState): state is Failure | Success {
   return state.type === FAILURE || state.type === SUCCESS;
 }
+export function isFundingState(state: ProtocolState): state is FundingState {
+  return (
+    state.type === WAIT_FOR_FUNDING ||
+    state.type === WAIT_FOR_STRATEGY_APPROVAL ||
+    state.type === WAIT_FOR_STRATEGY_PROPOSAL ||
+    state.type === WAIT_FOR_SUCCESS_CONFIRMATION ||
+    state.type === SUCCESS ||
+    state.type === FAILURE
+  );
+}
 
 // ------------
 // Constructors
 // ------------
 
 export function waitForStrategyProposal(p: P<WaitForStrategyProposal>): WaitForStrategyProposal {
-  const { processId, targetChannelId } = p;
-  return { type: WAIT_FOR_STRATEGY_PROPOSAL, processId, targetChannelId };
+  const { processId, opponentAddress, targetChannelId } = p;
+  return { type: WAIT_FOR_STRATEGY_PROPOSAL, processId, opponentAddress, targetChannelId };
 }
 
 export function waitForStrategyApproval(p: P<WaitForStrategyApproval>): WaitForStrategyApproval {
-  const { processId, targetChannelId } = p;
-  return { type: WAIT_FOR_STRATEGY_APPROVAL, processId, targetChannelId };
+  const { processId, opponentAddress, targetChannelId, strategy } = p;
+  return {
+    type: WAIT_FOR_STRATEGY_APPROVAL,
+    processId,
+    opponentAddress,
+    targetChannelId,
+    strategy,
+  };
 }
 
 export function waitForFunding(p: P<WaitForFunding>): WaitForFunding {
-  const { processId, fundingState } = p;
-  return { type: WAIT_FOR_FUNDING, processId, fundingState };
-}
-
-export function waitForPostFundSetup(p: P<WaitForPostFundSetup>): WaitForPostFundSetup {
-  const { processId } = p;
-  return { type: WAIT_FOR_POSTFUND_SETUP, processId };
+  const { processId, opponentAddress, fundingState } = p;
+  return { type: WAIT_FOR_FUNDING, processId, opponentAddress, fundingState };
 }
 
 export function waitForSuccessConfirmation(
   p: P<WaitForSuccessConfirmation>,
 ): WaitForSuccessConfirmation {
-  const { processId } = p;
-  return { type: WAIT_FOR_SUCCESS_CONFIRMATION, processId };
+  const { processId, opponentAddress } = p;
+  return { type: WAIT_FOR_SUCCESS_CONFIRMATION, processId, opponentAddress };
 }
 
 export function success(): Success {

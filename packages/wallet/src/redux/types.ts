@@ -7,6 +7,7 @@ export const enum WalletProtocol {
   Responding = 'Responding',
   TransactionSubmission = 'TransactionSubmission',
   IndirectDefunding = 'IndirectDefunding',
+  Funding = 'Funding',
 }
 
 export const enum PlayerIndex {

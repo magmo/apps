@@ -9,9 +9,26 @@ import { SharedData, queueMessage } from '../../../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { PlayerIndex } from '../../../types';
-import { fundingFailure } from 'magmo-wallet-client';
-
+import { showWallet } from '../../reducer-helpers';
+import { fundingFailure, messageRelayRequested } from 'magmo-wallet-client';
+import { strategyProposed } from '../player-b/actions';
 type EmbeddedAction = IndirectFundingAction;
+
+export function initialize(
+  sharedData: SharedData,
+  processId: string,
+  channelId: string,
+  opponentAddress: string,
+): ProtocolStateWithSharedData<states.FundingState> {
+  return {
+    protocolState: states.waitForStrategyChoice({
+      processId,
+      targetChannelId: channelId,
+      opponentAddress,
+    }),
+    sharedData: showWallet(sharedData),
+  };
+}
 
 export function fundingReducer(
   state: states.FundingState,
@@ -53,7 +70,15 @@ function strategyChosen(
   if (state.type !== states.WAIT_FOR_STRATEGY_CHOICE) {
     return { protocolState: state, sharedData };
   }
-  return { protocolState: states.waitForStrategyResponse(state), sharedData };
+  const { processId, opponentAddress } = state;
+  const { strategy } = action;
+  const sentAction = strategyProposed(processId, strategy);
+  const payload = { processId, data: { sentAction } };
+  const message = messageRelayRequested(opponentAddress, payload);
+  return {
+    protocolState: states.waitForStrategyResponse({ ...state, strategy }),
+    sharedData: queueMessage(sharedData, message),
+  };
 }
 
 function strategyApproved(

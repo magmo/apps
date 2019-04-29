@@ -1,15 +1,16 @@
-import * as states from './state';
-
-import * as actions from './actions';
-import { unreachable } from '../utils/reducer-utils';
-import { clearOutbox } from './outbox/reducer';
-import { accumulateSideEffects } from './outbox';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
-import { channelStateReducer } from './channel-state/reducer';
-import { combineReducersWithSideEffects } from './../utils/reducer-utils';
-import { createsNewProcess, routesToProcess, NewProcessAction } from './protocols/actions';
-import * as indirectFunding from './protocols/indirect-funding/reducer';
+import { unreachable } from '../utils/reducer-utils';
+import * as actions from './actions';
+import { accumulateSideEffects } from './outbox';
+import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
+import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
+import * as challengeProtocol from './protocols/challenging';
+import * as concludeProtocol from './protocols/concluding';
+import * as fundProtocol from './protocols/funding';
+import { FundingState } from './protocols/funding/states';
+import * as challengeResponseProtocol from './protocols/responding';
+import * as states from './state';
 import { WalletProtocol } from './types';
 
 const initialState = states.waitForLogin();
@@ -39,32 +40,24 @@ export function initializedReducer(
   action: actions.WalletAction,
 ): states.WalletState {
   // TODO: We will need to update SharedData here first
-  if (createsNewProcess(action)) {
+  if (isNewProcessAction(action)) {
     return routeToNewProcessInitializer(state, action);
-  } else if (routesToProcess(action)) {
+  } else if (isProtocolAction(action)) {
     return routeToProtocolReducer(state, action);
   }
 
-  // Default to combined reducer
-  const { state: newState, sideEffects } = combinedReducer(state, action);
-  // Since the wallet state itself has an outbox state, we need to apply the side effects
-  // by hand.
-  return {
-    ...state,
-    ...newState,
-    outboxState: accumulateSideEffects(state.outboxState, sideEffects),
-  };
+  return state;
 }
 
-function routeToProtocolReducer(state: states.Initialized, action: actions.protocol.ProcessAction) {
+function routeToProtocolReducer(state: states.Initialized, action: actions.ProtocolAction) {
   const processState = state.processStore[action.processId];
   if (!processState) {
     // Log warning?
     return state;
   } else {
     switch (processState.protocol) {
-      case WalletProtocol.IndirectFunding:
-        const { protocolState, sharedData } = indirectFunding.indirectFundingReducer(
+      case WalletProtocol.Funding:
+        const { protocolState, sharedData } = fundProtocol.reducer(
           processState.protocolState,
           states.sharedData(state),
           action,
@@ -85,7 +78,7 @@ function updatedState(
   state: states.Initialized,
   sharedData: states.SharedData,
   processState: states.ProcessState,
-  protocolState: states.indirectFunding.IndirectFundingState,
+  protocolState: FundingState,
 ) {
   const newState = { ...state, sharedData };
   const newProcessState = { ...processState, protocolState };
@@ -96,28 +89,47 @@ function updatedState(
   return newState;
 }
 
-function routeToNewProcessInitializer(
+function initializeNewProtocol(
   state: states.Initialized,
   action: actions.protocol.NewProcessAction,
-) {
+): { protocolState: ProtocolState; sharedData: states.SharedData } {
+  const { channelId } = action;
+  const processId = action.channelId;
+  const incomingSharedData = states.sharedData(state);
   switch (action.type) {
-    case actions.indirectFunding.FUNDING_REQUESTED:
-      const { protocolState, sharedData } = indirectFunding.initialize(
-        action,
-        states.sharedData(state),
+    case actions.protocol.FUNDING_REQUESTED:
+      return fundProtocol.initialize(incomingSharedData, channelId, processId, action.playerIndex);
+    case actions.protocol.CONCLUDE_REQUESTED: {
+      const { state: protocolState, storage: sharedData } = concludeProtocol.initialize(
+        channelId,
+        processId,
+        incomingSharedData,
       );
-
-      return startProcess(state, sharedData, action, protocolState);
+      return { protocolState, sharedData };
+    }
+    case actions.protocol.CREATE_CHALLENGE_REQUESTED: {
+      const { state: protocolState, storage: sharedData } = challengeProtocol.initialize(
+        channelId,
+        processId,
+        incomingSharedData,
+      );
+      return { protocolState, sharedData };
+    }
+    case actions.protocol.RESPOND_TO_CHALLENGE_REQUESTED:
+      return challengeResponseProtocol.initialize(processId, incomingSharedData, action.commitment);
     default:
-      return state;
-    // TODO: Why is the discriminated union not working here?
-    // return unreachable(action);
+      return unreachable(action);
   }
 }
 
-const combinedReducer = combineReducersWithSideEffects({
-  channelState: channelStateReducer,
-});
+function routeToNewProcessInitializer(
+  state: states.Initialized,
+  action: actions.protocol.NewProcessAction,
+): states.Initialized {
+  const processId = action.channelId;
+  const { protocolState, sharedData } = initializeNewProtocol(state, action);
+  return startProcess(state, sharedData, action, protocolState, processId);
+}
 
 const waitForLoginReducer = (
   state: states.WaitForLogin,
@@ -143,14 +155,16 @@ function startProcess(
   sharedData: states.SharedData,
   action: NewProcessAction,
   protocolState: ProtocolState,
+  processId: string,
 ): states.Initialized {
   const newState = { ...state, ...sharedData };
-  const processId = action.channelId;
   const { protocol } = action;
   newState.processStore = {
     ...newState.processStore,
     [processId]: { processId, protocolState, channelsToMonitor: [], protocol },
   };
+  // TODO: Right now any new processId get sets to the current process Id. We might need to be smarter about this in the future.
+  newState.currentProcessId = processId;
 
   return newState;
 }

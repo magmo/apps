@@ -1,22 +1,55 @@
-import { WalletAction } from '../actions';
-import {
-  ProcessAction as IndirectFundingProcessAction,
-  FUNDING_REQUESTED,
-  FundingRequested,
-} from './indirect-funding/actions';
+import { Commitment } from 'magmo-wallet-client/node_modules/fmg-core';
+import { ProtocolAction, WalletAction } from '../actions';
+import { PlayerIndex, WalletProtocol } from '../types';
 
-// For the moment, the FundingRequested action is tied to the indirect funding
-// protocol. It should change in the future to be a generic action, tied to the
-// "Funding" protocol, and that protocol is responsible for choosing a funding strategy.
-export type NewProcessAction = FundingRequested;
+export const FUNDING_REQUESTED = 'WALLET.NEW_PROCESS.FUNDING_REQUESTED';
+export const fundingRequested = (channelId: string, playerIndex: PlayerIndex) => ({
+  type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
+  channelId,
+  playerIndex,
+  protocol: WalletProtocol.IndirectFunding,
+});
+export type FundingRequested = ReturnType<typeof fundingRequested>;
 
-export function createsNewProcess(action: WalletAction): action is NewProcessAction {
-  switch (action.type) {
-    case FUNDING_REQUESTED:
-      return true;
-    default:
-      return false;
-  }
+export const CONCLUDE_REQUESTED = 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED';
+export const concludeRequested = (channelId: string) => ({
+  type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
+  channelId,
+  // TODO: Resolve inconsistent naming scheme: conclude vs closing
+  protocol: WalletProtocol.Closing,
+});
+export type ConcludeRequested = ReturnType<typeof concludeRequested>;
+
+export const CREATE_CHALLENGE_REQUESTED = 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
+export const createChallengeRequested = (channelId: string, commitment: Commitment) => ({
+  type: CREATE_CHALLENGE_REQUESTED as typeof CREATE_CHALLENGE_REQUESTED,
+  channelId,
+  commitment,
+  protocol: WalletProtocol.Challenging,
+});
+export type CreateChallengeRequested = ReturnType<typeof createChallengeRequested>;
+
+export const RESPOND_TO_CHALLENGE_REQUESTED = 'WALLET.NEW_PROCESS.RESPOND_TO_CHALLENGE_REQUESTED';
+export const respondToChallengeRequested = (channelId: string, commitment: Commitment) => ({
+  type: RESPOND_TO_CHALLENGE_REQUESTED as typeof RESPOND_TO_CHALLENGE_REQUESTED,
+  channelId,
+  commitment,
+  protocol: WalletProtocol.Responding,
+});
+export type RespondToChallengeRequested = ReturnType<typeof respondToChallengeRequested>;
+
+export type NewProcessAction =
+  | FundingRequested
+  | ConcludeRequested
+  | CreateChallengeRequested
+  | RespondToChallengeRequested;
+export function isNewProcessAction(action: WalletAction): action is NewProcessAction {
+  return (
+    action.type === FUNDING_REQUESTED ||
+    action.type === CONCLUDE_REQUESTED ||
+    action.type === CREATE_CHALLENGE_REQUESTED ||
+    action.type === RESPOND_TO_CHALLENGE_REQUESTED
+  );
 }
 
 export interface BaseProcessAction {
@@ -24,8 +57,6 @@ export interface BaseProcessAction {
   type: string;
 }
 
-export type ProcessAction = IndirectFundingProcessAction;
-
-export function routesToProcess(action: WalletAction): action is ProcessAction {
+export function isProtocolAction(action: WalletAction): action is ProtocolAction {
   return 'processId' in action;
 }

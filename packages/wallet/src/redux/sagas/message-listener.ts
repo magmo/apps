@@ -3,7 +3,6 @@ import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
 
 import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
-import { unreachable } from '../../utils/reducer-utils';
 
 export function* messageListener() {
   const postMessageEventChannel = eventChannel(emitter => {
@@ -20,17 +19,28 @@ export function* messageListener() {
     const messageEvent = yield take(postMessageEventChannel);
     const action = messageEvent.data;
     switch (messageEvent.data.type) {
+      // Events that need a new process
+      case incoming.CONCLUDE_CHANNEL_REQUEST:
+        yield put(actions.protocol.concludeRequested(action.channelId));
+        break;
+      case incoming.CREATE_CHALLENGE_REQUEST:
+        yield put(actions.protocol.createChallengeRequested(action.channelId, action.commitment));
+        break;
+      case incoming.FUNDING_REQUEST:
+        yield put(actions.protocol.fundingRequested(action.channelId, action.playerIndex));
+        break;
+      case incoming.RESPOND_TO_CHALLENGE:
+        yield put(
+          actions.protocol.respondToChallengeRequested(action.channelId, action.commitment),
+        );
+        break;
+
+      // Events that do not need a new process
       case incoming.INITIALIZE_REQUEST:
         yield put(actions.loggedIn(action.userId));
         break;
-      case incoming.CREATE_CHALLENGE_REQUEST:
-        yield put(actions.channel.challengeRequested());
-        break;
-      case incoming.FUNDING_REQUEST:
-        yield put(actions.channel.fundingRequested());
-        break;
       case incoming.INITIALIZE_CHANNEL_REQUEST:
-        yield put(actions.channel.channelInitialized());
+        // todo: what do we need to do here?
         break;
       case incoming.SIGN_COMMITMENT_REQUEST:
         yield put(actions.channel.ownCommitmentReceived(action.commitment));
@@ -41,12 +51,6 @@ export function* messageListener() {
       case incoming.RECEIVE_MESSAGE:
         yield put(handleIncomingMessage(action));
         break;
-      case incoming.RESPOND_TO_CHALLENGE:
-        yield put(actions.channel.challengeCommitmentReceived(action.commitment));
-        break;
-      case incoming.CONCLUDE_CHANNEL_REQUEST:
-        yield put(actions.channel.concludeRequested());
-        break;
       default:
     }
   }
@@ -55,15 +59,17 @@ export function* messageListener() {
 function handleIncomingMessage(action: incoming.ReceiveMessage) {
   const { messagePayload } = action as incoming.ReceiveMessage;
 
-  if ('processId' in messagePayload) {
-    const { data, processId } = messagePayload;
-    if ('commitment' in data) {
-      return actions.commitmentReceived(processId, data.commitment, data.signature);
-    } else {
-      return actions.messageReceived(processId, data);
-    }
-  } else if ('protocol' in messagePayload) {
-    throw new Error('Unexpected message');
+  const { data, processId } = messagePayload;
+
+  if ('commitment' in data) {
+    return actions.commitmentReceived(processId, {
+      commitment: data.commitment,
+      signature: data.signature,
+    });
+  } else if ('type' in data) {
+    // TODO: It would be nice if eventually every message simply wrapped an action
+    return data;
+  } else {
+    return actions.messageReceived(processId, data);
   }
-  return unreachable(messagePayload);
 }

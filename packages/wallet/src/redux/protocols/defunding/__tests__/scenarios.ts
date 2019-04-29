@@ -1,12 +1,7 @@
 import * as states from '../state';
 import * as withdrawalScenarios from '../../withdrawing/__tests__/scenarios';
 import * as testScenarios from '../../../__tests__/test-scenarios';
-import {
-  ChannelStatus,
-  RUNNING,
-  WAIT_FOR_UPDATE,
-  ChannelState,
-} from '../../../channel-state/state';
+import { ChannelState, ChannelStore } from '../../../channel-store';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
 
 const processId = 'process-id.123';
@@ -24,11 +19,9 @@ const {
   gameCommitment2,
 } = testScenarios;
 
-const channelStatus: ChannelStatus = {
+const channelStatus: ChannelState = {
   address,
   privateKey,
-  stage: RUNNING,
-  type: WAIT_FOR_UPDATE,
   channelId,
   libraryAddress,
   ourIndex: 0,
@@ -40,7 +33,7 @@ const channelStatus: ChannelStatus = {
   penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
 };
 
-const channelState: ChannelState = {
+const channelStore: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: channelStatus,
@@ -103,7 +96,7 @@ export const directlyFundingChannelHappyPath = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: directlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
 
@@ -119,7 +112,7 @@ export const indirectlyFundingChannelHappyPath = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: indirectlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
 
@@ -133,7 +126,7 @@ export const channelNotClosed = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: directlyFundedFundingState,
-    channelState: notClosedChannelState,
+    channelStore: notClosedChannelState,
   },
 };
 
@@ -149,7 +142,7 @@ export const directlyFundingFailure = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: directlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
 
@@ -165,6 +158,6 @@ export const indirectlyFundingFailure = {
   sharedData: {
     ...EMPTY_SHARED_DATA,
     fundingState: indirectlyFundedFundingState,
-    channelState,
+    channelStore,
   },
 };
