@@ -44,15 +44,21 @@ graph TD
 Key:
 
 ```mermaid
-graph TD
-L{Flow Logic} --> NT1(Non-Terminal States)
-NT1 --> C
-C(Call child reducer) -->|child return status| NT2
-NT2(More Non-Terminal States) --> |ACTION| T
-T((Terminal States))
-  style T  fill:#efdd20
+  graph TD
+  St((Start))-->L
+  L{Flow Logic} --> NT1(Non-Terminal States)
+  NT1 -->|ACTION| C
+  C(Call child reducer) -->|child return status| NT2
+  NT2(More Non-Terminal States) --> |SUCCESS_TRIGGER| Su
+  Su((Success))
+  NT2(More Non-Terminal States) --> |FAILURE_TRIGGER| F
+  F((Failure))
+
+  style St  fill:#efdd20
   style L fill:#efdd20
   style C stroke:#333,stroke-width:4px
+  style Su fill:#58ef21
+  style F  fill:#f45941
 ```
 
 ## Scenarios
