@@ -5,13 +5,12 @@ import { IndirectDefundingAction } from './actions';
 import { COMMITMENT_RECEIVED } from '../../actions';
 import { Commitment } from 'fmg-core/lib/commitment';
 import * as helpers from '../reducer-helpers';
-import * as channelActions from '../../channel-state/actions';
 import { getChannelState } from '../../selectors';
 import { unreachable } from '../../../utils/reducer-utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
-import { PlayerIndex, WalletProtocol } from '../../types';
-import { createCommitmentMessageRelay } from '../indirect-funding/reducer-helpers';
-import { signCommitment } from '../../../utils/signing-utils';
+import { PlayerIndex } from '../../types';
+import * as channelActions from '../../channel-store/actions';
+import { signCommitment } from '../../../domain';
 
 export const initialize = (
   processId: string,
@@ -72,8 +71,9 @@ const waitForFinalLedgerUpdateReducer = (
   if (action.type !== COMMITMENT_RECEIVED) {
     return { protocolState, sharedData };
   }
-  const newSharedData = receiveLedgerCommitment(sharedData, action.commitment, action.signature);
-  if (!validTransition(newSharedData, protocolState.channelId, action.commitment)) {
+  const { commitment, signature } = action.signedCommitment;
+  const newSharedData = receiveLedgerCommitment(sharedData, commitment, signature);
+  if (!validTransition(newSharedData, protocolState.channelId, commitment)) {
     return {
       protocolState: states.failure('Received Invalid Commitment'),
       sharedData: newSharedData,
@@ -90,9 +90,9 @@ const waitForLedgerUpdateReducer = (
   if (action.type !== COMMITMENT_RECEIVED) {
     return { protocolState, sharedData };
   }
-
-  let newSharedData = receiveLedgerCommitment(sharedData, action.commitment, action.signature);
-  if (!validTransition(newSharedData, protocolState.channelId, action.commitment)) {
+  const { commitment, signature } = action.signedCommitment;
+  let newSharedData = receiveLedgerCommitment(sharedData, commitment, signature);
+  if (!validTransition(newSharedData, protocolState.channelId, commitment)) {
     return {
       protocolState: states.failure('Received Invalid Commitment'),
       sharedData: newSharedData,
@@ -227,10 +227,9 @@ const receiveAndSendUpdateCommitment = (
 
   // Send out the commitment to the opponent
   newSharedData.outboxState.messageOutbox = [
-    createCommitmentMessageRelay(
-      WalletProtocol.IndirectDefunding,
-      channelState.participants[ourIndex],
+    helpers.createCommitmentMessageRelay(
       processId,
+      channelState.participants[ourIndex],
       commitment,
       newSignature,
     ),
