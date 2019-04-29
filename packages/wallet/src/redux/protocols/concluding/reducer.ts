@@ -14,7 +14,7 @@ import { ConcludingAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../state';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
-import { ChannelState, ourTurn } from '../../channel-store';
+import { ourTurn } from '../../channel-store';
 import { DefundingAction, isDefundingAction } from '../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
 type Storage = SharedData;
@@ -78,17 +78,12 @@ function handleDefundingAction(
 
   const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
   const defundingState2 = protocolStateWithSharedData.protocolState;
-  // const transactionState = retVal.state;
 
   if (isSuccess(defundingState2)) {
     state = acknowledgeSuccess(state);
   } else if (isFailure(defundingState2)) {
     state = acknowledgeFailure({ ...state, reason: 'DefundFailed' });
-  } else {
-    // update the transaction state?
-    // state = { ...state, transactionSubmission: transactionState };
   }
-
   return { state, storage };
 }
 
@@ -104,31 +99,19 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     return { state, storage };
   }
 
-  if (storage.channelStore.activeAppChannelId) {
-    const channelId = storage.channelStore.activeAppChannelId;
+  const channelState = getChannel(storage, state.channelId);
 
-    const channelState = getChannel(storage, channelId) as ChannelState;
-
-    const {
-      concludeCommitment,
-      commitmentSignature,
-      sendCommitmentAction,
-    } = composeConcludeCommitment(channelState);
+  if (channelState) {
+    const { sendCommitmentAction } = composeConcludeCommitment(channelState);
 
     return {
-      state: waitForOpponentConclude({
-        ...state,
-        turnNum: concludeCommitment.turnNum,
-        penultimateCommitment: storage.channelStore.initializedChannels.lastCommitment,
-        lastCommitment: { commitment: concludeCommitment, signature: commitmentSignature },
-      }),
+      state: waitForOpponentConclude({ ...state }),
       sideEffects: { messageOutbox: sendCommitmentAction },
       storage,
     };
+  } else {
+    return { state, storage };
   }
-  return { state: waitForOpponentConclude({ ...state }), storage };
-  // TODO craft conclude commitment
-  // TODO send to opponent
 }
 
 function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal {

@@ -109,7 +109,7 @@ export const composeConcludeCommitment = (channelState: ChannelState) => {
 
   const concludeCommitment: Commitment = {
     ...channelState.lastCommitment.commitment,
-    appAttributes: '',
+    appAttributes: '0x0',
     commitmentType: CommitmentType.Conclude,
     turnNum: channelState.lastCommitment.commitment.turnNum + 1,
     commitmentCount,

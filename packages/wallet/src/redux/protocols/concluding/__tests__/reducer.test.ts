@@ -15,7 +15,7 @@ describe('[ Happy path ]', () => {
     const state = scenario.states.approveConcluding;
     const action = scenario.actions.concludeSent;
     const result = concludingReducer(state, storage, action);
-    // TODO check that the conclude has actually been sent
+    expect(result.sideEffects.messageOutbox.messagePayload.data.concludeCommitment).toBeDefined();
     itTransitionsTo(result, 'WaitForOpponentConclude');
   });
 
