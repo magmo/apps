@@ -24,30 +24,36 @@ export type FailureReason =
 export interface AcknowledgeSuccess {
   type: 'AcknowledgeSuccess';
   processId: string;
+  channelId: string;
 }
 export interface AcknowledgeFailure {
   type: 'AcknowledgeFailure';
   reason: FailureReason;
   processId: string;
+  channelId: string;
 }
 export interface ApproveConcluding {
   type: 'ApproveConcluding';
   processId: string;
+  channelId: string;
 }
 
 export interface WaitForOpponentConclude {
   type: 'WaitForOpponentConclude';
   processId: string;
+  channelId: string;
 }
 
 export interface AcknowledgeConcludeReceived {
   type: 'AcknowledgeConcludeReceived';
   processId: string;
+  channelId: string;
 }
 
 export interface WaitForDefund {
   type: 'WaitForDefund';
   processId: string;
+  channelId: string;
   defundingState: DefundingState;
 }
 
@@ -81,33 +87,33 @@ export function isFailure(state: ConcludingState): state is Failure {
 // ------------
 
 export const approveConcluding: Constructor<ApproveConcluding> = p => {
-  const { processId } = p;
-  return { type: 'ApproveConcluding', processId };
+  const { processId, channelId } = p;
+  return { type: 'ApproveConcluding', processId, channelId };
 };
 
 export const waitForOpponentConclude: Constructor<WaitForOpponentConclude> = p => {
-  const { processId } = p;
-  return { type: 'WaitForOpponentConclude', processId };
+  const { processId, channelId } = p;
+  return { type: 'WaitForOpponentConclude', processId, channelId };
 };
 
 export const acknowledgeConcludeReceived: Constructor<AcknowledgeConcludeReceived> = p => {
-  const { processId } = p;
-  return { type: 'AcknowledgeConcludeReceived', processId };
+  const { processId, channelId } = p;
+  return { type: 'AcknowledgeConcludeReceived', processId, channelId };
 };
 
 export const acknowledgeSuccess: Constructor<AcknowledgeSuccess> = p => {
-  const { processId, reason } = p;
-  return { type: 'AcknowledgeSuccess', processId, reason };
+  const { processId, channelId } = p;
+  return { type: 'AcknowledgeSuccess', processId, channelId };
 };
 
 export const acknowledgeFailure: Constructor<AcknowledgeFailure> = p => {
-  const { processId, reason } = p;
-  return { type: 'AcknowledgeFailure', processId, reason };
+  const { processId, channelId, reason } = p;
+  return { type: 'AcknowledgeFailure', processId, channelId, reason };
 };
 
 export const waitForDefund: Constructor<WaitForDefund> = p => {
-  const { processId, defundingState } = p;
-  return { type: 'WaitForDefund', processId, defundingState };
+  const { processId, channelId, defundingState } = p;
+  return { type: 'WaitForDefund', processId, channelId, defundingState };
 };
 
 export function success(): Success {

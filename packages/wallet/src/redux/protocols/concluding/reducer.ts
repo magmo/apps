@@ -53,7 +53,10 @@ export function concludingReducer(
 export function initialize(channelId: string, processId: string, storage: Storage): ReturnVal {
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
-    return { state: acknowledgeFailure({ processId, reason: 'ChannelDoesntExist' }), storage };
+    return {
+      state: acknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
+      storage,
+    };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
