@@ -95,21 +95,9 @@ const waitForDirectFundingFailure = {
 // -------
 // Actions
 // -------
-const preFundL1Received = globalActions.commitmentReceived(
-  processId,
-  ledger1.commitment,
-  ledger1.signature,
-);
-const ledgerUpdate1Received = globalActions.commitmentReceived(
-  processId,
-  ledger5.commitment,
-  ledger5.signature,
-);
-const postFund1Received = globalActions.commitmentReceived(
-  processId,
-  app3.commitment,
-  app3.signature,
-);
+const preFundL1Received = globalActions.commitmentReceived(processId, ledger1);
+const ledgerUpdate1Received = globalActions.commitmentReceived(processId, ledger5);
+const postFund1Received = globalActions.commitmentReceived(processId, app3);
 
 export const happyPath = {
   initialParams: { store: waitForPreFundL1.store, channelId, reply: ledger0 },
