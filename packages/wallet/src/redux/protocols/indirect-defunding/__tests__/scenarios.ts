@@ -1,14 +1,10 @@
 import * as states from '../state';
 import * as testScenarios from '../../../__tests__/test-scenarios';
-import {
-  ChannelStatus,
-  RUNNING,
-  WAIT_FOR_UPDATE,
-  ChannelState,
-} from '../../../channel-state/state';
+
 import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import * as actions from '../../../actions';
 import { AdjudicatorState } from '../../../adjudicator-state/state';
+import { ChannelState, ChannelStore } from '../../../channel-store';
 
 // Various state properties
 const processId = 'processid.123';
@@ -19,14 +15,13 @@ const {
   ledgerCommitments,
   ledgerId,
   ledgerLibraryAddress,
+  signedLedgerCommitments,
 } = testScenarios;
 
 const channelId = ledgerId;
-const baseChannelStatus: ChannelStatus = {
+const baseChannelStatus: ChannelState = {
   address,
   privateKey,
-  stage: RUNNING,
-  type: WAIT_FOR_UPDATE,
   channelId,
   libraryAddress: ledgerLibraryAddress,
   participants,
@@ -38,14 +33,14 @@ const baseChannelStatus: ChannelStatus = {
   penultimateCommitment: { commitment: ledgerCommitments.ledgerUpdate2, signature: '0x0' },
 };
 
-const playerAStartChannelState: ChannelState = {
+const playerAStartChannelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: baseChannelStatus,
   },
 };
 
-const playerAWaitForCommitmentChannelState: ChannelState = {
+const playerAWaitForCommitmentChannelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: {
@@ -60,7 +55,7 @@ const playerAWaitForCommitmentChannelState: ChannelState = {
   },
 };
 
-const playerBStartChannelState: ChannelState = {
+const playerBStartChannelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: {
@@ -70,7 +65,7 @@ const playerBStartChannelState: ChannelState = {
   },
 };
 
-const playerBWaitForFinalCommitmentChannelState: ChannelState = {
+const playerBWaitForFinalCommitmentChannelState: ChannelStore = {
   initializingChannels: {},
   initializedChannels: {
     [channelId]: {
@@ -105,31 +100,31 @@ const notClosedAdjudicatorState: AdjudicatorState = {
 const playerAStartSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerAStartChannelState,
+  channelStore: playerAStartChannelState,
 };
 
 const playerAWaitForUpdateSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerAWaitForCommitmentChannelState,
+  channelStore: playerAWaitForCommitmentChannelState,
 };
 
 const playerBStartSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerBStartChannelState,
+  channelStore: playerBStartChannelState,
 };
 
 const playerBWaitForFinalUpdateSharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState,
-  channelState: playerBWaitForFinalCommitmentChannelState,
+  channelStore: playerBWaitForFinalCommitmentChannelState,
 };
 
 const notDefundableSharedData: SharedData = {
   ...EMPTY_SHARED_DATA,
   adjudicatorState: notClosedAdjudicatorState,
-  channelState: playerAStartChannelState,
+  channelStore: playerAStartChannelState,
 };
 
 const {
@@ -140,24 +135,20 @@ const {
 // Actions
 const playerACommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.ledgerDefundUpdate1,
-  '0x0',
+  signedLedgerCommitments.signedLedgerCommitment9,
 );
 const playerBFirstCommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.ledgerDefundUpdate0,
-  '0x0',
+  signedLedgerCommitments.signedLedgerCommitment8,
 );
 const playerBFinalCommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.ledgerDefundUpdate2,
-  '0x0',
+  signedLedgerCommitments.signedLedgerCommitment10,
 );
 
 const invalidCommitmentReceived = actions.commitmentReceived(
   processId,
-  ledgerCommitments.preFundCommitment0,
-  '0x0',
+  signedLedgerCommitments.signedLedgerCommitment0,
 );
 
 // Indirect Defunding States

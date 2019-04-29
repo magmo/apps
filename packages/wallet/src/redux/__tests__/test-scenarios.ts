@@ -28,7 +28,6 @@ export const fundingState = {
 };
 
 export const twoThree = [bigNumberify(2).toHexString(), bigNumberify(3).toHexString()];
-
 export const initializedState: states.Initialized = {
   ...states.EMPTY_SHARED_DATA,
   type: states.WALLET_INITIALIZED,
@@ -287,7 +286,24 @@ export const ledgerCommitments = {
     turnNum: 10,
   },
 };
-
+export const signedLedgerCommitments = {
+  signedLedgerCommitment0: {
+    commitment: ledgerCommitments.preFundCommitment0,
+    signature: signCommitment(ledgerCommitments.preFundCommitment0, asPrivateKey),
+  },
+  signedLedgerCommitment8: {
+    commitment: ledgerCommitments.ledgerDefundUpdate0,
+    signature: signCommitment(ledgerCommitments.ledgerDefundUpdate0, asPrivateKey),
+  },
+  signedLedgerCommitment9: {
+    commitment: ledgerCommitments.ledgerDefundUpdate1,
+    signature: signCommitment(ledgerCommitments.ledgerDefundUpdate1, bsPrivateKey),
+  },
+  signedLedgerCommitment10: {
+    commitment: ledgerCommitments.ledgerDefundUpdate2,
+    signature: signCommitment(ledgerCommitments.ledgerDefundUpdate2, asPrivateKey),
+  },
+};
 // Direct funding states
 const initialFundingState = (ourIndex: PlayerIndex, fundingRequestChannelId: string) => {
   const total = twoThree.reduce(addHex);

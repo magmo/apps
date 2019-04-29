@@ -1,5 +1,5 @@
 import { ProtocolStateWithSharedData } from '..';
-import { SharedData } from '../../state';
+import { SharedData, setChannelStore, queueMessage } from '../../state';
 import * as states from './state';
 import { IndirectDefundingAction } from './actions';
 import { COMMITMENT_RECEIVED } from '../../actions';
@@ -9,8 +9,7 @@ import { getChannelState } from '../../selectors';
 import { unreachable } from '../../../utils/reducer-utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { PlayerIndex } from '../../types';
-import * as channelActions from '../../channel-store/actions';
-import { signCommitment } from '../../../domain';
+import { checkAndStore, signAndStore } from '../../channel-store/reducer';
 
 export const initialize = (
   processId: string,
@@ -131,10 +130,11 @@ const receiveLedgerCommitment = (
   commitment: Commitment,
   signature: string,
 ): SharedData => {
-  return helpers.updateChannelState(
-    sharedData,
-    channelActions.opponentCommitmentReceived(commitment, signature),
-  );
+  const result = checkAndStore(sharedData.channelStore, { commitment, signature });
+  if (result.isSuccess) {
+    return setChannelStore(sharedData, result.store);
+  }
+  return sharedData;
 };
 
 // TODO: Once the channel state is simplified we can probably rely on a better check than this
@@ -218,22 +218,18 @@ const receiveAndSendUpdateCommitment = (
   ourIndex: PlayerIndex,
 ) => {
   const channelState = getChannelState(sharedData, channelId);
-  const newSharedData = helpers.updateChannelState(
-    sharedData,
-    channelActions.ownCommitmentReceived(commitment),
-  );
-
-  const newSignature = signCommitment(commitment, channelState.privateKey);
-
-  // Send out the commitment to the opponent
-  newSharedData.outboxState.messageOutbox = [
-    helpers.createCommitmentMessageRelay(
+  const result = signAndStore(sharedData.channelStore, commitment);
+  if (result.isSuccess) {
+    const newSharedData = setChannelStore(sharedData, result.store);
+    const message = helpers.createCommitmentMessageRelay(
       processId,
       channelState.participants[ourIndex],
       commitment,
-      newSignature,
-    ),
-  ];
+      result.signedCommitment.signature,
+    );
 
-  return newSharedData;
+    return queueMessage(newSharedData, message);
+  }
+
+  return sharedData;
 };
