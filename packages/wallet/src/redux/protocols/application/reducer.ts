@@ -1,5 +1,5 @@
 import { SharedData, queueMessage } from '../../state';
-import * as states from './state';
+import * as states from './states';
 import * as actions from './actions';
 import { ProtocolStateWithSharedData } from '..';
 import * as ethers from 'ethers';
@@ -42,18 +42,23 @@ export function applicationReducer(
   sharedData: SharedData,
   action: actions.ApplicationAction,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
+  if (states.isTerminal(protocolState)) {
+    return { protocolState, sharedData };
+  }
   switch (action.type) {
     case actions.OPPONENT_COMMITMENT_RECEIVED:
       return opponentCommitmentReceivedReducer(protocolState, sharedData, action);
     case actions.OWN_COMMITMENT_RECEIVED:
       return ownCommitmentReceivedReducer(protocolState, sharedData, action);
+    case actions.CLOSE_REQUESTED:
+      return { sharedData, protocolState: states.success() };
     default:
       return unreachable(action);
   }
 }
 
 function ownCommitmentReceivedReducer(
-  protocolState: states.ApplicationState,
+  protocolState: states.NonTerminalApplicationState,
   sharedData: SharedData,
   action: actions.OwnCommitmentReceived,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
@@ -76,7 +81,7 @@ function ownCommitmentReceivedReducer(
 }
 
 function opponentCommitmentReceivedReducer(
-  protocolState: states.ApplicationState,
+  protocolState: states.NonTerminalApplicationState,
   sharedData: SharedData,
   action: actions.OpponentCommitmentReceived,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
@@ -99,8 +104,8 @@ function opponentCommitmentReceivedReducer(
 }
 
 const updateProtocolState = (
-  protocolState: states.ApplicationState,
-  action: actions.ApplicationAction,
+  protocolState: states.NonTerminalApplicationState,
+  action: actions.OwnCommitmentReceived | actions.OpponentCommitmentReceived,
 ): states.ApplicationState => {
   let channelId;
   if (protocolState.type === 'AddressKnown') {

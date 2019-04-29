@@ -21,4 +21,11 @@ export const opponentCommitmentReceived = (
 });
 export type OpponentCommitmentReceived = ReturnType<typeof opponentCommitmentReceived>;
 
-export type ApplicationAction = OpponentCommitmentReceived | OwnCommitmentReceived;
+export const CLOSE_REQUESTED = 'CLOSE_REQUESTED';
+export const closeRequested = (processId: string) => ({
+  type: CLOSE_REQUESTED as typeof CLOSE_REQUESTED,
+  processId,
+});
+export type CloseRequested = ReturnType<typeof closeRequested>;
+
+export type ApplicationAction = OpponentCommitmentReceived | OwnCommitmentReceived | CloseRequested;

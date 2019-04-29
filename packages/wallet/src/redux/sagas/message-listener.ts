@@ -26,6 +26,7 @@ export function* messageListener() {
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.protocol.concludeRequested(action.channelId));
+        yield put(actions.application.closeRequested(application.APPLICATION_PROCESS_ID));
         break;
       case incoming.CREATE_CHALLENGE_REQUEST:
         yield put(actions.protocol.createChallengeRequested(action.channelId, action.commitment));

@@ -16,5 +16,18 @@ export interface Ongoing {
 export function ongoing(channelId: string): Ongoing {
   return { type: ONGOING, channelId };
 }
+export const SUCCESS = 'Success';
+export interface Success {
+  type: typeof SUCCESS;
+}
 
-export type ApplicationState = AddressKnown | Ongoing;
+export function success(): Success {
+  return { type: SUCCESS };
+}
+
+export function isTerminal(state: ApplicationState): state is Success {
+  return state.type === SUCCESS;
+}
+
+export type ApplicationState = AddressKnown | Ongoing | Success;
+export type NonTerminalApplicationState = AddressKnown | Ongoing;

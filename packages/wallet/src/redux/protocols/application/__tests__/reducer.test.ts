@@ -3,7 +3,12 @@ import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
 import { itSendsThisMessage } from '../../../__tests__/helpers';
 import { initialize, applicationReducer } from '../reducer';
-import { VALIDATION_SUCCESS, SIGNATURE_SUCCESS } from 'magmo-wallet-client';
+import {
+  VALIDATION_SUCCESS,
+  SIGNATURE_SUCCESS,
+  VALIDATION_FAILURE,
+  SIGNATURE_FAILURE,
+} from 'magmo-wallet-client';
 
 function whenIn(state) {
   return `when in ${state}`;
@@ -43,6 +48,20 @@ describe('signing a commitment', () => {
   });
 });
 
+describe('signing an invalid commitment', () => {
+  const scenario = scenarios.receivingOurInvalidCommitment;
+  const sharedData = scenario.storage;
+
+  describe(whenIn(states.ONGOING), () => {
+    const state = scenario.states.ongoing;
+    const action = scenario.actions.receiveOurInvalidCommitment;
+    const result = applicationReducer(state, sharedData, action);
+
+    itTransitionsTo(result, states.ONGOING);
+    itSendsThisMessage(result, SIGNATURE_FAILURE);
+  });
+});
+
 describe('validating a commitment', () => {
   const scenario = scenarios.receivingTheirCommitment;
   const sharedData = scenario.storage;
@@ -54,6 +73,33 @@ describe('validating a commitment', () => {
 
     itTransitionsTo(result, states.ONGOING);
     itSendsThisMessage(result, VALIDATION_SUCCESS);
+  });
+});
+
+describe('validating an invalid commitment', () => {
+  const scenario = scenarios.receivingTheirInvalidCommitment;
+  const sharedData = scenario.storage;
+
+  describe(whenIn(states.ONGOING), () => {
+    const state = scenario.states.ongoing;
+    const action = scenario.actions.receiveTheirInvalidCommitment;
+    const result = applicationReducer(state, sharedData, action);
+
+    itTransitionsTo(result, states.ONGOING);
+    itSendsThisMessage(result, VALIDATION_FAILURE);
+  });
+});
+
+describe('receiving a close request', () => {
+  const scenario = scenarios.receivingACloseRequest;
+  const sharedData = scenario.storage;
+
+  describe(whenIn(states.ONGOING), () => {
+    const state = scenario.states.ongoing;
+    const action = scenario.actions.closeRequested;
+    const result = applicationReducer(state, sharedData, action);
+
+    itTransitionsTo(result, states.SUCCESS);
   });
 });
 

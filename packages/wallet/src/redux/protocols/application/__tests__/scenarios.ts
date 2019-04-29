@@ -10,6 +10,7 @@ const { channelId, asAddress: address, asPrivateKey: privateKey } = channelScena
 import { ChannelState } from '../../../channel-store';
 import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { APPLICATION_PROCESS_ID } from '../reducer';
 
 const {
   signedCommitment19,
@@ -39,6 +40,7 @@ const defaults = { processId, channelId };
 // ------
 const addressKnown = states.addressKnown(address, privateKey);
 const ongoing = states.ongoing(channelId);
+const success = states.success();
 
 // -------
 // Actions
@@ -52,6 +54,17 @@ const receiveOurCommitment = actions.ownCommitmentReceived(
 const { commitment, signature } = signedCommitment21;
 const receiveTheirCommitment = actions.opponentCommitmentReceived(processId, commitment, signature);
 
+const receiveTheirInvalidCommitment = actions.opponentCommitmentReceived(
+  processId,
+  signedCommitment19.commitment,
+  signedCommitment19.signature,
+);
+const receiveOurInvalidCommitment = actions.ownCommitmentReceived(
+  processId,
+  signedCommitment20.commitment,
+);
+
+const closeRequested = actions.closeRequested(APPLICATION_PROCESS_ID);
 // -------
 // Scenarios
 // -------
@@ -74,6 +87,18 @@ export const startingApplication = {
   },
 };
 
+export const receivingACloseRequest = {
+  ...defaults,
+  storage: storage(ourTurn),
+  states: {
+    ongoing,
+    success,
+  },
+  actions: {
+    closeRequested,
+  },
+};
+
 export const receivingOurCommitment = {
   ...defaults,
   storage: storage(ourTurn),
@@ -93,5 +118,27 @@ export const receivingTheirCommitment = {
   },
   actions: {
     receiveTheirCommitment,
+  },
+};
+
+export const receivingTheirInvalidCommitment = {
+  ...defaults,
+  storage: storage(theirTurn),
+  states: {
+    ongoing,
+  },
+  actions: {
+    receiveTheirInvalidCommitment,
+  },
+};
+
+export const receivingOurInvalidCommitment = {
+  ...defaults,
+  storage: storage(ourTurn),
+  states: {
+    ongoing,
+  },
+  actions: {
+    receiveOurInvalidCommitment,
   },
 };

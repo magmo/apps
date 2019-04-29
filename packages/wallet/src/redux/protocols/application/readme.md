@@ -7,24 +7,20 @@ This prepares an address to be used to sign application commitments.
 
 It should never fail.
 
-## Open questions
-
-How does this process reach a terminal state?
-
-- One solution is to dispatch an application action when the message listener gets the `CONCLUDE_CHANNEL_REQUEST`
-
 ## State machine
 
 The protocol is implemented with the following state machine.
-When in the `Ongoing` state, it is the application's responsibility to inform the wallet that
 
 ```mermaid
 graph TD
   S((start)) --> AK(AddressKnown)
   AK-->|COMMITMENT_RECEIVED|O(Ongoing)
   O-->|COMMITMENT_RECEIVED|O(Ongoing)
+    AK-->|CLOSE_REQUESTED|Su((success))
+  O-->|CLOSE_REQUESTED|Su((success))
 ```
 
 Notes:
 
 - `COMMITMENT_RECEIVED` is shorthand for either `OWN_COMMITMENT_RECEIVED` or `OPPONENT_COMMITMENT_RECEIVED`
+- `CLOSE_REQUESTED` should get triggered when a conclude is requested. This means that the application protocol no longer needs to listen for commiments from the app.
