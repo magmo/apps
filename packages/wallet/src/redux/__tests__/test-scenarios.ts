@@ -316,4 +316,3 @@ export const signedLedgerCommitments = {
     signature: signCommitment(ledgerCommitments.ledgerDefundUpdate2, asPrivateKey),
   },
 };
-
