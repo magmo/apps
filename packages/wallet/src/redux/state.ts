@@ -12,6 +12,7 @@ import {
   setChannel as setChannelInStore,
   setChannels as setChannelsInStore,
   checkAndStore as checkAndStoreChannelStore,
+  checkAndInitialize as checkAndInitializeChannelStore,
   signAndStore as signAndStoreChannelStore,
   emptyChannelStore,
   SignFailureReason,
@@ -23,7 +24,7 @@ import { WalletEvent } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
 import { WalletProtocol } from './types';
 import { AdjudicatorState } from './adjudicator-state/state';
-import { SignedCommitment, Commitment } from 'src/domain';
+import { SignedCommitment, Commitment } from '../domain';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -160,6 +161,38 @@ export function setChannelStore(state: SharedData, channelStore: ChannelStore): 
 
 export function getLastMessage(state: SharedData): WalletEvent | undefined {
   return getLastMessageFromOutbox(state.outboxState);
+}
+
+export function getAddressAndPrivateKey(
+  state: SharedData,
+  channelId: string,
+): { address: string; privateKey: string } | undefined {
+  const channel = getChannel(state, channelId);
+  if (!channel) {
+    return undefined;
+  } else {
+    const { address, privateKey } = channel;
+    return { address, privateKey };
+  }
+}
+
+export function checkAndInitialize(
+  state: SharedData,
+  signedCommitment: SignedCommitment,
+  address: string,
+  privateKey: string,
+): CheckResult {
+  const result = checkAndInitializeChannelStore(
+    state.channelStore,
+    signedCommitment,
+    address,
+    privateKey,
+  );
+  if (result.isSuccess) {
+    return { ...result, store: setChannelStore(state, result.store) };
+  } else {
+    return result;
+  }
 }
 
 export function checkAndStore(state: SharedData, signedCommitment: SignedCommitment): CheckResult {
