@@ -49,7 +49,7 @@ describe('ledger-funding-fails scenario', () => {
     const { state, action } = scenario.waitForDirectFunding;
     const updatedState = playerBReducer(state.state, state.store, action);
 
-    itTransitionsTo(updatedState, 'BWaitForDirectFunding');
+    itTransitionsTo(updatedState, 'Failure');
   });
 });
 
