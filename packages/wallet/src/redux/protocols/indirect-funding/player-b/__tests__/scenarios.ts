@@ -56,7 +56,7 @@ const props = { channelId, ledgerId };
 // ------
 // States
 // ------
-const waitForPreFundL0 = {
+const waitForPreFundSetup0 = {
   state: bWaitForPreFundSetup0(props),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app0, app1, bsAddress, bsPrivateKey),
@@ -95,13 +95,17 @@ const waitForDirectFundingFailure = {
 // -------
 // Actions
 // -------
-const preFundL0Received = globalActions.commitmentReceived(processId, ledger0);
+const preFundSetup0Received = globalActions.commitmentReceived(processId, ledger0);
 const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger4);
 const postFund0Received = globalActions.commitmentReceived(processId, app2);
 
 export const happyPath = {
-  initialParams: { store: waitForPreFundL0.store, channelId },
-  waitForPreFundL0: { state: waitForPreFundL0, action: preFundL0Received, reply: ledger1 },
+  initialParams: { store: waitForPreFundSetup0.store, channelId },
+  waitForPreFundSetup0: {
+    state: waitForPreFundSetup0,
+    action: preFundSetup0Received,
+    reply: ledger1,
+  },
   waitForDirectFunding: { state: waitForDirectFunding, action: successTriggerB },
   waitForLedgerUpdate0: {
     state: waitForLedgerUpdate0,
