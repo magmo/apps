@@ -44,3 +44,21 @@ function incrementTurnNum(commitment: Commitment): Commitment {
 export function constructConclude(commitment: Commitment): Commitment {
   return { ...incrementTurnNum(commitment), commitmentType: CommitmentType.Conclude };
 }
+
+export function nextSetupCommitment(commitment: Commitment): Commitment | 'NotASetupCommitment' {
+  const turnNum = commitment.turnNum + 1;
+  const numParticipants = commitment.channel.participants.length;
+  let commitmentType;
+  let commitmentCount;
+  if (turnNum < numParticipants) {
+    commitmentType = CommitmentType.PreFundSetup;
+    commitmentCount = turnNum;
+  } else if (turnNum < 2 * numParticipants - 1) {
+    commitmentType = CommitmentType.PostFundSetup;
+    commitmentCount = turnNum - numParticipants;
+  } else {
+    return 'NotASetupCommitment';
+  }
+
+  return { ...commitment, turnNum, commitmentType, commitmentCount };
+}

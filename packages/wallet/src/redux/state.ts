@@ -11,7 +11,10 @@ import {
   ChannelState,
   setChannel as setChannelInStore,
   setChannels as setChannelsInStore,
+  checkAndStore as checkAndStoreChannelStore,
+  signAndStore as signAndStoreChannelStore,
   emptyChannelStore,
+  SignFailureReason,
 } from './channel-store';
 import { Properties } from './utils';
 import * as indirectFunding from './protocols/indirect-funding/state';
@@ -20,6 +23,7 @@ import { WalletEvent } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
 import { WalletProtocol } from './types';
 import { AdjudicatorState } from './adjudicator-state/state';
+import { SignedCommitment, Commitment } from 'src/domain';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -156,6 +160,42 @@ export function setChannelStore(state: SharedData, channelStore: ChannelStore): 
 
 export function getLastMessage(state: SharedData): WalletEvent | undefined {
   return getLastMessageFromOutbox(state.outboxState);
+}
+
+export function checkAndStore(state: SharedData, signedCommitment: SignedCommitment): CheckResult {
+  const result = checkAndStoreChannelStore(state.channelStore, signedCommitment);
+  if (result.isSuccess) {
+    return { ...result, store: setChannelStore(state, result.store) };
+  } else {
+    return result;
+  }
+}
+type CheckResult = CheckSuccess | CheckFailure;
+interface CheckSuccess {
+  isSuccess: true;
+  store: SharedData;
+}
+interface CheckFailure {
+  isSuccess: false;
+}
+
+export function signAndStore(state: SharedData, commitment: Commitment): SignResult {
+  const result = signAndStoreChannelStore(state.channelStore, commitment);
+  if (result.isSuccess) {
+    return { ...result, store: setChannelStore(state, result.store) };
+  } else {
+    return result;
+  }
+}
+type SignResult = SignSuccess | SignFailure;
+interface SignSuccess {
+  isSuccess: true;
+  signedCommitment: SignedCommitment;
+  store: SharedData;
+}
+interface SignFailure {
+  isSuccess: false;
+  reason: SignFailureReason;
 }
 
 export function queueTransaction(
