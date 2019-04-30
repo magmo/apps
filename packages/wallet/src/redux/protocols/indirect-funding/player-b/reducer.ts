@@ -4,7 +4,15 @@ import { PlayerBState } from '../state';
 import * as actions from '../../../actions';
 
 import { ProtocolStateWithSharedData } from '../../';
-import { SharedData, checkAndStore, getChannel, signAndStore, queueMessage } from '../../../state';
+import {
+  SharedData,
+  checkAndStore,
+  getChannel,
+  signAndStore,
+  queueMessage,
+  checkAndInitialize,
+  getAddressAndPrivateKey,
+} from '../../../state';
 import { IndirectFundingState, failure, success } from '../state';
 import { unreachable } from '../../../../utils/reducer-utils';
 import {
@@ -63,8 +71,19 @@ function handleWaitForPreFundSetup(
   if (action.type !== actions.COMMITMENT_RECEIVED) {
     throw new Error('Incorrect action');
   }
+  const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, protocolState.channelId);
+  if (!addressAndPrivateKey) {
+    throw new Error(
+      `Could not find address and private key for existing channel ${protocolState.channelId}`,
+    );
+  }
 
-  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  const checkResult = checkAndInitialize(
+    sharedData,
+    action.signedCommitment,
+    addressAndPrivateKey.address,
+    addressAndPrivateKey.privateKey,
+  );
   if (!checkResult.isSuccess) {
     throw new Error('Indirect funding protocol, unable to validate or store commitment');
   }
