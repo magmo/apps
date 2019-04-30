@@ -7,6 +7,7 @@ import {
   signAndInitialize,
   getAddressAndPrivateKey,
   queueMessage,
+  checkAndStore,
 } from '../../../state';
 import { IndirectFundingState } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
@@ -16,8 +17,12 @@ import { Channel } from 'fmg-core/lib/channel';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { getChannel, theirAddress } from '../../../channel-store';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
+import { DirectFundingAction } from '../../direct-funding';
+import { directFundingRequested } from '../../direct-funding/actions';
+import { initialDirectFundingState } from '../../direct-funding/state';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
+type IDFAction = actions.indirectFunding.Action;
 
 export function initialize(channelId: string, sharedData: SharedData): ReturnVal {
   const channel = getChannel(sharedData.channelStore, channelId);
@@ -63,7 +68,56 @@ export function playerAReducer(
   sharedData: SharedData,
   action: actions.indirectFunding.Action,
 ): ReturnVal {
-  return { protocolState, sharedData };
+  switch (protocolState.type) {
+    case 'AWaitForPreFundSetup1':
+      return handleWaitForPreFundSetup(protocolState, sharedData, action);
+    default:
+      return { protocolState, sharedData };
+  }
+}
+
+function handleWaitForPreFundSetup(
+  protocolState: states.AWaitForPreFundSetup1,
+  sharedData: SharedData,
+  action: IDFAction | DirectFundingAction,
+): ReturnVal {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, protocolState.channelId);
+  if (!addressAndPrivateKey) {
+    throw new Error(
+      `Could not find address and private key for existing channel ${protocolState.channelId}`,
+    );
+  }
+
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  // TODO: Skipping check if channel is defined/has correct library address
+  // Do we really need to do that constantly or is it for debugging mostly?
+  const theirCommitment = action.signedCommitment.commitment;
+  const ledgerId = getChannelId(theirCommitment);
+  // update the state
+  const directFundingAction = directFundingRequested(
+    'processId',
+    ledgerId,
+    '0',
+    '0', // TODO don't use dummy values
+    '0',
+    1,
+  );
+  const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
+  const newProtocolState = states.aWaitForDirectFunding({
+    ...protocolState,
+    ledgerId,
+    directFundingState: directFundingState.protocolState,
+  });
+
+  return { protocolState: newProtocolState, sharedData };
 }
 
 function createInitialSetupCommitment(allocation: string[], destination: string[]): Commitment {
