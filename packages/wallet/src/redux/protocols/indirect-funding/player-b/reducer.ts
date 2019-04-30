@@ -228,10 +228,45 @@ export function handleWaitForPostFundSetup(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
+  // TODO: There is a lot of repetitive code here
+  // We should probably refactor and clean this up
   const unchangedState = { protocolState, sharedData };
-  if (false) {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  const theirCommitment = action.signedCommitment.commitment;
+  const ourCommitment = nextSetupCommitment(theirCommitment);
+  if (ourCommitment === 'NotASetupCommitment') {
+    throw new Error('Not a Setup commitment');
+  }
+  const signResult = signAndStore(sharedData, ourCommitment);
+  if (!signResult.isSuccess) {
     return unchangedState;
   }
+  sharedData = signResult.store;
+  const ledgerId = getChannelId(theirCommitment);
+  let channel = getChannel(sharedData, ledgerId);
+  if (!channel || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
+    // todo: this could be more robust somehow.
+    // Maybe we should generate what we were expecting and compare.
+    throw new Error('Bad channel');
+  }
+  // just need to put our message in the outbox
+  const messageRelay = createCommitmentMessageRelay(
+    theirAddress(channel),
+    'processId', // TODO don't use dummy values
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  sharedData = queueMessage(sharedData, messageRelay);
+  channel = getChannel(sharedData, ledgerId); // refresh channel
+
   const newProtocolState = success();
   const newReturnVal = { protocolState: newProtocolState, sharedData };
   return newReturnVal;

@@ -49,7 +49,9 @@ export function constructConclude(commitment: Commitment): Commitment {
 export function nextLedgerUpdateCommitment(
   commitment: Commitment,
 ): Commitment | 'NotAnUpdateCommitment' {
-  if (commitment.commitmentType !== CommitmentType.App || commitment.turnNum > 4) {
+  const numParticipants = commitment.channel.participants.length;
+  const turnNum = commitment.turnNum + 1;
+  if (commitment.commitmentType !== CommitmentType.App || turnNum <= 2 * numParticipants - 1) {
     return 'NotAnUpdateCommitment';
   }
   const appAttributes = appAttributesFromBytes(commitment.appAttributes);
@@ -59,7 +61,7 @@ export function nextLedgerUpdateCommitment(
     allocation: appAttributes.proposedAllocation,
     destination: appAttributes.proposedDestination,
     appAttributes: updatedAppAttributes,
-    turnNum: commitment.turnNum + 1,
+    turnNum,
     commitmentCount: 0,
   };
 }
@@ -72,7 +74,7 @@ export function nextSetupCommitment(commitment: Commitment): Commitment | 'NotAS
   if (turnNum < numParticipants) {
     commitmentType = CommitmentType.PreFundSetup;
     commitmentCount = turnNum;
-  } else if (turnNum < 2 * numParticipants - 1) {
+  } else if (turnNum <= 2 * numParticipants - 1) {
     commitmentType = CommitmentType.PostFundSetup;
     commitmentCount = turnNum - numParticipants;
   } else {
