@@ -18,8 +18,8 @@ describe('happy-path scenario', () => {
     const { state, action, reply } = scenario.waitForPreFundSetup0;
     const updatedState = playerBReducer(state.state, state.store, action);
 
-    itTransitionsTo(updatedState, 'BWaitForDirectFunding');
     itSendsMessage(updatedState, reply);
+    itTransitionsTo(updatedState, 'BWaitForDirectFunding');
   });
   describe('when in WaitForDirectFunding', () => {
     const { state, action } = scenario.waitForDirectFunding;
@@ -67,7 +67,6 @@ function itTransitionsTo(state: ReturnVal, type: IndirectFundingState['type']) {
 function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
   it('sends a message', () => {
     const lastMessage = getLastMessage(state.sharedData);
-
     if (lastMessage && 'messagePayload' in lastMessage) {
       const dataPayload = lastMessage.messagePayload.data;
       // This is yuk. The data in a message is currently of 'any' type..
