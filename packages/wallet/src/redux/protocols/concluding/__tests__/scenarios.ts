@@ -7,6 +7,7 @@ import {
 } from '../../defunding/__tests__';
 import * as actions from '../actions';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
+import { CommitmentType, Commitment } from 'fmg-core';
 
 // -----------------
 // Channel Scenarios
@@ -24,6 +25,15 @@ const theirTurn = channelFromCommitments(
   privateKey,
 );
 const ourTurn = channelFromCommitments(signedCommitment20, signedCommitment21, address, privateKey);
+
+const concludeCommitment: Commitment = {
+  ...signedCommitment21.commitment,
+  channel: channelScenarios.channel,
+  commitmentCount: 0,
+  commitmentType: CommitmentType.Conclude,
+  appAttributes: '0x0',
+  turnNum: 22,
+};
 
 // --------
 // Defaults
@@ -74,6 +84,9 @@ export const happyPath = {
     defundChosen,
     successTrigger,
     acknowledged,
+  },
+  commitments: {
+    concludeCommitment,
   },
 };
 

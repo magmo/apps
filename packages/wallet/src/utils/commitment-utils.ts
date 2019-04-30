@@ -121,7 +121,7 @@ export const composeConcludeCommitment = (channelState: ChannelState) => {
     {
       processId: channelState.channelId,
       data: {
-        concludeCommitment,
+        commitment: concludeCommitment,
         commitmentSignature,
       },
     },
