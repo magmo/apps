@@ -20,6 +20,8 @@ import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from 'src/redux/channel-store';
 import { initialDirectFundingState } from '../../direct-funding/state';
 
+import { directFundingRequested } from '../../direct-funding/actions';
+
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
 
@@ -91,7 +93,7 @@ function handleWaitForPreFundSetup(
   // just need to put our message in the outbox
   const messageRelay = createCommitmentMessageRelay(
     theirAddress(channel),
-    'processId',
+    'processId', // TODO don't use dummy values
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
@@ -99,10 +101,22 @@ function handleWaitForPreFundSetup(
   channel = getChannel(sharedData, ledgerId); // refresh channel
 
   // update the state
-  const directFundingState = initialDirectFundingState();
-  protocolState = bWaitForDirectFunding({ ...protocolState, ledgerId, directFundingState });
+  const directFundingAction = directFundingRequested(
+    'processId',
+    ledgerId,
+    '0',
+    '0', // TODO don't use dummy values
+    '0',
+    1,
+  );
+  const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
+  const newProtocolState = bWaitForDirectFunding({
+    ...protocolState,
+    ledgerId,
+    directFundingState: directFundingState.protocolState,
+  });
 
-  return { protocolState, sharedData };
+  return { protocolState: newProtocolState, sharedData };
 }
 
 function handleWaitForDirectFunding(

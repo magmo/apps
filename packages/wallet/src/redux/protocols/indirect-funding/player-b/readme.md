@@ -6,11 +6,11 @@
   graph TD
   linkStyle default interpolate basis
     St((Start)) --> WFPrF0
-    WFPrF0(WaitForPreFundL0) -->|CommitmentReceived| WFDF(WaitForDirectFunding)
+    WFPrF0(BWaitForPreFundSetup0) -->|CommitmentReceived| WFDF(BWaitForDirectFunding)
     WFDF -->|FundingAction| WFDF
-    WFDF -->|Success| WFLU0(WaitForLedgerUpdate0)
+    WFDF -->|Success| WFLU0(BWaitForLedgerUpdate0)
     WFDF -->|Failure| F((Failure))
-    WFLU0 --> |CommitmentReceived| WFPoF0(WaitForPostFund0)
+    WFLU0 --> |CommitmentReceived| WFPoF0(BWaitForPostFundSetup0)
     WFPoF0 --> |CommitmentReceived| S((Success))
   style St  fill:#efdd20
   style S fill:#58ef21
