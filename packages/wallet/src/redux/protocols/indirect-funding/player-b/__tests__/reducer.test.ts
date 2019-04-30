@@ -14,8 +14,8 @@ describe('happy-path scenario', () => {
     itTransitionsTo(initialState, 'BWaitForPreFundSetup0');
   });
 
-  describe('when in WaitForPreFundL0', () => {
-    const { state, action, reply } = scenario.waitForPreFundL0;
+  describe('when in WaitForPreFundSetup0', () => {
+    const { state, action, reply } = scenario.waitForPreFundSetup0;
     const updatedState = playerBReducer(state.state, state.store, action);
 
     itTransitionsTo(updatedState, 'BWaitForDirectFunding');
