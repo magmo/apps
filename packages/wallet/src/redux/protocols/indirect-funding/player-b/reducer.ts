@@ -61,12 +61,12 @@ function handleWaitForPreFundSetup(
 ): ReturnVal {
   const unchangedState = { protocolState, sharedData };
   if (action.type !== actions.COMMITMENT_RECEIVED) {
-    return unchangedState;
+    throw new Error('Incorrect action');
   }
 
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
   if (!checkResult.isSuccess) {
-    return unchangedState;
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
   }
   sharedData = checkResult.store;
 
@@ -79,7 +79,7 @@ function handleWaitForPreFundSetup(
   if (!channel || channel.turnNum !== 0 || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
     // todo: this could be more robust somehow.
     // Maybe we should generate what we were expecting and compare.
-    return unchangedState;
+    throw new Error('Bad channel');
   }
 
   // at this point we're happy that we have the pre-fund setup
@@ -87,7 +87,7 @@ function handleWaitForPreFundSetup(
 
   const ourCommitment = nextSetupCommitment(theirCommitment);
   if (ourCommitment === 'NotASetupCommitment') {
-    return unchangedState;
+    throw new Error('Not a Setup commitment');
   }
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
@@ -124,31 +124,6 @@ function handleWaitForPreFundSetup(
   return { protocolState: newProtocolState, sharedData };
 }
 
-// function handleDirectFundingAction(
-//   protocolState: PlayerBState,
-//   sharedData: SharedData,
-//   action: DirectFundingAction,
-// ): ReturnVal {
-//   if (protocolState.type !== 'BWaitForDirectFunding') {
-//     return { protocolState, sharedData };
-//   }
-
-//   const directFundingState1 = protocolState.directFundingState;
-//   const protocolStateWithSharedData = directFundingStateReducer(
-//     directFundingState1,
-//     sharedData,
-//     action,
-//   );
-//   const directFundingState2 = protocolStateWithSharedData.protocolState;
-
-//   if (isSuccess(directFundingState2)) {
-//     protocolState = bWaitForLedgerUpdate0(protocolState);
-//   } else if (isFailure(directFundingState2)) {
-//     protocolState = failure();
-//   }
-//   return { protocolState, sharedData };
-// }
-
 function handleWaitForDirectFunding(
   protocolState: BWaitForDirectFunding,
   sharedData: SharedData,
@@ -182,8 +157,47 @@ function handleWaitForLedgerUpdate(
 ): ReturnVal {
   const unchangedState = { protocolState, sharedData };
   if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  const theirCommitment = action.signedCommitment.commitment;
+  const ledgerId = getChannelId(theirCommitment);
+  let channel = getChannel(sharedData, ledgerId);
+  if (!channel || channel.turnNum !== 0 || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
+    // todo: this could be more robust somehow.
+    // Maybe we should generate what we were expecting and compare.
+    throw new Error('Bad channel');
+  }
+
+  // are we happy that we have the ledger update?
+  // if so, we need to craft our reply
+
+  const ourCommitment = {
+    ...theirCommitment,
+    turnNum: theirCommitment.turnNum + 1,
+    commitmentCount: theirCommitment.commitmentCount + 1,
+  };
+  const signResult = signAndStore(sharedData, ourCommitment);
+  if (!signResult.isSuccess) {
     return unchangedState;
   }
+  sharedData = signResult.store;
+
+  // just need to put our message in the outbox
+  const messageRelay = createCommitmentMessageRelay(
+    theirAddress(channel),
+    'processId', // TODO don't use dummy values
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  sharedData = queueMessage(sharedData, messageRelay);
+  channel = getChannel(sharedData, ledgerId); // refresh channel
+
   const newProtocolState = bWaitForPostFundSetup0({
     ...protocolState,
   });
@@ -201,6 +215,5 @@ export function handleWaitForPostFundSetup(
   }
   const newProtocolState = success();
   const newReturnVal = { protocolState: newProtocolState, sharedData };
-  console.log(newReturnVal);
   return newReturnVal;
 }
