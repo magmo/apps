@@ -12,6 +12,10 @@
     WFDF -->|Failure| F((Failure))
     WFLU0 --> |CommitmentReceived| WFPoF0(WaitForPostFund0)
     WFPoF0 --> |CommitmentReceived| S((Success))
+  style St  fill:#efdd20
+  style S fill:#58ef21
+  style F  fill:#f45941
+  style WFDF stroke:#333,stroke-width:4px
 ```
 
 ### Scenarios
