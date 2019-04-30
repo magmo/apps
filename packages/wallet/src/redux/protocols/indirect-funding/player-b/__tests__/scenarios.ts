@@ -39,8 +39,6 @@ const fiveToApp = [{ address: channelId, wei: bigNumberify(5).toHexString() }];
 
 const app0 = appCommitment({ turnNum: 0, balances: twoThree });
 const app1 = appCommitment({ turnNum: 1, balances: twoThree });
-const app2 = appCommitment({ turnNum: 2, balances: twoThree });
-const app3 = appCommitment({ turnNum: 3, balances: twoThree });
 
 const ledger0 = ledgerCommitment({ turnNum: 0, balances: twoThree });
 const ledger1 = ledgerCommitment({ turnNum: 1, balances: twoThree });
@@ -80,7 +78,7 @@ const waitForPostFund0 = {
   state: bWaitForPostFundSetup0(props),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app0, app1, bsAddress, bsPrivateKey),
-    channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+    channelFromCommitments(ledger0, ledger1, bsAddress, bsPrivateKey),
   ]),
 };
 
@@ -97,7 +95,7 @@ const waitForDirectFundingFailure = {
 // -------
 const preFundSetup0Received = globalActions.commitmentReceived(processId, ledger0);
 const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger4);
-const postFund0Received = globalActions.commitmentReceived(processId, app2);
+const postFund0Received = globalActions.commitmentReceived(processId, ledger2);
 
 export const happyPath = {
   initialParams: { store: waitForPreFundSetup0.store, channelId },
@@ -112,7 +110,7 @@ export const happyPath = {
     action: ledgerUpdate0Received,
     reply: ledger5,
   },
-  waitForPostFund0: { state: waitForPostFund0, action: postFund0Received, reply: app3 },
+  waitForPostFund0: { state: waitForPostFund0, action: postFund0Received, reply: ledger3 },
 };
 
 export const ledgerFundingFails = {
