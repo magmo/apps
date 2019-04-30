@@ -14,6 +14,7 @@ import {
   checkAndStore as checkAndStoreChannelStore,
   checkAndInitialize as checkAndInitializeChannelStore,
   signAndStore as signAndStoreChannelStore,
+  signAndInitialize as signAndInitializeChannelStore,
   emptyChannelStore,
   SignFailureReason,
 } from './channel-store';
@@ -173,6 +174,20 @@ export function getAddressAndPrivateKey(
   } else {
     const { address, privateKey } = channel;
     return { address, privateKey };
+  }
+}
+
+export function signAndInitialize(
+  state: SharedData,
+  commitment: Commitment,
+  address: string,
+  privateKey: string,
+): SignResult {
+  const result = signAndInitializeChannelStore(state.channelStore, commitment, address, privateKey);
+  if (result.isSuccess) {
+    return { ...result, store: setChannelStore(state, result.store) };
+  } else {
+    return result;
   }
 }
 
