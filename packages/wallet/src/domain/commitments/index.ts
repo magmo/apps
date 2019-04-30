@@ -51,15 +51,35 @@ export function nextLedgerUpdateCommitment(
 ): Commitment | 'NotAnUpdateCommitment' {
   const numParticipants = commitment.channel.participants.length;
   const turnNum = commitment.turnNum + 1;
-  if (commitment.commitmentType !== CommitmentType.App || turnNum <= 2 * numParticipants - 1) {
+  if (commitment.commitmentType !== CommitmentType.App || turnNum <= 2 * numParticipants) {
     return 'NotAnUpdateCommitment';
   }
-  const appAttributes = appAttributesFromBytes(commitment.appAttributes);
-  const updatedAppAttributes = bytesFromAppAttributes({ ...appAttributes, consensusCounter: 0 });
+
+  let allocation;
+  let destination;
+  let updatedAppAttributes;
+
+  // This is the final commitment so we must reset to 0 and update allocation/destination
+  if (turnNum === 3 * numParticipants - 1) {
+    const appAttributes = appAttributesFromBytes(commitment.appAttributes);
+    allocation = appAttributes.proposedAllocation;
+    destination = appAttributes.proposedDestination;
+    updatedAppAttributes = bytesFromAppAttributes({ ...appAttributes, consensusCounter: 0 });
+  } else {
+    // Otherwise we just update the consensus counter
+    allocation = commitment.allocation;
+    destination = commitment.destination;
+    const appAttributes = appAttributesFromBytes(commitment.appAttributes);
+    updatedAppAttributes = bytesFromAppAttributes({
+      ...appAttributes,
+      consensusCounter: appAttributes.consensusCounter + 1,
+    });
+  }
+
   return {
     ...commitment,
-    allocation: appAttributes.proposedAllocation,
-    destination: appAttributes.proposedDestination,
+    allocation,
+    destination,
     appAttributes: updatedAppAttributes,
     turnNum,
     commitmentCount: 0,
