@@ -15,9 +15,9 @@ import {
   bWaitForDirectFunding,
 } from './state';
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
-import { CONSENSUS_LIBRARY_ADDRESS } from 'src/constants';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
-import { theirAddress } from 'src/redux/channel-store';
+import { theirAddress } from '../../../../redux/channel-store';
 import { initialDirectFundingState } from '../../direct-funding/state';
 
 import { directFundingRequested } from '../../direct-funding/actions';
