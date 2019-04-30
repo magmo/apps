@@ -5,7 +5,7 @@ import * as actions from '../../../actions';
 
 import { ProtocolStateWithSharedData } from '../../';
 import { SharedData, checkAndStore, getChannel, signAndStore, queueMessage } from '../../../state';
-import { IndirectFundingState, failure, Failure } from '../state';
+import { IndirectFundingState, failure, success } from '../state';
 import { unreachable } from '../../../../utils/reducer-utils';
 import {
   BWaitForPreFundSetup0,
@@ -14,6 +14,7 @@ import {
   BWaitForPostFundSetup0,
   bWaitForDirectFunding,
   bWaitForLedgerUpdate0,
+  bWaitForPostFundSetup0,
 } from './state';
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
@@ -21,7 +22,7 @@ import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from '../../../../redux/channel-store';
 import { initialDirectFundingState } from '../../direct-funding/state';
 
-import { directFundingRequested, isDirectFundingAction } from '../../direct-funding/actions';
+import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/state';
@@ -39,13 +40,10 @@ export function playerBReducer(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  if (isDirectFundingAction(action)) {
-    return handleDirectFundingAction(protocolState, sharedData, action);
-  }
   switch (protocolState.type) {
     case 'BWaitForPreFundSetup0':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
-    case 'BWaitForDirectFunding':
+    case 'BWaitForDirectFunding': // defer to child reducer
       return handleWaitForDirectFunding(protocolState, sharedData, action);
     case 'BWaitForLedgerUpdate0':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
@@ -59,7 +57,7 @@ export function playerBReducer(
 function handleWaitForPreFundSetup(
   protocolState: BWaitForPreFundSetup0,
   sharedData: SharedData,
-  action: IDFAction,
+  action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   const unchangedState = { protocolState, sharedData };
   if (action.type !== actions.COMMITMENT_RECEIVED) {
@@ -126,10 +124,35 @@ function handleWaitForPreFundSetup(
   return { protocolState: newProtocolState, sharedData };
 }
 
-function handleDirectFundingAction(
-  protocolState: PlayerBState | Failure,
+// function handleDirectFundingAction(
+//   protocolState: PlayerBState,
+//   sharedData: SharedData,
+//   action: DirectFundingAction,
+// ): ReturnVal {
+//   if (protocolState.type !== 'BWaitForDirectFunding') {
+//     return { protocolState, sharedData };
+//   }
+
+//   const directFundingState1 = protocolState.directFundingState;
+//   const protocolStateWithSharedData = directFundingStateReducer(
+//     directFundingState1,
+//     sharedData,
+//     action,
+//   );
+//   const directFundingState2 = protocolStateWithSharedData.protocolState;
+
+//   if (isSuccess(directFundingState2)) {
+//     protocolState = bWaitForLedgerUpdate0(protocolState);
+//   } else if (isFailure(directFundingState2)) {
+//     protocolState = failure();
+//   }
+//   return { protocolState, sharedData };
+// }
+
+function handleWaitForDirectFunding(
+  protocolState: BWaitForDirectFunding,
   sharedData: SharedData,
-  action: DirectFundingAction,
+  action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   if (protocolState.type !== 'BWaitForDirectFunding') {
     return { protocolState, sharedData };
@@ -144,33 +167,40 @@ function handleDirectFundingAction(
   const directFundingState2 = protocolStateWithSharedData.protocolState;
 
   if (isSuccess(directFundingState2)) {
-    protocolState = bWaitForLedgerUpdate0(protocolState);
+    return { protocolState: bWaitForLedgerUpdate0(protocolState), sharedData };
   } else if (isFailure(directFundingState2)) {
-    protocolState = failure();
+    return { protocolState: failure(), sharedData };
   }
-  return { protocolState, sharedData };
-}
 
-function handleWaitForDirectFunding(
-  protocolState: BWaitForDirectFunding,
-  sharedData: SharedData,
-  action: IDFAction,
-): ReturnVal {
   return { protocolState, sharedData };
 }
 
 function handleWaitForLedgerUpdate(
   protocolState: BWaitForLedgerUpdate0,
   sharedData: SharedData,
-  action: IDFAction,
+  action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  return { protocolState, sharedData };
+  const unchangedState = { protocolState, sharedData };
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    return unchangedState;
+  }
+  const newProtocolState = bWaitForPostFundSetup0({
+    ...protocolState,
+  });
+  return { protocolState: newProtocolState, sharedData };
 }
 
-function handleWaitForPostFundSetup(
+export function handleWaitForPostFundSetup(
   protocolState: BWaitForPostFundSetup0,
   sharedData: SharedData,
-  action: IDFAction,
+  action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  return { protocolState, sharedData };
+  const unchangedState = { protocolState, sharedData };
+  if (false) {
+    return unchangedState;
+  }
+  const newProtocolState = success();
+  const newReturnVal = { protocolState: newProtocolState, sharedData };
+  console.log(newReturnVal);
+  return newReturnVal;
 }
