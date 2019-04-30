@@ -24,7 +24,7 @@ import {
   bWaitForLedgerUpdate0,
   bWaitForPostFundSetup0,
 } from './state';
-import { getChannelId, nextSetupCommitment, Commitment } from '../../../../domain';
+import { getChannelId, nextSetupCommitment, nextLedgerUpdateCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from '../../../../redux/channel-store';
@@ -34,7 +34,6 @@ import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/state';
-import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -186,6 +185,7 @@ function handleWaitForLedgerUpdate(
   sharedData = checkResult.store;
 
   const theirCommitment = action.signedCommitment.commitment;
+  // TODO: We need to validate the proposed allocation and destination
   const ledgerId = getChannelId(theirCommitment);
   let channel = getChannel(sharedData, ledgerId);
   if (!channel || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
@@ -197,7 +197,10 @@ function handleWaitForLedgerUpdate(
   // are we happy that we have the ledger update?
   // if so, we need to craft our reply
 
-  const ourCommitment = craftLedgerUpdateResponse(theirCommitment);
+  const ourCommitment = nextLedgerUpdateCommitment(theirCommitment);
+  if (ourCommitment === 'NotAnUpdateCommitment') {
+    throw new Error('Not a ledger update commitment');
+  }
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
     return unchangedState;
@@ -232,17 +235,4 @@ export function handleWaitForPostFundSetup(
   const newProtocolState = success();
   const newReturnVal = { protocolState: newProtocolState, sharedData };
   return newReturnVal;
-}
-
-function craftLedgerUpdateResponse(theirCommitment: Commitment): Commitment {
-  const appAttributes = appAttributesFromBytes(theirCommitment.appAttributes);
-  const updatedAppAttributes = bytesFromAppAttributes({ ...appAttributes, consensusCounter: 0 });
-  return {
-    ...theirCommitment,
-    allocation: appAttributes.proposedAllocation,
-    destination: appAttributes.proposedDestination,
-    appAttributes: updatedAppAttributes,
-    turnNum: theirCommitment.turnNum + 1,
-    commitmentCount: 0,
-  };
 }

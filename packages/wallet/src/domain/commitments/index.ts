@@ -1,6 +1,7 @@
 import { Commitment as C, CommitmentType as CT } from 'fmg-core';
 import { validCommitmentSignature, signCommitment as signCommitmentUtil } from '../signing-utils';
 import { channelID } from 'fmg-core/lib/channel';
+import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 
 export type Commitment = C;
 export const CommitmentType = CT;
@@ -43,6 +44,24 @@ function incrementTurnNum(commitment: Commitment): Commitment {
 
 export function constructConclude(commitment: Commitment): Commitment {
   return { ...incrementTurnNum(commitment), commitmentType: CommitmentType.Conclude };
+}
+
+export function nextLedgerUpdateCommitment(
+  commitment: Commitment,
+): Commitment | 'NotAnUpdateCommitment' {
+  if (commitment.commitmentType !== CommitmentType.App || commitment.turnNum > 4) {
+    return 'NotAnUpdateCommitment';
+  }
+  const appAttributes = appAttributesFromBytes(commitment.appAttributes);
+  const updatedAppAttributes = bytesFromAppAttributes({ ...appAttributes, consensusCounter: 0 });
+  return {
+    ...commitment,
+    allocation: appAttributes.proposedAllocation,
+    destination: appAttributes.proposedDestination,
+    appAttributes: updatedAppAttributes,
+    turnNum: commitment.turnNum + 1,
+    commitmentCount: 0,
+  };
 }
 
 export function nextSetupCommitment(commitment: Commitment): Commitment | 'NotASetupCommitment' {
