@@ -1,4 +1,5 @@
 import { Commitment } from '../domain';
+import { messageRelayRequested } from 'magmo-wallet-client';
 
 export enum Strategy {
   IndirectFunding = 'IndirectFunding',
@@ -31,7 +32,6 @@ export const strategyApproved = (processId: string): StrategyApproved => ({
 });
 
 // CONCLUDING
-
 export const CONCLUDE_CHANNEL = 'WALLET.CONCLUDING.CONCLUDE_CHANNEL';
 export interface ConcludeChannel extends BaseProcessAction {
   type: typeof CONCLUDE_CHANNEL;
@@ -48,3 +48,9 @@ export const concludeChannel = (
   commitment,
   signature,
 });
+
+export type Message = StrategyProposed | StrategyApproved | ConcludeChannel;
+export function sendMessage(to: string, message: Message) {
+  const { processId } = message;
+  return messageRelayRequested(to, { processId, data: message });
+}
