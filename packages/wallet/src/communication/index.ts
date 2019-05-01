@@ -1,9 +1,7 @@
 import { Commitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client';
 
-export enum Strategy {
-  IndirectFunding = 'IndirectFunding',
-}
+export type FundingStrategy = 'IndirectFundingStrategy';
 
 export interface BaseProcessAction {
   processId: string;
@@ -14,9 +12,12 @@ export interface BaseProcessAction {
 export const STRATEGY_PROPOSED = 'WALLET.FUNDING.STRATEGY_PROPOSED';
 export interface StrategyProposed extends BaseProcessAction {
   type: typeof STRATEGY_PROPOSED;
-  strategy: Strategy;
+  strategy: FundingStrategy;
 }
-export const strategyProposed = (processId: string, strategy): StrategyProposed => ({
+export const strategyProposed = (
+  processId: string,
+  strategy: FundingStrategy,
+): StrategyProposed => ({
   type: STRATEGY_PROPOSED,
   processId,
   strategy,
