@@ -29,14 +29,15 @@ describe('happy-path scenario', () => {
     itTransitionsTo(updatedState, 'AWaitForLedgerUpdate1');
     itSendsMessage(updatedState, reply);
   });
-  describe('when in WaitForLedgerUpdate1', () => {
+
+  describe.skip('when in WaitForLedgerUpdate1', () => {
     const { state, action, reply } = scenario.waitForLedgerUpdate1;
     const updatedState = playerAReducer(state.state, state.store, action);
 
     itTransitionsTo(updatedState, 'AWaitForPostFundSetup1');
     itSendsMessage(updatedState, reply);
   });
-  describe('when in WaitForPostFund1', () => {
+  describe.skip('when in WaitForPostFund1', () => {
     const { state, action } = scenario.waitForPostFund1;
     const updatedState = playerAReducer(state.state, state.store, action);
 
