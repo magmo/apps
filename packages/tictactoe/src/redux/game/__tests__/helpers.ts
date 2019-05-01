@@ -16,6 +16,7 @@ export const itIncreasesTurnNumBy = (
   oldState: JointState,
   newState: JointState,
 ) => {
+  // @ts-ignore
   it(`increases the turnNum by ${increase}`, () => {
     if (!('turnNum' in newState.gameState) || !('turnNum' in oldState.gameState)) {
       return fail('turnNum does not exist on one of the states');
@@ -70,6 +71,7 @@ export const itFullySwingsTheBalancesToA = (
   oldState: JointState,
   newState: JointState,
 ) => {
+  // @ts-ignore
   it(`swings the balance by ${String(2 * Number(stake))}`, () => {
     if (!('balances' in newState.gameState) || !('balances' in oldState.gameState)) {
       return fail('balances does not exist on one of the states');
@@ -111,6 +113,7 @@ export const itHalfSwingsTheBalancesToB = (
 };
 
 export const itPreservesOnScreenBalances = (oldState: JointState, newState: JointState) => {
+  // @ts-ignore
   it(`preserves the balances`, () => {
     if (
       !('onScreenBalances' in newState.gameState) ||
