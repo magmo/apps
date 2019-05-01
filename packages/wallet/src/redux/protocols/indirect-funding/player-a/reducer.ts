@@ -10,7 +10,7 @@ import {
   checkAndStore,
   signAndStore,
 } from '../../../state';
-import { IndirectFundingState, failure, aWaitForPostFundSetup1 } from '../state';
+import { IndirectFundingState, failure, success, aWaitForPostFundSetup1 } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { CommitmentType, Commitment, getChannelId } from '../../../../domain';
@@ -83,6 +83,8 @@ export function playerAReducer(
       return handleWaitForDirectFunding(protocolState, sharedData, action);
     case 'AWaitForLedgerUpdate1':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
+    case 'AWaitForPostFundSetup1':
+      return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
       return { protocolState, sharedData };
   }
@@ -274,6 +276,28 @@ function createInitialLedgerUpdateCommitment(
     commitmentType: CommitmentType.App,
     appAttributes: bytesFromAppAttributes(appAttributes),
   };
+}
+
+function handleWaitForPostFundSetup(
+  protocolState: states.AWaitForPostFundSetup1,
+  sharedData: SharedData,
+  action: IDFAction,
+): ReturnVal {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  // are we happy that we have the PostFundSetup?
+  // if so, we can exit to the parent protocol with Success
+
+  const newProtocolState = success();
+
+  return { protocolState: newProtocolState, sharedData };
 }
 
 function createInitialSetupCommitment(allocation: string[], destination: string[]): Commitment {

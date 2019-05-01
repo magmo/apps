@@ -36,7 +36,7 @@ describe('happy-path scenario', () => {
     itTransitionsTo(updatedState, 'AWaitForPostFundSetup1');
     itSendsMessage(updatedState, reply);
   });
-  describe('when in WaitForPostFund0', () => {
+  describe('when in WaitForPostFund1', () => {
     const { state, action } = scenario.waitForPostFund1;
     const updatedState = playerAReducer(state.state, state.store, action);
 
