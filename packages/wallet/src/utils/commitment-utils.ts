@@ -6,6 +6,7 @@ import { Channel } from 'fmg-core';
 import { SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
 import { ChannelState } from '../redux/channel-store';
+import { concludeChannel } from '../communication';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,
@@ -116,14 +117,12 @@ export const composeConcludeCommitment = (channelState: ChannelState) => {
   };
 
   const commitmentSignature = signCommitment(concludeCommitment, channelState.privateKey);
+  const processId = channelState.channelId;
   const sendCommitmentAction = messageRelayRequested(
     channelState.participants[1 - channelState.ourIndex],
     {
-      processId: channelState.channelId,
-      data: {
-        commitment: concludeCommitment,
-        commitmentSignature,
-      },
+      processId,
+      data: concludeChannel(processId, concludeCommitment, commitmentSignature),
     },
   );
   return { concludeCommitment, commitmentSignature, sendCommitmentAction };

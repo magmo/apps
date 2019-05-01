@@ -1,3 +1,5 @@
+import { Commitment } from '../domain';
+
 export enum Strategy {
   IndirectFunding = 'IndirectFunding',
 }
@@ -7,6 +9,7 @@ export interface BaseProcessAction {
   type: string;
 }
 
+// FUNDING
 export const STRATEGY_PROPOSED = 'WALLET.FUNDING.STRATEGY_PROPOSED';
 export interface StrategyProposed extends BaseProcessAction {
   type: typeof STRATEGY_PROPOSED;
@@ -25,4 +28,23 @@ export interface StrategyApproved extends BaseProcessAction {
 export const strategyApproved = (processId: string): StrategyApproved => ({
   type: STRATEGY_APPROVED,
   processId,
+});
+
+// CONCLUDING
+
+export const CONCLUDE_CHANNEL = 'WALLET.CONCLUDING.CONCLUDE_CHANNEL';
+export interface ConcludeChannel extends BaseProcessAction {
+  type: typeof CONCLUDE_CHANNEL;
+  commitment: Commitment;
+  signature: string;
+}
+export const concludeChannel = (
+  processId: string,
+  commitment: Commitment,
+  signature: string,
+): ConcludeChannel => ({
+  type: CONCLUDE_CHANNEL,
+  processId,
+  commitment,
+  signature,
 });
