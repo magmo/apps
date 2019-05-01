@@ -251,8 +251,9 @@ export function handleWaitForPostFundSetup(
     return unchangedState;
   }
   sharedData = signResult.store;
-  const ledgerId = getChannelId(theirCommitment);
-  let channel = getChannel(sharedData, ledgerId);
+  // We expect this to be a application post fund setup
+  const appId = getChannelId(theirCommitment);
+  let channel = getChannel(sharedData, appId);
   if (!channel || channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS) {
     // todo: this could be more robust somehow.
     // Maybe we should generate what we were expecting and compare.
@@ -266,7 +267,7 @@ export function handleWaitForPostFundSetup(
     signResult.signedCommitment.signature,
   );
   sharedData = queueMessage(sharedData, messageRelay);
-  channel = getChannel(sharedData, ledgerId); // refresh channel
+  channel = getChannel(sharedData, appId); // refresh channel
 
   const newProtocolState = success();
   const newReturnVal = { protocolState: newProtocolState, sharedData };
