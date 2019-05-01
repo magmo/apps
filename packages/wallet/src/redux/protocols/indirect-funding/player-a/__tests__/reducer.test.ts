@@ -25,6 +25,7 @@ describe('happy-path scenario', () => {
     const { state, action, reply } = scenario.waitForDirectFunding;
     const updatedState = playerAReducer(state.state, state.store, action);
 
+    // TODO need to check for ledger update commitment being sent
     itTransitionsTo(updatedState, 'AWaitForLedgerUpdate1');
     itSendsMessage(updatedState, reply);
   });

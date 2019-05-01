@@ -10,7 +10,7 @@ import {
   checkAndStore,
   signAndStore,
 } from '../../../state';
-import { IndirectFundingState, failure } from '../state';
+import { IndirectFundingState, failure, aWaitForPostFundSetup1 } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { CommitmentType, Commitment, getChannelId } from '../../../../domain';
@@ -81,6 +81,8 @@ export function playerAReducer(
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
     case 'AWaitForDirectFunding':
       return handleWaitForDirectFunding(protocolState, sharedData, action);
+    case 'AWaitForLedgerUpdate1':
+      return handleWaitForLedgerUpdate(protocolState, sharedData, action);
     default:
       return { protocolState, sharedData };
   }
@@ -179,6 +181,74 @@ function handleWaitForDirectFunding(
   }
 
   return { protocolState, sharedData };
+}
+
+function handleWaitForLedgerUpdate(
+  protocolState: states.AWaitForLedgerUpdate1,
+  sharedData: SharedData,
+  action: IDFAction,
+): ReturnVal {
+  const unchangedState = { protocolState, sharedData };
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  const theirCommitment = action.signedCommitment.commitment;
+  // TODO: We need to validate the proposed allocation and destination
+  const ledgerId = getChannelId(theirCommitment);
+  let channel = getChannel(sharedData.channelStore, ledgerId);
+  if (!channel || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
+    // todo: this could be more robust somehow.
+    // Maybe we should generate what we were expecting and compare.
+    throw new Error('Bad channel');
+  }
+
+  // are we happy that we have the ledger update?
+  // if so, we need to craft a post fund setup for the application channel
+
+  // TODO we need the channel information to be passed down from the parent protocol
+  const nonce = 0;
+  const appChannel: Channel = {
+    nonce,
+    participants: theirCommitment.destination,
+    channelType: '0x0',
+  };
+  const ourCommitment: Commitment = {
+    channel: appChannel,
+    commitmentType: CommitmentType.PostFundSetup,
+    turnNum: 3,
+    commitmentCount: 0,
+    allocation: ['0', '0'],
+    destination: theirCommitment.destination,
+    appAttributes: '',
+  };
+
+  const signResult = signAndStore(sharedData, ourCommitment);
+  if (!signResult.isSuccess) {
+    return unchangedState;
+    // TODO throw error here?
+  }
+  sharedData = signResult.store;
+
+  // just need to put our message in the outbox
+  const messageRelay = createCommitmentMessageRelay(
+    theirAddress(channel),
+    'processId', // TODO don't use dummy values
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  sharedData = queueMessage(sharedData, messageRelay);
+  channel = getChannel(sharedData.channelStore, ledgerId); // refresh channel
+
+  const newProtocolState = aWaitForPostFundSetup1({
+    ...protocolState,
+  });
+  return { protocolState: newProtocolState, sharedData };
 }
 
 function createInitialLedgerUpdateCommitment(
