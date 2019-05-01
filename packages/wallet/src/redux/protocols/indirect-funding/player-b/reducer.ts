@@ -253,7 +253,7 @@ export function handleWaitForPostFundSetup(
   sharedData = signResult.store;
   const ledgerId = getChannelId(theirCommitment);
   let channel = getChannel(sharedData, ledgerId);
-  if (!channel || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
+  if (!channel || channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS) {
     // todo: this could be more robust somehow.
     // Maybe we should generate what we were expecting and compare.
     throw new Error('Bad channel');
