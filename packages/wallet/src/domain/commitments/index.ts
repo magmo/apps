@@ -94,7 +94,7 @@ export function nextSetupCommitment(commitment: Commitment): Commitment | 'NotAS
   if (turnNum < numParticipants) {
     commitmentType = CommitmentType.PreFundSetup;
     commitmentCount = turnNum;
-  } else if (turnNum < 2 * numParticipants - 1) {
+  } else if (turnNum <= 2 * numParticipants - 1) {
     commitmentType = CommitmentType.PostFundSetup;
     commitmentCount = turnNum - numParticipants;
   } else {
