@@ -201,8 +201,11 @@ function handleWaitForLedgerUpdate(
   // if so, we need to craft our reply
 
   const ourCommitment = nextLedgerUpdateCommitment(theirCommitment);
-  if (ourCommitment === 'NotAnUpdateCommitment') {
+  if (ourCommitment === 'InputNotPrecedingAnUpdateCommitment') {
     throw new Error('Not a ledger update commitment');
+  }
+  if (ourCommitment === 'InputNotAProposal') {
+    throw new Error('Input is not a proposal');
   }
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
