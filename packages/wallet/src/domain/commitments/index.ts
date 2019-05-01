@@ -91,7 +91,7 @@ export function nextSetupCommitment(commitment: Commitment): Commitment | 'NotAS
   const numParticipants = commitment.channel.participants.length;
   let commitmentType;
   let commitmentCount;
-  if (turnNum < numParticipants) {
+  if (turnNum <= numParticipants - 1) {
     commitmentType = CommitmentType.PreFundSetup;
     commitmentCount = turnNum;
   } else if (turnNum <= 2 * numParticipants - 1) {
