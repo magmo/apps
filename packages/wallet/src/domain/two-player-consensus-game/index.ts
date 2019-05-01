@@ -1,5 +1,13 @@
 // This is copy-pasted from fmg-nitro-adjudicator
-import { CommitmentType, Uint32, Uint256, Address, Bytes, BaseCommitment } from 'fmg-core';
+import {
+  Commitment,
+  CommitmentType,
+  Uint32,
+  Uint256,
+  Address,
+  Bytes,
+  BaseCommitment,
+} from 'fmg-core';
 import abi from 'web3-eth-abi';
 import { bigNumberify } from 'ethers/utils';
 
@@ -10,6 +18,7 @@ export interface AppAttributes {
 }
 
 interface ConsensusGameBaseCommitment extends BaseCommitment {
+  commitmentType: CommitmentType;
   consensusCounter: Uint32;
   proposedAllocation: Uint256[];
   proposedDestination: Address[];
@@ -19,55 +28,22 @@ interface ConsensusGameBaseCommitment extends BaseCommitment {
 // Interfaces //
 ////////////////
 
-interface PreFundSetupCommitment extends ConsensusGameBaseCommitment {
-  commitmentType: CommitmentType.PreFundSetup;
-  appAttributes: string;
-}
-
-interface PostFundSetupCommitment extends ConsensusGameBaseCommitment {
-  commitmentType: CommitmentType.PostFundSetup;
-  appAttributes: string;
-}
-
 interface ConsensusCommitment extends ConsensusGameBaseCommitment {
-  commitmentType: CommitmentType.App;
-  consensusType: 'Consensus';
-  appAttributes: string;
+  consensusCounter: 0;
 }
 
 interface ProposalCommitment extends ConsensusGameBaseCommitment {
-  commitmentType: CommitmentType.App;
-  consensusType: 'Proposal';
-  appAttributes: string;
+  consensusCounter: 1;
 }
 
 //////////////////
 // Constructors //
 //////////////////
 
-function preFundSetupCommitment(opts: ConsensusGameBaseCommitment): PreFundSetupCommitment {
-  return {
-    ...opts,
-    commitmentType: CommitmentType.PreFundSetup,
-    appAttributes: bytesFromAppAttributes(opts),
-  };
-}
-
-function postFundSetupCommitment(opts: ConsensusGameBaseCommitment): PostFundSetupCommitment {
-  return {
-    ...opts,
-    commitmentType: CommitmentType.PostFundSetup,
-    appAttributes: bytesFromAppAttributes(opts),
-  };
-}
-
 function consensusCommitment(opts: ConsensusGameBaseCommitment): ConsensusCommitment {
   return {
     ...opts,
     consensusCounter: 0,
-    commitmentType: CommitmentType.App,
-    consensusType: 'Consensus',
-    appAttributes: bytesFromAppAttributes(opts),
   };
 }
 
@@ -75,19 +51,12 @@ function proposalCommitment(opts: ConsensusGameBaseCommitment): ProposalCommitme
   return {
     ...opts,
     consensusCounter: 1,
-    commitmentType: CommitmentType.App,
-    consensusType: 'Proposal',
-    appAttributes: bytesFromAppAttributes(opts),
   };
 }
 
-function concludeCommitment(opts: ConsensusGameBaseCommitment) {
-  return {
-    ...opts,
-    commitmentType: CommitmentType.Conclude,
-    appAttributes: bytesFromAppAttributes(opts),
-  };
-}
+/////////////
+// Helpers //
+/////////////
 
 export function appAttributes(
   consensusCommitmentArgs: [string, string[], string[]],
@@ -107,7 +76,7 @@ const SolidityConsensusCommitmentType = {
   },
 };
 
-export function bytesFromAppAttributes(appAttrs: AppAttributes): Bytes {
+export function encodeAppAttributes(appAttrs: AppAttributes): Bytes {
   return abi.encodeParameter(SolidityConsensusCommitmentType, [
     appAttrs.consensusCounter,
     appAttrs.proposedAllocation,
@@ -115,12 +84,57 @@ export function bytesFromAppAttributes(appAttrs: AppAttributes): Bytes {
   ]);
 }
 
-export function appAttributesFromBytes(appAttrs: Bytes): AppAttributes {
+export function decodeAppAttributes(appAttrs: Bytes): AppAttributes {
   return appAttributes(abi.decodeParameter(SolidityConsensusCommitmentType, appAttrs));
 }
 
-type ConsensusGameAppCommitment = ConsensusCommitment | ProposalCommitment;
+export function asCoreCommitment(commitment: ConsensusGameBaseCommitment): Commitment {
+  const {
+    channel,
+    commitmentType,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+    consensusCounter,
+    proposedAllocation,
+    proposedDestination,
+  } = commitment;
 
+  return {
+    channel,
+    commitmentType,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+    appAttributes: encodeAppAttributes({
+      consensusCounter,
+      proposedAllocation,
+      proposedDestination,
+    }),
+  };
+}
+
+export function fromCoreCommitment(commitment: Commitment): ConsensusGameBaseCommitment {
+  const { channel, turnNum, commitmentType, allocation, destination, commitmentCount } = commitment;
+  const { consensusCounter, proposedAllocation, proposedDestination } = decodeAppAttributes(
+    commitment.appAttributes,
+  );
+  return {
+    channel,
+    turnNum,
+    allocation,
+    destination,
+    commitmentCount,
+    commitmentType,
+    consensusCounter,
+    proposedAllocation,
+    proposedDestination,
+  };
+}
+
+// TODO
 // function initialize(channelDetails: ??, initialOutcome: Outcome): Proposal
 
 export function accept(commitment: ProposalCommitment): ConsensusCommitment {
@@ -129,6 +143,7 @@ export function accept(commitment: ProposalCommitment): ConsensusCommitment {
     turnNum: commitment.turnNum + 1,
     allocation: commitment.proposedAllocation,
     destination: commitment.proposedDestination,
+    // TODO should proposedAllocation be conserved, or reset?
   });
 }
 
@@ -157,14 +172,28 @@ export function propose(
 }
 
 export function isConsensus(
-  commitment: ConsensusGameAppCommitment,
+  commitment: ConsensusGameBaseCommitment,
 ): commitment is ConsensusCommitment {
-  return commitment.consensusType === 'Consensus';
+  return commitment.consensusCounter === 0;
 }
 export function isProposal(
-  commitment: ConsensusGameAppCommitment,
+  commitment: ConsensusGameBaseCommitment,
 ): commitment is ProposalCommitment {
-  return commitment.consensusType === 'Proposal';
+  return commitment.consensusCounter === 1;
 }
 
-// how to encode app attributes?
+export function nextLedgerUpdateCommitment(
+  coreCommitment: Commitment,
+): Commitment | 'InputNotPrecedingAnUpdateCommitment' | 'InputNotAProposal' {
+  const commitment = fromCoreCommitment(coreCommitment);
+  const turnNum = commitment.turnNum + 1;
+  if (coreCommitment.commitmentType !== CommitmentType.App || turnNum <= 4) {
+    return 'InputNotPrecedingAnUpdateCommitment';
+  }
+  if (isProposal(commitment)) {
+    // TODO reject instead (if some checks on the proposal do not pass)
+    return asCoreCommitment(accept(commitment));
+  } else {
+    return 'InputNotAProposal';
+  }
+}

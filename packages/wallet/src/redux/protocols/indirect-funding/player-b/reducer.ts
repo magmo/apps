@@ -24,7 +24,8 @@ import {
   bWaitForLedgerUpdate0,
   bWaitForPostFundSetup0,
 } from './state';
-import { getChannelId, nextSetupCommitment, nextLedgerUpdateCommitment } from '../../../../domain';
+import { getChannelId, nextSetupCommitment } from '../../../../domain';
+import { nextLedgerUpdateCommitment } from '../../../../domain/two-player-consensus-game';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from '../../../../redux/channel-store';
