@@ -8,17 +8,17 @@ import { OutboxState } from '../state';
 const { mockTransactionOutboxItem } = scenarios;
 
 describe('when a side effect occured', () => {
-  const sendFundingDeclinedActionA = outgoing.messageRelayRequested('0xa00', {
+  const sendMessageA = outgoing.messageRelayRequested('0xa00', {
     processId: '0x0',
-    data: 'FundingDeclined',
+    data: 'SomeMessage',
   });
-  const sendFundingDeclinedActionB = outgoing.messageRelayRequested('0xb00', {
+  const sendMessageB = outgoing.messageRelayRequested('0xb00', {
     processId: '0x0',
-    data: 'FundingDeclined',
+    data: 'SomeMessage',
   });
   const displayOutbox = [outgoing.hideWallet(), outgoing.showWallet()];
   const transactionOutbox = [mockTransactionOutboxItem, mockTransactionOutboxItem];
-  const messageOutbox = [sendFundingDeclinedActionA, sendFundingDeclinedActionB];
+  const messageOutbox = [sendMessageA, sendMessageB];
   const state: OutboxState = {
     displayOutbox,
     transactionOutbox,
