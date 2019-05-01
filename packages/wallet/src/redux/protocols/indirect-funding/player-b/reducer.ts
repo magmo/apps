@@ -152,22 +152,23 @@ function handleWaitForDirectFunding(
     return { protocolState, sharedData };
   }
 
-  const directFundingState1 = protocolState.directFundingState;
+  const existingDirectFundingState = protocolState.directFundingState;
   const protocolStateWithSharedData = directFundingStateReducer(
-    directFundingState1,
+    existingDirectFundingState,
     sharedData,
     action,
   );
-  const directFundingState2 = protocolStateWithSharedData.protocolState;
-  // TODO: We need to update the direct funding state on our protocol state
-  // Otherwise we'll never progress from the initial direct funding state.
-  if (isSuccess(directFundingState2)) {
-    return { protocolState: bWaitForLedgerUpdate0(protocolState), sharedData };
-  } else if (isFailure(directFundingState2)) {
+  // Update direct funding state on our protocol state
+  const newDirectFundingState = protocolStateWithSharedData.protocolState;
+  const newProtocolState = { ...protocolState, directFundingState: newDirectFundingState };
+
+  if (isSuccess(newDirectFundingState)) {
+    return { protocolState: bWaitForLedgerUpdate0(newProtocolState), sharedData };
+  } else if (isFailure(newDirectFundingState)) {
     return { protocolState: failure(), sharedData };
   }
 
-  return { protocolState, sharedData };
+  return { protocolState: newProtocolState, sharedData };
 }
 
 function handleWaitForLedgerUpdate(
