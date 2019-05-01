@@ -5,7 +5,7 @@ import { signCommitment } from '../domain';
 import { Channel } from 'fmg-core';
 import { SignedCommitment } from '../domain';
 import { ChannelState } from '../redux/channel-store';
-import { concludeChannel, sendMessage } from '../communication';
+import { sendConcludeChannel } from '../communication';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,
@@ -115,11 +115,13 @@ export const composeConcludeCommitment = (channelState: ChannelState) => {
     commitmentCount,
   };
 
-  const commitmentSignature = signCommitment(concludeCommitment, channelState.privateKey);
+  const signature = signCommitment(concludeCommitment, channelState.privateKey);
   const processId = channelState.channelId;
-  const sendCommitmentAction = sendMessage(
+  const sendCommitmentAction = sendConcludeChannel(
     channelState.participants[1 - channelState.ourIndex],
-    concludeChannel(processId, concludeCommitment, commitmentSignature),
+    processId,
+    concludeCommitment,
+    signature,
   );
-  return { concludeCommitment, commitmentSignature, sendCommitmentAction };
+  return { concludeCommitment, signature, sendCommitmentAction };
 };

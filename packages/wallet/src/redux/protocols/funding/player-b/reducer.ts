@@ -11,7 +11,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { PlayerIndex } from '../../../types';
 import { showWallet } from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
-import { sendMessage } from '../../../../communication';
+import { sendStrategyApproved } from '../../../../communication';
 
 type EmbeddedAction = IndirectFundingAction;
 
@@ -86,8 +86,7 @@ function strategyApproved(
   }
 
   const { processId, opponentAddress } = state;
-  const { strategy } = action;
-  const message = sendMessage(opponentAddress, actions.strategyApproved(processId, strategy));
+  const message = sendStrategyApproved(opponentAddress, processId);
 
   return {
     protocolState: states.waitForFunding({ ...state, fundingState: 'funding state' }),

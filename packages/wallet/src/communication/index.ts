@@ -51,7 +51,19 @@ export const concludeChannel = (
 });
 
 export type Message = StrategyProposed | StrategyApproved | ConcludeChannel;
-export function sendMessage(to: string, message: Message) {
+function sendMessage(to: string, message: Message) {
   const { processId } = message;
   return messageRelayRequested(to, { processId, data: message });
+}
+
+export function sendStrategyProposed(to: string, processId: string, strategy: FundingStrategy) {
+  return sendMessage(to, strategyProposed(processId, strategy));
+}
+
+export function sendStrategyApproved(to: string, processId: string) {
+  return sendMessage(to, strategyApproved(processId));
+}
+
+export function sendConcludeChannel(to: string, processId, commitment, signature) {
+  return sendMessage(to, concludeChannel(processId, commitment, signature));
 }
