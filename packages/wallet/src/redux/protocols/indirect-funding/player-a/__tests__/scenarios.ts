@@ -11,9 +11,10 @@ import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 
 import {
   preSuccessStateB,
-  successTriggerB,
   preFailureState,
   failureTrigger,
+  successTriggerA,
+  preSuccessStateA,
 } from '../../../direct-funding/__tests__';
 import {
   appCommitment,
@@ -44,6 +45,7 @@ const app3 = appCommitment({ turnNum: 3, balances: twoThree });
 
 const ledger0 = ledgerCommitment({ turnNum: 0, balances: twoThree });
 const ledger1 = ledgerCommitment({ turnNum: 1, balances: twoThree });
+const ledger2 = ledgerCommitment({ turnNum: 2, balances: twoThree });
 const ledger3 = ledgerCommitment({ turnNum: 3, balances: twoThree });
 const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
@@ -63,10 +65,10 @@ const waitForPreFundL1 = {
   ]),
 };
 const waitForDirectFunding = {
-  state: aWaitForDirectFunding({ ...props, directFundingState: preSuccessStateB.protocolState }), //
+  state: aWaitForDirectFunding({ ...props, directFundingState: preSuccessStateA.protocolState }), //
   store: setChannels(preSuccessStateB.sharedData, [
-    channelFromCommitments(app0, app1, asAddress, asPrivateKey),
-    channelFromCommitments(ledger0, ledger1, asAddress, asPrivateKey),
+    channelFromCommitments(app1, app2, asAddress, asPrivateKey),
+    channelFromCommitments(ledger2, ledger3, asAddress, asPrivateKey),
   ]),
 };
 const waitForLedgerUpdate1 = {
@@ -102,7 +104,7 @@ const postFund1Received = globalActions.commitmentReceived(processId, app3);
 export const happyPath = {
   initialParams: { store: waitForPreFundL1.store, channelId, reply: ledger0 },
   waitForPreFundL1: { state: waitForPreFundL1, action: preFundL1Received },
-  waitForDirectFunding: { state: waitForDirectFunding, action: successTriggerB, reply: ledger4 },
+  waitForDirectFunding: { state: waitForDirectFunding, action: successTriggerA, reply: ledger4 },
   waitForLedgerUpdate1: {
     state: waitForLedgerUpdate1,
     action: ledgerUpdate1Received,

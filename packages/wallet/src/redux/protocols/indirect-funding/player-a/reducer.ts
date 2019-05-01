@@ -8,8 +8,9 @@ import {
   getAddressAndPrivateKey,
   queueMessage,
   checkAndStore,
+  signAndStore,
 } from '../../../state';
-import { IndirectFundingState } from '../state';
+import { IndirectFundingState, failure } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { CommitmentType, Commitment, getChannelId } from '../../../../domain';
@@ -19,7 +20,14 @@ import { getChannel, theirAddress } from '../../../channel-store';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingRequested } from '../../direct-funding/actions';
-import { initialDirectFundingState } from '../../direct-funding/state';
+import {
+  initialDirectFundingState,
+  isSuccess,
+  isFailure,
+  isTerminal,
+} from '../../direct-funding/state';
+import { directFundingStateReducer } from '../../direct-funding/reducer';
+import { addHex } from '../../../../utils/hex-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -71,6 +79,8 @@ export function playerAReducer(
   switch (protocolState.type) {
     case 'AWaitForPreFundSetup1':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
+    case 'AWaitForDirectFunding':
+      return handleWaitForDirectFunding(protocolState, sharedData, action);
     default:
       return { protocolState, sharedData };
   }
@@ -120,6 +130,82 @@ function handleWaitForPreFundSetup(
   return { protocolState: newProtocolState, sharedData };
 }
 
+function handleWaitForDirectFunding(
+  protocolState: states.AWaitForDirectFunding,
+  sharedData: SharedData,
+  action: IDFAction | DirectFundingAction,
+): ReturnVal {
+  const existingDirectFundingState = protocolState.directFundingState;
+  const protocolStateWithSharedData = directFundingStateReducer(
+    existingDirectFundingState,
+    sharedData,
+    action,
+  );
+  const newDirectFundingState = protocolStateWithSharedData.protocolState;
+  const newProtocolState = { ...protocolState, directFundingState: newDirectFundingState };
+  sharedData = protocolStateWithSharedData.sharedData;
+
+  if (!isTerminal(newDirectFundingState)) {
+    return { protocolState: newProtocolState, sharedData };
+  }
+  if (isFailure(newDirectFundingState)) {
+    return { protocolState: failure(), sharedData };
+  }
+  if (isSuccess(newDirectFundingState)) {
+    const channel = getChannel(sharedData.channelStore, newProtocolState.ledgerId);
+    if (!channel) {
+      throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
+    }
+    const ourCommitment = createInitialLedgerUpdateCommitment(
+      protocolState.channelId,
+      channel.lastCommitment.commitment,
+    );
+
+    const signResult = signAndStore(sharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      return { protocolState: newProtocolState, sharedData };
+    }
+    sharedData = signResult.store;
+
+    const messageRelay = createCommitmentMessageRelay(
+      theirAddress(channel),
+      'processId', // TODO don't use dummy values
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
+    );
+    sharedData = queueMessage(sharedData, messageRelay);
+
+    return { protocolState: states.aWaitForLedgerUpdate1(protocolState), sharedData };
+  }
+
+  return { protocolState, sharedData };
+}
+
+function createInitialLedgerUpdateCommitment(
+  channelIdToFund: string,
+  commitment: Commitment,
+): Commitment {
+  const numParticipants = commitment.channel.participants.length;
+  const turnNum = commitment.turnNum + 1;
+  const expectedTurnNum = numParticipants * 2;
+  if (turnNum !== expectedTurnNum) {
+    throw new Error(`Expected a turn number ${expectedTurnNum} received ${turnNum}`);
+  }
+  const total = commitment.allocation.reduce(addHex);
+  const appAttributes = {
+    proposedAllocation: [total],
+    proposedDestination: [channelIdToFund],
+    consensusCounter: 1,
+  };
+  return {
+    ...commitment,
+    turnNum,
+    commitmentCount: 0,
+    commitmentType: CommitmentType.App,
+    appAttributes: bytesFromAppAttributes(appAttributes),
+  };
+}
+
 function createInitialSetupCommitment(allocation: string[], destination: string[]): Commitment {
   const appAttributes = {
     proposedAllocation: allocation,
@@ -128,7 +214,6 @@ function createInitialSetupCommitment(allocation: string[], destination: string[
   };
   // TODO: We'll run into collisions if we reuse the same nonce
   const nonce = 0;
-  console.log(nonce);
   const channel: Channel = {
     nonce,
     participants: destination,
