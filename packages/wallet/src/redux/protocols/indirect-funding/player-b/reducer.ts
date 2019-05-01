@@ -4,7 +4,15 @@ import { PlayerBState } from '../state';
 import * as actions from '../../../actions';
 
 import { ProtocolStateWithSharedData } from '../../';
-import { SharedData, checkAndStore, getChannel, signAndStore, queueMessage } from '../../../state';
+import {
+  SharedData,
+  checkAndStore,
+  getChannel,
+  signAndStore,
+  queueMessage,
+  checkAndInitialize,
+  getAddressAndPrivateKey,
+} from '../../../state';
 import { IndirectFundingState, failure, success } from '../state';
 import { unreachable } from '../../../../utils/reducer-utils';
 import {
@@ -16,7 +24,7 @@ import {
   bWaitForLedgerUpdate0,
   bWaitForPostFundSetup0,
 } from './state';
-import { getChannelId, nextSetupCommitment } from '../../../../domain';
+import { getChannelId, nextSetupCommitment, nextLedgerUpdateCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from '../../../../redux/channel-store';
@@ -63,8 +71,19 @@ function handleWaitForPreFundSetup(
   if (action.type !== actions.COMMITMENT_RECEIVED) {
     throw new Error('Incorrect action');
   }
+  const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, protocolState.channelId);
+  if (!addressAndPrivateKey) {
+    throw new Error(
+      `Could not find address and private key for existing channel ${protocolState.channelId}`,
+    );
+  }
 
-  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  const checkResult = checkAndInitialize(
+    sharedData,
+    action.signedCommitment,
+    addressAndPrivateKey.address,
+    addressAndPrivateKey.privateKey,
+  );
   if (!checkResult.isSuccess) {
     throw new Error('Indirect funding protocol, unable to validate or store commitment');
   }
@@ -133,21 +152,23 @@ function handleWaitForDirectFunding(
     return { protocolState, sharedData };
   }
 
-  const directFundingState1 = protocolState.directFundingState;
+  const existingDirectFundingState = protocolState.directFundingState;
   const protocolStateWithSharedData = directFundingStateReducer(
-    directFundingState1,
+    existingDirectFundingState,
     sharedData,
     action,
   );
-  const directFundingState2 = protocolStateWithSharedData.protocolState;
+  // Update direct funding state on our protocol state
+  const newDirectFundingState = protocolStateWithSharedData.protocolState;
+  const newProtocolState = { ...protocolState, directFundingState: newDirectFundingState };
 
-  if (isSuccess(directFundingState2)) {
-    return { protocolState: bWaitForLedgerUpdate0(protocolState), sharedData };
-  } else if (isFailure(directFundingState2)) {
+  if (isSuccess(newDirectFundingState)) {
+    return { protocolState: bWaitForLedgerUpdate0(newProtocolState), sharedData };
+  } else if (isFailure(newDirectFundingState)) {
     return { protocolState: failure(), sharedData };
   }
 
-  return { protocolState, sharedData };
+  return { protocolState: newProtocolState, sharedData };
 }
 
 function handleWaitForLedgerUpdate(
@@ -166,9 +187,10 @@ function handleWaitForLedgerUpdate(
   sharedData = checkResult.store;
 
   const theirCommitment = action.signedCommitment.commitment;
+  // TODO: We need to validate the proposed allocation and destination
   const ledgerId = getChannelId(theirCommitment);
   let channel = getChannel(sharedData, ledgerId);
-  if (!channel || channel.turnNum !== 0 || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
+  if (!channel || channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
     // todo: this could be more robust somehow.
     // Maybe we should generate what we were expecting and compare.
     throw new Error('Bad channel');
@@ -177,11 +199,10 @@ function handleWaitForLedgerUpdate(
   // are we happy that we have the ledger update?
   // if so, we need to craft our reply
 
-  const ourCommitment = {
-    ...theirCommitment,
-    turnNum: theirCommitment.turnNum + 1,
-    commitmentCount: theirCommitment.commitmentCount + 1,
-  };
+  const ourCommitment = nextLedgerUpdateCommitment(theirCommitment);
+  if (ourCommitment === 'NotAnUpdateCommitment') {
+    throw new Error('Not a ledger update commitment');
+  }
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
     return unchangedState;
@@ -209,10 +230,46 @@ export function handleWaitForPostFundSetup(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
+  // TODO: There is a lot of repetitive code here
+  // We should probably refactor and clean this up
   const unchangedState = { protocolState, sharedData };
-  if (false) {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  const theirCommitment = action.signedCommitment.commitment;
+  const ourCommitment = nextSetupCommitment(theirCommitment);
+  if (ourCommitment === 'NotASetupCommitment') {
+    throw new Error('Not a Setup commitment');
+  }
+  const signResult = signAndStore(sharedData, ourCommitment);
+  if (!signResult.isSuccess) {
     return unchangedState;
   }
+  sharedData = signResult.store;
+  // We expect this to be a application post fund setup
+  const appId = getChannelId(theirCommitment);
+  let channel = getChannel(sharedData, appId);
+  if (!channel || channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS) {
+    // todo: this could be more robust somehow.
+    // Maybe we should generate what we were expecting and compare.
+    throw new Error('Bad channel');
+  }
+  // just need to put our message in the outbox
+  const messageRelay = createCommitmentMessageRelay(
+    theirAddress(channel),
+    'processId', // TODO don't use dummy values
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  sharedData = queueMessage(sharedData, messageRelay);
+  channel = getChannel(sharedData, appId); // refresh channel
+
   const newProtocolState = success();
   const newReturnVal = { protocolState: newProtocolState, sharedData };
   return newReturnVal;
