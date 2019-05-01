@@ -4,8 +4,12 @@
   },
   "name": "apps",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "test:ci": "test:ci",
     "build": "build"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
