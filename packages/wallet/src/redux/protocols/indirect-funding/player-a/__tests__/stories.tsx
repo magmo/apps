@@ -31,7 +31,6 @@ addStories(scenarios.ledgerFundingFails, 'Indirect Funding / Player A / Ledger f
 function addStories(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {
-      console.log(scenario[key]);
       storiesOf(chapter, module).add(
         key,
         render(<IndirectFunding state={scenario[key].state.state} />),
