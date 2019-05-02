@@ -6,6 +6,7 @@ import { Funding } from '..';
 import { fakeStore } from '../../../../../__stories__/index';
 import StatusBarLayout from '../../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
+import { isTerminal } from '../states';
 
 const render = container => () => {
   // todo: rework this modal stuff
@@ -30,6 +31,8 @@ addStories(scenarios.cancelledByOpponent, 'Funding / Player B / Cancelled by opp
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {
-    storiesOf(chapter, module).add(key, render(<Funding state={scenario.states[key]} />));
+    if (!isTerminal(scenario.states[key])) {
+      storiesOf(chapter, module).add(key, render(<Funding state={scenario.states[key]} />));
+    }
   });
 }
