@@ -1,5 +1,5 @@
 import { put } from 'redux-saga/effects';
-import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
+import { walletInstructions as incoming } from 'magmo-wallet-client';
 
 import { messageListener } from '../message-listener';
 import * as actions from '../../actions';
