@@ -23,10 +23,10 @@ const render = container => () => {
   );
 };
 
-addStories(scenarios.happyPath, 'Funding / Happy path');
-addStories(scenarios.rejectedStrategy, 'Funding / Rejected strategy');
-addStories(scenarios.cancelledByUser, 'Funding / Cancelled by user');
-addStories(scenarios.cancelledByOpponent, 'Funding / Cancelled by opponent');
+addStories(scenarios.happyPath, 'Funding / Player A / Happy path');
+addStories(scenarios.rejectedStrategy, 'Funding / Player A / Rejected strategy');
+addStories(scenarios.cancelledByUser, 'Funding / Player A / Cancelled by user');
+addStories(scenarios.cancelledByOpponent, 'Funding / Player A / Cancelled by opponent');
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {
