@@ -1,6 +1,6 @@
-# Concluding Protocol (Instigator)
+# Concluding Protocol
 
-The purpose of this protocol is to instigate conclusion of a channel, i.e. to move to a conclude state.
+The purpose of this protocol is to resign a channel, i.e. to move to a conclude state.
 It covers:
 
 - Checking to see if it is the player's turn and explaining they can't resign if not
