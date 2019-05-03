@@ -1,29 +1,29 @@
 import React from 'react';
 import { Checklist, MessagesForStep, messagesForStep } from '../../../../../components/checklist';
 import { unreachable } from '../../../../../utils/reducer-utils';
-import { PlayerAState } from '../state';
+import { PlayerBState } from '../state';
 
 interface Props {
-  indirectFundingStateA: PlayerAState;
+  indirectFundingStateB: PlayerBState;
 }
 
 export enum Step {
-  AWaitForPreFundSetup1,
-  AWaitForDirectFunding,
-  AWaitForLedgerUpdate1,
-  AWaitForPostFundSetup1,
+  BWaitForPreFundSetup1,
+  BWaitForDirectFunding,
+  BWaitForLedgerUpdate1,
+  BWaitForPostFundSetup1,
 }
 
-const fundingStepByState = (state: PlayerAState): Step => {
+const fundingStepByState = (state: PlayerBState): Step => {
   switch (state.type) {
-    case 'AWaitForPreFundSetup1':
-      return Step.AWaitForPreFundSetup1;
-    case 'AWaitForDirectFunding':
-      return Step.AWaitForDirectFunding;
-    case 'AWaitForLedgerUpdate1':
-      return Step.AWaitForLedgerUpdate1;
-    case 'AWaitForPostFundSetup1':
-      return Step.AWaitForPostFundSetup1;
+    case 'BWaitForPreFundSetup0':
+      return Step.BWaitForPreFundSetup1;
+    case 'BWaitForDirectFunding':
+      return Step.BWaitForDirectFunding;
+    case 'BWaitForLedgerUpdate0':
+      return Step.BWaitForLedgerUpdate1;
+    case 'BWaitForPostFundSetup0':
+      return Step.BWaitForPostFundSetup1;
     default:
       return unreachable(state);
   }
@@ -32,7 +32,7 @@ const fundingStepByState = (state: PlayerAState): Step => {
 const messagesForStepList: MessagesForStep[] = [
   messagesForStep(
     'Open a ledger channel', // UNUSED
-    'Waiting for opponent confirmation...',
+    'Waiting for opponent...',
     'Ledger channel opened',
   ),
   messagesForStep(
@@ -42,7 +42,7 @@ const messagesForStepList: MessagesForStep[] = [
   ),
   messagesForStep(
     'Fund application from ledger channel',
-    'Waiting for opponent to confirm...',
+    'Waiting for opponent...',
     'Application channel funded',
   ),
   messagesForStep(
@@ -54,7 +54,7 @@ const messagesForStepList: MessagesForStep[] = [
 
 export class FundingStep extends React.PureComponent<Props> {
   render() {
-    const fundingState = this.props.indirectFundingStateA;
+    const fundingState = this.props.indirectFundingStateB;
     const currentStep = fundingStepByState(fundingState);
 
     return (
