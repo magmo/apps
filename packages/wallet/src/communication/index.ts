@@ -1,5 +1,6 @@
 import { Commitment, SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client';
+import { WalletAction } from '../redux/actions';
 
 export type FundingStrategy = 'IndirectFundingStrategy';
 
@@ -64,6 +65,15 @@ export type RelayableAction =
   | StrategyApproved
   | ConcludeChannel
   | CommitmentReceived;
+
+export function isRelayableAction(action: WalletAction): action is RelayableAction {
+  return (
+    action.type === STRATEGY_PROPOSED ||
+    action.type === STRATEGY_APPROVED ||
+    action.type === CONCLUDE_CHANNEL ||
+    action.type === COMMITMENT_RECEIVED
+  );
+}
 
 function sendMessage(to: string, message: RelayableAction) {
   const { processId } = message;
