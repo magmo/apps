@@ -85,7 +85,7 @@ export const sendCommitmentReceived = (
 ) => {
   const payload = {
     processId,
-    data: { commitment, signature, processId },
+    data: commitmentReceived(processId, { commitment, signature }),
   };
   return messageRelayRequested(to, payload);
 };
