@@ -67,3 +67,16 @@ export function sendStrategyApproved(to: string, processId: string) {
 export function sendConcludeChannel(to: string, processId, commitment, signature) {
   return sendMessage(to, concludeChannel(processId, commitment, signature));
 }
+
+export const createCommitmentMessageRelay = (
+  to: string,
+  processId: string,
+  commitment: Commitment,
+  signature: string,
+) => {
+  const payload = {
+    processId,
+    data: { commitment, signature, processId },
+  };
+  return messageRelayRequested(to, payload);
+};

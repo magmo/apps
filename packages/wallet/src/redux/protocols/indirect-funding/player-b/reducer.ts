@@ -26,7 +26,6 @@ import {
 } from './state';
 import { getChannelId, nextSetupCommitment, nextLedgerUpdateCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from '../../../../redux/channel-store';
 import { initialDirectFundingState } from '../../direct-funding/state';
 
@@ -34,6 +33,7 @@ import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/state';
+import { createCommitmentMessageRelay } from '../../../../communication';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
