@@ -67,7 +67,7 @@ const expectSideEffect = (
 
 export const expectThisCommitmentSent = (state: SideEffectState, c: Partial<Commitment>) => {
   expectSideEffect('messageOutbox', state, item =>
-    expect(item.messagePayload.data.commitment).toMatchObject(c),
+    expect(item.messagePayload.data.signedCommitment.commitment).toMatchObject(c),
   );
 };
 
