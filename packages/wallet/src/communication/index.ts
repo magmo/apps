@@ -59,9 +59,13 @@ export const commitmentReceived = (processId: string, signedCommitment: SignedCo
 });
 export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
 
-export type Message = StrategyProposed | StrategyApproved | ConcludeChannel | CommitmentReceived;
+export type RelayableAction =
+  | StrategyProposed
+  | StrategyApproved
+  | ConcludeChannel
+  | CommitmentReceived;
 
-function sendMessage(to: string, message: Message) {
+function sendMessage(to: string, message: RelayableAction) {
   const { processId } = message;
   return messageRelayRequested(to, { processId, data: message });
 }
