@@ -1,17 +1,17 @@
-# Concluding Protocol
+# Concluding Protocol (Responder)
 
-The purpose of this protocol is to resign a channel, i.e. to move to a conclude state.
+The purpose of this protocol is to respond to the instigation of a concluding a channel, i.e. your opponent's move to a conclude state.
+
 It covers:
 
-- Checking to see if it is the player's turn and explaining they can't resign if not
+- Assume a conclude commitment has already been received and a higher level process has then triggered this protocol
 - Asking user to confirm the resignation (probably displaying the current outcome)
 - Formulating the conclude state and sending to the opponent
-- Waiting for a conclude from the opponent
 - Acknowledge channel concluded (giving the option to defund)
 
 Out of scope (for the time being):
 
-- Giving the option to launch a challenge if the conclude doesn't arrive
+- Allowing responder to not conclude
 - Allowing the user to not choose to not defund
 
 ## State machine
@@ -27,9 +27,8 @@ graph TD
   MT  --> |Yes| CC(ApproveConcluding)
   MT  --> |No| AF(AcknowledgeFailure)
   CC  --> |CONCLUDING.CANCELLED| F
-  CC  --> |CONCLUDE.SENT| WOC(WaitForOpponentConclude)
-  WOC --> |CONCLUDE.RECEIVED| ACR(AcknowledgeConcludeReceived)
-  ACR --> |DEFUND.CHOSEN| D(WaitForDefund)
+  CC  --> |CONCLUDE.SENT| DD(DecideDefund)
+  DD --> |DEFUND.CHOSEN| D(WaitForDefund)
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   AS -->  |ACKNOWLEDGED| SS((Success))
   D   --> |defunding protocol failed| AF(AcknowledgeFailure)
@@ -41,31 +40,11 @@ graph TD
   style D stroke:#333,stroke-width:4px
 ```
 
-Key:
-
-```mermaid
-  graph TD
-  St((Start))-->L
-  L{Flow Logic} --> NT1(Non-Terminal States)
-  NT1 -->|ACTION| C
-  C(Call child reducer) -->|child return status| NT2
-  NT2(More Non-Terminal States) --> |SUCCESS_TRIGGER| Su
-  Su((Success))
-  NT2(More Non-Terminal States) --> |FAILURE_TRIGGER| F
-  F((Failure))
-
-  style St  fill:#efdd20
-  style L fill:#efdd20
-  style C stroke:#333,stroke-width:4px
-  style Su fill:#58ef21
-  style F  fill:#f45941
-```
-
 ## Scenarios
 
 We will use the following scenarios for testing:
 
-1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `Success`
+1. **Happy path**: `ApproveConcluding` -> `DecideDefund` -> `WaitForDefund` -> `AcknowledgeSuccess` -> `Success`
 2. **Channel doesnt exist** `AcknowledgeFailure` -> `Failure`
 3. **Concluding not possible**: `AcknowledgeFailure` -> `Failure`
 4. **Concluding cancelled** `ApproveConcluding` -> `Failure`

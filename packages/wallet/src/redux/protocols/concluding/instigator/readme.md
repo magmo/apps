@@ -41,31 +41,11 @@ graph TD
   style D stroke:#333,stroke-width:4px
 ```
 
-Key:
-
-```mermaid
-  graph TD
-  St((Start))-->L
-  L{Flow Logic} --> NT1(Non-Terminal States)
-  NT1 -->|ACTION| C
-  C(Call child reducer) -->|child return status| NT2
-  NT2(More Non-Terminal States) --> |SUCCESS_TRIGGER| Su
-  Su((Success))
-  NT2(More Non-Terminal States) --> |FAILURE_TRIGGER| F
-  F((Failure))
-
-  style St  fill:#efdd20
-  style L fill:#efdd20
-  style C stroke:#333,stroke-width:4px
-  style Su fill:#58ef21
-  style F  fill:#f45941
-```
-
 ## Scenarios
 
 We will use the following scenarios for testing:
 
-1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `Success`
+1. **Happy path**: `ApproveConcluding` -> `WaitForOpponentConclude` -> `AcknowledgeChannelConcluded` -> `WaitForDefund` -> `AcknowledgeSuccess` -> `Success`
 2. **Channel doesnt exist** `AcknowledgeFailure` -> `Failure`
 3. **Concluding not possible**: `AcknowledgeFailure` -> `Failure`
 4. **Concluding cancelled** `ApproveConcluding` -> `Failure`
