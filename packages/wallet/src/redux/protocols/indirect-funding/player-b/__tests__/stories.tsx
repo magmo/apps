@@ -2,11 +2,10 @@ import { storiesOf } from '@storybook/react';
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
-import { Funding } from '..';
+import { IndirectFunding } from '..';
 import { fakeStore } from '../../../../../__stories__/index';
 import StatusBarLayout from '../../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
-import { isTerminal } from '../states';
 
 const render = container => () => {
   // todo: rework this modal stuff
@@ -24,15 +23,18 @@ const render = container => () => {
   );
 };
 
-addStories(scenarios.happyPath, 'Funding / Player A / Happy path');
-addStories(scenarios.rejectedStrategy, 'Funding / Player A / Rejected strategy');
-addStories(scenarios.cancelledByUser, 'Funding / Player A / Cancelled by user');
-addStories(scenarios.cancelledByOpponent, 'Funding / Player A / Cancelled by opponent');
+// Convention is to add all scenarios here, and allow the
+// addStories function to govern what ends up being shown.
+addStories(scenarios.happyPath, 'Indirect Funding / Player B / Happy Path');
+addStories(scenarios.ledgerFundingFails, 'Indirect Funding / Player B / Ledger funding fails');
 
 function addStories(scenario, chapter) {
-  Object.keys(scenario.states).forEach(key => {
-    if (!isTerminal(scenario.states[key])) {
-      storiesOf(chapter, module).add(key, render(<Funding state={scenario.states[key]} />));
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      storiesOf(chapter, module).add(
+        key,
+        render(<IndirectFunding state={scenario[key].state.state} />),
+      );
     }
   });
 }
