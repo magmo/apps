@@ -1,5 +1,5 @@
 import { messageRelayRequested } from 'magmo-wallet-client';
-import { strategyProposed, strategyApproved } from '../';
+import { strategyProposed, strategyApproved } from '..';
 
 export const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
 export const bsAddress = '0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb';
