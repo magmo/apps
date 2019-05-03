@@ -2,13 +2,13 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { NonTerminalState as NonTerminalConcludingState } from './states';
-import { unreachable } from '../../../utils/reducer-utils';
+import { unreachable } from '../../../../utils/reducer-utils';
 import ApproveConcluding from './components/approve-concluding';
 import ApproveDefunding from './components/approve-defunding';
 import WaitForOpponentConclude from './components/wait-for-opponent-conclude';
 import WaitForDefunding from './components/wait-for-defunding';
 import * as actions from './actions';
-import Acknowledge from '../shared-components/acknowledge';
+import Acknowledge from '../../shared-components/acknowledge';
 
 interface Props {
   state: NonTerminalConcludingState;

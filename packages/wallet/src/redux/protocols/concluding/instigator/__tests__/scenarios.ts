@@ -4,18 +4,18 @@ import {
   preFailureState,
   successTrigger,
   failureTrigger,
-} from '../../defunding/__tests__';
+} from '../../../defunding/__tests__';
 import * as actions from '../actions';
-import * as channelScenarios from '../../../__tests__/test-scenarios';
+import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import { CommitmentType, Commitment } from 'fmg-core';
 
 // -----------------
 // Channel Scenarios
 // -----------------
 const { channelId, asAddress: address, asPrivateKey: privateKey } = channelScenarios;
-import { ChannelState } from '../../../channel-store';
-import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { ChannelState } from '../../../../channel-store';
+import { setChannel, EMPTY_SHARED_DATA } from '../../../../state';
+import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 
 const { signedCommitment19, signedCommitment20, signedCommitment21 } = channelScenarios;
 const theirTurn = channelFromCommitments(

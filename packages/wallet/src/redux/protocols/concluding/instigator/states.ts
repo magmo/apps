@@ -1,5 +1,5 @@
-import { Constructor } from '../../utils';
-import { DefundingState } from '../defunding';
+import { Constructor } from '../../../utils';
+import { DefundingState } from '../../defunding';
 export type ConcludingState = NonTerminalState | PreTerminalState | TerminalState;
 export type ConcludingStateType = ConcludingState['type'];
 

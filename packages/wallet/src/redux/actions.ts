@@ -13,7 +13,7 @@ import {
 import { WithdrawalAction } from './protocols/withdrawing/actions';
 import { RespondingAction } from './protocols/responding/actions';
 import { DefundingAction } from './protocols/defunding/actions';
-import { ConcludingAction } from './protocols/concluding/actions';
+import { ConcludingAction } from './protocols/concluding/instigator/actions';
 export * from './protocols/transaction-submission/actions';
 
 export type TransactionAction = TA;

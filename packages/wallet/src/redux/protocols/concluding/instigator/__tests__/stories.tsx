@@ -3,10 +3,10 @@ import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
 import { Concluding } from '..';
-import { fakeStore } from '../../../../__stories__/index';
-import StatusBarLayout from '../../../../components/status-bar-layout';
+import { fakeStore } from '../../../../../__stories__/index';
+import StatusBarLayout from '../../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
-import { isTerminal } from '../../responding/state';
+import { isTerminal } from '../../../responding/state';
 
 const render = container => () => {
   // todo: rework this modal stuff

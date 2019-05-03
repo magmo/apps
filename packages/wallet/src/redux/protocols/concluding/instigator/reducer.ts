@@ -11,14 +11,14 @@ import {
   acknowledgeConcludeReceived,
 } from './states';
 import { ConcludingAction } from './actions';
-import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData, getChannel } from '../../state';
-import { composeConcludeCommitment } from '../../../utils/commitment-utils';
-import { ourTurn } from '../../channel-store';
-import { DefundingAction, isDefundingAction } from '../defunding/actions';
-import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { SharedData, getChannel } from '../../../state';
+import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
+import { ourTurn } from '../../../channel-store';
+import { DefundingAction, isDefundingAction } from '../../defunding/actions';
+import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
 type Storage = SharedData;
-import { isSuccess, isFailure } from '../defunding/states';
+import { isSuccess, isFailure } from '../../defunding/states';
 
 export interface ReturnVal {
   state: CState;

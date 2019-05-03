@@ -1,7 +1,7 @@
 import * as scenarios from './scenarios';
 import { concludingReducer, initialize, ReturnVal } from '../reducer';
 import { ConcludingStateType, FailureReason } from '../states';
-import { expectThisCommitmentSent } from '../../../__tests__/helpers';
+import { expectThisCommitmentSent } from '../../../../__tests__/helpers';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
