@@ -6,7 +6,12 @@ import * as challenging from './protocols/challenging/actions';
 import * as application from './protocols/application/actions';
 import { FundingAction } from './protocols/funding/actions';
 import { Commitment } from '../domain';
-import { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived } from '../communication';
+import {
+  COMMITMENT_RECEIVED,
+  CommitmentReceived,
+  commitmentReceived,
+  RelayableAction,
+} from '../communication';
 import {
   TransactionAction as TA,
   isTransactionAction as isTA,
@@ -165,7 +170,8 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | ChallengeCreatedEvent;
+  | ChallengeCreatedEvent
+  | RelayableAction;
 
 function isCommonAction(action: WalletAction): action is CommonAction {
   return (
