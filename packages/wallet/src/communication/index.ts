@@ -1,4 +1,4 @@
-import { Commitment } from '../domain';
+import { Commitment, SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client';
 
 export type FundingStrategy = 'IndirectFundingStrategy';
@@ -49,6 +49,15 @@ export const concludeChannel = (
   commitment,
   signature,
 });
+
+// COMMON
+export const COMMITMENT_RECEIVED = 'WALLET.COMMON.COMMITMENT_RECEIVED';
+export const commitmentReceived = (processId: string, signedCommitment: SignedCommitment) => ({
+  type: COMMITMENT_RECEIVED as typeof COMMITMENT_RECEIVED,
+  processId,
+  signedCommitment,
+});
+export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
 
 export type Message = StrategyProposed | StrategyApproved | ConcludeChannel;
 function sendMessage(to: string, message: Message) {
