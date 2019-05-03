@@ -77,7 +77,7 @@ export function sendConcludeChannel(to: string, processId, commitment, signature
   return sendMessage(to, concludeChannel(processId, commitment, signature));
 }
 
-export const createCommitmentMessageRelay = (
+export const sendCommitmentReceived = (
   to: string,
   processId: string,
   commitment: Commitment,

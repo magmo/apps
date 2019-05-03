@@ -16,7 +16,7 @@ import { isTerminal, isSuccess } from '../transaction-submission/states';
 import * as states from './state';
 import { theirAddress } from '../../channel-store';
 import * as channelStoreReducer from '../../channel-store/reducer';
-import { createCommitmentMessageRelay } from '../../../communication';
+import { sendCommitmentReceived } from '../../../communication';
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
 
@@ -266,7 +266,7 @@ const createAndSendPostFundCommitment = (sharedData: SharedData, channelId: stri
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = createCommitmentMessageRelay(
+    const messageRelay = sendCommitmentReceived(
       theirAddress(channelState),
       channelId,
       signResult.signedCommitment.commitment,
