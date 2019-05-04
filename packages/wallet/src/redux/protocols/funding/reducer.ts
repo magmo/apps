@@ -18,7 +18,8 @@ export function initialize(
 ): ProtocolStateWithSharedData<states.FundingState> {
   // TODO: We probably want to handle this in the root reducer
   const channelState = selectors.getChannelState(sharedData, channelId);
-  const opponentAddress = channelState.participants[playerIndex];
+  const { participants } = channelState;
+  const opponentAddress = participants[playerIndex + (1 % participants.length)];
   switch (playerIndex) {
     case PlayerIndex.A:
       return initializeA(sharedData, processId, channelId, opponentAddress);
