@@ -112,8 +112,15 @@ function strategyApproved(
   if (state.type !== states.WAIT_FOR_STRATEGY_RESPONSE) {
     return { protocolState: state, sharedData };
   }
-
-  return initializeFunding(state, sharedData);
+  const channelState = selectors.getChannelState(sharedData, state.targetChannelId);
+  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
+    channelState,
+    sharedData,
+  );
+  return {
+    protocolState: states.waitForFunding({ ...state, fundingState }),
+    sharedData: newSharedData,
+  };
 }
 
 function strategyRejected(
@@ -165,25 +172,6 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
     default:
       return unreachable(action.by);
   }
-}
-
-// Helper Functions
-function initializeFunding(
-  protocolState: states.WaitForStrategyResponse,
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<states.WaitForFunding> {
-  const channelState = selectors.getChannelState(sharedData, protocolState.targetChannelId);
-  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
-    channelState,
-    sharedData,
-  );
-  return {
-    protocolState: states.waitForFunding({
-      ...protocolState,
-      fundingState,
-    }),
-    sharedData: newSharedData,
-  };
 }
 
 function handleFundingComplete(
