@@ -12,6 +12,12 @@ import { PlayerIndex } from '../../../types';
 import { showWallet } from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyProposed } from '../../../../communication';
+import {
+  indirectFundingReducer,
+  initialize as initializeIndirectFunding,
+} from '../../indirect-funding/reducer';
+import * as indirectFundingStates from '../../indirect-funding/state';
+import * as selectors from '../../../selectors';
 type EmbeddedAction = IndirectFundingAction;
 
 export function initialize(
@@ -36,7 +42,7 @@ export function fundingReducer(
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (isIndirectFundingAction(action)) {
-    return handleIndirectFundingAction(state, sharedData);
+    return handleIndirectFundingAction(state, sharedData, action);
   }
 
   switch (action.type) {
@@ -56,10 +62,29 @@ export function fundingReducer(
 }
 
 function handleIndirectFundingAction(
-  state: states.FundingState,
+  protocolState: states.FundingState,
   sharedData: SharedData,
+  action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  return { protocolState: state, sharedData };
+  if (protocolState.type !== 'WaitForFunding') {
+    console.error(
+      `Funding reducer received indirect funding action ${action.type} but is currently in state ${
+        protocolState.type
+      }`,
+    );
+    return { protocolState, sharedData };
+  }
+
+  const { protocolState: newProtocolState, sharedData: newSharedData } = updateFundingState(
+    protocolState,
+    sharedData,
+    action,
+  );
+  if (!indirectFundingStates.isTerminal(newProtocolState.fundingState)) {
+    return { protocolState: handleFundingComplete(newProtocolState), sharedData: newSharedData };
+  } else {
+    return { protocolState: newProtocolState, sharedData: newSharedData };
+  }
 }
 
 function strategyChosen(
@@ -87,10 +112,8 @@ function strategyApproved(
   if (state.type !== states.WAIT_FOR_STRATEGY_RESPONSE) {
     return { protocolState: state, sharedData };
   }
-  return {
-    protocolState: states.waitForFunding({ ...state, fundingState: 'funding state' }),
-    sharedData,
-  };
+
+  return initializeFunding(state, sharedData);
 }
 
 function strategyRejected(
@@ -142,4 +165,58 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
     default:
       return unreachable(action.by);
   }
+}
+
+// Helper Functions
+function initializeFunding(
+  protocolState: states.WaitForStrategyResponse,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.WaitForFunding> {
+  const channelState = selectors.getChannelState(sharedData, protocolState.targetChannelId);
+  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
+    channelState,
+    sharedData,
+  );
+  return {
+    protocolState: states.waitForFunding({
+      ...protocolState,
+      fundingState,
+    }),
+    sharedData: newSharedData,
+  };
+}
+
+function handleFundingComplete(
+  protocolState: states.WaitForFunding,
+): states.WaitForSuccessConfirmation | states.Failure {
+  if (protocolState.fundingState.type === 'Success') {
+    return states.waitForSuccessConfirmation(protocolState);
+  } else {
+    // TODO: Indirect funding should return a proper error to pass to our failure state
+    return states.failure('Funding Failure');
+  }
+}
+function updateFundingState(
+  protocolState: states.WaitForFunding,
+  sharedData: SharedData,
+  action: IndirectFundingAction,
+): ProtocolStateWithSharedData<states.WaitForFunding> {
+  if (indirectFundingStates.isTerminal(protocolState.fundingState)) {
+    console.error(
+      `Funding reducer received indirect funding action ${
+        action.type
+      } but indirect funding is in terminal state ${protocolState.type}`,
+    );
+    return { protocolState, sharedData };
+  }
+
+  const {
+    protocolState: updatedFundingState,
+    sharedData: updatedSharedData,
+  } = indirectFundingReducer(protocolState.fundingState, sharedData, action);
+
+  return {
+    protocolState: states.waitForFunding({ ...protocolState, fundingState: updatedFundingState }),
+    sharedData: updatedSharedData,
+  };
 }
