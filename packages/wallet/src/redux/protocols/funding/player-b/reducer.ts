@@ -18,6 +18,7 @@ import {
 } from '../../indirect-funding/reducer';
 import * as indirectFundingStates from '../../indirect-funding/state';
 import * as selectors from '../../../selectors';
+import { Properties } from '../../../utils';
 
 type EmbeddedAction = IndirectFundingAction;
 
@@ -76,17 +77,21 @@ function handleIndirectFundingAction(
     return { protocolState, sharedData };
   }
 
-  const { protocolState: newProtocolState, sharedData: newSharedData } = updateFundingState(
-    protocolState,
-    sharedData,
-    action,
-  );
-  if (indirectFundingStates.isTerminal(newProtocolState.fundingState)) {
-    return { protocolState: handleFundingComplete(newProtocolState), sharedData: newSharedData };
+  const {
+    protocolState: updatedFundingState,
+    sharedData: updatedSharedData,
+  } = indirectFundingReducer(protocolState.fundingState, sharedData, action);
+
+  if (!indirectFundingStates.isTerminal(updatedFundingState)) {
+    return {
+      protocolState: states.waitForFunding({ ...protocolState, fundingState: updatedFundingState }),
+      sharedData: updatedSharedData,
+    };
   } else {
-    return { protocolState: newProtocolState, sharedData: newSharedData };
+    return handleFundingComplete(protocolState, updatedFundingState, updatedSharedData);
   }
 }
+
 function strategyProposed(
   state: states.FundingState,
   sharedData: SharedData,
@@ -117,6 +122,10 @@ function strategyApproved(
     channelState,
     sharedData,
   );
+  if (indirectFundingStates.isTerminal(fundingState)) {
+    console.error('Indirect funding strate initialized to terminal state.');
+    return handleFundingComplete(state, fundingState, newSharedData);
+  }
   return {
     protocolState: states.waitForFunding({ ...state, fundingState }),
     sharedData: queueMessage(newSharedData, message),
@@ -179,36 +188,20 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 }
 
 function handleFundingComplete(
-  protocolState: states.WaitForFunding,
-): states.WaitForSuccessConfirmation | states.Failure {
-  if (protocolState.fundingState.type === 'Success') {
-    return states.waitForSuccessConfirmation(protocolState);
+  protocolState: Properties<states.WaitForSuccessConfirmation>,
+  fundingState: indirectFundingStates.IndirectFundingState,
+  sharedData: SharedData,
+) {
+  if (fundingState.type === 'Success') {
+    return {
+      protocolState: states.waitForSuccessConfirmation(protocolState),
+      sharedData,
+    };
   } else {
     // TODO: Indirect funding should return a proper error to pass to our failure state
-    return states.failure('Funding Failure');
+    return {
+      protocolState: states.failure('Indirect Funding Failure'),
+      sharedData,
+    };
   }
-}
-function updateFundingState(
-  protocolState: states.WaitForFunding,
-  sharedData: SharedData,
-  action: IndirectFundingAction,
-): ProtocolStateWithSharedData<states.WaitForFunding> {
-  if (indirectFundingStates.isTerminal(protocolState.fundingState)) {
-    console.error(
-      `Funding reducer received indirect funding action ${
-        action.type
-      } but indirect funding is in terminal state ${protocolState.type}`,
-    );
-    return { protocolState, sharedData };
-  }
-
-  const {
-    protocolState: updatedFundingState,
-    sharedData: updatedSharedData,
-  } = indirectFundingReducer(protocolState.fundingState, sharedData, action);
-
-  return {
-    protocolState: states.waitForFunding({ ...protocolState, fundingState: updatedFundingState }),
-    sharedData: updatedSharedData,
-  };
 }
