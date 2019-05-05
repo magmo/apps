@@ -11,6 +11,8 @@ import ApproveStrategy from '../../../../components/funding/approve-strategy';
 import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
 import AcknowledgeX from '../../../../components/acknowledge-x';
 import { FundingStrategy } from '..';
+import { IndirectFunding } from '../../indirect-funding/container';
+import { isTerminal } from '../../indirect-funding/state';
 
 interface Props {
   state: states.OngoingFundingState;
@@ -36,8 +38,11 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.WAIT_FOR_FUNDING:
-        // TODO: embed the funding container
-        return <div />;
+        if (isTerminal(state.fundingState)) {
+          console.error('Funding state is terminal');
+          return <div />;
+        }
+        return <IndirectFunding state={state.fundingState} />;
       case states.WAIT_FOR_SUCCESS_CONFIRMATION:
         return (
           <AcknowledgeX
