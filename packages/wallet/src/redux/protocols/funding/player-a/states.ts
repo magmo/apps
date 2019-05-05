@@ -37,8 +37,6 @@ export interface WaitForStrategyResponse extends BaseState {
 
 export interface WaitForFunding extends BaseState {
   type: typeof WAIT_FOR_FUNDING;
-  // TODO: Currently we are limited to indirect funding
-  // In the future this could support other funding states
   fundingState: IndirectFundingState;
 }
 
