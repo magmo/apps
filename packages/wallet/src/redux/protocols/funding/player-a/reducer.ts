@@ -80,7 +80,7 @@ function handleIndirectFundingAction(
     sharedData,
     action,
   );
-  if (!indirectFundingStates.isTerminal(newProtocolState.fundingState)) {
+  if (indirectFundingStates.isTerminal(newProtocolState.fundingState)) {
     return { protocolState: handleFundingComplete(newProtocolState), sharedData: newSharedData };
   } else {
     return { protocolState: newProtocolState, sharedData: newSharedData };
