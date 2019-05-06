@@ -1,5 +1,3 @@
-import { FundingAction as PlayerAFundingAction } from './player-a/actions';
-import { FundingAction as PlayerBFundingAction } from './player-b/actions';
 import * as playerAFundingActions from './player-a/actions';
 import * as playerBFundingActions from './player-b/actions';
 import * as playerA from './player-a/states';
@@ -9,11 +7,16 @@ import {
   Action as IndirectFundingAction,
 } from '../indirect-funding/actions';
 
-export type FundingAction = PlayerAFundingAction | PlayerBFundingAction | IndirectFundingAction;
+export type FundingAction =
+  | playerAFundingActions.FundingAction
+  | playerBFundingActions.FundingAction
+  | IndirectFundingAction;
 
 export { playerA, playerB };
 
-export function isPlayerAFundingAction(action: FundingAction): action is PlayerAFundingAction {
+export function isPlayerAFundingAction(
+  action: FundingAction,
+): action is playerAFundingActions.FundingAction {
   return (
     action.type === playerAFundingActions.CANCELLED ||
     // TODO: Add this to the check when the action exists action.type === playerAFundingActions.CANCELLED_BY_OPPONENT ||
@@ -24,7 +27,9 @@ export function isPlayerAFundingAction(action: FundingAction): action is PlayerA
     isIndirectFundingAction(action)
   );
 }
-export function isPlayerBFundingAction(action: FundingAction): action is PlayerBFundingAction {
+export function isPlayerBFundingAction(
+  action: FundingAction,
+): action is playerBFundingActions.FundingAction {
   return (
     action.type === playerBFundingActions.CANCELLED ||
     // TODO: Add this to the check when the action exists action.type === playerAFundingActions.CANCELLED_BY_OPPONENT ||
