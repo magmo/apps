@@ -10,7 +10,6 @@ export type FundingAction = playerA.FundingAction | playerB.FundingAction | Indi
 export function isPlayerAFundingAction(action: FundingAction): action is playerA.FundingAction {
   return (
     action.type === playerA.CANCELLED ||
-    // TODO: Add this to the check when the action exists action.type === playerAFundingActions.CANCELLED_BY_OPPONENT ||
     action.type === playerA.FUNDING_SUCCESS_ACKNOWLEDGED ||
     action.type === playerA.STRATEGY_APPROVED ||
     action.type === playerA.STRATEGY_CHOSEN ||
@@ -21,7 +20,6 @@ export function isPlayerAFundingAction(action: FundingAction): action is playerA
 export function isPlayerBFundingAction(action: FundingAction): action is playerB.FundingAction {
   return (
     action.type === playerB.CANCELLED ||
-    // TODO: Add this to the check when the action exists action.type === playerAFundingActions.CANCELLED_BY_OPPONENT ||
     action.type === playerB.FUNDING_SUCCESS_ACKNOWLEDGED ||
     action.type === playerB.STRATEGY_APPROVED ||
     action.type === playerB.STRATEGY_PROPOSED ||
