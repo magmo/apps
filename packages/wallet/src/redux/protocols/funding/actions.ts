@@ -5,7 +5,10 @@ import {
   Action as IndirectFundingAction,
 } from '../indirect-funding/actions';
 
-export type FundingAction = playerA.FundingAction | playerB.FundingAction | IndirectFundingAction;
+type EmbeddedAction = IndirectFundingAction;
+const isEmbeddedAction = isIndirectFundingAction;
+
+export type FundingAction = playerA.FundingAction | playerB.FundingAction | EmbeddedAction;
 
 export function isPlayerAFundingAction(action: FundingAction): action is playerA.FundingAction {
   return (
@@ -14,7 +17,7 @@ export function isPlayerAFundingAction(action: FundingAction): action is playerA
     action.type === playerA.STRATEGY_APPROVED ||
     action.type === playerA.STRATEGY_CHOSEN ||
     action.type === playerA.STRATEGY_REJECTED ||
-    isIndirectFundingAction(action)
+    isEmbeddedAction(action)
   );
 }
 export function isPlayerBFundingAction(action: FundingAction): action is playerB.FundingAction {
@@ -24,6 +27,6 @@ export function isPlayerBFundingAction(action: FundingAction): action is playerB
     action.type === playerB.STRATEGY_APPROVED ||
     action.type === playerB.STRATEGY_PROPOSED ||
     action.type === playerB.STRATEGY_REJECTED ||
-    isIndirectFundingAction(action)
+    isEmbeddedAction(action)
   );
 }
