@@ -1,7 +1,5 @@
 import * as playerAFundingActions from './player-a/actions';
 import * as playerBFundingActions from './player-b/actions';
-import * as playerA from './player-a/states';
-import * as playerB from './player-b/states';
 import {
   isIndirectFundingAction,
   Action as IndirectFundingAction,
@@ -11,8 +9,6 @@ export type FundingAction =
   | playerAFundingActions.FundingAction
   | playerBFundingActions.FundingAction
   | IndirectFundingAction;
-
-export { playerA, playerB };
 
 export function isPlayerAFundingAction(
   action: FundingAction,
