@@ -28,6 +28,7 @@ import {
 } from '../../direct-funding/state';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
+import { initialConsensus, UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -192,17 +193,17 @@ function createInitialLedgerUpdateCommitment(
     throw new Error(`Expected a turn number ${expectedTurnNum} received ${turnNum}`);
   }
   const total = commitment.allocation.reduce(addHex);
-  const appAttributes = {
+  const initialConsensusArgs = {
+    ...commitment,
     proposedAllocation: [total],
     proposedDestination: [channelIdToFund],
-    consensusCounter: 1,
   };
   return {
     ...commitment,
     turnNum,
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    appAttributes: bytesFromAppAttributes(appAttributes),
+    appAttributes: bytesFromAppAttributes(initialConsensus(initialConsensusArgs)),
   };
 }
 
@@ -210,7 +211,8 @@ function createInitialSetupCommitment(allocation: string[], destination: string[
   const appAttributes = {
     proposedAllocation: allocation,
     proposedDestination: destination,
-    consensusCounter: 0,
+    furtherVotesRequired: 0,
+    updateType: UpdateType.Consensus,
   };
   // TODO: We'll run into collisions if we reuse the same nonce
   const nonce = 0;
