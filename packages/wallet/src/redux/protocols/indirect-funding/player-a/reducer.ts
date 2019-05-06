@@ -28,7 +28,12 @@ import {
 } from '../../direct-funding/state';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
-import { initialConsensus, UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import {
+  UpdateType,
+  propose,
+  appAttributesFromBytes,
+  ConsensusReachedCommitment,
+} from 'fmg-nitro-adjudicator/lib/consensus-app';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -157,7 +162,7 @@ function handleWaitForDirectFunding(
     if (!channel) {
       throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
     }
-    const ourCommitment = createInitialLedgerUpdateCommitment(
+    const ourCommitment = createProposeLedgerUpdate(
       protocolState.channelId,
       channel.lastCommitment.commitment,
     );
@@ -182,28 +187,20 @@ function handleWaitForDirectFunding(
   return { protocolState, sharedData };
 }
 
-function createInitialLedgerUpdateCommitment(
-  channelIdToFund: string,
-  commitment: Commitment,
-): Commitment {
-  const numParticipants = commitment.channel.participants.length;
-  const turnNum = commitment.turnNum + 1;
-  const expectedTurnNum = numParticipants * 2;
-  if (turnNum !== expectedTurnNum) {
-    throw new Error(`Expected a turn number ${expectedTurnNum} received ${turnNum}`);
-  }
+function createProposeLedgerUpdate(channelIdToFund: string, commitment: Commitment): Commitment {
   const total = commitment.allocation.reduce(addHex);
-  const initialConsensusArgs = {
+  const proposeArgs: ConsensusReachedCommitment = {
     ...commitment,
-    proposedAllocation: [total],
-    proposedDestination: [channelIdToFund],
+    ...appAttributesFromBytes(commitment.appAttributes),
+    updateType: UpdateType.Consensus,
   };
+  const proposeCommitment = propose(proposeArgs, [total], [channelIdToFund]);
   return {
     ...commitment,
-    turnNum,
+    turnNum: proposeCommitment.turnNum,
     commitmentCount: 0,
     commitmentType: CommitmentType.App,
-    appAttributes: bytesFromAppAttributes(initialConsensus(initialConsensusArgs)),
+    appAttributes: bytesFromAppAttributes(proposeCommitment),
   };
 }
 

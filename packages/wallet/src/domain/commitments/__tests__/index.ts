@@ -113,15 +113,18 @@ export function ledgerCommitment(params: LedgerCommitmentParams): SignedCommitme
   const isFinal = params.isFinal || false;
   const balances = params.balances || twoThree;
   const proposedBalances = params.proposedBalances || balances;
-  const consensusCounter = JSON.stringify(balances) === JSON.stringify(proposedBalances) ? 0 : 1;
+  const furtherVotesRequired =
+    JSON.stringify(balances) === JSON.stringify(proposedBalances) ? 0 : 1;
+  const updateType =
+    JSON.stringify(balances) === JSON.stringify(proposedBalances)
+      ? UpdateType.Consensus
+      : UpdateType.Proposal;
   const allocation = balances.map(b => b.wei);
   const destination = balances.map(b => b.address);
   const { commitmentCount, commitmentType } = typeAndCount(turnNum, isFinal);
-  const appAttributes = ledgerAppAttributes(
-    consensusCounter,
-    proposedBalances,
-    UpdateType.Consensus,
-  );
+
+  const appAttributes = ledgerAppAttributes(furtherVotesRequired, proposedBalances, updateType);
+
   const commitment = {
     channel: ledgerChannel,
     commitmentCount,
