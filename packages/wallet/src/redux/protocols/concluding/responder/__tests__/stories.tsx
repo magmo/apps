@@ -26,11 +26,11 @@ const render = container => () => {
 
 // Convention is to add all scenarios here, and allow the
 // addStories function to govern what ends up being shown.
-addStories(scenarios.happyPath, 'Concluding / Happy Path');
-addStories(scenarios.channelDoesntExist, 'Concluding / Channel doesnt exist');
-addStories(scenarios.concludingNotPossible, 'Concluding / Concluding impossible');
-addStories(scenarios.concludingCancelled, 'Concluding / Concluding cancelled');
-addStories(scenarios.defundingFailed, 'Concluding / Defund failed');
+addStories(scenarios.happyPath, 'Concluding / Responder / Happy Path');
+addStories(scenarios.channelDoesntExist, 'Concluding / Responder / Channel doesnt exist');
+addStories(scenarios.concludingNotPossible, 'Concluding / Responder / Concluding impossible');
+addStories(scenarios.concludingCancelled, 'Concluding / Responder / Concluding cancelled');
+addStories(scenarios.defundingFailed, 'Concluding / Responder / Defund failed');
 
 function addStories(scenario, chapter) {
   Object.keys(scenario.states).forEach(key => {
