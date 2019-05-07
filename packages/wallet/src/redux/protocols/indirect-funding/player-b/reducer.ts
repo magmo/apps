@@ -122,7 +122,7 @@ function handleWaitForPreFundSetup(
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
     theirAddress(channel),
-    'processId', // TODO don't use dummy values
+    protocolState.processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
@@ -131,7 +131,7 @@ function handleWaitForPreFundSetup(
 
   // update the state
   const directFundingAction = directFundingRequested(
-    'processId',
+    protocolState.processId,
     ledgerId,
     '0',
     '0', // TODO don't use dummy values
@@ -216,7 +216,7 @@ function handleWaitForLedgerUpdate(
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
     theirAddress(channel),
-    'processId', // TODO don't use dummy values
+    protocolState.processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
@@ -267,7 +267,7 @@ export function handleWaitForPostFundSetup(
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
     theirAddress(channel),
-    'processId', // TODO don't use dummy values
+    protocolState.processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
