@@ -35,7 +35,11 @@ import { unreachable } from '../../../../utils/reducer-utils';
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
 
-export function initialize(channelId: string, sharedData: SharedData): ReturnVal {
+export function initialize(
+  processId: string,
+  channelId: string,
+  sharedData: SharedData,
+): ReturnVal {
   const channel = getChannel(sharedData.channelStore, channelId);
   if (!channel) {
     throw new Error(`Could not find existing application channel ${channelId}`);
@@ -61,7 +65,7 @@ export function initialize(channelId: string, sharedData: SharedData): ReturnVal
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
     theirAddress(channel),
-    'processId', // TODO don't use dummy values
+    processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
@@ -70,6 +74,7 @@ export function initialize(channelId: string, sharedData: SharedData): ReturnVal
   const protocolState = states.aWaitForPreFundSetup1({
     channelId,
     ledgerId,
+    processId,
   });
   return { protocolState, sharedData };
 }

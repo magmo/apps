@@ -39,9 +39,13 @@ import { sendCommitmentReceived } from '../../../../communication';
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
 
-export function initialize(channelId: string, sharedData: SharedData): ReturnVal {
+export function initialize(
+  processId: string,
+  channelId: string,
+  sharedData: SharedData,
+): ReturnVal {
   // todo: check that channel exists?
-  return { protocolState: states.bWaitForPreFundSetup0({ channelId }), sharedData };
+  return { protocolState: states.bWaitForPreFundSetup0({ processId, channelId }), sharedData };
 }
 
 export function playerBReducer(
