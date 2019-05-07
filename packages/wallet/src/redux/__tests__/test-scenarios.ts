@@ -215,6 +215,7 @@ const proposeDefundChannelCommitment = propose(
 const approveDefundChannelCommitment = finalVote(proposeDefundChannelCommitment);
 
 export const ledgerId = channelID(ledgerChannel);
+
 export const ledgerCommitments = {
   preFundCommitment0: {
     ...initialConsensusCommitment,
@@ -270,6 +271,7 @@ export const ledgerCommitments = {
     commitmentType: CommitmentType.App,
   },
 };
+
 export const signedLedgerCommitments = {
   signedLedgerCommitment0: {
     commitment: ledgerCommitments.preFundCommitment0,

@@ -7,15 +7,14 @@ import * as states from './states';
 
 import { unreachable } from '../../../../utils/reducer-utils';
 import { PlayerIndex } from '../../../types';
-import { Strategy } from '..';
 import ApproveStrategy from '../../../../components/funding/approve-strategy';
 import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
 import AcknowledgeX from '../../../../components/acknowledge-x';
-
+import { FundingStrategy } from '..';
+import { IndirectFunding } from '../../indirect-funding/container';
 interface Props {
   state: states.OngoingFundingState;
-  strategyChosen: (processId: string, strategy: Strategy) => void;
-  strategyApproved: (processId: string, strategy: Strategy) => void;
+  strategyApproved: (processId: string, strategy: FundingStrategy) => void;
   strategyRejected: (processId: string) => void;
   fundingSuccessAcknowledged: (processId: string) => void;
   cancelled: (processId: string, by: PlayerIndex) => void;
@@ -23,7 +22,7 @@ interface Props {
 
 class FundingContainer extends PureComponent<Props> {
   render() {
-    const { state } = this.props;
+    const { state, strategyApproved, cancelled } = this.props;
     const { processId } = state;
 
     switch (state.type) {
@@ -32,13 +31,12 @@ class FundingContainer extends PureComponent<Props> {
       case states.WAIT_FOR_STRATEGY_APPROVAL:
         return (
           <ApproveStrategy
-            strategyChosen={(strategy: Strategy) => actions.strategyApproved(processId, strategy)}
-            cancelled={() => actions.cancelled(processId, PlayerIndex.B)}
+            strategyChosen={(strategy: FundingStrategy) => strategyApproved(processId, strategy)}
+            cancelled={() => cancelled(processId, PlayerIndex.B)}
           />
         );
       case states.WAIT_FOR_FUNDING:
-        // TODO: embed the funding container
-        return <div />;
+        return <IndirectFunding state={state.fundingState} />;
       case states.WAIT_FOR_SUCCESS_CONFIRMATION:
         return (
           <AcknowledgeX

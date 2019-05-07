@@ -1,5 +1,4 @@
-import { Commitment } from '../../domain';
-import { messageRelayRequested, SIGNATURE_SUCCESS, VALIDATION_SUCCESS } from 'magmo-wallet-client';
+import { SIGNATURE_SUCCESS, VALIDATION_SUCCESS } from 'magmo-wallet-client';
 import * as actions from '../actions';
 import { channelStoreReducer } from '../channel-store/reducer';
 import { accumulateSideEffects } from '../outbox';
@@ -9,6 +8,7 @@ import * as selectors from '../selectors';
 import { PlayerIndex } from '../types';
 import { CommitmentType } from 'fmg-core/lib/commitment';
 import * as magmoWalletClient from 'magmo-wallet-client';
+import { ChannelState } from '../channel-store';
 
 export const updateChannelState = (
   sharedData: SharedData,
@@ -40,19 +40,6 @@ export const filterOutSignatureMessages = (sideEffects?: SideEffects): SideEffec
     };
   }
   return sideEffects;
-};
-
-export const createCommitmentMessageRelay = (
-  to: string,
-  processId: string,
-  commitment: Commitment,
-  signature: string,
-) => {
-  const payload = {
-    processId,
-    data: { commitment, signature, processId },
-  };
-  return messageRelayRequested(to, payload);
 };
 
 export function showWallet(sharedData: SharedData): SharedData {
@@ -104,3 +91,9 @@ export const isFirstPlayer = (channelId: string, sharedData: SharedData) => {
   const channelState = selectors.getChannelState(sharedData, channelId);
   return channelState.ourIndex === PlayerIndex.A;
 };
+
+export function getOpponentAddress(channelState: ChannelState, playerIndex: PlayerIndex) {
+  const { participants } = channelState;
+  const opponentAddress = participants[(playerIndex + 1) % participants.length];
+  return opponentAddress;
+}

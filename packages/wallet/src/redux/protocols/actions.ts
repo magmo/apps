@@ -1,6 +1,7 @@
-import { Commitment } from 'magmo-wallet-client/node_modules/fmg-core';
 import { ProtocolAction, WalletAction } from '../actions';
 import { PlayerIndex, WalletProtocol } from '../types';
+import { Commitment } from '../../domain';
+export { BaseProcessAction } from '../../communication';
 
 export const INITIALIZE_CHANNEL = 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL';
 export const initializeChannel = () => ({
@@ -14,7 +15,7 @@ export const fundingRequested = (channelId: string, playerIndex: PlayerIndex) =>
   type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
   channelId,
   playerIndex,
-  protocol: WalletProtocol.IndirectFunding,
+  protocol: WalletProtocol.Funding,
 });
 export type FundingRequested = ReturnType<typeof fundingRequested>;
 
@@ -59,11 +60,6 @@ export function isNewProcessAction(action: WalletAction): action is NewProcessAc
     action.type === CREATE_CHALLENGE_REQUESTED ||
     action.type === RESPOND_TO_CHALLENGE_REQUESTED
   );
-}
-
-export interface BaseProcessAction {
-  processId: string;
-  type: string;
 }
 
 export function isProtocolAction(action: WalletAction): action is ProtocolAction {

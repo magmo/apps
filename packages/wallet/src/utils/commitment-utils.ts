@@ -1,10 +1,8 @@
 import { Commitment, CommitmentType, signCommitment2 } from '../domain';
 import { appAttributesFromBytes, bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { PlayerIndex } from '../redux/types';
-import { signCommitment } from '../domain';
 import { Channel } from 'fmg-core';
 import { SignedCommitment } from '../domain';
-import { messageRelayRequested } from 'magmo-wallet-client/lib/wallet-events';
 import { ChannelState } from '../redux/channel-store';
 import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
 
@@ -88,16 +86,5 @@ export const composeConcludeCommitment = (channelState: ChannelState) => {
     commitmentCount,
   };
 
-  const commitmentSignature = signCommitment(concludeCommitment, channelState.privateKey);
-  const sendCommitmentAction = messageRelayRequested(
-    channelState.participants[1 - channelState.ourIndex],
-    {
-      processId: channelState.channelId,
-      data: {
-        commitment: concludeCommitment,
-        commitmentSignature,
-      },
-    },
-  );
-  return { concludeCommitment, commitmentSignature, sendCommitmentAction };
+  return signCommitment2(concludeCommitment, channelState.privateKey);
 };

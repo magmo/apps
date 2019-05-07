@@ -1,6 +1,7 @@
 import { Properties as P } from '../../../utils';
 import { ProtocolState } from '../..';
-import { Strategy } from '..';
+import { FundingStrategy } from '..';
+import { NonTerminalIndirectFundingState } from '../../indirect-funding/state';
 
 export type OngoingFundingState =
   | WaitForStrategyProposal
@@ -31,12 +32,12 @@ export interface WaitForStrategyProposal extends BaseState {
 export interface WaitForStrategyApproval extends BaseState {
   type: typeof WAIT_FOR_STRATEGY_APPROVAL;
   targetChannelId: string;
-  strategy: Strategy;
+  strategy: FundingStrategy;
 }
 
 export interface WaitForFunding extends BaseState {
   type: typeof WAIT_FOR_FUNDING;
-  fundingState: 'funding state';
+  fundingState: NonTerminalIndirectFundingState;
 }
 
 export interface WaitForSuccessConfirmation extends BaseState {
