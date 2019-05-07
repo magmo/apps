@@ -25,7 +25,6 @@ import {
   bWaitForPostFundSetup0,
 } from './state';
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
-import { nextLedgerUpdateCommitment } from '../../../../domain/two-player-consensus-game';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { createCommitmentMessageRelay } from '../../reducer-helpers';
 import { theirAddress } from '../../../../redux/channel-store';
@@ -35,6 +34,8 @@ import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/state';
+import { finalVote, UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { fromCoreCommitment, asCoreCommitment } from '../../../../domain/two-player-consensus-game';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -200,13 +201,15 @@ function handleWaitForLedgerUpdate(
   // are we happy that we have the ledger update?
   // if so, we need to craft our reply
 
-  const ourCommitment = nextLedgerUpdateCommitment(theirCommitment);
-  if (ourCommitment === 'InputNotPrecedingAnUpdateCommitment') {
-    throw new Error('Not a ledger update commitment');
+  const theirConsensusCommitment = fromCoreCommitment(theirCommitment);
+  if (theirConsensusCommitment.updateType !== UpdateType.Proposal) {
+    throw new Error('The received commitment was not a ledger proposal');
   }
-  if (ourCommitment === 'InputNotAProposal') {
-    throw new Error('Input is not a proposal');
-  }
+  const ourConsensusCommitment = finalVote(theirConsensusCommitment);
+  // TODO this should happen automatically in the finalVote helper function
+  ourConsensusCommitment.furtherVotesRequired = 0;
+  const ourCommitment = asCoreCommitment(ourConsensusCommitment);
+
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
     return unchangedState;
