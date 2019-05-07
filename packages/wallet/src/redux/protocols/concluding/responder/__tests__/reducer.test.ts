@@ -83,19 +83,6 @@ describe('[ Concluding Not Possible ]', () => {
   });
 });
 
-describe('[ Concluding Cancelled ]', () => {
-  const scenario = scenarios.concludingCancelled;
-  const { storage } = scenario;
-
-  describe('when in ApproveConcluding', () => {
-    const state = scenario.states.approveConcluding;
-    const action = scenario.actions.cancelled;
-    const result = concludingReducer(state, storage, action);
-
-    itTransitionsToFailure(result, 'ConcludeCancelled');
-  });
-});
-
 describe('[ Defunding Failed ]', () => {
   const scenario = scenarios.defundingFailed;
   const { storage } = scenario;

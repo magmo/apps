@@ -1,8 +1,4 @@
-export type ConcludingAction = Cancelled | ConcludeSent | DefundChosen | Acknowledged;
-export interface Cancelled {
-  type: 'CONCLUDING.CANCELLED';
-  processId: string;
-}
+export type ConcludingAction = ConcludeSent | DefundChosen | Acknowledged;
 
 export interface ConcludeSent {
   type: 'CONCLUDE.SENT';
@@ -22,11 +18,6 @@ export interface Acknowledged {
 // --------
 // Creators
 // --------
-
-export const cancelled = (processId: string): Cancelled => ({
-  type: 'CONCLUDING.CANCELLED',
-  processId,
-});
 
 export const concludeSent = (processId: string): ConcludeSent => ({
   type: 'CONCLUDE.SENT',

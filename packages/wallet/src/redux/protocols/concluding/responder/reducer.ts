@@ -34,8 +34,6 @@ export function concludingReducer(
     return handleDefundingAction(state, storage, action);
   }
   switch (action.type) {
-    case 'CONCLUDING.CANCELLED':
-      return concludingCancelled(state, storage);
     case 'CONCLUDE.SENT':
       return concludeSent(state, storage);
     case 'DEFUND.CHOSEN':
@@ -102,13 +100,6 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
   } else {
     return { state, storage };
   }
-}
-
-function concludingCancelled(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveConcluding') {
-    return { state, storage };
-  }
-  return { state: failure({ reason: 'ConcludeCancelled' }), storage };
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {

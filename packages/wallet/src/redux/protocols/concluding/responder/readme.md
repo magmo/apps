@@ -26,7 +26,6 @@ graph TD
   E --> |Yes| MT{My turn?}
   MT  --> |Yes| CC(ApproveConcluding)
   MT  --> |No| AF(AcknowledgeFailure)
-  CC  --> |CONCLUDING.CANCELLED| F
   CC  --> |CONCLUDE.SENT| DD(DecideDefund)
   DD --> |DEFUND.CHOSEN| D(WaitForDefund)
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
@@ -47,8 +46,7 @@ We will use the following scenarios for testing:
 1. **Happy path**: `ApproveConcluding` -> `DecideDefund` -> `WaitForDefund` -> `AcknowledgeSuccess` -> `Success`
 2. **Channel doesnt exist** `AcknowledgeFailure` -> `Failure`
 3. **Concluding not possible**: `AcknowledgeFailure` -> `Failure`
-4. **Concluding cancelled** `ApproveConcluding` -> `Failure`
-5. **Defund failed** `WaitForDefund` -> `AcknowledgeFailure` -> `Failure`
+4. **Defund failed** `WaitForDefund` -> `AcknowledgeFailure` -> `Failure`
 
 # Terminology
 

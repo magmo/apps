@@ -12,14 +12,13 @@ import Acknowledge from '../../shared-components/acknowledge';
 interface Props {
   state: NonTerminalConcludingState;
   approve: (processId: string) => void;
-  deny: (processId: string) => void;
   defund: (processId: string) => void;
   acknowledge: (processId: string) => void;
 }
 
 class ConcludingContainer extends PureComponent<Props> {
   render() {
-    const { state, deny, approve, defund, acknowledge } = this.props;
+    const { state, approve, defund, acknowledge } = this.props;
     const processId = state.processId;
     switch (state.type) {
       case 'AcknowledgeSuccess':
@@ -43,9 +42,7 @@ class ConcludingContainer extends PureComponent<Props> {
       case 'WaitForDefund':
         return <WaitForDefunding />;
       case 'ApproveConcluding':
-        return (
-          <ApproveConcluding deny={() => deny(processId)} approve={() => approve(processId)} />
-        );
+        return <ApproveConcluding approve={() => approve(processId)} />;
       default:
         return unreachable(state);
     }
@@ -54,7 +51,6 @@ class ConcludingContainer extends PureComponent<Props> {
 
 const mapDispatchToProps = {
   approve: actions.concludeSent,
-  deny: actions.cancelled,
   defund: actions.defundChosen,
   acknowledge: actions.acknowledged,
 };

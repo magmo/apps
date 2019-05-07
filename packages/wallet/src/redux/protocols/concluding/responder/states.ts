@@ -14,11 +14,7 @@ export type PreTerminalState = AcknowledgeSuccess | AcknowledgeFailure;
 
 export type TerminalState = Success | Failure;
 
-export type FailureReason =
-  | 'NotYourTurn'
-  | 'ChannelDoesntExist'
-  | 'ConcludeCancelled'
-  | 'DefundFailed';
+export type FailureReason = 'NotYourTurn' | 'ChannelDoesntExist' | 'DefundFailed';
 
 export interface AcknowledgeSuccess {
   type: 'AcknowledgeSuccess';

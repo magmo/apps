@@ -59,7 +59,6 @@ const success = states.success();
 const concludeSent = actions.concludeSent(processId);
 const defundChosen = actions.defundChosen(processId);
 const concludingImpossibleAcknowledged = actions.acknowledged(processId);
-const cancelled = actions.cancelled(processId);
 const acknowledged = actions.acknowledged(processId);
 
 // -------
@@ -108,18 +107,6 @@ export const concludingNotPossible = {
   actions: {
     concludingImpossibleAcknowledged,
     acknowledged,
-  },
-};
-
-export const concludingCancelled = {
-  ...defaults,
-  storage: storage(ourTurn),
-  states: {
-    approveConcluding,
-    failure: states.failure({ reason: 'ConcludeCancelled' }),
-  },
-  actions: {
-    cancelled,
   },
 };
 

@@ -29,7 +29,6 @@ const render = container => () => {
 addStories(scenarios.happyPath, 'Concluding / Responder / Happy Path');
 addStories(scenarios.channelDoesntExist, 'Concluding / Responder / Channel doesnt exist');
 addStories(scenarios.concludingNotPossible, 'Concluding / Responder / Concluding impossible');
-addStories(scenarios.concludingCancelled, 'Concluding / Responder / Concluding cancelled');
 addStories(scenarios.defundingFailed, 'Concluding / Responder / Defund failed');
 
 function addStories(scenario, chapter) {
