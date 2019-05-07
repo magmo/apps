@@ -12,7 +12,7 @@ import { CommitmentType, Commitment } from 'fmg-core';
 // -----------------
 // Channel Scenarios
 // -----------------
-const { channelId, asAddress: address, asPrivateKey: privateKey } = channelScenarios;
+const { channelId, bsAddress: address, bsPrivateKey: privateKey } = channelScenarios;
 import { ChannelState } from '../../../../channel-store';
 import { setChannel, EMPTY_SHARED_DATA } from '../../../../state';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
