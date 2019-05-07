@@ -33,8 +33,7 @@ import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/state';
-import { finalVote, UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { fromCoreCommitment, asCoreCommitment } from '../../../../domain/two-player-consensus-game';
+import { acceptConsensus } from '../../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../../communication';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
@@ -201,14 +200,8 @@ function handleWaitForLedgerUpdate(
   // are we happy that we have the ledger update?
   // if so, we need to craft our reply
 
-  const theirConsensusCommitment = fromCoreCommitment(theirCommitment);
-  if (theirConsensusCommitment.updateType !== UpdateType.Proposal) {
-    throw new Error('The received commitment was not a ledger proposal');
-  }
-  const ourConsensusCommitment = finalVote(theirConsensusCommitment);
+  const ourCommitment = acceptConsensus(theirCommitment);
   // TODO this should happen automatically in the finalVote helper function
-  ourConsensusCommitment.furtherVotesRequired = 0;
-  const ourCommitment = asCoreCommitment(ourConsensusCommitment);
 
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
