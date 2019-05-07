@@ -10,7 +10,7 @@ import {
   checkAndStore,
   signAndStore,
 } from '../../../state';
-import { IndirectFundingState, failure } from '../state';
+import { IndirectFundingState, failure, success } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../../domain';
@@ -30,6 +30,7 @@ import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
 import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { proposeNewConsensus } from '../../../../domain/two-player-consensus-game';
+import { unreachable } from '../../../../utils/reducer-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -85,9 +86,30 @@ export function playerAReducer(
       return handleWaitForDirectFunding(protocolState, sharedData, action);
     case 'AWaitForLedgerUpdate1':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
+    case 'AWaitForPostFundSetup1':
+      return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
-      return { protocolState, sharedData };
+      return unreachable(protocolState);
   }
+}
+
+function handleWaitForPostFundSetup(
+  protocolState: states.AWaitForPostFundSetup1,
+  sharedData: SharedData,
+  action: IDFAction | DirectFundingAction,
+): ReturnVal {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  const newProtocolState = success();
+  const newReturnVal = { protocolState: newProtocolState, sharedData };
+  return newReturnVal;
 }
 
 function handleWaitForLedgerUpdate(
