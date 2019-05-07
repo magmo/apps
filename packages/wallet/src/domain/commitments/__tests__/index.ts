@@ -48,6 +48,8 @@ const twoThree = [
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
 ];
 
+const blankBalance: Balance[] = [];
+
 interface AppCommitmentParams {
   turnNum: number;
   isFinal?: boolean;
@@ -80,11 +82,11 @@ export function appCommitment(params: AppCommitmentParams): SignedCommitment {
 
 function ledgerAppAttributes(
   furtherVotesRequired,
-  balances: Balance[] = twoThree,
   updateType: UpdateType,
+  proposedBalances: Balance[],
 ) {
-  const proposedAllocation = balances.map(b => b.wei);
-  const proposedDestination = balances.map(b => b.address);
+  const proposedAllocation = proposedBalances.map(b => b.wei);
+  const proposedDestination = proposedBalances.map(b => b.address);
   return bytesFromAppAttributes({
     proposedAllocation,
     proposedDestination,
@@ -112,18 +114,19 @@ export function ledgerCommitment(params: LedgerCommitmentParams): SignedCommitme
   const turnNum = params.turnNum;
   const isFinal = params.isFinal || false;
   const balances = params.balances || twoThree;
-  const proposedBalances = params.proposedBalances || balances;
-  const furtherVotesRequired =
-    JSON.stringify(balances) === JSON.stringify(proposedBalances) ? 0 : 1;
-  const updateType =
-    JSON.stringify(balances) === JSON.stringify(proposedBalances)
-      ? UpdateType.Consensus
-      : UpdateType.Proposal;
+  let proposedBalances = params.proposedBalances || blankBalance;
+  let furtherVotesRequired = 0;
+  let updateType = UpdateType.Consensus;
+  if (params.proposedBalances) {
+    furtherVotesRequired = 1;
+    updateType = UpdateType.Proposal;
+    proposedBalances = params.proposedBalances;
+  }
   const allocation = balances.map(b => b.wei);
   const destination = balances.map(b => b.address);
   const { commitmentCount, commitmentType } = typeAndCount(turnNum, isFinal);
 
-  const appAttributes = ledgerAppAttributes(furtherVotesRequired, proposedBalances, updateType);
+  const appAttributes = ledgerAppAttributes(furtherVotesRequired, updateType, proposedBalances);
 
   const commitment = {
     channel: ledgerChannel,

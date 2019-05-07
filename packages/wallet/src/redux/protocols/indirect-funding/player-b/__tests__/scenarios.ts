@@ -42,12 +42,18 @@ const app1 = appCommitment({ turnNum: 1, balances: twoThree });
 const app2 = appCommitment({ turnNum: 2, balances: twoThree });
 const app3 = appCommitment({ turnNum: 3, balances: twoThree });
 
-const ledger0 = ledgerCommitment({ turnNum: 0, balances: twoThree });
-const ledger1 = ledgerCommitment({ turnNum: 1, balances: twoThree });
-const ledger2 = ledgerCommitment({ turnNum: 2, balances: twoThree });
-const ledger3 = ledgerCommitment({ turnNum: 3, balances: twoThree });
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
+// todo use imported helper functions instead of this one
+
+const ledger0 = ledgerCommitment({ turnNum: 0, balances: twoThree }); // Ledger PreFundSetup
+const ledger1 = ledgerCommitment({ turnNum: 1, balances: twoThree }); // Ledger PreFundSetup
+const ledger2 = ledgerCommitment({ turnNum: 2, balances: twoThree }); // Ledger PostFundSetup
+const ledger3 = ledgerCommitment({ turnNum: 3, balances: twoThree }); // Ledger PostFundSetup
+const ledger4 = ledgerCommitment({
+  turnNum: 4,
+  balances: twoThree,
+  proposedBalances: fiveToApp,
+}); // Ledger App/Proposal
+const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp }); // Ledger App/Consensus
 
 // Channels
 
