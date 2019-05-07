@@ -50,6 +50,14 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "packages/magmo-wallet-client/yarn.lock" }}
             - v1-dependencies-magmo-wallet-client
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "packages/nitro/yarn.lock" }}
+            - v1-dependencies-nitro
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "packages/force-move-core/yarn.lock" }}
+            - v1-dependencies-force-move-framework
 
       - run: npx lerna bootstrap
 
@@ -78,6 +86,14 @@ jobs:
           paths:
             - packages/magmo-wallet-client/node_modules
           key: v1-dependencies-{{ checksum "packages/magmo-wallet-client/yarn.lock" }}
+      - restore_cache:
+          paths:
+            - packages/nitro/node_modules
+          key: v1-dependencies-{{ checksum "packages/nitro/yarn.lock" }}
+      - restore_cache:
+          paths:
+            - packages/force-move-framework/node_modules
+          key: v1-dependencies-{{ checksum "packages/force-move-core/yarn.lock" }}
 
       - run:
           name: Waiting for Postgres to be ready
