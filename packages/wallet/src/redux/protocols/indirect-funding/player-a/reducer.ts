@@ -145,7 +145,7 @@ function handleWaitForLedgerUpdate(
   sharedData = signResult.store;
 
   // just need to put our message in the outbox
-  const messageRelay = createCommitmentMessageRelay(
+  const messageRelay = sendCommitmentReceived(
     theirAddress(appChannel),
     'processId', // TODO don't use dummy values
     signResult.signedCommitment.commitment,
