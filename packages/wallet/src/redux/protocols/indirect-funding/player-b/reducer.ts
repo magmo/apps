@@ -35,6 +35,7 @@ import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/state';
 import { acceptConsensus } from '../../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../../communication';
+import { addHex } from '../../../../utils/hex-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -129,13 +130,16 @@ function handleWaitForPreFundSetup(
   sharedData = queueMessage(sharedData, messageRelay);
   channel = getChannel(sharedData, ledgerId); // refresh channel
 
+  const total = theirCommitment.allocation.reduce(addHex);
+  const theirAmount = theirCommitment.allocation[0];
+  const ourAmount = theirCommitment.allocation[1];
   // update the state
   const directFundingAction = directFundingRequested(
     protocolState.processId,
     ledgerId,
-    '0',
-    '0', // TODO don't use dummy values
-    '0',
+    theirAmount,
+    total,
+    ourAmount,
     1,
   );
   const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
@@ -144,7 +148,7 @@ function handleWaitForPreFundSetup(
     ledgerId,
     directFundingState: directFundingState.protocolState,
   });
-
+  sharedData = directFundingState.sharedData;
   return { protocolState: newProtocolState, sharedData };
 }
 

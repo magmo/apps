@@ -188,14 +188,17 @@ function handleWaitForPreFundSetup(
   // Do we really need to do that constantly or is it for debugging mostly?
   const theirCommitment = action.signedCommitment.commitment;
   const ledgerId = getChannelId(theirCommitment);
+
+  const total = theirCommitment.allocation.reduce(addHex);
+  const ourAmount = theirCommitment.allocation[0];
   // update the state
   const directFundingAction = directFundingRequested(
     protocolState.processId,
     ledgerId,
-    '0',
-    '0', // TODO don't use dummy values
-    '0',
-    1,
+    '0x0',
+    total,
+    ourAmount,
+    0,
   );
   const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
   const newProtocolState = states.aWaitForDirectFunding({
@@ -203,6 +206,7 @@ function handleWaitForPreFundSetup(
     ledgerId,
     directFundingState: directFundingState.protocolState,
   });
+  sharedData = directFundingState.sharedData;
 
   return { protocolState: newProtocolState, sharedData };
 }
