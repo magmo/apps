@@ -43,11 +43,15 @@ export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 export interface SharedData {
   channelStore: ChannelStore;
   outboxState: OutboxState;
+  channelSubscriptions?: ChannelSubscriptions;
   adjudicatorState: AdjudicatorState;
   fundingState: FundingState;
   activeAppChannelId?: string;
 }
 
+export interface ChannelSubscriptions {
+  [channelId: string]: string[];
+}
 export interface WaitForLogin extends SharedData {
   type: typeof WAIT_FOR_LOGIN;
 }
@@ -90,6 +94,7 @@ export interface ChannelFundingState {
 export const EMPTY_SHARED_DATA: SharedData = {
   outboxState: emptyDisplayOutboxState(),
   channelStore: emptyChannelStore(),
+  channelSubscriptions: {},
   adjudicatorState: {},
   fundingState: {},
 };
@@ -101,6 +106,7 @@ export function sharedData(params: SharedData): SharedData {
     adjudicatorState,
     fundingState,
     activeAppChannelId,
+    channelSubscriptions,
   } = params;
   return {
     outboxState,
@@ -108,6 +114,7 @@ export function sharedData(params: SharedData): SharedData {
     adjudicatorState,
     fundingState,
     activeAppChannelId,
+    channelSubscriptions,
   };
 }
 
