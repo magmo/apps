@@ -23,6 +23,17 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
     });
   };
 
+  it('should return an empty array when channelSubscriptions is empty', () => {
+    const state = walletStates.initialized({
+      ...walletStates.EMPTY_SHARED_DATA,
+      uid: '',
+      processStore: {},
+      adjudicatorStore: {},
+      channelSubscriptions: {},
+    });
+    expect(selectors.getAdjudicatorWatcherProcessesForChannel(state, '0x0')).toEqual([]);
+  });
+
   it('should return an array of processIds that are registered for a channel', () => {
     const processIds = ['p1', 'p2'];
     const channelId = '0x0';
