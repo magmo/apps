@@ -1,9 +1,59 @@
-// TODO: Update for new consensus game
+import * as scenarios from './scenarios';
+import { IndirectDefundingState } from '../state';
+import { ProtocolStateWithSharedData } from '../..';
+import { getLastMessage } from '../../../state';
+import { SignedCommitment } from '../../../../domain';
+import * as states from '../state';
+import { initialize } from '../reducer';
 
-it.skip('dummy', () => {
-  expect(true).toBe(true);
+describe('player A happy path', () => {
+  const scenario = scenarios.playerAHappyPath;
+  const {
+    processId,
+    channelId,
+    ledgerId,
+    store,
+    proposedAllocation,
+    proposedDestination,
+  } = scenario.initialParams;
+
+  describe('when initializing', () => {
+    const result = initialize(
+      processId,
+      channelId,
+      ledgerId,
+      proposedAllocation,
+      proposedDestination,
+      store,
+    );
+    itTransitionsTo(result, states.WAIT_FOR_LEDGER_UPDATE);
+    itSendsMessage(result, scenario.initialParams.reply);
+  });
 });
 
+type ReturnVal = ProtocolStateWithSharedData<IndirectDefundingState>;
+function itTransitionsTo(state: ReturnVal, type: IndirectDefundingState['type']) {
+  it(`transitions protocol state to ${type}`, () => {
+    expect(state.protocolState.type).toEqual(type);
+  });
+}
+
+function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
+  it('sends a message', () => {
+    const lastMessage = getLastMessage(state.sharedData);
+    if (lastMessage && 'messagePayload' in lastMessage) {
+      const dataPayload = lastMessage.messagePayload.data;
+      // This is yuk. The data in a message is currently of 'any' type..
+      if (!('signedCommitment' in dataPayload)) {
+        fail('No signedCommitment in the last message.');
+      }
+      const { commitment, signature } = dataPayload.signedCommitment;
+      expect({ commitment, signature }).toEqual(message);
+    } else {
+      fail('No messages in the outbox.');
+    }
+  });
+}
 // import * as states from '../state';
 // import { initialize, indirectDefundingReducer } from '../reducer';
 // import * as scenarios from './scenarios';

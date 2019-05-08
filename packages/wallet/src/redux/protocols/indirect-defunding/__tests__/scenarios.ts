@@ -1,255 +1,74 @@
-import * as states from '../state';
-import * as testScenarios from '../../../__tests__/test-scenarios';
-
-import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
-import * as actions from '../../../actions';
-import { AdjudicatorState } from '../../../adjudicator-state/state';
-import { ChannelState, ChannelStore } from '../../../channel-store';
-
-// Various state properties
-const processId = 'processid.123';
-const {
-  asAddress: address,
-  asPrivateKey: privateKey,
-  participants,
-  ledgerCommitments,
+import {
+  appCommitment,
+  ledgerCommitment,
+  asAddress,
+  bsAddress,
+  asPrivateKey,
   ledgerId,
-  ledgerLibraryAddress,
-  signedLedgerCommitments,
-} = testScenarios;
-
-const channelId = ledgerId;
-const baseChannelStatus: ChannelState = {
-  address,
-  privateKey,
   channelId,
-  libraryAddress: ledgerLibraryAddress,
-  participants,
-  channelNonce: 0,
-  funded: true,
-  ourIndex: 0,
-  turnNum: ledgerCommitments.ledgerUpdate1.turnNum,
-  lastCommitment: { commitment: ledgerCommitments.ledgerUpdate1, signature: '0x0' },
-  penultimateCommitment: { commitment: ledgerCommitments.ledgerUpdate0, signature: '0x0' },
-};
+} from '../../../../domain/commitments/__tests__';
+import { bigNumberify } from 'ethers/utils/bignumber';
+import { waitForLedgerUpdate } from '../state';
+import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
+// -----------
+// Commitments
+// -----------
+const processId = 'processId';
 
-const playerAStartChannelState: ChannelStore = {
-  [channelId]: baseChannelStatus,
-};
+const twoThree = [
+  { address: asAddress, wei: bigNumberify(2).toHexString() },
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+];
 
-const playerAWaitForCommitmentChannelState: ChannelStore = {
-  [channelId]: {
-    ...baseChannelStatus,
-    lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate1, signature: '0x0' },
-    penultimateCommitment: {
-      commitment: ledgerCommitments.ledgerDefundUpdate0,
-      signature: '0x0',
-    },
-    turnNum: ledgerCommitments.ledgerDefundUpdate1.turnNum,
-  },
-};
+const fiveToApp = [{ address: channelId, wei: bigNumberify(5).toHexString() }];
 
-const playerBStartChannelState: ChannelStore = {
-  [channelId]: {
-    ...baseChannelStatus,
-    ourIndex: 1,
-  },
-};
-
-const playerBWaitForFinalCommitmentChannelState: ChannelStore = {
-  [channelId]: {
-    ...baseChannelStatus,
-    ourIndex: 1,
-    lastCommitment: { commitment: ledgerCommitments.ledgerDefundUpdate1, signature: '0x0' },
-    penultimateCommitment: {
-      commitment: ledgerCommitments.ledgerDefundUpdate0,
-      signature: '0x0',
-    },
-    turnNum: ledgerCommitments.ledgerDefundUpdate1.turnNum,
-  },
-};
-
-const adjudicatorState: AdjudicatorState = {
-  [channelId]: {
-    finalized: true,
-    channelId,
-    balance: '0x0',
-  },
-};
-
-const notClosedAdjudicatorState: AdjudicatorState = {
-  [channelId]: {
-    finalized: false,
-    channelId,
-    balance: '0x0',
-  },
-};
-
-const playerAStartSharedData: SharedData = {
-  ...EMPTY_SHARED_DATA,
-  adjudicatorState,
-  channelStore: playerAStartChannelState,
-};
-
-const playerAWaitForUpdateSharedData: SharedData = {
-  ...EMPTY_SHARED_DATA,
-  adjudicatorState,
-  channelStore: playerAWaitForCommitmentChannelState,
-};
-
-const playerBStartSharedData: SharedData = {
-  ...EMPTY_SHARED_DATA,
-  adjudicatorState,
-  channelStore: playerBStartChannelState,
-};
-
-const playerBWaitForFinalUpdateSharedData = {
-  ...EMPTY_SHARED_DATA,
-  adjudicatorState,
-  channelStore: playerBWaitForFinalCommitmentChannelState,
-};
-
-const notDefundableSharedData: SharedData = {
-  ...EMPTY_SHARED_DATA,
-  adjudicatorState: notClosedAdjudicatorState,
-  channelStore: playerAStartChannelState,
-};
-
-const {
-  allocation: proposedAllocation,
-  destination: proposedDestination,
-} = ledgerCommitments.ledgerDefundUpdate1;
-
-// Actions
-const playerACommitmentReceived = actions.commitmentReceived(
-  processId,
-  signedLedgerCommitments.signedLedgerCommitment7,
-);
-const playerBFirstCommitmentReceived = actions.commitmentReceived(
-  processId,
-  signedLedgerCommitments.signedLedgerCommitment6,
-);
-const playerBFinalCommitmentReceived = actions.commitmentReceived(
-  processId,
-  signedLedgerCommitments.signedLedgerCommitment6,
-);
-
-const invalidCommitmentReceived = actions.commitmentReceived(
-  processId,
-  signedLedgerCommitments.signedLedgerCommitment0,
-);
-
-// Indirect Defunding States
-const waitForLedgerUpdate = states.waitForLedgerUpdate({
-  processId,
+const props = {
   channelId,
-  proposedAllocation,
-  proposedDestination,
-});
-const waitForFinalLedgerUpdate = states.waitForFinalLedgerUpdate({
+  ledgerId,
   processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-});
-const notDefundableFailure = states.failure('Channel Not Closed');
-const invalidCommitmentFailure = states.failure('Received Invalid Commitment');
+  proposedAllocation: twoThree.map(a => a.wei),
+  proposedDestination: twoThree.map(a => a.address),
+};
 
-// Scenarios
+const app10 = appCommitment({ turnNum: 10, balances: twoThree, isFinal: true });
+const app11 = appCommitment({ turnNum: 11, balances: twoThree, isFinal: true });
+
+const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
+const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
+const ledger6 = ledgerCommitment({ turnNum: 6, balances: fiveToApp, proposedBalances: twoThree });
+// const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
+
+const playerAWaitForUpdate = {
+  state: waitForLedgerUpdate(props),
+  store: setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(app10, app11, asAddress, asPrivateKey),
+    channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+  ]),
+};
+
+const playerBWaitForUpdate = {
+  state: waitForLedgerUpdate(props),
+  store: setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),
+    channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+  ]),
+};
+
 export const playerAHappyPath = {
-  processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-  firstUpdateCommitment: ledgerCommitments.ledgerDefundUpdate0,
-  // secondUpdateCommitment: ledgerCommitments.ledgerDefundUpdate2,
-  states: {
-    waitForLedgerUpdate,
-  },
-  actions: {
-    commitmentReceived: playerACommitmentReceived,
-  },
-  sharedData: {
-    initializingSharedData: playerAStartSharedData,
-    waitForLedgerUpdateSharedData: playerAWaitForUpdateSharedData,
+  initialParams: {
+    store: playerAWaitForUpdate.store,
+    ...props,
+    reply: ledger6,
   },
 };
 
 export const playerBHappyPath = {
-  processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-  updateCommitment: ledgerCommitments.ledgerDefundUpdate1,
-
-  states: {
-    waitForLedgerUpdate,
-    waitForFinalLedgerUpdate,
-  },
-  actions: {
-    firstCommitmentReceived: playerBFirstCommitmentReceived,
-    finalCommitmentReceived: playerBFinalCommitmentReceived,
-  },
-  sharedData: {
-    initializingSharedData: playerBStartSharedData,
-    waitForFinalUpdateSharedData: playerBWaitForFinalUpdateSharedData,
-  },
-};
-
-export const notDefundable = {
-  processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-  sharedData: notDefundableSharedData,
-  states: {
-    failure: notDefundableFailure,
-  },
-};
-
-export const playerAInvalidCommitment = {
-  processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-  sharedData: playerAStartSharedData,
-  states: {
-    waitForLedgerUpdate,
-    failure: invalidCommitmentFailure,
-  },
-  actions: {
-    commitmentReceived: invalidCommitmentReceived,
-  },
-};
-
-export const playerBInvalidFirstCommitment = {
-  processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-  sharedData: playerBStartSharedData,
-  states: {
-    waitForLedgerUpdate,
-    failure: invalidCommitmentFailure,
-  },
-  actions: {
-    firstCommitmentReceived: invalidCommitmentReceived,
-  },
-};
-
-export const playerBInvalidFinalCommitment = {
-  processId,
-  channelId,
-  proposedAllocation,
-  proposedDestination,
-  sharedData: playerBStartSharedData,
-  states: {
-    waitForLedgerUpdate,
-    waitForFinalLedgerUpdate,
-    failure: invalidCommitmentFailure,
-  },
-  actions: {
-    firstCommitmentReceived: playerBFirstCommitmentReceived,
-    finalCommitmentReceived: invalidCommitmentReceived,
+  initialParams: {
+    store: playerBWaitForUpdate.store,
+    channelId,
+    ledgerId,
+    processId: 'processId',
   },
 };
