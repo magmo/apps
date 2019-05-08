@@ -173,7 +173,7 @@ function handleWaitForDirectFunding(
   // Update direct funding state on our protocol state
   const newDirectFundingState = protocolStateWithSharedData.protocolState;
   const newProtocolState = { ...protocolState, directFundingState: newDirectFundingState };
-
+  sharedData = protocolStateWithSharedData.sharedData;
   if (isSuccess(newDirectFundingState)) {
     return { protocolState: bWaitForLedgerUpdate0(newProtocolState), sharedData };
   } else if (isFailure(newDirectFundingState)) {
