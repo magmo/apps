@@ -10,10 +10,10 @@ import {
   checkAndStore,
   signAndStore,
 } from '../../../state';
-import { IndirectFundingState, failure } from '../state';
+import { IndirectFundingState, failure, success } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
-import { CommitmentType, Commitment, getChannelId } from '../../../../domain';
+import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../../domain';
 import { Channel } from 'fmg-core/lib/channel';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { getChannel, theirAddress } from '../../../channel-store';
@@ -28,17 +28,18 @@ import {
 } from '../../direct-funding/state';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
-import {
-  UpdateType,
-  propose,
-  appAttributesFromBytes,
-  ConsensusReachedCommitment,
-} from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { proposeNewConsensus } from '../../../../domain/two-player-consensus-game';
+import { unreachable } from '../../../../utils/reducer-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
 
-export function initialize(channelId: string, sharedData: SharedData): ReturnVal {
+export function initialize(
+  processId: string,
+  channelId: string,
+  sharedData: SharedData,
+): ReturnVal {
   const channel = getChannel(sharedData.channelStore, channelId);
   if (!channel) {
     throw new Error(`Could not find existing application channel ${channelId}`);
@@ -64,7 +65,7 @@ export function initialize(channelId: string, sharedData: SharedData): ReturnVal
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
     theirAddress(channel),
-    'processId', // TODO don't use dummy values
+    processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
@@ -73,6 +74,7 @@ export function initialize(channelId: string, sharedData: SharedData): ReturnVal
   const protocolState = states.aWaitForPreFundSetup1({
     channelId,
     ledgerId,
+    processId,
   });
   return { protocolState, sharedData };
 }
@@ -87,9 +89,78 @@ export function playerAReducer(
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
     case 'AWaitForDirectFunding':
       return handleWaitForDirectFunding(protocolState, sharedData, action);
+    case 'AWaitForLedgerUpdate1':
+      return handleWaitForLedgerUpdate(protocolState, sharedData, action);
+    case 'AWaitForPostFundSetup1':
+      return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
-      return { protocolState, sharedData };
+      return unreachable(protocolState);
   }
+}
+
+function handleWaitForPostFundSetup(
+  protocolState: states.AWaitForPostFundSetup1,
+  sharedData: SharedData,
+  action: IDFAction | DirectFundingAction,
+): ReturnVal {
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  const newProtocolState = success();
+  const newReturnVal = { protocolState: newProtocolState, sharedData };
+  return newReturnVal;
+}
+
+function handleWaitForLedgerUpdate(
+  protocolState: states.AWaitForLedgerUpdate1,
+  sharedData: SharedData,
+  action: IDFAction | DirectFundingAction,
+): ReturnVal {
+  const unchangedState = { protocolState, sharedData };
+  if (action.type !== actions.COMMITMENT_RECEIVED) {
+    throw new Error('Incorrect action');
+  }
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Indirect funding protocol, unable to validate or store commitment');
+  }
+  sharedData = checkResult.store;
+
+  // We can now create a post fund commitment for the app
+  const appChannel = getChannel(sharedData.channelStore, protocolState.channelId);
+  if (!appChannel) {
+    throw new Error(`Could not find app channel for id ${protocolState.channelId}`);
+  }
+  const theirAppCommitment = appChannel.lastCommitment.commitment;
+
+  const ourAppCommitment = nextSetupCommitment(theirAppCommitment);
+  if (ourAppCommitment === 'NotASetupCommitment') {
+    throw new Error('Not a Setup commitment');
+  }
+  const signResult = signAndStore(sharedData, ourAppCommitment);
+  if (!signResult.isSuccess) {
+    return unchangedState;
+  }
+  sharedData = signResult.store;
+
+  // just need to put our message in the outbox
+  const messageRelay = sendCommitmentReceived(
+    theirAddress(appChannel),
+    protocolState.processId,
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  sharedData = queueMessage(sharedData, messageRelay);
+
+  const newProtocolState = states.aWaitForPostFundSetup1(protocolState);
+  const newReturnVal = { protocolState: newProtocolState, sharedData };
+  return newReturnVal;
 }
 
 function handleWaitForPreFundSetup(
@@ -117,14 +188,17 @@ function handleWaitForPreFundSetup(
   // Do we really need to do that constantly or is it for debugging mostly?
   const theirCommitment = action.signedCommitment.commitment;
   const ledgerId = getChannelId(theirCommitment);
+
+  const total = theirCommitment.allocation.reduce(addHex);
+  const ourAmount = theirCommitment.allocation[0];
   // update the state
   const directFundingAction = directFundingRequested(
-    'processId',
+    protocolState.processId,
     ledgerId,
-    '0',
-    '0', // TODO don't use dummy values
-    '0',
-    1,
+    '0x0',
+    total,
+    ourAmount,
+    0,
   );
   const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
   const newProtocolState = states.aWaitForDirectFunding({
@@ -132,6 +206,7 @@ function handleWaitForPreFundSetup(
     ledgerId,
     directFundingState: directFundingState.protocolState,
   });
+  sharedData = directFundingState.sharedData;
 
   return { protocolState: newProtocolState, sharedData };
 }
@@ -162,11 +237,10 @@ function handleWaitForDirectFunding(
     if (!channel) {
       throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
     }
-    const ourCommitment = createProposeLedgerUpdate(
-      protocolState.channelId,
-      channel.lastCommitment.commitment,
-    );
 
+    const theirCommitment = channel.lastCommitment.commitment;
+    const total = theirCommitment.allocation.reduce(addHex);
+    const ourCommitment = proposeNewConsensus(theirCommitment, [total], [protocolState.channelId]);
     const signResult = signAndStore(sharedData, ourCommitment);
     if (!signResult.isSuccess) {
       return { protocolState: newProtocolState, sharedData };
@@ -175,7 +249,7 @@ function handleWaitForDirectFunding(
 
     const messageRelay = sendCommitmentReceived(
       theirAddress(channel),
-      'processId', // TODO don't use dummy values
+      protocolState.processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
     );
@@ -187,27 +261,10 @@ function handleWaitForDirectFunding(
   return { protocolState, sharedData };
 }
 
-function createProposeLedgerUpdate(channelIdToFund: string, commitment: Commitment): Commitment {
-  const total = commitment.allocation.reduce(addHex);
-  const proposeArgs: ConsensusReachedCommitment = {
-    ...commitment,
-    ...appAttributesFromBytes(commitment.appAttributes),
-    updateType: UpdateType.Consensus,
-  };
-  const proposeCommitment = propose(proposeArgs, [total], [channelIdToFund]);
-  return {
-    ...commitment,
-    turnNum: proposeCommitment.turnNum,
-    commitmentCount: 0,
-    commitmentType: CommitmentType.App,
-    appAttributes: bytesFromAppAttributes(proposeCommitment),
-  };
-}
-
 function createInitialSetupCommitment(allocation: string[], destination: string[]): Commitment {
   const appAttributes = {
-    proposedAllocation: allocation,
-    proposedDestination: destination,
+    proposedAllocation: [],
+    proposedDestination: [],
     furtherVotesRequired: 0,
     updateType: UpdateType.Consensus,
   };

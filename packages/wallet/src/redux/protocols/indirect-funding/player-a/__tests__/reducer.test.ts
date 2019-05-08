@@ -8,8 +8,8 @@ import { getLastMessage } from '../../../../state';
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('initializing', () => {
-    const { channelId, store, reply } = scenario.initialParams;
-    const initialState = initialize(channelId, store);
+    const { channelId, store, reply, processId } = scenario.initialParams;
+    const initialState = initialize(processId, channelId, store);
 
     itTransitionsTo(initialState, 'AWaitForPreFundSetup1');
     itSendsMessage(initialState, reply);
@@ -68,17 +68,13 @@ function itTransitionsTo(state: ReturnVal, type: IndirectFundingState['type']) {
 function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
   it('sends a message', () => {
     const lastMessage = getLastMessage(state.sharedData);
-
     if (lastMessage && 'messagePayload' in lastMessage) {
       const dataPayload = lastMessage.messagePayload.data;
       // This is yuk. The data in a message is currently of 'any' type..
-      if (!('commitment' in dataPayload)) {
-        fail('No commitment in the last message.');
+      if (!('signedCommitment' in dataPayload)) {
+        fail('No signedCommitment in the last message.');
       }
-      if (!('signature' in dataPayload)) {
-        fail('No signature in the last message.');
-      }
-      const { commitment, signature } = dataPayload;
+      const { commitment, signature } = dataPayload.signedCommitment;
       expect({ commitment, signature }).toEqual(message);
     } else {
       fail('No messages in the outbox.');

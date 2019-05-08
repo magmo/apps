@@ -1,38 +1,47 @@
 import {
-  AppAttributes,
-  appAttributes,
   ConsensusBaseCommitment,
   ConsensusReachedCommitment,
   ProposalCommitment,
   UpdateType,
+  bytesFromAppAttributes,
+  appAttributesFromBytes,
+  finalVote,
+  propose,
 } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { Bytes, Commitment } from 'fmg-core';
-import abi from 'web3-eth-abi';
+import { Commitment } from 'fmg-core';
 import { CommitmentType } from '../commitments';
 /////////////
 // Helpers //
 /////////////
 
-const SolidityConsensusCommitmentType = {
-  ConsensusCommitmentStruct: {
-    furtherVotesRequired: 'uint32',
-    proposedAllocation: 'uint256[]',
-    proposedDestination: 'address[]',
-    updateType: 'uint32',
-  },
-};
+export function acceptConsensus(commitment: Commitment): Commitment {
+  const fromCommitment = fromCoreCommitment(commitment);
+  if (fromCommitment.updateType !== UpdateType.Proposal) {
+    throw new Error('The received commitment was not a ledger proposal');
+  }
+  const acceptCommitment = finalVote(fromCommitment);
+  // TODO: This should be done in the finalVote helper
+  // Once the fmg-nitro-adjudicator package is part of apps
+  // we can make the change there and remove this.
+  acceptCommitment.furtherVotesRequired = 0;
 
-export function encodeAppAttributes(appAttrs: AppAttributes): Bytes {
-  return abi.encodeParameter(SolidityConsensusCommitmentType, [
-    appAttrs.furtherVotesRequired,
-    appAttrs.proposedAllocation,
-    appAttrs.proposedDestination,
-    appAttrs.updateType,
-  ]);
+  acceptCommitment.commitmentCount = 0;
+  return asCoreCommitment(acceptCommitment);
 }
 
-export function decodeAppAttributes(appAttrs: Bytes): AppAttributes {
-  return appAttributes(abi.decodeParameter(SolidityConsensusCommitmentType, appAttrs));
+// TODO: Should we use a Balance interface instead of proposedAlloc/Dest
+export function proposeNewConsensus(
+  commitment: Commitment,
+  proposedAllocation: string[],
+  proposedDestination: string[],
+): Commitment {
+  const fromCommitment = fromCoreCommitment(commitment);
+  if (fromCommitment.updateType !== UpdateType.Consensus) {
+    throw new Error('The received commitment was not a ledger consensus');
+  }
+  const proposeCommitment = propose(fromCommitment, proposedAllocation, proposedDestination);
+  proposeCommitment.commitmentCount = 0;
+  return asCoreCommitment(proposeCommitment);
 }
 
 export function asCoreCommitment(commitment: ConsensusBaseCommitment): Commitment {
@@ -55,7 +64,7 @@ export function asCoreCommitment(commitment: ConsensusBaseCommitment): Commitmen
     allocation,
     destination,
     commitmentCount,
-    appAttributes: encodeAppAttributes({
+    appAttributes: bytesFromAppAttributes({
       furtherVotesRequired,
       proposedAllocation,
       proposedDestination,
@@ -74,7 +83,7 @@ export function fromCoreCommitment(
     proposedAllocation,
     updateType,
     proposedDestination,
-  } = decodeAppAttributes(commitment.appAttributes);
+  } = appAttributesFromBytes(commitment.appAttributes);
   if (updateType === UpdateType.Consensus) {
     return {
       channel,
