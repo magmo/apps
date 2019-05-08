@@ -31,6 +31,7 @@ import { addHex } from '../../../../utils/hex-utils';
 import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { proposeNewConsensus } from '../../../../domain/two-player-consensus-game';
 import { unreachable } from '../../../../utils/reducer-utils';
+import { AdjudicatorChannelState } from '../../../adjudicator-state/state';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = actions.indirectFunding.Action;
@@ -61,6 +62,12 @@ export function initialize(
   sharedData = signResult.store;
 
   const ledgerId = getChannelId(ourCommitment);
+  const emptyAdjudicatorChannelState: AdjudicatorChannelState = {
+    channelId: ledgerId,
+    balance: '',
+    finalized: false,
+  };
+  sharedData.adjudicatorState[ledgerId] = emptyAdjudicatorChannelState;
 
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
