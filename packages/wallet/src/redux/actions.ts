@@ -19,8 +19,8 @@ import {
 import { WithdrawalAction } from './protocols/withdrawing/actions';
 import { RespondingAction } from './protocols/responding/actions';
 import { DefundingAction } from './protocols/defunding/actions';
-import { ConcludingAction as ConcludingActionI } from './protocols/concluding/instigator/actions';
-import { ConcludingAction as ConcludingActionR } from './protocols/concluding/responder/actions';
+import { ConcludingAction as ConcludingActionInstigator } from './protocols/concluding/instigator/actions';
+import { ConcludingAction as ConcludingActionResponder } from './protocols/concluding/responder/actions';
 export * from './protocols/transaction-submission/actions';
 export { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived };
 
@@ -158,8 +158,8 @@ export type ProtocolAction =
   | RespondingAction
   | application.ApplicationAction
   | DefundingAction
-  | ConcludingActionI
-  | ConcludingActionR;
+  | ConcludingActionInstigator
+  | ConcludingActionResponder;
 
 export type WalletAction =
   | AdjudicatorKnown
