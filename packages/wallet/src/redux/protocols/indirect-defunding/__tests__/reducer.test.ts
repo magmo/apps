@@ -37,6 +37,16 @@ describe('player A happy path', () => {
   });
 });
 
+describe('player A invalid commitment', () => {
+  const scenario = scenarios.playerAInvalidCommitment;
+
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action } = scenario.waitForLedgerUpdate;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, states.FAILURE);
+  });
+});
+
 describe('player B happy path', () => {
   const scenario = scenarios.playerBHappyPath;
   const {
@@ -65,6 +75,16 @@ describe('player B happy path', () => {
     const updatedState = indirectDefundingReducer(state.state, state.store, action);
     itTransitionsTo(updatedState, states.SUCCESS);
     itSendsMessage(updatedState, reply);
+  });
+});
+
+describe('player B invalid commitment', () => {
+  const scenario = scenarios.playerBInvalidCommitment;
+
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action } = scenario.waitForLedgerUpdate;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, states.FAILURE);
   });
 });
 

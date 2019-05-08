@@ -57,7 +57,7 @@ const notDefundableInitialStore = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
 ]);
 
-const playerAWaitForLedgerUpdate = {
+const playerAWaitForUpdate = {
   state: waitForLedgerUpdate(props),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app10, app11, asAddress, asPrivateKey),
@@ -78,7 +78,7 @@ const playerBWaitForUpdate = {
 // -----------
 const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger6);
 const ledgerUpdate1Received = globalActions.commitmentReceived(processId, ledger7);
-
+const invalidLedgerUpdateReceived = globalActions.commitmentReceived(processId, ledger5);
 // -----------
 // Scenarios
 // -----------
@@ -88,13 +88,14 @@ export const playerAHappyPath = {
     ...props,
     reply: ledger6,
   },
-  waitForLedgerUpdate: { state: playerAWaitForLedgerUpdate, action: ledgerUpdate1Received },
+  waitForLedgerUpdate: { state: playerAWaitForUpdate, action: ledgerUpdate1Received },
 };
-export const notDefundable = {
-  initialParams: {
-    store: notDefundableInitialStore,
-    ...props,
-  },
+
+export const playerAInvalidCommitment = {
+  waitForLedgerUpdate: { state: playerAWaitForUpdate, action: invalidLedgerUpdateReceived },
+};
+export const playerBInvalidCommitment = {
+  waitForLedgerUpdate: { state: playerBWaitForUpdate, action: invalidLedgerUpdateReceived },
 };
 
 export const playerBHappyPath = {
@@ -106,5 +107,12 @@ export const playerBHappyPath = {
     state: playerBWaitForUpdate,
     action: ledgerUpdate0Received,
     reply: ledger7,
+  },
+};
+
+export const notDefundable = {
+  initialParams: {
+    store: notDefundableInitialStore,
+    ...props,
   },
 };
