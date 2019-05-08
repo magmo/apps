@@ -209,7 +209,6 @@ function handleWaitForLedgerUpdate(
   // if so, we need to craft our reply
 
   const ourCommitment = acceptConsensus(theirCommitment);
-  // TODO this should happen automatically in the finalVote helper function
 
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
