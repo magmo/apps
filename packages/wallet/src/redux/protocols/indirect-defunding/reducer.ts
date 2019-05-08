@@ -1,12 +1,12 @@
 import { ProtocolStateWithSharedData } from '..';
-import { SharedData, signAndStore, queueMessage } from '../../state';
+import { SharedData, signAndStore, queueMessage, checkAndStore } from '../../state';
 import * as states from './state';
 import { IndirectDefundingAction } from './actions';
 import { COMMITMENT_RECEIVED } from '../../actions';
 import * as helpers from '../reducer-helpers';
 import { unreachable } from '../../../utils/reducer-utils';
 import * as selectors from '../../selectors';
-import { proposeNewConsensus } from '../../../domain/two-player-consensus-game';
+import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../communication';
 import { theirAddress } from '../../channel-store';
 
@@ -84,33 +84,36 @@ const waitForLedgerUpdateReducer = (
   if (action.type !== COMMITMENT_RECEIVED) {
     throw new Error(`Invalid action ${action.type}`);
   }
-  return { protocolState, sharedData };
-  // const { commitment, signature } = action.signedCommitment;
-  // const newSharedData = receiveLedgerCommitment(sharedData, commitment, signature);
-  // if (!validTransition(newSharedData, protocolState.ledgerChannelId, commitment)) {
-  //   return {
-  //     protocolState: states.failure('Received Invalid Commitment'),
-  //     sharedData: newSharedData,
-  //   };
-  // }
-  // const { processId, channelId, proposedAllocation, proposedDestination } = protocolState;
-  // if (helpers.isFirstPlayer(protocolState.ledgerChannelId, newSharedData)) {
-  //   return {
-  //     protocolState: states.success(),
-  //     sharedData: newSharedData,
-  //   };
-  // } else {
-  //   // TODO: This needs to be updated to the new consensus game
-  //   // newSharedData = craftAndSendLegerUpdate(
-  //   //   newSharedData,
-  //   //   processId,
-  //   //   channelId,
-  //   //   proposedAllocation,
-  //   //   proposedDestination,
-  //   // );
-  //   return {
-  //     protocolState: states.waitForFinalLedgerUpdate(protocolState),
-  //     sharedData: newSharedData,
-  //   };
-  // }
+
+  let newSharedData = { ...sharedData };
+
+  const checkResult = checkAndStore(newSharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    return { protocolState: states.failure('Received Invalid Commitment'), sharedData };
+  }
+  newSharedData = checkResult.store;
+
+  if (!helpers.isFirstPlayer(protocolState.channelId, sharedData)) {
+    const theirCommitment = action.signedCommitment.commitment;
+    const ourCommitment = acceptConsensus(theirCommitment);
+    const signResult = signAndStore(newSharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      return {
+        protocolState: states.failure('Received Invalid Commitment'),
+        sharedData: newSharedData,
+      };
+    }
+    newSharedData = signResult.store;
+    const { ledgerId, processId } = protocolState;
+    const ledgerChannel = selectors.getChannelState(newSharedData, ledgerId);
+
+    const messageRelay = sendCommitmentReceived(
+      theirAddress(ledgerChannel),
+      processId,
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
+    );
+    newSharedData = queueMessage(newSharedData, messageRelay);
+  }
+  return { protocolState: states.success(), sharedData: newSharedData };
 };

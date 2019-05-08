@@ -12,6 +12,7 @@ import { waitForLedgerUpdate } from '../state';
 import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
+import * as globalActions from '../../../actions';
 // -----------
 // Commitments
 // -----------
@@ -38,13 +39,18 @@ const app11 = appCommitment({ turnNum: 11, balances: twoThree, isFinal: true });
 const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances: fiveToApp, proposedBalances: twoThree });
-// const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
+const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
 
-const playerAWaitForUpdate = {
+const initialStore = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app10, app11, asAddress, asPrivateKey),
+  channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+]);
+
+const playerAWaitForLedgerUpdate = {
   state: waitForLedgerUpdate(props),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app10, app11, asAddress, asPrivateKey),
-    channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+    channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
   ]),
 };
 
@@ -55,20 +61,25 @@ const playerBWaitForUpdate = {
     channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
   ]),
 };
-
+const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger6);
+const ledgerUpdate1Received = globalActions.commitmentReceived(processId, ledger7);
 export const playerAHappyPath = {
   initialParams: {
-    store: playerAWaitForUpdate.store,
+    store: initialStore,
     ...props,
     reply: ledger6,
   },
+  waitForLedgerUpdate: { state: playerAWaitForLedgerUpdate, action: ledgerUpdate1Received },
 };
 
 export const playerBHappyPath = {
   initialParams: {
-    store: playerBWaitForUpdate.store,
-    channelId,
-    ledgerId,
-    processId: 'processId',
+    store: initialStore,
+    ...props,
+  },
+  waitForLedgerUpdate: {
+    state: playerBWaitForUpdate,
+    action: ledgerUpdate0Received,
+    reply: ledger7,
   },
 };

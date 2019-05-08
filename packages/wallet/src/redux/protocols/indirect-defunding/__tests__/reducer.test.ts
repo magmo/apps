@@ -4,7 +4,7 @@ import { ProtocolStateWithSharedData } from '../..';
 import { getLastMessage } from '../../../state';
 import { SignedCommitment } from '../../../../domain';
 import * as states from '../state';
-import { initialize } from '../reducer';
+import { initialize, indirectDefundingReducer } from '../reducer';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAHappyPath;
@@ -28,6 +28,43 @@ describe('player A happy path', () => {
     );
     itTransitionsTo(result, states.WAIT_FOR_LEDGER_UPDATE);
     itSendsMessage(result, scenario.initialParams.reply);
+  });
+
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action } = scenario.waitForLedgerUpdate;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, states.SUCCESS);
+  });
+});
+
+describe('player B happy path', () => {
+  const scenario = scenarios.playerBHappyPath;
+  const {
+    processId,
+    channelId,
+    ledgerId,
+    store,
+    proposedAllocation,
+    proposedDestination,
+  } = scenario.initialParams;
+
+  describe('when initializing', () => {
+    const result = initialize(
+      processId,
+      channelId,
+      ledgerId,
+      proposedAllocation,
+      proposedDestination,
+      store,
+    );
+    itTransitionsTo(result, states.WAIT_FOR_LEDGER_UPDATE);
+  });
+
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action, reply } = scenario.waitForLedgerUpdate;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, states.SUCCESS);
+    itSendsMessage(updatedState, reply);
   });
 });
 
