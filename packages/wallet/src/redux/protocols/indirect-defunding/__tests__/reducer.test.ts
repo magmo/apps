@@ -68,6 +68,29 @@ describe('player B happy path', () => {
   });
 });
 
+describe('not defundable', () => {
+  const scenario = scenarios.notDefundable;
+  const {
+    processId,
+    channelId,
+    ledgerId,
+    store,
+    proposedAllocation,
+    proposedDestination,
+  } = scenario.initialParams;
+  describe('when initializing', () => {
+    const result = initialize(
+      processId,
+      channelId,
+      ledgerId,
+      proposedAllocation,
+      proposedDestination,
+      store,
+    );
+    itTransitionsTo(result, states.FAILURE);
+  });
+});
+
 type ReturnVal = ProtocolStateWithSharedData<IndirectDefundingState>;
 function itTransitionsTo(state: ReturnVal, type: IndirectDefundingState['type']) {
   it(`transitions protocol state to ${type}`, () => {
