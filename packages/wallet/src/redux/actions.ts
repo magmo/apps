@@ -5,7 +5,13 @@ import * as protocol from './protocols/actions';
 import * as challenging from './protocols/challenging/actions';
 import * as application from './protocols/application/actions';
 import { FundingAction } from './protocols/funding/actions';
-import { Commitment, SignedCommitment } from '../domain';
+import { Commitment } from '../domain';
+import {
+  COMMITMENT_RECEIVED,
+  CommitmentReceived,
+  commitmentReceived,
+  RelayableAction,
+} from '../communication';
 import {
   TransactionAction as TA,
   isTransactionAction as isTA,
@@ -13,8 +19,10 @@ import {
 import { WithdrawalAction } from './protocols/withdrawing/actions';
 import { RespondingAction } from './protocols/responding/actions';
 import { DefundingAction } from './protocols/defunding/actions';
-import { ConcludingAction } from './protocols/concluding/instigator/actions';
+import { ConcludingAction as ConcludingActionI } from './protocols/concluding/instigator/actions';
+import { ConcludingAction as ConcludingActionR } from './protocols/concluding/responder/actions';
 export * from './protocols/transaction-submission/actions';
+export { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived };
 
 export type TransactionAction = TA;
 export const isTransactionAction = isTA;
@@ -67,14 +75,6 @@ export const messageReceived = (processId: string, data: Message) => ({
   data,
 });
 export type MessageReceived = ReturnType<typeof messageReceived>;
-
-export const COMMITMENT_RECEIVED = 'WALLET.COMMON.COMMITMENT_RECEIVED';
-export const commitmentReceived = (processId: string, signedCommitment: SignedCommitment) => ({
-  type: COMMITMENT_RECEIVED as typeof COMMITMENT_RECEIVED,
-  processId,
-  signedCommitment,
-});
-export type CommitmentReceived = ReturnType<typeof commitmentReceived>;
 
 export const CHALLENGE_CREATED_EVENT = 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT';
 export const challengeCreatedEvent = (channelId: string, commitment: Commitment, finalizedAt) => ({
@@ -158,7 +158,8 @@ export type ProtocolAction =
   | RespondingAction
   | application.ApplicationAction
   | DefundingAction
-  | ConcludingAction;
+  | ConcludingActionI
+  | ConcludingActionR;
 
 export type WalletAction =
   | AdjudicatorKnown
@@ -170,7 +171,8 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | ChallengeCreatedEvent;
+  | ChallengeCreatedEvent
+  | RelayableAction;
 
 function isCommonAction(action: WalletAction): action is CommonAction {
   return (
