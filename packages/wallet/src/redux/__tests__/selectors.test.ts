@@ -1,27 +1,25 @@
 import * as walletStates from '../state';
 import * as selectors from '../selectors';
-import { WalletProtocol } from '../types';
 
 describe('getAdjudicatorWatcherProcessesForChannel', () => {
   const createWatcherState = (
     processIds: string[],
     channelId?: string,
   ): walletStates.Initialized => {
-    const processStore: walletStates.ProcessStore = {};
-    const channelsToMonitor = channelId ? [channelId] : [];
-    for (const processId of processIds) {
-      processStore[processId] = {
-        protocolState: {},
-        processId,
-        channelsToMonitor,
-        protocol: WalletProtocol.TransactionSubmission,
-      };
-    }
+    const channelSubscriptions: walletStates.ChannelSubscriptions = {};
+    processIds.forEach(processId => {
+      if (channelId) {
+        channelSubscriptions[processId] = [channelId];
+      } else {
+        channelSubscriptions[processId] = [];
+      }
+    });
     return walletStates.initialized({
       ...walletStates.EMPTY_SHARED_DATA,
       uid: '',
-      processStore,
+      processStore: {},
       adjudicatorStore: {},
+      channelSubscriptions,
     });
   };
 

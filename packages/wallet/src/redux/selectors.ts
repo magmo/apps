@@ -19,19 +19,14 @@ export const getChannelState = (state: SharedData, channelId: string): ChannelSt
   return channelStatus;
 };
 
-// TODO alter this function to pull watcher processes out of adjudicatoState[channelId].registeredProcesses
 export const getAdjudicatorWatcherProcessesForChannel = (
   state: walletStates.Initialized,
   channelId: string,
 ): string[] => {
   const processIds: string[] = [];
 
-  if (!state.channelSubscriptions) {
-    return processIds;
-  }
-  for (const processId of Object.keys(state.channelSubscriptions[channelId])) {
-    const { channelsToMonitor } = state.processStore[processId];
-
+  for (const processId of Object.keys(state.channelSubscriptions)) {
+    const channelsToMonitor = state.channelSubscriptions[processId];
     if (channelsToMonitor.indexOf(channelId) > -1) {
       processIds.push(processId);
     }

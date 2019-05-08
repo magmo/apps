@@ -43,14 +43,14 @@ export const WALLET_INITIALIZED = 'WALLET.INITIALIZED';
 export interface SharedData {
   channelStore: ChannelStore;
   outboxState: OutboxState;
-  channelSubscriptions?: ChannelSubscriptions;
+  channelSubscriptions: ChannelSubscriptions;
   adjudicatorState: AdjudicatorState;
   fundingState: FundingState;
   activeAppChannelId?: string;
 }
 
 export interface ChannelSubscriptions {
-  [channelId: string]: string[];
+  [processId: string]: string[];
 }
 export interface WaitForLogin extends SharedData {
   type: typeof WAIT_FOR_LOGIN;
@@ -69,6 +69,25 @@ export interface Initialized extends SharedData {
 }
 
 // TODO: Once these are fleshed out they should be moved to their own file.
+export function registerChannelToMonitor(
+  data: SharedData,
+  processId: string,
+  channelId: string,
+): SharedData {
+  const channelsToMonitor = data.channelSubscriptions[processId] || [];
+  return {
+    ...data,
+    channelSubscriptions: {
+      ...data.channelSubscriptions,
+      [processId]: channelsToMonitor.concat(channelId),
+    },
+  };
+}
+
+export function unregisterAllChannelToMonitor(data: SharedData, processId: string): SharedData {
+  return { ...data, channelSubscriptions: { ...data.channelSubscriptions, [processId]: [] } };
+}
+
 export interface ProcessStore {
   [processId: string]: ProcessState;
 }

@@ -9,6 +9,7 @@ import {
   queueMessage,
   checkAndStore,
   signAndStore,
+  registerChannelToMonitor,
 } from '../../../state';
 import { IndirectFundingState, failure, success } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
@@ -60,7 +61,7 @@ export function initialize(
   }
   sharedData = signResult.store;
   const ledgerId = getChannelId(ourCommitment);
-  sharedData = { ...sharedData, channelSubscriptions: { ledgerId: [processId] } };
+  sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
 
   // just need to put our message in the outbox
   const messageRelay = sendCommitmentReceived(
