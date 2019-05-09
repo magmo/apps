@@ -64,7 +64,7 @@ const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived
 const concludeSent = actions.concludeApproved(processId);
 const acknowledged = actions.acknowledged(processId);
 const commitmentReceivedAction = commitmentReceived(processId, app53);
-
+const defundChosen = actions.defundChosen(processId);
 // TODO: Failure scenarios
 
 // -------
@@ -87,7 +87,7 @@ export const happyPath = {
   acknowledgeConcludeReceived: {
     state: acknowledgeConcludeReceived,
     store: secondConcludeReceived,
-    action: acknowledged,
+    action: defundChosen,
   },
   waitForDefund: { state: waitForDefund, store: secondConcludeReceived, action: successTrigger },
   acknowledgeSuccess: {
