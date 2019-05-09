@@ -11,14 +11,17 @@ import {
 } from './states';
 import { ConcludingAction } from './actions';
 import { unreachable } from '../../../../utils/reducer-utils';
-import { SharedData, getChannel } from '../../../state';
+import { SharedData, getChannel, setChannelStore, queueMessage } from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
 type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
-import { sendConcludeChannel } from '../../../../communication';
+import * as selectors from '../../../selectors';
+import * as channelStoreReducer from '../../../channel-store/reducer';
+import { theirAddress } from '../../../channel-store';
+import { sendCommitmentReceived } from '../../../../communication';
 
 export interface ReturnVal {
   state: CState;
@@ -91,15 +94,14 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
   const channelState = getChannel(storage, state.channelId);
 
   if (channelState) {
-    const { commitment, signature } = composeConcludeCommitment(channelState);
-    const opponentAddress = channelState.participants[1 - channelState.ourIndex];
-    const processId = channelState.channelId;
+    const sharedDataWithOwnCommitment = createAndSendConcludeCommitment(
+      storage,
+      state.processId,
+      state.channelId,
+    );
     return {
       state: decideDefund({ ...state }),
-      sideEffects: {
-        messageOutbox: sendConcludeChannel(opponentAddress, processId, commitment, signature),
-      },
-      storage,
+      storage: sharedDataWithOwnCommitment,
     };
   } else {
     return { state, storage };
@@ -131,3 +133,32 @@ function acknowledged(state: CState, storage: Storage): ReturnVal {
       return { state, storage };
   }
 }
+
+//  Helpers
+const createAndSendConcludeCommitment = (
+  sharedData: SharedData,
+  processId: string,
+  channelId: string,
+): SharedData => {
+  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
+
+  const commitment = composeConcludeCommitment(channelState);
+
+  const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
+  if (signResult.isSuccess) {
+    const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
+    const messageRelay = sendCommitmentReceived(
+      theirAddress(channelState),
+      processId,
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
+    );
+    return queueMessage(sharedDataWithOwnCommitment, messageRelay);
+  } else {
+    throw new Error(
+      `Direct funding protocol, createAndSendPostFundCommitment, unable to sign commitment: ${
+        signResult.reason
+      }`,
+    );
+  }
+};

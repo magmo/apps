@@ -86,5 +86,5 @@ export const composeConcludeCommitment = (channelState: ChannelState) => {
     commitmentCount,
   };
 
-  return signCommitment2(concludeCommitment, channelState.privateKey);
+  return concludeCommitment;
 };
