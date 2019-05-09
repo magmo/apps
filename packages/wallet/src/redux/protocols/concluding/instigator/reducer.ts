@@ -20,11 +20,11 @@ import { initialize as initializeDefunding, defundingReducer } from '../../defun
 type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
 import * as channelStoreReducer from '../../../channel-store/reducer';
-import { sendCommitmentReceived } from '../../../../communication';
 import * as selectors from '../../../selectors';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
+import { sendConcludeChannel } from '../../../../communication';
 
 export interface ReturnVal {
   state: CState;
@@ -178,7 +178,7 @@ const createAndSendConcludeCommitment = (
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = sendCommitmentReceived(
+    const messageRelay = sendConcludeChannel(
       theirAddress(channelState),
       processId,
       signResult.signedCommitment.commitment,

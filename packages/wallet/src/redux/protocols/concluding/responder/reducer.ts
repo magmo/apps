@@ -21,7 +21,7 @@ import { isSuccess, isFailure } from '../../defunding/states';
 import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
-import { sendCommitmentReceived } from '../../../../communication';
+import { sendConcludeChannel } from '../../../../communication';
 
 export interface ReturnVal {
   state: CState;
@@ -147,7 +147,7 @@ const createAndSendConcludeCommitment = (
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = sendCommitmentReceived(
+    const messageRelay = sendConcludeChannel(
       theirAddress(channelState),
       processId,
       signResult.signedCommitment.commitment,
