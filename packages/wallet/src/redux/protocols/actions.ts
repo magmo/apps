@@ -23,7 +23,7 @@ export const CONCLUDE_REQUESTED = 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED';
 export const concludeRequested = (channelId: string) => ({
   type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
   channelId,
-  protocol: WalletProtocol.ConcludingInstigator,
+  protocol: WalletProtocol.Concluding,
 });
 export type ConcludeRequested = ReturnType<typeof concludeRequested>;
 
@@ -31,7 +31,7 @@ export const CONCLUDE_INSTIGATED = 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
 export const concludeInstigated = (signedCommitment: SignedCommitment) => ({
   type: CONCLUDE_INSTIGATED as typeof CONCLUDE_INSTIGATED,
   signedCommitment,
-  protocol: WalletProtocol.ConcludingResponder,
+  protocol: WalletProtocol.Concluding,
 });
 export type ConcludeInstigated = ReturnType<typeof concludeInstigated>;
 
