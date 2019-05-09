@@ -43,15 +43,15 @@ export function concludingReducer(
   }
 
   switch (action.type) {
-    case 'CONCLUDING.CANCELLED':
+    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED':
       return concludingCancelled(state, storage);
-    case 'CONCLUDE.SENT':
+    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT':
       return concludeSent(state, storage);
-    case 'CONCLUDE.RECEIVED':
+    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED':
       return concludeReceived(state, storage);
-    case 'DEFUND.CHOSEN':
+    case 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN':
       return defundChosen(state, storage);
-    case 'ACKNOWLEDGED':
+    case 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED':
       return acknowledged(state, storage);
     default:
       return unreachable(action);

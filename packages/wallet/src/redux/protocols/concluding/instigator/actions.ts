@@ -7,27 +7,27 @@ export type ConcludingAction =
   | DefundChosen
   | Acknowledged;
 export interface Cancelled {
-  type: 'CONCLUDING.CANCELLED';
+  type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED';
   processId: string;
 }
 
 export interface ConcludeSent {
-  type: 'CONCLUDE.SENT';
+  type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT';
   processId: string;
 }
 
 export interface ConcludeReceived {
-  type: 'CONCLUDE.RECEIVED';
+  type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED';
   processId: string;
 }
 
 export interface DefundChosen {
-  type: 'DEFUND.CHOSEN';
+  type: 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN';
   processId: string;
 }
 
 export interface Acknowledged {
-  type: 'ACKNOWLEDGED';
+  type: 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED';
   processId: string;
 }
 
@@ -36,27 +36,27 @@ export interface Acknowledged {
 // --------
 
 export const cancelled = (processId: string): Cancelled => ({
-  type: 'CONCLUDING.CANCELLED',
+  type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED',
   processId,
 });
 
 export const concludeSent = (processId: string): ConcludeSent => ({
-  type: 'CONCLUDE.SENT',
+  type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT',
   processId,
 });
 
 export const concludeReceived = (processId: string): ConcludeReceived => ({
-  type: 'CONCLUDE.RECEIVED',
+  type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED',
   processId,
 });
 
 export const defundChosen = (processId: string): DefundChosen => ({
-  type: 'DEFUND.CHOSEN',
+  type: 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN',
   processId,
 });
 
 export const acknowledged = (processId: string): Acknowledged => ({
-  type: 'ACKNOWLEDGED',
+  type: 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED',
   processId,
 });
 
@@ -66,9 +66,9 @@ export const acknowledged = (processId: string): Acknowledged => ({
 
 export const isConcludingAction = (action: WalletAction): action is ConcludingAction => {
   return (
-    action.type === 'CONCLUDING.CANCELLED' ||
-    action.type === 'CONCLUDE.SENT' ||
-    action.type === 'CONCLUDE.RECEIVED' ||
-    action.type === 'DEFUND.CHOSEN'
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT' ||
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED' ||
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN'
   );
 };
