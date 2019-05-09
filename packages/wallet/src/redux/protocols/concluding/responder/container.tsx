@@ -50,7 +50,7 @@ class ConcludingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  approve: actions.concludeSent,
+  approve: actions.concludeApproved,
   defund: actions.defundChosen,
   acknowledge: actions.acknowledged,
 };

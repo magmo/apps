@@ -51,8 +51,8 @@ export function responderConcludingReducer(
   }
 
   switch (action.type) {
-    case 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_SENT':
-      return concludeSent(state, storage);
+    case 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED':
+      return concludeApproved(state, storage);
     case 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN':
       return defundChosen(state, storage);
     case 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED':
@@ -117,7 +117,7 @@ function handleDefundingAction(
   return { state, storage };
 }
 
-function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
+function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'ResponderApproveConcluding') {
     return { state, storage };
   }

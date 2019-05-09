@@ -22,8 +22,9 @@ import * as selectors from '../../../selectors';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
-import { sendConcludeInstigated } from '../../../../communication';
+import { sendConcludeInstigated, COMMITMENT_RECEIVED } from '../../../../communication';
 import { failure, success } from '../state';
+import { getChannelId } from '../../../../domain';
 
 export interface ReturnVal {
   state: CState;
@@ -35,6 +36,15 @@ export function instigatorConcludingReducer(
   storage: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
+  // TODO: Since a commitment received could be a defundingAction OR
+  // a concludingAction we need to check if its the action we're interested in
+  // This is a bit awkward, probably a better way of handling this?
+  if (action.type === COMMITMENT_RECEIVED) {
+    const channelId = getChannelId(action.signedCommitment.commitment);
+    if (channelId === state.channelId) {
+      return concludeReceived(state, storage);
+    }
+  }
   if (isDefundingAction(action)) {
     return handleDefundingAction(state, storage, action);
   }
@@ -46,10 +56,8 @@ export function instigatorConcludingReducer(
   switch (action.type) {
     case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED':
       return concludingCancelled(state, storage);
-    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT':
-      return concludeSent(state, storage);
-    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED':
-      return concludeReceived(state, storage);
+    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED':
+      return concludeApproved(state, storage);
     case 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN':
       return defundChosen(state, storage);
     case 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED':
@@ -109,7 +117,7 @@ function concludingCancelled(state: NonTerminalCState, storage: Storage): Return
   return { state: failure({ reason: 'ConcludeCancelled' }), storage };
 }
 
-function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
+function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'InstigatorApproveConcluding') {
     return { state, storage };
   }

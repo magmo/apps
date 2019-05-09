@@ -61,7 +61,7 @@ const acknowledgeSuccess = states.responderAcknowledgeSuccess(defaults);
 // -------
 // Actions
 // -------
-const concludeSent = actions.concludeSent(processId);
+const concludeSent = actions.concludeApproved(processId);
 const defundChosen = actions.defundChosen(processId);
 const acknowledged = actions.acknowledged(processId);
 
