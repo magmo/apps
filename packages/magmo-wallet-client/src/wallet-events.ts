@@ -1,5 +1,4 @@
 import { Commitment } from 'fmg-core';
-import { WalletMessagePayload } from './wallet-types';
 
 // TODO: We should limit WalletEvent/WalletEventTypes to the bare minimum of events we expect the app to handle. Some of these can be pruned.
 // Events that we handle for the user (HideWallet,ShowWallet, ValidateSuccess, etc..) should be removed from WalletEvent/WalletEventTypes
@@ -282,7 +281,7 @@ export const MESSAGE_RELAY_REQUESTED = 'WALLET.MESSAGING.MESSAGE_RELAY_REQUESTED
 /**
  * @ignore
  */
-export const messageRelayRequested = (to: string, messagePayload: WalletMessagePayload) => ({
+export const messageRelayRequested = (to: string, messagePayload: any) => ({
   type: MESSAGE_RELAY_REQUESTED as typeof MESSAGE_RELAY_REQUESTED,
   to,
   messagePayload,

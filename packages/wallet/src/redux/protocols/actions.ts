@@ -1,6 +1,6 @@
 import { ProtocolAction, WalletAction } from '../actions';
 import { PlayerIndex, WalletProtocol } from '../types';
-import { Commitment } from '../../domain';
+import { Commitment, SignedCommitment } from '../../domain';
 export { BaseProcessAction } from '../../communication';
 
 export const INITIALIZE_CHANNEL = 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL';
@@ -28,9 +28,9 @@ export const concludeRequested = (channelId: string) => ({
 export type ConcludeRequested = ReturnType<typeof concludeRequested>;
 
 export const CONCLUDE_INSTIGATED = 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
-export const concludeInstigated = (channelId: string) => ({
+export const concludeInstigated = (signedCommitment: SignedCommitment) => ({
   type: CONCLUDE_INSTIGATED as typeof CONCLUDE_INSTIGATED,
-  channelId,
+  signedCommitment,
   protocol: WalletProtocol.ConcludingResponder,
 });
 export type ConcludeInstigated = ReturnType<typeof concludeInstigated>;
