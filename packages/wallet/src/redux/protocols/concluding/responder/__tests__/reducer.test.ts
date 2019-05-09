@@ -29,7 +29,7 @@ describe('[ Happy path ]', () => {
   });
 
   describe('when in WaitForDefund', () => {
-    const { state, store, action } = scenario.decideDefund;
+    const { state, store, action } = scenario.waitForDefund;
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'ResponderAcknowledgeSuccess');

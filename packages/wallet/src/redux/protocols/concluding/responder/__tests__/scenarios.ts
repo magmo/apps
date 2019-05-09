@@ -11,7 +11,7 @@ import { bsPrivateKey } from '../../../../../communication/__tests__/commitments
 // -----------------
 // Channel Scenarios
 // -----------------
-const { channelId, bsAddress, asAddress, ledgerId } = channelScenarios;
+const { channelId, bsAddress, asAddress } = channelScenarios;
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
@@ -34,12 +34,10 @@ const secondConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
 ]);
 
 const firstConcludeReceived = setFundingState(firstConcludeReceivedChannelState, channelId, {
-  directlyFunded: false,
-  fundingChannel: ledgerId,
+  directlyFunded: true,
 });
 const secondConcludeReceived = setFundingState(secondConcludeReceivedChannelState, channelId, {
-  directlyFunded: false,
-  fundingChannel: ledgerId,
+  directlyFunded: true,
 });
 // --------
 // Defaults
