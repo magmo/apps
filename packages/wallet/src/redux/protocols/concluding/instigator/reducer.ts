@@ -20,6 +20,7 @@ import { initialize as initializeDefunding, defundingReducer } from '../../defun
 type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
 import { sendConcludeChannel } from '../../../../communication';
+import { showWallet } from '../../reducer-helpers';
 
 export interface ReturnVal {
   state: CState;
@@ -61,7 +62,10 @@ export function initialize(channelId: string, processId: string, storage: Storag
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
-    return { state: approveConcluding({ channelId, processId }), storage };
+    return {
+      state: approveConcluding({ channelId, processId }),
+      storage: showWallet(storage),
+    };
   } else {
     return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
   }

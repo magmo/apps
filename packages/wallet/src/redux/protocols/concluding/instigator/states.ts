@@ -2,6 +2,7 @@ import { Constructor } from '../../../utils';
 import { DefundingState } from '../../defunding';
 export type ConcludingState = NonTerminalState | PreTerminalState | TerminalState;
 export type ConcludingStateType = ConcludingState['type'];
+import { ProtocolState } from '../..';
 
 export type NonTerminalState =
   | ApproveConcluding
@@ -80,6 +81,17 @@ export function isSuccess(state: ConcludingState): state is Success {
 
 export function isFailure(state: ConcludingState): state is Failure {
   return state.type === 'Failure';
+}
+
+export function isConcludingInstigatorState(state: ProtocolState): state is ConcludingState {
+  return (
+    state.type === 'AcknowledgeSuccess' ||
+    state.type === 'AcknowledgeFailure' ||
+    state.type === 'ApproveConcluding' ||
+    state.type === 'WaitForOpponentConclude' ||
+    state.type === 'AcknowledgeConcludeReceived' ||
+    state.type === 'WaitForDefund'
+  );
 }
 
 // ------------
