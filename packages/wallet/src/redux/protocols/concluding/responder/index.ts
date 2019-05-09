@@ -1,2 +1,2 @@
 export { Concluding } from './container';
-export { initialize } from './reducer';
+export { initialize, concludingReducer as reducer } from './reducer';

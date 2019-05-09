@@ -32,7 +32,7 @@ export const strategyApproved = (processId: string): StrategyApproved => ({
 });
 
 // CONCLUDING
-export const CONCLUDE_CHANNEL = 'WALLET.CONCLUDING.CONCLUDE_CHANNEL';
+export const CONCLUDE_CHANNEL = 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
 export interface ConcludeChannel extends BaseProcessAction {
   type: typeof CONCLUDE_CHANNEL;
   commitment: Commitment;

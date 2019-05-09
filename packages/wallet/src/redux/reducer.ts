@@ -8,6 +8,7 @@ import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protoc
 import * as applicationProtocol from './protocols/application';
 import * as challengeProtocol from './protocols/challenging';
 import * as concludingInstigatorProtocol from './protocols/concluding/instigator';
+import * as concludingResponderProtocol from './protocols/concluding/responder';
 import * as fundProtocol from './protocols/funding';
 import * as challengeResponseProtocol from './protocols/responding';
 import * as states from './state';
@@ -82,8 +83,8 @@ function routeToProtocolReducer(
           states.sharedData(state),
           action,
         );
-
         return updatedState(state, sharedData, processState, protocolState);
+
       case WalletProtocol.Application:
         const {
           protocolState: appProtocolState,
@@ -94,13 +95,22 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, appSharedData, processState, appProtocolState);
-      case WalletProtocol.Concluding:
-        const { state: concState, storage: concStorage } = concludingInstigatorProtocol.reducer(
+
+      case WalletProtocol.ConcludingInstigator:
+        const { state: concIState, storage: concIStorage } = concludingInstigatorProtocol.reducer(
           processState.protocolState,
           states.sharedData(state),
           action,
         );
-        return updatedState(state, concStorage, processState, concState);
+        return updatedState(state, concIStorage, processState, concIState);
+
+      case WalletProtocol.ConcludingResponder:
+        const { state: concRState, storage: concRStorage } = concludingResponderProtocol.reducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+        return updatedState(state, concRStorage, processState, concRState);
 
       default:
         // TODO: This should return unreachable(state), but right now, only some protocols are
@@ -147,6 +157,15 @@ function initializeNewProtocol(
     case actions.protocol.CONCLUDE_REQUESTED: {
       const { channelId } = action;
       const { state: protocolState, storage: sharedData } = concludingInstigatorProtocol.initialize(
+        channelId,
+        processId,
+        incomingSharedData,
+      );
+      return { protocolState, sharedData };
+    }
+    case actions.protocol.CONCLUDE_INSTIGATED: {
+      const { channelId } = action;
+      const { state: protocolState, storage: sharedData } = concludingResponderProtocol.initialize(
         channelId,
         processId,
         incomingSharedData,

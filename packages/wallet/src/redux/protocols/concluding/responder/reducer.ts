@@ -9,7 +9,6 @@ import {
   acknowledgeFailure,
   decideDefund,
 } from './states';
-import { ConcludingAction } from './actions';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { SharedData, getChannel, setChannelStore, queueMessage } from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
@@ -22,6 +21,9 @@ import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
 import { sendConcludeChannel } from '../../../../communication';
+import { showWallet } from '../../reducer-helpers';
+import { ProtocolAction } from '../../../../redux/actions';
+import { isConcludingAction } from './actions';
 
 export interface ReturnVal {
   state: CState;
@@ -32,17 +34,22 @@ export interface ReturnVal {
 export function concludingReducer(
   state: NonTerminalCState,
   storage: SharedData,
-  action: ConcludingAction | DefundingAction,
+  action: ProtocolAction,
 ): ReturnVal {
   if (isDefundingAction(action)) {
     return handleDefundingAction(state, storage, action);
   }
+
+  if (!isConcludingAction(action)) {
+    return { state, storage };
+  }
+
   switch (action.type) {
-    case 'CONCLUDE.SENT':
+    case 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_SENT':
       return concludeSent(state, storage);
-    case 'DEFUND.CHOSEN':
+    case 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN':
       return defundChosen(state, storage);
-    case 'ACKNOWLEDGED':
+    case 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED':
       return acknowledged(state, storage);
     default:
       return unreachable(action);
@@ -59,7 +66,7 @@ export function initialize(channelId: string, processId: string, storage: Storag
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
-    return { state: approveConcluding({ channelId, processId }), storage };
+    return { state: approveConcluding({ channelId, processId }), storage: showWallet(storage) };
   } else {
     return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
   }

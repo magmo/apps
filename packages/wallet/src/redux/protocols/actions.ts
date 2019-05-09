@@ -23,9 +23,17 @@ export const CONCLUDE_REQUESTED = 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED';
 export const concludeRequested = (channelId: string) => ({
   type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
   channelId,
-  protocol: WalletProtocol.Concluding,
+  protocol: WalletProtocol.ConcludingInstigator,
 });
 export type ConcludeRequested = ReturnType<typeof concludeRequested>;
+
+export const CONCLUDE_INSTIGATED = 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
+export const concludeInstigated = (channelId: string) => ({
+  type: CONCLUDE_INSTIGATED as typeof CONCLUDE_INSTIGATED,
+  channelId,
+  protocol: WalletProtocol.ConcludingResponder,
+});
+export type ConcludeInstigated = ReturnType<typeof concludeInstigated>;
 
 export const CREATE_CHALLENGE_REQUESTED = 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
 export const createChallengeRequested = (channelId: string, commitment: Commitment) => ({
@@ -49,13 +57,16 @@ export type NewProcessAction =
   | InitializeChannel
   | FundingRequested
   | ConcludeRequested
+  | ConcludeInstigated
   | CreateChallengeRequested
   | RespondToChallengeRequested;
+
 export function isNewProcessAction(action: WalletAction): action is NewProcessAction {
   return (
     action.type === INITIALIZE_CHANNEL ||
     action.type === FUNDING_REQUESTED ||
     action.type === CONCLUDE_REQUESTED ||
+    action.type === CONCLUDE_INSTIGATED ||
     action.type === CREATE_CHALLENGE_REQUESTED ||
     action.type === RESPOND_TO_CHALLENGE_REQUESTED
   );
