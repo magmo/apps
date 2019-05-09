@@ -1,13 +1,14 @@
 import { WithdrawalState } from '../withdrawing/states';
 import { Properties } from '../../utils';
+import { IndirectDefundingState } from '../indirect-defunding/state';
 
 export const WAIT_FOR_WITHDRAWAL = 'WaitForWithdrawal';
-export const WAIT_FOR_LEDGER_DEFUNDING = 'WaitForLedgerDefunding';
+export const WAIT_FOR_INDIRECT_DEFUNDING = 'WaitForIndirectDefunding';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
 
-export type NonTerminalDefundingState = WaitForWithdrawal | WaitForLedgerDefunding;
-export type DefundingState = WaitForWithdrawal | WaitForLedgerDefunding | Failure | Success;
+export type NonTerminalDefundingState = WaitForWithdrawal | WaitForIndirectDefunding;
+export type DefundingState = WaitForWithdrawal | WaitForIndirectDefunding | Failure | Success;
 
 export type FailureReason =
   | 'Withdrawal Failure'
@@ -20,11 +21,10 @@ export interface WaitForWithdrawal {
   withdrawalState: WithdrawalState;
 }
 
-export interface WaitForLedgerDefunding {
-  type: typeof WAIT_FOR_LEDGER_DEFUNDING;
+export interface WaitForIndirectDefunding {
+  type: typeof WAIT_FOR_INDIRECT_DEFUNDING;
   processId: string;
-  // TODO: This will be typed to Ledger Defunding state when it exists
-  ledgerDefundingState: any;
+  indirectDefundingState: IndirectDefundingState;
 }
 
 export interface Failure {
@@ -62,10 +62,14 @@ export function waitForWithdrawal(properties: Properties<WaitForWithdrawal>): Wa
 }
 
 export function waitForLedgerDefunding(
-  properties: Properties<WaitForLedgerDefunding>,
-): WaitForLedgerDefunding {
-  const { processId, ledgerDefundingState } = properties;
-  return { type: WAIT_FOR_LEDGER_DEFUNDING, processId, ledgerDefundingState };
+  properties: Properties<WaitForIndirectDefunding>,
+): WaitForIndirectDefunding {
+  const { processId, indirectDefundingState: ledgerDefundingState } = properties;
+  return {
+    type: WAIT_FOR_INDIRECT_DEFUNDING,
+    processId,
+    indirectDefundingState: ledgerDefundingState,
+  };
 }
 
 export function success(): Success {

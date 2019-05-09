@@ -3,7 +3,7 @@ import * as withdrawalScenarios from '../../withdrawing/__tests__/scenarios';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { ChannelState, ChannelStore } from '../../../channel-store';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
-
+import * as indirectDefundingStates from '../../indirect-defunding/state';
 const processId = 'process-id.123';
 
 const {
@@ -70,7 +70,7 @@ const waitForWithdrawalFailure = states.waitForWithdrawal({
 
 const waitForLedgerDefunding = states.waitForLedgerDefunding({
   processId,
-  ledgerDefundingState: 'Success',
+  indirectDefundingState: indirectDefundingStates.success(),
 });
 
 const success = states.success();

@@ -16,7 +16,7 @@ class DefundingContainer extends PureComponent<Props> {
     switch (state.type) {
       case states.WAIT_FOR_WITHDRAWAL:
         return <Withdrawal state={state.withdrawalState} />;
-      case states.WAIT_FOR_LEDGER_DEFUNDING:
+      case states.WAIT_FOR_INDIRECT_DEFUNDING:
         return <div>TODO: Ledger defunding container</div>;
       case states.FAILURE:
         return <Failure name="de-funding" reason={state.reason} />;
