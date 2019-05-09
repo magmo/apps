@@ -27,73 +27,73 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v3-dependencies-{{ checksum "yarn.lock" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v3-dependencies-
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/rps/yarn.lock" }}
-            - v1-dependencies-rps
+            - v3-dependencies-{{ checksum "packages/rps/yarn.lock" }}
+            - v3-dependencies-rps
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/tictactoe/yarn.lock" }}
-            - v1-dependencies-tictactoe
+            - v3-dependencies-{{ checksum "packages/tictactoe/yarn.lock" }}
+            - v3-dependencies-tictactoe
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/server/yarn.lock" }}
-            - v1-dependencies-server
+            - v3-dependencies-{{ checksum "packages/server/yarn.lock" }}
+            - v3-dependencies-server
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/wallet/yarn.lock" }}
-            - v1-dependencies-wallet
+            - v3-dependencies-{{ checksum "packages/wallet/yarn.lock" }}
+            - v3-dependencies-wallet
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/magmo-wallet-client/yarn.lock" }}
-            - v1-dependencies-magmo-wallet-client
+            - v3-dependencies-{{ checksum "packages/magmo-wallet-client/yarn.lock" }}
+            - v3-dependencies-magmo-wallet-client
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/fmg-nitro-adjudicator/yarn.lock" }}
-            - v1-dependencies-fmg-nitro-adjudicator
+            - v3-dependencies-{{ checksum "packages/fmg-nitro-adjudicator/yarn.lock" }}
+            - v3-dependencies-fmg-nitro-adjudicator
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "packages/fmg-core/yarn.lock" }}
-            - v1-dependencies-force-move-framework
+            - v3-dependencies-{{ checksum "packages/fmg-core/yarn.lock" }}
+            - v3-dependencies-force-move-framework
 
       - run: npx lerna bootstrap
 
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-{{ checksum "yarn.lock" }}
       - save_cache:
           paths:
             - packages/rps/node_modules
-          key: v1-dependencies-{{ checksum "packages/rps/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/rps/yarn.lock" }}
       - save_cache:
           paths:
             - packages/tictactoe/node_modules
-          key: v1-dependencies-{{ checksum "packages/tictactoe/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/tictactoe/yarn.lock" }}
       - save_cache:
           paths:
             - packages/server/node_modules
-          key: v1-dependencies-{{ checksum "packages/server/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/server/yarn.lock" }}
 
       - save_cache:
           paths:
             - packages/wallet/node_modules
-          key: v1-dependencies-{{ checksum "packages/wallet/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/wallet/yarn.lock" }}
       - save_cache:
           paths:
             - packages/magmo-wallet-client/node_modules
-          key: v1-dependencies-{{ checksum "packages/magmo-wallet-client/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/magmo-wallet-client/yarn.lock" }}
       - restore_cache:
           paths:
             - packages/fmg-nitro-adjudicator/node_modules
-          key: v1-dependencies-{{ checksum "packages/fmg-nitro-adjudicator/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/fmg-nitro-adjudicator/yarn.lock" }}
       - restore_cache:
           paths:
             - packages/force-move-framework/node_modules
-          key: v1-dependencies-{{ checksum "packages/fmg-core/yarn.lock" }}
+          key: v3-dependencies-{{ checksum "packages/fmg-core/yarn.lock" }}
 
       - run:
           name: Waiting for Postgres to be ready
