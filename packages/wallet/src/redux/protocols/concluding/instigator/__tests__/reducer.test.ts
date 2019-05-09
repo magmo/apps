@@ -10,7 +10,7 @@ describe('[ Happy path ]', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'ApproveConcluding');
+    itTransitionsTo(result, 'InstigatorApproveConcluding');
   });
   describe('when in ApproveConcluding', () => {
     const state = scenario.states.approveConcluding;
@@ -18,7 +18,7 @@ describe('[ Happy path ]', () => {
     const result = concludingReducer(state, storage, action);
 
     expectThisCommitmentSent(result.storage, scenario.commitments.concludeCommitment);
-    itTransitionsTo(result, 'WaitForOpponentConclude');
+    itTransitionsTo(result, 'InstigatorWaitForOpponentConclude');
   });
 
   describe('when in WaitForOpponentConclude', () => {
@@ -26,7 +26,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.concludeReceived;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeConcludeReceived');
+    itTransitionsTo(result, 'InstigatorAcknowledgeConcludeReceived');
   });
 
   describe('when in AcknowledgeConcludeReceived', () => {
@@ -34,7 +34,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.defundChosen;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'WaitForDefund');
+    itTransitionsTo(result, 'InstigatorWaitForDefund');
   });
 
   describe('when in WaitForDefund', () => {
@@ -42,7 +42,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.successTrigger;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeSuccess');
+    itTransitionsTo(result, 'InstigatorAcknowledgeSuccess');
   });
 
   describe('when in AcknowledgeSuccess', () => {
@@ -50,7 +50,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Success');
+    itTransitionsTo(result, 'InstigatorSuccess');
   });
 });
 
@@ -135,7 +135,7 @@ function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
     expect(result.state.type).toEqual('Failure');
-    if (result.state.type === 'Failure') {
+    if (result.state.type === 'InstigatorFailure') {
       expect(result.state.reason).toEqual(reason);
     }
   });
@@ -144,7 +144,7 @@ function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
 function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to AcknowledgeFailure with reason ${reason}`, () => {
     expect(result.state.type).toEqual('AcknowledgeFailure');
-    if (result.state.type === 'AcknowledgeFailure') {
+    if (result.state.type === 'InstigatorAcknowledgeFailure') {
       expect(result.state.reason).toEqual(reason);
     }
   });

@@ -80,7 +80,7 @@ function handleDefundingAction(
   storage: Storage,
   action: DefundingAction,
 ): ReturnVal {
-  if (state.type !== 'WaitForDefund') {
+  if (state.type !== 'ResponderWaitForDefund') {
     return { state, storage };
   }
   const defundingState1 = state.defundingState;
@@ -97,7 +97,7 @@ function handleDefundingAction(
 }
 
 function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveConcluding') {
+  if (state.type !== 'ResponderApproveConcluding') {
     return { state, storage };
   }
 
@@ -119,7 +119,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'DecideDefund') {
+  if (state.type !== 'ResponderDecideDefund') {
     return { state, storage };
   }
   // initialize defunding state machine
@@ -135,9 +135,9 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {
   switch (state.type) {
-    case 'AcknowledgeSuccess':
+    case 'ResponderAcknowledgeSuccess':
       return { state: success(), storage };
-    case 'AcknowledgeFailure':
+    case 'ResponderAcknowledgeFailure':
       return { state: failure({ reason: state.reason }), storage };
     default:
       return { state, storage };

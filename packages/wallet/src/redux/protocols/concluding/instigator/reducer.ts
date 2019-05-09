@@ -85,7 +85,7 @@ function handleDefundingAction(
   storage: Storage,
   action: DefundingAction,
 ): ReturnVal {
-  if (state.type !== 'WaitForDefund') {
+  if (state.type !== 'InstigatorWaitForDefund') {
     return { state, storage };
   }
   const defundingState1 = state.defundingState;
@@ -102,14 +102,14 @@ function handleDefundingAction(
 }
 
 function concludingCancelled(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveConcluding') {
+  if (state.type !== 'InstigatorApproveConcluding') {
     return { state, storage };
   }
   return { state: failure({ reason: 'ConcludeCancelled' }), storage };
 }
 
 function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveConcluding') {
+  if (state.type !== 'InstigatorApproveConcluding') {
     return { state, storage };
   }
 
@@ -132,14 +132,14 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
 }
 
 function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForOpponentConclude') {
+  if (state.type !== 'InstigatorWaitForOpponentConclude') {
     return { state, storage };
   }
   return { state: acknowledgeConcludeReceived(state), storage };
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeConcludeReceived') {
+  if (state.type !== 'InstigatorAcknowledgeConcludeReceived') {
     return { state, storage };
   }
   // initialize defunding state machine
@@ -155,9 +155,9 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {
   switch (state.type) {
-    case 'AcknowledgeSuccess':
+    case 'InstigatorAcknowledgeSuccess':
       return { state: success(), storage };
-    case 'AcknowledgeFailure':
+    case 'InstigatorAcknowledgeFailure':
       return { state: failure({ reason: state.reason }), storage };
     default:
       return { state, storage };

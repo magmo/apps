@@ -10,7 +10,7 @@ describe('[ Happy path ]', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'ApproveConcluding');
+    itTransitionsTo(result, 'ResponderApproveConcluding');
   });
   describe('when in ApproveConcluding', () => {
     const state = scenario.states.approveConcluding;
@@ -18,7 +18,7 @@ describe('[ Happy path ]', () => {
     const result = concludingReducer(state, storage, action);
 
     expectThisCommitmentSent(result.storage, scenario.commitments.concludeCommitment);
-    itTransitionsTo(result, 'DecideDefund');
+    itTransitionsTo(result, 'ResponderDecideDefund');
   });
 
   describe('when in DecideDefund', () => {
@@ -26,7 +26,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.defundChosen;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'WaitForDefund');
+    itTransitionsTo(result, 'ResponderWaitForDefund');
   });
 
   describe('when in WaitForDefund', () => {
@@ -34,7 +34,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.successTrigger;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeSuccess');
+    itTransitionsTo(result, 'ResponderAcknowledgeSuccess');
   });
 
   describe('when in AcknowledgeSuccess', () => {
@@ -42,7 +42,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.acknowledged;
     const result = concludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Success');
+    itTransitionsTo(result, 'ResponderSuccess');
   });
 });
 
@@ -114,7 +114,7 @@ function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
     expect(result.state.type).toEqual('Failure');
-    if (result.state.type === 'Failure') {
+    if (result.state.type === 'ResponderFailure') {
       expect(result.state.reason).toEqual(reason);
     }
   });
@@ -123,7 +123,7 @@ function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
 function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to AcknowledgeFailure with reason ${reason}`, () => {
     expect(result.state.type).toEqual('AcknowledgeFailure');
-    if (result.state.type === 'AcknowledgeFailure') {
+    if (result.state.type === 'ResponderAcknowledgeFailure') {
       expect(result.state.reason).toEqual(reason);
     }
   });

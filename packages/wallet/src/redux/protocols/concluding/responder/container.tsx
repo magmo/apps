@@ -21,7 +21,7 @@ class ConcludingContainer extends PureComponent<Props> {
     const { state, approve, defund, acknowledge } = this.props;
     const processId = state.processId;
     switch (state.type) {
-      case 'AcknowledgeSuccess':
+      case 'ResponderAcknowledgeSuccess':
         return (
           <Acknowledge
             title="Concluding Succesful"
@@ -29,7 +29,7 @@ class ConcludingContainer extends PureComponent<Props> {
             acknowledge={() => acknowledge(state.processId)}
           />
         );
-      case 'AcknowledgeFailure':
+      case 'ResponderAcknowledgeFailure':
         return (
           <Acknowledge
             title="Concluding Failed"
@@ -37,11 +37,11 @@ class ConcludingContainer extends PureComponent<Props> {
             acknowledge={() => acknowledge(state.processId)}
           />
         );
-      case 'DecideDefund':
+      case 'ResponderDecideDefund':
         return <ApproveDefunding approve={() => defund(processId)} />;
-      case 'WaitForDefund':
+      case 'ResponderWaitForDefund':
         return <WaitForDefunding />;
-      case 'ApproveConcluding':
+      case 'ResponderApproveConcluding':
         return <ApproveConcluding approve={() => approve(processId)} />;
       default:
         return unreachable(state);

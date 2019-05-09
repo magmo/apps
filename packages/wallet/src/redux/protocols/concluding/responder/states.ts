@@ -18,42 +18,42 @@ export type TerminalState = Success | Failure;
 export type FailureReason = 'NotYourTurn' | 'ChannelDoesntExist' | 'DefundFailed';
 
 export interface AcknowledgeSuccess {
-  type: 'AcknowledgeSuccess';
+  type: 'ResponderAcknowledgeSuccess';
   processId: string;
   channelId: string;
 }
 export interface AcknowledgeFailure {
-  type: 'AcknowledgeFailure';
+  type: 'ResponderAcknowledgeFailure';
   reason: FailureReason;
   processId: string;
   channelId: string;
 }
 export interface ApproveConcluding {
-  type: 'ApproveConcluding';
+  type: 'ResponderApproveConcluding';
   processId: string;
   channelId: string;
 }
 
 export interface DecideDefund {
-  type: 'DecideDefund';
+  type: 'ResponderDecideDefund';
   processId: string;
   channelId: string;
 }
 
 export interface WaitForDefund {
-  type: 'WaitForDefund';
+  type: 'ResponderWaitForDefund';
   processId: string;
   channelId: string;
   defundingState: DefundingState;
 }
 
 export interface Failure {
-  type: 'Failure';
+  type: 'ResponderFailure';
   reason: FailureReason;
 }
 
 export interface Success {
-  type: 'Success';
+  type: 'ResponderSuccess';
 }
 
 // -------
@@ -61,23 +61,24 @@ export interface Success {
 // -------
 
 export function isTerminal(state: ConcludingState): state is Failure | Success {
-  return state.type === 'Failure' || state.type === 'Success';
+  return state.type === 'ResponderFailure' || state.type === 'ResponderSuccess';
 }
 
 export function isSuccess(state: ConcludingState): state is Success {
-  return state.type === 'Success';
+  return state.type === 'ResponderSuccess';
 }
 
 export function isFailure(state: ConcludingState): state is Failure {
-  return state.type === 'Failure';
+  return state.type === 'ResponderFailure';
 }
 
 export function isConcludingResponderState(state: ProtocolState): state is ConcludingState {
   return (
-    state.type === 'AcknowledgeSuccess' ||
-    state.type === 'AcknowledgeFailure' ||
-    state.type === 'DecideDefund' ||
-    state.type === 'WaitForDefund'
+    state.type === 'ResponderAcknowledgeSuccess' ||
+    state.type === 'ResponderAcknowledgeFailure' ||
+    state.type === 'ResponderApproveConcluding' ||
+    state.type === 'ResponderDecideDefund' ||
+    state.type === 'ResponderWaitForDefund'
   );
 }
 
@@ -87,34 +88,34 @@ export function isConcludingResponderState(state: ProtocolState): state is Concl
 
 export const approveConcluding: Constructor<ApproveConcluding> = p => {
   const { processId, channelId } = p;
-  return { type: 'ApproveConcluding', processId, channelId };
+  return { type: 'ResponderApproveConcluding', processId, channelId };
 };
 
 export const decideDefund: Constructor<DecideDefund> = p => {
   const { processId, channelId } = p;
-  return { type: 'DecideDefund', processId, channelId };
+  return { type: 'ResponderDecideDefund', processId, channelId };
 };
 
 export const acknowledgeSuccess: Constructor<AcknowledgeSuccess> = p => {
   const { processId, channelId } = p;
-  return { type: 'AcknowledgeSuccess', processId, channelId };
+  return { type: 'ResponderAcknowledgeSuccess', processId, channelId };
 };
 
 export const acknowledgeFailure: Constructor<AcknowledgeFailure> = p => {
   const { processId, channelId, reason } = p;
-  return { type: 'AcknowledgeFailure', processId, channelId, reason };
+  return { type: 'ResponderAcknowledgeFailure', processId, channelId, reason };
 };
 
 export const waitForDefund: Constructor<WaitForDefund> = p => {
   const { processId, channelId, defundingState } = p;
-  return { type: 'WaitForDefund', processId, channelId, defundingState };
+  return { type: 'ResponderWaitForDefund', processId, channelId, defundingState };
 };
 
 export function success(): Success {
-  return { type: 'Success' };
+  return { type: 'ResponderSuccess' };
 }
 
 export const failure: Constructor<Failure> = p => {
   const { reason } = p;
-  return { type: 'Failure', reason };
+  return { type: 'ResponderFailure', reason };
 };
