@@ -1,8 +1,7 @@
 import * as scenarios from './scenarios';
 import { concludingReducer, initialize, ReturnVal } from '../reducer';
 import { ConcludingStateType, FailureReason } from '../states';
-import { itSendsThisMessage } from '../../../../__tests__/helpers';
-import { sendConcludeChannel } from '../../../../../communication';
+import { expectThisCommitmentSent } from '../../../../__tests__/helpers';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -17,15 +16,8 @@ describe('[ Happy path ]', () => {
     const state = scenario.states.approveConcluding;
     const action = scenario.actions.concludeSent;
     const result = concludingReducer(state, storage, action);
-    itSendsThisMessage(
-      result,
-      sendConcludeChannel(
-        expect.any(String),
-        expect.any(String),
-        scenario.commitments.concludeCommitment,
-        expect.any(String),
-      ),
-    );
+
+    expectThisCommitmentSent(result.storage, scenario.commitments.concludeCommitment);
     itTransitionsTo(result, 'DecideDefund');
   });
 

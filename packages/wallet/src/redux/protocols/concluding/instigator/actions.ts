@@ -69,6 +69,7 @@ export const isConcludingAction = (action: WalletAction): action is ConcludingAc
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED' ||
-    action.type === 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN'
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN' ||
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED'
   );
 };

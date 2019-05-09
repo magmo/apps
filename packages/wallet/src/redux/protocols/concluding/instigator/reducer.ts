@@ -41,7 +41,7 @@ export function concludingReducer(
     return handleDefundingAction(state, storage, action);
   }
 
-  if (!isDefundingAction(action) && !isConcludingAction(action)) {
+  if (!isConcludingAction(action)) {
     return { state, storage };
   }
 
