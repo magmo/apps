@@ -352,7 +352,7 @@ function* receiveCommitmentSaga(message: AppMessage) {
 }
 
 async function postData(data = {}) {
-  const response = await fetch(`${process.env.BOT_URL}/api/v1/rps_channels`, {
+  const response = await fetch(`${process.env.BOT_URL}/api/v2/channels`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
