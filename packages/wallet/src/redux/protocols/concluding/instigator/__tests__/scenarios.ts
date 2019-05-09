@@ -1,4 +1,4 @@
-import * as states from '../states';
+import * as states from '../../state';
 import {
   preSuccessState,
   preFailureState,
@@ -46,12 +46,18 @@ const defaults = { processId, channelId };
 // ------
 // States
 // ------
-const approveConcluding = states.approveConcluding(defaults);
-const waitForOpponentConclude = states.waitForOpponentConclude(defaults);
-const acknowledgeConcludeReceived = states.acknowledgeConcludeReceived(defaults);
-const waitForDefund = states.waitForDefund({ ...defaults, defundingState: preSuccessState });
-const waitForDefund2 = states.waitForDefund({ ...defaults, defundingState: preFailureState });
-const acknowledgeSuccess = states.acknowledgeSuccess(defaults);
+const approveConcluding = states.instigatorApproveConcluding(defaults);
+const waitForOpponentConclude = states.instigatorWaitForOpponentConclude(defaults);
+const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived(defaults);
+const waitForDefund = states.instigatorWaitForDefund({
+  ...defaults,
+  defundingState: preSuccessState,
+});
+const waitForDefund2 = states.instigatorWaitForDefund({
+  ...defaults,
+  defundingState: preFailureState,
+});
+const acknowledgeSuccess = states.instigatorAcknowledgeSuccess(defaults);
 const success = states.success();
 
 // -------
@@ -94,7 +100,10 @@ export const channelDoesntExist = {
   ...defaults,
   storage: storage(ourTurn),
   states: {
-    acknowledgeFailure: states.acknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
+    acknowledgeFailure: states.instigatorAcknowledgeFailure({
+      ...defaults,
+      reason: 'ChannelDoesntExist',
+    }),
     failure: states.failure({ reason: 'ChannelDoesntExist' }),
   },
   actions: {
@@ -106,7 +115,7 @@ export const concludingNotPossible = {
   ...defaults,
   storage: storage(theirTurn),
   states: {
-    acknowledgeFailure: states.acknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
+    acknowledgeFailure: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
     failure: states.failure({ reason: 'NotYourTurn' }),
   },
   actions: {
@@ -132,7 +141,7 @@ export const defundingFailed = {
   storage: storage(ourTurn),
   states: {
     waitForDefund2,
-    acknowledgeFailure: states.acknowledgeFailure({
+    acknowledgeFailure: states.instigatorAcknowledgeFailure({
       ...defaults,
       reason: 'DefundFailed',
     }),

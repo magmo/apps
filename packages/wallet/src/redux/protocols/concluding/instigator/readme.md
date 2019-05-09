@@ -22,7 +22,7 @@ The protocol is implemented with the following state machine
 graph TD
   S((Start)) --> E{Channel Exists?}
   E --> |No| AF(InstigatorAcknowledgeFailure)
-  AF -->|ACKNOWLEDGED| F((InstigatorFailure))
+  AF -->|ACKNOWLEDGED| F((Failure))
   E --> |Yes| MT{My turn?}
   MT  --> |Yes| CC(InstigatorApproveConcluding)
   MT  --> |No| AF(InstigatorAcknowledgeFailure)
@@ -31,7 +31,7 @@ graph TD
   WOC --> |CONCLUDE.RECEIVED| ACR(InstigatorAcknowledgeConcludeReceived)
   ACR --> |DEFUND.CHOSEN| D(WInstigatorWaitForDefund)
   D   --> |defunding protocol succeeded| AS(InstigatorAcknowledgeSuccess)
-  AS -->  |ACKNOWLEDGED| SS((InstigatorSuccess))
+  AS -->  |ACKNOWLEDGED| SS((Success))
   D   --> |defunding protocol failed| AF(InstigatorAcknowledgeFailure)
   style S  fill:#efdd20
   style E  fill:#efdd20
@@ -45,11 +45,11 @@ graph TD
 
 We will use the following scenarios for testing:
 
-1. **Happy path**: `InstigatorApproveConcluding` -> `InstigatorWaitForOpponentConclude` -> `InstigatorAcknowledgeChannelConcluded` -> `InstigatorWaitForDefund` -> `InstigatorAcknowledgeSuccess` -> `InstigatorSuccess`
-2. **Channel doesnt exist** `InstigatorAcknowledgeFailure` -> `InstigatorFailure`
-3. **Concluding not possible**: `InstigatorAcknowledgeFailure` -> `InstigatorFailure`
-4. **Concluding cancelled** `InstigatorApproveConcluding` -> `InstigatorFailure`
-5. **Defund failed** `InstigatorWaitForDefund` -> `InstigatorAcknowledgeFailure` -> `InstigatorFailure`
+1. **Happy path**: `InstigatorApproveConcluding` -> `InstigatorWaitForOpponentConclude` -> `InstigatorAcknowledgeChannelConcluded` -> `InstigatorWaitForDefund` -> `InstigatorAcknowledgeSuccess` -> `Success`
+2. **Channel doesnt exist** `InstigatorAcknowledgeFailure` -> `Failure`
+3. **Concluding not possible**: `InstigatorAcknowledgeFailure` -> `Failure`
+4. **Concluding cancelled** `InstigatorApproveConcluding` -> `Failure`
+5. **Defund failed** `InstigatorWaitForDefund` -> `InstigatorAcknowledgeFailure` -> `Failure`
 
 # Terminology
 

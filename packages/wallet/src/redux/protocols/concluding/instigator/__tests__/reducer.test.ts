@@ -1,10 +1,11 @@
 import * as scenarios from './scenarios';
-import { concludingReducer, initialize, ReturnVal } from '../reducer';
-import { ConcludingStateType, FailureReason } from '../states';
+import { instigatorConcludingReducer, initialize, ReturnVal } from '../reducer';
+import { InstigatorConcludingStateType } from '../states';
 import { SharedData } from '../../../../state';
 import { Commitment } from '../../../../../domain';
 import { CONCLUDE_INSTIGATED } from '../../../actions';
 import { expectThisMessageAndCommitmentSent } from '../../../../__tests__/helpers';
+import { FailureReason } from '../../state';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -18,7 +19,7 @@ describe('[ Happy path ]', () => {
   describe('when in ApproveConcluding', () => {
     const state = scenario.states.approveConcluding;
     const action = scenario.actions.concludeSent;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itSendsConcludeInstigated(result.storage, scenario.commitments.concludeCommitment);
     itTransitionsTo(result, 'InstigatorWaitForOpponentConclude');
@@ -27,7 +28,7 @@ describe('[ Happy path ]', () => {
   describe('when in WaitForOpponentConclude', () => {
     const state = scenario.states.waitForOpponentConclude;
     const action = scenario.actions.concludeReceived;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsTo(result, 'InstigatorAcknowledgeConcludeReceived');
   });
@@ -35,7 +36,7 @@ describe('[ Happy path ]', () => {
   describe('when in AcknowledgeConcludeReceived', () => {
     const state = scenario.states.acknowledgeConcludeReceived;
     const action = scenario.actions.defundChosen;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsTo(result, 'InstigatorWaitForDefund');
   });
@@ -43,7 +44,7 @@ describe('[ Happy path ]', () => {
   describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund;
     const action = scenario.actions.successTrigger;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsTo(result, 'InstigatorAcknowledgeSuccess');
   });
@@ -51,9 +52,9 @@ describe('[ Happy path ]', () => {
   describe('when in AcknowledgeSuccess', () => {
     const state = scenario.states.acknowledgeSuccess;
     const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'InstigatorSuccess');
+    itTransitionsTo(result, 'Success');
   });
 });
 
@@ -70,7 +71,7 @@ describe('[ Channel doesnt exist ]', () => {
   describe('when in AcknowledgeFailure', () => {
     const state = scenario.states.acknowledgeFailure;
     const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'ChannelDoesntExist');
   });
@@ -89,7 +90,7 @@ describe('[ Concluding Not Possible ]', () => {
   describe('when in AcknowledgeFailure', () => {
     const state = scenario.states.acknowledgeFailure;
     const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
   });
@@ -102,7 +103,7 @@ describe('[ Concluding Cancelled ]', () => {
   describe('when in ApproveConcluding', () => {
     const state = scenario.states.approveConcluding;
     const action = scenario.actions.cancelled;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'ConcludeCancelled');
   });
@@ -115,7 +116,7 @@ describe('[ Defunding Failed ]', () => {
   describe('when in WaitForDefund', () => {
     const state = scenario.states.waitForDefund2;
     const action = scenario.actions.failureTrigger;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
   });
@@ -123,7 +124,7 @@ describe('[ Defunding Failed ]', () => {
   describe('when in AcknowledgeFailure', () => {
     const state = scenario.states.acknowledgeFailure;
     const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const result = instigatorConcludingReducer(state, storage, action);
 
     itTransitionsToFailure(result, 'DefundFailed');
   });
@@ -135,7 +136,7 @@ function itSendsConcludeInstigated(storage: SharedData, commitment: Commitment) 
   });
 }
 
-function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
+function itTransitionsTo(result: ReturnVal, type: InstigatorConcludingStateType) {
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
   });
@@ -143,8 +144,8 @@ function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
 
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('InstigatorFailure');
-    if (result.state.type === 'InstigatorFailure') {
+    expect(result.state.type).toEqual('Failure');
+    if (result.state.type === 'Failure') {
       expect(result.state.reason).toEqual(reason);
     }
   });

@@ -1,14 +1,12 @@
 import {
-  ConcludingState as CState,
-  NonTerminalState as NonTerminalCState,
-  approveConcluding,
-  failure,
-  waitForOpponentConclude,
-  waitForDefund,
-  success,
-  acknowledgeSuccess,
-  acknowledgeFailure,
-  acknowledgeConcludeReceived,
+  InstigatorConcludingState as CState,
+  InstigatorNonTerminalState as NonTerminalCState,
+  instigatorApproveConcluding,
+  instigatorWaitForOpponentConclude,
+  instigatorWaitForDefund,
+  instigatorAcknowledgeSuccess,
+  instigatorAcknowledgeFailure,
+  instigatorAcknowledgeConcludeReceived,
 } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { SharedData, getChannel, setChannelStore, queueMessage } from '../../../state';
@@ -25,14 +23,14 @@ import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
 import { sendConcludeInstigated } from '../../../../communication';
+import { failure, success } from '../state';
 
 export interface ReturnVal {
   state: CState;
   storage: Storage;
-  sideEffects?;
 }
 
-export function concludingReducer(
+export function instigatorConcludingReducer(
   state: NonTerminalCState,
   storage: SharedData,
   action: ProtocolAction,
@@ -65,18 +63,21 @@ export function initialize(channelId: string, processId: string, storage: Storag
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
     return {
-      state: acknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
+      state: instigatorAcknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
       storage,
     };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return {
-      state: approveConcluding({ channelId, processId }),
+      state: instigatorApproveConcluding({ channelId, processId }),
       storage: showWallet(storage),
     };
   } else {
-    return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
+    return {
+      state: instigatorAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      storage,
+    };
   }
 }
 
@@ -94,9 +95,9 @@ function handleDefundingAction(
   const defundingState2 = protocolStateWithSharedData.protocolState;
 
   if (isSuccess(defundingState2)) {
-    state = acknowledgeSuccess(state);
+    state = instigatorAcknowledgeSuccess(state);
   } else if (isFailure(defundingState2)) {
-    state = acknowledgeFailure({ ...state, reason: 'DefundFailed' });
+    state = instigatorAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
   }
   return { state, storage };
 }
@@ -123,7 +124,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     );
 
     return {
-      state: waitForOpponentConclude({ ...state }),
+      state: instigatorWaitForOpponentConclude({ ...state }),
       storage: sharedDataWithOwnCommitment,
     };
   } else {
@@ -135,7 +136,7 @@ function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal
   if (state.type !== 'InstigatorWaitForOpponentConclude') {
     return { state, storage };
   }
-  return { state: acknowledgeConcludeReceived(state), storage };
+  return { state: instigatorAcknowledgeConcludeReceived(state), storage };
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -150,7 +151,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     storage,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
-  return { state: waitForDefund({ ...state, defundingState }), storage };
+  return { state: instigatorWaitForDefund({ ...state, defundingState }), storage };
 }
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {

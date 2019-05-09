@@ -1,13 +1,11 @@
 import {
-  ConcludingState as CState,
-  NonTerminalState as NonTerminalCState,
-  approveConcluding,
-  failure,
-  waitForDefund,
-  success,
-  acknowledgeSuccess,
-  acknowledgeFailure,
-  decideDefund,
+  ResponderConcludingState as CState,
+  ResponderNonTerminalState as NonTerminalCState,
+  responderApproveConcluding,
+  responderWaitForDefund,
+  responderAcknowledgeSuccess,
+  responderAcknowledgeFailure,
+  responderDecideDefund,
 } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import {
@@ -31,6 +29,7 @@ import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
+import { failure, success } from '../state';
 
 export interface ReturnVal {
   state: CState;
@@ -38,7 +37,7 @@ export interface ReturnVal {
   sideEffects?;
 }
 
-export function concludingReducer(
+export function responderConcludingReducer(
   state: NonTerminalCState,
   storage: SharedData,
   action: ProtocolAction,
@@ -72,7 +71,7 @@ export function initialize(
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
     return {
-      state: acknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
+      state: responderAcknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
       storage: showWallet(storage),
     };
   }
@@ -86,12 +85,12 @@ export function initialize(
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return {
-      state: approveConcluding({ channelId, processId }),
+      state: responderApproveConcluding({ channelId, processId }),
       storage: showWallet(updatedStorage),
     };
   } else {
     return {
-      state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      state: responderAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
       storage: showWallet(storage),
     };
   }
@@ -111,9 +110,9 @@ function handleDefundingAction(
   const defundingState2 = protocolStateWithSharedData.protocolState;
 
   if (isSuccess(defundingState2)) {
-    state = acknowledgeSuccess(state);
+    state = responderAcknowledgeSuccess(state);
   } else if (isFailure(defundingState2)) {
-    state = acknowledgeFailure({ ...state, reason: 'DefundFailed' });
+    state = responderAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
   }
   return { state, storage };
 }
@@ -132,7 +131,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
       state.channelId,
     );
     return {
-      state: decideDefund({ ...state }),
+      state: responderDecideDefund({ ...state }),
       storage: sharedDataWithOwnCommitment,
     };
   } else {
@@ -152,7 +151,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     storage,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
-  return { state: waitForDefund({ ...state, defundingState }), storage };
+  return { state: responderWaitForDefund({ ...state, defundingState }), storage };
 }
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {
