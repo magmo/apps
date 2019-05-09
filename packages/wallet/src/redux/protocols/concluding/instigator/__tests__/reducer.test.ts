@@ -143,7 +143,7 @@ function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
 
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('Failure');
+    expect(result.state.type).toEqual('InstigatorFailure');
     if (result.state.type === 'InstigatorFailure') {
       expect(result.state.reason).toEqual(reason);
     }
@@ -152,7 +152,7 @@ function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
 
 function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to AcknowledgeFailure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('AcknowledgeFailure');
+    expect(result.state.type).toEqual('InstigatorAcknowledgeFailure');
     if (result.state.type === 'InstigatorAcknowledgeFailure') {
       expect(result.state.reason).toEqual(reason);
     }
