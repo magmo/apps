@@ -10,7 +10,13 @@ import {
   decideDefund,
 } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
-import { SharedData, getChannel, setChannelStore, queueMessage } from '../../../state';
+import {
+  SharedData,
+  getChannel,
+  setChannelStore,
+  queueMessage,
+  checkAndStore,
+} from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
@@ -20,10 +26,11 @@ import { isSuccess, isFailure } from '../../defunding/states';
 import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
-import { sendConcludeChannel } from '../../../../communication';
+import { sendConcludeInstigated } from '../../../../communication';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
+import { getChannelId, SignedCommitment } from '../../../../domain';
 
 export interface ReturnVal {
   state: CState;
@@ -56,7 +63,12 @@ export function concludingReducer(
   }
 }
 
-export function initialize(channelId: string, processId: string, storage: Storage): ReturnVal {
+export function initialize(
+  signedCommitment: SignedCommitment,
+  processId: string,
+  storage: Storage,
+): ReturnVal {
+  const channelId = getChannelId(signedCommitment.commitment);
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
     return {
@@ -64,9 +76,19 @@ export function initialize(channelId: string, processId: string, storage: Storag
       storage: showWallet(storage),
     };
   }
+
+  const checkResult = checkAndStore(storage, signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Concluding responding protocol, unable to validate or store commitment');
+  }
+  const updatedStorage = checkResult.store;
+
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
-    return { state: approveConcluding({ channelId, processId }), storage: showWallet(storage) };
+    return {
+      state: approveConcluding({ channelId, processId }),
+      storage: showWallet(updatedStorage),
+    };
   } else {
     return {
       state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
@@ -157,12 +179,10 @@ const createAndSendConcludeCommitment = (
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = sendConcludeChannel(
+    const messageRelay = sendConcludeInstigated(
       theirAddress(channelState),
       processId,
-      signResult.signedCommitment.commitment,
-      signResult.signedCommitment.signature,
-      channelId,
+      signResult.signedCommitment,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {

@@ -51,7 +51,7 @@ describe('[ Channel doesnt exist ]', () => {
   const { processId, storage } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize('NotInitializedChannelId', processId, storage);
+    const result = initialize(scenario.initialProps.commitment, processId, storage);
 
     itTransitionsToAcknowledgeFailure(result, 'ChannelDoesntExist');
   });

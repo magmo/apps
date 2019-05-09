@@ -24,7 +24,7 @@ import * as selectors from '../../../selectors';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
-import { sendConcludeChannel } from '../../../../communication';
+import { sendConcludeInstigated } from '../../../../communication';
 
 export interface ReturnVal {
   state: CState;
@@ -178,12 +178,10 @@ const createAndSendConcludeCommitment = (
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = sendConcludeChannel(
+    const messageRelay = sendConcludeInstigated(
       theirAddress(channelState),
       processId,
-      signResult.signedCommitment.commitment,
-      signResult.signedCommitment.signature,
-      channelId,
+      signResult.signedCommitment,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {

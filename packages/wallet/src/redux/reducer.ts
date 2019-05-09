@@ -15,7 +15,6 @@ import * as states from './state';
 import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
-import { getChannel } from './state';
 
 const initialState = states.waitForLogin();
 
@@ -165,18 +164,11 @@ function initializeNewProtocol(
       return { protocolState, sharedData };
     }
     case actions.protocol.CONCLUDE_INSTIGATED: {
-      const { channelId } = action;
-      const channelState = getChannel(incomingSharedData, channelId);
-      const updatedChannelState = channelState;
-      let updatedSharedData = incomingSharedData;
-      if (channelState && updatedChannelState) {
-        updatedChannelState.turnNum = channelState.turnNum + 1;
-        updatedSharedData = { ...incomingSharedData, ...updatedChannelState };
-      } // TODO this is a bit hacky and possibly the wrong place to update the turn number...
+      const { signedCommitment } = action;
       const { state: protocolState, storage: sharedData } = concludingResponderProtocol.initialize(
-        channelId,
+        signedCommitment,
         processId,
-        updatedSharedData,
+        incomingSharedData,
       );
       return { protocolState, sharedData };
     }

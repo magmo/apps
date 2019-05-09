@@ -19,7 +19,7 @@ export function sendStrategyApproved(to: string, processId: string) {
 }
 
 export function sendConcludeInstigated(to: string, processId, signedCommitment: SignedCommitment) {
-  return sendMessage(to, concludeInstigated(processId, signedCommitment));
+  return sendMessage(to, concludeInstigated(signedCommitment));
 }
 
 export const sendCommitmentReceived = (

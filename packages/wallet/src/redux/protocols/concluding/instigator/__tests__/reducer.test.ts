@@ -1,7 +1,10 @@
 import * as scenarios from './scenarios';
 import { concludingReducer, initialize, ReturnVal } from '../reducer';
 import { ConcludingStateType, FailureReason } from '../states';
-import { expectThisCommitmentSent } from '../../../../__tests__/helpers';
+import { SharedData } from '../../../../state';
+import { Commitment } from '../../../../../domain';
+import { CONCLUDE_INSTIGATED } from '../../../actions';
+import { expectThisMessageAndCommitmentSent } from '../../../../__tests__/helpers';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -17,7 +20,7 @@ describe('[ Happy path ]', () => {
     const action = scenario.actions.concludeSent;
     const result = concludingReducer(state, storage, action);
 
-    expectThisCommitmentSent(result.storage, scenario.commitments.concludeCommitment);
+    itSendsConcludeInstigated(result.storage, scenario.commitments.concludeCommitment);
     itTransitionsTo(result, 'InstigatorWaitForOpponentConclude');
   });
 
@@ -125,6 +128,12 @@ describe('[ Defunding Failed ]', () => {
     itTransitionsToFailure(result, 'DefundFailed');
   });
 });
+
+function itSendsConcludeInstigated(storage: SharedData, commitment: Commitment) {
+  it('sends a conclude instigated message with the correct commitment', () => {
+    expectThisMessageAndCommitmentSent(storage, commitment, CONCLUDE_INSTIGATED);
+  });
+}
 
 function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
   it(`transitions to ${type}`, () => {

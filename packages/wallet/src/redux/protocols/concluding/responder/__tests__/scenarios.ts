@@ -87,6 +87,9 @@ export const happyPath = {
 
 export const channelDoesntExist = {
   ...defaults,
+  initialProps: {
+    commitment: signedCommitment20,
+  },
   storage: storage(ourTurn),
   states: {
     acknowledgeFailure: states.acknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
