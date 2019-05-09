@@ -37,16 +37,21 @@ export interface ConcludeChannel extends BaseProcessAction {
   type: typeof CONCLUDE_CHANNEL;
   commitment: Commitment;
   signature: string;
+  channelId: string;
+  protocol: 'ConcludingResponder';
 }
 export const concludeChannel = (
   processId: string,
   commitment: Commitment,
   signature: string,
+  channelId: string,
 ): ConcludeChannel => ({
   type: CONCLUDE_CHANNEL,
   processId,
   commitment,
   signature,
+  channelId,
+  protocol: 'ConcludingResponder',
 });
 
 // COMMON

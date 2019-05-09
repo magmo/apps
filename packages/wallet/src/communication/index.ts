@@ -24,8 +24,8 @@ export function sendStrategyApproved(to: string, processId: string) {
   return sendMessage(to, strategyApproved(processId));
 }
 
-export function sendConcludeChannel(to: string, processId, commitment, signature) {
-  return sendMessage(to, concludeChannel(processId, commitment, signature));
+export function sendConcludeChannel(to: string, processId, commitment, signature, channelId) {
+  return sendMessage(to, concludeChannel(processId, commitment, signature, channelId));
 }
 
 export const sendCommitmentReceived = (

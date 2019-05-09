@@ -183,6 +183,7 @@ const createAndSendConcludeCommitment = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      channelId,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {
