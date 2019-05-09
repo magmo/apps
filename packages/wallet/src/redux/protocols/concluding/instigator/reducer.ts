@@ -9,7 +9,13 @@ import {
   instigatorAcknowledgeConcludeReceived,
 } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
-import { SharedData, getChannel, setChannelStore, queueMessage } from '../../../state';
+import {
+  SharedData,
+  getChannel,
+  setChannelStore,
+  queueMessage,
+  checkAndStore,
+} from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
@@ -22,7 +28,11 @@ import * as selectors from '../../../selectors';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
-import { sendConcludeInstigated, COMMITMENT_RECEIVED } from '../../../../communication';
+import {
+  sendConcludeInstigated,
+  COMMITMENT_RECEIVED,
+  CommitmentReceived,
+} from '../../../../communication';
 import { failure, success } from '../state';
 import { getChannelId } from '../../../../domain';
 
@@ -42,7 +52,7 @@ export function instigatorConcludingReducer(
   if (action.type === COMMITMENT_RECEIVED) {
     const channelId = getChannelId(action.signedCommitment.commitment);
     if (channelId === state.channelId) {
-      return concludeReceived(state, storage);
+      return concludeReceived(action, state, storage);
     }
   }
   if (isDefundingAction(action)) {
@@ -140,11 +150,22 @@ function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal
   }
 }
 
-function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal {
+function concludeReceived(
+  action: CommitmentReceived,
+  state: NonTerminalCState,
+  storage: Storage,
+): ReturnVal {
   if (state.type !== 'InstigatorWaitForOpponentConclude') {
     return { state, storage };
   }
-  return { state: instigatorAcknowledgeConcludeReceived(state), storage };
+  const { signedCommitment } = action;
+  const checkResult = checkAndStore(storage, signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Concluding instigator protocol, unable to validate or store commitment');
+  }
+  const updatedStorage = checkResult.store;
+
+  return { state: instigatorAcknowledgeConcludeReceived(state), storage: updatedStorage };
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
