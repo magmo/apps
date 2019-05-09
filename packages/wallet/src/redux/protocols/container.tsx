@@ -2,9 +2,11 @@ import { PureComponent } from 'react';
 import { ProtocolState } from '.';
 import * as fundingStates from './funding/states';
 import * as concludingInstigatorStates from './concluding/instigator/states';
+import * as concludingResponderStates from './concluding/responder/states';
 import React from 'react';
 import { Funding } from './funding/container';
 import { Concluding as ConcludingInstigator } from './concluding/instigator/container';
+import { Concluding as ConcludingResponder } from './concluding/responder/container';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -27,6 +29,13 @@ class ProtocolContainer extends PureComponent<Props> {
       !concludingInstigatorStates.isTerminal(protocolState)
     ) {
       return <ConcludingInstigator state={protocolState} />;
+    }
+
+    if (
+      concludingResponderStates.isConcludingResponderState(protocolState) &&
+      !concludingResponderStates.isTerminal(protocolState)
+    ) {
+      return <ConcludingResponder state={protocolState} />;
     }
     // TODO: We need a placeholder screen here when transitioning back to the app from a success state
     return (

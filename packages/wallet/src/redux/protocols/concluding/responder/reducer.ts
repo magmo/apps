@@ -61,14 +61,17 @@ export function initialize(channelId: string, processId: string, storage: Storag
   if (!channelState) {
     return {
       state: acknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
-      storage,
+      storage: showWallet(storage),
     };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return { state: approveConcluding({ channelId, processId }), storage: showWallet(storage) };
   } else {
-    return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
+    return {
+      state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      storage: showWallet(storage),
+    };
   }
 }
 
