@@ -24,7 +24,7 @@ import { isSuccess, isFailure } from '../../defunding/states';
 import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
-import { sendConcludeInstigated } from '../../../../communication';
+import { sendCommitmentReceived } from '../../../../communication';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
@@ -68,7 +68,7 @@ export function initialize(
   storage: Storage,
 ): ReturnVal {
   const channelId = getChannelId(signedCommitment.commitment);
-  const channelState = getChannel(storage, channelId);
+  let channelState = getChannel(storage, channelId);
   if (!channelState) {
     return {
       state: responderAcknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
@@ -81,8 +81,8 @@ export function initialize(
     throw new Error('Concluding responding protocol, unable to validate or store commitment');
   }
   const updatedStorage = checkResult.store;
-
-  if (ourTurn(channelState)) {
+  channelState = getChannel(updatedStorage, channelId);
+  if (channelState && ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return {
       state: responderApproveConcluding({ channelId, processId }),
@@ -178,10 +178,11 @@ const createAndSendConcludeCommitment = (
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = sendConcludeInstigated(
+    const messageRelay = sendCommitmentReceived(
       theirAddress(channelState),
       processId,
-      signResult.signedCommitment,
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {

@@ -23,7 +23,7 @@ function typeAndCount(
   let commitmentCount;
   let commitmentType;
   if (isFinal) {
-    commitmentCount = 0;
+    commitmentCount = turnNum % 2;
     commitmentType = CommitmentType.Conclude;
   } else if (turnNum < 2) {
     commitmentCount = turnNum;

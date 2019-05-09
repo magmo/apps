@@ -1,46 +1,50 @@
 import * as states from '../../state';
 
-import {
-  preSuccessState,
-  preFailureState,
-  successTrigger,
-  failureTrigger,
-} from '../../../defunding/__tests__';
+import { preSuccessState, successTrigger } from '../../../defunding/__tests__';
 import * as actions from '../actions';
 import * as channelScenarios from '../../../../__tests__/test-scenarios';
-import { CommitmentType, Commitment } from 'fmg-core';
-import { ChannelState } from '../../../../channel-store';
-import { setChannel, EMPTY_SHARED_DATA } from '../../../../state';
+import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
-
+import { appCommitment } from '../../../../../domain/commitments/__tests__';
+import { bigNumberify } from 'ethers/utils';
+import { bsPrivateKey } from '../../../../../communication/__tests__/commitments';
 // -----------------
 // Channel Scenarios
 // -----------------
-const { channelId, bsAddress: address, bsPrivateKey: privateKey } = channelScenarios;
+const { channelId, bsAddress, asAddress, ledgerId } = channelScenarios;
 
-const { signedCommitment20, signedCommitment21, signedCommitment22 } = channelScenarios;
-const theirTurn = channelFromCommitments(
-  signedCommitment20,
-  signedCommitment21,
-  address,
-  privateKey,
-);
-const ourTurn = channelFromCommitments(signedCommitment21, signedCommitment22, address, privateKey);
+const twoThree = [
+  { address: asAddress, wei: bigNumberify(2).toHexString() },
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+];
 
-const concludeCommitment: Commitment = {
-  ...signedCommitment21.commitment,
-  channel: channelScenarios.channel,
-  commitmentCount: 0,
-  commitmentType: CommitmentType.Conclude,
-  appAttributes: '0x0',
-  turnNum: 23,
-};
+const app50 = appCommitment({ turnNum: 50, balances: twoThree, isFinal: false });
+const app51 = appCommitment({ turnNum: 51, balances: twoThree, isFinal: false });
+const app52 = appCommitment({ turnNum: 52, balances: twoThree, isFinal: true });
+const app53 = appCommitment({ turnNum: 53, balances: twoThree, isFinal: true });
 
+const initialStore = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app50, app51, bsAddress, bsPrivateKey),
+]);
+const firstConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app51, app52, bsAddress, bsPrivateKey),
+]);
+const secondConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app52, app53, bsAddress, bsPrivateKey),
+]);
+
+const firstConcludeReceived = setFundingState(firstConcludeReceivedChannelState, channelId, {
+  directlyFunded: false,
+  fundingChannel: ledgerId,
+});
+const secondConcludeReceived = setFundingState(secondConcludeReceivedChannelState, channelId, {
+  directlyFunded: false,
+  fundingChannel: ledgerId,
+});
 // --------
 // Defaults
 // --------
 const processId = 'processId';
-const storage = (channelState: ChannelState) => setChannel(EMPTY_SHARED_DATA, channelState);
 
 const defaults = { processId, channelId };
 
@@ -53,89 +57,35 @@ const waitForDefund = states.responderWaitForDefund({
   ...defaults,
   defundingState: preSuccessState,
 });
-const waitForDefund2 = states.responderWaitForDefund({
-  ...defaults,
-  defundingState: preFailureState,
-});
+
 const acknowledgeSuccess = states.responderAcknowledgeSuccess(defaults);
-const success = states.success();
 
 // -------
 // Actions
 // -------
 const concludeSent = actions.concludeSent(processId);
 const defundChosen = actions.defundChosen(processId);
-const concludingImpossibleAcknowledged = actions.acknowledged(processId);
 const acknowledged = actions.acknowledged(processId);
+
+// TODO: Failure scenarios
 
 // -------
 // Scenarios
 // -------
 export const happyPath = {
   ...defaults,
-  storage: storage(ourTurn),
-  states: {
-    approveConcluding,
-    decideDefund,
-    waitForDefund,
-    acknowledgeSuccess,
-    success,
+  initialize: { store: initialStore, commitment: app52 },
+  approveConcluding: {
+    state: approveConcluding,
+    store: firstConcludeReceived,
+    action: concludeSent,
+    reply: app53.commitment,
   },
-  actions: {
-    concludeSent,
-    defundChosen,
-    successTrigger,
-    acknowledged,
-  },
-  commitments: {
-    concludeCommitment,
-  },
-};
-
-export const channelDoesntExist = {
-  ...defaults,
-  initialProps: {
-    commitment: signedCommitment20,
-  },
-  storage: storage(ourTurn),
-  states: {
-    acknowledgeFailure: states.responderAcknowledgeFailure({
-      ...defaults,
-      reason: 'ChannelDoesntExist',
-    }),
-    failure: states.failure({ reason: 'ChannelDoesntExist' }),
-  },
-  actions: {
-    acknowledged,
-  },
-};
-
-export const concludingNotPossible = {
-  ...defaults,
-  storage: storage(theirTurn),
-  states: {
-    acknowledgeFailure: states.responderAcknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
-    failure: states.failure({ reason: 'NotYourTurn' }),
-  },
-  actions: {
-    concludingImpossibleAcknowledged,
-    acknowledged,
-  },
-};
-
-export const defundingFailed = {
-  ...defaults,
-  storage: storage(ourTurn),
-  states: {
-    waitForDefund2,
-    acknowledgeFailure: states.responderAcknowledgeFailure({
-      ...defaults,
-      reason: 'DefundFailed',
-    }),
-    failure: states.failure({ reason: 'DefundFailed' }),
-  },
-  actions: {
-    acknowledged,
-    failureTrigger,
+  decideDefund: { state: decideDefund, store: secondConcludeReceived, action: defundChosen },
+  waitForDefund: { state: waitForDefund, store: secondConcludeReceived, action: successTrigger },
+  acknowledgeSuccess: {
+    state: acknowledgeSuccess,
+    store: secondConcludeReceived,
+    action: acknowledged,
   },
 };
