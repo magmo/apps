@@ -23,8 +23,7 @@ export const CONCLUDE_REQUESTED = 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED';
 export const concludeRequested = (channelId: string) => ({
   type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
   channelId,
-  // TODO: Resolve inconsistent naming scheme: conclude vs closing
-  protocol: WalletProtocol.Closing,
+  protocol: WalletProtocol.Concluding,
 });
 export type ConcludeRequested = ReturnType<typeof concludeRequested>;
 

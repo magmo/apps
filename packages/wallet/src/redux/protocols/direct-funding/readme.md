@@ -7,7 +7,7 @@ The direct funding protocol is one of the funding protocols, which means that th
 The protocol implements the following state machine:
 
 ```mermaid
-graph LR
+graph TD
 ST((Start))-->NSD(NotSafeToDeposit)
 NSD-->|FUNDING_RECEIVED|WFDT(WaitForDepositTransaction)
 ST-->WFDT
