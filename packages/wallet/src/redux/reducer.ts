@@ -7,7 +7,7 @@ import { ProtocolState } from './protocols';
 import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
 import * as challengeProtocol from './protocols/challenging';
-import * as concludeInstigatorProtocol from './protocols/concluding/instigator';
+import * as concludingInstigatorProtocol from './protocols/concluding/instigator';
 import * as fundProtocol from './protocols/funding';
 import * as challengeResponseProtocol from './protocols/responding';
 import * as states from './state';
@@ -94,6 +94,14 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, appSharedData, processState, appProtocolState);
+      case WalletProtocol.Concluding:
+        const { state: concState, storage: concStorage } = concludingInstigatorProtocol.reducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+        return updatedState(state, concStorage, processState, concState);
+
       default:
         // TODO: This should return unreachable(state), but right now, only some protocols are
         // "whitelisted" to run as a top-level process, which means we can't
@@ -138,9 +146,9 @@ function initializeNewProtocol(
     }
     case actions.protocol.CONCLUDE_REQUESTED: {
       const { channelId } = action;
-      const { state: protocolState, storage: sharedData } = concludeInstigatorProtocol.initialize(
+      const { state: protocolState, storage: sharedData } = concludingInstigatorProtocol.initialize(
         channelId,
-        APPLICATION_PROCESS_ID,
+        processId,
         incomingSharedData,
       );
       return { protocolState, sharedData };

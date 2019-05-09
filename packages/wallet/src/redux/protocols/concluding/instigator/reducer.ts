@@ -10,17 +10,18 @@ import {
   acknowledgeFailure,
   acknowledgeConcludeReceived,
 } from './states';
-import { ConcludingAction } from './actions';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { SharedData, getChannel } from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
+import { isConcludingAction } from './actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
 type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
 import { sendConcludeChannel } from '../../../../communication';
 import { showWallet } from '../../reducer-helpers';
+import { ProtocolAction } from '../../../../redux/actions';
 
 export interface ReturnVal {
   state: CState;
@@ -31,11 +32,16 @@ export interface ReturnVal {
 export function concludingReducer(
   state: NonTerminalCState,
   storage: SharedData,
-  action: ConcludingAction | DefundingAction,
+  action: ProtocolAction,
 ): ReturnVal {
   if (isDefundingAction(action)) {
     return handleDefundingAction(state, storage, action);
   }
+
+  if (!isDefundingAction(action) && !isConcludingAction(action)) {
+    return { state, storage };
+  }
+
   switch (action.type) {
     case 'CONCLUDING.CANCELLED':
       return concludingCancelled(state, storage);

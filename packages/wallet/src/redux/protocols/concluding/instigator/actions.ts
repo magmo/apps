@@ -1,3 +1,5 @@
+import { WalletAction } from '../../../actions';
+
 export type ConcludingAction =
   | Cancelled
   | ConcludeSent
@@ -57,3 +59,16 @@ export const acknowledged = (processId: string): Acknowledged => ({
   type: 'ACKNOWLEDGED',
   processId,
 });
+
+// --------
+// Helpers
+// --------
+
+export const isConcludingAction = (action: WalletAction): action is ConcludingAction => {
+  return (
+    action.type === 'CONCLUDING.CANCELLED' ||
+    action.type === 'CONCLUDE.SENT' ||
+    action.type === 'CONCLUDE.RECEIVED' ||
+    action.type === 'DEFUND.CHOSEN'
+  );
+};
