@@ -264,7 +264,7 @@ function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.Pl
         Wallet.CONCLUDE_SUCCESS,
         Wallet.CONCLUDE_FAILURE,
       ]);
-      Wallet.startConcludingGame(WALLET_IFRAME_ID, 'TODO-computed-channelId');
+      Wallet.startConcludingGame(WALLET_IFRAME_ID, channelId);
       const concludeResponse = yield take(conclusionChannel);
       if (concludeResponse.type === Wallet.CONCLUDE_SUCCESS) {
         yield put(gameActions.messageSent());
