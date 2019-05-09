@@ -201,9 +201,9 @@ export function relayMessage(iFrameId: string, messagePayload: WalletMessagePayl
  * using the [[WalletEventListener]] during the conclusion process.
  * @param iFrameId The id of the embedded wallet iframe.
  */
-export function startConcludingGame(iFrameId: string): void {
+export function startConcludingGame(iFrameId: string, channelId: string): void {
   const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
-  const message = concludeChannelRequest();
+  const message = concludeChannelRequest(channelId);
   iFrame.contentWindow.postMessage(message, '*');
 }
 
