@@ -72,9 +72,7 @@ export function* messageListener() {
 }
 
 function handleIncomingMessage(action: incoming.ReceiveMessage) {
-  const { messagePayload } = action as incoming.ReceiveMessage;
-
-  const { data } = messagePayload;
+  const data = action.messagePayload;
 
   if ('type' in data && isRelayableAction(data)) {
     return data;
