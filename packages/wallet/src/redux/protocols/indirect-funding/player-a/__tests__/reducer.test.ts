@@ -43,7 +43,7 @@ describe('happy-path scenario', () => {
     itUpdatesFundingState(
       updatedState,
       scenario.initialParams.channelId,
-      scenario.initialParams.ledgerId, // TODO
+      scenario.initialParams.ledgerId,
     );
     itTransitionsTo(updatedState, 'Success');
   });
