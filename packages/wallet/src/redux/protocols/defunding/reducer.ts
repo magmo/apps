@@ -44,6 +44,7 @@ export const initialize = (
 
     const protocolState = states.waitForLedgerDefunding({
       processId,
+      channelId,
       indirectDefundingState: indirectDefundingState.protocolState,
     });
     return { protocolState, sharedData: indirectDefundingState.sharedData };
@@ -83,10 +84,11 @@ const waitForIndirectDefundingReducer = (
   } = indirectDefundingReducer(protocolState.indirectDefundingState, sharedData, action);
   if (indirectDefundingStates.isTerminal(updatedIndirectDefundingState)) {
     if (updatedIndirectDefundingState.type === SUCCESS) {
-      return {
-        protocolState: states.success(),
-        sharedData: updatedSharedData,
-      };
+      const fundingChannelId = helpers.getFundingChannelId(
+        protocolState.channelId,
+        updatedSharedData,
+      );
+      return createWaitForWithdrawal(updatedSharedData, protocolState.processId, fundingChannelId);
     } else {
       return {
         protocolState: states.failure('Ledger De-funding Failure'),
@@ -151,6 +153,7 @@ const createWaitForWithdrawal = (sharedData: SharedData, processId: string, chan
   const protocolState = states.waitForWithdrawal({
     processId,
     withdrawalState,
+    channelId,
   });
 
   return { protocolState, sharedData: newSharedData };

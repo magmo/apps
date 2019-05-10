@@ -25,7 +25,7 @@ import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
 import { sendCommitmentReceived } from '../../../../communication';
-import { showWallet } from '../../reducer-helpers';
+import { showWallet, hideWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
@@ -107,12 +107,14 @@ function handleDefundingAction(
   const defundingState1 = state.defundingState;
 
   const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
-  const defundingState2 = protocolStateWithSharedData.protocolState;
-
-  if (isSuccess(defundingState2)) {
+  const updatedDefundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
+  if (isSuccess(updatedDefundingState)) {
     state = responderAcknowledgeSuccess(state);
-  } else if (isFailure(defundingState2)) {
+  } else if (isFailure(updatedDefundingState)) {
     state = responderAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
+  } else {
+    state = { ...state, defundingState: updatedDefundingState };
   }
   return { state, storage };
 }
@@ -151,15 +153,16 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     storage,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
   return { state: responderWaitForDefund({ ...state, defundingState }), storage };
 }
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {
   switch (state.type) {
     case 'ResponderAcknowledgeSuccess':
-      return { state: success(), storage };
+      return { state: success(), storage: hideWallet(storage) };
     case 'ResponderAcknowledgeFailure':
-      return { state: failure({ reason: state.reason }), storage };
+      return { state: failure({ reason: state.reason }), storage: hideWallet(storage) };
     default:
       return { state, storage };
   }

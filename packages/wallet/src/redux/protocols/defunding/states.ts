@@ -19,12 +19,14 @@ export interface WaitForWithdrawal {
   type: typeof WAIT_FOR_WITHDRAWAL;
   processId: string;
   withdrawalState: WithdrawalState;
+  channelId;
 }
 
 export interface WaitForIndirectDefunding {
   type: typeof WAIT_FOR_INDIRECT_DEFUNDING;
   processId: string;
   indirectDefundingState: IndirectDefundingState;
+  channelId;
 }
 
 export interface Failure {
@@ -57,18 +59,19 @@ export function isFailure(state: DefundingState): state is Failure {
 // -------
 
 export function waitForWithdrawal(properties: Properties<WaitForWithdrawal>): WaitForWithdrawal {
-  const { processId, withdrawalState } = properties;
-  return { type: WAIT_FOR_WITHDRAWAL, processId, withdrawalState };
+  const { processId, withdrawalState, channelId } = properties;
+  return { type: WAIT_FOR_WITHDRAWAL, processId, withdrawalState, channelId };
 }
 
 export function waitForLedgerDefunding(
   properties: Properties<WaitForIndirectDefunding>,
 ): WaitForIndirectDefunding {
-  const { processId, indirectDefundingState: ledgerDefundingState } = properties;
+  const { processId, indirectDefundingState: ledgerDefundingState, channelId } = properties;
   return {
     type: WAIT_FOR_INDIRECT_DEFUNDING,
     processId,
     indirectDefundingState: ledgerDefundingState,
+    channelId,
   };
 }
 
