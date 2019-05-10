@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
-  "main": "index.js",
-  "module": "src/index.js",
+  "main": "lib/index.js",
   "resolutions": {
     "firebase/**/grpc": "^1.16.1"
   },
