@@ -9,7 +9,7 @@ import {
 } from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils/bignumber';
 import { waitForLedgerUpdate } from '../state';
-import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
+import { setChannels, EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
 import * as globalActions from '../../../actions';
@@ -47,30 +47,45 @@ const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
 // -----------
 // States
 // -----------
-const initialStore = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app10, app11, asAddress, asPrivateKey),
-  channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
-]);
 
-const notDefundableInitialStore = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app9, app10, asAddress, asPrivateKey),
-  channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
-]);
+const setFundingState = (sharedData: SharedData): SharedData => {
+  return {
+    ...sharedData,
+    fundingState: { [channelId]: { directlyFunded: false, fundingChannel: ledgerId } },
+  };
+};
+const initialStore = setFundingState(
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(app10, app11, asAddress, asPrivateKey),
+    channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+  ]),
+);
+
+const notDefundableInitialStore = setFundingState(
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(app9, app10, asAddress, asPrivateKey),
+    channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+  ]),
+);
 
 const playerAWaitForUpdate = {
   state: waitForLedgerUpdate(props),
-  store: setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(app10, app11, asAddress, asPrivateKey),
-    channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
-  ]),
+  store: setFundingState(
+    setChannels(EMPTY_SHARED_DATA, [
+      channelFromCommitments(app10, app11, asAddress, asPrivateKey),
+      channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
+    ]),
+  ),
 };
 
 const playerBWaitForUpdate = {
   state: waitForLedgerUpdate(props),
-  store: setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),
-    channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
-  ]),
+  store: setFundingState(
+    setChannels(EMPTY_SHARED_DATA, [
+      channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),
+      channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+    ]),
+  ),
 };
 
 // -----------
