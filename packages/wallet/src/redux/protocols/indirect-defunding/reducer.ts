@@ -97,7 +97,11 @@ const waitForConcludeReducer = (
   newSharedData = checkResult.store;
 
   if (!helpers.isFirstPlayer(protocolState.ledgerId, sharedData)) {
-    newSharedData = createAndSendConcludeCommitment(newSharedData, protocolState.ledgerId);
+    newSharedData = createAndSendConcludeCommitment(
+      newSharedData,
+      protocolState.processId,
+      protocolState.ledgerId,
+    );
   }
 
   return {
@@ -145,14 +149,22 @@ const waitForLedgerUpdateReducer = (
     );
     newSharedData = queueMessage(newSharedData, messageRelay);
   } else {
-    newSharedData = createAndSendConcludeCommitment(newSharedData, protocolState.ledgerId);
+    newSharedData = createAndSendConcludeCommitment(
+      newSharedData,
+      protocolState.processId,
+      protocolState.ledgerId,
+    );
   }
   return { protocolState: states.waitForConclude(protocolState), sharedData: newSharedData };
 };
 
 // Helpers
 
-const createAndSendConcludeCommitment = (sharedData: SharedData, channelId: string): SharedData => {
+const createAndSendConcludeCommitment = (
+  sharedData: SharedData,
+  processId: string,
+  channelId: string,
+): SharedData => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
 
   const commitment = composeConcludeCommitment(channelState);
@@ -164,7 +176,7 @@ const createAndSendConcludeCommitment = (sharedData: SharedData, channelId: stri
 
   const messageRelay = sendCommitmentReceived(
     theirAddress(channelState),
-    channelId,
+    processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
   );
