@@ -14,24 +14,36 @@ It covers:
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   St((start))-->DF{Defundable?}
   DF --> |No| F((Failure))
   DF -->|Yes|SC0[SendLedgerUpdate]
   SC0-->WFU(WaitForLedgerUpdate)
   WFU --> |"CommitmentReceived(Accept)"|Su[Success]
   WFU --> |"CommitmentReceived(Reject)"| F
+
+  style St  fill:#efdd20
+  style DF  fill:#efdd20
+  style Su fill:#58ef21
+  style F  fill:#f45941
 ```
 
 ### Player B State machine
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   St((start))-->DF{Defundable?}
   DF --> |No| F((Failure))
   DF --> |Yes| WFU(WaitForLedgerUpdate)
   WFU-->|"CommitmentReceived(Accept)"|SC1[SendLedgerUpdate1]
   WFU --> |"CommitmentReceived(Reject)"| F
   SC1-->S((success))
+
+  style St  fill:#efdd20
+  style DF  fill:#efdd20
+  style S fill:#58ef21
+  style F  fill:#f45941
 
 ```
 
