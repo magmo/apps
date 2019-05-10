@@ -135,11 +135,7 @@ function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal
   const channelState = getChannel(storage, state.channelId);
 
   if (channelState) {
-    const sharedDataWithOwnCommitment = createAndSendConcludeCommitment(
-      storage,
-      state.processId,
-      state.channelId,
-    );
+    const sharedDataWithOwnCommitment = createAndSendConcludeCommitment(storage, state.channelId);
 
     return {
       state: instigatorWaitForOpponentConclude({ ...state }),
@@ -196,11 +192,7 @@ function acknowledged(state: CState, storage: Storage): ReturnVal {
 
 // Helpers
 
-const createAndSendConcludeCommitment = (
-  sharedData: SharedData,
-  processId: string,
-  channelId: string,
-): SharedData => {
+const createAndSendConcludeCommitment = (sharedData: SharedData, channelId: string): SharedData => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
 
   const commitment = composeConcludeCommitment(channelState);
@@ -210,7 +202,7 @@ const createAndSendConcludeCommitment = (
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
     const messageRelay = sendConcludeInstigated(
       theirAddress(channelState),
-      processId,
+      channelId,
       signResult.signedCommitment,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);

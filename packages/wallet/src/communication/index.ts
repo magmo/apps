@@ -18,8 +18,8 @@ export function sendStrategyApproved(to: string, processId: string) {
   return sendMessage(to, strategyApproved(processId));
 }
 
-export function sendConcludeInstigated(to: string, processId, signedCommitment: SignedCommitment) {
-  return sendMessage(to, concludeInstigated(signedCommitment));
+export function sendConcludeInstigated(to: string, channelId, signedCommitment: SignedCommitment) {
+  return sendMessage(to, concludeInstigated(signedCommitment, channelId));
 }
 
 export const sendCommitmentReceived = (

@@ -28,10 +28,11 @@ export const concludeRequested = (channelId: string) => ({
 export type ConcludeRequested = ReturnType<typeof concludeRequested>;
 
 export const CONCLUDE_INSTIGATED = 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
-export const concludeInstigated = (signedCommitment: SignedCommitment) => ({
+export const concludeInstigated = (signedCommitment: SignedCommitment, channelId: string) => ({
   type: CONCLUDE_INSTIGATED as typeof CONCLUDE_INSTIGATED,
   signedCommitment,
   protocol: WalletProtocol.Concluding,
+  channelId,
 });
 export type ConcludeInstigated = ReturnType<typeof concludeInstigated>;
 

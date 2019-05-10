@@ -26,7 +26,7 @@ graph TD
   E --> |Yes| MT{My turn?}
   MT  --> |Yes| CC(ResponderApproveConcluding)
   MT  --> |No| AF(ResponderAcknowledgeFailure)
-  CC  --> |CONCLUDE.SENT| DD(ResponderDecideDefund)
+  CC  --> |CONCLUDE.APPROVED| DD(ResponderDecideDefund)
   DD --> |DEFUND.CHOSEN| D(ResponderWaitForDefund)
   D   --> |defunding protocol succeeded| AS(ResponderAcknowledgeSuccess)
   AS -->  |ACKNOWLEDGED| SS((Success))
