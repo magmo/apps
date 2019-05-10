@@ -176,6 +176,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     storage,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
   return { state: instigatorWaitForDefund({ ...state, defundingState }), storage };
 }
 

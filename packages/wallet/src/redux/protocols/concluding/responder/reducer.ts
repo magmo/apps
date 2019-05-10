@@ -108,7 +108,7 @@ function handleDefundingAction(
 
   const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
   const defundingState2 = protocolStateWithSharedData.protocolState;
-
+  storage = protocolStateWithSharedData.sharedData;
   if (isSuccess(defundingState2)) {
     state = responderAcknowledgeSuccess(state);
   } else if (isFailure(defundingState2)) {
@@ -151,6 +151,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     storage,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
   return { state: responderWaitForDefund({ ...state, defundingState }), storage };
 }
 
