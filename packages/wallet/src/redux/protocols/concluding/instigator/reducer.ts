@@ -110,12 +110,14 @@ function handleDefundingAction(
   const defundingState1 = state.defundingState;
 
   const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
-  const defundingState2 = protocolStateWithSharedData.protocolState;
-
-  if (isSuccess(defundingState2)) {
+  const updatedDefundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
+  if (isSuccess(updatedDefundingState)) {
     state = instigatorAcknowledgeSuccess(state);
-  } else if (isFailure(defundingState2)) {
+  } else if (isFailure(updatedDefundingState)) {
     state = instigatorAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
+  } else {
+    state = { ...state, defundingState: updatedDefundingState };
   }
   return { state, storage };
 }
