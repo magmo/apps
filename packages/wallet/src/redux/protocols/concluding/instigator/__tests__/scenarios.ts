@@ -1,6 +1,11 @@
 import * as states from '../../state';
 
-import { preSuccessState, successTrigger } from '../../../defunding/__tests__';
+import {
+  preSuccessState,
+  successTrigger,
+  preFailureState,
+  failureTrigger,
+} from '../../../defunding/__tests__';
 import * as actions from '../actions';
 import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
@@ -8,6 +13,7 @@ import { channelFromCommitments } from '../../../../channel-store/channel-state/
 import { appCommitment, asPrivateKey } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import { commitmentReceived } from '../../../../actions';
+
 // -----------------
 // Channel Scenarios
 // -----------------
@@ -26,6 +32,7 @@ const app53 = appCommitment({ turnNum: 53, balances: twoThree, isFinal: true });
 const initialStore = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(app50, app51, asAddress, asPrivateKey),
 ]);
+
 const firstConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(app51, app52, asAddress, asPrivateKey),
 ]);
@@ -54,10 +61,15 @@ const waitForDefund = states.instigatorWaitForDefund({
   ...defaults,
   defundingState: preSuccessState,
 });
+const waitForDefundPreFailure = states.instigatorWaitForDefund({
+  ...defaults,
+  defundingState: preFailureState,
+});
 
 const acknowledgeSuccess = states.instigatorAcknowledgeSuccess(defaults);
 const waitforOpponentConclude = states.instigatorWaitForOpponentConclude(defaults);
 const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived(defaults);
+
 // -------
 // Actions
 // -------
@@ -65,7 +77,7 @@ const concludeSent = actions.concludeApproved(processId);
 const acknowledged = actions.acknowledged(processId);
 const commitmentReceivedAction = commitmentReceived(processId, app53);
 const defundChosen = actions.defundChosen(processId);
-// TODO: Failure scenarios
+const cancelled = actions.cancelled(processId);
 
 // -------
 // Scenarios
@@ -93,6 +105,55 @@ export const happyPath = {
   acknowledgeSuccess: {
     state: acknowledgeSuccess,
     store: secondConcludeReceived,
+    action: acknowledged,
+  },
+};
+
+export const channelDoesntExist = {
+  ...defaults,
+  initialize: { channelId, store: setChannels(EMPTY_SHARED_DATA, []) },
+  acknowledgeFailure: {
+    state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
+    store: initialStore,
+    action: acknowledged,
+  },
+};
+
+export const concludingNotPossible = {
+  ...defaults,
+  initialize: { channelId, store: firstConcludeReceived },
+  acknowledgeFailure: {
+    state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
+    store: initialStore,
+    action: acknowledged,
+  },
+};
+
+export const concludingCancelled = {
+  ...defaults,
+  initialize: { channelId, store: firstConcludeReceived },
+  approveConcluding: {
+    state: approveConcluding,
+    store: initialStore,
+    action: cancelled,
+  },
+  acknowledgeFailure: {
+    state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'ConcludeCancelled' }),
+    store: initialStore,
+    action: acknowledged,
+  },
+};
+
+export const defudFailed = {
+  ...defaults,
+  waitForDefund: {
+    state: waitForDefundPreFailure,
+    store: initialStore,
+    action: failureTrigger,
+  },
+  acknowledgeFailure: {
+    state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
+    store: initialStore,
     action: acknowledged,
   },
 };

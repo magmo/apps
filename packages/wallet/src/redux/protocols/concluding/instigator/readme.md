@@ -48,7 +48,7 @@ We will use the following scenarios for testing:
 1. **Happy path**: `InstigatorApproveConcluding` -> `InstigatorWaitForOpponentConclude` -> `InstigatorAcknowledgeChannelConcluded` -> `InstigatorWaitForDefund` -> `InstigatorAcknowledgeSuccess` -> `Success`
 2. **Channel doesnt exist** `InstigatorAcknowledgeFailure` -> `Failure`
 3. **Concluding not possible**: `InstigatorAcknowledgeFailure` -> `Failure`
-4. **Concluding cancelled** `InstigatorApproveConcluding` -> `Failure`
+4. **Concluding cancelled** `InstigatorApproveConcluding` -> `Failure` (note lack of acknowledgement screen)
 5. **Defund failed** `InstigatorWaitForDefund` -> `InstigatorAcknowledgeFailure` -> `Failure`
 
 # Terminology
