@@ -1,7 +1,6 @@
 import { Properties } from '../../utils';
 
 export const WAIT_FOR_LEDGER_UPDATE = 'WaitForLedgerUpdate';
-export const WAIT_FOR_FINAL_LEDGER_UPDATE = 'WaitForFinalLedgerUpdate';
 export const WAIT_FOR_CONCLUDE = 'WaitForConclude';
 export const FAILURE = 'Failure';
 export const SUCCESS = 'Success';
