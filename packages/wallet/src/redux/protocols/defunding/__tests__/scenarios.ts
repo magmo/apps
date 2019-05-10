@@ -61,15 +61,18 @@ const indirectlyFundedFundingState = {
 };
 const waitForWithdrawal = states.waitForWithdrawal({
   processId,
+  channelId,
   withdrawalState: withdrawalScenarios.happyPath.waitForAcknowledgement,
 });
 const waitForWithdrawalFailure = states.waitForWithdrawal({
   processId,
+  channelId,
   withdrawalState: withdrawalScenarios.withdrawalRejected.waitForApproval,
 });
 
 const waitForLedgerDefunding = states.waitForLedgerDefunding({
   processId,
+  channelId,
   indirectDefundingState: indirectDefundingStates.success(),
 });
 
