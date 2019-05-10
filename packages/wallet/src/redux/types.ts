@@ -2,8 +2,7 @@ export const enum WalletProtocol {
   Application = 'Application',
   Funding = 'Funding',
   Challenging = 'Challenging',
-  ConcludingInstigator = 'ConcludingInstigator',
-  ConcludingResponder = 'ConcludingResponder',
+  Concluding = 'Concluding',
   Responding = 'Responding',
 
   Withdrawing = 'Withdrawing',

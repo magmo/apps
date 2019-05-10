@@ -7,15 +7,13 @@ import { ProtocolState } from './protocols';
 import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
 import * as challengeProtocol from './protocols/challenging';
-import * as concludingInstigatorProtocol from './protocols/concluding/instigator';
-import * as concludingResponderProtocol from './protocols/concluding/responder';
+import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
 import * as challengeResponseProtocol from './protocols/responding';
 import * as states from './state';
 import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
-import { getChannel } from './state';
 
 const initialState = states.waitForLogin();
 
@@ -97,22 +95,16 @@ function routeToProtocolReducer(
         );
         return updatedState(state, appSharedData, processState, appProtocolState);
 
-      case WalletProtocol.ConcludingInstigator:
-        const { state: concIState, storage: concIStorage } = concludingInstigatorProtocol.reducer(
+      case WalletProtocol.Concluding:
+        const {
+          protocolState: concludingProtocolState,
+          sharedData: concludingSharedData,
+        } = concludingProtocol.reducer(
           processState.protocolState,
           states.sharedData(state),
           action,
         );
-        return updatedState(state, concIStorage, processState, concIState);
-
-      case WalletProtocol.ConcludingResponder:
-        const { state: concRState, storage: concRStorage } = concludingResponderProtocol.reducer(
-          processState.protocolState,
-          states.sharedData(state),
-          action,
-        );
-        return updatedState(state, concRStorage, processState, concRState);
-
+        return updatedState(state, concludingSharedData, processState, concludingProtocolState);
       default:
         // TODO: This should return unreachable(state), but right now, only some protocols are
         // "whitelisted" to run as a top-level process, which means we can't
@@ -157,7 +149,7 @@ function initializeNewProtocol(
     }
     case actions.protocol.CONCLUDE_REQUESTED: {
       const { channelId } = action;
-      const { state: protocolState, storage: sharedData } = concludingInstigatorProtocol.initialize(
+      const { protocolState, sharedData } = concludingProtocol.initializeInstigatorState(
         channelId,
         processId,
         incomingSharedData,
@@ -165,18 +157,11 @@ function initializeNewProtocol(
       return { protocolState, sharedData };
     }
     case actions.protocol.CONCLUDE_INSTIGATED: {
-      const { channelId } = action;
-      const channelState = getChannel(incomingSharedData, channelId);
-      const updatedChannelState = channelState;
-      let updatedSharedData = incomingSharedData;
-      if (channelState && updatedChannelState) {
-        updatedChannelState.turnNum = channelState.turnNum + 1;
-        updatedSharedData = { ...incomingSharedData, ...updatedChannelState };
-      } // TODO this is a bit hacky and possibly the wrong place to update the turn number...
-      const { state: protocolState, storage: sharedData } = concludingResponderProtocol.initialize(
-        channelId,
+      const { signedCommitment } = action;
+      const { protocolState, sharedData } = concludingProtocol.initializeResponderState(
+        signedCommitment,
         processId,
-        updatedSharedData,
+        incomingSharedData,
       );
       return { protocolState, sharedData };
     }

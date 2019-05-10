@@ -1,73 +1,72 @@
 import * as scenarios from './scenarios';
-import { concludingReducer, initialize, ReturnVal } from '../reducer';
-import { ConcludingStateType, FailureReason } from '../states';
-import { expectThisCommitmentSent } from '../../../../__tests__/helpers';
+import { instigatorConcludingReducer, initialize, ReturnVal } from '../reducer';
+import { InstigatorConcludingStateType } from '../states';
+import { FailureReason } from '../../state';
+import { SharedData } from '../../../../state';
+import { Commitment } from '../../../../../domain';
+import { CONCLUDE_INSTIGATED } from '../../../actions';
+import { expectThisMessageAndCommitmentSent } from '../../../../__tests__/helpers';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
-  const { channelId, processId, storage } = scenario;
+  const { channelId, processId } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(channelId, processId, storage);
-
+    const { store } = scenario.initialize;
+    const result = initialize(channelId, processId, store);
     itTransitionsTo(result, 'InstigatorApproveConcluding');
   });
   describe('when in ApproveConcluding', () => {
-    const state = scenario.states.approveConcluding;
-    const action = scenario.actions.concludeSent;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store, reply } = scenario.approveConcluding;
+    const result = instigatorConcludingReducer(state, store, action);
 
-    expectThisCommitmentSent(result.storage, scenario.commitments.concludeCommitment);
+    itSendsConcludeInstigated(result.storage, reply);
     itTransitionsTo(result, 'InstigatorWaitForOpponentConclude');
   });
 
   describe('when in WaitForOpponentConclude', () => {
-    const state = scenario.states.waitForOpponentConclude;
-    const action = scenario.actions.concludeReceived;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.waitforOpponentConclude;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'InstigatorAcknowledgeConcludeReceived');
   });
 
   describe('when in AcknowledgeConcludeReceived', () => {
-    const state = scenario.states.acknowledgeConcludeReceived;
-    const action = scenario.actions.defundChosen;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'InstigatorWaitForDefund');
   });
 
   describe('when in WaitForDefund', () => {
-    const state = scenario.states.waitForDefund;
-    const action = scenario.actions.successTrigger;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.waitForDefund;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'InstigatorAcknowledgeSuccess');
   });
 
   describe('when in AcknowledgeSuccess', () => {
-    const state = scenario.states.acknowledgeSuccess;
-    const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.acknowledgeSuccess;
+    const result = instigatorConcludingReducer(state, store, action);
 
-    itTransitionsTo(result, 'InstigatorSuccess');
+    itTransitionsTo(result, 'Success');
   });
 });
 
 describe('[ Channel doesnt exist ]', () => {
   const scenario = scenarios.channelDoesntExist;
-  const { processId, storage } = scenario;
+  const { channelId, processId } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize('NotInitializedChannelId', processId, storage);
+    const { store } = scenario.initialize;
+    const result = initialize(channelId, processId, store);
 
     itTransitionsToAcknowledgeFailure(result, 'ChannelDoesntExist');
   });
 
   describe('when in AcknowledgeFailure', () => {
-    const state = scenario.states.acknowledgeFailure;
-    const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.acknowledgeFailure;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'ChannelDoesntExist');
   });
@@ -75,18 +74,18 @@ describe('[ Channel doesnt exist ]', () => {
 
 describe('[ Concluding Not Possible ]', () => {
   const scenario = scenarios.concludingNotPossible;
-  const { channelId, processId, storage } = scenario;
+  const { channelId, processId } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(channelId, processId, storage);
+    const { store } = scenario.initialize;
+    const result = initialize(channelId, processId, store);
 
     itTransitionsToAcknowledgeFailure(result, 'NotYourTurn');
   });
 
   describe('when in AcknowledgeFailure', () => {
-    const state = scenario.states.acknowledgeFailure;
-    const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.acknowledgeFailure;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
   });
@@ -94,39 +93,44 @@ describe('[ Concluding Not Possible ]', () => {
 
 describe('[ Concluding Cancelled ]', () => {
   const scenario = scenarios.concludingCancelled;
-  const { storage } = scenario;
 
   describe('when in ApproveConcluding', () => {
-    const state = scenario.states.approveConcluding;
-    const action = scenario.actions.cancelled;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.approveConcluding;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'ConcludeCancelled');
   });
 });
 
-describe('[ Defunding Failed ]', () => {
-  const scenario = scenarios.defundingFailed;
-  const { storage } = scenario;
+describe('[ Defund failed ]', () => {
+  const scenario = scenarios.defundFailed;
 
   describe('when in WaitForDefund', () => {
-    const state = scenario.states.waitForDefund2;
-    const action = scenario.actions.failureTrigger;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.waitForDefund;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
   });
 
   describe('when in AcknowledgeFailure', () => {
-    const state = scenario.states.acknowledgeFailure;
-    const action = scenario.actions.acknowledged;
-    const result = concludingReducer(state, storage, action);
+    const { state, action, store } = scenario.acknowledgeFailure;
+    const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'DefundFailed');
   });
 });
 
-function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
+/////////////
+// Helpers //
+/////////////
+
+function itSendsConcludeInstigated(storage: SharedData, commitment: Commitment) {
+  it('sends a conclude instigated message with the correct commitment', () => {
+    expectThisMessageAndCommitmentSent(storage, commitment, CONCLUDE_INSTIGATED);
+  });
+}
+
+function itTransitionsTo(result: ReturnVal, type: InstigatorConcludingStateType) {
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
   });
@@ -135,7 +139,7 @@ function itTransitionsTo(result: ReturnVal, type: ConcludingStateType) {
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
     expect(result.state.type).toEqual('Failure');
-    if (result.state.type === 'InstigatorFailure') {
+    if (result.state.type === 'Failure') {
       expect(result.state.reason).toEqual(reason);
     }
   });
@@ -143,7 +147,7 @@ function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
 
 function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to AcknowledgeFailure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('AcknowledgeFailure');
+    expect(result.state.type).toEqual('InstigatorAcknowledgeFailure');
     if (result.state.type === 'InstigatorAcknowledgeFailure') {
       expect(result.state.reason).toEqual(reason);
     }

@@ -103,6 +103,18 @@ export const isChannelDirectlyFunded = (channelId: string, sharedData: SharedDat
   return channelFundingState.directlyFunded;
 };
 
+export const getFundingChannelId = (channelId: string, sharedData: SharedData): string => {
+  const channelFundingState = selectors.getChannelFundingState(sharedData, channelId);
+  if (!channelFundingState) {
+    throw new Error(`No funding state for ${channelId}. Cannot determine funding type.`);
+  }
+
+  if (!channelFundingState.fundingChannel) {
+    throw new Error('No funding channel id defined.');
+  }
+  return channelFundingState.fundingChannel;
+};
+
 export const isFirstPlayer = (channelId: string, sharedData: SharedData) => {
   const channelState = selectors.getChannelState(sharedData, channelId);
   return channelState.ourIndex === PlayerIndex.A;

@@ -1,17 +1,21 @@
 import {
-  ConcludingState as CState,
-  NonTerminalState as NonTerminalCState,
-  approveConcluding,
-  failure,
-  waitForOpponentConclude,
-  waitForDefund,
-  success,
-  acknowledgeSuccess,
-  acknowledgeFailure,
-  acknowledgeConcludeReceived,
+  InstigatorConcludingState as CState,
+  InstigatorNonTerminalState as NonTerminalCState,
+  instigatorApproveConcluding,
+  instigatorWaitForOpponentConclude,
+  instigatorWaitForDefund,
+  instigatorAcknowledgeSuccess,
+  instigatorAcknowledgeFailure,
+  instigatorAcknowledgeConcludeReceived,
 } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
-import { SharedData, getChannel, setChannelStore, queueMessage } from '../../../state';
+import {
+  SharedData,
+  getChannel,
+  setChannelStore,
+  queueMessage,
+  checkAndStore,
+} from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
@@ -24,19 +28,33 @@ import * as selectors from '../../../selectors';
 import { showWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
-import { sendConcludeChannel } from '../../../../communication';
+import {
+  sendConcludeInstigated,
+  COMMITMENT_RECEIVED,
+  CommitmentReceived,
+} from '../../../../communication';
+import { failure, success } from '../state';
+import { getChannelId } from '../../../../domain';
 
 export interface ReturnVal {
   state: CState;
   storage: Storage;
-  sideEffects?;
 }
 
-export function concludingReducer(
+export function instigatorConcludingReducer(
   state: NonTerminalCState,
   storage: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
+  // TODO: Since a commitment received could be a defundingAction OR
+  // a concludingAction we need to check if its the action we're interested in
+  // This is a bit awkward, probably a better way of handling this?
+  if (action.type === COMMITMENT_RECEIVED) {
+    const channelId = getChannelId(action.signedCommitment.commitment);
+    if (channelId === state.channelId) {
+      return concludeReceived(action, state, storage);
+    }
+  }
   if (isDefundingAction(action)) {
     return handleDefundingAction(state, storage, action);
   }
@@ -48,10 +66,8 @@ export function concludingReducer(
   switch (action.type) {
     case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED':
       return concludingCancelled(state, storage);
-    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_SENT':
-      return concludeSent(state, storage);
-    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_RECEIVED':
-      return concludeReceived(state, storage);
+    case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED':
+      return concludeApproved(state, storage);
     case 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN':
       return defundChosen(state, storage);
     case 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED':
@@ -65,18 +81,21 @@ export function initialize(channelId: string, processId: string, storage: Storag
   const channelState = getChannel(storage, channelId);
   if (!channelState) {
     return {
-      state: acknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
+      state: instigatorAcknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
       storage,
     };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return {
-      state: approveConcluding({ channelId, processId }),
+      state: instigatorApproveConcluding({ channelId, processId }),
       storage: showWallet(storage),
     };
   } else {
-    return { state: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }), storage };
+    return {
+      state: instigatorAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      storage,
+    };
   }
 }
 
@@ -94,9 +113,9 @@ function handleDefundingAction(
   const defundingState2 = protocolStateWithSharedData.protocolState;
 
   if (isSuccess(defundingState2)) {
-    state = acknowledgeSuccess(state);
+    state = instigatorAcknowledgeSuccess(state);
   } else if (isFailure(defundingState2)) {
-    state = acknowledgeFailure({ ...state, reason: 'DefundFailed' });
+    state = instigatorAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
   }
   return { state, storage };
 }
@@ -108,7 +127,7 @@ function concludingCancelled(state: NonTerminalCState, storage: Storage): Return
   return { state: failure({ reason: 'ConcludeCancelled' }), storage };
 }
 
-function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
+function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'InstigatorApproveConcluding') {
     return { state, storage };
   }
@@ -123,7 +142,7 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
     );
 
     return {
-      state: waitForOpponentConclude({ ...state }),
+      state: instigatorWaitForOpponentConclude({ ...state }),
       storage: sharedDataWithOwnCommitment,
     };
   } else {
@@ -131,11 +150,22 @@ function concludeSent(state: NonTerminalCState, storage: Storage): ReturnVal {
   }
 }
 
-function concludeReceived(state: NonTerminalCState, storage: Storage): ReturnVal {
+function concludeReceived(
+  action: CommitmentReceived,
+  state: NonTerminalCState,
+  storage: Storage,
+): ReturnVal {
   if (state.type !== 'InstigatorWaitForOpponentConclude') {
     return { state, storage };
   }
-  return { state: acknowledgeConcludeReceived(state), storage };
+  const { signedCommitment } = action;
+  const checkResult = checkAndStore(storage, signedCommitment);
+  if (!checkResult.isSuccess) {
+    throw new Error('Concluding instigator protocol, unable to validate or store commitment');
+  }
+  const updatedStorage = checkResult.store;
+
+  return { state: instigatorAcknowledgeConcludeReceived(state), storage: updatedStorage };
 }
 
 function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -150,7 +180,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
     storage,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
-  return { state: waitForDefund({ ...state, defundingState }), storage };
+  return { state: instigatorWaitForDefund({ ...state, defundingState }), storage };
 }
 
 function acknowledged(state: CState, storage: Storage): ReturnVal {
@@ -178,12 +208,10 @@ const createAndSendConcludeCommitment = (
   const signResult = channelStoreReducer.signAndStore(sharedData.channelStore, commitment);
   if (signResult.isSuccess) {
     const sharedDataWithOwnCommitment = setChannelStore(sharedData, signResult.store);
-    const messageRelay = sendConcludeChannel(
+    const messageRelay = sendConcludeInstigated(
       theirAddress(channelState),
       processId,
-      signResult.signedCommitment.commitment,
-      signResult.signedCommitment.signature,
-      channelId,
+      signResult.signedCommitment,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {

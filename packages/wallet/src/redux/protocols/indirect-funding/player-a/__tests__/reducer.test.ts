@@ -69,7 +69,7 @@ function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
   it('sends a message', () => {
     const lastMessage = getLastMessage(state.sharedData);
     if (lastMessage && 'messagePayload' in lastMessage) {
-      const dataPayload = lastMessage.messagePayload.data;
+      const dataPayload = lastMessage.messagePayload;
       // This is yuk. The data in a message is currently of 'any' type..
       if (!('signedCommitment' in dataPayload)) {
         fail('No signedCommitment in the last message.');

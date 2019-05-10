@@ -1,7 +1,7 @@
 import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { NonTerminalState as NonTerminalConcludingState } from './states';
+import { InstigatorNonTerminalState as NonTerminalConcludingState } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import ApproveConcluding from './components/approve-concluding';
 import ApproveDefunding from './components/approve-defunding';
@@ -56,7 +56,7 @@ class ConcludingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  approve: actions.concludeSent,
+  approve: actions.concludeApproved,
   deny: actions.cancelled,
   defund: actions.defundChosen,
   acknowledge: actions.acknowledged,
