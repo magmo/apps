@@ -31,7 +31,13 @@ describe('player A happy path', () => {
   });
 
   describe('when in WaitForLedgerUpdate', () => {
-    const { state, action } = scenario.waitForLedgerUpdate;
+    const { state, action, reply } = scenario.waitForLedgerUpdate;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, states.WAIT_FOR_CONCLUDE);
+    itSendsMessage(updatedState, reply);
+  });
+  describe('when in WaitForConclude', () => {
+    const { state, action } = scenario.waitForConclude;
     const updatedState = indirectDefundingReducer(state.state, state.store, action);
     itTransitionsTo(updatedState, states.SUCCESS);
   });
@@ -72,6 +78,13 @@ describe('player B happy path', () => {
 
   describe('when in WaitForLedgerUpdate', () => {
     const { state, action, reply } = scenario.waitForLedgerUpdate;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, states.WAIT_FOR_CONCLUDE);
+    itSendsMessage(updatedState, reply);
+  });
+
+  describe('when in WaitForConclude', () => {
+    const { state, action, reply } = scenario.waitForConclude;
     const updatedState = indirectDefundingReducer(state.state, state.store, action);
     itTransitionsTo(updatedState, states.SUCCESS);
     itSendsMessage(updatedState, reply);

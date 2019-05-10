@@ -9,6 +9,7 @@ import * as selectors from '../../selectors';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../communication';
 import { theirAddress } from '../../channel-store';
+import { composeConcludeCommitment } from '../../../utils/commitment-utils';
 
 export const initialize = (
   processId: string,
@@ -68,12 +69,41 @@ export const indirectDefundingReducer = (
   switch (protocolState.type) {
     case states.WAIT_FOR_LEDGER_UPDATE:
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
+    case states.WAIT_FOR_CONCLUDE:
+      return waitForConcludeReducer(protocolState, sharedData, action);
     case states.SUCCESS:
     case states.FAILURE:
       return { protocolState, sharedData };
     default:
       return unreachable(protocolState);
   }
+};
+
+const waitForConcludeReducer = (
+  protocolState: states.WaitForConclude,
+  sharedData: SharedData,
+  action: IndirectDefundingAction,
+): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
+  if (action.type !== COMMITMENT_RECEIVED) {
+    throw new Error(`Invalid action ${action.type}`);
+  }
+
+  let newSharedData = { ...sharedData };
+
+  const checkResult = checkAndStore(newSharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    return { protocolState: states.failure('Received Invalid Commitment'), sharedData };
+  }
+  newSharedData = checkResult.store;
+
+  if (!helpers.isFirstPlayer(protocolState.ledgerId, sharedData)) {
+    newSharedData = createAndSendConcludeCommitment(newSharedData, protocolState.ledgerId);
+  }
+
+  return {
+    protocolState: states.success(),
+    sharedData: newSharedData,
+  };
 };
 
 const waitForLedgerUpdateReducer = (
@@ -114,6 +144,29 @@ const waitForLedgerUpdateReducer = (
       signResult.signedCommitment.signature,
     );
     newSharedData = queueMessage(newSharedData, messageRelay);
+  } else {
+    newSharedData = createAndSendConcludeCommitment(newSharedData, protocolState.ledgerId);
   }
-  return { protocolState: states.success(), sharedData: newSharedData };
+  return { protocolState: states.waitForConclude(protocolState), sharedData: newSharedData };
+};
+
+// Helpers
+
+const createAndSendConcludeCommitment = (sharedData: SharedData, channelId: string): SharedData => {
+  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
+
+  const commitment = composeConcludeCommitment(channelState);
+
+  const signResult = signAndStore(sharedData, commitment);
+  if (!signResult.isSuccess) {
+    throw new Error(`Could not sign commitment due to  ${signResult.reason}`);
+  }
+
+  const messageRelay = sendCommitmentReceived(
+    theirAddress(channelState),
+    channelId,
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  return queueMessage(signResult.store, messageRelay);
 };
