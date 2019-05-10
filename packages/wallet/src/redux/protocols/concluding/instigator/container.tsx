@@ -6,7 +6,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import ApproveConcluding from './components/approve-concluding';
 import ApproveDefunding from './components/approve-defunding';
 import WaitForOpponentConclude from './components/wait-for-opponent-conclude';
-import WaitForDefunding from './components/wait-for-defunding';
+import { Defunding } from '../../defunding/container';
 import * as actions from './actions';
 import Acknowledge from '../../shared-components/acknowledge';
 
@@ -44,7 +44,7 @@ class ConcludingContainer extends PureComponent<Props> {
       case 'InstigatorAcknowledgeConcludeReceived':
         return <ApproveDefunding approve={() => defund(processId)} />;
       case 'InstigatorWaitForDefund':
-        return <WaitForDefunding />;
+        return <Defunding state={state.defundingState} />;
       case 'InstigatorApproveConcluding':
         return (
           <ApproveConcluding deny={() => deny(processId)} approve={() => approve(processId)} />
