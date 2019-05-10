@@ -144,7 +144,7 @@ export const concludingCancelled = {
   },
 };
 
-export const defudFailed = {
+export const defundFailed = {
   ...defaults,
   waitForDefund: {
     state: waitForDefundPreFailure,

@@ -91,25 +91,6 @@ describe('[ Concluding Not Possible ]', () => {
   });
 });
 
-describe('[ Concluding Not Possible ]', () => {
-  const scenario = scenarios.concludingNotPossible;
-  const { channelId, processId } = scenario;
-
-  describe('when initializing', () => {
-    const { store } = scenario.initialize;
-    const result = initialize(channelId, processId, store);
-
-    itTransitionsToAcknowledgeFailure(result, 'NotYourTurn');
-  });
-
-  describe('when in AcknowledgeFailure', () => {
-    const { state, action, store } = scenario.acknowledgeFailure;
-    const result = instigatorConcludingReducer(state, store, action);
-
-    itTransitionsToFailure(result, 'NotYourTurn');
-  });
-});
-
 describe('[ Concluding Cancelled ]', () => {
   const scenario = scenarios.concludingCancelled;
 
@@ -122,7 +103,7 @@ describe('[ Concluding Cancelled ]', () => {
 });
 
 describe('[ Defund failed ]', () => {
-  const scenario = scenarios.defudFailed;
+  const scenario = scenarios.defundFailed;
 
   describe('when in WaitForDefund', () => {
     const { state, action, store } = scenario.waitForDefund;

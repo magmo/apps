@@ -1,6 +1,11 @@
 import * as states from '../../state';
 
-import { preSuccessState, successTrigger } from '../../../defunding/__tests__';
+import {
+  preSuccessState,
+  successTrigger,
+  preFailureState,
+  failureTrigger,
+} from '../../../defunding/__tests__';
 import * as actions from '../actions';
 import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
@@ -25,6 +30,9 @@ const app53 = appCommitment({ turnNum: 53, balances: twoThree, isFinal: true });
 
 const initialStore = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(app50, app51, bsAddress, bsPrivateKey),
+]);
+const initialStoreYourTurn = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app51, app52, bsAddress, bsPrivateKey),
 ]);
 const firstConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(app51, app52, bsAddress, bsPrivateKey),
@@ -55,7 +63,10 @@ const waitForDefund = states.responderWaitForDefund({
   ...defaults,
   defundingState: preSuccessState,
 });
-
+const waitForDefundPreFailure = states.responderWaitForDefund({
+  ...defaults,
+  defundingState: preFailureState,
+});
 const acknowledgeSuccess = states.responderAcknowledgeSuccess(defaults);
 
 // -------
@@ -64,8 +75,6 @@ const acknowledgeSuccess = states.responderAcknowledgeSuccess(defaults);
 const concludeSent = actions.concludeApproved(processId);
 const defundChosen = actions.defundChosen(processId);
 const acknowledged = actions.acknowledged(processId);
-
-// TODO: Failure scenarios
 
 // -------
 // Scenarios
@@ -84,6 +93,40 @@ export const happyPath = {
   acknowledgeSuccess: {
     state: acknowledgeSuccess,
     store: secondConcludeReceived,
+    action: acknowledged,
+  },
+};
+
+export const channelDoesntExist = {
+  ...defaults,
+  initialize: { channelId, store: setChannels(EMPTY_SHARED_DATA, []), commitment: app52 },
+  acknowledgeFailure: {
+    state: states.responderAcknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
+    store: initialStore,
+    action: acknowledged,
+  },
+};
+
+export const concludingNotPossible = {
+  ...defaults,
+  initialize: { store: initialStoreYourTurn, commitment: app53 },
+  acknowledgeFailure: {
+    state: states.responderAcknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
+    store: initialStore,
+    action: acknowledged,
+  },
+};
+
+export const defundFailed = {
+  ...defaults,
+  waitForDefund: {
+    state: waitForDefundPreFailure,
+    store: initialStore,
+    action: failureTrigger,
+  },
+  acknowledgeFailure: {
+    state: states.responderAcknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
+    store: initialStore,
     action: acknowledged,
   },
 };
