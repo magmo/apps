@@ -23,6 +23,7 @@ import { isSuccess, isFailure } from '../transaction-submission/states';
 import { getChannel } from '../../state';
 import { createForceMoveTransaction } from '../../../utils/transaction-generator';
 import { isFullyOpen, ourTurn } from '../../channel-store';
+import { showWallet } from '../reducer-helpers';
 
 type Storage = SharedData;
 
@@ -65,18 +66,18 @@ export function initialize(channelId: string, processId: string, storage: Storag
   const props = { processId, channelId };
 
   if (!channelState) {
-    return { state: acknowledgeFailure(props, 'ChannelDoesntExist'), storage };
+    return { state: acknowledgeFailure(props, 'ChannelDoesntExist'), storage: showWallet(storage) };
   }
 
   if (!isFullyOpen(channelState)) {
-    return { state: acknowledgeFailure(props, 'NotFullyOpen'), storage };
+    return { state: acknowledgeFailure(props, 'NotFullyOpen'), storage: showWallet(storage) };
   }
 
   if (ourTurn(channelState)) {
     // if it's our turn we don't need to challenge
-    return { state: acknowledgeFailure(props, 'AlreadyHaveLatest'), storage };
+    return { state: acknowledgeFailure(props, 'AlreadyHaveLatest'), storage: showWallet(storage) };
   }
-  return { state: approveChallenge({ channelId, processId }), storage };
+  return { state: approveChallenge({ channelId, processId }), storage: showWallet(storage) };
 }
 
 function handleTransactionAction(
