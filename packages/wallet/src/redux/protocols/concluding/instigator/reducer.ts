@@ -25,7 +25,7 @@ type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import * as selectors from '../../../selectors';
-import { showWallet } from '../../reducer-helpers';
+import { showWallet, hideWallet } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
 import {
@@ -185,9 +185,9 @@ function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
 function acknowledged(state: CState, storage: Storage): ReturnVal {
   switch (state.type) {
     case 'InstigatorAcknowledgeSuccess':
-      return { state: success(), storage };
+      return { state: success(), storage: hideWallet(storage) };
     case 'InstigatorAcknowledgeFailure':
-      return { state: failure({ reason: state.reason }), storage };
+      return { state: failure({ reason: state.reason }), storage: hideWallet(storage) };
     default:
       return { state, storage };
   }
