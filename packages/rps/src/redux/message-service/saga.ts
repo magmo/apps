@@ -277,7 +277,7 @@ function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.Pl
       break;
     case 'CHALLENGE_REQUESTED':
       const challengeChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
-      Wallet.startChallenge(WALLET_IFRAME_ID);
+      Wallet.startChallenge(WALLET_IFRAME_ID, channelId);
       yield put(gameActions.messageSent());
       yield take(challengeChannel);
       yield put(gameActions.challengeCompleted());
