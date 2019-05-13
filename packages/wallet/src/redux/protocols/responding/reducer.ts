@@ -20,6 +20,7 @@ import {
   isSuccess,
 } from '../transaction-submission/states';
 import { channelID } from 'fmg-core/lib/channel';
+import { showWallet } from '../reducer-helpers';
 
 export const initialize = (
   processId: string,
@@ -28,7 +29,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.RespondingState> => {
   return {
     protocolState: states.waitForApproval({ processId, challengeCommitment }),
-    sharedData,
+    sharedData: showWallet(sharedData),
   };
 };
 
