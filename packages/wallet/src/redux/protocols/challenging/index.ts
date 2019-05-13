@@ -1,2 +1,2 @@
 export { Challenging } from './container';
-export { initialize } from './reducer';
+export { initialize, challengingReducer as reducer } from './reducer';

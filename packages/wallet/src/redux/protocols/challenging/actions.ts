@@ -1,4 +1,8 @@
+import { ProtocolAction } from '../../actions';
+import { isTransactionAction, TransactionAction } from '../transaction-submission/actions';
+
 export type ChallengingAction =
+  | TransactionAction
   | ChallengeApproved
   | ChallengeDenied
   | ChallengeResponseReceived
@@ -95,3 +99,16 @@ export const challengeFailureAcknowledged = (processId: string): ChallengeFailur
   type: CHALLENGE_FAILURE_ACKNOWLEDGED,
   processId,
 });
+
+export function isChallengingAction(action: ProtocolAction): action is ChallengingAction {
+  return (
+    isTransactionAction(action) ||
+    action.type === CHALLENGE_APPROVED ||
+    action.type === CHALLENGE_DENIED ||
+    action.type === CHALLENGE_RESPONSE_RECEIVED ||
+    action.type === CHALLENGE_TIMED_OUT ||
+    action.type === CHALLENGE_TIMEOUT_ACKNOWLEDGED ||
+    action.type === CHALLENGE_RESPONSE_ACKNOWLEDGED ||
+    action.type === CHALLENGE_FAILURE_ACKNOWLEDGED
+  );
+}

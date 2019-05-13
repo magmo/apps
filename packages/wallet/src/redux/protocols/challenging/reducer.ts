@@ -1,4 +1,3 @@
-import { ChallengingAction } from './actions';
 import {
   ChallengingState as CState,
   NonTerminalState as NonTerminalCState,
@@ -17,7 +16,7 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
-import { isTransactionAction } from '../../actions';
+import { isTransactionAction, ProtocolAction } from '../../actions';
 import { transactionReducer, initialize as initializeTransaction } from '../transaction-submission';
 import { isSuccess, isFailure } from '../transaction-submission/states';
 import { getChannel } from '../../state';
@@ -35,8 +34,12 @@ export interface ReturnVal {
 export function challengingReducer(
   state: NonTerminalCState,
   storage: SharedData,
-  action: ChallengingAction | TransactionAction,
+  action: ProtocolAction,
 ): ReturnVal {
+  if (!actions.isChallengingAction(action)) {
+    console.warn(`Challenging reducer received non-challenging action ${action.type}.`);
+    return { state, storage };
+  }
   if (isTransactionAction(action)) {
     return handleTransactionAction(state, storage, action);
   }
