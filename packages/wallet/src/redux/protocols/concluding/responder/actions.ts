@@ -1,6 +1,6 @@
-import { WalletAction } from '../../../actions';
+import { CommitmentReceived, COMMITMENT_RECEIVED, WalletAction } from '../../../actions';
 
-export type ConcludingAction = ConcludeApproved | DefundChosen | Acknowledged;
+export type ConcludingAction = ConcludeApproved | DefundChosen | Acknowledged | CommitmentReceived;
 
 export interface ConcludeApproved {
   type: 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED';
@@ -44,6 +44,7 @@ export const isConcludingAction = (action: WalletAction): action is ConcludingAc
   return (
     action.type === 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN' ||
-    action.type === 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED'
+    action.type === 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED' ||
+    action.type === COMMITMENT_RECEIVED
   );
 };

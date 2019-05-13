@@ -1,4 +1,5 @@
 import * as states from './states';
+import { COMMITMENT_RECEIVED } from '../../../actions';
 import {
   ResponderConcludingState as CState,
   ResponderNonTerminalState as NonTerminalCState,
@@ -32,7 +33,7 @@ import {
   sendOpponentConcluded,
 } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
-import { isConcludingAction } from './actions';
+import { isConcludingAction, ConcludingAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
 import { failure, success } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
@@ -56,8 +57,9 @@ export function responderConcludingReducer(
   switch (action.type) {
     case 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED':
       return concludeApproved(protocolState, sharedData);
+    case COMMITMENT_RECEIVED:
     case 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN':
-      return defundChosen(protocolState, sharedData);
+      return defundChosen(protocolState, sharedData, action);
     case 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED':
       return acknowledged(protocolState, sharedData);
     default:
@@ -148,7 +150,11 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
   }
 }
 
-function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+function defundChosen(
+  protocolState: NonTerminalCState,
+  sharedData: Storage,
+  action: ConcludingAction,
+): ReturnVal {
   if (protocolState.type !== 'ResponderDecideDefund') {
     return { protocolState, sharedData };
   }
@@ -158,6 +164,7 @@ function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): Re
     protocolState.processId,
     protocolState.channelId,
     sharedData,
+    action,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
   sharedData = protocolStateWithSharedData.sharedData;

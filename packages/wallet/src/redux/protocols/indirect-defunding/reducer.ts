@@ -10,6 +10,7 @@ import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player
 import { sendCommitmentReceived } from '../../../communication';
 import { theirAddress } from '../../channel-store';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
+import { CommitmentReceived } from '../../../../actions';
 
 export const initialize = (
   processId: string,
@@ -18,6 +19,7 @@ export const initialize = (
   proposedAllocation: string[],
   proposedDestination: string[],
   sharedData: SharedData,
+  action?: CommitmentReceived,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   if (!helpers.channelIsClosed(channelId, sharedData)) {
     return {
@@ -49,14 +51,21 @@ export const initialize = (
     );
     newSharedData = queueMessage(newSharedData, messageRelay);
   }
+
+  const protocolState = states.waitForLedgerUpdate({
+    processId,
+    ledgerId,
+    channelId,
+    proposedAllocation,
+    proposedDestination,
+  });
+
+  if (!helpers.isFirstPlayer && action) {
+    // are we second player?
+    return waitForLedgerUpdateReducer(protocolState, sharedData, action);
+  }
   return {
-    protocolState: states.waitForLedgerUpdate({
-      processId,
-      ledgerId,
-      channelId,
-      proposedAllocation,
-      proposedDestination,
-    }),
+    protocolState,
     sharedData: newSharedData,
   };
 };
