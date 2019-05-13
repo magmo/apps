@@ -25,7 +25,12 @@ import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
 import { sendCommitmentReceived } from '../../../../communication';
-import { showWallet, hideWallet } from '../../reducer-helpers';
+import {
+  showWallet,
+  hideWallet,
+  sendConcludeFailure,
+  sendConcludeSuccess,
+} from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
@@ -165,11 +170,11 @@ function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): Re
 function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
   switch (protocolState.type) {
     case 'ResponderAcknowledgeSuccess':
-      return { protocolState: success(), sharedData: hideWallet(sharedData) };
+      return { protocolState: success(), sharedData: sendConcludeSuccess(hideWallet(sharedData)) };
     case 'ResponderAcknowledgeFailure':
       return {
         protocolState: failure({ reason: protocolState.reason }),
-        sharedData: hideWallet(sharedData),
+        sharedData: sendConcludeFailure(hideWallet(sharedData), 'Other'),
       };
     default:
       return { protocolState, sharedData };

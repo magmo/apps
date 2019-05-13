@@ -3,10 +3,11 @@ import { responderConcludingReducer, initialize, ReturnVal } from '../reducer';
 import { ResponderConcludingStateType } from '../states';
 import {
   expectThisCommitmentSent,
+  itSendsThisMessage,
   itSendsThisDisplayEventType,
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../state';
-import { HIDE_WALLET } from 'magmo-wallet-client';
+import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -45,7 +46,8 @@ describe('[ Happy path ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'Success');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -65,7 +67,8 @@ describe('[ Channel doesnt exist ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'ChannelDoesntExist');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -85,7 +88,8 @@ describe('[ Concluding Not Possible ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -104,7 +108,8 @@ describe('[ Defund failed ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'DefundFailed');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 

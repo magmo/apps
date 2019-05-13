@@ -7,9 +7,10 @@ import { Commitment } from '../../../../../domain';
 import { CONCLUDE_INSTIGATED } from '../../../actions';
 import {
   expectThisMessageAndCommitmentSent,
+  itSendsThisMessage,
   itSendsThisDisplayEventType,
 } from '../../../../__tests__/helpers';
-import { HIDE_WALLET } from 'magmo-wallet-client';
+import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -54,7 +55,8 @@ describe('[ Happy path ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'Success');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -74,6 +76,8 @@ describe('[ Channel doesnt exist ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'ChannelDoesntExist');
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -93,7 +97,8 @@ describe('[ Concluding Not Possible ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -124,7 +129,8 @@ describe('[ Defund failed ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'DefundFailed');
-    itSendsThisDisplayEventType(result, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 

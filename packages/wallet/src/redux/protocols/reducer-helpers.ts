@@ -74,6 +74,25 @@ export function hideWallet(sharedData: SharedData): SharedData {
   return newSharedData;
 }
 
+export function sendConcludeSuccess(sharedData: SharedData): SharedData {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    messageOutbox: magmoWalletClient.concludeSuccess(),
+  });
+  return newSharedData;
+}
+
+export function sendConcludeFailure(
+  sharedData: SharedData,
+  reason: 'Other' | 'UserDeclined',
+): SharedData {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    messageOutbox: magmoWalletClient.concludeFailure(reason),
+  });
+  return newSharedData;
+}
+
 export const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {
   return (
     channelHasConclusionProof(channelId, sharedData) ||
