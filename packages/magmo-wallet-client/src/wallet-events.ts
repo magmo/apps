@@ -195,6 +195,24 @@ export type ChannelInitializationSuccess = ReturnType<typeof channelInitializati
 
 // CONCLUDE
 // ==============
+
+/**
+ * The event type when the opponent concludes the game.
+ */
+export const OPPONENT_CONCLUDED = 'WALLET.CONCLUDE.OPPONENT';
+
+/**
+ * @ignore
+ */
+export const opponentConcluded = () => ({
+  type: OPPONENT_CONCLUDED as typeof OPPONENT_CONCLUDED,
+});
+
+/**
+ * The event emitted when a conclude succeeds.
+ */
+export type OpponentConcluded = ReturnType<typeof opponentConcluded>;
+
 /**
  * The event type when the game successfully concludes.
  */
@@ -225,21 +243,6 @@ export type ConcludeSuccess = ReturnType<typeof concludeSuccess>;
  * The event emitted when a conclude fails.
  */
 export type ConcludeFailure = ReturnType<typeof concludeFailure>;
-/**
- * The event type when the game closes.
- */
-export const CLOSE_SUCCESS = 'WALLET.CLOSE.SUCCESS';
-/**
- * @ignore
- */
-export const closeSuccess = () => ({
-  type: CLOSE_SUCCESS as typeof CLOSE_SUCCESS,
-});
-
-/**
- * The event emitted when the game has been successfully closed.
- */
-export type CloseSuccess = ReturnType<typeof closeSuccess>;
 
 // DISPLAY
 /**
@@ -360,7 +363,7 @@ export type WalletEventType =
   | typeof CHALLENGE_COMPLETE
   | typeof CHALLENGE_REJECTED
   | typeof CHALLENGE_RESPONSE_REQUESTED
-  | typeof CLOSE_SUCCESS
+  | typeof OPPONENT_CONCLUDED
   | typeof CONCLUDE_FAILURE
   | typeof CONCLUDE_SUCCESS
   | typeof FUNDING_FAILURE
@@ -385,7 +388,7 @@ export type WalletEvent =
   | ChallengeRejected
   | ChallengeResponseRequested
   | ChannelInitializationSuccess
-  | CloseSuccess
+  | OpponentConcluded
   | ConcludeFailure
   | ConcludeSuccess
   | FundingFailure

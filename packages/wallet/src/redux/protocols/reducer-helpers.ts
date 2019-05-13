@@ -82,6 +82,14 @@ export function sendConcludeSuccess(sharedData: SharedData): SharedData {
   return newSharedData;
 }
 
+export function sendOpponentConcluded(sharedData: SharedData): SharedData {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    messageOutbox: magmoWalletClient.opponentConcluded(),
+  });
+  return newSharedData;
+}
+
 export function sendConcludeFailure(
   sharedData: SharedData,
   reason: 'Other' | 'UserDeclined',

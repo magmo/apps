@@ -72,9 +72,9 @@ export function* sendWalletMessageSaga() {
 }
 
 export function* exitGameSaga() {
-  const closeGameChannel = createWalletEventChannel([Wallet.CLOSE_SUCCESS]);
+  const opponentConcludedChannel = createWalletEventChannel([Wallet.OPPONENT_CONCLUDED]);
   while (true) {
-    yield take(closeGameChannel);
+    yield take(opponentConcludedChannel);
     yield put(gameActions.exitToLobby());
   }
 }

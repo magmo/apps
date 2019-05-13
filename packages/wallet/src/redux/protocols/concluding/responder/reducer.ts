@@ -29,7 +29,7 @@ import {
   showWallet,
   hideWallet,
   sendConcludeFailure,
-  sendConcludeSuccess,
+  sendOpponentConcluded,
 } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
@@ -170,7 +170,10 @@ function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): Re
 function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
   switch (protocolState.type) {
     case 'ResponderAcknowledgeSuccess':
-      return { protocolState: success(), sharedData: sendConcludeSuccess(hideWallet(sharedData)) };
+      return {
+        protocolState: success(),
+        sharedData: sendOpponentConcluded(hideWallet(sharedData)),
+      };
     case 'ResponderAcknowledgeFailure':
       return {
         protocolState: failure({ reason: protocolState.reason }),

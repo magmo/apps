@@ -7,7 +7,7 @@ import {
   itSendsThisDisplayEventType,
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../state';
-import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
+import { HIDE_WALLET, CONCLUDE_FAILURE, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -46,7 +46,7 @@ describe('[ Happy path ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'Success');
-    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
+    itSendsThisMessage(result.sharedData, OPPONENT_CONCLUDED);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
