@@ -1,8 +1,12 @@
 import * as scenarios from './scenarios';
 import { responderConcludingReducer, initialize, ReturnVal } from '../reducer';
 import { ResponderConcludingStateType } from '../states';
-import { expectThisCommitmentSent } from '../../../../__tests__/helpers';
+import {
+  expectThisCommitmentSent,
+  itSendsThisDisplayEventType,
+} from '../../../../__tests__/helpers';
 import { FailureReason } from '../../state';
+import { HIDE_WALLET } from 'magmo-wallet-client';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -18,7 +22,7 @@ describe('[ Happy path ]', () => {
     const { state, store, action, reply } = scenario.approveConcluding;
     const result = responderConcludingReducer(state, store, action);
 
-    expectThisCommitmentSent(result.storage, reply);
+    expectThisCommitmentSent(result.sharedData, reply);
     itTransitionsTo(result, 'ResponderDecideDefund');
   });
 
@@ -41,6 +45,7 @@ describe('[ Happy path ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'Success');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -60,6 +65,7 @@ describe('[ Channel doesnt exist ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'ChannelDoesntExist');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -79,6 +85,7 @@ describe('[ Concluding Not Possible ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -97,29 +104,30 @@ describe('[ Defund failed ]', () => {
     const result = responderConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'DefundFailed');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
 function itTransitionsTo(result: ReturnVal, type: ResponderConcludingStateType) {
   it(`transitions to ${type}`, () => {
-    expect(result.state.type).toEqual(type);
+    expect(result.protocolState.type).toEqual(type);
   });
 }
 
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('Failure');
-    if (result.state.type === 'Failure') {
-      expect(result.state.reason).toEqual(reason);
+    expect(result.protocolState.type).toEqual('Failure');
+    if (result.protocolState.type === 'Failure') {
+      expect(result.protocolState.reason).toEqual(reason);
     }
   });
 }
 
 function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to AcknowledgeFailure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('ResponderAcknowledgeFailure');
-    if (result.state.type === 'ResponderAcknowledgeFailure') {
-      expect(result.state.reason).toEqual(reason);
+    expect(result.protocolState.type).toEqual('ResponderAcknowledgeFailure');
+    if (result.protocolState.type === 'ResponderAcknowledgeFailure') {
+      expect(result.protocolState.reason).toEqual(reason);
     }
   });
 }

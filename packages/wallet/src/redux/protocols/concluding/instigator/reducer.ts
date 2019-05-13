@@ -1,3 +1,4 @@
+import * as states from './states';
 import {
   InstigatorConcludingState as CState,
   InstigatorNonTerminalState as NonTerminalCState,
@@ -21,7 +22,6 @@ import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
 import { isConcludingAction } from './actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
-type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import * as selectors from '../../../selectors';
@@ -35,15 +35,14 @@ import {
 } from '../../../../communication';
 import { failure, success } from '../state';
 import { getChannelId } from '../../../../domain';
+import { ProtocolStateWithSharedData } from '../..';
 
-export interface ReturnVal {
-  state: CState;
-  storage: Storage;
-}
+export type ReturnVal = ProtocolStateWithSharedData<states.InstigatorConcludingState>;
+export type Storage = SharedData;
 
 export function instigatorConcludingReducer(
-  state: NonTerminalCState,
-  storage: SharedData,
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
   // TODO: Since a commitment received could be a defundingAction OR
@@ -51,145 +50,164 @@ export function instigatorConcludingReducer(
   // This is a bit awkward, probably a better way of handling this?
   if (action.type === COMMITMENT_RECEIVED) {
     const channelId = getChannelId(action.signedCommitment.commitment);
-    if (channelId === state.channelId) {
-      return concludeReceived(action, state, storage);
+    if (channelId === protocolState.channelId) {
+      return concludeReceived(action, protocolState, sharedData);
     }
   }
   if (isDefundingAction(action)) {
-    return handleDefundingAction(state, storage, action);
+    return handleDefundingAction(protocolState, sharedData, action);
   }
 
   if (!isConcludingAction(action)) {
-    return { state, storage };
+    return { protocolState, sharedData };
   }
 
   switch (action.type) {
     case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED':
-      return concludingCancelled(state, storage);
+      return concludingCancelled(protocolState, sharedData);
     case 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED':
-      return concludeApproved(state, storage);
+      return concludeApproved(protocolState, sharedData);
     case 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN':
-      return defundChosen(state, storage);
+      return defundChosen(protocolState, sharedData);
     case 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED':
-      return acknowledged(state, storage);
+      return acknowledged(protocolState, sharedData);
     default:
       return unreachable(action);
   }
 }
 
-export function initialize(channelId: string, processId: string, storage: Storage): ReturnVal {
-  const channelState = getChannel(storage, channelId);
+export function initialize(channelId: string, processId: string, sharedData: Storage): ReturnVal {
+  const channelState = getChannel(sharedData, channelId);
   if (!channelState) {
     return {
-      state: instigatorAcknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
-      storage,
+      protocolState: instigatorAcknowledgeFailure({
+        processId,
+        channelId,
+        reason: 'ChannelDoesntExist',
+      }),
+      sharedData,
     };
   }
   if (ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return {
-      state: instigatorApproveConcluding({ channelId, processId }),
-      storage: showWallet(storage),
+      protocolState: instigatorApproveConcluding({ channelId, processId }),
+      sharedData: showWallet(sharedData),
     };
   } else {
     return {
-      state: instigatorAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
-      storage,
+      protocolState: instigatorAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      sharedData,
     };
   }
 }
 
 function handleDefundingAction(
-  state: NonTerminalCState,
-  storage: Storage,
+  protocolState: NonTerminalCState,
+  sharedData: Storage,
   action: DefundingAction,
 ): ReturnVal {
-  if (state.type !== 'InstigatorWaitForDefund') {
-    return { state, storage };
+  if (protocolState.type !== 'InstigatorWaitForDefund') {
+    return { protocolState, sharedData };
   }
-  const defundingState1 = state.defundingState;
+  const defundingState1 = protocolState.defundingState;
 
-  const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
+  const protocolStateWithSharedData = defundingReducer(defundingState1, sharedData, action);
   const updatedDefundingState = protocolStateWithSharedData.protocolState;
-  storage = protocolStateWithSharedData.sharedData;
+  sharedData = protocolStateWithSharedData.sharedData;
   if (isSuccess(updatedDefundingState)) {
-    state = instigatorAcknowledgeSuccess(state);
+    protocolState = instigatorAcknowledgeSuccess(protocolState);
   } else if (isFailure(updatedDefundingState)) {
-    state = instigatorAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
+    protocolState = instigatorAcknowledgeFailure({ ...protocolState, reason: 'DefundFailed' });
   } else {
-    state = { ...state, defundingState: updatedDefundingState };
+    protocolState = { ...protocolState, defundingState: updatedDefundingState };
   }
-  return { state, storage };
+  return { protocolState, sharedData };
 }
 
-function concludingCancelled(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'InstigatorApproveConcluding') {
-    return { state, storage };
+function concludingCancelled(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'InstigatorApproveConcluding') {
+    return { protocolState, sharedData };
   }
-  return { state: failure({ reason: 'ConcludeCancelled' }), storage };
+  return {
+    protocolState: failure({ reason: 'ConcludeCancelled' }),
+    sharedData: hideWallet(sharedData),
+  };
 }
 
-function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'InstigatorApproveConcluding') {
-    return { state, storage };
+function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'InstigatorApproveConcluding') {
+    return { protocolState, sharedData };
   }
 
-  const channelState = getChannel(storage, state.channelId);
+  const channelState = getChannel(sharedData, protocolState.channelId);
 
   if (channelState) {
-    const sharedDataWithOwnCommitment = createAndSendConcludeCommitment(storage, state.channelId);
+    const sharedDataWithOwnCommitment = createAndSendConcludeCommitment(
+      sharedData,
+      protocolState.channelId,
+    );
 
     return {
-      state: instigatorWaitForOpponentConclude({ ...state }),
-      storage: sharedDataWithOwnCommitment,
+      protocolState: instigatorWaitForOpponentConclude({ ...protocolState }),
+      sharedData: sharedDataWithOwnCommitment,
     };
   } else {
-    return { state, storage };
+    return { protocolState, sharedData };
   }
 }
 
 function concludeReceived(
   action: CommitmentReceived,
-  state: NonTerminalCState,
-  storage: Storage,
+  protocolState: NonTerminalCState,
+  sharedData: Storage,
 ): ReturnVal {
-  if (state.type !== 'InstigatorWaitForOpponentConclude') {
-    return { state, storage };
+  if (protocolState.type !== 'InstigatorWaitForOpponentConclude') {
+    return { protocolState, sharedData };
   }
   const { signedCommitment } = action;
-  const checkResult = checkAndStore(storage, signedCommitment);
+  const checkResult = checkAndStore(sharedData, signedCommitment);
   if (!checkResult.isSuccess) {
     throw new Error('Concluding instigator protocol, unable to validate or store commitment');
   }
   const updatedStorage = checkResult.store;
 
-  return { state: instigatorAcknowledgeConcludeReceived(state), storage: updatedStorage };
+  return {
+    protocolState: instigatorAcknowledgeConcludeReceived(protocolState),
+    sharedData: updatedStorage,
+  };
 }
 
-function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'InstigatorAcknowledgeConcludeReceived') {
-    return { state, storage };
+function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'InstigatorAcknowledgeConcludeReceived') {
+    return { protocolState, sharedData };
   }
   // initialize defunding state machine
 
   const protocolStateWithSharedData = initializeDefunding(
-    state.processId,
-    state.channelId,
-    storage,
+    protocolState.processId,
+    protocolState.channelId,
+    sharedData,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
-  storage = protocolStateWithSharedData.sharedData;
-  return { state: instigatorWaitForDefund({ ...state, defundingState }), storage };
+  sharedData = protocolStateWithSharedData.sharedData;
+  return {
+    protocolState: instigatorWaitForDefund({ ...protocolState, defundingState }),
+    sharedData,
+  };
 }
 
-function acknowledged(state: CState, storage: Storage): ReturnVal {
-  switch (state.type) {
+function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
+  switch (protocolState.type) {
     case 'InstigatorAcknowledgeSuccess':
-      return { state: success(), storage: hideWallet(storage) };
+      return { protocolState: success(), sharedData: hideWallet(sharedData) };
     case 'InstigatorAcknowledgeFailure':
-      return { state: failure({ reason: state.reason }), storage: hideWallet(storage) };
+      return {
+        protocolState: failure({ reason: protocolState.reason }),
+        sharedData: hideWallet(sharedData),
+      };
     default:
-      return { state, storage };
+      return { protocolState, sharedData };
   }
 }
 

@@ -5,7 +5,11 @@ import { FailureReason } from '../../state';
 import { SharedData } from '../../../../state';
 import { Commitment } from '../../../../../domain';
 import { CONCLUDE_INSTIGATED } from '../../../actions';
-import { expectThisMessageAndCommitmentSent } from '../../../../__tests__/helpers';
+import {
+  expectThisMessageAndCommitmentSent,
+  itSendsThisDisplayEventType,
+} from '../../../../__tests__/helpers';
+import { HIDE_WALLET } from 'magmo-wallet-client';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -20,7 +24,7 @@ describe('[ Happy path ]', () => {
     const { state, action, store, reply } = scenario.approveConcluding;
     const result = instigatorConcludingReducer(state, store, action);
 
-    itSendsConcludeInstigated(result.storage, reply);
+    itSendsConcludeInstigated(result.sharedData, reply);
     itTransitionsTo(result, 'InstigatorWaitForOpponentConclude');
   });
 
@@ -50,6 +54,7 @@ describe('[ Happy path ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsTo(result, 'Success');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -88,6 +93,7 @@ describe('[ Concluding Not Possible ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'NotYourTurn');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -99,6 +105,7 @@ describe('[ Concluding Cancelled ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'ConcludeCancelled');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -117,6 +124,7 @@ describe('[ Defund failed ]', () => {
     const result = instigatorConcludingReducer(state, store, action);
 
     itTransitionsToFailure(result, 'DefundFailed');
+    itSendsThisDisplayEventType(result, HIDE_WALLET);
   });
 });
 
@@ -124,32 +132,32 @@ describe('[ Defund failed ]', () => {
 // Helpers //
 /////////////
 
-function itSendsConcludeInstigated(storage: SharedData, commitment: Commitment) {
+function itSendsConcludeInstigated(sharedData: SharedData, commitment: Commitment) {
   it('sends a conclude instigated message with the correct commitment', () => {
-    expectThisMessageAndCommitmentSent(storage, commitment, CONCLUDE_INSTIGATED);
+    expectThisMessageAndCommitmentSent(sharedData, commitment, CONCLUDE_INSTIGATED);
   });
 }
 
 function itTransitionsTo(result: ReturnVal, type: InstigatorConcludingStateType) {
   it(`transitions to ${type}`, () => {
-    expect(result.state.type).toEqual(type);
+    expect(result.protocolState.type).toEqual(type);
   });
 }
 
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('Failure');
-    if (result.state.type === 'Failure') {
-      expect(result.state.reason).toEqual(reason);
+    expect(result.protocolState.type).toEqual('Failure');
+    if (result.protocolState.type === 'Failure') {
+      expect(result.protocolState.reason).toEqual(reason);
     }
   });
 }
 
 function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to AcknowledgeFailure with reason ${reason}`, () => {
-    expect(result.state.type).toEqual('InstigatorAcknowledgeFailure');
-    if (result.state.type === 'InstigatorAcknowledgeFailure') {
-      expect(result.state.reason).toEqual(reason);
+    expect(result.protocolState.type).toEqual('InstigatorAcknowledgeFailure');
+    if (result.protocolState.type === 'InstigatorAcknowledgeFailure') {
+      expect(result.protocolState.reason).toEqual(reason);
     }
   });
 }

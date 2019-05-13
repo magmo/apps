@@ -12,16 +12,16 @@ import { ProtocolStateWithSharedData } from '..';
 import { SignedCommitment } from '../../../domain';
 
 export function concludingReducer(
-  state: ResponderNonTerminalState | InstigatorNonTerminalState,
-  storage: SharedData,
+  protocolState: ResponderNonTerminalState | InstigatorNonTerminalState,
+  sharedData: SharedData,
   action: ProtocolAction,
 ): ProtocolStateWithSharedData<ConcludingState> {
-  if (isConcludingInstigatorState(state)) {
-    const result = instigatorConcludingReducer(state, storage, action);
-    return { protocolState: result.state, sharedData: result.storage };
+  if (isConcludingInstigatorState(protocolState)) {
+    const result = instigatorConcludingReducer(protocolState, sharedData, action);
+    return { protocolState: result.protocolState, sharedData: result.sharedData };
   } else {
-    const result = responderConcludingReducer(state, storage, action);
-    return { protocolState: result.state, sharedData: result.storage };
+    const result = responderConcludingReducer(protocolState, sharedData, action);
+    return { protocolState: result.protocolState, sharedData: result.sharedData };
   }
 }
 
@@ -31,7 +31,7 @@ export function initializeInstigatorState(
   sharedData: SharedData,
 ) {
   const result = initializeInstigator(channelId, processId, sharedData);
-  return { protocolState: result.state, sharedData: result.storage };
+  return { protocolState: result.protocolState, sharedData: result.sharedData };
 }
 
 export function initializeResponderState(
@@ -40,5 +40,5 @@ export function initializeResponderState(
   sharedData: SharedData,
 ) {
   const result = initializeResponder(signedCommitment, processId, sharedData);
-  return { protocolState: result.state, sharedData: result.storage };
+  return { protocolState: result.protocolState, sharedData: result.sharedData };
 }

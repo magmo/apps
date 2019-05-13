@@ -1,3 +1,4 @@
+import * as states from './states';
 import {
   ResponderConcludingState as CState,
   ResponderNonTerminalState as NonTerminalCState,
@@ -19,7 +20,6 @@ import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
-type Storage = SharedData;
 import { isSuccess, isFailure } from '../../defunding/states';
 import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
@@ -30,33 +30,31 @@ import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
 import { failure, success } from '../state';
+import { ProtocolStateWithSharedData } from '../..';
 
-export interface ReturnVal {
-  state: CState;
-  storage: Storage;
-  sideEffects?;
-}
+export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
+export type Storage = SharedData;
 
 export function responderConcludingReducer(
-  state: NonTerminalCState,
-  storage: SharedData,
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
   if (isDefundingAction(action)) {
-    return handleDefundingAction(state, storage, action);
+    return handleDefundingAction(protocolState, sharedData, action);
   }
 
   if (!isConcludingAction(action)) {
-    return { state, storage };
+    return { protocolState, sharedData };
   }
 
   switch (action.type) {
     case 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED':
-      return concludeApproved(state, storage);
+      return concludeApproved(protocolState, sharedData);
     case 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN':
-      return defundChosen(state, storage);
+      return defundChosen(protocolState, sharedData);
     case 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED':
-      return acknowledged(state, storage);
+      return acknowledged(protocolState, sharedData);
     default:
       return unreachable(action);
   }
@@ -65,18 +63,22 @@ export function responderConcludingReducer(
 export function initialize(
   signedCommitment: SignedCommitment,
   processId: string,
-  storage: Storage,
+  sharedData: Storage,
 ): ReturnVal {
   const channelId = getChannelId(signedCommitment.commitment);
-  let channelState = getChannel(storage, channelId);
+  let channelState = getChannel(sharedData, channelId);
   if (!channelState) {
     return {
-      state: responderAcknowledgeFailure({ processId, channelId, reason: 'ChannelDoesntExist' }),
-      storage: showWallet(storage),
+      protocolState: responderAcknowledgeFailure({
+        processId,
+        channelId,
+        reason: 'ChannelDoesntExist',
+      }),
+      sharedData: showWallet(sharedData),
     };
   }
 
-  const checkResult = checkAndStore(storage, signedCommitment);
+  const checkResult = checkAndStore(sharedData, signedCommitment);
   if (!checkResult.isSuccess) {
     throw new Error('Concluding responding protocol, unable to validate or store commitment');
   }
@@ -85,86 +87,92 @@ export function initialize(
   if (channelState && ourTurn(channelState)) {
     // if it's our turn now, we may resign
     return {
-      state: responderApproveConcluding({ channelId, processId }),
-      storage: showWallet(updatedStorage),
+      protocolState: responderApproveConcluding({ channelId, processId }),
+      sharedData: showWallet(updatedStorage),
     };
   } else {
     return {
-      state: responderAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
-      storage: showWallet(storage),
+      protocolState: responderAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      sharedData: showWallet(sharedData),
     };
   }
 }
 
 function handleDefundingAction(
-  state: NonTerminalCState,
-  storage: Storage,
+  protocolState: NonTerminalCState,
+  sharedData: Storage,
   action: DefundingAction,
 ): ReturnVal {
-  if (state.type !== 'ResponderWaitForDefund') {
-    return { state, storage };
+  if (protocolState.type !== 'ResponderWaitForDefund') {
+    return { protocolState, sharedData };
   }
-  const defundingState1 = state.defundingState;
+  const defundingState1 = protocolState.defundingState;
 
-  const protocolStateWithSharedData = defundingReducer(defundingState1, storage, action);
+  const protocolStateWithSharedData = defundingReducer(defundingState1, sharedData, action);
   const updatedDefundingState = protocolStateWithSharedData.protocolState;
-  storage = protocolStateWithSharedData.sharedData;
+  sharedData = protocolStateWithSharedData.sharedData;
   if (isSuccess(updatedDefundingState)) {
-    state = responderAcknowledgeSuccess(state);
+    protocolState = responderAcknowledgeSuccess(protocolState);
   } else if (isFailure(updatedDefundingState)) {
-    state = responderAcknowledgeFailure({ ...state, reason: 'DefundFailed' });
+    protocolState = responderAcknowledgeFailure({ ...protocolState, reason: 'DefundFailed' });
   } else {
-    state = { ...state, defundingState: updatedDefundingState };
+    protocolState = { ...protocolState, defundingState: updatedDefundingState };
   }
-  return { state, storage };
+  return { protocolState, sharedData };
 }
 
-function concludeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ResponderApproveConcluding') {
-    return { state, storage };
+function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'ResponderApproveConcluding') {
+    return { protocolState, sharedData };
   }
 
-  const channelState = getChannel(storage, state.channelId);
+  const channelState = getChannel(sharedData, protocolState.channelId);
 
   if (channelState) {
     const sharedDataWithOwnCommitment = createAndSendConcludeCommitment(
-      storage,
-      state.processId,
-      state.channelId,
+      sharedData,
+      protocolState.processId,
+      protocolState.channelId,
     );
     return {
-      state: responderDecideDefund({ ...state }),
-      storage: sharedDataWithOwnCommitment,
+      protocolState: responderDecideDefund({ ...protocolState }),
+      sharedData: sharedDataWithOwnCommitment,
     };
   } else {
-    return { state, storage };
+    return { protocolState, sharedData };
   }
 }
 
-function defundChosen(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ResponderDecideDefund') {
-    return { state, storage };
+function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'ResponderDecideDefund') {
+    return { protocolState, sharedData };
   }
   // initialize defunding state machine
 
   const protocolStateWithSharedData = initializeDefunding(
-    state.processId,
-    state.channelId,
-    storage,
+    protocolState.processId,
+    protocolState.channelId,
+    sharedData,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
-  storage = protocolStateWithSharedData.sharedData;
-  return { state: responderWaitForDefund({ ...state, defundingState }), storage };
+  sharedData = protocolStateWithSharedData.sharedData;
+  return {
+    protocolState: responderWaitForDefund({ ...protocolState, defundingState }),
+    sharedData,
+  };
 }
 
-function acknowledged(state: CState, storage: Storage): ReturnVal {
-  switch (state.type) {
+function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
+  switch (protocolState.type) {
     case 'ResponderAcknowledgeSuccess':
-      return { state: success(), storage: hideWallet(storage) };
+      return { protocolState: success(), sharedData: hideWallet(sharedData) };
     case 'ResponderAcknowledgeFailure':
-      return { state: failure({ reason: state.reason }), storage: hideWallet(storage) };
+      return {
+        protocolState: failure({ reason: protocolState.reason }),
+        sharedData: hideWallet(sharedData),
+      };
     default:
-      return { state, storage };
+      return { protocolState, sharedData };
   }
 }
 
