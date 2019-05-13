@@ -1,4 +1,9 @@
-import { ProtocolAction, WalletAction } from '../actions';
+import {
+  ProtocolAction,
+  WalletAction,
+  CHALLENGE_CREATED_EVENT,
+  ChallengeCreatedEvent,
+} from '../actions';
 import { PlayerIndex, WalletProtocol } from '../types';
 import { Commitment } from '../../domain';
 export { BaseProcessAction } from '../../communication';
@@ -37,21 +42,12 @@ export const createChallengeRequested = (channelId: string, commitment: Commitme
 });
 export type CreateChallengeRequested = ReturnType<typeof createChallengeRequested>;
 
-export const RESPOND_TO_CHALLENGE_REQUESTED = 'WALLET.NEW_PROCESS.RESPOND_TO_CHALLENGE_REQUESTED';
-export const respondToChallengeRequested = (channelId: string, commitment: Commitment) => ({
-  type: RESPOND_TO_CHALLENGE_REQUESTED as typeof RESPOND_TO_CHALLENGE_REQUESTED,
-  channelId,
-  commitment,
-  protocol: WalletProtocol.Responding,
-});
-export type RespondToChallengeRequested = ReturnType<typeof respondToChallengeRequested>;
-
 export type NewProcessAction =
   | InitializeChannel
   | FundingRequested
   | ConcludeRequested
   | CreateChallengeRequested
-  | RespondToChallengeRequested;
+  | ChallengeCreatedEvent;
 
 export function isNewProcessAction(action: WalletAction): action is NewProcessAction {
   return (
@@ -59,7 +55,7 @@ export function isNewProcessAction(action: WalletAction): action is NewProcessAc
     action.type === FUNDING_REQUESTED ||
     action.type === CONCLUDE_REQUESTED ||
     action.type === CREATE_CHALLENGE_REQUESTED ||
-    action.type === RESPOND_TO_CHALLENGE_REQUESTED
+    action.type === CHALLENGE_CREATED_EVENT
   );
 }
 

@@ -21,6 +21,7 @@ import { RespondingAction } from './protocols/responding/actions';
 import { DefundingAction } from './protocols/defunding/actions';
 import { ConcludingAction as ConcludingActionInstigator } from './protocols/concluding/instigator/actions';
 import { ConcludingAction as ConcludingActionResponder } from './protocols/concluding/responder/actions';
+import { WalletProtocol } from './types';
 export * from './protocols/transaction-submission/actions';
 export { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived };
 
@@ -81,6 +82,7 @@ export const challengeCreatedEvent = (channelId: string, commitment: Commitment,
   channelId,
   commitment,
   finalizedAt,
+  protocol: WalletProtocol.Responding,
   type: CHALLENGE_CREATED_EVENT as typeof CHALLENGE_CREATED_EVENT,
 });
 export type ChallengeCreatedEvent = ReturnType<typeof challengeCreatedEvent>;

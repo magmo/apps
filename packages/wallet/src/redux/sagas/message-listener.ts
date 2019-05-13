@@ -36,9 +36,10 @@ export function* messageListener() {
         yield put(actions.protocol.fundingRequested(action.channelId, action.playerIndex));
         break;
       case incoming.RESPOND_TO_CHALLENGE:
-        yield put(
-          actions.protocol.respondToChallengeRequested(action.channelId, action.commitment),
-        );
+        // TODO: Hook up to responding action
+        // yield put(
+        //   actions.protocol.respondToChallengeRequested(action.channelId, action.commitment),
+        // );
         break;
 
       // Events that do not need a new process
