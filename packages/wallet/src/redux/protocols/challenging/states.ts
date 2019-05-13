@@ -1,5 +1,6 @@
 import { Properties as P } from '../../utils';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission';
+import { ProtocolState } from '..';
 
 export type ChallengingState = NonTerminalState | TerminalState;
 export type ChallengingStateType = ChallengingState['type'];
@@ -74,6 +75,24 @@ export interface SuccessClosed {
 // -------
 // Helpers
 // -------
+// | ApproveChallenge
+// | WaitForTransaction
+// | WaitForResponseOrTimeout
+// | AcknowledgeTimeout
+// | AcknowledgeResponse
+// | AcknowledgeFailure;
+export function isChallengingState(state: ProtocolState): state is ChallengingState {
+  return (
+    state.type === 'ApproveChallenge' ||
+    state.type === 'WaitForTransaction' ||
+    state.type === 'WaitForResponseOrTimeout' ||
+    state.type === 'AcknowledgeTimeout' ||
+    state.type === 'AcknowledgeFailure' ||
+    state.type === 'Failure' ||
+    state.type === 'SuccessOpen' ||
+    state.type === 'SuccessClosed'
+  );
+}
 
 export function isTerminal(state: ChallengingState): state is TerminalState {
   return state.type === 'Failure' || state.type === 'SuccessOpen' || state.type === 'SuccessClosed';

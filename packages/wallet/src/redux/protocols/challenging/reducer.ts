@@ -139,7 +139,7 @@ function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVa
   const returnVal = initializeTransaction(transactionRequest, state.processId, storage);
   const transactionSubmission = returnVal.state;
 
-  // transition to wait for trnasaction
+  // transition to wait for transaction
   const newState = waitForTransaction({ ...state, transactionSubmission });
   return { state: newState, storage: returnVal.storage };
 }
