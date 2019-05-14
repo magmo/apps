@@ -75,12 +75,11 @@ export interface SuccessClosed {
 // -------
 // Helpers
 // -------
-// | ApproveChallenge
-// | WaitForTransaction
-// | WaitForResponseOrTimeout
-// | AcknowledgeTimeout
-// | AcknowledgeResponse
-// | AcknowledgeFailure;
+
+export function isNonTerminalChallengingState(state: ProtocolState): state is NonTerminalState {
+  return isChallengingState(state) && isNonTerminal(state);
+}
+
 export function isChallengingState(state: ProtocolState): state is ChallengingState {
   return (
     state.type === 'ApproveChallenge' ||

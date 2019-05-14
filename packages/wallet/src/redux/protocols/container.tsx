@@ -8,7 +8,8 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Challenging } from './challenging';
-
+import * as respondingStates from './responding/state';
+import { Responding } from './responding/container';
 interface Props {
   protocolState: ProtocolState;
 }
@@ -19,13 +20,12 @@ class ProtocolContainer extends PureComponent<Props> {
     // if we can figure out a way to do it.
     // Maybe every state has a protocol type on it?
     const { protocolState } = this.props;
-    if (fundingStates.isFundingState(protocolState) && !fundingStates.isTerminal(protocolState)) {
+    if (fundingStates.isNonTerminalFundingState(protocolState)) {
       return <Funding state={protocolState} />;
-    } else if (
-      challengingStates.isChallengingState(protocolState) &&
-      !challengingStates.isTerminal(protocolState)
-    ) {
+    } else if (challengingStates.isNonTerminalChallengingState(protocolState)) {
       return <Challenging state={protocolState} />;
+    } else if (respondingStates.isNonTerminalRespondingState(protocolState)) {
+      return <Responding state={protocolState} />;
     } else {
       // TODO: We need a placeholder screen here when transitioning back to the app from a success state
       return (

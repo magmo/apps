@@ -1,13 +1,14 @@
 import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../transaction-submission/states';
 import { Properties } from '../../utils';
 import { Commitment } from '../../../domain';
-export type RespondingState =
+import { ProtocolState } from '..';
+export type RespondingState = NonTerminalRespondingState | Success | Failure;
+
+export type NonTerminalRespondingState =
   | WaitForApproval
   | WaitForTransaction
   | WaitForAcknowledgement
-  | WaitForResponse
-  | Success
-  | Failure;
+  | WaitForResponse;
 
 export const enum FailureReason {
   TransactionFailure = 'Transaction failed',
@@ -54,6 +55,30 @@ export interface Success {
 // -------
 // Helpers
 // -------
+
+// export const WAIT_FOR_APPROVAL = 'WaitForApproval';
+// export const WAIT_FOR_TRANSACTION = 'WaitForTransaction';
+// export const WAIT_FOR_ACKNOWLEDGEMENT = 'WaitForAcknowledgement';
+// export const WAIT_FOR_RESPONSE = 'WaitForResponse';
+// export const FAILURE = 'Failure';
+// export const SUCCESS = 'Success';
+
+export function isRespondingState(state: ProtocolState): state is RespondingState {
+  return (
+    state.type === WAIT_FOR_APPROVAL ||
+    state.type === WAIT_FOR_TRANSACTION ||
+    state.type === WAIT_FOR_ACKNOWLEDGEMENT ||
+    state.type === WAIT_FOR_RESPONSE ||
+    state.type === FAILURE ||
+    state.type === SUCCESS
+  );
+}
+
+export function isNonTerminalRespondingState(
+  state: ProtocolState,
+): state is NonTerminalRespondingState {
+  return isRespondingState(state) && !isTerminal(state);
+}
 
 export function isTerminal(state: RespondingState): state is Failure | Success {
   return state.type === FAILURE || state.type === SUCCESS;
