@@ -90,6 +90,17 @@ export function sendOpponentConcluded(sharedData: SharedData): SharedData {
   return newSharedData;
 }
 
+export function sendChallengeResponseRequested(
+  sharedData: SharedData,
+  channelId: string,
+): SharedData {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    messageOutbox: magmoWalletClient.challengeResponseRequested(channelId),
+  });
+  return newSharedData;
+}
+
 export function sendConcludeFailure(
   sharedData: SharedData,
   reason: 'Other' | 'UserDeclined',

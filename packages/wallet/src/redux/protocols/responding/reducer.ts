@@ -1,4 +1,4 @@
-import { Commitment } from '../../../domain';
+import { Commitment, getChannelId } from '../../../domain';
 import { ProtocolStateWithSharedData } from '..';
 import * as states from './state';
 import * as actions from './actions';
@@ -20,7 +20,7 @@ import {
   isSuccess,
 } from '../transaction-submission/states';
 import { channelID } from 'fmg-core/lib/channel';
-import { showWallet } from '../reducer-helpers';
+import { showWallet, hideWallet, sendChallengeResponseRequested } from '../reducer-helpers';
 import { ProtocolAction } from '../../actions';
 
 export const initialize = (
@@ -125,10 +125,11 @@ const waitForApprovalReducer = (
   switch (action.type) {
     case actions.RESPOND_APPROVED:
       const { challengeCommitment, processId } = protocolState;
+      const channelId = getChannelId(challengeCommitment);
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
         return {
           protocolState: states.waitForResponse(protocolState),
-          sharedData,
+          sharedData: hideWallet(sendChallengeResponseRequested(sharedData, channelId)),
         };
       } else {
         const transaction = craftResponseTransactionWithExistingCommitment(
@@ -185,7 +186,7 @@ const transitionToWaitForTransaction = (
   });
   return {
     protocolState: newProtocolState,
-    sharedData: newSharedData,
+    sharedData: showWallet(newSharedData),
   };
 };
 
