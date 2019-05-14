@@ -14,6 +14,7 @@ import * as states from './state';
 import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
+import { CONCLUDE_INSTIGATED } from '../communication';
 
 const initialState = states.waitForLogin();
 
@@ -156,7 +157,7 @@ function initializeNewProtocol(
       );
       return { protocolState, sharedData };
     }
-    case actions.protocol.CONCLUDE_INSTIGATED: {
+    case CONCLUDE_INSTIGATED: {
       const { signedCommitment } = action;
       const { protocolState, sharedData } = concludingProtocol.initializeResponderState(
         signedCommitment,

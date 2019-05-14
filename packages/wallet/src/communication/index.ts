@@ -1,7 +1,12 @@
 import { Commitment, SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client';
-import { RelayableAction, strategyProposed, strategyApproved, commitmentReceived } from './actions';
-import { concludeInstigated } from '../redux/protocols/actions';
+import {
+  RelayableAction,
+  strategyProposed,
+  strategyApproved,
+  commitmentReceived,
+  concludeInstigated,
+} from './actions';
 export * from './actions';
 
 export type FundingStrategy = 'IndirectFundingStrategy';
