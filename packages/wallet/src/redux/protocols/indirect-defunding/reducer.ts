@@ -10,7 +10,7 @@ import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player
 import { sendCommitmentReceived } from '../../../communication';
 import { theirAddress } from '../../channel-store';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
-import { CommitmentReceived } from '../../../../actions';
+import { CommitmentReceived } from '../../actions';
 
 export const initialize = (
   processId: string,

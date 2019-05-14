@@ -13,6 +13,7 @@ import { channelFromCommitments } from '../../../../channel-store/channel-state/
 import { appCommitment } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import { bsPrivateKey } from '../../../../../communication/__tests__/commitments';
+
 // -----------------
 // Channel Scenarios
 // -----------------
@@ -63,6 +64,7 @@ const waitForDefund = states.responderWaitForDefund({
   ...defaults,
   defundingState: preSuccessState,
 });
+
 const waitForDefundPreFailure = states.responderWaitForDefund({
   ...defaults,
   defundingState: preFailureState,
@@ -75,6 +77,7 @@ const acknowledgeSuccess = states.responderAcknowledgeSuccess(defaults);
 const concludeSent = actions.concludeApproved(processId);
 const defundChosen = actions.defundChosen(processId);
 const acknowledged = actions.acknowledged(processId);
+import { ledgerUpdate0Received, ledger8 } from '../../../indirect-defunding/__tests__/scenarios';
 
 // -------
 // Scenarios
@@ -94,6 +97,17 @@ export const happyPath = {
     state: acknowledgeSuccess,
     store: secondConcludeReceived,
     action: acknowledged,
+  },
+};
+
+export const happyPathAlternative = {
+  ...defaults,
+
+  decideDefund: {
+    state: decideDefund,
+    store: secondConcludeReceived,
+    action: ledgerUpdate0Received,
+    reply: ledger8,
   },
 };
 

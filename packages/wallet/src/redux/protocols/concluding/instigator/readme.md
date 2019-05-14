@@ -29,7 +29,7 @@ graph TD
   CC  --> |CONCLUDING.CANCELLED| F
   CC  --> |CONCLUDE.SENT| WOC(InstigatorWaitForOpponentConclude)
   WOC --> |CONCLUDE.RECEIVED| ACR(InstigatorAcknowledgeConcludeReceived)
-  ACR --> |DEFUND.CHOSEN| D(WInstigatorWaitForDefund)
+  ACR --> |DEFUND.CHOSEN| D(InstigatorWaitForDefund)
   D   --> |defunding protocol succeeded| AS(InstigatorAcknowledgeSuccess)
   AS -->  |ACKNOWLEDGED| SS((Success))
   D   --> |defunding protocol failed| AF(InstigatorAcknowledgeFailure)

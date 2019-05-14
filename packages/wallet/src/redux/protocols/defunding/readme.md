@@ -12,6 +12,7 @@ The protocol is implemented with the following state machine
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   S((start))-->ICC{Is Channel Closed}
   ICC-->|No|F((failure))
   ICC-->|Yes|ID{Is Direct Channel}

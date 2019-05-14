@@ -43,7 +43,7 @@ const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalan
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances: fiveToApp, proposedBalances: twoThree });
 const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
-const ledger8 = ledgerCommitment({ turnNum: 8, balances: twoThree, isFinal: true });
+export const ledger8 = ledgerCommitment({ turnNum: 8, balances: twoThree, isFinal: true });
 const ledger9 = ledgerCommitment({ turnNum: 9, balances: twoThree, isFinal: true });
 
 // -----------
@@ -113,7 +113,7 @@ const playerBWaitForConclude = {
 // -----------
 // Actions
 // -----------
-const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger6);
+export const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger6);
 const ledgerUpdate1Received = globalActions.commitmentReceived(processId, ledger7);
 const conclude0Received = globalActions.commitmentReceived(processId, ledger8);
 const conclude1Received = globalActions.commitmentReceived(processId, ledger9);

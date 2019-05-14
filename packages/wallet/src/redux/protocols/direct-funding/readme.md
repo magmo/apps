@@ -8,17 +8,23 @@ The protocol implements the following state machine:
 
 ```mermaid
 graph TD
-ST((Start))-->NSD(NotSafeToDeposit)
-NSD-->|FUNDING_RECEIVED|WFDT(WaitForDepositTransaction)
-ST-->WFDT
-WFDT-->|TRANSACTION_SUCCESS|WFFCPF(WaitForFundingConfirmationAndPostFund)
-WFDT-->|FUNDING_RECEIVED|WFFCPF
-WFDT-->|COMMITMENT_RECEIVED|WFFCPF
-WFDT-->|TRANSACTION_FAILURE|F((Failure))
-WFFCPF-->|FUNDING_RECEIVED|WFFCPF
-WFFCPF-->|COMMITMENT_RECEIVED|WFFCPF
-WFFCPF-->|FUNDING_RECEIVED + COMMITMENT_RECEIVED|CF((ChannelFunded))
-ST-->WFFCPF
+linkStyle default interpolate basis
+    ST((Start))-->NSD(NotSafeToDeposit)
+    NSD-->|FUNDING_RECEIVED|WFDT(WaitForDepositTransaction)
+    ST-->WFDT
+    WFDT-->|TRANSACTION_SUCCESS|WFFCPF(WaitForFundingConfirmationAndPostFund)
+    WFDT-->|FUNDING_RECEIVED|WFFCPF
+    WFDT-->|COMMITMENT_RECEIVED|WFFCPF
+    WFDT-->|TRANSACTION_FAILURE|F((Failure))
+    WFFCPF-->|FUNDING_RECEIVED|WFFCPF
+    WFFCPF-->|COMMITMENT_RECEIVED|WFFCPF
+    WFFCPF-->|FUNDING_RECEIVED + COMMITMENT_RECEIVED|CF((ChannelFunded))
+    ST-->WFFCPF
+
+    style ST  fill:#efdd20
+    style CF fill:#58ef21
+    style F  fill:#f45941
+
 ```
 
 ## Not covered by protocol for now
