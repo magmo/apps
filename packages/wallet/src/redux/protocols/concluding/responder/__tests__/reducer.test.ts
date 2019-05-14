@@ -8,6 +8,8 @@ import {
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../state';
 import { HIDE_WALLET, CONCLUDE_FAILURE, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
+import { SharedData, getLastMessage } from '../../../../state';
+import { SignedCommitment } from '../../../../../domain';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -48,6 +50,32 @@ describe('[ Happy path ]', () => {
     itTransitionsTo(result, 'Success');
     itSendsThisMessage(result.sharedData, OPPONENT_CONCLUDED);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});
+
+describe('[ Happy path (alternative) ]', () => {
+  const scenario = scenarios.happyPathAlternative;
+
+  describe('when in DecideDefund', () => {
+    const { state, store, action, reply } = scenario.decideDefund;
+    const result = responderConcludingReducer(state, store, action);
+
+    itTransitionsTo(result, 'ResponderWaitForDefund');
+    it(`initializes defundingState`, () => {
+      expect(result.protocolState).toHaveProperty('defundingState');
+    });
+
+    it(`initializes indirectDefundingState`, () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+
+    it(`transitions indirectDefundingState to WaitForConclude`, () => {
+      expect(result.protocolState).toHaveProperty(
+        'defundingState.indirectDefundingState.type',
+        'WaitForConclude',
+      );
+    });
+    itSendsMessage(result.sharedData, reply);
   });
 });
 
@@ -133,6 +161,23 @@ function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureRea
     expect(result.protocolState.type).toEqual('ResponderAcknowledgeFailure');
     if (result.protocolState.type === 'ResponderAcknowledgeFailure') {
       expect(result.protocolState.reason).toEqual(reason);
+    }
+  });
+}
+
+function itSendsMessage(sharedData: SharedData, message: SignedCommitment) {
+  it('sends a message', () => {
+    const lastMessage = getLastMessage(sharedData);
+    if (lastMessage && 'messagePayload' in lastMessage) {
+      const dataPayload = lastMessage.messagePayload;
+      // This is yuk. The data in a message is currently of 'any' type..
+      if (!('signedCommitment' in dataPayload)) {
+        fail('No signedCommitment in the last message.');
+      }
+      const { commitment, signature } = dataPayload.signedCommitment;
+      expect({ commitment, signature }).toEqual(message);
+    } else {
+      fail('No messages in the outbox.');
     }
   });
 }

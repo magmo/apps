@@ -15,10 +15,13 @@ import {
 } from '../indirect-defunding/reducer';
 import { isIndirectDefundingAction } from '../indirect-defunding/actions';
 import * as indirectDefundingStates from '../indirect-defunding/state';
+import { CommitmentReceived } from 'src/communication';
+
 export const initialize = (
   processId: string,
   channelId: string,
   sharedData: SharedData,
+  action?: CommitmentReceived,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
   if (!helpers.channelIsClosed(channelId, sharedData)) {
     return { protocolState: states.failure('Channel Not Closed'), sharedData };
@@ -40,6 +43,7 @@ export const initialize = (
       proposedAllocation,
       proposedDestination,
       sharedData,
+      action,
     );
 
     const protocolState = states.waitForLedgerDefunding({
@@ -47,6 +51,7 @@ export const initialize = (
       channelId,
       indirectDefundingState: indirectDefundingState.protocolState,
     });
+
     return { protocolState, sharedData: indirectDefundingState.sharedData };
   }
 };

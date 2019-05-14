@@ -36,6 +36,9 @@ import { isConcludingAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
 import { failure, success } from '../state';
 import { ProtocolStateWithSharedData } from '../..';
+import { waitForLedgerUpdate } from '../../indirect-defunding/state';
+import { waitForLedgerDefunding } from '../../defunding/states';
+import { indirectDefundingReducer } from '../../indirect-defunding/reducer';
 
 export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
 export type Storage = SharedData;
@@ -47,7 +50,7 @@ export function responderConcludingReducer(
 ): ReturnVal {
   if (isDefundingAction(action)) {
     return handleDefundingAction(protocolState, sharedData, action);
-  }
+  } // COMMITMENT_RECEIVED is a defunding action
 
   if (!isConcludingAction(action)) {
     return { protocolState, sharedData };
@@ -108,6 +111,44 @@ function handleDefundingAction(
   sharedData: Storage,
   action: DefundingAction,
 ): ReturnVal {
+  if (
+    protocolState.type === 'ResponderDecideDefund' &&
+    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED'
+  ) {
+    // TODO need stricter tests here (for now assume it is playerA's proposed ledger update)
+    // setup preaction FS with sub-IDFS, call IDF reducer with this action
+    const { processId } = action;
+    const channel = getChannel(sharedData, protocolState.channelId);
+    if (!channel) {
+      throw new Error(`Channel does not exist with id ${protocolState.channelId}`);
+    }
+    const preActionIndirectDefundingState = waitForLedgerUpdate({
+      processId,
+      ledgerId: getChannelId(action.signedCommitment.commitment),
+      channelId: protocolState.channelId,
+      proposedAllocation: channel.lastCommitment.commitment.allocation,
+      proposedDestination: channel.lastCommitment.commitment.destination,
+    });
+    const postActionIndirectDefundingState = indirectDefundingReducer(
+      preActionIndirectDefundingState,
+      sharedData,
+      action,
+    );
+    const postActionDefundingState = waitForLedgerDefunding({
+      processId,
+      channelId: protocolState.channelId,
+      indirectDefundingState: postActionIndirectDefundingState.protocolState,
+    });
+    const postActionConcludingState = responderWaitForDefund({
+      processId,
+      channelId: protocolState.channelId,
+      defundingState: postActionDefundingState,
+    });
+    return {
+      protocolState: postActionConcludingState,
+      sharedData: postActionIndirectDefundingState.sharedData,
+    };
+  }
   if (protocolState.type !== 'ResponderWaitForDefund') {
     return { protocolState, sharedData };
   }

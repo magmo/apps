@@ -20,6 +20,7 @@ The protocol is implemented with the following state machine
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   S((Start)) --> E{Channel Exists?}
   E --> |No| AF(ResponderAcknowledgeFailure)
   AF -->|ACKNOWLEDGED| F((ResponderFailure))
@@ -28,6 +29,7 @@ graph TD
   MT  --> |No| AF(ResponderAcknowledgeFailure)
   CC  --> |CONCLUDE.APPROVED| DD(ResponderDecideDefund)
   DD --> |DEFUND.CHOSEN| D(ResponderWaitForDefund)
+  DD --> |COMMITMENT_RECEIVED| D(ResponderWaitForDefund)
   D   --> |defunding protocol succeeded| AS(ResponderAcknowledgeSuccess)
   AS -->  |ACKNOWLEDGED| SS((Success))
   D   --> |defunding protocol failed| AF(ResponderAcknowledgeFailure)
@@ -44,9 +46,11 @@ graph TD
 We will use the following scenarios for testing:
 
 1. **Happy path**: `ResponderApproveConcluding` -> `ResponderDecideDefund` -> `ResponderWaitForDefund` -> `ResponderAcknowledgeSuccess` -> `ResponderSuccess`
-2. **Channel doesnt exist** `ResponderAcknowledgeFailure` -> `ResponderFailure`
-3. **Concluding not possible**: `ResponderAcknowledgeFailure` -> `ResponderFailure`
-4. **Defund failed** `ResponderWaitForDefund` -> `ResponderAcknowledgeFailure` -> `ResponderFailure`
+2. **Happy path (alternative)**
+   As 1 but commitment received and handled by _this_ reducer
+3. **Channel doesnt exist** `ResponderAcknowledgeFailure` -> `ResponderFailure`
+4. **Concluding not possible**: `ResponderAcknowledgeFailure` -> `ResponderFailure`
+5. **Defund failed** `ResponderWaitForDefund` -> `ResponderAcknowledgeFailure` -> `ResponderFailure`
 
 # Terminology
 
