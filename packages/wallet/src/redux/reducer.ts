@@ -111,6 +111,16 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, concludingSharedData, processState, concludingProtocolState);
+      case WalletProtocol.Responding:
+        const {
+          protocolState: respondingProtocolState,
+          sharedData: respondingSharedData,
+        } = challengeResponseProtocol.reducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+        return updatedState(state, respondingSharedData, processState, respondingProtocolState);
       default:
         // TODO: This should return unreachable(state), but right now, only some protocols are
         // "whitelisted" to run as a top-level process, which means we can't

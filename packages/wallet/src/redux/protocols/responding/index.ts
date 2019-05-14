@@ -1,1 +1,1 @@
-export { initialize } from './reducer';
+export { initialize, respondingReducer as reducer } from './reducer';

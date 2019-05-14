@@ -1,6 +1,7 @@
 import { BaseProcessAction } from '../actions';
 import { Commitment } from '../../../domain';
 import { TransactionAction } from '../transaction-submission/actions';
+import { ProtocolAction, isTransactionAction } from '../../actions';
 
 export type RespondingAction =
   | RespondApproved
@@ -59,3 +60,13 @@ export const responseProvided = (processId: string, commitment: Commitment): Res
   processId,
   commitment,
 });
+
+export function isRespondingAction(action: ProtocolAction): action is RespondingAction {
+  return (
+    isTransactionAction(action) ||
+    action.type === RESPOND_APPROVED ||
+    action.type === RESPOND_REJECTED ||
+    action.type === RESPONSE_PROVIDED ||
+    action.type === RESPOND_SUCCESS_ACKNOWLEDGED
+  );
+}

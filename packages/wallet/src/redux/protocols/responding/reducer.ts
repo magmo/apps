@@ -21,6 +21,7 @@ import {
 } from '../transaction-submission/states';
 import { channelID } from 'fmg-core/lib/channel';
 import { showWallet } from '../reducer-helpers';
+import { ProtocolAction } from '../../actions';
 
 export const initialize = (
   processId: string,
@@ -36,8 +37,12 @@ export const initialize = (
 export const respondingReducer = (
   protocolState: states.RespondingState,
   sharedData: SharedData,
-  action: actions.RespondingAction,
+  action: ProtocolAction,
 ): ProtocolStateWithSharedData<states.RespondingState> => {
+  if (!actions.isRespondingAction(action)) {
+    console.warn(`Challenge Responding Reducer called with non responding action ${action.type}`);
+    return { protocolState, sharedData };
+  }
   switch (protocolState.type) {
     case states.WAIT_FOR_APPROVAL:
       return waitForApprovalReducer(protocolState, sharedData, action);
