@@ -160,7 +160,7 @@ function initializeNewProtocol(
       );
       return { protocolState, sharedData };
     }
-    case actions.CHALLENGE_CREATED_EVENT:
+    case actions.protocol.CHALLENGE_CREATED:
       return challengeResponseProtocol.initialize(processId, incomingSharedData, action.commitment);
     case actions.protocol.INITIALIZE_CHANNEL:
       return applicationProtocol.initialize(incomingSharedData);
