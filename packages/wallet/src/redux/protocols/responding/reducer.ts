@@ -110,7 +110,7 @@ const waitForAcknowledgementReducer = (
     case actions.RESPOND_SUCCESS_ACKNOWLEDGED:
       return {
         protocolState: states.success(),
-        sharedData,
+        sharedData: hideWallet(sharedData),
       };
     default:
       return { protocolState, sharedData };
