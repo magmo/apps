@@ -20,6 +20,7 @@ import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
 import { CONCLUDE_INSTIGATED, isStartProcessAction } from '../communication';
+import { communication } from '../..';
 
 const initialState = states.waitForLogin();
 
@@ -137,6 +138,7 @@ function updatedState(
 
 export function getProcessId(action: NewProcessAction): string {
   if (isStartProcessAction(action)) {
+    return communication.getProcessId(action);
   } else if (action.type === INITIALIZE_CHANNEL) {
     return APPLICATION_PROCESS_ID;
   } else if ('channelId' in action) {
