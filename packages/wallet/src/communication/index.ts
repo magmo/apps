@@ -6,6 +6,8 @@ import {
   strategyApproved,
   commitmentReceived,
   concludeInstigated,
+  ConcludeInstigated,
+  CONCLUDE_INSTIGATED,
 } from './actions';
 export * from './actions';
 
@@ -36,3 +38,8 @@ export const sendCommitmentReceived = (
   const payload = commitmentReceived(processId, { commitment, signature });
   return messageRelayRequested(to, payload);
 };
+
+export type StartProcessAction = ConcludeInstigated;
+export function isStartProcessAction(a: { type: string }): a is StartProcessAction {
+  return a.type === CONCLUDE_INSTIGATED;
+}
