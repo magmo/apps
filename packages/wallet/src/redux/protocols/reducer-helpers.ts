@@ -110,6 +110,14 @@ export function sendChallengeCommitmentReceived(sharedData: SharedData, commitme
   return newSharedData;
 }
 
+export function sendChallengeComplete(sharedData: SharedData) {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    messageOutbox: magmoWalletClient.challengeComplete(),
+  });
+  return newSharedData;
+}
+
 export function sendConcludeFailure(
   sharedData: SharedData,
   reason: 'Other' | 'UserDeclined',

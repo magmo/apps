@@ -13,7 +13,7 @@ import {
   failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData, registerChannelToMonitor, sharedData } from '../../state';
+import { SharedData, registerChannelToMonitor } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
 import {
@@ -28,7 +28,12 @@ import { isSuccess, isFailure } from '../transaction-submission/states';
 import { getChannel } from '../../state';
 import { createForceMoveTransaction } from '../../../utils/transaction-generator';
 import { isFullyOpen, ourTurn } from '../../channel-store';
-import { showWallet, hideWallet, sendChallengeCommitmentReceived } from '../reducer-helpers';
+import {
+  showWallet,
+  hideWallet,
+  sendChallengeCommitmentReceived,
+  sendChallengeComplete,
+} from '../reducer-helpers';
 import { Commitment } from '../../../domain';
 
 type Storage = SharedData;
@@ -210,8 +215,8 @@ function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storag
   if (state.type !== 'Challenging.AcknowledgeResponse') {
     return { state, storage };
   }
-
-  return { state: successOpen(), storage: hideWallet(storage) };
+  storage = sendChallengeComplete(hideWallet(storage));
+  return { state: successOpen(), storage };
 }
 
 function challengeFailureAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
