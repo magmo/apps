@@ -9,6 +9,7 @@ import { PlayerIndex } from '../types';
 import { CommitmentType } from 'fmg-core/lib/commitment';
 import * as magmoWalletClient from 'magmo-wallet-client';
 import { ChannelState } from '../channel-store';
+import { Commitment } from '../../domain';
 
 export const updateChannelState = (
   sharedData: SharedData,
@@ -97,6 +98,14 @@ export function sendChallengeResponseRequested(
   const newSharedData = { ...sharedData };
   newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
     messageOutbox: magmoWalletClient.challengeResponseRequested(channelId),
+  });
+  return newSharedData;
+}
+
+export function sendChallengeCommitmentReceived(sharedData: SharedData, commitment: Commitment) {
+  const newSharedData = { ...sharedData };
+  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+    messageOutbox: magmoWalletClient.challengeCommitmentReceived(commitment),
   });
   return newSharedData;
 }

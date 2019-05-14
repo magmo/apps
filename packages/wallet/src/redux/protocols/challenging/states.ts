@@ -87,6 +87,7 @@ export function isChallengingState(state: ProtocolState): state is ChallengingSt
     state.type === 'Challenging.WaitForResponseOrTimeout' ||
     state.type === 'Challenging.AcknowledgeTimeout' ||
     state.type === 'Challenging.AcknowledgeFailure' ||
+    state.type === 'Challenging.AcknowledgeResponse' ||
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
     state.type === 'Challenging.SuccessClosed'

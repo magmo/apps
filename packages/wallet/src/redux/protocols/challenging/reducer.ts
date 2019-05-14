@@ -13,7 +13,7 @@ import {
   failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData, registerChannelToMonitor } from '../../state';
+import { SharedData, registerChannelToMonitor, sharedData } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
 import {
@@ -28,7 +28,8 @@ import { isSuccess, isFailure } from '../transaction-submission/states';
 import { getChannel } from '../../state';
 import { createForceMoveTransaction } from '../../../utils/transaction-generator';
 import { isFullyOpen, ourTurn } from '../../channel-store';
-import { showWallet } from '../reducer-helpers';
+import { showWallet, hideWallet, sendChallengeCommitmentReceived } from '../reducer-helpers';
+import { Commitment } from '../../../domain';
 
 type Storage = SharedData;
 
@@ -55,9 +56,10 @@ export function challengingReducer(
       return challengeApproved(state, storage);
     case actions.CHALLENGE_DENIED:
       return challengeDenied(state, storage);
-    case REFUTED_EVENT:
     case RESPOND_WITH_MOVE_EVENT:
-      return challengeResponseRecieved(state, storage);
+      return challengeResponseReceived(state, storage, action.responseCommitment);
+    case REFUTED_EVENT:
+      return refuteReceived(state, storage);
     case CHALLENGE_EXPIRED_EVENT:
       return challengeTimedOut(state, storage);
     case actions.CHALLENGE_TIMEOUT_ACKNOWLEDGED:
@@ -164,12 +166,26 @@ function challengeDenied(state: NonTerminalCState, storage: Storage): ReturnVal 
   return { state, storage };
 }
 
-function challengeResponseRecieved(state: NonTerminalCState, storage: Storage): ReturnVal {
+function refuteReceived(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
     return { state, storage };
   }
 
   state = acknowledgeResponse(state);
+  return { state, storage };
+}
+
+function challengeResponseReceived(
+  state: NonTerminalCState,
+  storage: Storage,
+  challengeCommitment: Commitment,
+): ReturnVal {
+  if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
+    return { state, storage };
+  }
+
+  state = acknowledgeResponse(state);
+  storage = sendChallengeCommitmentReceived(storage, challengeCommitment);
   return { state, storage };
 }
 
@@ -187,7 +203,7 @@ function challengeTimeoutAcknowledged(state: NonTerminalCState, storage: Storage
     return { state, storage };
   }
 
-  return { state: successClosed(), storage };
+  return { state: successClosed(), storage: hideWallet(storage) };
 }
 
 function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -195,7 +211,7 @@ function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storag
     return { state, storage };
   }
 
-  return { state: successOpen(), storage };
+  return { state: successOpen(), storage: hideWallet(storage) };
 }
 
 function challengeFailureAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -203,7 +219,7 @@ function challengeFailureAcknowledged(state: NonTerminalCState, storage: Storage
     return { state, storage };
   }
 
-  return { state: failure(state), storage };
+  return { state: failure(state), storage: hideWallet(storage) };
 }
 
 // Helpers
