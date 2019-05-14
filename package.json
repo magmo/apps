@@ -1,11 +1,26 @@
 {
-  "dependencies": {
-    "lerna": "^3.10.1"
-  },
   "name": "apps",
   "license": "MIT",
+  "private": true,
+  "npmClient": "yarn",
   "scripts": {
     "test:ci": "test:ci",
-    "build": "build"
+    "build": "build",
+    "heroku-postbuild": "npx lerna run prepare"
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "packages/wallet/node_modules",
+    "packages/server/node_modules",
+    "packages/magmo-wallet-client/node_modules",
+    "packages/rps/node_modules",
+    "packages/tictactoe/node_modules",
+    "packages/wallet-common/node_modules"
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "lerna": "^3.10.1"
   }
 }
