@@ -8,7 +8,8 @@ import Failure from '../shared-components/failure';
 import { unreachable } from '../../../utils/reducer-utils';
 import Acknowledge from '../shared-components/acknowledge';
 import WaitForApproval from './components/wait-for-approval';
-import { TransactionSubmission } from '../transaction-submission';
+import { TransactionSubmission } from '../../protocols/transaction-submission/container';
+
 import { connect } from 'react-redux';
 
 interface Props {

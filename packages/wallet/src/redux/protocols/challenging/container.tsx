@@ -30,16 +30,16 @@ class ChallengingContainer extends PureComponent<Props> {
     } = this.props;
     const processId = state.processId;
     switch (state.type) {
-      case 'ApproveChallenge':
+      case 'Challenging.ApproveChallenge':
         return <ApproveChallenge deny={() => deny(processId)} approve={() => approve(processId)} />;
-      case 'WaitForTransaction':
+      case 'Challenging.WaitForTransaction':
         return (
           <TransactionSubmission transactionName="challenge" state={state.transactionSubmission} />
         );
-      case 'WaitForResponseOrTimeout':
+      case 'Challenging.WaitForResponseOrTimeout':
         // todo: get expiration time
         return <WaitForResponseOrTimeout expirationTime={20} />;
-      case 'AcknowledgeResponse':
+      case 'Challenging.AcknowledgeResponse':
         return (
           <Acknowledge
             title="Opponent responded!"
@@ -47,7 +47,7 @@ class ChallengingContainer extends PureComponent<Props> {
             acknowledge={() => responseAcknowledged(processId)}
           />
         );
-      case 'AcknowledgeTimeout':
+      case 'Challenging.AcknowledgeTimeout':
         return (
           <Acknowledge
             title="Challenge timed out!"
@@ -55,7 +55,7 @@ class ChallengingContainer extends PureComponent<Props> {
             acknowledge={() => timeoutAcknowledged(processId)}
           />
         );
-      case 'AcknowledgeFailure':
+      case 'Challenging.AcknowledgeFailure':
         const description = describeFailure(state.reason);
 
         return (

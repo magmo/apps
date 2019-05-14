@@ -9,14 +9,14 @@ describe('opponent-responds scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'ApproveChallenge');
+    itTransitionsTo(result, 'Challenging.ApproveChallenge');
   });
   describe('when in ApproveChallenge', () => {
     const state = scenario.approveChallenge;
     const action = scenario.challengeApproved;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'WaitForTransaction');
+    itTransitionsTo(result, 'Challenging.WaitForTransaction');
     // it initializes the transaction state machine
   });
 
@@ -25,7 +25,7 @@ describe('opponent-responds scenario', () => {
     const action = scenario.transactionSuccessTrigger;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'WaitForResponseOrTimeout');
+    itTransitionsTo(result, 'Challenging.WaitForResponseOrTimeout');
   });
 
   describe('when in WaitForResponseOrTimeout', () => {
@@ -33,7 +33,7 @@ describe('opponent-responds scenario', () => {
     const action = scenario.responseReceived;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeResponse');
+    itTransitionsTo(result, 'Challenging.AcknowledgeResponse');
   });
 
   describe('when in AcknowledgeResponse', () => {
@@ -41,7 +41,7 @@ describe('opponent-responds scenario', () => {
     const action = scenario.responseAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'SuccessOpen');
+    itTransitionsTo(result, 'Challenging.SuccessOpen');
   });
 });
 
@@ -53,7 +53,7 @@ describe('challenge-times-out scenario', () => {
     const state = scenario.waitForResponseOrTimeout;
     const action = scenario.challengeTimedOut;
     const result = challengingReducer(state, storage, action);
-    itTransitionsTo(result, 'AcknowledgeTimeout');
+    itTransitionsTo(result, 'Challenging.AcknowledgeTimeout');
   });
 
   describe('when in AcknowledgeTimeout', () => {
@@ -61,7 +61,7 @@ describe('challenge-times-out scenario', () => {
     const action = scenario.timeoutAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'SuccessClosed');
+    itTransitionsTo(result, 'Challenging.SuccessClosed');
   });
 });
 
@@ -72,7 +72,7 @@ describe("channel-doesn't-exist scenario", () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'AcknowledgeFailure');
+    itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'ChannelDoesntExist');
   });
 
@@ -81,7 +81,7 @@ describe("channel-doesn't-exist scenario", () => {
     const action = scenario.failureAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Failure');
+    itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'ChannelDoesntExist');
   });
 });
@@ -93,7 +93,7 @@ describe('channel-not-fully-open scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'AcknowledgeFailure');
+    itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'NotFullyOpen');
   });
 
@@ -102,7 +102,7 @@ describe('channel-not-fully-open scenario', () => {
     const action = scenario.failureAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Failure');
+    itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'NotFullyOpen');
   });
 });
@@ -114,7 +114,7 @@ describe('already-have-latest-commitment scenario', () => {
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
 
-    itTransitionsTo(result, 'AcknowledgeFailure');
+    itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'AlreadyHaveLatest');
   });
 
@@ -123,7 +123,7 @@ describe('already-have-latest-commitment scenario', () => {
     const action = scenario.failureAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Failure');
+    itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'AlreadyHaveLatest');
   });
 });
@@ -137,7 +137,7 @@ describe('user-declines-challenge scenario', () => {
     const action = scenario.challengeDenied;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeFailure');
+    itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'DeclinedByUser');
   });
   describe('when in AcknowledgeFailure', () => {
@@ -145,7 +145,7 @@ describe('user-declines-challenge scenario', () => {
     const action = scenario.failureAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Failure');
+    itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'DeclinedByUser');
   });
 });
@@ -160,7 +160,7 @@ describe('receive-commitment-while-approving scenario', () => {
     const action = scenario.challengeApproved;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeFailure');
+    itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'LatestWhileApproving');
   });
 
@@ -169,7 +169,7 @@ describe('receive-commitment-while-approving scenario', () => {
     const action = scenario.failureAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Failure');
+    itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'LatestWhileApproving');
   });
 });
@@ -183,7 +183,7 @@ describe('transaction-fails scenario', () => {
     const action = scenario.transactionFailureTrigger;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'AcknowledgeFailure');
+    itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'TransactionFailed');
   });
 
@@ -192,7 +192,7 @@ describe('transaction-fails scenario', () => {
     const action = scenario.failureAcknowledged;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Failure');
+    itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'TransactionFailed');
   });
 });

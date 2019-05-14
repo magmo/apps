@@ -88,7 +88,7 @@ function handleTransactionAction(
   storage: Storage,
   action: TransactionAction,
 ): ReturnVal {
-  if (state.type !== 'WaitForTransaction') {
+  if (state.type !== 'Challenging.WaitForTransaction') {
     return { state, storage };
   }
   const transactionSubmission = state.transactionSubmission;
@@ -109,7 +109,7 @@ function handleTransactionAction(
 }
 
 function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveChallenge') {
+  if (state.type !== 'Challenging.ApproveChallenge') {
     return { state, storage };
   }
   const channelState = getChannel(storage, state.channelId);
@@ -148,7 +148,7 @@ function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVa
 }
 
 function challengeDenied(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveChallenge') {
+  if (state.type !== 'Challenging.ApproveChallenge') {
     return { state, storage };
   }
 
@@ -157,7 +157,7 @@ function challengeDenied(state: NonTerminalCState, storage: Storage): ReturnVal 
 }
 
 function challengeResponseRecieved(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForResponseOrTimeout') {
+  if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
     return { state, storage };
   }
 
@@ -166,7 +166,7 @@ function challengeResponseRecieved(state: NonTerminalCState, storage: Storage): 
 }
 
 function challengeTimedOut(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForResponseOrTimeout') {
+  if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
     return { state, storage };
   }
 
@@ -175,7 +175,7 @@ function challengeTimedOut(state: NonTerminalCState, storage: Storage): ReturnVa
 }
 
 function challengeTimeoutAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeTimeout') {
+  if (state.type !== 'Challenging.AcknowledgeTimeout') {
     return { state, storage };
   }
 
@@ -183,7 +183,7 @@ function challengeTimeoutAcknowledged(state: NonTerminalCState, storage: Storage
 }
 
 function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeResponse') {
+  if (state.type !== 'Challenging.AcknowledgeResponse') {
     return { state, storage };
   }
 
@@ -191,7 +191,7 @@ function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storag
 }
 
 function challengeFailureAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'AcknowledgeFailure') {
+  if (state.type !== 'Challenging.AcknowledgeFailure') {
     return { state, storage };
   }
 

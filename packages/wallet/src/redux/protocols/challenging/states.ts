@@ -24,52 +24,52 @@ export type FailureReason =
   | 'TransactionFailed';
 
 export interface ApproveChallenge {
-  type: 'ApproveChallenge';
+  type: 'Challenging.ApproveChallenge';
   processId: string;
   channelId: string;
 }
 
 export interface WaitForTransaction {
-  type: 'WaitForTransaction';
+  type: 'Challenging.WaitForTransaction';
   processId: string;
   channelId: string;
   transactionSubmission: NonTerminalTransactionSubmissionState;
 }
 
 export interface WaitForResponseOrTimeout {
-  type: 'WaitForResponseOrTimeout';
+  type: 'Challenging.WaitForResponseOrTimeout';
   processId: string;
   channelId: string;
 }
 
 export interface AcknowledgeTimeout {
-  type: 'AcknowledgeTimeout';
+  type: 'Challenging.AcknowledgeTimeout';
   processId: string;
   channelId: string;
 }
 
 export interface AcknowledgeFailure {
-  type: 'AcknowledgeFailure';
+  type: 'Challenging.AcknowledgeFailure';
   processId: string;
   channelId: string;
   reason: FailureReason;
 }
 export interface AcknowledgeResponse {
-  type: 'AcknowledgeResponse';
+  type: 'Challenging.AcknowledgeResponse';
   processId: string;
   channelId: string;
 }
 export interface Failure {
-  type: 'Failure';
+  type: 'Challenging.Failure';
   reason: FailureReason;
 }
 
 export interface SuccessOpen {
-  type: 'SuccessOpen';
+  type: 'Challenging.SuccessOpen';
 }
 
 export interface SuccessClosed {
-  type: 'SuccessClosed';
+  type: 'Challenging.SuccessClosed';
 }
 
 // -------
@@ -82,75 +82,71 @@ export function isNonTerminalChallengingState(state: ProtocolState): state is No
 
 export function isChallengingState(state: ProtocolState): state is ChallengingState {
   return (
-    state.type === 'ApproveChallenge' ||
-    state.type === 'WaitForTransaction' ||
-    state.type === 'WaitForResponseOrTimeout' ||
-    state.type === 'AcknowledgeTimeout' ||
-    state.type === 'AcknowledgeFailure' ||
-    state.type === 'Failure' ||
-    state.type === 'SuccessOpen' ||
-    state.type === 'SuccessClosed'
+    state.type === 'Challenging.ApproveChallenge' ||
+    state.type === 'Challenging.WaitForTransaction' ||
+    state.type === 'Challenging.WaitForResponseOrTimeout' ||
+    state.type === 'Challenging.AcknowledgeTimeout' ||
+    state.type === 'Challenging.AcknowledgeFailure' ||
+    state.type === 'Challenging.Failure' ||
+    state.type === 'Challenging.SuccessOpen' ||
+    state.type === 'Challenging.SuccessClosed'
   );
 }
 
 export function isTerminal(state: ChallengingState): state is TerminalState {
-  return state.type === 'Failure' || state.type === 'SuccessOpen' || state.type === 'SuccessClosed';
-}
-
-export function isNonTerminal(state: ChallengingState): state is NonTerminalState {
   return (
-    state.type === 'ApproveChallenge' ||
-    state.type === 'WaitForTransaction' ||
-    state.type === 'WaitForResponseOrTimeout' ||
-    state.type === 'AcknowledgeTimeout' ||
-    state.type === 'AcknowledgeFailure' ||
-    state.type === 'AcknowledgeResponse'
+    state.type === 'Challenging.Failure' ||
+    state.type === 'Challenging.SuccessOpen' ||
+    state.type === 'Challenging.SuccessClosed'
   );
 }
 
+export function isNonTerminal(state: ChallengingState): state is NonTerminalState {
+  return !isTerminal(state);
+}
 // --------
 // Creators
 // --------
 
 export function approveChallenge(p: P<ApproveChallenge>): ApproveChallenge {
   const { processId, channelId } = p;
-  return { type: 'ApproveChallenge', processId, channelId };
+  return { type: 'Challenging.ApproveChallenge', processId, channelId };
 }
 
 export function waitForTransaction(p: P<WaitForTransaction>): WaitForTransaction {
   const { processId, channelId, transactionSubmission } = p;
-  return { type: 'WaitForTransaction', processId, channelId, transactionSubmission };
+  return { type: 'Challenging.WaitForTransaction', processId, channelId, transactionSubmission };
 }
 
 export function waitForResponseOrTimeout(p: P<WaitForResponseOrTimeout>): WaitForResponseOrTimeout {
   const { processId, channelId } = p;
-  return { type: 'WaitForResponseOrTimeout', processId, channelId };
+  return { type: 'Challenging.WaitForResponseOrTimeout', processId, channelId };
 }
 
 export function acknowledgeResponse(p: P<AcknowledgeResponse>): AcknowledgeResponse {
   const { processId, channelId } = p;
-  return { type: 'AcknowledgeResponse', processId, channelId };
+  return { type: 'Challenging.AcknowledgeResponse', processId, channelId };
 }
 
 export function acknowledgeTimeout(p: P<AcknowledgeTimeout>): AcknowledgeTimeout {
   const { processId, channelId } = p;
-  return { type: 'AcknowledgeTimeout', processId, channelId };
+  return { type: 'Challenging.AcknowledgeTimeout', processId, channelId };
 }
 
 export function acknowledgeFailure(p: P<AcknowledgeFailure>): AcknowledgeFailure {
   const { processId, channelId, reason } = p;
-  return { type: 'AcknowledgeFailure', processId, channelId, reason };
+  return { type: 'Challenging.AcknowledgeFailure', processId, channelId, reason };
 }
 
 export function failure(p: P<Failure>): Failure {
   const { reason } = p;
-  return { type: 'Failure', reason };
+  return { type: 'Challenging.Failure', reason };
 }
 
 export function successClosed(): SuccessClosed {
-  return { type: 'SuccessClosed' };
+  return { type: 'Challenging.SuccessClosed' };
 }
 
 export function successOpen(): SuccessOpen {
-  return { type: 'SuccessOpen' };
+  return { type: 'Challenging.SuccessOpen' };
 }
