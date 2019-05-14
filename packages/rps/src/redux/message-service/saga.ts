@@ -61,7 +61,7 @@ export function* sendWalletMessageSaga() {
 
         // Since the response is returned straight away, we have to relay the commitment
         // immediately
-        Wallet.relayMessage(WALLET_IFRAME_ID, response.data);
+        Wallet.relayMessage(WALLET_IFRAME_ID, response.messagePayload);
       } catch (err) {
         console.error(err);
       }
