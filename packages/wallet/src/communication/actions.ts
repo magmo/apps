@@ -37,7 +37,7 @@ export const concludeInstigated = (signedCommitment: SignedCommitment, channelId
   type: CONCLUDE_INSTIGATED as typeof CONCLUDE_INSTIGATED,
   signedCommitment,
   protocol: WalletProtocol.Concluding,
-  channelId,
+  processId: `${WalletProtocol.Concluding}-${channelId}`,
 });
 export type ConcludeInstigated = ReturnType<typeof concludeInstigated>;
 
