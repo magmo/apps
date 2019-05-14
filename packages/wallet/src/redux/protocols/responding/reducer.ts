@@ -20,7 +20,12 @@ import {
   isSuccess,
 } from '../transaction-submission/states';
 import { channelID } from 'fmg-core/lib/channel';
-import { showWallet, hideWallet, sendChallengeResponseRequested } from '../reducer-helpers';
+import {
+  showWallet,
+  hideWallet,
+  sendChallengeResponseRequested,
+  sendChallengeComplete,
+} from '../reducer-helpers';
 import { ProtocolAction } from '../../actions';
 
 export const initialize = (
@@ -110,7 +115,7 @@ const waitForAcknowledgementReducer = (
     case actions.RESPOND_SUCCESS_ACKNOWLEDGED:
       return {
         protocolState: states.success(),
-        sharedData: hideWallet(sharedData),
+        sharedData: sendChallengeComplete(hideWallet(sharedData)),
       };
     default:
       return { protocolState, sharedData };
