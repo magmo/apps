@@ -8,6 +8,7 @@ import {
   channelFromCommitments,
   partiallyOpenChannelFromCommitment,
 } from '../../../channel-store/channel-state/__tests__';
+import { challengeExpiredEvent, respondWithMoveEvent } from '../../../actions';
 
 type Reason = states.FailureReason;
 
@@ -67,10 +68,10 @@ const failure = (reason: Reason) => states.failure({ reason });
 // -------
 const challengeApproved = actions.challengeApproved(processId);
 const challengeDenied = actions.challengeDenied(processId);
-const challengeTimedOut = actions.challengeTimedOut(processId);
+const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
 const transactionSuccessTrigger = tsScenarios.successTrigger;
 const transactionFailureTrigger = tsScenarios.failureTrigger;
-const responseReceived = actions.challengeResponseReceived(processId);
+const responseReceived = respondWithMoveEvent(processId, channelId, signedCommitment21.commitment);
 const responseAcknowledged = actions.challengeResponseAcknowledged(processId);
 const timeoutAcknowledged = actions.challengeTimeoutAcknowledged(processId);
 const failureAcknowledged = actions.challengeFailureAcknowledged(processId);

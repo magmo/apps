@@ -13,10 +13,16 @@ import {
   failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData } from '../../state';
+import { SharedData, registerChannelToMonitor } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
-import { isTransactionAction, ProtocolAction } from '../../actions';
+import {
+  isTransactionAction,
+  ProtocolAction,
+  CHALLENGE_EXPIRED_EVENT,
+  REFUTED_EVENT,
+  RESPOND_WITH_MOVE_EVENT,
+} from '../../actions';
 import { transactionReducer, initialize as initializeTransaction } from '../transaction-submission';
 import { isSuccess, isFailure } from '../transaction-submission/states';
 import { getChannel } from '../../state';
@@ -49,9 +55,10 @@ export function challengingReducer(
       return challengeApproved(state, storage);
     case actions.CHALLENGE_DENIED:
       return challengeDenied(state, storage);
-    case actions.CHALLENGE_RESPONSE_RECEIVED:
+    case REFUTED_EVENT:
+    case RESPOND_WITH_MOVE_EVENT:
       return challengeResponseRecieved(state, storage);
-    case actions.CHALLENGE_TIMED_OUT:
+    case CHALLENGE_EXPIRED_EVENT:
       return challengeTimedOut(state, storage);
     case actions.CHALLENGE_TIMEOUT_ACKNOWLEDGED:
       return challengeTimeoutAcknowledged(state, storage);
@@ -80,6 +87,7 @@ export function initialize(channelId: string, processId: string, storage: Storag
     // if it's our turn we don't need to challenge
     return { state: acknowledgeFailure(props, 'AlreadyHaveLatest'), storage: showWallet(storage) };
   }
+  storage = registerChannelToMonitor(storage, processId, channelId);
   return { state: approveChallenge({ channelId, processId }), storage: showWallet(storage) };
 }
 
