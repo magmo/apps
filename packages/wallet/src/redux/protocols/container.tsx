@@ -2,8 +2,10 @@ import { PureComponent } from 'react';
 import { ProtocolState } from '.';
 import * as fundingStates from './funding/states';
 import * as challengingStates from './challenging/states';
+import * as concludingStates from './concluding/state';
 import React from 'react';
 import { Funding } from './funding/container';
+import { Concluding } from './concluding/container';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -26,8 +28,9 @@ class ProtocolContainer extends PureComponent<Props> {
       return <Challenging state={protocolState} />;
     } else if (respondingStates.isNonTerminalRespondingState(protocolState)) {
       return <Responding state={protocolState} />;
+    } else if (concludingStates.isConcludingState(protocolState)) {
+      return <Concluding state={protocolState} />;
     } else {
-      // TODO: We need a placeholder screen here when transitioning back to the app from a success state
       return (
         <div>
           <FontAwesomeIcon icon={faSpinner} pulse={true} size="lg" />

@@ -7,7 +7,7 @@ import { ProtocolState } from './protocols';
 import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
 import * as challengeProtocol from './protocols/challenging';
-import * as concludeProtocol from './protocols/concluding/instigator';
+import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
 import * as challengeResponseProtocol from './protocols/responding';
 import * as states from './state';
@@ -82,8 +82,8 @@ function routeToProtocolReducer(
           states.sharedData(state),
           action,
         );
-
         return updatedState(state, sharedData, processState, protocolState);
+
       case WalletProtocol.Application:
         const {
           protocolState: appProtocolState,
@@ -100,6 +100,17 @@ function routeToProtocolReducer(
           storage: challengingSharedData,
         } = challengeProtocol.reducer(processState.protocolState, states.sharedData(state), action);
         return updatedState(state, challengingSharedData, processState, challengingProtocolState);
+
+      case WalletProtocol.Concluding:
+        const {
+          protocolState: concludingProtocolState,
+          sharedData: concludingSharedData,
+        } = concludingProtocol.reducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+        return updatedState(state, concludingSharedData, processState, concludingProtocolState);
       default:
         // TODO: This should return unreachable(state), but right now, only some protocols are
         // "whitelisted" to run as a top-level process, which means we can't
@@ -144,8 +155,17 @@ function initializeNewProtocol(
     }
     case actions.protocol.CONCLUDE_REQUESTED: {
       const { channelId } = action;
-      const { state: protocolState, storage: sharedData } = concludeProtocol.initialize(
+      const { protocolState, sharedData } = concludingProtocol.initializeInstigatorState(
         channelId,
+        processId,
+        incomingSharedData,
+      );
+      return { protocolState, sharedData };
+    }
+    case actions.protocol.CONCLUDE_INSTIGATED: {
+      const { signedCommitment } = action;
+      const { protocolState, sharedData } = concludingProtocol.initializeResponderState(
+        signedCommitment,
         processId,
         incomingSharedData,
       );
