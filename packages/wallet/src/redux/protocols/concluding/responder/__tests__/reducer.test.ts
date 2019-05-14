@@ -75,7 +75,6 @@ describe('[ Happy path (alternative) ]', () => {
         'WaitForConclude',
       );
     });
-
     itSendsMessage(result.sharedData, reply);
   });
 });

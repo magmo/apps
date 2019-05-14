@@ -36,21 +36,25 @@ const props = {
 // -----------
 
 const app9 = appCommitment({ turnNum: 9, balances: twoThree, isFinal: false });
-const app10 = appCommitment({ turnNum: 10, balances: twoThree, isFinal: true });
-const app11 = appCommitment({ turnNum: 11, balances: twoThree, isFinal: true });
+export const app10 = appCommitment({ turnNum: 10, balances: twoThree, isFinal: true });
+export const app11 = appCommitment({ turnNum: 11, balances: twoThree, isFinal: true });
 
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
+export const ledger4 = ledgerCommitment({
+  turnNum: 4,
+  balances: twoThree,
+  proposedBalances: fiveToApp,
+});
+export const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances: fiveToApp, proposedBalances: twoThree });
-const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
-export const ledger8 = ledgerCommitment({ turnNum: 8, balances: twoThree, isFinal: true });
+export const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThree });
+const ledger8 = ledgerCommitment({ turnNum: 8, balances: twoThree, isFinal: true });
 const ledger9 = ledgerCommitment({ turnNum: 9, balances: twoThree, isFinal: true });
 
 // -----------
 // States
 // -----------
 
-const setFundingState = (sharedData: SharedData): SharedData => {
+export const setFundingState = (sharedData: SharedData): SharedData => {
   return {
     ...sharedData,
     fundingState: { [channelId]: { directlyFunded: false, fundingChannel: ledgerId } },

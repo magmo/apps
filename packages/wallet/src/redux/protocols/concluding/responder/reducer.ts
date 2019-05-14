@@ -129,7 +129,7 @@ function handleDefundingAction(
       proposedAllocation: channel.lastCommitment.commitment.allocation,
       proposedDestination: channel.lastCommitment.commitment.destination,
     });
-    const postActionIndirectFundingState = indirectDefundingReducer(
+    const postActionIndirectDefundingState = indirectDefundingReducer(
       preActionIndirectDefundingState,
       sharedData,
       action,
@@ -137,14 +137,17 @@ function handleDefundingAction(
     const postActionDefundingState = waitForLedgerDefunding({
       processId,
       channelId: protocolState.channelId,
-      indirectDefundingState: postActionIndirectFundingState.protocolState,
+      indirectDefundingState: postActionIndirectDefundingState.protocolState,
     });
     const postActionConcludingState = responderWaitForDefund({
       processId,
       channelId: protocolState.channelId,
       defundingState: postActionDefundingState,
     });
-    return { protocolState: postActionConcludingState, sharedData };
+    return {
+      protocolState: postActionConcludingState,
+      sharedData: postActionIndirectDefundingState.sharedData,
+    };
   }
   if (protocolState.type !== 'ResponderWaitForDefund') {
     return { protocolState, sharedData };

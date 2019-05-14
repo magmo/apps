@@ -13,6 +13,15 @@ import { channelFromCommitments } from '../../../../channel-store/channel-state/
 import { appCommitment } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import { bsPrivateKey } from '../../../../../communication/__tests__/commitments';
+import {
+  ledgerUpdate0Received,
+  ledger4,
+  ledger5,
+  ledger7,
+  app10,
+  app11,
+  setFundingState as setFundingStateAlt,
+} from '../../../indirect-defunding/__tests__/scenarios';
 
 // -----------------
 // Channel Scenarios
@@ -60,6 +69,7 @@ const defaults = { processId, channelId };
 // ------
 const approveConcluding = states.responderApproveConcluding(defaults);
 const decideDefund = states.responderDecideDefund(defaults);
+
 const waitForDefund = states.responderWaitForDefund({
   ...defaults,
   defundingState: preSuccessState,
@@ -77,7 +87,6 @@ const acknowledgeSuccess = states.responderAcknowledgeSuccess(defaults);
 const concludeSent = actions.concludeApproved(processId);
 const defundChosen = actions.defundChosen(processId);
 const acknowledged = actions.acknowledged(processId);
-import { ledgerUpdate0Received, ledger8 } from '../../../indirect-defunding/__tests__/scenarios';
 
 // -------
 // Scenarios
@@ -105,9 +114,14 @@ export const happyPathAlternative = {
 
   decideDefund: {
     state: decideDefund,
-    store: secondConcludeReceived,
+    store: setFundingStateAlt(
+      setChannels(EMPTY_SHARED_DATA, [
+        channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),
+        channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+      ]),
+    ),
     action: ledgerUpdate0Received,
-    reply: ledger8,
+    reply: ledger7,
   },
 };
 
