@@ -191,6 +191,9 @@ function challengeResponseReceived(
 
   state = acknowledgeResponse(state);
   storage = sendChallengeCommitmentReceived(storage, challengeCommitment);
+  // TODO: We probably need to update the channel state with the latest commitment?
+  // Otherwise the next transition will fail since we're missing a commitment.
+  // That might be tricky without the signature...
   return { state, storage };
 }
 
@@ -207,7 +210,7 @@ function challengeTimeoutAcknowledged(state: NonTerminalCState, storage: Storage
   if (state.type !== 'Challenging.AcknowledgeTimeout') {
     return { state, storage };
   }
-
+  // TODO: Should we send out a challenge success or failure here to the app?
   return { state: successClosed(), storage: hideWallet(storage) };
 }
 
