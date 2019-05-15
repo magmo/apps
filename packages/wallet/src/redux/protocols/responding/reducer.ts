@@ -26,7 +26,7 @@ import {
   sendChallengeComplete,
 } from '../reducer-helpers';
 import { ProtocolAction } from '../../actions';
-
+import * as _ from 'lodash';
 export const initialize = (
   processId: string,
   sharedData: SharedData,
@@ -262,7 +262,7 @@ const canRespondWithExistingMove = (
     sharedData,
   );
   return (
-    penultimateCommitment === challengeCommitment &&
+    _.isEqual(penultimateCommitment, challengeCommitment) &&
     mover(lastCommitment) !== mover(challengeCommitment)
   );
 };
