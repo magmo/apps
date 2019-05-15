@@ -6,6 +6,8 @@ import {
   CHALLENGE_EXPIRED_EVENT,
   RESPOND_WITH_MOVE_EVENT,
   REFUTED_EVENT,
+  ChallengeExpirySetEvent,
+  CHALLENGE_EXPIRY_SET_EVENT,
 } from '../../actions';
 import { isTransactionAction, TransactionAction } from '../transaction-submission/actions';
 export type ChallengingAction =
@@ -15,6 +17,7 @@ export type ChallengingAction =
   | RefutedEvent
   | RespondWithMoveEvent
   | ChallengeExpiredEvent
+  | ChallengeExpirySetEvent
   | ChallengeTimeoutAcknowledged
   | ChallengeResponseAcknowledged
   | ChallengeFailureAcknowledged;
@@ -95,6 +98,7 @@ export function isChallengingAction(action: ProtocolAction): action is Challengi
     action.type === CHALLENGE_FAILURE_ACKNOWLEDGED ||
     action.type === CHALLENGE_EXPIRED_EVENT ||
     action.type === RESPOND_WITH_MOVE_EVENT ||
-    action.type === REFUTED_EVENT
+    action.type === REFUTED_EVENT ||
+    action.type === CHALLENGE_EXPIRY_SET_EVENT
   );
 }

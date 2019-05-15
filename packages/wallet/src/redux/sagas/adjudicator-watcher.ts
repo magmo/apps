@@ -42,7 +42,9 @@ function* dispatchEventAction(event: AdjudicatorEvent) {
     case AdjudicatorEventType.ChallengeCreated:
       const { channelId } = event;
       const { commitment, finalizedAt } = event.eventArgs;
-      yield put(actions.challengeCreatedEvent(channelId, fromParameters(commitment), finalizedAt));
+      yield put(
+        actions.challengeCreatedEvent(channelId, fromParameters(commitment), finalizedAt * 1000),
+      );
       break;
   }
 }
@@ -50,6 +52,10 @@ function* dispatchEventAction(event: AdjudicatorEvent) {
 function* dispatchProcessEventAction(event: AdjudicatorEvent, processId: string) {
   const { channelId } = event;
   switch (event.eventType) {
+    case AdjudicatorEventType.ChallengeCreated:
+      const { finalizedAt } = event.eventArgs;
+      yield put(actions.challengeExpirySetEvent(processId, channelId, finalizedAt * 1000));
+      break;
     case AdjudicatorEventType.Concluded:
       yield put(actions.concludedEvent(processId, channelId));
       break;

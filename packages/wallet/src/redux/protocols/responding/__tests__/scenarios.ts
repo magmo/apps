@@ -12,8 +12,8 @@ import * as transactionActions from '../../transaction-submission/actions';
 // ---------
 
 const {
-  asAddress: address,
-  asPrivateKey: privateKey,
+  bsAddress: address,
+  bsPrivateKey: privateKey,
   channelId,
   libraryAddress,
   participants,
@@ -28,7 +28,7 @@ const channelStatus: ChannelState = {
   privateKey,
   channelId,
   libraryAddress,
-  ourIndex: 0,
+  ourIndex: 1,
   participants,
   channelNonce,
   funded: true,

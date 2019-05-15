@@ -11,8 +11,7 @@ import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../transaction-submission/reducer';
-import { SharedData } from '../../state';
-import * as SigningUtils from '../../../domain';
+import { SharedData, signAndStore } from '../../state';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   isTerminal,
@@ -27,7 +26,7 @@ import {
   sendChallengeComplete,
 } from '../reducer-helpers';
 import { ProtocolAction } from '../../actions';
-
+import * as _ from 'lodash';
 export const initialize = (
   processId: string,
   sharedData: SharedData,
@@ -95,12 +94,15 @@ const waitForResponseReducer = (
   switch (action.type) {
     case actions.RESPONSE_PROVIDED:
       const { commitment } = action;
-      const signature = signCommitment(commitment, sharedData);
+      const signResult = signAndStore(sharedData, commitment);
+      if (!signResult.isSuccess) {
+        throw new Error(`Could not sign response commitment due to ${signResult.reason}`);
+      }
       const transaction = TransactionGenerator.createRespondWithMoveTransaction(
-        commitment,
-        signature,
+        signResult.signedCommitment.commitment,
+        signResult.signedCommitment.signature,
       );
-      return transitionToWaitForTransaction(transaction, protocolState, sharedData);
+      return transitionToWaitForTransaction(transaction, protocolState, signResult.store);
     default:
       return { protocolState, sharedData };
   }
@@ -195,13 +197,6 @@ const transitionToWaitForTransaction = (
   };
 };
 
-// TODO: Should we just expect a signature on the action?
-const signCommitment = (commitment: Commitment, sharedData: SharedData): string => {
-  const channelId = channelID(commitment.channel);
-  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  return SigningUtils.signCommitment(commitment, channelState.privateKey);
-};
-
 const craftResponseTransactionWithExistingCommitment = (
   processId: string,
   challengeCommitment: Commitment,
@@ -267,7 +262,7 @@ const canRespondWithExistingMove = (
     sharedData,
   );
   return (
-    penultimateCommitment === challengeCommitment &&
+    _.isEqual(penultimateCommitment, challengeCommitment) &&
     mover(lastCommitment) !== mover(challengeCommitment)
   );
 };

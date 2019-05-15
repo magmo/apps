@@ -8,7 +8,11 @@ import {
   channelFromCommitments,
   partiallyOpenChannelFromCommitment,
 } from '../../../channel-store/channel-state/__tests__';
-import { challengeExpiredEvent, respondWithMoveEvent } from '../../../actions';
+import {
+  challengeExpiredEvent,
+  respondWithMoveEvent,
+  challengeExpirySetEvent,
+} from '../../../actions';
 
 type Reason = states.FailureReason;
 
@@ -55,7 +59,7 @@ const waitForTransactionFailure = states.waitForTransaction({
   ...defaults,
   transactionSubmission: tsPreFailure,
 });
-const waitForResponseOrTimeout = states.waitForResponseOrTimeout(defaults);
+const waitForResponseOrTimeout = states.waitForResponseOrTimeout({ ...defaults, expiryTime: 0 });
 const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
 const successOpen = states.successOpen();
@@ -80,7 +84,7 @@ const responseReceived = respondWithMoveEvent(
 const responseAcknowledged = actions.challengeResponseAcknowledged(processId);
 const timeoutAcknowledged = actions.challengeTimeoutAcknowledged(processId);
 const failureAcknowledged = actions.challengeFailureAcknowledged(processId);
-
+const challengeExpirySet = challengeExpirySetEvent(processId, channelId, 1234);
 // -------
 // Scenarios
 // -------
@@ -97,6 +101,7 @@ export const opponentResponds = {
   transactionSuccessTrigger,
   responseReceived,
   responseAcknowledged,
+  challengeExpirySet,
 
   challengeCommitment: signedCommitment21,
 };
