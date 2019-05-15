@@ -112,7 +112,7 @@ export const RESPOND_WITH_MOVE_EVENT = 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVE
 export const respondWithMoveEvent = (
   processId: string,
   channelId: string,
-  responseCommitment,
+  responseCommitment: Commitment,
   responseSignature: string,
 ) => ({
   processId,

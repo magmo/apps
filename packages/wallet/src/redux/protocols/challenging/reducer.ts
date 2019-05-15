@@ -62,7 +62,12 @@ export function challengingReducer(
     case actions.CHALLENGE_DENIED:
       return challengeDenied(state, storage);
     case RESPOND_WITH_MOVE_EVENT:
-      return challengeResponseReceived(state, storage, action.responseCommitment);
+      return challengeResponseReceived(
+        state,
+        storage,
+        action.responseCommitment,
+        action.responseSignature,
+      );
     case REFUTED_EVENT:
       return refuteReceived(state, storage);
     case CHALLENGE_EXPIRED_EVENT:
@@ -184,6 +189,7 @@ function challengeResponseReceived(
   state: NonTerminalCState,
   storage: Storage,
   challengeCommitment: Commitment,
+  challengeSignature: string,
 ): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
     return { state, storage };
@@ -191,12 +197,10 @@ function challengeResponseReceived(
 
   state = acknowledgeResponse(state);
   storage = sendChallengeCommitmentReceived(storage, challengeCommitment);
-  // TODO: We probably need to update the channel state with the latest commitment?
-  // Otherwise the next transition will fail since we're missing a commitment.
-  // That might be tricky without the signature...
+
   const signedCommitment: SignedCommitment = {
     commitment: challengeCommitment,
-    signature: '0xTODO',
+    signature: challengeSignature,
   };
   const checkResult = checkAndStore(storage, signedCommitment);
   if (checkResult.isSuccess) {

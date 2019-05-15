@@ -1,7 +1,11 @@
 import * as scenarios from './scenarios';
 import { challengingReducer, initialize, ReturnVal } from '../reducer';
 import { FailureReason, ChallengingStateType } from '../states';
-import { itSendsThisMessage, itSendsThisDisplayEventType } from '../../../__tests__/helpers';
+import {
+  itSendsThisMessage,
+  itSendsThisDisplayEventType,
+  itStoresThisCommitment,
+} from '../../../__tests__/helpers';
 import {
   HIDE_WALLET,
   CHALLENGE_COMPLETE,
@@ -42,6 +46,7 @@ describe('opponent-responds scenario', () => {
     const result = challengingReducer(state, storage, action);
 
     itSendsThisMessage(result.storage, CHALLENGE_COMMITMENT_RECEIVED);
+    itStoresThisCommitment(result.storage, scenario.challengeCommitment);
     itTransitionsTo(result, 'Challenging.AcknowledgeResponse');
   });
 
