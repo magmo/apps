@@ -1,6 +1,13 @@
 import * as scenarios from './scenarios';
 import { challengingReducer, initialize, ReturnVal } from '../reducer';
 import { FailureReason, ChallengingStateType } from '../states';
+import { itSendsThisMessage, itSendsThisDisplayEventType } from '../../../__tests__/helpers';
+import {
+  HIDE_WALLET,
+  CHALLENGE_COMPLETE,
+  CHALLENGE_COMMITMENT_RECEIVED,
+  SHOW_WALLET,
+} from 'magmo-wallet-client';
 
 describe('opponent-responds scenario', () => {
   const scenario = scenarios.opponentResponds;
@@ -8,6 +15,7 @@ describe('opponent-responds scenario', () => {
 
   describe('when initializing', () => {
     const result = initialize(channelId, processId, storage);
+    itSendsThisDisplayEventType(result.storage, SHOW_WALLET);
 
     itTransitionsTo(result, 'Challenging.ApproveChallenge');
   });
@@ -33,6 +41,7 @@ describe('opponent-responds scenario', () => {
     const action = scenario.responseReceived;
     const result = challengingReducer(state, storage, action);
 
+    itSendsThisMessage(result.storage, CHALLENGE_COMMITMENT_RECEIVED);
     itTransitionsTo(result, 'Challenging.AcknowledgeResponse');
   });
 
@@ -42,6 +51,8 @@ describe('opponent-responds scenario', () => {
     const result = challengingReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.SuccessOpen');
+    itSendsThisMessage(result.storage, CHALLENGE_COMPLETE);
+    itSendsThisDisplayEventType(result.storage, HIDE_WALLET);
   });
 });
 

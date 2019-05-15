@@ -4,6 +4,8 @@ import { initialize, respondingReducer } from '../reducer';
 import * as states from '../state';
 import { Commitment } from '../../../../domain';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
+import { SHOW_WALLET, HIDE_WALLET, CHALLENGE_COMPLETE } from 'magmo-wallet-client';
+import { itSendsThisDisplayEventType, itSendsThisMessage } from '../../../__tests__/helpers';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };
@@ -67,6 +69,7 @@ describe('respond with existing move happy-path scenario', () => {
     const result = initialize(processId, sharedData, challengeCommitment);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
+    itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
     itSetsChallengeCommitment(result, scenario.challengeCommitment);
   });
 
@@ -154,6 +157,7 @@ describe('select response happy-path scenario', () => {
     const result = respondingReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_RESPONSE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 
   describe(`when in ${states.WAIT_FOR_RESPONSE}`, () => {
@@ -162,6 +166,7 @@ describe('select response happy-path scenario', () => {
 
     const result = respondingReducer(state, sharedData, action);
 
+    itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
     itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
     itCallsRespondWithMoveWith(scenario.responseCommitment);
   });
@@ -179,6 +184,9 @@ describe('select response happy-path scenario', () => {
     const action = scenario.acknowledge;
 
     const result = respondingReducer(state, sharedData, action);
+
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+    itSendsThisMessage(result.sharedData, CHALLENGE_COMPLETE);
     itTransitionsTo(result, states.SUCCESS);
   });
 });
