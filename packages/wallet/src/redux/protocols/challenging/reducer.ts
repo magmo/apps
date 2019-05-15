@@ -13,7 +13,7 @@ import {
   failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData, registerChannelToMonitor } from '../../state';
+import { SharedData, registerChannelToMonitor, checkAndStore } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
 import {
@@ -34,7 +34,7 @@ import {
   sendChallengeCommitmentReceived,
   sendChallengeComplete,
 } from '../reducer-helpers';
-import { Commitment } from '../../../domain';
+import { Commitment, SignedCommitment } from '../../../domain';
 
 type Storage = SharedData;
 
@@ -194,6 +194,15 @@ function challengeResponseReceived(
   // TODO: We probably need to update the channel state with the latest commitment?
   // Otherwise the next transition will fail since we're missing a commitment.
   // That might be tricky without the signature...
+  const signedCommitment: SignedCommitment = {
+    commitment: challengeCommitment,
+    signature: '0xTODO',
+  };
+  const checkResult = checkAndStore(storage, signedCommitment);
+  if (checkResult.isSuccess) {
+    return { state, storage: checkResult.store };
+  }
+
   return { state, storage };
 }
 

@@ -59,11 +59,13 @@ function* dispatchProcessEventAction(event: AdjudicatorEvent, processId: string)
       );
       break;
     case AdjudicatorEventType.RespondWithMove:
+      console.log(event.eventArgs);
       yield put(
         actions.respondWithMoveEvent(
           processId,
           channelId,
           fromParameters(event.eventArgs.response),
+          event.eventArgs.v, // TODO reconstruct signature from v, r, s
         ),
       );
       break;
