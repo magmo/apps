@@ -15,12 +15,12 @@ export const enum FailureReason {
   UserRejected = 'User rejected',
 }
 
-export const WAIT_FOR_APPROVAL = 'WaitForApproval';
-export const WAIT_FOR_TRANSACTION = 'WaitForTransaction';
-export const WAIT_FOR_ACKNOWLEDGEMENT = 'WaitForAcknowledgement';
-export const WAIT_FOR_RESPONSE = 'WaitForResponse';
-export const FAILURE = 'Failure';
-export const SUCCESS = 'Success';
+export const WAIT_FOR_APPROVAL = 'Responding.WaitForApproval';
+export const WAIT_FOR_TRANSACTION = 'Responding.WaitForTransaction';
+export const WAIT_FOR_ACKNOWLEDGEMENT = 'Responding.WaitForAcknowledgement';
+export const WAIT_FOR_RESPONSE = 'Responding.WaitForResponse';
+export const FAILURE = 'Responding.Failure';
+export const SUCCESS = 'Responding.Success';
 
 export interface WaitForApproval {
   type: typeof WAIT_FOR_APPROVAL;
