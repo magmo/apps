@@ -1,6 +1,11 @@
 import * as scenarios from './scenarios';
 import { challengingReducer, initialize, ReturnVal } from '../reducer';
-import { FailureReason, ChallengingStateType } from '../states';
+import {
+  FailureReason,
+  ChallengingStateType,
+  WaitForTransaction,
+  WaitForResponseOrTimeout,
+} from '../states';
 import {
   itSendsThisMessage,
   itSendsThisDisplayEventType,
@@ -31,7 +36,16 @@ describe('opponent-responds scenario', () => {
     itTransitionsTo(result, 'Challenging.WaitForTransaction');
     // it initializes the transaction state machine
   });
+  describe('when in WaitForTransaction', () => {
+    const state = scenario.waitForTransaction;
+    const action = scenario.challengeExpirySet;
+    const result = challengingReducer(state, storage, action);
 
+    itTransitionsTo(result, 'Challenging.WaitForTransaction');
+    it('updates the expiry time', () => {
+      expect((result.state as WaitForTransaction).expiryTime).toEqual(action.expiryTime);
+    });
+  });
   describe('when in WaitForTransaction', () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionSuccessTrigger;
@@ -40,6 +54,16 @@ describe('opponent-responds scenario', () => {
     itTransitionsTo(result, 'Challenging.WaitForResponseOrTimeout');
   });
 
+  describe('when in WaitForResponseOrTimeout', () => {
+    const state = scenario.waitForResponseOrTimeout;
+    const action = scenario.challengeExpirySet;
+    const result = challengingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'Challenging.WaitForResponseOrTimeout');
+    it('updates the expiry time', () => {
+      expect((result.state as WaitForResponseOrTimeout).expiryTime).toEqual(action.expiryTime);
+    });
+  });
   describe('when in WaitForResponseOrTimeout', () => {
     const state = scenario.waitForResponseOrTimeout;
     const action = scenario.responseReceived;

@@ -22,6 +22,7 @@ import {
   CHALLENGE_EXPIRED_EVENT,
   REFUTED_EVENT,
   RESPOND_WITH_MOVE_EVENT,
+  CHALLENGE_EXPIRY_SET_EVENT,
 } from '../../actions';
 import { transactionReducer, initialize as initializeTransaction } from '../transaction-submission';
 import { isSuccess, isFailure } from '../transaction-submission/states';
@@ -35,6 +36,8 @@ import {
   sendChallengeComplete,
 } from '../reducer-helpers';
 import { Commitment, SignedCommitment } from '../../../domain';
+
+const CHALLENGE_TIMEOUT = 5 * 60000;
 
 type Storage = SharedData;
 
@@ -72,6 +75,8 @@ export function challengingReducer(
       return refuteReceived(state, storage);
     case CHALLENGE_EXPIRED_EVENT:
       return challengeTimedOut(state, storage);
+    case CHALLENGE_EXPIRY_SET_EVENT:
+      return handleChallengeCreatedEvent(state, storage, action.expiryTime);
     case actions.CHALLENGE_TIMEOUT_ACKNOWLEDGED:
       return challengeTimeoutAcknowledged(state, storage);
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
@@ -103,6 +108,22 @@ export function initialize(channelId: string, processId: string, storage: Storag
   return { state: approveChallenge({ channelId, processId }), storage: showWallet(storage) };
 }
 
+function handleChallengeCreatedEvent(
+  state: NonTerminalCState,
+  storage: Storage,
+  expiryTime: number,
+): ReturnVal {
+  if (
+    state.type !== 'Challenging.WaitForResponseOrTimeout' &&
+    state.type !== 'Challenging.WaitForTransaction'
+  ) {
+    return { state, storage };
+  } else {
+    const updatedState = { ...state, expiryTime };
+    return { state: updatedState, storage };
+  }
+}
+
 function handleTransactionAction(
   state: NonTerminalCState,
   storage: Storage,
@@ -117,7 +138,9 @@ function handleTransactionAction(
   const transactionState = retVal.state;
 
   if (isSuccess(transactionState)) {
-    state = waitForResponseOrTimeout(state);
+    // We use an estimate if we haven't received a real expiry time yet.
+    const expiryTime = state.expiryTime || new Date(Date.now() + CHALLENGE_TIMEOUT).getTime();
+    state = waitForResponseOrTimeout({ ...state, expiryTime });
   } else if (isFailure(transactionState)) {
     state = acknowledgeFailure(state, 'TransactionFailed');
   } else {

@@ -33,6 +33,7 @@ export interface WaitForTransaction {
   type: 'Challenging.WaitForTransaction';
   processId: string;
   channelId: string;
+  expiryTime?: number;
   transactionSubmission: NonTerminalTransactionSubmissionState;
 }
 
@@ -40,6 +41,7 @@ export interface WaitForResponseOrTimeout {
   type: 'Challenging.WaitForResponseOrTimeout';
   processId: string;
   channelId: string;
+  expiryTime: number;
 }
 
 export interface AcknowledgeTimeout {
@@ -115,13 +117,19 @@ export function approveChallenge(p: P<ApproveChallenge>): ApproveChallenge {
 }
 
 export function waitForTransaction(p: P<WaitForTransaction>): WaitForTransaction {
-  const { processId, channelId, transactionSubmission } = p;
-  return { type: 'Challenging.WaitForTransaction', processId, channelId, transactionSubmission };
+  const { processId, channelId, transactionSubmission, expiryTime } = p;
+  return {
+    type: 'Challenging.WaitForTransaction',
+    processId,
+    channelId,
+    transactionSubmission,
+    expiryTime,
+  };
 }
 
 export function waitForResponseOrTimeout(p: P<WaitForResponseOrTimeout>): WaitForResponseOrTimeout {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.WaitForResponseOrTimeout', processId, channelId };
+  const { processId, channelId, expiryTime } = p;
+  return { type: 'Challenging.WaitForResponseOrTimeout', processId, channelId, expiryTime };
 }
 
 export function acknowledgeResponse(p: P<AcknowledgeResponse>): AcknowledgeResponse {

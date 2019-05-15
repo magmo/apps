@@ -38,7 +38,7 @@ class ChallengingContainer extends PureComponent<Props> {
         );
       case 'Challenging.WaitForResponseOrTimeout':
         // todo: get expiration time
-        return <WaitForResponseOrTimeout expirationTime={20} />;
+        return <WaitForResponseOrTimeout expirationTime={state.expiryTime} />;
       case 'Challenging.AcknowledgeResponse':
         return (
           <Acknowledge
