@@ -177,16 +177,13 @@ describe('adjudicator listener', () => {
     const sagaTester = new SagaTester({ initialState: createWatcherState(processId, channelId) });
     sagaTester.start(adjudicatorWatcher, provider);
 
-    const responseCommitment = await respondWithMove(
-      provider,
-      channelNonce,
-      participantA,
-      participantB,
-    );
+    const response = await respondWithMove(provider, channelNonce, participantA, participantB);
 
     await sagaTester.waitFor(actions.RESPOND_WITH_MOVE_EVENT);
 
     const action: actions.RespondWithMoveEvent = sagaTester.getLatestCalledAction();
-    expect(action).toEqual(actions.respondWithMoveEvent(processId, channelId, responseCommitment));
+    expect(action).toEqual(
+      actions.respondWithMoveEvent(processId, channelId, response.toCommitment, response.toSig),
+    );
   });
 });

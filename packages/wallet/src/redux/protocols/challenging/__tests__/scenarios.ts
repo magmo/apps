@@ -71,7 +71,12 @@ const challengeDenied = actions.challengeDenied(processId);
 const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
 const transactionSuccessTrigger = tsScenarios.successTrigger;
 const transactionFailureTrigger = tsScenarios.failureTrigger;
-const responseReceived = respondWithMoveEvent(processId, channelId, signedCommitment21.commitment);
+const responseReceived = respondWithMoveEvent(
+  processId,
+  channelId,
+  signedCommitment21.commitment,
+  signedCommitment21.signature,
+);
 const responseAcknowledged = actions.challengeResponseAcknowledged(processId);
 const timeoutAcknowledged = actions.challengeTimeoutAcknowledged(processId);
 const failureAcknowledged = actions.challengeFailureAcknowledged(processId);
@@ -92,6 +97,8 @@ export const opponentResponds = {
   transactionSuccessTrigger,
   responseReceived,
   responseAcknowledged,
+
+  challengeCommitment: signedCommitment21,
 };
 
 // Todo: need to figure out how a `ChallengeTimedOut` action should be triggered

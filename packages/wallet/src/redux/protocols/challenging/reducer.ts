@@ -13,7 +13,7 @@ import {
   failure,
 } from './states';
 import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData, registerChannelToMonitor } from '../../state';
+import { SharedData, registerChannelToMonitor, checkAndStore } from '../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../transaction-submission/actions';
 import {
@@ -34,7 +34,7 @@ import {
   sendChallengeCommitmentReceived,
   sendChallengeComplete,
 } from '../reducer-helpers';
-import { Commitment } from '../../../domain';
+import { Commitment, SignedCommitment } from '../../../domain';
 
 type Storage = SharedData;
 
@@ -62,7 +62,12 @@ export function challengingReducer(
     case actions.CHALLENGE_DENIED:
       return challengeDenied(state, storage);
     case RESPOND_WITH_MOVE_EVENT:
-      return challengeResponseReceived(state, storage, action.responseCommitment);
+      return challengeResponseReceived(
+        state,
+        storage,
+        action.responseCommitment,
+        action.responseSignature,
+      );
     case REFUTED_EVENT:
       return refuteReceived(state, storage);
     case CHALLENGE_EXPIRED_EVENT:
@@ -184,6 +189,7 @@ function challengeResponseReceived(
   state: NonTerminalCState,
   storage: Storage,
   challengeCommitment: Commitment,
+  challengeSignature: string,
 ): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
     return { state, storage };
@@ -191,9 +197,16 @@ function challengeResponseReceived(
 
   state = acknowledgeResponse(state);
   storage = sendChallengeCommitmentReceived(storage, challengeCommitment);
-  // TODO: We probably need to update the channel state with the latest commitment?
-  // Otherwise the next transition will fail since we're missing a commitment.
-  // That might be tricky without the signature...
+
+  const signedCommitment: SignedCommitment = {
+    commitment: challengeCommitment,
+    signature: challengeSignature,
+  };
+  const checkResult = checkAndStore(storage, signedCommitment);
+  if (checkResult.isSuccess) {
+    return { state, storage: checkResult.store };
+  }
+
   return { state, storage };
 }
 

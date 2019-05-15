@@ -109,10 +109,16 @@ export const refutedEvent = (
 export type RefutedEvent = ReturnType<typeof refutedEvent>;
 
 export const RESPOND_WITH_MOVE_EVENT = 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT';
-export const respondWithMoveEvent = (processId: string, channelId: string, responseCommitment) => ({
+export const respondWithMoveEvent = (
+  processId: string,
+  channelId: string,
+  responseCommitment: Commitment,
+  responseSignature: string,
+) => ({
   processId,
   channelId,
   responseCommitment,
+  responseSignature,
   type: RESPOND_WITH_MOVE_EVENT as typeof RESPOND_WITH_MOVE_EVENT,
 });
 export type RespondWithMoveEvent = ReturnType<typeof respondWithMoveEvent>;
