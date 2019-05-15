@@ -59,13 +59,19 @@ function* dispatchProcessEventAction(event: AdjudicatorEvent, processId: string)
       );
       break;
     case AdjudicatorEventType.RespondWithMove:
-      console.log(event.eventArgs);
+      const { v, r, s } = event.eventArgs;
+      const signature = ethers.utils.joinSignature({
+        v,
+        r,
+        s,
+      });
+
       yield put(
         actions.respondWithMoveEvent(
           processId,
           channelId,
           fromParameters(event.eventArgs.response),
-          event.eventArgs.v, // TODO reconstruct signature from v, r, s
+          signature,
         ),
       );
       break;
@@ -105,10 +111,10 @@ function* createAdjudicatorEventChannel(provider) {
     adjudicator.on(refutedFilter, (channelId, refutation) => {
       emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { refutation }, channelId });
     });
-    adjudicator.on(respondWithMoveFilter, (channelId, response) => {
+    adjudicator.on(respondWithMoveFilter, (channelId, response, v, r, s) => {
       emitter({
         eventType: AdjudicatorEventType.RespondWithMove,
-        eventArgs: { response },
+        eventArgs: { response, v, r, s },
         channelId,
       });
     });
