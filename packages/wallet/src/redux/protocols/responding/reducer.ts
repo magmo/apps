@@ -11,7 +11,7 @@ import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../transaction-submission/reducer';
-import { SharedData, signAndStore } from '../../state';
+import { SharedData, signAndStore, registerChannelToMonitor } from '../../state';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   isTerminal,
@@ -41,7 +41,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.RespondingState> => {
   return {
     protocolState: states.waitForApproval({ processId, channelId, challengeCommitment }),
-    sharedData: showWallet(sharedData),
+    sharedData: showWallet(registerChannelToMonitor(sharedData, processId, channelId)),
   };
 };
 
