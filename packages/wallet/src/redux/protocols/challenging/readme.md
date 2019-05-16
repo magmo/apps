@@ -5,12 +5,14 @@ This protocol handles launching a challenge on the blockchain. It includes:
 - Getting confirmation from the user to launch the challenge.
 - Submitting the challenge transaction to the blockchain.
 - Monitoring the blockchain for a response or timeout.
+- Firing up the defunding protocol if the challenge times out (since the channel is then finalized).
 
 Out of scope (for now)
 
 - Halting the challenge in the case where the opponent's commitment arrives between approval and transaction submission.
 - Interrupting the "ApproveChallenge" screen if the opponent's commitment arrives during approval. (Instead, the user will be informed after they approve the challenge.)
 - Chain reorgs (e.g. timeout on one fork vs. response on another)
+- Allowing the user to choose not to defund if the challenge times out.
 
 ## State machine
 
@@ -18,6 +20,7 @@ The protocol is implemented with the following state machine
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   S((start)) --> CE{Can<br/>challenge?}
   CE --> |Yes| WFA(ApproveChallenge)
   WFA --> |CommitmentArrives| AF
@@ -28,10 +31,24 @@ graph TD
   WFT --> |TransactionSuccess| WFRT(WaitForResponseOrTimeout)
   WFT --> |TransactionFailure| AF
   WFRT --> |BlockMined??| AT(AcknowledgeTimeout)
-  AT --> |TimeoutAcknowledged| SC((Closed))
+  AT --> |DefundChosen| D(ChallengerWaitForDefund)
+  D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
+  D   --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
+  ACBND -->|AcknowledgeSuccess| SC((Closed))
+  AS -->|AcknowledgeSuccess| SC((Closed))
   WFRT --> |ChallengeResponseReceived| AR(AcknowledgeResponse)
   AR --> |ResponseAcknowledged| SP((Open))
+  classDef logic fill:#efdd20;
+  classDef Success fill:#58ef21;
+  classDef Failure fill:#f45941;
+  classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
+  class S,CE logic;
+  class SP,SC Success;
+  class F Failure;
+  class D WaitForChildProtocol;
 ```
+
+<!-- style D stroke:#333,stroke-width:4px -->
 
 Note:
 
