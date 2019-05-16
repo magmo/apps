@@ -107,7 +107,7 @@ describe('CHALLENGE TIMES OUT AND IS DEFUNDED ', () => {
     const { state, action } = scenario.acknowledgeSuccess;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Challenging.SuccessClosed');
+    itTransitionsTo(result, 'Challenging.SuccessClosedAndDefunded');
   });
 });
 
@@ -126,7 +126,7 @@ describe('CHALLENGE TIMES OUT AND IS not DEFUNDED ', () => {
     const { state, action } = scenario.acknowledgeClosedButNotDefunded;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Challenging.SuccessClosed');
+    itTransitionsTo(result, 'Challenging.SuccessClosedButNotDefunded');
   });
 });
 

@@ -16,7 +16,11 @@ export type NonTerminalState =
   | AcknowledgeClosedButNotDefunded
   | AcknowledgeSuccess;
 
-export type TerminalState = SuccessOpen | SuccessClosed | Failure;
+export type TerminalState =
+  | SuccessOpen
+  | SuccessClosedAndDefunded
+  | SuccessClosedButNotDefunded
+  | Failure;
 
 export type FailureReason =
   | 'ChannelDoesntExist'
@@ -91,8 +95,12 @@ export interface SuccessOpen {
   type: 'Challenging.SuccessOpen';
 }
 
-export interface SuccessClosed {
-  type: 'Challenging.SuccessClosed';
+export interface SuccessClosedAndDefunded {
+  type: 'Challenging.SuccessClosedAndDefunded';
+}
+
+export interface SuccessClosedButNotDefunded {
+  type: 'Challenging.SuccessClosedButNotDefunded';
 }
 
 // -------
@@ -113,7 +121,8 @@ export function isChallengingState(state: ProtocolState): state is ChallengingSt
     state.type === 'Challenging.AcknowledgeResponse' ||
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
-    state.type === 'Challenging.SuccessClosed'
+    state.type === 'Challenging.SuccessClosedAndDefunded' ||
+    state.type === 'Challenging.SuccessClosedButNotDefunded'
   );
 }
 
@@ -121,7 +130,8 @@ export function isTerminal(state: ChallengingState): state is TerminalState {
   return (
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
-    state.type === 'Challenging.SuccessClosed'
+    state.type === 'Challenging.SuccessClosedAndDefunded' ||
+    state.type === 'Challenging.SuccessClosedButNotDefunded'
   );
 }
 
@@ -190,8 +200,12 @@ export function failure(p: P<Failure>): Failure {
   return { type: 'Challenging.Failure', reason };
 }
 
-export function successClosed(): SuccessClosed {
-  return { type: 'Challenging.SuccessClosed' };
+export function successClosedAndDefunded(): SuccessClosedAndDefunded {
+  return { type: 'Challenging.SuccessClosedAndDefunded' };
+}
+
+export function successClosedButNotDefunded(): SuccessClosedButNotDefunded {
+  return { type: 'Challenging.SuccessClosedButNotDefunded' };
 }
 
 export function successOpen(): SuccessOpen {

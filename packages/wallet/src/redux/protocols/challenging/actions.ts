@@ -10,6 +10,7 @@ import {
   CHALLENGE_EXPIRY_SET_EVENT,
 } from '../../actions';
 import { isTransactionAction, TransactionAction } from '../transaction-submission/actions';
+import { isDefundingAction } from '../defunding/actions';
 
 export type ChallengingAction =
   | TransactionAction
@@ -116,6 +117,7 @@ export const acknowledged = (processId: string): Acknowledged => ({
 export function isChallengingAction(action: ProtocolAction): action is ChallengingAction {
   return (
     isTransactionAction(action) ||
+    isDefundingAction(action) ||
     action.type === CHALLENGE_APPROVED ||
     action.type === CHALLENGE_DENIED ||
     action.type === CHALLENGE_TIMEOUT_ACKNOWLEDGED ||
@@ -124,6 +126,8 @@ export function isChallengingAction(action: ProtocolAction): action is Challengi
     action.type === CHALLENGE_EXPIRED_EVENT ||
     action.type === RESPOND_WITH_MOVE_EVENT ||
     action.type === REFUTED_EVENT ||
-    action.type === CHALLENGE_EXPIRY_SET_EVENT
+    action.type === CHALLENGE_EXPIRY_SET_EVENT ||
+    action.type === DEFUND_CHOSEN ||
+    action.type === ACKNOWLEDGED
   );
 }

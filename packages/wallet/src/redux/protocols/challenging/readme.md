@@ -34,8 +34,8 @@ linkStyle default interpolate basis
   AT --> |DefundChosen| D(WaitForDefund)
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   D   --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
-  ACBND -->|Acknowledged| SC((Closed))
-  AS -->|AcknowledgeSuccess| SC((Closed))
+  ACBND -->|Acknowledged| SCBND((ClosedButNotDefunded))
+  AS -->|AcknowledgeSuccess| SCD((ClosedAndDefunded))
   WFRT --> |ChallengeResponseReceived| AR(AcknowledgeResponse)
   AR --> |ResponseAcknowledged| SP((Open))
   classDef logic fill:#efdd20;
@@ -43,12 +43,10 @@ linkStyle default interpolate basis
   classDef Failure fill:#f45941;
   classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
   class S,CE logic;
-  class SP,SC Success;
+  class SP,SCD,SCBND Success;
   class F Failure;
   class D WaitForChildProtocol;
 ```
-
-<!-- style D stroke:#333,stroke-width:4px -->
 
 Note:
 
@@ -62,8 +60,8 @@ To test all paths through the state machine we will the following scenarios:
 
 1. **Opponent responds**: `ApproveChallenge` -> `WaitForTransaction` -> `WaitForResponseOrTimeout`
    -> `AcknowledgeResponse` -> `Open`
-2. **Challenge times out and is defunded**: `WaitForResponseOrTimeout` -> `AcknowledgeTimeout` -> `ChallengerWaitForDefund` -> `AcknowledgeSuccess` -> `Closed`
-3. **Challenge times out and is not defunded**: `ChallengerWaitForDefund` -> `AcknowledgeClosedButNotDefunded` -> `Closed`
+2. **Challenge times out and is defunded**: `WaitForResponseOrTimeout` -> `AcknowledgeTimeout` -> `ChallengerWaitForDefund` -> `AcknowledgeSuccess` -> `ClosedAndDefunded`
+3. **Challenge times out and is not defunded**: `ChallengerWaitForDefund` -> `AcknowledgeClosedButNotDefunded` -> `ClosedButNotDefunded`
 4. **Channel doesn't exist**: `AcknowledgeFailure` -> `Failure`
    - Challenge requested for `channelId` that doesn't exist in the wallet.
 5. **Channel not fully open**: `AcknowledgeFailure` -> `Failure`
