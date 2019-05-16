@@ -60,7 +60,7 @@ const refuteChannelState = {
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
 const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
-const props = { processId, transactionSubmissionState, sharedData };
+const props = { processId, transactionSubmissionState, sharedData, channelId };
 
 // ------
 // States
@@ -93,8 +93,8 @@ const waitForDefund2 = states.waitForDefund({
   ...props,
   defundingState: defundingPreFailureState,
 });
-const acknowledgeDefundingSuccess = states.acknowledgeDefundingSuccess;
-const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded;
+const acknowledgeDefundingSuccess = states.acknowledgeDefundingSuccess({ ...props });
+const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded({ ...props });
 // ------
 // Actions
 // ------
@@ -103,6 +103,7 @@ const acknowledge = actions.respondSuccessAcknowledged(processId);
 const responseProvided = actions.responseProvided(processId, testScenarios.gameCommitment3);
 const defundChosen = actions.defundChosen(processId);
 const acknowledged = actions.acknowledged(processId);
+const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
 
 // ---------
 // Scenarios
@@ -174,10 +175,10 @@ export const challengeExpiresChannelDefunded = {
   waitForDefund1,
   acknowledgeDefundingSuccess,
   // Actions
-  challengeExpiredEvent,
+  challengeTimedOut,
   defundChosen,
   defundingSuccessTrigger,
-  acknowledge,
+  acknowledged,
 };
 
 export const challengeExpiresButChannelNotDefunded = {

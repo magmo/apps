@@ -27,13 +27,20 @@ import {
 } from '../reducer-helpers';
 import { ProtocolAction } from '../../actions';
 import * as _ from 'lodash';
+import { isDefundingAction, DefundingAction } from '../defunding/actions';
+import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
+import {
+  isSuccess as isDefundingSuccess,
+  isFailure as isDefundingFailure,
+} from '../defunding/states';
 export const initialize = (
   processId: string,
+  channelId: string,
   sharedData: SharedData,
   challengeCommitment: Commitment,
 ): ProtocolStateWithSharedData<states.RespondingState> => {
   return {
-    protocolState: states.waitForApproval({ processId, challengeCommitment }),
+    protocolState: states.waitForApproval({ processId, channelId, challengeCommitment }),
     sharedData: showWallet(sharedData),
   };
 };
@@ -43,6 +50,9 @@ export const respondingReducer = (
   sharedData: SharedData,
   action: ProtocolAction,
 ): ProtocolStateWithSharedData<states.RespondingState> => {
+  if (isDefundingAction(action)) {
+    return handleDefundingAction(protocolState, sharedData, action);
+  }
   if (!actions.isRespondingAction(action)) {
     console.warn(`Challenge Responding Reducer called with non responding action ${action.type}`);
     return { protocolState, sharedData };
@@ -56,6 +66,13 @@ export const respondingReducer = (
       return waitForResponseReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_TRANSACTION:
       return waitForTransactionReducer(protocolState, sharedData, action);
+    case states.ACKNOWLEDGE_TIMEOUT:
+      return acknowledgeTimeout(protocolState, sharedData, action);
+    case states.WAIT_FOR_DEFUND:
+    case states.ACKNOWLEDGE_DEFUNDING_SUCCESS:
+    case states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED:
+    case states.CLOSED_AND_DEFUNDED:
+    case states.CLOSED_BUT_NOT_DEFUNDED:
     case states.SUCCESS:
     case states.FAILURE:
       return { protocolState, sharedData };
@@ -63,6 +80,29 @@ export const respondingReducer = (
       return unreachable(protocolState);
   }
 };
+
+function handleDefundingAction(
+  protocolState: states.RespondingState,
+  sharedData: SharedData,
+  action: DefundingAction,
+): ProtocolStateWithSharedData<states.RespondingState> {
+  if (protocolState.type !== 'Responding.WaitForDefund') {
+    return { protocolState, sharedData };
+  }
+
+  const retVal = defundingReducer(protocolState.defundingState, sharedData, action);
+  const defundingState = retVal.protocolState;
+
+  if (isDefundingSuccess(defundingState)) {
+    protocolState = states.acknowledgeDefundingSuccess({ ...protocolState });
+  } else if (isDefundingFailure(defundingState)) {
+    protocolState = states.acknowledgeClosedButNotDefunded(protocolState);
+  } else {
+    // update the transaction state
+    protocolState = { ...protocolState, defundingState };
+  }
+  return { protocolState, sharedData: retVal.sharedData };
+}
 
 const waitForTransactionReducer = (
   protocolState: states.WaitForTransaction,
@@ -151,6 +191,28 @@ const waitForApprovalReducer = (
       return { protocolState, sharedData };
   }
 };
+
+function acknowledgeTimeout(
+  protocolState: states.AcknowledgeTimeout,
+  sharedData: SharedData,
+  action: actions.RespondingAction,
+): ProtocolStateWithSharedData<states.RespondingState> {
+  if (action.type !== 'WALLET.RESPOND.DEFUND_CHOSEN') {
+    return { protocolState, sharedData };
+  }
+  // initialize defunding state machine
+  const protocolStateWithSharedData = initializeDefunding(
+    protocolState.processId,
+    protocolState.channelId,
+    sharedData,
+  );
+  const defundingState = protocolStateWithSharedData.protocolState;
+  sharedData = protocolStateWithSharedData.sharedData;
+  return {
+    protocolState: states.waitForDefund({ ...protocolState, defundingState }),
+    sharedData,
+  };
+}
 
 // helpers
 const handleTransactionSubmissionComplete = (

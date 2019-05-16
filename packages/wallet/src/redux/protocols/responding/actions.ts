@@ -6,6 +6,8 @@ import {
   isTransactionAction,
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
+  CHALLENGE_EXPIRY_SET_EVENT,
+  CHALLENGE_EXPIRED_EVENT,
 } from '../../actions';
 
 export type RespondingAction =
@@ -85,6 +87,8 @@ export function isRespondingAction(action: ProtocolAction): action is Responding
     action.type === RESPOND_APPROVED ||
     action.type === RESPONSE_PROVIDED ||
     action.type === RESPOND_SUCCESS_ACKNOWLEDGED ||
+    action.type === CHALLENGE_EXPIRY_SET_EVENT ||
+    action.type === CHALLENGE_EXPIRED_EVENT ||
     action.type === DEFUND_CHOSEN ||
     action.type === ACKNOWLEDGED
   );

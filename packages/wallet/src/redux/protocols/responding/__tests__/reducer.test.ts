@@ -60,13 +60,13 @@ const itSetsChallengeCommitment = (
   });
 };
 
-describe('respond with existing move happy-path scenario', () => {
+describe('RESPOND WITH EXISTING MOVE HAPPY-PATH', () => {
   const scenario = scenarios.respondWithExistingCommitmentHappyPath;
-  const { sharedData, processId } = scenario;
+  const { sharedData, processId, channelId } = scenario;
 
   describe('when initializing', () => {
     const { challengeCommitment } = scenario;
-    const result = initialize(processId, sharedData, challengeCommitment);
+    const result = initialize(processId, channelId, sharedData, challengeCommitment);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
     itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
@@ -100,13 +100,13 @@ describe('respond with existing move happy-path scenario', () => {
   });
 });
 
-describe('refute happy-path scenario', () => {
+describe('REFUTE HAPPY-PATH ', () => {
   const scenario = scenarios.refuteHappyPath;
-  const { sharedData, processId } = scenario;
+  const { sharedData, processId, channelId } = scenario;
 
   describe('when initializing', () => {
     const { challengeCommitment } = scenario;
-    const result = initialize(processId, sharedData, challengeCommitment);
+    const result = initialize(processId, channelId, sharedData, challengeCommitment);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
     itSetsChallengeCommitment(result, scenario.challengeCommitment);
@@ -139,12 +139,12 @@ describe('refute happy-path scenario', () => {
   });
 });
 
-describe('select response happy-path scenario', () => {
+describe('SELECT RESPONSE HAPPY-PATH ', () => {
   const scenario = scenarios.requireResponseHappyPath;
-  const { sharedData, processId } = scenario;
+  const { sharedData, processId, channelId } = scenario;
 
   describe('when initializing', () => {
-    const result = initialize(processId, sharedData, scenario.challengeCommitment);
+    const result = initialize(processId, channelId, sharedData, scenario.challengeCommitment);
 
     itTransitionsTo(result, states.WAIT_FOR_APPROVAL);
     itSetsChallengeCommitment(result, scenario.challengeCommitment);
@@ -191,7 +191,7 @@ describe('select response happy-path scenario', () => {
   });
 });
 
-describe('transaction failed scenario', () => {
+describe('TRANSACTION FAILED ', () => {
   const scenario = scenarios.transactionFails;
   const { sharedData } = scenario;
 
@@ -202,4 +202,50 @@ describe('transaction failed scenario', () => {
     const result = respondingReducer(state, sharedData, action);
     itTransitionsToFailure(result, scenario.failure);
   });
+});
+
+describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
+  const scenario = scenarios.challengeExpiresChannelDefunded;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_RESPONSE}`, () => {
+    const state = scenario.waitForResponse;
+    const action = scenario.challengeTimedOut;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+  });
+
+  describe(`when in ${states.ACKNOWLEDGE_TIMEOUT}`, () => {
+    const state = scenario.waitForDefund1;
+    const action = scenario.defundChosen;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.ACKNOWLEDGE_DEFUNDING_SUCCESS);
+  });
+
+  describe(`when in ${states.ACKNOWLEDGE_DEFUNDING_SUCCESS}`, () => {
+    const state = scenario.acknowledgeDefundingSuccess;
+    const action = scenario.acknowledged;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.CLOSED_AND_DEFUNDED);
+  });
+});
+
+describe('transaction failed ', () => {
+  const scenario = scenarios.transactionFails;
+  const { sharedData } = scenario;
+
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
+    const state = scenario.waitForTransaction;
+    const action = scenario.transactionFailed;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsToFailure(result, scenario.failure);
+  });
+});
+
+describe.skip('CHALLENGE EXPIRES --> not DEFUNDED', () => {
+  /* */
 });

@@ -174,6 +174,7 @@ export type ProtocolAction =
   | FundingAction
   | TransactionAction
   | challenging.ChallengingAction
+  | RespondingAction
   | directFunding.FundingAction
   | indirectFunding.Action
   | WithdrawalAction
