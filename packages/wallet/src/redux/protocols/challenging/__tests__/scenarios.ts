@@ -9,10 +9,16 @@ import {
   partiallyOpenChannelFromCommitment,
 } from '../../../channel-store/channel-state/__tests__';
 import {
-  // challengeExpiredEvent,
+  challengeExpiredEvent,
   respondWithMoveEvent,
   challengeExpirySetEvent,
 } from '../../../actions';
+import {
+  // preSuccessState as defundingPreSuccessState,
+  successTrigger as defundingSuccessTrigger,
+  // preFailureState as defundingPreFailureState,
+  failureTrigger as defundingFailureTrigger,
+} from '../../defunding/__tests__';
 
 type Reason = states.FailureReason;
 
@@ -60,19 +66,20 @@ const waitForTransactionFailure = states.waitForTransaction({
   transactionSubmission: tsPreFailure,
 });
 const waitForResponseOrTimeout = states.waitForResponseOrTimeout({ ...defaults, expiryTime: 0 });
-// const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
+const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
 const successOpen = states.successOpen();
-// const successClosed = states.successClosed();
 const acknowledge = (reason: Reason) => states.acknowledgeFailure({ ...defaults, reason });
-// const failure = (reason: Reason) => states.failure({ reason });
+const waitForDefund = states.waitForDefund({ ...defaults });
+const acknowledgeSuccess = states.acknowledgeSuccess({ ...defaults });
+const acknowledgeClosedButNotDefunded = states.AcknowledgeClosedButNotDefunded({ ...defaults });
 
 // -------
 // Actions
 // -------
 const challengeApproved = actions.challengeApproved(processId);
 const challengeDenied = actions.challengeDenied(processId);
-// const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
+const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
 const transactionSuccessTrigger = tsScenarios.successTrigger;
 const transactionFailureTrigger = tsScenarios.failureTrigger;
 const responseReceived = respondWithMoveEvent(
@@ -82,9 +89,10 @@ const responseReceived = respondWithMoveEvent(
   signedCommitment21.signature,
 );
 const responseAcknowledged = actions.challengeResponseAcknowledged(processId);
-// const timeoutAcknowledged = actions.challengeTimeoutAcknowledged(processId);
 const failureAcknowledged = actions.challengeFailureAcknowledged(processId);
 const challengeExpirySet = challengeExpirySetEvent(processId, channelId, 1234);
+const defundChosen = actions.defundChosen(processId);
+const acknowledged = actions.acknowledged(processId);
 // -------
 // Scenarios
 // -------
@@ -114,38 +122,38 @@ export const opponentResponds = {
   },
 };
 
-// // Todo: need to figure out how a `ChallengeTimedOut` action should be triggered
-// export const challengeTimesOutAndIsDefunded = {
-//   ...defaults,
-//   waitForResponseOrTimeout: {
-//     state: waitForResponseOrTimeout,
-//     action: challengeTimedOut,
-//   },
-//   acknowledgeTimeout: {
-//     state: acknowledgeTimeout,
-//     action: defundChosen,
-//   },
-//   challengerWaitForDefund: {
-//     state: challengerWaitForDefund,
-//     action: defundSuccessTrigger,
-//   },
-//   acknowledgeSuccess: {
-//     state: acknowledgeSuccess,
-//     action: acknowledge,
-//   },
-// };
+// Todo: need to figure out how a `ChallengeTimedOut` action should be triggered
+export const challengeTimesOutAndIsDefunded = {
+  ...defaults,
+  waitForResponseOrTimeout: {
+    state: waitForResponseOrTimeout,
+    action: challengeTimedOut,
+  },
+  acknowledgeTimeout: {
+    state: acknowledgeTimeout,
+    action: defundChosen,
+  },
+  challengerWaitForDefund: {
+    state: waitForDefund,
+    action: defundingSuccessTrigger,
+  },
+  acknowledgeSuccess: {
+    state: acknowledgeSuccess,
+    action: acknowledged,
+  },
+};
 
-// export const challengeTimesOutAndIsNotDefunded = {
-//   ...defaults,
-//   challengerWaitForDefund: {
-//     state: challengerWaitForDefund,
-//     action: defundFailureTrigger,
-//   },
-//   acknowledgeSuccess: {
-//     state: acknowledgeClosedButNotDefunded,
-//     action: acknowledged,
-//   },
-// };
+export const challengeTimesOutAndIsNotDefunded = {
+  ...defaults,
+  challengerWaitForDefund: {
+    state: waitForDefund,
+    action: defundingFailureTrigger,
+  },
+  acknowledgeClosedButNotDefunded: {
+    state: acknowledgeClosedButNotDefunded,
+    action: acknowledged,
+  },
+};
 
 export const channelDoesntExist = {
   ...defaults,

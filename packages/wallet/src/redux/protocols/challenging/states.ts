@@ -11,7 +11,10 @@ export type NonTerminalState =
   | WaitForResponseOrTimeout
   | AcknowledgeTimeout
   | AcknowledgeResponse
-  | AcknowledgeFailure;
+  | AcknowledgeFailure
+  | WaitForDefund
+  | AcknowledgeClosedButNotDefunded
+  | AcknowledgeSuccess;
 
 export type TerminalState = SuccessOpen | SuccessClosed | Failure;
 
@@ -58,6 +61,24 @@ export interface AcknowledgeFailure {
 }
 export interface AcknowledgeResponse {
   type: 'Challenging.AcknowledgeResponse';
+  processId: string;
+  channelId: string;
+}
+
+export interface WaitForDefund {
+  type: 'Challenging.WaitForDefund';
+  processId: string;
+  channelId: string;
+}
+
+export interface AcknowledgeClosedButNotDefunded {
+  type: 'Challenging.AcknowledgeClosedButNotDefunded';
+  processId: string;
+  channelId: string;
+}
+
+export interface AcknowledgeSuccess {
+  type: 'Challenging.AcknowledgeSuccess';
   processId: string;
   channelId: string;
 }
@@ -145,6 +166,23 @@ export function acknowledgeTimeout(p: P<AcknowledgeTimeout>): AcknowledgeTimeout
 export function acknowledgeFailure(p: P<AcknowledgeFailure>): AcknowledgeFailure {
   const { processId, channelId, reason } = p;
   return { type: 'Challenging.AcknowledgeFailure', processId, channelId, reason };
+}
+
+export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {
+  const { processId, channelId } = p;
+  return { type: 'Challenging.WaitForDefund', processId, channelId };
+}
+
+export function AcknowledgeClosedButNotDefunded(
+  p: P<AcknowledgeClosedButNotDefunded>,
+): AcknowledgeClosedButNotDefunded {
+  const { processId, channelId } = p;
+  return { type: 'Challenging.AcknowledgeClosedButNotDefunded', processId, channelId };
+}
+
+export function acknowledgeSuccess(p: P<AcknowledgeSuccess>): AcknowledgeSuccess {
+  const { processId, channelId } = p;
+  return { type: 'Challenging.AcknowledgeSuccess', processId, channelId };
 }
 
 export function failure(p: P<Failure>): Failure {

@@ -79,25 +79,56 @@ describe('OPPONENT RESPONDS', () => {
   });
 });
 
-// describe('challenge-times-out ', () => {
-//   const scenario = scenarios.challengeTimesOut;
-//   const { storage } = scenario;
+describe('CHALLENGE TIMES OUT AND IS DEFUNDED ', () => {
+  const scenario = scenarios.challengeTimesOutAndIsDefunded;
+  const { storage } = scenario;
 
-//   describe('when in WaitForResponseOrTimeout', () => {
-//     const state = scenario.waitForResponseOrTimeout;
-//     const action = scenario.challengeTimedOut;
-//     const result = challengingReducer(state, storage, action);
-//     itTransitionsTo(result, 'Challenging.AcknowledgeTimeout');
-//   });
+  describe('when in WaitForResponseOrTimeout', () => {
+    const { state, action } = scenario.waitForResponseOrTimeout;
+    const result = challengingReducer(state, storage, action);
+    itTransitionsTo(result, 'Challenging.AcknowledgeTimeout');
+  });
 
-//   describe('when in AcknowledgeTimeout', () => {
-//     const state = scenario.acknowledgeTimeout;
-//     const action = scenario.timeoutAcknowledged;
-//     const result = challengingReducer(state, storage, action);
+  describe('when in AcknowledgeTimeout', () => {
+    const { state, action } = scenario.acknowledgeTimeout;
+    const result = challengingReducer(state, storage, action);
 
-//     itTransitionsTo(result, 'Challenging.SuccessClosed');
-//   });
-// });
+    itTransitionsTo(result, 'Challenging.WaitForDefund');
+  });
+
+  describe('when in WaitForDefund', () => {
+    const { state, action } = scenario.challengerWaitForDefund;
+    const result = challengingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'Challenging.AcknowledgeSuccess');
+  });
+
+  describe('when in Acknowledge Success', () => {
+    const { state, action } = scenario.acknowledgeSuccess;
+    const result = challengingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'Challenging.SuccessClosed');
+  });
+});
+
+describe('CHALLENGE TIMES OUT AND IS not DEFUNDED ', () => {
+  const scenario = scenarios.challengeTimesOutAndIsNotDefunded;
+  const { storage } = scenario;
+
+  describe('when in WaitForDefund', () => {
+    const { state, action } = scenario.challengerWaitForDefund;
+    const result = challengingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'Challenging.AcknowledgeSuccess');
+  });
+
+  describe('when in Acknowledge Success', () => {
+    const { state, action } = scenario.acknowledgeClosedButNotDefunded;
+    const result = challengingReducer(state, storage, action);
+
+    itTransitionsTo(result, 'Challenging.SuccessClosed');
+  });
+});
 
 describe('CHANNEL DOESNT EXIST  ', () => {
   const scenario = scenarios.channelDoesntExist;
