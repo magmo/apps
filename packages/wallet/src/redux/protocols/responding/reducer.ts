@@ -147,11 +147,6 @@ const waitForApprovalReducer = (
 
         return transitionToWaitForTransaction(transaction, protocolState, sharedData);
       }
-    case actions.RESPOND_REJECTED:
-      return {
-        protocolState: states.failure(states.FailureReason.UserRejected),
-        sharedData,
-      };
     default:
       return { protocolState, sharedData };
   }

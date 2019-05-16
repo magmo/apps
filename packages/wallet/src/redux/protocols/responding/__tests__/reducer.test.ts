@@ -191,20 +191,6 @@ describe('select response happy-path scenario', () => {
   });
 });
 
-describe('user declines scenario', () => {
-  const scenario = scenarios.userDeclines;
-  const { sharedData } = scenario;
-
-  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
-    const state = scenario.waitForApproval;
-    const action = scenario.reject;
-
-    const result = respondingReducer(state, sharedData, action);
-
-    itTransitionsToFailure(result, scenario.failure);
-  });
-});
-
 describe('transaction failed scenario', () => {
   const scenario = scenarios.transactionFails;
   const { sharedData } = scenario;

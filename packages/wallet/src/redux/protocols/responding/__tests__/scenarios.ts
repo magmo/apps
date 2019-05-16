@@ -74,7 +74,6 @@ const waitForTransaction = states.waitForTransaction(props);
 const waitForAcknowledgement = states.waitForAcknowledgement(props);
 const waitForResponse = states.waitForResponse(props);
 const success = states.success();
-const userRejectedFailure = states.failure(states.FailureReason.UserRejected);
 const transactionFailedFailure = states.failure(states.FailureReason.TransactionFailure);
 const transactionConfirmed = transactionActions.transactionConfirmed(processId);
 const transactionFailed = transactionActions.transactionFailed(processId);
@@ -82,7 +81,6 @@ const transactionFailed = transactionActions.transactionFailed(processId);
 // Actions
 // ------
 const approve = actions.respondApproved(processId);
-const reject = actions.respondRejected(processId);
 const acknowledge = actions.respondSuccessAcknowledged(processId);
 const responseProvided = actions.responseProvided(processId, testScenarios.gameCommitment3);
 
@@ -135,15 +133,6 @@ export const requireResponseHappyPath = {
   responseProvided,
   transactionConfirmed,
   acknowledge,
-};
-
-export const userDeclines = {
-  ...props,
-  // States
-  waitForApproval: waitForApprovalRequiresResponse,
-  failure: userRejectedFailure,
-  // Action
-  reject,
 };
 
 export const transactionFails = {

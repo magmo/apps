@@ -18,15 +18,20 @@ Out of scope (for the time being):
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   St((start)) --> WFAp(WaitForApproval)
   WFAp--> |Approve| HC{Commitment<br/>exists?}
   HC --> |Yes| WFT(WaitForTransaction)
   HC --> |No| WFR(WaitForResponse)
   WFR-->|ResponseProvided| WFT(WaitForTransaction)
-  WFAp-->|Rejected| F((failure))
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
   WFAc-->|Acknowledged| S((success))
   WFT --> |TransactionFailed| F((failure))
+
+  style St  fill:#efdd20
+  style HC  fill:#efdd20
+  style S fill:#58ef21
+  style F  fill:#f45941
 ```
 
 Notes:
@@ -41,5 +46,4 @@ Notes:
 1. Respond With Existing Commitment Happy Path: WaitForApproval->WaitForTransaction->WaitForAcknowledgement->success
 2. Refute Happy Path: WaitForApproval->WaitForTransaction->WaitForAcknowledgement->success
 3. Select Response Happy Path: WaitForApproval->WaitForResponse->WaitForTransaction->WaitForAcknowledgement->success
-4. User declines: WaitForApproval->failure
-5. Transaction fails: WaitForApproval->WaitForTransaction->failure
+4. Transaction fails: WaitForApproval->WaitForTransaction->failure

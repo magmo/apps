@@ -5,23 +5,16 @@ import { ProtocolAction, isTransactionAction } from '../../actions';
 
 export type RespondingAction =
   | RespondApproved
-  | RespondRejected
   | ResponseProvided
   | RespondSuccessAcknowledged
   | TransactionAction;
 
 export const RESPOND_APPROVED = 'WALLET.RESPOND_APPROVED';
-export const RESPOND_REJECTED = 'WALLET.RESPOND_REJECTED';
 export const RESPONSE_PROVIDED = 'WALLET.RESPONSE_PROVIDED';
 export const RESPOND_SUCCESS_ACKNOWLEDGED = 'WALLET.RESPOND_SUCCESS_ACKNOWLEDGED';
 
 export interface RespondApproved extends BaseProcessAction {
   type: typeof RESPOND_APPROVED;
-  processId: string;
-}
-
-export interface RespondRejected extends BaseProcessAction {
-  type: typeof RESPOND_REJECTED;
   processId: string;
 }
 
@@ -45,11 +38,6 @@ export const respondApproved = (processId: string): RespondApproved => ({
   processId,
 });
 
-export const respondRejected = (processId: string): RespondRejected => ({
-  type: RESPOND_REJECTED,
-  processId,
-});
-
 export const respondSuccessAcknowledged = (processId: string): RespondSuccessAcknowledged => ({
   type: RESPOND_SUCCESS_ACKNOWLEDGED,
   processId,
@@ -65,7 +53,6 @@ export function isRespondingAction(action: ProtocolAction): action is Responding
   return (
     isTransactionAction(action) ||
     action.type === RESPOND_APPROVED ||
-    action.type === RESPOND_REJECTED ||
     action.type === RESPONSE_PROVIDED ||
     action.type === RESPOND_SUCCESS_ACKNOWLEDGED
   );
