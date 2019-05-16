@@ -190,3 +190,15 @@ export const challengeExpiresButChannelNotDefunded = {
   defundingFailureTrigger,
   acknowledged,
 };
+
+export const challengeExpiresDuringWaitForTransaction = {
+  ...props,
+  waitForTransaction,
+  challengeTimedOut,
+};
+
+export const challengeExpiresDuringWaitForApproval = {
+  ...props,
+  waitForApproval: waitForApprovalRespond,
+  challengeTimedOut,
+};

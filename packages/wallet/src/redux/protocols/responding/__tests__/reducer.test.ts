@@ -261,3 +261,27 @@ describe('CHALLENGE EXPIRES --> not DEFUNDED', () => {
     itTransitionsTo(result, states.CLOSED_BUT_NOT_DEFUNDED);
   });
 });
+
+describe('CHALLENGE EXPIRES when in WAIT_FOR_TRANSACTION', () => {
+  const scenario = scenarios.challengeExpiresDuringWaitForTransaction;
+  const { sharedData } = scenario;
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
+    const state = scenario.waitForTransaction;
+    const action = scenario.challengeTimedOut;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+  });
+});
+
+describe('CHALLENGE EXPIRES when in WAIT_FOR_APPROVAL', () => {
+  const scenario = scenarios.challengeExpiresDuringWaitForApproval;
+  const { sharedData } = scenario;
+  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
+    const state = scenario.waitForApproval;
+    const action = scenario.challengeTimedOut;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+  });
+});

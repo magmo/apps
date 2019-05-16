@@ -113,6 +113,9 @@ const waitForTransactionReducer = (
   sharedData: SharedData,
   action: actions.RespondingAction,
 ): ProtocolStateWithSharedData<states.RespondingState> => {
+  if (action.type === CHALLENGE_EXPIRED_EVENT) {
+    return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
+  }
   if (!isTransactionAction(action)) {
     return { sharedData, protocolState };
   }
@@ -194,6 +197,9 @@ const waitForApprovalReducer = (
 
         return transitionToWaitForTransaction(transaction, protocolState, sharedData);
       }
+    case CHALLENGE_EXPIRED_EVENT:
+      return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
+
     default:
       return { protocolState, sharedData };
   }
