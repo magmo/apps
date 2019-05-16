@@ -34,7 +34,7 @@ linkStyle default interpolate basis
   AT --> |DefundChosen| D(ChallengerWaitForDefund)
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   D   --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
-  ACBND -->|AcknowledgeSuccess| SC((Closed))
+  ACBND -->|Acknowledged| SC((Closed))
   AS -->|AcknowledgeSuccess| SC((Closed))
   WFRT --> |ChallengeResponseReceived| AR(AcknowledgeResponse)
   AR --> |ResponseAcknowledged| SP((Open))
@@ -62,13 +62,14 @@ To test all paths through the state machine we will the following scenarios:
 
 1. **Opponent responds**: `ApproveChallenge` -> `WaitForTransaction` -> `WaitForResponseOrTimeout`
    -> `AcknowledgeResponse` -> `Open`
-2. **Challenge times out**: `WaitForResponseOrTimeout` -> `AcknowledgeTimeout` -> `Closed`
-3. **Channel doesn't exist**: `AcknowledgeFailure` -> `Failure`
+2. **Challenge times out and is defunded**: `WaitForResponseOrTimeout` -> `AcknowledgeTimeout` -> `ChallengerWaitForDefund` -> `AcknowledgeSuccess` -> `Closed`
+3. **Challenge times out and is not defunded**: `ChallengerWaitForDefund` -> `AcknowledgeClosedButNotDefunded` -> `Closed`
+4. **Channel doesn't exist**: `AcknowledgeFailure` -> `Failure`
    - Challenge requested for `channelId` that doesn't exist in the wallet.
-4. **Channel not fully open**: `AcknowledgeFailure` -> `Failure`
+5. **Channel not fully open**: `AcknowledgeFailure` -> `Failure`
    - Challenge requested for channel which only has one state (two are needed to challenge).
-5. **Already have latest commitment**: `AcknowledgeFailure` -> `Failure`
-6. **User declines challenge**: `ApproveChallenge` -> `AcknowledgeFailure` -> `Failure`
-7. **Receive commitment while approving**: `ApproveChallenge` -> `AcknowledgeFailure`
+6. **Already have latest commitment**: `AcknowledgeFailure` -> `Failure`
+7. **User declines challenge**: `ApproveChallenge` -> `AcknowledgeFailure` -> `Failure`
+8. **Receive commitment while approving**: `ApproveChallenge` -> `AcknowledgeFailure`
    - The opponent's commitment arrives while the user is approving the challenge
-8. **Transaction fails**: `WaitForTransaction` -> `AcknowledgeFailure` -> `Failure`
+9. **Transaction fails**: `WaitForTransaction` -> `AcknowledgeFailure` -> `Failure`

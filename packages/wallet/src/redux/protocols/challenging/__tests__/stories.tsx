@@ -23,51 +23,21 @@ const render = container => () => {
   );
 };
 
-const opponentResponds = {
-  ApproveChallenge: scenarios.opponentResponds.approveChallenge,
-  WaitForTransaction: scenarios.opponentResponds.waitForTransaction,
-  WaitForResponseOrTimeout: scenarios.opponentResponds.waitForResponseOrTimeout,
-  AcknowledgeResponse: scenarios.opponentResponds.acknowledgeResponse,
-};
+addStories(scenarios.opponentResponds, 'Challenging / Opponent responds');
+addStories(
+  scenarios.challengeTimesOutAndIsDefunded,
+  'Challenging / Challenge times out and is defunded',
+);
+addStories(scenarios.channelDoesntExist, "Challenging / Channel doesn't exist");
+addStories(scenarios.channelNotFullyOpen, 'Challenging / Channel not fully open');
+addStories(scenarios.alreadyHaveLatest, 'Challenging / Already have latest state');
+addStories(scenarios.userDeclinesChallenge, 'Challenging / User declines challenge');
+addStories(scenarios.transactionFails, 'Challenging / Transaction fails');
 
-const challengeTimesOut = {
-  WaitForResponseOrTimeout: scenarios.challengeTimesOut.waitForResponseOrTimeout,
-  AcknowledgeTimeout: scenarios.challengeTimesOut.acknowledgeTimeout,
-};
-
-const channelDoesntExist = {
-  AcknowledgeFailure: scenarios.channelDoesntExist.acknowledgeFailure,
-};
-
-const channelNotFullyOpen = {
-  AcknowledgeFailure: scenarios.channelNotFullyOpen.acknowledgeFailure,
-};
-
-const alreadyHaveLatest = {
-  AcknowledgeFailure: scenarios.alreadyHaveLatest.acknowledgeFailure,
-};
-
-const userDeclinesChallenge = {
-  ApproveChallenge: scenarios.userDeclinesChallenge.approveChallenge,
-  AcknowledgeFailure: scenarios.userDeclinesChallenge.acknowledgeFailure,
-};
-
-const transactionFails = {
-  WaitForTransaction: scenarios.transactionFails.waitForTransaction,
-  AcknowledgeFailure: scenarios.transactionFails.acknowledgeFailure,
-};
-
-addStories(opponentResponds, 'Challenging / Opponent responds');
-addStories(challengeTimesOut, 'Challenging / Challenge times out');
-addStories(channelDoesntExist, "Challenging / Channel doesn't exist");
-addStories(channelNotFullyOpen, 'Challenging / Channel not fully open');
-addStories(alreadyHaveLatest, 'Challenging / Already have latest state');
-addStories(userDeclinesChallenge, 'Challenging / User declines challenge');
-addStories(transactionFails, 'Challenging / Transaction fails');
-
-function addStories(collection, chapter) {
-  Object.keys(collection).map(storyName => {
-    const state = collection[storyName];
-    storiesOf(chapter, module).add(storyName, render(<Challenging state={state} />));
+function addStories(scenario, chapter) {
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      storiesOf(chapter, module).add(key, render(<Challenging state={scenario[key].state} />));
+    }
   });
 }
