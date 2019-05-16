@@ -1,5 +1,5 @@
 import * as communicationModule from './src/communication';
-import { RelayableAction } from './src/communication';
+import { RelayableAction, CommitmentReceived, StrategyProposed } from './src/communication';
 import { unreachable } from './src/utils/reducer-utils';
 import { getProcessId } from './src/redux/reducer';
 
@@ -11,4 +11,5 @@ import { getChannelId } from './src/domain';
 import { WalletProtocol } from './src/redux/types';
 const communication = { ...communicationModule, testScenarios: communicationScenarios };
 
-export { communication, RelayableAction, unreachable, getChannelId, getProcessId, WalletProtocol };
+export { communication, unreachable, getChannelId, getProcessId, WalletProtocol };
+export { RelayableAction, CommitmentReceived, StrategyProposed };
