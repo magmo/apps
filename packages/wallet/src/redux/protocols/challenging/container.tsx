@@ -8,6 +8,7 @@ import ApproveChallenge from './components/approve-challenge';
 import { TransactionSubmission } from '../transaction-submission';
 import Acknowledge from '../shared-components/acknowledge';
 import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout';
+import { Defunding } from '../defunding/container';
 
 interface Props {
   state: NonTerminalChallengingState;
@@ -15,7 +16,8 @@ interface Props {
   deny: (processId: string) => void;
   failureAcknowledged: (processId: string) => void;
   responseAcknowledged: (processId: string) => void;
-  timeoutAcknowledged: (processId: string) => void;
+  acknowledged: (processId: string) => void;
+  defundChosen: (processId: string) => void;
 }
 
 class ChallengingContainer extends PureComponent<Props> {
@@ -26,7 +28,8 @@ class ChallengingContainer extends PureComponent<Props> {
       approve,
       failureAcknowledged,
       responseAcknowledged,
-      timeoutAcknowledged,
+      acknowledged,
+      defundChosen,
     } = this.props;
     const processId = state.processId;
     switch (state.type) {
@@ -52,7 +55,7 @@ class ChallengingContainer extends PureComponent<Props> {
           <Acknowledge
             title="Challenge timed out!"
             description="The challenge timed out. You can now reclaim your funds."
-            acknowledge={() => timeoutAcknowledged(processId)}
+            acknowledge={() => defundChosen(processId)}
           />
         );
       case 'Challenging.AcknowledgeFailure':
@@ -63,6 +66,24 @@ class ChallengingContainer extends PureComponent<Props> {
             title="Challenge not possible"
             description={description}
             acknowledge={() => failureAcknowledged(processId)}
+          />
+        );
+      case 'Challenging.WaitForDefund':
+        return <Defunding state={state.defundingState} />;
+      case 'Challenging.AcknowledgeClosedButNotDefunded':
+        return (
+          <Acknowledge
+            title="Defunding failed!"
+            description="The channel was closed but not defunded."
+            acknowledge={() => acknowledged(processId)}
+          />
+        );
+      case 'Challenging.AcknowledgeSuccess':
+        return (
+          <Acknowledge
+            title="Success!"
+            description="The channel was closed and defunded."
+            acknowledge={() => acknowledged(processId)}
           />
         );
       default:
@@ -95,7 +116,8 @@ const mapDispatchToProps = {
   deny: actions.challengeDenied,
   failureAcknowledged: actions.challengeFailureAcknowledged,
   responseAcknowledged: actions.challengeResponseAcknowledged,
-  timeoutAcknowledged: actions.challengeTimeoutAcknowledged,
+  acknowledged: actions.acknowledged,
+  defundChosen: actions.defundChosen,
 };
 
 export const Challenging = connect(
