@@ -59,7 +59,7 @@ export function initializedReducer(
     return routeToProtocolReducer(newState, action);
   }
 
-  return state;
+  return newState;
 }
 
 function updateSharedData(

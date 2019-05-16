@@ -231,6 +231,8 @@ export function isAdjudicatorEventAction(action: WalletAction): action is Adjudi
     action.type === REFUTED_EVENT ||
     action.type === RESPOND_WITH_MOVE_EVENT ||
     action.type === FUNDING_RECEIVED_EVENT ||
-    action.type === CHALLENGE_EXPIRED_EVENT
+    action.type === CHALLENGE_EXPIRED_EVENT ||
+    action.type === CHALLENGE_CREATED_EVENT ||
+    action.type === CHALLENGE_EXPIRY_SET_EVENT
   );
 }
