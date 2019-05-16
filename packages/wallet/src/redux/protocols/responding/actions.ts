@@ -1,17 +1,28 @@
 import { BaseProcessAction } from '../actions';
 import { Commitment } from '../../../domain';
 import { TransactionAction } from '../transaction-submission/actions';
-import { ProtocolAction, isTransactionAction } from '../../actions';
+import {
+  ProtocolAction,
+  isTransactionAction,
+  ChallengeExpiredEvent,
+  ChallengeExpirySetEvent,
+} from '../../actions';
 
 export type RespondingAction =
   | RespondApproved
   | ResponseProvided
   | RespondSuccessAcknowledged
-  | TransactionAction;
+  | TransactionAction
+  | ChallengeExpiredEvent
+  | ChallengeExpirySetEvent
+  | DefundChosen
+  | Acknowledged;
 
 export const RESPOND_APPROVED = 'WALLET.RESPOND_APPROVED';
 export const RESPONSE_PROVIDED = 'WALLET.RESPONSE_PROVIDED';
 export const RESPOND_SUCCESS_ACKNOWLEDGED = 'WALLET.RESPOND_SUCCESS_ACKNOWLEDGED';
+export const DEFUND_CHOSEN = 'WALLET.RESPOND.DEFUND_CHOSEN';
+export const ACKNOWLEDGED = 'WALLET.RESPOND.ACKNOWLEDGED';
 
 export interface RespondApproved extends BaseProcessAction {
   type: typeof RESPOND_APPROVED;
@@ -26,6 +37,15 @@ export interface ResponseProvided extends BaseProcessAction {
 
 export interface RespondSuccessAcknowledged extends BaseProcessAction {
   type: typeof RESPOND_SUCCESS_ACKNOWLEDGED;
+  processId: string;
+}
+
+export interface DefundChosen extends BaseProcessAction {
+  type: typeof DEFUND_CHOSEN;
+  processId: string;
+}
+export interface Acknowledged extends BaseProcessAction {
+  type: typeof ACKNOWLEDGED;
   processId: string;
 }
 
@@ -54,6 +74,8 @@ export function isRespondingAction(action: ProtocolAction): action is Responding
     isTransactionAction(action) ||
     action.type === RESPOND_APPROVED ||
     action.type === RESPONSE_PROVIDED ||
-    action.type === RESPOND_SUCCESS_ACKNOWLEDGED
+    action.type === RESPOND_SUCCESS_ACKNOWLEDGED ||
+    action.type === DEFUND_CHOSEN ||
+    action.type === ACKNOWLEDGED
   );
 }

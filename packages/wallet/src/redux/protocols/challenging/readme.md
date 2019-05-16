@@ -31,6 +31,7 @@ linkStyle default interpolate basis
   WFT --> |TransactionSuccess| WFRT(WaitForResponseOrTimeout)
   WFT --> |TransactionFailure| AF
   WFRT --> |CHALLENGE_EXPIRED| AT(AcknowledgeTimeout)
+  WFRT -->|ChallengeExpirySetEvent| WFRT
   AT --> |DefundChosen| D(WaitForDefund)
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   D   --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)

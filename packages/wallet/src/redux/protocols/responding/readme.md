@@ -23,6 +23,7 @@ linkStyle default interpolate basis
   WFAp--> |Approve| HC{Commitment<br/>exists?}
   HC --> |Yes| WFT(WaitForTransaction)
   HC --> |No| WFR(WaitForResponse)
+  WFR -->|ChallengeExpirySetEvent| WFR
   WFR -->|ResponseProvided| WFT(WaitForTransaction)
   WFR -->|CHALLENGE_EXPIRED| AT(AcknowledgeTimeOut)
   AT -->|DEFUND_CHOSEN| WFD(WaitForDefund)
