@@ -27,7 +27,7 @@ linkStyle default interpolate basis
   WFR -->|ResponseProvided| WFT(WaitForTransaction)
   WFR -->|CHALLENGE_EXPIRED| AT(AcknowledgeTimeOut)
   AT -->|DEFUND_CHOSEN| WFD(WaitForDefund)
-  WFD --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
+  WFD --> |defunding protocol succeeded| AS(AcknowledgeDefundingSuccess)
   WFD --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
   WFAc-->|Acknowledged| S((success))
@@ -53,7 +53,11 @@ Notes:
 
 ## Test Scenarios
 
-1. Respond With Existing Commitment Happy Path: WaitForApproval->WaitForTransaction->WaitForAcknowledgement->success
-2. Refute Happy Path: WaitForApproval->WaitForTransaction->WaitForAcknowledgement->success
-3. Select Response Happy Path: WaitForApproval->WaitForResponse->WaitForTransaction->WaitForAcknowledgement->success
-4. Transaction fails: WaitForApproval->WaitForTransaction->failure
+1. Respond With Existing Commitment Happy Path: `WaitForApproval`->`WaitForTransaction`->`WaitForAcknowledgement`->`success`
+2. Refute Happy Path: `WaitForApproval`->`WaitForTransaction`->`WaitForAcknowledgement`->`success`
+3. Select Response Happy Path: `WaitForApproval`->`WaitForResponse`->`WaitForTransaction`->`WaitForAcknowledgement`->`success`
+4. Transaction fails: `WaitForApproval`->`WaitForTransaction`->`failure`
+5. Challenge expires and channel defunded:
+   `WaitForResponse`->`AcknowledgeTimeout`-> `WaitForDefund` -> `AcknowledgeDefundingSuccess` -> `ClosedAndDefunded`
+6. Challenge expires and channel NOT defunded:
+   `WaitForDefund` -> `AcknowledgeClosedButNotDefunded` -> `ClosedButNotDefunded`

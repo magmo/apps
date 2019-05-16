@@ -69,6 +69,16 @@ export const responseProvided = (processId: string, commitment: Commitment): Res
   commitment,
 });
 
+export const defundChosen = (processId: string): DefundChosen => ({
+  type: DEFUND_CHOSEN,
+  processId,
+});
+
+export const acknowledged = (processId: string): Acknowledged => ({
+  type: ACKNOWLEDGED,
+  processId,
+});
+
 export function isRespondingAction(action: ProtocolAction): action is RespondingAction {
   return (
     isTransactionAction(action) ||

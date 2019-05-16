@@ -6,6 +6,13 @@ import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 
 import { ChannelState, ChannelStore } from '../../../channel-store';
 import * as transactionActions from '../../transaction-submission/actions';
+import { challengeExpiredEvent } from '../../../actions';
+import {
+  preSuccessState as defundingPreSuccessState,
+  successTrigger as defundingSuccessTrigger,
+  preFailureState as defundingPreFailureState,
+  failureTrigger as defundingFailureTrigger,
+} from '../../defunding/__tests__';
 
 // ---------
 // Test data
@@ -77,12 +84,25 @@ const success = states.success();
 const transactionFailedFailure = states.failure(states.FailureReason.TransactionFailure);
 const transactionConfirmed = transactionActions.transactionConfirmed(processId);
 const transactionFailed = transactionActions.transactionFailed(processId);
+const acknowledgeTimeout = states.acknowledgeTimeOut(props);
+const waitForDefund1 = states.waitForDefund({
+  ...props,
+  defundingState: defundingPreSuccessState,
+});
+const waitForDefund2 = states.waitForDefund({
+  ...props,
+  defundingState: defundingPreFailureState,
+});
+const acknowledgeDefundingSuccess = states.acknowledgeDefundingSuccess;
+const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded;
 // ------
 // Actions
 // ------
 const approve = actions.respondApproved(processId);
 const acknowledge = actions.respondSuccessAcknowledged(processId);
 const responseProvided = actions.responseProvided(processId, testScenarios.gameCommitment3);
+const defundChosen = actions.defundChosen(processId);
+const acknowledged = actions.acknowledged(processId);
 
 // ---------
 // Scenarios
@@ -144,4 +164,28 @@ export const transactionFails = {
   // Actions
   approve,
   transactionFailed,
+};
+
+export const challengeExpiresChannelDefunded = {
+  ...props,
+  // States
+  waitForResponse,
+  acknowledgeTimeout,
+  waitForDefund1,
+  acknowledgeDefundingSuccess,
+  // Actions
+  challengeExpiredEvent,
+  defundChosen,
+  defundingSuccessTrigger,
+  acknowledge,
+};
+
+export const challengeExpiresButChannelNotDefunded = {
+  ...props,
+  // States
+  waitForDefund2,
+  acknowledgeClosedButNotDefunded,
+  // Actions
+  defundingFailureTrigger,
+  acknowledged,
 };

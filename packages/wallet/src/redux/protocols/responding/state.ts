@@ -2,6 +2,7 @@ import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../
 import { Properties } from '../../utils';
 import { Commitment } from '../../../domain';
 import { ProtocolState } from '..';
+import { DefundingState } from '../defunding';
 
 export type RespondingState = NonTerminalRespondingState | Success | Failure;
 
@@ -59,6 +60,7 @@ export interface AcknowledgeTimeout {
 export interface WaitForDefund {
   type: typeof WAIT_FOR_DEFUND;
   processId: string;
+  defundingState: DefundingState;
 }
 
 export interface AcknowledgeDefundingSuccess {
@@ -144,8 +146,8 @@ export function acknowledgeTimeOut(properties: Properties<AcknowledgeTimeout>): 
 }
 
 export function waitForDefund(properties: Properties<WaitForDefund>): WaitForDefund {
-  const { processId } = properties;
-  return { type: WAIT_FOR_DEFUND, processId };
+  const { processId, defundingState } = properties;
+  return { type: WAIT_FOR_DEFUND, processId, defundingState };
 }
 
 export function acknowledgeDefundingSuccess(
