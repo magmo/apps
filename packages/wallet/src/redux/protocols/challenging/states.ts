@@ -124,7 +124,10 @@ export function isChallengingState(state: ProtocolState): state is ChallengingSt
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
     state.type === 'Challenging.SuccessClosedAndDefunded' ||
-    state.type === 'Challenging.SuccessClosedButNotDefunded'
+    state.type === 'Challenging.SuccessClosedButNotDefunded' ||
+    state.type === 'Challenging.WaitForDefund' ||
+    state.type === 'Challenging.AcknowledgeSuccess' ||
+    state.type === 'Challenging.AcknowledgeClosedButNotDefunded'
   );
 }
 
