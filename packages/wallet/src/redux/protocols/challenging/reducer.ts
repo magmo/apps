@@ -8,10 +8,15 @@ import {
   waitForTransaction,
   acknowledgeResponse,
   acknowledgeTimeout,
-  successClosed,
+  successClosedAndDefunded,
+  successClosedButNotDefunded,
   successOpen,
   failure,
+  waitForDefund,
+  acknowledgeSuccess,
+  AcknowledgeClosedButNotDefunded,
 } from './states';
+import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
 import { unreachable } from '../../../utils/reducer-utils';
 import { SharedData, registerChannelToMonitor, checkAndStore } from '../../state';
 import * as actions from './actions';
@@ -26,6 +31,10 @@ import {
 } from '../../actions';
 import { transactionReducer, initialize as initializeTransaction } from '../transaction-submission';
 import { isSuccess, isFailure } from '../transaction-submission/states';
+import {
+  isSuccess as isDefundingSuccess,
+  isFailure as isDefundingFailure,
+} from '../defunding/states';
 import { getChannel } from '../../state';
 import { createForceMoveTransaction } from '../../../utils/transaction-generator';
 import { isFullyOpen, ourTurn } from '../../channel-store';
@@ -36,6 +45,7 @@ import {
   sendChallengeComplete,
 } from '../reducer-helpers';
 import { Commitment, SignedCommitment } from '../../../domain';
+import { isDefundingAction, DefundingAction } from '../defunding/actions';
 
 const CHALLENGE_TIMEOUT = 5 * 60000;
 
@@ -58,6 +68,9 @@ export function challengingReducer(
   if (isTransactionAction(action)) {
     return handleTransactionAction(state, storage, action);
   }
+  if (isDefundingAction(action)) {
+    return handleDefundingAction(state, storage, action);
+  }
 
   switch (action.type) {
     case actions.CHALLENGE_APPROVED:
@@ -77,12 +90,14 @@ export function challengingReducer(
       return challengeTimedOut(state, storage);
     case CHALLENGE_EXPIRY_SET_EVENT:
       return handleChallengeCreatedEvent(state, storage, action.expiryTime);
-    case actions.CHALLENGE_TIMEOUT_ACKNOWLEDGED:
-      return challengeTimeoutAcknowledged(state, storage);
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return challengeResponseAcknowledged(state, storage);
     case actions.CHALLENGE_FAILURE_ACKNOWLEDGED:
       return challengeFailureAcknowledged(state, storage);
+    case actions.DEFUND_CHOSEN:
+      return defundChosen(state, storage);
+    case actions.ACKNOWLEDGED:
+      return acknowledged(state, storage);
     default:
       return unreachable(action);
   }
@@ -149,6 +164,29 @@ function handleTransactionAction(
   }
 
   return { state, storage: retVal.storage };
+}
+
+function handleDefundingAction(
+  state: NonTerminalCState,
+  storage: Storage,
+  action: DefundingAction,
+): ReturnVal {
+  if (state.type !== 'Challenging.WaitForDefund') {
+    return { state, storage };
+  }
+
+  const retVal = defundingReducer(state.defundingState, storage, action);
+  const defundingState = retVal.protocolState;
+
+  if (isDefundingSuccess(defundingState)) {
+    state = acknowledgeSuccess({ ...state });
+  } else if (isDefundingFailure(defundingState)) {
+    state = AcknowledgeClosedButNotDefunded(state);
+  } else {
+    // update the transaction state
+    state = { ...state, defundingState };
+  }
+  return { state, storage: retVal.sharedData };
 }
 
 function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
@@ -242,14 +280,6 @@ function challengeTimedOut(state: NonTerminalCState, storage: Storage): ReturnVa
   return { state, storage };
 }
 
-function challengeTimeoutAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
-  if (state.type !== 'Challenging.AcknowledgeTimeout') {
-    return { state, storage };
-  }
-  // TODO: Should we send out a challenge success or failure here to the app?
-  return { state: successClosed(), storage: hideWallet(storage) };
-}
-
 function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
   if (state.type !== 'Challenging.AcknowledgeResponse') {
     return { state, storage };
@@ -266,6 +296,32 @@ function challengeFailureAcknowledged(state: NonTerminalCState, storage: Storage
   return { state: failure(state), storage: hideWallet(storage) };
 }
 
+function defundChosen(state: NonTerminalCState, storage: Storage) {
+  if (state.type !== 'Challenging.AcknowledgeTimeout') {
+    return { state, storage };
+  }
+  // initialize defunding state machine
+  const protocolStateWithSharedData = initializeDefunding(
+    state.processId,
+    state.channelId,
+    storage,
+  );
+  const defundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
+  return {
+    state: waitForDefund({ ...state, defundingState }),
+    storage,
+  };
+}
+function acknowledged(state: NonTerminalCState, storage: Storage) {
+  if (state.type === 'Challenging.AcknowledgeClosedButNotDefunded') {
+    return { state: successClosedButNotDefunded(), storage: hideWallet(storage) };
+  }
+  if (state.type === 'Challenging.AcknowledgeSuccess') {
+    return { state: successClosedAndDefunded(), storage: hideWallet(storage) };
+  }
+  return { state, storage };
+}
 // Helpers
 
 interface ChannelProps {

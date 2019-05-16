@@ -35,7 +35,7 @@ linkStyle default interpolate basis
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   D   --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
   ACBND -->|Acknowledged| SCBND((ClosedButNotDefunded))
-  AS -->|AcknowledgeSuccess| SCD((ClosedAndDefunded))
+  AS -->|Acknowledged| SCD((ClosedAndDefunded))
   WFRT --> |ChallengeResponseReceived| AR(AcknowledgeResponse)
   AR --> |ResponseAcknowledged| SP((Open))
   classDef logic fill:#efdd20;

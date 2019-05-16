@@ -20,7 +20,6 @@ export type ChallengingAction =
   | RespondWithMoveEvent
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
-  | ChallengeTimeoutAcknowledged
   | ChallengeResponseAcknowledged
   | ChallengeFailureAcknowledged
   | DefundChosen
@@ -46,11 +45,6 @@ export interface ChallengeApproved {
 
 export interface ChallengeDenied {
   type: typeof CHALLENGE_DENIED;
-  processId: string;
-}
-
-export interface ChallengeTimeoutAcknowledged {
-  type: typeof CHALLENGE_TIMEOUT_ACKNOWLEDGED;
   processId: string;
 }
 
@@ -87,11 +81,6 @@ export const challengeDenied = (processId: string): ChallengeDenied => ({
   processId,
 });
 
-export const challengeTimeoutAcknowledged = (processId: string): ChallengeTimeoutAcknowledged => ({
-  type: CHALLENGE_TIMEOUT_ACKNOWLEDGED,
-  processId,
-});
-
 export const challengeResponseAcknowledged = (
   processId: string,
 ): ChallengeResponseAcknowledged => ({
@@ -120,7 +109,6 @@ export function isChallengingAction(action: ProtocolAction): action is Challengi
     isDefundingAction(action) ||
     action.type === CHALLENGE_APPROVED ||
     action.type === CHALLENGE_DENIED ||
-    action.type === CHALLENGE_TIMEOUT_ACKNOWLEDGED ||
     action.type === CHALLENGE_RESPONSE_ACKNOWLEDGED ||
     action.type === CHALLENGE_FAILURE_ACKNOWLEDGED ||
     action.type === CHALLENGE_EXPIRED_EVENT ||

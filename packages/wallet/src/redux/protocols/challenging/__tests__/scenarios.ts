@@ -14,9 +14,9 @@ import {
   challengeExpirySetEvent,
 } from '../../../actions';
 import {
-  // preSuccessState as defundingPreSuccessState,
+  preSuccessState as defundingPreSuccessState,
   successTrigger as defundingSuccessTrigger,
-  // preFailureState as defundingPreFailureState,
+  preFailureState as defundingPreFailureState,
   failureTrigger as defundingFailureTrigger,
 } from '../../defunding/__tests__';
 
@@ -70,7 +70,14 @@ const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
 const successOpen = states.successOpen();
 const acknowledge = (reason: Reason) => states.acknowledgeFailure({ ...defaults, reason });
-const waitForDefund = states.waitForDefund({ ...defaults });
+const waitForDefund1 = states.waitForDefund({
+  ...defaults,
+  defundingState: defundingPreSuccessState,
+});
+const waitForDefund2 = states.waitForDefund({
+  ...defaults,
+  defundingState: defundingPreFailureState,
+});
 const acknowledgeSuccess = states.acknowledgeSuccess({ ...defaults });
 const acknowledgeClosedButNotDefunded = states.AcknowledgeClosedButNotDefunded({ ...defaults });
 
@@ -134,7 +141,7 @@ export const challengeTimesOutAndIsDefunded = {
     action: defundChosen,
   },
   challengerWaitForDefund: {
-    state: waitForDefund,
+    state: waitForDefund1,
     action: defundingSuccessTrigger,
   },
   acknowledgeSuccess: {
@@ -146,7 +153,7 @@ export const challengeTimesOutAndIsDefunded = {
 export const challengeTimesOutAndIsNotDefunded = {
   ...defaults,
   challengerWaitForDefund: {
-    state: waitForDefund,
+    state: waitForDefund2,
     action: defundingFailureTrigger,
   },
   acknowledgeClosedButNotDefunded: {

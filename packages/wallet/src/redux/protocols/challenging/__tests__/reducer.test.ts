@@ -119,10 +119,10 @@ describe('CHALLENGE TIMES OUT AND IS not DEFUNDED ', () => {
     const { state, action } = scenario.challengerWaitForDefund;
     const result = challengingReducer(state, storage, action);
 
-    itTransitionsTo(result, 'Challenging.AcknowledgeSuccess');
+    itTransitionsTo(result, 'Challenging.AcknowledgeClosedButNotDefunded');
   });
 
-  describe('when in Acknowledge Success', () => {
+  describe('when in AcknowledgeSuccessClosedButNotDefunded', () => {
     const { state, action } = scenario.acknowledgeClosedButNotDefunded;
     const result = challengingReducer(state, storage, action);
 
@@ -255,6 +255,9 @@ describe('TRANSACTION FAILS  ', () => {
 });
 
 function itTransitionsTo(result: ReturnVal, type: ChallengingStateType) {
+  if (!result.state) {
+    console.log(result);
+  }
   it(`transitions to ${type}`, () => {
     expect(result.state.type).toEqual(type);
   });

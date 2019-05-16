@@ -1,6 +1,7 @@
 import { Properties as P } from '../../utils';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission';
 import { ProtocolState } from '..';
+import { DefundingState } from '../defunding';
 
 export type ChallengingState = NonTerminalState | TerminalState;
 export type ChallengingStateType = ChallengingState['type'];
@@ -73,6 +74,7 @@ export interface WaitForDefund {
   type: 'Challenging.WaitForDefund';
   processId: string;
   channelId: string;
+  defundingState: DefundingState;
 }
 
 export interface AcknowledgeClosedButNotDefunded {
@@ -179,8 +181,8 @@ export function acknowledgeFailure(p: P<AcknowledgeFailure>): AcknowledgeFailure
 }
 
 export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.WaitForDefund', processId, channelId };
+  const { processId, channelId, defundingState } = p;
+  return { type: 'Challenging.WaitForDefund', processId, channelId, defundingState };
 }
 
 export function AcknowledgeClosedButNotDefunded(
