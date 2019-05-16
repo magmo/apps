@@ -30,7 +30,7 @@ linkStyle default interpolate basis
   AF --> |FailureAcknowledged| F((Failure))
   WFT --> |TransactionSuccess| WFRT(WaitForResponseOrTimeout)
   WFT --> |TransactionFailure| AF
-  WFRT --> |BlockMined??| AT(AcknowledgeTimeout)
+  WFRT --> |CHALLENGE_EXPIRED| AT(AcknowledgeTimeout)
   AT --> |DefundChosen| D(WaitForDefund)
   D   --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
   D   --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
@@ -45,7 +45,7 @@ linkStyle default interpolate basis
   class S,CE logic;
   class SP,SCD,SCBND Success;
   class F Failure;
-  class D WaitForChildProtocol;
+  class WFT,D WaitForChildProtocol;
 ```
 
 Note:

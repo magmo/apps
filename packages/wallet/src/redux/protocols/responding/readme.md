@@ -23,15 +23,24 @@ linkStyle default interpolate basis
   WFAp--> |Approve| HC{Commitment<br/>exists?}
   HC --> |Yes| WFT(WaitForTransaction)
   HC --> |No| WFR(WaitForResponse)
-  WFR-->|ResponseProvided| WFT(WaitForTransaction)
+  WFR -->|ResponseProvided| WFT(WaitForTransaction)
+  WFR -->|CHALLENGE_EXPIRED| AT(AcknowledgeTimeOut)
+  AT -->|DEFUND_CHOSEN| WFD(WaitForDefund)
+  WFD --> |defunding protocol succeeded| AS(AcknowledgeSuccess)
+  WFD --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
   WFAc-->|Acknowledged| S((success))
   WFT --> |TransactionFailed| F((failure))
-
-  style St  fill:#efdd20
-  style HC  fill:#efdd20
-  style S fill:#58ef21
-  style F  fill:#f45941
+  ACBND -->|Acknowledged| FCBND((ClosedButNotDefunded))
+  AS -->|Acknowledged| FCD((ClosedAndDefunded))
+  classDef logic fill:#efdd20;
+  classDef Success fill:#58ef21;
+  classDef Failure fill:#f45941;
+  classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
+  class St,HC logic;
+  class S Success;
+  class F,FCD,FCBND Failure;
+  class WFT,WFD WaitForChildProtocol;
 ```
 
 Notes:
