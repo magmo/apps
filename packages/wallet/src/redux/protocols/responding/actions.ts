@@ -9,6 +9,7 @@ import {
   CHALLENGE_EXPIRY_SET_EVENT,
   CHALLENGE_EXPIRED_EVENT,
 } from '../../actions';
+import { isDefundingAction } from '../defunding/actions';
 
 export type RespondingAction =
   | RespondApproved
@@ -84,6 +85,7 @@ export const acknowledged = (processId: string): Acknowledged => ({
 export function isRespondingAction(action: ProtocolAction): action is RespondingAction {
   return (
     isTransactionAction(action) ||
+    isDefundingAction(action) ||
     action.type === RESPOND_APPROVED ||
     action.type === RESPONSE_PROVIDED ||
     action.type === RESPOND_SUCCESS_ACKNOWLEDGED ||

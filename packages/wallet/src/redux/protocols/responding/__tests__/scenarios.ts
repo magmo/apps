@@ -84,7 +84,7 @@ const success = states.success();
 const transactionFailedFailure = states.failure(states.FailureReason.TransactionFailure);
 const transactionConfirmed = transactionActions.transactionConfirmed(processId);
 const transactionFailed = transactionActions.transactionFailed(processId);
-const acknowledgeTimeout = states.acknowledgeTimeOut(props);
+const acknowledgeTimeout = states.acknowledgeTimeout(props);
 const waitForDefund1 = states.waitForDefund({
   ...props,
   defundingState: defundingPreSuccessState,

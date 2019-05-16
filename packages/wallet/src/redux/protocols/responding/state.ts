@@ -173,7 +173,7 @@ export function waitForResponse(properties: Properties<WaitForResponse>): WaitFo
   return { type: WAIT_FOR_RESPONSE, processId, channelId };
 }
 
-export function acknowledgeTimeOut(properties: Properties<AcknowledgeTimeout>): AcknowledgeTimeout {
+export function acknowledgeTimeout(properties: Properties<AcknowledgeTimeout>): AcknowledgeTimeout {
   const { processId, channelId } = properties;
   return { type: ACKNOWLEDGE_TIMEOUT, processId, channelId };
 }

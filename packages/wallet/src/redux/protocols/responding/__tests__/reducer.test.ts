@@ -217,8 +217,16 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
   });
 
   describe(`when in ${states.ACKNOWLEDGE_TIMEOUT}`, () => {
-    const state = scenario.waitForDefund1;
+    const state = scenario.acknowledgeTimeout;
     const action = scenario.defundChosen;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.WAIT_FOR_DEFUND);
+  });
+
+  describe(`when in ${states.WAIT_FOR_DEFUND}`, () => {
+    const state = scenario.waitForDefund1;
+    const action = scenario.defundingSuccessTrigger;
 
     const result = respondingReducer(state, sharedData, action);
     itTransitionsTo(result, states.ACKNOWLEDGE_DEFUNDING_SUCCESS);
@@ -233,19 +241,23 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
   });
 });
 
-describe('transaction failed ', () => {
-  const scenario = scenarios.transactionFails;
+describe('CHALLENGE EXPIRES --> not DEFUNDED', () => {
+  const scenario = scenarios.challengeExpiresButChannelNotDefunded;
   const { sharedData } = scenario;
 
-  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
-    const state = scenario.waitForTransaction;
-    const action = scenario.transactionFailed;
+  describe(`when in ${states.WAIT_FOR_DEFUND}`, () => {
+    const state = scenario.waitForDefund2;
+    const action = scenario.defundingFailureTrigger;
 
     const result = respondingReducer(state, sharedData, action);
-    itTransitionsToFailure(result, scenario.failure);
+    itTransitionsTo(result, states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED);
   });
-});
 
-describe.skip('CHALLENGE EXPIRES --> not DEFUNDED', () => {
-  /* */
+  describe(`when in ${states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED}`, () => {
+    const state = scenario.acknowledgeClosedButNotDefunded;
+    const action = scenario.acknowledged;
+
+    const result = respondingReducer(state, sharedData, action);
+    itTransitionsTo(result, states.CLOSED_BUT_NOT_DEFUNDED);
+  });
 });

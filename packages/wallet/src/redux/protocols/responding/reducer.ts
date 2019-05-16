@@ -25,7 +25,7 @@ import {
   sendChallengeResponseRequested,
   sendChallengeComplete,
 } from '../reducer-helpers';
-import { ProtocolAction } from '../../actions';
+import { ProtocolAction, CHALLENGE_EXPIRED_EVENT } from '../../actions';
 import * as _ from 'lodash';
 import { isDefundingAction, DefundingAction } from '../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
@@ -50,9 +50,6 @@ export const respondingReducer = (
   sharedData: SharedData,
   action: ProtocolAction,
 ): ProtocolStateWithSharedData<states.RespondingState> => {
-  if (isDefundingAction(action)) {
-    return handleDefundingAction(protocolState, sharedData, action);
-  }
   if (!actions.isRespondingAction(action)) {
     console.warn(`Challenge Responding Reducer called with non responding action ${action.type}`);
     return { protocolState, sharedData };
@@ -67,10 +64,17 @@ export const respondingReducer = (
     case states.WAIT_FOR_TRANSACTION:
       return waitForTransactionReducer(protocolState, sharedData, action);
     case states.ACKNOWLEDGE_TIMEOUT:
-      return acknowledgeTimeout(protocolState, sharedData, action);
+      return acknowledgeTimeoutReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_DEFUND:
+      if (isDefundingAction(action)) {
+        return handleDefundingAction(protocolState, sharedData, action);
+      } else {
+        return { protocolState, sharedData };
+      }
     case states.ACKNOWLEDGE_DEFUNDING_SUCCESS:
+      return acknowledgeDefundingSuccessReducer(protocolState, sharedData, action);
     case states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED:
+      return acknowledgeClosedButNotDefundedReducer(protocolState, sharedData, action);
     case states.CLOSED_AND_DEFUNDED:
     case states.CLOSED_BUT_NOT_DEFUNDED:
     case states.SUCCESS:
@@ -98,7 +102,7 @@ function handleDefundingAction(
   } else if (isDefundingFailure(defundingState)) {
     protocolState = states.acknowledgeClosedButNotDefunded(protocolState);
   } else {
-    // update the transaction state
+    // update the defunding state
     protocolState = { ...protocolState, defundingState };
   }
   return { protocolState, sharedData: retVal.sharedData };
@@ -143,6 +147,9 @@ const waitForResponseReducer = (
         signResult.signedCommitment.signature,
       );
       return transitionToWaitForTransaction(transaction, protocolState, signResult.store);
+    case CHALLENGE_EXPIRED_EVENT:
+      return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
+
     default:
       return { protocolState, sharedData };
   }
@@ -192,7 +199,7 @@ const waitForApprovalReducer = (
   }
 };
 
-function acknowledgeTimeout(
+function acknowledgeTimeoutReducer(
   protocolState: states.AcknowledgeTimeout,
   sharedData: SharedData,
   action: actions.RespondingAction,
@@ -214,6 +221,27 @@ function acknowledgeTimeout(
   };
 }
 
+function acknowledgeDefundingSuccessReducer(
+  protocolState: states.AcknowledgeDefundingSuccess,
+  sharedData: SharedData,
+  action: actions.RespondingAction,
+): ProtocolStateWithSharedData<states.RespondingState> {
+  if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
+    return { protocolState, sharedData };
+  }
+  return { protocolState: states.closedAndDefunded(), sharedData };
+}
+
+function acknowledgeClosedButNotDefundedReducer(
+  protocolState: states.AcknowledgeClosedButNotDefunded,
+  sharedData: SharedData,
+  action: actions.RespondingAction,
+): ProtocolStateWithSharedData<states.RespondingState> {
+  if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
+    return { protocolState, sharedData };
+  }
+  return { protocolState: states.closedButNotDefunded(), sharedData };
+}
 // helpers
 const handleTransactionSubmissionComplete = (
   protocolState: states.WaitForTransaction,
