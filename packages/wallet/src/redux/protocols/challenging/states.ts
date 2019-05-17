@@ -1,6 +1,7 @@
 import { Properties as P } from '../../utils';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission';
 import { ProtocolState } from '..';
+import { DefundingState } from '../defunding';
 
 export type ChallengingState = NonTerminalState | TerminalState;
 export type ChallengingStateType = ChallengingState['type'];
@@ -11,9 +12,16 @@ export type NonTerminalState =
   | WaitForResponseOrTimeout
   | AcknowledgeTimeout
   | AcknowledgeResponse
-  | AcknowledgeFailure;
+  | AcknowledgeFailure
+  | WaitForDefund
+  | AcknowledgeClosedButNotDefunded
+  | AcknowledgeSuccess;
 
-export type TerminalState = SuccessOpen | SuccessClosed | Failure;
+export type TerminalState =
+  | SuccessOpen
+  | SuccessClosedAndDefunded
+  | SuccessClosedButNotDefunded
+  | Failure;
 
 export type FailureReason =
   | 'ChannelDoesntExist'
@@ -61,6 +69,25 @@ export interface AcknowledgeResponse {
   processId: string;
   channelId: string;
 }
+
+export interface WaitForDefund {
+  type: 'Challenging.WaitForDefund';
+  processId: string;
+  channelId: string;
+  defundingState: DefundingState;
+}
+
+export interface AcknowledgeClosedButNotDefunded {
+  type: 'Challenging.AcknowledgeClosedButNotDefunded';
+  processId: string;
+  channelId: string;
+}
+
+export interface AcknowledgeSuccess {
+  type: 'Challenging.AcknowledgeSuccess';
+  processId: string;
+  channelId: string;
+}
 export interface Failure {
   type: 'Challenging.Failure';
   reason: FailureReason;
@@ -70,8 +97,12 @@ export interface SuccessOpen {
   type: 'Challenging.SuccessOpen';
 }
 
-export interface SuccessClosed {
-  type: 'Challenging.SuccessClosed';
+export interface SuccessClosedAndDefunded {
+  type: 'Challenging.SuccessClosedAndDefunded';
+}
+
+export interface SuccessClosedButNotDefunded {
+  type: 'Challenging.SuccessClosedButNotDefunded';
 }
 
 // -------
@@ -92,7 +123,11 @@ export function isChallengingState(state: ProtocolState): state is ChallengingSt
     state.type === 'Challenging.AcknowledgeResponse' ||
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
-    state.type === 'Challenging.SuccessClosed'
+    state.type === 'Challenging.SuccessClosedAndDefunded' ||
+    state.type === 'Challenging.SuccessClosedButNotDefunded' ||
+    state.type === 'Challenging.WaitForDefund' ||
+    state.type === 'Challenging.AcknowledgeSuccess' ||
+    state.type === 'Challenging.AcknowledgeClosedButNotDefunded'
   );
 }
 
@@ -100,7 +135,8 @@ export function isTerminal(state: ChallengingState): state is TerminalState {
   return (
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
-    state.type === 'Challenging.SuccessClosed'
+    state.type === 'Challenging.SuccessClosedAndDefunded' ||
+    state.type === 'Challenging.SuccessClosedButNotDefunded'
   );
 }
 
@@ -147,13 +183,34 @@ export function acknowledgeFailure(p: P<AcknowledgeFailure>): AcknowledgeFailure
   return { type: 'Challenging.AcknowledgeFailure', processId, channelId, reason };
 }
 
+export function waitForDefund(p: P<WaitForDefund>): WaitForDefund {
+  const { processId, channelId, defundingState } = p;
+  return { type: 'Challenging.WaitForDefund', processId, channelId, defundingState };
+}
+
+export function AcknowledgeClosedButNotDefunded(
+  p: P<AcknowledgeClosedButNotDefunded>,
+): AcknowledgeClosedButNotDefunded {
+  const { processId, channelId } = p;
+  return { type: 'Challenging.AcknowledgeClosedButNotDefunded', processId, channelId };
+}
+
+export function acknowledgeSuccess(p: P<AcknowledgeSuccess>): AcknowledgeSuccess {
+  const { processId, channelId } = p;
+  return { type: 'Challenging.AcknowledgeSuccess', processId, channelId };
+}
+
 export function failure(p: P<Failure>): Failure {
   const { reason } = p;
   return { type: 'Challenging.Failure', reason };
 }
 
-export function successClosed(): SuccessClosed {
-  return { type: 'Challenging.SuccessClosed' };
+export function successClosedAndDefunded(): SuccessClosedAndDefunded {
+  return { type: 'Challenging.SuccessClosedAndDefunded' };
+}
+
+export function successClosedButNotDefunded(): SuccessClosedButNotDefunded {
+  return { type: 'Challenging.SuccessClosedButNotDefunded' };
 }
 
 export function successOpen(): SuccessOpen {

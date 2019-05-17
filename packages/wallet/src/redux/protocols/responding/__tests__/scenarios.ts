@@ -6,6 +6,13 @@ import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 
 import { ChannelState, ChannelStore } from '../../../channel-store';
 import * as transactionActions from '../../transaction-submission/actions';
+import { challengeExpiredEvent } from '../../../actions';
+import {
+  preSuccessState as defundingPreSuccessState,
+  successTrigger as defundingSuccessTrigger,
+  preFailureState as defundingPreFailureState,
+  failureTrigger as defundingFailureTrigger,
+} from '../../defunding/__tests__';
 
 // ---------
 // Test data
@@ -53,7 +60,7 @@ const refuteChannelState = {
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
 const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
-const props = { processId, transactionSubmissionState, sharedData };
+const props = { processId, transactionSubmissionState, sharedData, channelId };
 
 // ------
 // States
@@ -74,17 +81,29 @@ const waitForTransaction = states.waitForTransaction(props);
 const waitForAcknowledgement = states.waitForAcknowledgement(props);
 const waitForResponse = states.waitForResponse(props);
 const success = states.success();
-const userRejectedFailure = states.failure(states.FailureReason.UserRejected);
 const transactionFailedFailure = states.failure(states.FailureReason.TransactionFailure);
 const transactionConfirmed = transactionActions.transactionConfirmed(processId);
 const transactionFailed = transactionActions.transactionFailed(processId);
+const acknowledgeTimeout = states.acknowledgeTimeout(props);
+const waitForDefund1 = states.waitForDefund({
+  ...props,
+  defundingState: defundingPreSuccessState,
+});
+const waitForDefund2 = states.waitForDefund({
+  ...props,
+  defundingState: defundingPreFailureState,
+});
+const acknowledgeDefundingSuccess = states.acknowledgeDefundingSuccess({ ...props });
+const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded({ ...props });
 // ------
 // Actions
 // ------
 const approve = actions.respondApproved(processId);
-const reject = actions.respondRejected(processId);
 const acknowledge = actions.respondSuccessAcknowledged(processId);
 const responseProvided = actions.responseProvided(processId, testScenarios.gameCommitment3);
+const defundChosen = actions.defundChosen(processId);
+const acknowledged = actions.acknowledged(processId);
+const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
 
 // ---------
 // Scenarios
@@ -137,15 +156,6 @@ export const requireResponseHappyPath = {
   acknowledge,
 };
 
-export const userDeclines = {
-  ...props,
-  // States
-  waitForApproval: waitForApprovalRequiresResponse,
-  failure: userRejectedFailure,
-  // Action
-  reject,
-};
-
 export const transactionFails = {
   ...props,
   // States
@@ -155,4 +165,28 @@ export const transactionFails = {
   // Actions
   approve,
   transactionFailed,
+};
+
+export const challengeExpiresChannelDefunded = {
+  ...props,
+  // States
+  waitForResponse,
+  acknowledgeTimeout,
+  waitForDefund1,
+  acknowledgeDefundingSuccess,
+  // Actions
+  challengeTimedOut,
+  defundChosen,
+  defundingSuccessTrigger,
+  acknowledged,
+};
+
+export const challengeExpiresButChannelNotDefunded = {
+  ...props,
+  // States
+  waitForDefund2,
+  acknowledgeClosedButNotDefunded,
+  // Actions
+  defundingFailureTrigger,
+  acknowledged,
 };

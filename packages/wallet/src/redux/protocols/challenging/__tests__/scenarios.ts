@@ -13,6 +13,12 @@ import {
   respondWithMoveEvent,
   challengeExpirySetEvent,
 } from '../../../actions';
+import {
+  preSuccessState as defundingPreSuccessState,
+  successTrigger as defundingSuccessTrigger,
+  preFailureState as defundingPreFailureState,
+  failureTrigger as defundingFailureTrigger,
+} from '../../defunding/__tests__';
 
 type Reason = states.FailureReason;
 
@@ -63,9 +69,17 @@ const waitForResponseOrTimeout = states.waitForResponseOrTimeout({ ...defaults, 
 const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
 const successOpen = states.successOpen();
-const successClosed = states.successClosed();
 const acknowledge = (reason: Reason) => states.acknowledgeFailure({ ...defaults, reason });
-const failure = (reason: Reason) => states.failure({ reason });
+const waitForDefund1 = states.waitForDefund({
+  ...defaults,
+  defundingState: defundingPreSuccessState,
+});
+const waitForDefund2 = states.waitForDefund({
+  ...defaults,
+  defundingState: defundingPreFailureState,
+});
+const acknowledgeSuccess = states.acknowledgeSuccess({ ...defaults });
+const acknowledgeClosedButNotDefunded = states.AcknowledgeClosedButNotDefunded({ ...defaults });
 
 // -------
 // Actions
@@ -82,102 +96,132 @@ const responseReceived = respondWithMoveEvent(
   signedCommitment21.signature,
 );
 const responseAcknowledged = actions.challengeResponseAcknowledged(processId);
-const timeoutAcknowledged = actions.challengeTimeoutAcknowledged(processId);
 const failureAcknowledged = actions.challengeFailureAcknowledged(processId);
 const challengeExpirySet = challengeExpirySetEvent(processId, channelId, 1234);
+const defundChosen = actions.defundChosen(processId);
+const acknowledged = actions.acknowledged(processId);
 // -------
 // Scenarios
 // -------
 export const opponentResponds = {
   ...defaults,
-  // states
-  approveChallenge,
-  waitForTransaction: waitForTransactionSuccess,
-  waitForResponseOrTimeout,
-  acknowledgeResponse,
-  successOpen,
-  // actions
-  challengeApproved,
-  transactionSuccessTrigger,
-  responseReceived,
-  responseAcknowledged,
-  challengeExpirySet,
-
-  challengeCommitment: signedCommitment21,
+  approveChallenge: {
+    state: approveChallenge,
+    action: challengeApproved,
+  },
+  waitForTransaction: {
+    state: waitForTransactionSuccess,
+    action: transactionSuccessTrigger,
+    action2: challengeExpirySet,
+  },
+  waitForResponseOrTimeout: {
+    state: waitForResponseOrTimeout,
+    action1: challengeExpirySet,
+    action2: responseReceived,
+    commitment: signedCommitment21,
+  },
+  acknowledgeResponse: {
+    state: acknowledgeResponse,
+    action: responseAcknowledged,
+  },
+  successOpen: {
+    state: successOpen,
+  },
 };
 
 // Todo: need to figure out how a `ChallengeTimedOut` action should be triggered
-export const challengeTimesOut = {
+export const challengeTimesOutAndIsDefunded = {
   ...defaults,
-  // states
-  waitForResponseOrTimeout,
-  acknowledgeTimeout,
-  successClosed,
-  // actions
-  challengeTimedOut,
-  timeoutAcknowledged,
+  waitForResponseOrTimeout: {
+    state: waitForResponseOrTimeout,
+    action: challengeTimedOut,
+  },
+  acknowledgeTimeout: {
+    state: acknowledgeTimeout,
+    action: defundChosen,
+  },
+  challengerWaitForDefund: {
+    state: waitForDefund1,
+    action: defundingSuccessTrigger,
+  },
+  acknowledgeSuccess: {
+    state: acknowledgeSuccess,
+    action: acknowledged,
+  },
+};
+
+export const challengeTimesOutAndIsNotDefunded = {
+  ...defaults,
+  challengerWaitForDefund: {
+    state: waitForDefund2,
+    action: defundingFailureTrigger,
+  },
+  acknowledgeClosedButNotDefunded: {
+    state: acknowledgeClosedButNotDefunded,
+    action: acknowledged,
+  },
 };
 
 export const channelDoesntExist = {
   ...defaults,
   storage: EMPTY_SHARED_DATA,
-  // states
-  acknowledgeFailure: acknowledge('ChannelDoesntExist'),
-  failure: failure('ChannelDoesntExist'),
-  // actions
-  failureAcknowledged,
+  acknowledgeFailure: {
+    state: acknowledge('ChannelDoesntExist'),
+    action: failureAcknowledged,
+  },
 };
 
 export const channelNotFullyOpen = {
   ...defaults,
   storage: storage(partiallyOpen),
-  // states
-  acknowledgeFailure: acknowledge('NotFullyOpen'),
-  failure: failure('NotFullyOpen'),
-  // actions
-  failureAcknowledged,
+  acknowledgeFailure: {
+    state: acknowledge('NotFullyOpen'),
+    action: failureAcknowledged,
+  },
 };
 
 export const alreadyHaveLatest = {
   ...defaults,
   storage: storage(ourTurn),
-  // states
-  acknowledgeFailure: acknowledge('AlreadyHaveLatest'),
-  failure: failure('AlreadyHaveLatest'),
-  // actions
-  failureAcknowledged,
+  acknowledgeFailure: {
+    state: acknowledge('AlreadyHaveLatest'),
+    action: failureAcknowledged,
+  },
 };
 
 export const userDeclinesChallenge = {
   ...defaults,
-  // states
-  approveChallenge,
-  acknowledgeFailure: acknowledge('DeclinedByUser'),
-  failure: failure('DeclinedByUser'),
-  // actions
-  challengeDenied,
-  failureAcknowledged,
+  approveChallenge: {
+    state: approveChallenge,
+    action: challengeDenied,
+  },
+  acknowledgeFailure: {
+    state: acknowledge('DeclinedByUser'),
+    action: failureAcknowledged,
+  },
 };
 
 export const receiveCommitmentWhileApproving = {
   ...defaults,
   storage: storage(ourTurn),
-  // states
-  approveChallenge,
-  acknowledgeFailure: acknowledge('LatestWhileApproving'),
-  failure: failure('LatestWhileApproving'),
-  // actions
-  challengeApproved,
-  failureAcknowledged,
+  approveChallenge: {
+    state: approveChallenge,
+    action: challengeApproved,
+  },
+  acknowledgeFailure: {
+    state: acknowledge('LatestWhileApproving'),
+    action: failureAcknowledged,
+  },
 };
 
 export const transactionFails = {
   ...defaults,
-  // states
-  waitForTransaction: waitForTransactionFailure,
-  acknowledgeFailure: acknowledge('TransactionFailed'),
-  failure: failure('TransactionFailed'),
-  // actions
-  transactionFailureTrigger,
-  failureAcknowledged,
+  waitForTransaction: {
+    state: waitForTransactionFailure,
+    action: transactionFailureTrigger,
+  },
+  acknowledgeFailure: {
+    state: acknowledge('TransactionFailed'),
+    action: failureAcknowledged,
+  },
 };
