@@ -1,6 +1,6 @@
-import { BaseProcessAction } from '../actions';
-import { Commitment } from '../../../domain';
-import { TransactionAction } from '../transaction-submission/actions';
+import { BaseProcessAction } from '../../actions';
+import { Commitment } from '../../../../domain';
+import { TransactionAction } from '../../transaction-submission/actions';
 import {
   ProtocolAction,
   isTransactionAction,
@@ -8,10 +8,10 @@ import {
   ChallengeExpirySetEvent,
   CHALLENGE_EXPIRY_SET_EVENT,
   CHALLENGE_EXPIRED_EVENT,
-} from '../../actions';
-import { isDefundingAction } from '../defunding/actions';
+} from '../../../actions';
+import { isDefundingAction } from '../../defunding/actions';
 
-export type RespondingAction =
+export type ResponderAction =
   | RespondApproved
   | ResponseProvided
   | RespondSuccessAcknowledged
@@ -82,7 +82,7 @@ export const acknowledged = (processId: string): Acknowledged => ({
   processId,
 });
 
-export function isRespondingAction(action: ProtocolAction): action is RespondingAction {
+export function isRespondingAction(action: ProtocolAction): action is ResponderAction {
   return (
     isTransactionAction(action) ||
     isDefundingAction(action) ||

@@ -1,24 +1,24 @@
 import * as states from '../states';
 import * as actions from '../actions';
-import * as tsScenarios from '../../transaction-submission/__tests__';
-import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
-import { ChannelState } from '../../../channel-store';
-import * as channelScenarios from '../../../__tests__/test-scenarios';
+import * as tsScenarios from '../../../transaction-submission/__tests__';
+import { setChannel, EMPTY_SHARED_DATA } from '../../../../state';
+import { ChannelState } from '../../../../channel-store';
+import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import {
   channelFromCommitments,
   partiallyOpenChannelFromCommitment,
-} from '../../../channel-store/channel-state/__tests__';
+} from '../../../../channel-store/channel-state/__tests__';
 import {
   challengeExpiredEvent,
   respondWithMoveEvent,
   challengeExpirySetEvent,
-} from '../../../actions';
+} from '../../../../actions';
 import {
   preSuccessState as defundingPreSuccessState,
   successTrigger as defundingSuccessTrigger,
   preFailureState as defundingPreFailureState,
   failureTrigger as defundingFailureTrigger,
-} from '../../defunding/__tests__';
+} from '../../../defunding/__tests__';
 
 type Reason = states.FailureReason;
 

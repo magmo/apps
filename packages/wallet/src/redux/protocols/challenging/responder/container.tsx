@@ -1,25 +1,25 @@
 import * as states from './state';
 import * as actions from './actions';
 import { PureComponent } from 'react';
-import { Commitment } from '../../../domain';
+import { Commitment } from '../../../../domain';
 import React from 'react';
-import { unreachable } from '../../../utils/reducer-utils';
-import Acknowledge from '../shared-components/acknowledge';
+import { unreachable } from '../../../../utils/reducer-utils';
+import Acknowledge from '../../shared-components/acknowledge';
 import WaitForApproval from './components/wait-for-approval';
-import { TransactionSubmission } from '../../protocols/transaction-submission/container';
-import { Defunding } from '../defunding/container';
+import { TransactionSubmission } from '../../transaction-submission/container';
+import { Defunding } from '../../defunding/container';
 
 import { connect } from 'react-redux';
 
 interface Props {
-  state: states.NonTerminalRespondingState;
+  state: states.NonTerminalResponderState;
   respondApproved: (processId: string) => void;
   respondSuccessAcknowledged: (processId: string) => void;
   responseProvided: (processId: string, commitment: Commitment) => void;
   acknowledged: (processId: string) => void;
   defundChosen: (processId: string) => void;
 }
-class RespondingContainer extends PureComponent<Props> {
+class ResponderContainer extends PureComponent<Props> {
   render() {
     const {
       state,
@@ -89,7 +89,7 @@ const mapDispatchToProps = {
   defundChosen: actions.defundChosen,
 };
 
-export const Responding = connect(
+export const Responder = connect(
   () => ({}),
   mapDispatchToProps,
-)(RespondingContainer);
+)(ResponderContainer);

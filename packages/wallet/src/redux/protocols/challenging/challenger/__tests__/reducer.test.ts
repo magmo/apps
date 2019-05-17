@@ -1,8 +1,8 @@
 import * as scenarios from './scenarios';
-import { challengingReducer, initialize, ReturnVal } from '../reducer';
+import { challengerReducer, initialize, ReturnVal } from '../reducer';
 import {
   FailureReason,
-  ChallengingStateType,
+  ChallengerStateType,
   WaitForTransaction,
   WaitForResponseOrTimeout,
 } from '../states';
@@ -10,7 +10,7 @@ import {
   itSendsThisMessage,
   itSendsThisDisplayEventType,
   itStoresThisCommitment,
-} from '../../../__tests__/helpers';
+} from '../../../../__tests__/helpers';
 import {
   HIDE_WALLET,
   CHALLENGE_COMPLETE,
@@ -30,14 +30,14 @@ describe('OPPONENT RESPONDS', () => {
   });
   describe('when in ApproveChallenge', () => {
     const { state, action } = scenario.approveChallenge;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.WaitForTransaction');
     // it initializes the transaction state machine
   });
   describe('when in WaitForTransaction', () => {
     const { state, action2 } = scenario.waitForTransaction;
-    const result = challengingReducer(state, storage, action2);
+    const result = challengerReducer(state, storage, action2);
 
     itTransitionsTo(result, 'Challenging.WaitForTransaction');
     it('updates the expiry time', () => {
@@ -46,14 +46,14 @@ describe('OPPONENT RESPONDS', () => {
   });
   describe('when in WaitForTransaction', () => {
     const { state, action } = scenario.waitForTransaction;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.WaitForResponseOrTimeout');
   });
 
   describe('when in WaitForResponseOrTimeout', () => {
     const { state, action1 } = scenario.waitForResponseOrTimeout;
-    const result = challengingReducer(state, storage, action1);
+    const result = challengerReducer(state, storage, action1);
 
     itTransitionsTo(result, 'Challenging.WaitForResponseOrTimeout');
     it('updates the expiry time', () => {
@@ -62,7 +62,7 @@ describe('OPPONENT RESPONDS', () => {
   });
   describe('when in WaitForResponseOrTimeout', () => {
     const { state, action2, commitment } = scenario.waitForResponseOrTimeout;
-    const result = challengingReducer(state, storage, action2);
+    const result = challengerReducer(state, storage, action2);
 
     itSendsThisMessage(result.storage, CHALLENGE_COMMITMENT_RECEIVED);
     itStoresThisCommitment(result.storage, commitment);
@@ -71,7 +71,7 @@ describe('OPPONENT RESPONDS', () => {
 
   describe('when in AcknowledgeResponse', () => {
     const { state, action } = scenario.acknowledgeResponse;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.SuccessOpen');
     itSendsThisMessage(result.storage, CHALLENGE_COMPLETE);
@@ -85,27 +85,27 @@ describe('CHALLENGE TIMES OUT AND IS DEFUNDED ', () => {
 
   describe('when in WaitForResponseOrTimeout', () => {
     const { state, action } = scenario.waitForResponseOrTimeout;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
     itTransitionsTo(result, 'Challenging.AcknowledgeTimeout');
   });
 
   describe('when in AcknowledgeTimeout', () => {
     const { state, action } = scenario.acknowledgeTimeout;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.WaitForDefund');
   });
 
   describe('when in WaitForDefund', () => {
     const { state, action } = scenario.challengerWaitForDefund;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.AcknowledgeSuccess');
   });
 
   describe('when in Acknowledge Success', () => {
     const { state, action } = scenario.acknowledgeSuccess;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.SuccessClosedAndDefunded');
   });
@@ -117,14 +117,14 @@ describe('CHALLENGE TIMES OUT AND IS not DEFUNDED ', () => {
 
   describe('when in WaitForDefund', () => {
     const { state, action } = scenario.challengerWaitForDefund;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.AcknowledgeClosedButNotDefunded');
   });
 
   describe('when in AcknowledgeSuccessClosedButNotDefunded', () => {
     const { state, action } = scenario.acknowledgeClosedButNotDefunded;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.SuccessClosedButNotDefunded');
   });
@@ -143,7 +143,7 @@ describe('CHANNEL DOESNT EXIST  ', () => {
 
   describe('when in AcknowledgeFailure', () => {
     const { state, action } = scenario.acknowledgeFailure;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'ChannelDoesntExist');
@@ -163,7 +163,7 @@ describe('CHANNEL NOT FULLY OPEN  ', () => {
 
   describe('when in AcknowledgeFailure', () => {
     const { state, action } = scenario.acknowledgeFailure;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'NotFullyOpen');
@@ -183,7 +183,7 @@ describe('ALREADY HAVE LATEST COMMITMENT', () => {
 
   describe('when in AcknowledgeFailure', () => {
     const { state, action } = scenario.acknowledgeFailure;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'AlreadyHaveLatest');
@@ -196,14 +196,14 @@ describe('USER DECLINES CHALLENGE  ', () => {
 
   describe('when in ApproveChallenge', () => {
     const { state, action } = scenario.approveChallenge;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'DeclinedByUser');
   });
   describe('when in AcknowledgeFailure', () => {
     const { state, action } = scenario.acknowledgeFailure;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'DeclinedByUser');
@@ -217,7 +217,7 @@ describe('RECEIVE COMMITMENT WHILE APPROVING  ', () => {
   describe('when in ApproveChallenge', () => {
     const { state, action } = scenario.approveChallenge;
     // note: we're triggering this off the user's acceptance, not the arrival of the update
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'LatestWhileApproving');
@@ -226,7 +226,7 @@ describe('RECEIVE COMMITMENT WHILE APPROVING  ', () => {
   describe('when in AcknowledgeFailure', () => {
     const { state, action } = scenario.acknowledgeFailure;
 
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'LatestWhileApproving');
@@ -239,7 +239,7 @@ describe('TRANSACTION FAILS  ', () => {
 
   describe('when in WaitForTransaction', () => {
     const { state, action } = scenario.waitForTransaction;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.AcknowledgeFailure');
     itHasFailureReason(result, 'TransactionFailed');
@@ -247,7 +247,7 @@ describe('TRANSACTION FAILS  ', () => {
 
   describe('when in AcknowledgeFailure', () => {
     const { state, action } = scenario.acknowledgeFailure;
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
 
     itTransitionsTo(result, 'Challenging.Failure');
     itHasFailureReason(result, 'TransactionFailed');
@@ -261,13 +261,13 @@ describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
     const state = scenario.acknowledgeTimeout;
     const action = scenario.defundingSuccessTrigger;
 
-    const result = challengingReducer(state, storage, action);
+    const result = challengerReducer(state, storage, action);
     // TODO: Is this the correct state?
     itTransitionsTo(result, 'Challenging.AcknowledgeClosedButNotDefunded');
   });
 });
 
-function itTransitionsTo(result: ReturnVal, type: ChallengingStateType) {
+function itTransitionsTo(result: ReturnVal, type: ChallengerStateType) {
   if (!result.state) {
     console.log(result);
   }

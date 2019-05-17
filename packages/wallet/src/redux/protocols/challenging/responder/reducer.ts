@@ -1,55 +1,55 @@
-import { Commitment, getChannelId } from '../../../domain';
-import { ProtocolStateWithSharedData } from '..';
+import { Commitment, getChannelId } from '../../../../domain';
+import { ProtocolStateWithSharedData } from '../..';
 import * as states from './state';
 import * as actions from './actions';
-import { unreachable } from '../../../utils/reducer-utils';
-import * as selectors from '../../selectors';
-import * as TransactionGenerator from '../../../utils/transaction-generator';
-import { PlayerIndex } from '../../types';
+import { unreachable } from '../../../../utils/reducer-utils';
+import * as selectors from '../../../selectors';
+import * as TransactionGenerator from '../../../../utils/transaction-generator';
+import { PlayerIndex } from '../../../types';
 import { TransactionRequest } from 'ethers/providers';
 import {
   initialize as initTransactionState,
   transactionReducer,
-} from '../transaction-submission/reducer';
-import { SharedData, signAndStore, registerChannelToMonitor } from '../../state';
-import { isTransactionAction } from '../transaction-submission/actions';
+} from '../../transaction-submission/reducer';
+import { SharedData, signAndStore, registerChannelToMonitor } from '../../../state';
+import { isTransactionAction } from '../../transaction-submission/actions';
 import {
   isTerminal,
   TransactionSubmissionState,
   isSuccess,
-} from '../transaction-submission/states';
+} from '../../transaction-submission/states';
 import { channelID } from 'fmg-core/lib/channel';
 import {
   showWallet,
   hideWallet,
   sendChallengeResponseRequested,
   sendChallengeComplete,
-} from '../reducer-helpers';
-import { ProtocolAction, CHALLENGE_EXPIRED_EVENT } from '../../actions';
+} from '../../reducer-helpers';
+import { ProtocolAction, CHALLENGE_EXPIRED_EVENT } from '../../../actions';
 import * as _ from 'lodash';
-import { isDefundingAction, DefundingAction } from '../defunding/actions';
-import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
+import { isDefundingAction, DefundingAction } from '../../defunding/actions';
+import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
 import {
   isSuccess as isDefundingSuccess,
   isFailure as isDefundingFailure,
-} from '../defunding/states';
+} from '../../defunding/states';
 export const initialize = (
   processId: string,
   channelId: string,
   sharedData: SharedData,
   challengeCommitment: Commitment,
-): ProtocolStateWithSharedData<states.RespondingState> => {
+): ProtocolStateWithSharedData<states.ResponderState> => {
   return {
     protocolState: states.waitForApproval({ processId, channelId, challengeCommitment }),
     sharedData: showWallet(registerChannelToMonitor(sharedData, processId, channelId)),
   };
 };
 
-export const respondingReducer = (
-  protocolState: states.RespondingState,
+export const responderReducer = (
+  protocolState: states.ResponderState,
   sharedData: SharedData,
   action: ProtocolAction,
-): ProtocolStateWithSharedData<states.RespondingState> => {
+): ProtocolStateWithSharedData<states.ResponderState> => {
   if (!actions.isRespondingAction(action)) {
     console.warn(`Challenge Responding Reducer called with non responding action ${action.type}`);
     return { protocolState, sharedData };
@@ -89,10 +89,10 @@ export const respondingReducer = (
 };
 
 function handleDefundingAction(
-  protocolState: states.RespondingState,
+  protocolState: states.ResponderState,
   sharedData: SharedData,
   action: DefundingAction,
-): ProtocolStateWithSharedData<states.RespondingState> {
+): ProtocolStateWithSharedData<states.ResponderState> {
   if (
     protocolState.type !== states.WAIT_FOR_DEFUND &&
     protocolState.type !== states.ACKNOWLEDGE_TIMEOUT
@@ -125,8 +125,8 @@ function handleDefundingAction(
 const waitForTransactionReducer = (
   protocolState: states.WaitForTransaction,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> => {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> => {
   if (action.type === CHALLENGE_EXPIRED_EVENT) {
     return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
   }
@@ -150,8 +150,8 @@ const waitForTransactionReducer = (
 const waitForResponseReducer = (
   protocolState: states.WaitForResponse,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> => {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
     case actions.RESPONSE_PROVIDED:
       const { commitment } = action;
@@ -175,8 +175,8 @@ const waitForResponseReducer = (
 const waitForAcknowledgementReducer = (
   protocolState: states.WaitForAcknowledgement,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> => {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
     case actions.RESPOND_SUCCESS_ACKNOWLEDGED:
       return {
@@ -191,8 +191,8 @@ const waitForAcknowledgementReducer = (
 const waitForApprovalReducer = (
   protocolState: states.WaitForApproval,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> => {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
     case actions.RESPOND_APPROVED:
       const { challengeCommitment, processId } = protocolState;
@@ -222,8 +222,8 @@ const waitForApprovalReducer = (
 function acknowledgeTimeoutReducer(
   protocolState: states.AcknowledgeTimeout,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> {
   if (action.type !== 'WALLET.RESPOND.DEFUND_CHOSEN') {
     return { protocolState, sharedData };
   }
@@ -233,8 +233,8 @@ function acknowledgeTimeoutReducer(
 function acknowledgeDefundingSuccessReducer(
   protocolState: states.AcknowledgeDefundingSuccess,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> {
   if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
@@ -244,8 +244,8 @@ function acknowledgeDefundingSuccessReducer(
 function acknowledgeClosedButNotDefundedReducer(
   protocolState: states.AcknowledgeClosedButNotDefunded,
   sharedData: SharedData,
-  action: actions.RespondingAction,
-): ProtocolStateWithSharedData<states.RespondingState> {
+  action: actions.ResponderAction,
+): ProtocolStateWithSharedData<states.ResponderState> {
   if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
@@ -384,7 +384,7 @@ const mover = (commitment: Commitment): PlayerIndex => {
 };
 
 const transitionToWaitForDefunding = (
-  protocolState: states.NonTerminalRespondingState,
+  protocolState: states.NonTerminalResponderState,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.WaitForDefund> => {
   // initialize defunding state machine

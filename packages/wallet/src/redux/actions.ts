@@ -2,7 +2,7 @@ import * as channel from './channel-store/actions';
 import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
-import * as challenging from './protocols/challenging/actions';
+import * as challenging from './protocols/challenging/challenger/actions';
 import * as application from './protocols/application/actions';
 import { FundingAction } from './protocols/funding/actions';
 import { Commitment } from '../domain';
@@ -17,7 +17,7 @@ import {
   isTransactionAction as isTA,
 } from './protocols/transaction-submission/actions';
 import { WithdrawalAction } from './protocols/withdrawing/actions';
-import { RespondingAction } from './protocols/responding/actions';
+import { ResponderAction } from './protocols/challenging/responder/actions';
 import { DefundingAction } from './protocols/defunding/actions';
 import { ConcludingAction as ConcludingActionInstigator } from './protocols/concluding/instigator/actions';
 import { ConcludingAction as ConcludingActionResponder } from './protocols/concluding/responder/actions';
@@ -173,12 +173,12 @@ export type ProtocolAction =
   | CommonAction
   | FundingAction
   | TransactionAction
-  | challenging.ChallengingAction
-  | RespondingAction
+  | challenging.ChallengerAction
+  | ResponderAction
   | directFunding.FundingAction
   | indirectFunding.Action
   | WithdrawalAction
-  | RespondingAction
+  | ResponderAction
   | application.ApplicationAction
   | DefundingAction
   | ConcludingActionInstigator

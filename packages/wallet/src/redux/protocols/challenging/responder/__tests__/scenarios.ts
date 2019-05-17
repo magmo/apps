@@ -1,18 +1,18 @@
 import * as states from '../state';
 import * as actions from '../actions';
-import * as testScenarios from '../../../__tests__/test-scenarios';
-import * as transactionScenarios from '../../transaction-submission/__tests__';
-import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
+import * as testScenarios from '../../../../__tests__/test-scenarios';
+import * as transactionScenarios from '../../../transaction-submission/__tests__';
+import { EMPTY_SHARED_DATA, SharedData } from '../../../../state';
 
-import { ChannelState, ChannelStore } from '../../../channel-store';
-import * as transactionActions from '../../transaction-submission/actions';
-import { challengeExpiredEvent } from '../../../actions';
+import { ChannelState, ChannelStore } from '../../../../channel-store';
+import * as transactionActions from '../../../transaction-submission/actions';
+import { challengeExpiredEvent } from '../../../../actions';
 import {
   preSuccessState as defundingPreSuccessState,
   successTrigger as defundingSuccessTrigger,
   preFailureState as defundingPreFailureState,
   failureTrigger as defundingFailureTrigger,
-} from '../../defunding/__tests__';
+} from '../../../defunding/__tests__';
 
 // ---------
 // Test data

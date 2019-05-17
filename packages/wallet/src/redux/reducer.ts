@@ -11,10 +11,10 @@ import {
   INITIALIZE_CHANNEL,
 } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
-import * as challengeProtocol from './protocols/challenging';
+import * as challengeProtocol from './protocols/challenging/challenger';
 import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
-import * as challengeResponseProtocol from './protocols/responding';
+import * as challengeResponseProtocol from './protocols/challenging/responder';
 import * as states from './state';
 import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';

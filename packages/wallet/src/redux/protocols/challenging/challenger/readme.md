@@ -1,4 +1,4 @@
-# Challenging Protocol
+# Challenger Protocol
 
 This protocol handles launching a challenge on the blockchain. It includes:
 
