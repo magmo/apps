@@ -11,10 +11,13 @@ import {
   INITIALIZE_CHANNEL,
 } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
-import * as challengeProtocol from './protocols/challenging/challenger';
+import {
+  challengingReducer,
+  initializeChallengerState,
+  initializeResponderState,
+} from './protocols/challenging/reducer';
 import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
-import * as challengeResponseProtocol from './protocols/challenging/responder';
 import * as states from './state';
 import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
@@ -103,9 +106,9 @@ function routeToProtocolReducer(
         return updatedState(state, appSharedData, processState, appProtocolState);
       case WalletProtocol.Challenging:
         const {
-          state: challengingProtocolState,
-          storage: challengingSharedData,
-        } = challengeProtocol.reducer(processState.protocolState, states.sharedData(state), action);
+          protocolState: challengingProtocolState,
+          sharedData: challengingSharedData,
+        } = challengingReducer(processState.protocolState, states.sharedData(state), action);
         return updatedState(state, challengingSharedData, processState, challengingProtocolState);
 
       case WalletProtocol.Concluding:
@@ -118,16 +121,6 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, concludingSharedData, processState, concludingProtocolState);
-      case WalletProtocol.Responding:
-        const {
-          protocolState: respondingProtocolState,
-          sharedData: respondingSharedData,
-        } = challengeResponseProtocol.reducer(
-          processState.protocolState,
-          states.sharedData(state),
-          action,
-        );
-        return updatedState(state, respondingSharedData, processState, respondingProtocolState);
       default:
         // TODO: This should return unreachable(state), but right now, only some protocols are
         // "whitelisted" to run as a top-level process, which means we can't
@@ -194,7 +187,7 @@ function initializeNewProtocol(
     }
     case actions.protocol.CREATE_CHALLENGE_REQUESTED: {
       const { channelId } = action;
-      const { state: protocolState, storage: sharedData } = challengeProtocol.initialize(
+      const { protocolState, sharedData } = initializeChallengerState(
         channelId,
         processId,
         incomingSharedData,
@@ -202,7 +195,7 @@ function initializeNewProtocol(
       return { protocolState, sharedData };
     }
     case actions.protocol.CHALLENGE_CREATED:
-      return challengeResponseProtocol.initialize(
+      return initializeResponderState(
         processId,
         action.channelId,
         incomingSharedData,

@@ -4,9 +4,11 @@ import { ProtocolStateWithSharedData } from '..';
 import { ChallengingState, isTerminal } from './state';
 import { initialize as responderInitialize, responderReducer } from './responder/reducer';
 import { initialize as challengerInitialize, challengerReducer } from './challenger/reducer';
-import { isNonTerminalResponderState } from './responder/state';
-import { ResponderAction } from './responder/actions';
+import { isNonTerminalResponderState, isResponderState } from './responder/state';
+import { ResponderAction, isResponderAction } from './responder/actions';
 import { ChallengerState } from './challenger/states';
+import { ProtocolAction } from '../../actions';
+import { isChallengerAction } from './challenger/actions';
 
 export const initializeResponderState = (
   processId: string,
@@ -26,11 +28,14 @@ export const initializeChallengerState = (
   return { protocolState, sharedData: storage };
 };
 
-export const reducer = (
+export const challengingReducer = (
   protocolState: ChallengerState,
   sharedData: SharedData,
-  action: ResponderAction,
+  action: ProtocolAction,
 ): ProtocolStateWithSharedData<ChallengingState> => {
+  if (!isChallengerAction(action) && !isResponderAction(action)) {
+    return { protocolState, sharedData };
+  }
   if (isTerminal(protocolState)) {
     return { protocolState, sharedData };
   }

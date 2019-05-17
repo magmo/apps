@@ -65,7 +65,7 @@ export function challengerReducer(
   storage: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
-  if (!actions.isChallengingAction(action)) {
+  if (!actions.isChallengerAction(action)) {
     console.warn(`Challenging reducer received non-challenging action ${action.type}.`);
     return { state, storage };
   }

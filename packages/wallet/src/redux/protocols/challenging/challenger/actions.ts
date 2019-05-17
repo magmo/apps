@@ -103,7 +103,7 @@ export const acknowledged = (processId: string): Acknowledged => ({
   processId,
 });
 
-export function isChallengingAction(action: ProtocolAction): action is ChallengerAction {
+export function isChallengerAction(action: ProtocolAction): action is ChallengerAction {
   return (
     isTransactionAction(action) ||
     isDefundingAction(action) ||

@@ -43,7 +43,7 @@ export const challengeCreated = (commitment: Commitment, expiresAt: number, chan
   commitment,
   expiresAt,
   channelId,
-  protocol: WalletProtocol.Responding,
+  protocol: WalletProtocol.Challenging,
 });
 export type ChallengeCreated = ReturnType<typeof challengeCreated>;
 

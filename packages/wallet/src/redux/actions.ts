@@ -95,7 +95,7 @@ export const challengeCreatedEvent = (channelId: string, commitment: Commitment,
   channelId,
   commitment,
   finalizedAt,
-  protocol: WalletProtocol.Responding,
+  protocol: WalletProtocol.Challenging,
   type: CHALLENGE_CREATED_EVENT as typeof CHALLENGE_CREATED_EVENT,
 });
 export type ChallengeCreatedEvent = ReturnType<typeof challengeCreatedEvent>;

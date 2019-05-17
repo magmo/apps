@@ -50,7 +50,7 @@ export const responderReducer = (
   sharedData: SharedData,
   action: ProtocolAction,
 ): ProtocolStateWithSharedData<states.ResponderState> => {
-  if (!actions.isRespondingAction(action)) {
+  if (!actions.isResponderAction(action)) {
     console.warn(`Challenge Responding Reducer called with non responding action ${action.type}`);
     return { protocolState, sharedData };
   }
