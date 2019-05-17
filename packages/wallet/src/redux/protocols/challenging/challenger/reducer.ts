@@ -69,7 +69,11 @@ export function challengerReducer(
     console.warn(`Challenging reducer received non-challenging action ${action.type}.`);
     return { state, storage };
   }
-  if (isTransactionAction(action)) {
+  if (
+    isTransactionAction(action) &&
+    (state.type === 'Challenging.WaitForResponseOrTimeout' ||
+      state.type === 'Challenging.WaitForTransaction')
+  ) {
     return handleTransactionAction(state, storage, action);
   }
   if (isDefundingAction(action)) {
