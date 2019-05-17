@@ -238,7 +238,7 @@ function acknowledgeDefundingSuccessReducer(
   if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
-  return { protocolState: states.closedAndDefunded(), sharedData };
+  return { protocolState: states.closedAndDefunded(), sharedData: hideWallet(sharedData) };
 }
 
 function acknowledgeClosedButNotDefundedReducer(
@@ -249,7 +249,7 @@ function acknowledgeClosedButNotDefundedReducer(
   if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
-  return { protocolState: states.closedButNotDefunded(), sharedData };
+  return { protocolState: states.closedButNotDefunded(), sharedData: hideWallet(sharedData) };
 }
 // helpers
 const handleTransactionSubmissionComplete = (
