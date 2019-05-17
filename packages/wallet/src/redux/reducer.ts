@@ -104,7 +104,7 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, appSharedData, processState, appProtocolState);
-      case WalletProtocol.Challenging:
+      case WalletProtocol.Dispute:
         const {
           protocolState: challengingProtocolState,
           sharedData: challengingSharedData,

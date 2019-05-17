@@ -64,7 +64,7 @@ export function* messageListener() {
       case incoming.RESPOND_TO_CHALLENGE:
         // TODO: This probably should be in a function
         const channelId = getChannelId(action.commitment);
-        const processId = `${WalletProtocol.Challenging}-${channelId}`;
+        const processId = `${WalletProtocol.Dispute}-${channelId}`;
         yield put(responseProvided(processId, action.commitment));
         break;
       case incoming.RECEIVE_MESSAGE:
