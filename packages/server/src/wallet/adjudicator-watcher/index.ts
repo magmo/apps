@@ -7,7 +7,7 @@ import { nitroAdjudicator } from '../utilities/blockchain';
 /**
  * todos:
  * - wire up then other events.
- **/
+ */
 
 enum EventType {
   Deposited,
@@ -52,4 +52,8 @@ export async function listen(eventCallback?: EventCallback) {
     adjudicator.removeAllListeners(depositedFilter);
     adjudicator.removeAllListeners(challengeCreatedFilter);
   };
+}
+
+if (require.main === module) {
+  listen();
 }
