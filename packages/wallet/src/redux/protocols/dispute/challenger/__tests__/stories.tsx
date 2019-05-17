@@ -2,9 +2,9 @@ import { storiesOf } from '@storybook/react';
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
-import { Challenging } from '..';
-import { fakeStore } from '../../../../__stories__/index';
-import StatusBarLayout from '../../../../components/status-bar-layout';
+import { Challenging } from '../../challenger';
+import { fakeStore } from '../../../../../__stories__/index';
+import StatusBarLayout from '../../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
 
 const render = container => () => {

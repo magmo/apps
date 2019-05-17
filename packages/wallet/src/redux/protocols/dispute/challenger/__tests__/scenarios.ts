@@ -1,24 +1,24 @@
 import * as states from '../states';
 import * as actions from '../actions';
-import * as tsScenarios from '../../transaction-submission/__tests__';
-import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
-import { ChannelState } from '../../../channel-store';
-import * as channelScenarios from '../../../__tests__/test-scenarios';
+import * as tsScenarios from '../../../transaction-submission/__tests__';
+import { setChannel, EMPTY_SHARED_DATA } from '../../../../state';
+import { ChannelState } from '../../../../channel-store';
+import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import {
   channelFromCommitments,
   partiallyOpenChannelFromCommitment,
-} from '../../../channel-store/channel-state/__tests__';
+} from '../../../../channel-store/channel-state/__tests__';
 import {
   challengeExpiredEvent,
   respondWithMoveEvent,
   challengeExpirySetEvent,
-} from '../../../actions';
+} from '../../../../actions';
 import {
   preSuccessState as defundingPreSuccessState,
   successTrigger as defundingSuccessTrigger,
   preFailureState as defundingPreFailureState,
   failureTrigger as defundingFailureTrigger,
-} from '../../defunding/__tests__';
+} from '../../../defunding/__tests__';
 
 type Reason = states.FailureReason;
 
@@ -49,9 +49,9 @@ const ourTurn = channelFromCommitments(signedCommitment20, signedCommitment21, a
 const processId = 'processId';
 const tsPreSuccess = tsScenarios.preSuccessState;
 const tsPreFailure = tsScenarios.preFailureState;
-const storage = (channelState: ChannelState) => setChannel(EMPTY_SHARED_DATA, channelState);
+const sharedData = (channelState: ChannelState) => setChannel(EMPTY_SHARED_DATA, channelState);
 
-const defaults = { processId, channelId, storage: storage(theirTurn) };
+const defaults = { processId, channelId, sharedData: sharedData(theirTurn) };
 
 // ------
 // States
@@ -164,7 +164,7 @@ export const challengeTimesOutAndIsNotDefunded = {
 
 export const channelDoesntExist = {
   ...defaults,
-  storage: EMPTY_SHARED_DATA,
+  sharedData: EMPTY_SHARED_DATA,
   acknowledgeFailure: {
     state: acknowledge('ChannelDoesntExist'),
     action: failureAcknowledged,
@@ -173,7 +173,7 @@ export const channelDoesntExist = {
 
 export const channelNotFullyOpen = {
   ...defaults,
-  storage: storage(partiallyOpen),
+  sharedData: sharedData(partiallyOpen),
   acknowledgeFailure: {
     state: acknowledge('NotFullyOpen'),
     action: failureAcknowledged,
@@ -182,7 +182,7 @@ export const channelNotFullyOpen = {
 
 export const alreadyHaveLatest = {
   ...defaults,
-  storage: storage(ourTurn),
+  sharedData: sharedData(ourTurn),
   acknowledgeFailure: {
     state: acknowledge('AlreadyHaveLatest'),
     action: failureAcknowledged,
@@ -203,7 +203,7 @@ export const userDeclinesChallenge = {
 
 export const receiveCommitmentWhileApproving = {
   ...defaults,
-  storage: storage(ourTurn),
+  sharedData: sharedData(ourTurn),
   approveChallenge: {
     state: approveChallenge,
     action: challengeApproved,
@@ -224,4 +224,12 @@ export const transactionFails = {
     state: acknowledge('TransactionFailed'),
     action: failureAcknowledged,
   },
+};
+
+export const defundActionComesDuringAcknowledgeTimeout = {
+  ...defaults,
+  sharedData: sharedData(ourTurn),
+  acknowledgeTimeout,
+
+  defundingSuccessTrigger,
 };

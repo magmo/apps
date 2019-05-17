@@ -1,17 +1,17 @@
-import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../transaction-submission/states';
-import { Properties } from '../../utils';
-import { Commitment } from '../../../domain';
-import { ProtocolState } from '..';
-import { DefundingState } from '../defunding';
+import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../../transaction-submission/states';
+import { Properties } from '../../../utils';
+import { Commitment } from '../../../../domain';
+import { ProtocolState } from '../..';
+import { DefundingState } from '../../defunding';
 
-export type RespondingState =
-  | NonTerminalRespondingState
+export type ResponderState =
+  | NonTerminalResponderState
   | Success
   | ClosedAndDefunded
   | ClosedButNotDefunded
   | Failure;
 
-export type NonTerminalRespondingState =
+export type NonTerminalResponderState =
   | WaitForApproval
   | WaitForTransaction
   | WaitForAcknowledgement
@@ -21,6 +21,7 @@ export type NonTerminalRespondingState =
   | AcknowledgeDefundingSuccess
   | AcknowledgeClosedButNotDefunded;
 
+export type TerminalResponderState = ClosedAndDefunded | ClosedButNotDefunded | Success;
 export const enum FailureReason {
   TransactionFailure = 'Transaction failed',
 }
@@ -108,7 +109,7 @@ export interface Success {
 // Helpers
 // -------
 
-export function isRespondingState(state: ProtocolState): state is RespondingState {
+export function isResponderState(state: ProtocolState): state is ResponderState {
   return (
     state.type === WAIT_FOR_APPROVAL ||
     state.type === WAIT_FOR_TRANSACTION ||
@@ -125,15 +126,13 @@ export function isRespondingState(state: ProtocolState): state is RespondingStat
   );
 }
 
-export function isNonTerminalRespondingState(
+export function isNonTerminalResponderState(
   state: ProtocolState,
-): state is NonTerminalRespondingState {
-  return isRespondingState(state) && !isTerminal(state);
+): state is NonTerminalResponderState {
+  return isResponderState(state) && !isTerminal(state);
 }
 
-export function isTerminal(
-  state: RespondingState,
-): state is ClosedAndDefunded | ClosedButNotDefunded | Success {
+export function isTerminal(state: ResponderState): state is TerminalResponderState {
   return (
     state.type === CLOSED_AND_DEFUNDED ||
     state.type === FAILURE ||

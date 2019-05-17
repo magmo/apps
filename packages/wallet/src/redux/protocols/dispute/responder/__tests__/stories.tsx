@@ -2,10 +2,10 @@ import { storiesOf } from '@storybook/react';
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
-import { fakeStore } from '../../../../__stories__/index';
-import StatusBarLayout from '../../../../components/status-bar-layout';
+import { fakeStore } from '../../../../../__stories__/index';
+import StatusBarLayout from '../../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
-import { Responding } from '../container';
+import { Responder } from '../container';
 
 const render = container => () => {
   // todo: rework this modal stuff
@@ -59,6 +59,6 @@ addStories(transactionFailureStories, 'Responding / Transaction fails');
 function addStories(collection, chapter) {
   Object.keys(collection).map(storyName => {
     const state = collection[storyName];
-    storiesOf(chapter, module).add(storyName, render(<Responding state={state} />));
+    storiesOf(chapter, module).add(storyName, render(<Responder state={state} />));
   });
 }

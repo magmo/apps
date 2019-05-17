@@ -20,6 +20,7 @@ Out of scope (for the time being):
 graph TD
 linkStyle default interpolate basis
   St((start)) --> WFAp(WaitForApproval)
+  WFAp-->|CHALLENGE_EXPIRED| AT(AcknowledgeTimeOut)
   WFAp--> |Approve| HC{Commitment<br/>exists?}
   HC --> |Yes| WFT(WaitForTransaction)
   HC --> |No| WFR(WaitForResponse)
@@ -30,6 +31,7 @@ linkStyle default interpolate basis
   WFD --> |defunding protocol succeeded| AS(AcknowledgeDefundingSuccess)
   WFD --> |defunding protocol failed| ACBND(AcknowledgeClosedButNotDefunded)
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
+  WFT-->|CHALLENGE_EXPIRED| AT(AcknowledgeTimeOut)
   WFAc-->|Acknowledged| S((success))
   WFT --> |TransactionFailed| F((failure))
   ACBND -->|Acknowledged| FCBND((ClosedButNotDefunded))
@@ -53,11 +55,33 @@ Notes:
 
 ## Test Scenarios
 
-1. Respond With Existing Commitment Happy Path: `WaitForApproval`->`WaitForTransaction`->`WaitForAcknowledgement`->`success`
-2. Refute Happy Path: `WaitForApproval`->`WaitForTransaction`->`WaitForAcknowledgement`->`success`
-3. Select Response Happy Path: `WaitForApproval`->`WaitForResponse`->`WaitForTransaction`->`WaitForAcknowledgement`->`success`
-4. Transaction fails: `WaitForApproval`->`WaitForTransaction`->`failure`
-5. Challenge expires and channel defunded:
-   `WaitForResponse`->`AcknowledgeTimeout`-> `WaitForDefund` -> `AcknowledgeDefundingSuccess` -> `ClosedAndDefunded`
-6. Challenge expires and channel NOT defunded:
-   `WaitForDefund` -> `AcknowledgeClosedButNotDefunded` -> `ClosedButNotDefunded`
+1. **Respond With Existing Commitment Happy Path:**
+   - `WaitForApproval`
+   - `WaitForTransaction`
+   - `WaitForAcknowledgement`
+   - `Success`
+2. **Refute Happy Path:**
+   - `WaitForApproval`
+   - `WaitForTransaction`
+   - `WaitForAcknowledgement`
+   - `Success`
+3. **Select Response Happy Path:**
+   - `WaitForApproval`
+   - `WaitForResponse`
+   - `WaitForTransaction`
+   - `WaitForAcknowledgement`
+   - `Success`
+4. **Transaction fails:**
+   - `WaitForApproval`
+   - `WaitForTransaction`
+   - `Failure`
+5. **Challenge expires and channel defunded:**
+   - `WaitForResponse`
+   - `AcknowledgeTimeout`
+   - `WaitForDefund`
+   - `AcknowledgeDefundingSuccess`
+   - `ClosedAndDefunded`
+6. **Challenge expires and channel NOT defunded:**
+   - `WaitForDefund`
+   - `AcknowledgeClosedButNotDefunded`
+   - `ClosedButNotDefunded`

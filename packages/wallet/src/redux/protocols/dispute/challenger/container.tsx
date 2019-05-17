@@ -1,17 +1,17 @@
 import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { NonTerminalState as NonTerminalChallengingState, FailureReason } from './states';
-import { unreachable } from '../../../utils/reducer-utils';
+import { NonTerminalChallengerState, FailureReason } from './states';
+import { unreachable } from '../../../../utils/reducer-utils';
 import * as actions from './actions';
 import ApproveChallenge from './components/approve-challenge';
-import { TransactionSubmission } from '../transaction-submission';
-import Acknowledge from '../shared-components/acknowledge';
+import { TransactionSubmission } from '../../transaction-submission';
+import Acknowledge from '../../shared-components/acknowledge';
 import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout';
-import { Defunding } from '../defunding/container';
+import { Defunding } from '../../defunding/container';
 
 interface Props {
-  state: NonTerminalChallengingState;
+  state: NonTerminalChallengerState;
   approve: (processId: string) => void;
   deny: (processId: string) => void;
   failureAcknowledged: (processId: string) => void;
@@ -20,7 +20,7 @@ interface Props {
   defundChosen: (processId: string) => void;
 }
 
-class ChallengingContainer extends PureComponent<Props> {
+class ChallengerContainer extends PureComponent<Props> {
   render() {
     const {
       state,
@@ -120,7 +120,7 @@ const mapDispatchToProps = {
   defundChosen: actions.defundChosen,
 };
 
-export const Challenging = connect(
+export const Challenger = connect(
   () => ({}),
   mapDispatchToProps,
-)(ChallengingContainer);
+)(ChallengerContainer);

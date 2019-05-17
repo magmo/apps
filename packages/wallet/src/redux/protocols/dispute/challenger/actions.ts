@@ -8,11 +8,11 @@ import {
   REFUTED_EVENT,
   ChallengeExpirySetEvent,
   CHALLENGE_EXPIRY_SET_EVENT,
-} from '../../actions';
-import { isTransactionAction, TransactionAction } from '../transaction-submission/actions';
-import { isDefundingAction } from '../defunding/actions';
+} from '../../../actions';
+import { isTransactionAction, TransactionAction } from '../../transaction-submission/actions';
+import { isDefundingAction } from '../../defunding/actions';
 
-export type ChallengingAction =
+export type ChallengerAction =
   | TransactionAction
   | ChallengeApproved
   | ChallengeDenied
@@ -103,7 +103,7 @@ export const acknowledged = (processId: string): Acknowledged => ({
   processId,
 });
 
-export function isChallengingAction(action: ProtocolAction): action is ChallengingAction {
+export function isChallengerAction(action: ProtocolAction): action is ChallengerAction {
   return (
     isTransactionAction(action) ||
     isDefundingAction(action) ||

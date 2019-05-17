@@ -1,12 +1,12 @@
-import { Properties as P } from '../../utils';
-import { NonTerminalTransactionSubmissionState } from '../transaction-submission';
-import { ProtocolState } from '..';
-import { DefundingState } from '../defunding';
+import { Properties as P } from '../../../utils';
+import { NonTerminalTransactionSubmissionState } from '../../transaction-submission';
+import { ProtocolState } from '../..';
+import { DefundingState } from '../../defunding';
 
-export type ChallengingState = NonTerminalState | TerminalState;
-export type ChallengingStateType = ChallengingState['type'];
+export type ChallengerState = NonTerminalChallengerState | TerminalChallengerState;
+export type ChallengerStateType = ChallengerState['type'];
 
-export type NonTerminalState =
+export type NonTerminalChallengerState =
   | ApproveChallenge
   | WaitForTransaction
   | WaitForResponseOrTimeout
@@ -17,7 +17,7 @@ export type NonTerminalState =
   | AcknowledgeClosedButNotDefunded
   | AcknowledgeSuccess;
 
-export type TerminalState =
+export type TerminalChallengerState =
   | SuccessOpen
   | SuccessClosedAndDefunded
   | SuccessClosedButNotDefunded
@@ -109,11 +109,13 @@ export interface SuccessClosedButNotDefunded {
 // Helpers
 // -------
 
-export function isNonTerminalChallengingState(state: ProtocolState): state is NonTerminalState {
-  return isChallengingState(state) && isNonTerminal(state);
+export function isNonTerminalChallengerState(
+  state: ProtocolState,
+): state is NonTerminalChallengerState {
+  return isChallengerState(state) && isNonTerminal(state);
 }
 
-export function isChallengingState(state: ProtocolState): state is ChallengingState {
+export function isChallengerState(state: ProtocolState): state is ChallengerState {
   return (
     state.type === 'Challenging.ApproveChallenge' ||
     state.type === 'Challenging.WaitForTransaction' ||
@@ -131,7 +133,7 @@ export function isChallengingState(state: ProtocolState): state is ChallengingSt
   );
 }
 
-export function isTerminal(state: ChallengingState): state is TerminalState {
+export function isTerminal(state: ChallengerState): state is TerminalChallengerState {
   return (
     state.type === 'Challenging.Failure' ||
     state.type === 'Challenging.SuccessOpen' ||
@@ -140,7 +142,7 @@ export function isTerminal(state: ChallengingState): state is TerminalState {
   );
 }
 
-export function isNonTerminal(state: ChallengingState): state is NonTerminalState {
+export function isNonTerminal(state: ChallengerState): state is NonTerminalChallengerState {
   return !isTerminal(state);
 }
 // --------

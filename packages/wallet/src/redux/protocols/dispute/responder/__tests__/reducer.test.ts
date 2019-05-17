@@ -1,11 +1,11 @@
 import * as scenarios from './scenarios';
-import { initialize, respondingReducer } from '../reducer';
+import { initialize, responderReducer } from '../reducer';
 
 import * as states from '../state';
-import { Commitment } from '../../../../domain';
-import * as TransactionGenerator from '../../../../utils/transaction-generator';
+import { Commitment } from '../../../../../domain';
+import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { SHOW_WALLET, HIDE_WALLET, CHALLENGE_COMPLETE } from 'magmo-wallet-client';
-import { itSendsThisDisplayEventType, itSendsThisMessage } from '../../../__tests__/helpers';
+import { itSendsThisDisplayEventType, itSendsThisMessage } from '../../../../__tests__/helpers';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };
@@ -20,7 +20,7 @@ Object.defineProperty(TransactionGenerator, 'createRefuteTransaction', {
 
 // helpers
 const itTransitionsToFailure = (
-  result: { protocolState: states.RespondingState },
+  result: { protocolState: states.ResponderState },
   failure: states.Failure,
 ) => {
   it(`transitions to failure with reason ${failure.reason}`, () => {
@@ -43,14 +43,14 @@ const itCallsRefuteWith = (refuteCommitment: Commitment) => {
   });
 };
 
-const itTransitionsTo = (result: { protocolState: states.RespondingState }, type: string) => {
+const itTransitionsTo = (result: { protocolState: states.ResponderState }, type: string) => {
   it(`transitions to ${type}`, () => {
     expect(result.protocolState.type).toEqual(type);
   });
 };
 
 const itSetsChallengeCommitment = (
-  result: { protocolState: states.RespondingState },
+  result: { protocolState: states.ResponderState },
   commitment: Commitment,
 ) => {
   it('sets the correct challenge commitment', () => {
@@ -77,7 +77,7 @@ describe('RESPOND WITH EXISTING MOVE HAPPY-PATH', () => {
     const state = scenario.waitForApproval;
     const action = scenario.approve;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
     itCallsRespondWithMoveWith(scenario.responseCommitment);
@@ -87,7 +87,7 @@ describe('RESPOND WITH EXISTING MOVE HAPPY-PATH', () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionConfirmed;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.WAIT_FOR_ACKNOWLEDGEMENT);
   });
 
@@ -95,7 +95,7 @@ describe('RESPOND WITH EXISTING MOVE HAPPY-PATH', () => {
     const state = scenario.waitForAcknowledgement;
     const action = scenario.acknowledge;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.SUCCESS);
   });
 });
@@ -116,7 +116,7 @@ describe('REFUTE HAPPY-PATH ', () => {
     const state = scenario.waitForApproval;
     const action = scenario.approve;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
     itCallsRefuteWith(scenario.refuteCommitment);
@@ -126,7 +126,7 @@ describe('REFUTE HAPPY-PATH ', () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionConfirmed;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.WAIT_FOR_ACKNOWLEDGEMENT);
   });
 
@@ -134,7 +134,7 @@ describe('REFUTE HAPPY-PATH ', () => {
     const state = scenario.waitForAcknowledgement;
     const action = scenario.acknowledge;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.SUCCESS);
   });
 });
@@ -154,7 +154,7 @@ describe('SELECT RESPONSE HAPPY-PATH ', () => {
     const state = scenario.waitForApproval;
     const action = scenario.approve;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
 
     itTransitionsTo(result, states.WAIT_FOR_RESPONSE);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
@@ -164,7 +164,7 @@ describe('SELECT RESPONSE HAPPY-PATH ', () => {
     const state = scenario.waitForResponse;
     const action = scenario.responseProvided;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
 
     itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
     itTransitionsTo(result, states.WAIT_FOR_TRANSACTION);
@@ -175,7 +175,7 @@ describe('SELECT RESPONSE HAPPY-PATH ', () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionConfirmed;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.WAIT_FOR_ACKNOWLEDGEMENT);
   });
 
@@ -183,7 +183,7 @@ describe('SELECT RESPONSE HAPPY-PATH ', () => {
     const state = scenario.waitForAcknowledgement;
     const action = scenario.acknowledge;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
 
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
     itSendsThisMessage(result.sharedData, CHALLENGE_COMPLETE);
@@ -199,7 +199,7 @@ describe('TRANSACTION FAILED ', () => {
     const state = scenario.waitForTransaction;
     const action = scenario.transactionFailed;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsToFailure(result, scenario.failure);
   });
 });
@@ -212,15 +212,16 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
     const state = scenario.waitForResponse;
     const action = scenario.challengeTimedOut;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+    itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
   });
 
   describe(`when in ${states.ACKNOWLEDGE_TIMEOUT}`, () => {
     const state = scenario.acknowledgeTimeout;
     const action = scenario.defundChosen;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.WAIT_FOR_DEFUND);
   });
 
@@ -228,7 +229,7 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
     const state = scenario.waitForDefund1;
     const action = scenario.defundingSuccessTrigger;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.ACKNOWLEDGE_DEFUNDING_SUCCESS);
   });
 
@@ -236,7 +237,7 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
     const state = scenario.acknowledgeDefundingSuccess;
     const action = scenario.acknowledged;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.CLOSED_AND_DEFUNDED);
   });
 });
@@ -249,7 +250,7 @@ describe('CHALLENGE EXPIRES --> not DEFUNDED', () => {
     const state = scenario.waitForDefund2;
     const action = scenario.defundingFailureTrigger;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED);
   });
 
@@ -257,7 +258,44 @@ describe('CHALLENGE EXPIRES --> not DEFUNDED', () => {
     const state = scenario.acknowledgeClosedButNotDefunded;
     const action = scenario.acknowledged;
 
-    const result = respondingReducer(state, sharedData, action);
+    const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.CLOSED_BUT_NOT_DEFUNDED);
+  });
+});
+
+describe('CHALLENGE EXPIRES when in WAIT_FOR_TRANSACTION', () => {
+  const scenario = scenarios.challengeExpiresDuringWaitForTransaction;
+  const { sharedData } = scenario;
+  describe(`when in ${states.WAIT_FOR_TRANSACTION}`, () => {
+    const state = scenario.waitForTransaction;
+    const action = scenario.challengeTimedOut;
+
+    const result = responderReducer(state, sharedData, action);
+    itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+  });
+});
+
+describe('CHALLENGE EXPIRES when in WAIT_FOR_APPROVAL', () => {
+  const scenario = scenarios.challengeExpiresDuringWaitForApproval;
+  const { sharedData } = scenario;
+  describe(`when in ${states.WAIT_FOR_APPROVAL}`, () => {
+    const state = scenario.waitForApproval;
+    const action = scenario.challengeTimedOut;
+
+    const result = responderReducer(state, sharedData, action);
+    itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+  });
+});
+
+describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
+  const scenario = scenarios.defundActionComesDuringAcknowledgeTimeout;
+  const { sharedData } = scenario;
+  describe(`when in ${states.ACKNOWLEDGE_TIMEOUT}`, () => {
+    const state = scenario.acknowledgeTimeout;
+    const action = scenario.defundingSuccessTrigger;
+
+    const result = responderReducer(state, sharedData, action);
+    // TODO: Is this the correct state?
+    itTransitionsTo(result, states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED);
   });
 });
