@@ -1,10 +1,10 @@
 import { SharedData } from '../state';
-import { ChallengerState } from './challenging/challenger/states';
+import { ChallengerState } from './dispute/challenger/states';
 
 import { DirectFundingState } from './direct-funding/state';
 import { FundingState } from './funding/states';
 import { IndirectFundingState } from './indirect-funding/state';
-import { ResponderState } from './challenging/responder/state';
+import { ResponderState } from './dispute/responder/state';
 import { WithdrawalState } from './withdrawing/states';
 import { ApplicationState } from './application/states';
 import { IndirectDefundingState } from './indirect-defunding/state';

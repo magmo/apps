@@ -14,10 +14,10 @@ import {
 } from './challenger/states';
 import { ProtocolState } from '..';
 
-export type ChallengingState = ResponderState | ChallengerState;
+export type DisputeState = ResponderState | ChallengerState;
 
 export function isTerminal(
-  state: ChallengingState,
+  state: DisputeState,
 ): state is TerminalChallengerState | TerminalResponderState {
   return (
     (isChallengerState(state) && isChallengerTerminal(state)) ||
@@ -25,12 +25,12 @@ export function isTerminal(
   );
 }
 
-export function isChallengingState(state: ProtocolState): state is ChallengerState {
+export function isDisputeState(state: ProtocolState): state is ChallengerState {
   return isChallengerState(state) || isResponderState(state);
 }
 
-export function isNonTerminalChallengingState(
+export function isNonTerminalDisputeState(
   state: ProtocolState,
 ): state is NonTerminalChallengerState | NonTerminalResponderState {
-  return isChallengingState(state) && !isTerminal(state);
+  return isDisputeState(state) && !isTerminal(state);
 }

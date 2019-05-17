@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 interface Props {
   state: NonTerminalResponderState | NonTerminalChallengerState;
 }
-class ChallengingContainer extends PureComponent<Props> {
+class DisputeContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
     if (isChallengerState(state)) {
@@ -20,4 +20,4 @@ class ChallengingContainer extends PureComponent<Props> {
   }
 }
 
-export const Challenging = connect(() => ({}))(ChallengingContainer);
+export const Challenging = connect(() => ({}))(DisputeContainer);

@@ -6,7 +6,7 @@ import { eventChannel } from 'redux-saga';
 import * as application from '../protocols/application/reducer';
 import { isRelayableAction } from '../../communication';
 import { getProcessId } from '../reducer';
-import { responseProvided } from '../protocols/challenging/responder/actions';
+import { responseProvided } from '../protocols/dispute/responder/actions';
 import { WalletProtocol } from '../types';
 import { getChannelId } from '../../domain';
 

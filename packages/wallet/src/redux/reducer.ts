@@ -15,7 +15,7 @@ import {
   challengingReducer,
   initializeChallengerState,
   initializeResponderState,
-} from './protocols/challenging/reducer';
+} from './protocols/dispute/reducer';
 import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
 import * as states from './state';
