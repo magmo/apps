@@ -34,14 +34,14 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
-if (!process.env.TARGET_NETWORK_ID) {
+if (!process.env.CHAIN_NETWORK_ID) {
   console.error(
-    'TARGET_NETWORK_ID is not defined. Please update your .env file and specify a TARGET_NETWORK_ID',
+    'CHAIN_NETWORK_ID is not defined. Please update your .env file and specify a CHAIN_NETWORK_ID',
   );
   process.exit(1);
-} else if (process.env.TARGET_NETWORK_ID.length == 0 || isNaN(process.env.TARGET_NETWORK_ID)) {
+} else if (process.env.CHAIN_NETWORK_ID.length == 0 || isNaN(process.env.CHAIN_NETWORK_ID)) {
   console.error(
-    'TARGET_NETWORK_ID is not a number. Please update your .env file and specify a number for TARGET_NETWORK_ID',
+    'CHAIN_NETWORK_ID is not a number. Please update your .env file and specify a number for CHAIN_NETWORK_ID',
   );
   process.exit(1);
 }

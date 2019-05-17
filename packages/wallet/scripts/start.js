@@ -77,21 +77,21 @@ choosePort(HOST, DEFAULT_PORT).then(port => {
 
   const { deployContracts, startGanache, getNetworkName } = require('magmo-devtools');
   let argv = require('yargs').argv;
-  if (!process.env.TARGET_NETWORK_ID) {
+  if (!process.env.CHAIN_NETWORK_ID) {
     console.error(
-      'TARGET_NETWORK_ID is not defined. Please update your .env file and specify a TARGET_NETWORK_ID',
+      'CHAIN_NETWORK_ID is not defined. Please update your .env file and specify a CHAIN_NETWORK_ID',
     );
     process.exit(1);
-  } else if (process.env.TARGET_NETWORK_ID.length == 0 || isNaN(process.env.TARGET_NETWORK_ID)) {
+  } else if (process.env.CHAIN_NETWORK_ID.length == 0 || isNaN(process.env.CHAIN_NETWORK_ID)) {
     console.error(
-      'TARGET_NETWORK_ID is not a number. Please update your .env file and specify a number for TARGET_NETWORK_ID',
+      'CHAIN_NETWORK_ID is not a number. Please update your .env file and specify a number for CHAIN_NETWORK_ID',
     );
     process.exit(1);
   } else {
-    argv.i = parseInt(process.env.TARGET_NETWORK_ID);
+    argv.i = parseInt(process.env.CHAIN_NETWORK_ID);
   }
 
-  process.env.TARGET_NETWORK = getNetworkName(process.env.TARGET_NETWORK_ID);
+  process.env.TARGET_NETWORK = getNetworkName(process.env.CHAIN_NETWORK_ID);
   startGanache(argv).then(() => {
     deployContracts()
       .then(value => {
