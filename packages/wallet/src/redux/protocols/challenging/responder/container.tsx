@@ -68,7 +68,7 @@ class ResponderContainer extends PureComponent<Props> {
       case states.ACKNOWLEDGE_TIMEOUT:
         return (
           <Acknowledge
-            title="Challende timeout!"
+            title="Challenge timeout!"
             description="You failed to respond to a challenge in time. Defund the channel now?"
             acknowledge={() => defundChosen(state.processId)}
           />

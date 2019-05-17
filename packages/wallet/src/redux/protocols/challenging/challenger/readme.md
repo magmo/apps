@@ -59,16 +59,38 @@ Note:
 
 To test all paths through the state machine we will the following scenarios:
 
-1. **Opponent responds**: `ApproveChallenge` -> `WaitForTransaction` -> `WaitForResponseOrTimeout`
-   -> `AcknowledgeResponse` -> `Open`
-2. **Challenge times out and is defunded**: `WaitForResponseOrTimeout` -> `AcknowledgeTimeout` -> `ChallengerWaitForDefund` -> `AcknowledgeSuccess` -> `ClosedAndDefunded`
-3. **Challenge times out and is not defunded**: `ChallengerWaitForDefund` -> `AcknowledgeClosedButNotDefunded` -> `ClosedButNotDefunded`
-4. **Channel doesn't exist**: `AcknowledgeFailure` -> `Failure`
-   - Challenge requested for `channelId` that doesn't exist in the wallet.
-5. **Channel not fully open**: `AcknowledgeFailure` -> `Failure`
-   - Challenge requested for channel which only has one state (two are needed to challenge).
-6. **Already have latest commitment**: `AcknowledgeFailure` -> `Failure`
-7. **User declines challenge**: `ApproveChallenge` -> `AcknowledgeFailure` -> `Failure`
-8. **Receive commitment while approving**: `ApproveChallenge` -> `AcknowledgeFailure`
-   - The opponent's commitment arrives while the user is approving the challenge
-9. **Transaction fails**: `WaitForTransaction` -> `AcknowledgeFailure` -> `Failure`
+1. **Opponent responds**:
+   - `ApproveChallenge`
+   - `WaitForTransaction`
+   - `WaitForResponseOrTimeout`
+   - `AcknowledgeResponse`
+   - `Open`
+2. **Challenge times out and is defunded**:
+   - `WaitForResponseOrTimeout`
+   - `AcknowledgeTimeout`
+   - `ChallengerWaitForDefund`
+   - `AcknowledgeSuccess`
+   - `ClosedAndDefunded`
+3. **Challenge times out and is not defunded**:
+   - `ChallengerWaitForDefund`
+   - `AcknowledgeClosedButNotDefunded`
+   - `ClosedButNotDefunded`
+4. **Channel doesn't exist**:
+   (Challenge requested for `channelId` that doesn't exist in the wallet.) - `AcknowledgeFailure` - `Failure`
+
+5. **Channel not fully open**:  
+   (Challenge requested for channel which only has one state: two are needed to challenge.) - `AcknowledgeFailure` - `Failure`
+
+6. **Already have latest commitment**:
+   - `AcknowledgeFailure`
+   - `Failure`
+7. **User declines challenge**:
+   - `ApproveChallenge`
+   - `AcknowledgeFailure`
+   - `Failure`
+8. **Receive commitment while approving**:
+   The opponent's commitment arrives while the user is approving the challenge - `ApproveChallenge` - `AcknowledgeFailure`
+9. **Transaction fails**:
+   - `WaitForTransaction`
+   - `AcknowledgeFailure`
+   - `Failure`
