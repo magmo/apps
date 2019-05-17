@@ -23,7 +23,7 @@ class ProtocolContainer extends PureComponent<Props> {
     const { protocolState } = this.props;
     if (fundingStates.isNonTerminalFundingState(protocolState)) {
       return <Funding state={protocolState} />;
-    } else if (!challengingStates.isNonTerminalChallengingState(protocolState)) {
+    } else if (challengingStates.isNonTerminalChallengingState(protocolState)) {
       return <Challenging state={protocolState} />;
     } else if (concludingStates.isConcludingState(protocolState)) {
       return <Concluding state={protocolState} />;
