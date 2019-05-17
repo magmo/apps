@@ -15,6 +15,7 @@ import {
   waitForDefund,
   acknowledgeSuccess,
   AcknowledgeClosedButNotDefunded,
+  WaitForDefund,
 } from './states';
 import { initialize as initializeDefunding, defundingReducer } from '../defunding/reducer';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -171,10 +172,17 @@ function handleDefundingAction(
   storage: Storage,
   action: DefundingAction,
 ): ReturnVal {
-  if (state.type !== 'Challenging.WaitForDefund') {
+  if (
+    state.type !== 'Challenging.WaitForDefund' &&
+    state.type !== 'Challenging.AcknowledgeTimeout'
+  ) {
     return { state, storage };
   }
-
+  if (state.type === 'Challenging.AcknowledgeTimeout') {
+    const updatedState = transitionToWaitForDefunding(state, storage);
+    state = updatedState.state;
+    storage = updatedState.storage;
+  }
   const retVal = defundingReducer(state.defundingState, storage, action);
   const defundingState = retVal.protocolState;
 
@@ -300,18 +308,7 @@ function defundChosen(state: NonTerminalCState, storage: Storage) {
   if (state.type !== 'Challenging.AcknowledgeTimeout') {
     return { state, storage };
   }
-  // initialize defunding state machine
-  const protocolStateWithSharedData = initializeDefunding(
-    state.processId,
-    state.channelId,
-    storage,
-  );
-  const defundingState = protocolStateWithSharedData.protocolState;
-  storage = protocolStateWithSharedData.sharedData;
-  return {
-    state: waitForDefund({ ...state, defundingState }),
-    storage,
-  };
+  return transitionToWaitForDefunding(state, storage);
 }
 function acknowledged(state: NonTerminalCState, storage: Storage) {
   if (state.type === 'Challenging.AcknowledgeClosedButNotDefunded') {
@@ -332,3 +329,24 @@ interface ChannelProps {
 function acknowledgeFailure(props: ChannelProps, reason: FailureReason): NonTerminalCState {
   return acknowledgeFailureState({ ...props, reason });
 }
+
+const transitionToWaitForDefunding = (
+  state: NonTerminalCState,
+  storage: Storage,
+): { state: WaitForDefund; storage: Storage } => {
+  // initialize defunding state machine
+  const protocolStateWithSharedData = initializeDefunding(
+    state.processId,
+    state.channelId,
+    storage,
+  );
+  const defundingState = protocolStateWithSharedData.protocolState;
+  storage = protocolStateWithSharedData.sharedData;
+  return {
+    state: waitForDefund({
+      ...state,
+      defundingState,
+    }),
+    storage,
+  };
+};

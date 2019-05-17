@@ -285,3 +285,16 @@ describe('CHALLENGE EXPIRES when in WAIT_FOR_APPROVAL', () => {
     itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
   });
 });
+
+describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
+  const scenario = scenarios.defundActionComesDuringAcknowledgeTimeout;
+  const { sharedData } = scenario;
+  describe(`when in ${states.ACKNOWLEDGE_TIMEOUT}`, () => {
+    const state = scenario.acknowledgeTimeout;
+    const action = scenario.defundingSuccessTrigger;
+
+    const result = respondingReducer(state, sharedData, action);
+    // TODO: Is this the correct state?
+    itTransitionsTo(result, states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED);
+  });
+});

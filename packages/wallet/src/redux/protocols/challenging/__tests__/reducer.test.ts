@@ -254,6 +254,19 @@ describe('TRANSACTION FAILS  ', () => {
   });
 });
 
+describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
+  const scenario = scenarios.defundActionComesDuringAcknowledgeTimeout;
+  const { storage } = scenario;
+  describe(`when in AcknowledgeTimeout`, () => {
+    const state = scenario.acknowledgeTimeout;
+    const action = scenario.defundingSuccessTrigger;
+
+    const result = challengingReducer(state, storage, action);
+    // TODO: Is this the correct state?
+    itTransitionsTo(result, 'Challenging.AcknowledgeClosedButNotDefunded');
+  });
+});
+
 function itTransitionsTo(result: ReturnVal, type: ChallengingStateType) {
   if (!result.state) {
     console.log(result);

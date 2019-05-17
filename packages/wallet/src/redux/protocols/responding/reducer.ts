@@ -64,6 +64,9 @@ export const respondingReducer = (
     case states.WAIT_FOR_TRANSACTION:
       return waitForTransactionReducer(protocolState, sharedData, action);
     case states.ACKNOWLEDGE_TIMEOUT:
+      if (isDefundingAction(action)) {
+        return handleDefundingAction(protocolState, sharedData, action);
+      }
       return acknowledgeTimeoutReducer(protocolState, sharedData, action);
     case states.WAIT_FOR_DEFUND:
       if (isDefundingAction(action)) {
@@ -90,8 +93,19 @@ function handleDefundingAction(
   sharedData: SharedData,
   action: DefundingAction,
 ): ProtocolStateWithSharedData<states.RespondingState> {
-  if (protocolState.type !== 'Responding.WaitForDefund') {
+  if (
+    protocolState.type !== states.WAIT_FOR_DEFUND &&
+    protocolState.type !== states.ACKNOWLEDGE_TIMEOUT
+  ) {
     return { protocolState, sharedData };
+  }
+
+  // If we received a defunding action before we acknowledge the timeout
+  // we transition right into defunding
+  if (protocolState.type === states.ACKNOWLEDGE_TIMEOUT) {
+    const updatedState = transitionToWaitForDefunding(protocolState, sharedData);
+    protocolState = updatedState.protocolState;
+    sharedData = updatedState.sharedData;
   }
 
   const retVal = defundingReducer(protocolState.defundingState, sharedData, action);
@@ -213,18 +227,7 @@ function acknowledgeTimeoutReducer(
   if (action.type !== 'WALLET.RESPOND.DEFUND_CHOSEN') {
     return { protocolState, sharedData };
   }
-  // initialize defunding state machine
-  const protocolStateWithSharedData = initializeDefunding(
-    protocolState.processId,
-    protocolState.channelId,
-    sharedData,
-  );
-  const defundingState = protocolStateWithSharedData.protocolState;
-  sharedData = protocolStateWithSharedData.sharedData;
-  return {
-    protocolState: states.waitForDefund({ ...protocolState, defundingState }),
-    sharedData,
-  };
+  return transitionToWaitForDefunding(protocolState, sharedData);
 }
 
 function acknowledgeDefundingSuccessReducer(
@@ -378,4 +381,25 @@ const canRefuteWithCommitment = (commitment: Commitment, challengeCommitment: Co
 
 const mover = (commitment: Commitment): PlayerIndex => {
   return commitment.turnNum % 2;
+};
+
+const transitionToWaitForDefunding = (
+  protocolState: states.NonTerminalRespondingState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.WaitForDefund> => {
+  // initialize defunding state machine
+  const protocolStateWithSharedData = initializeDefunding(
+    protocolState.processId,
+    protocolState.channelId,
+    sharedData,
+  );
+  const defundingState = protocolStateWithSharedData.protocolState;
+  sharedData = protocolStateWithSharedData.sharedData;
+  return {
+    protocolState: states.waitForDefund({
+      ...protocolState,
+      defundingState,
+    }),
+    sharedData,
+  };
 };

@@ -202,3 +202,10 @@ export const challengeExpiresDuringWaitForApproval = {
   waitForApproval: waitForApprovalRespond,
   challengeTimedOut,
 };
+
+export const defundActionComesDuringAcknowledgeTimeout = {
+  ...props,
+  acknowledgeTimeout,
+
+  defundingSuccessTrigger,
+};

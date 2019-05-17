@@ -225,3 +225,11 @@ export const transactionFails = {
     action: failureAcknowledged,
   },
 };
+
+export const defundActionComesDuringAcknowledgeTimeout = {
+  ...defaults,
+  storage: storage(ourTurn),
+  acknowledgeTimeout,
+
+  defundingSuccessTrigger,
+};
