@@ -1,4 +1,4 @@
-import { Commitment, getChannelId } from '../../../../domain';
+import { Commitment } from '../../../../domain';
 import { ProtocolStateWithSharedData } from '../..';
 import * as states from './state';
 import * as actions from './actions';
@@ -24,6 +24,7 @@ import {
   hideWallet,
   sendChallengeResponseRequested,
   sendChallengeComplete,
+  sendOpponentConcluded,
 } from '../../reducer-helpers';
 import { ProtocolAction, CHALLENGE_EXPIRED_EVENT } from '../../../actions';
 import * as _ from 'lodash';
@@ -41,7 +42,13 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   return {
     protocolState: states.waitForApproval({ processId, channelId, challengeCommitment }),
-    sharedData: showWallet(registerChannelToMonitor(sharedData, processId, channelId)),
+    sharedData: showWallet(
+      registerChannelToMonitor(
+        sendChallengeResponseRequested(sharedData, channelId),
+        processId,
+        channelId,
+      ),
+    ),
   };
 };
 
@@ -165,7 +172,10 @@ const waitForResponseReducer = (
       );
       return transitionToWaitForTransaction(transaction, protocolState, signResult.store);
     case CHALLENGE_EXPIRED_EVENT:
-      return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
+      return {
+        protocolState: states.acknowledgeTimeout({ ...protocolState }),
+        sharedData: showWallet(sharedData),
+      };
 
     default:
       return { protocolState, sharedData };
@@ -196,11 +206,10 @@ const waitForApprovalReducer = (
   switch (action.type) {
     case actions.RESPOND_APPROVED:
       const { challengeCommitment, processId } = protocolState;
-      const channelId = getChannelId(challengeCommitment);
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
         return {
           protocolState: states.waitForResponse(protocolState),
-          sharedData: hideWallet(sendChallengeResponseRequested(sharedData, channelId)),
+          sharedData: hideWallet(sharedData),
         };
       } else {
         const transaction = craftResponseTransactionWithExistingCommitment(
@@ -238,7 +247,11 @@ function acknowledgeDefundingSuccessReducer(
   if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
-  return { protocolState: states.closedAndDefunded(), sharedData: hideWallet(sharedData) };
+  return {
+    protocolState: states.closedAndDefunded(),
+    sharedData: sendOpponentConcluded(hideWallet(sharedData)),
+  };
+  // From the point of view of the app, it is as if we have concluded
 }
 
 function acknowledgeClosedButNotDefundedReducer(
@@ -249,7 +262,11 @@ function acknowledgeClosedButNotDefundedReducer(
   if (action.type !== 'WALLET.RESPOND.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
-  return { protocolState: states.closedButNotDefunded(), sharedData: hideWallet(sharedData) };
+  return {
+    protocolState: states.closedButNotDefunded(),
+    sharedData: sendOpponentConcluded(hideWallet(sharedData)),
+  };
+  // From the point of view of the app, it is as if we have concluded
 }
 // helpers
 const handleTransactionSubmissionComplete = (

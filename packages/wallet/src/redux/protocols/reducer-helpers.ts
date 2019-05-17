@@ -79,6 +79,7 @@ export function sendConcludeSuccess(sharedData: SharedData): SharedData {
   const newSharedData = { ...sharedData };
   newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
     messageOutbox: magmoWalletClient.concludeSuccess(),
+    // TODO could rename this helper function, as it covers both ways of finalizing a channel
   });
   return newSharedData;
 }
@@ -87,6 +88,7 @@ export function sendOpponentConcluded(sharedData: SharedData): SharedData {
   const newSharedData = { ...sharedData };
   newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
     messageOutbox: magmoWalletClient.opponentConcluded(),
+    // TODO could rename this helper function, as it covers both ways of finalizing a channel
   });
   return newSharedData;
 }
@@ -110,6 +112,7 @@ export function sendChallengeCommitmentReceived(sharedData: SharedData, commitme
   return newSharedData;
 }
 
+// TODO 'Complete' here means the challenge was successfully responded to
 export function sendChallengeComplete(sharedData: SharedData) {
   const newSharedData = { ...sharedData };
   newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {

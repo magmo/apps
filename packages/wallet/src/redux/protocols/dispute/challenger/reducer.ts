@@ -47,117 +47,126 @@ import {
   hideWallet,
   sendChallengeCommitmentReceived,
   sendChallengeComplete,
+  sendConcludeSuccess,
 } from '../../reducer-helpers';
 import { Commitment, SignedCommitment } from '../../../../domain';
 import { isDefundingAction, DefundingAction } from '../../defunding/actions';
 
 const CHALLENGE_TIMEOUT = 5 * 60000;
 
-type Storage = SharedData;
-
 export interface ReturnVal {
   state: CState;
-  storage: Storage;
+  sharedData: SharedData;
 }
 
 export function challengerReducer(
   state: NonTerminalCState,
-  storage: SharedData,
+  sharedData: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
   if (!actions.isChallengerAction(action)) {
     console.warn(`Challenging reducer received non-challenging action ${action.type}.`);
-    return { state, storage };
+    return { state, sharedData };
   }
   if (
     isTransactionAction(action) &&
     (state.type === 'Challenging.WaitForResponseOrTimeout' ||
       state.type === 'Challenging.WaitForTransaction')
   ) {
-    return handleTransactionAction(state, storage, action);
+    return handleTransactionAction(state, sharedData, action);
   }
   if (isDefundingAction(action)) {
-    return handleDefundingAction(state, storage, action);
+    return handleDefundingAction(state, sharedData, action);
   }
 
   switch (action.type) {
     case actions.CHALLENGE_APPROVED:
-      return challengeApproved(state, storage);
+      return challengeApproved(state, sharedData);
     case actions.CHALLENGE_DENIED:
-      return challengeDenied(state, storage);
+      return challengeDenied(state, sharedData);
     case RESPOND_WITH_MOVE_EVENT:
       return challengeResponseReceived(
         state,
-        storage,
+        sharedData,
         action.responseCommitment,
         action.responseSignature,
       );
     case REFUTED_EVENT:
-      return refuteReceived(state, storage);
+      return refuteReceived(state, sharedData);
     case CHALLENGE_EXPIRED_EVENT:
-      return challengeTimedOut(state, storage);
+      return challengeTimedOut(state, sharedData);
     case CHALLENGE_EXPIRY_SET_EVENT:
-      return handleChallengeCreatedEvent(state, storage, action.expiryTime);
+      return handleChallengeCreatedEvent(state, sharedData, action.expiryTime);
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
-      return challengeResponseAcknowledged(state, storage);
+      return challengeResponseAcknowledged(state, sharedData);
     case actions.CHALLENGE_FAILURE_ACKNOWLEDGED:
-      return challengeFailureAcknowledged(state, storage);
+      return challengeFailureAcknowledged(state, sharedData);
     case actions.DEFUND_CHOSEN:
-      return defundChosen(state, storage);
+      return defundChosen(state, sharedData);
     case actions.ACKNOWLEDGED:
-      return acknowledged(state, storage);
+      return acknowledged(state, sharedData);
     default:
       return unreachable(action);
   }
 }
 
-export function initialize(channelId: string, processId: string, storage: Storage): ReturnVal {
-  const channelState = getChannel(storage, channelId);
+export function initialize(
+  channelId: string,
+  processId: string,
+  sharedData: SharedData,
+): ReturnVal {
+  const channelState = getChannel(sharedData, channelId);
   const props = { processId, channelId };
 
   if (!channelState) {
-    return { state: acknowledgeFailure(props, 'ChannelDoesntExist'), storage: showWallet(storage) };
+    return {
+      state: acknowledgeFailure(props, 'ChannelDoesntExist'),
+      sharedData: showWallet(sharedData),
+    };
   }
 
   if (!isFullyOpen(channelState)) {
-    return { state: acknowledgeFailure(props, 'NotFullyOpen'), storage: showWallet(storage) };
+    return { state: acknowledgeFailure(props, 'NotFullyOpen'), sharedData: showWallet(sharedData) };
   }
 
   if (ourTurn(channelState)) {
     // if it's our turn we don't need to challenge
-    return { state: acknowledgeFailure(props, 'AlreadyHaveLatest'), storage: showWallet(storage) };
+    return {
+      state: acknowledgeFailure(props, 'AlreadyHaveLatest'),
+      sharedData: showWallet(sharedData),
+    };
   }
-  storage = registerChannelToMonitor(storage, processId, channelId);
-  return { state: approveChallenge({ channelId, processId }), storage: showWallet(storage) };
+  sharedData = registerChannelToMonitor(sharedData, processId, channelId);
+  return { state: approveChallenge({ channelId, processId }), sharedData: showWallet(sharedData) };
 }
 
 function handleChallengeCreatedEvent(
   state: NonTerminalCState,
-  storage: Storage,
+  sharedData: SharedData,
   expiryTime: number,
 ): ReturnVal {
   if (
     state.type !== 'Challenging.WaitForResponseOrTimeout' &&
     state.type !== 'Challenging.WaitForTransaction'
   ) {
-    return { state, storage };
+    return { state, sharedData };
   } else {
     const updatedState = { ...state, expiryTime };
-    return { state: updatedState, storage };
+    return { state: updatedState, sharedData };
   }
 }
 
 function handleTransactionAction(
   state: NonTerminalCState,
-  storage: Storage,
+  sharedData: SharedData,
   action: TransactionAction,
 ): ReturnVal {
   if (state.type !== 'Challenging.WaitForTransaction') {
-    return { state, storage };
+    return { state, sharedData };
   }
   const transactionSubmission = state.transactionSubmission;
 
-  const retVal = transactionReducer(transactionSubmission, storage, action);
+  const retVal = transactionReducer(transactionSubmission, sharedData, action);
   const transactionState = retVal.state;
 
   if (isSuccess(transactionState)) {
@@ -171,26 +180,26 @@ function handleTransactionAction(
     state = { ...state, transactionSubmission: transactionState };
   }
 
-  return { state, storage: retVal.storage };
+  return { state, sharedData: retVal.storage };
 }
 
 function handleDefundingAction(
   state: NonTerminalCState,
-  storage: Storage,
+  sharedData: SharedData,
   action: DefundingAction,
 ): ReturnVal {
   if (
     state.type !== 'Challenging.WaitForDefund' &&
     state.type !== 'Challenging.AcknowledgeTimeout'
   ) {
-    return { state, storage };
+    return { state, sharedData };
   }
   if (state.type === 'Challenging.AcknowledgeTimeout') {
-    const updatedState = transitionToWaitForDefunding(state, storage);
+    const updatedState = transitionToWaitForDefunding(state, sharedData);
     state = updatedState.state;
-    storage = updatedState.storage;
+    sharedData = updatedState.sharedData;
   }
-  const retVal = defundingReducer(state.defundingState, storage, action);
+  const retVal = defundingReducer(state.defundingState, sharedData, action);
   const defundingState = retVal.protocolState;
 
   if (isDefundingSuccess(defundingState)) {
@@ -201,27 +210,27 @@ function handleDefundingAction(
     // update the transaction state
     state = { ...state, defundingState };
   }
-  return { state, storage: retVal.sharedData };
+  return { state, sharedData: retVal.sharedData };
 }
 
-function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVal {
+function challengeApproved(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
   if (state.type !== 'Challenging.ApproveChallenge') {
-    return { state, storage };
+    return { state, sharedData };
   }
-  const channelState = getChannel(storage, state.channelId);
+  const channelState = getChannel(sharedData, state.channelId);
 
   // These shouldn't have changed but the type system doesn't know that. In any case, we
   // might as well be safe. And type-safe...
   if (!channelState) {
-    return { state: acknowledgeFailure(state, 'ChannelDoesntExist'), storage };
+    return { state: acknowledgeFailure(state, 'ChannelDoesntExist'), sharedData };
   }
   if (!isFullyOpen(channelState)) {
-    return { state: acknowledgeFailure(state, 'NotFullyOpen'), storage };
+    return { state: acknowledgeFailure(state, 'NotFullyOpen'), sharedData };
   }
 
   if (ourTurn(channelState)) {
     // if it's our turn now, a commitment must have arrived while we were approving
-    return { state: acknowledgeFailure(state, 'LatestWhileApproving'), storage };
+    return { state: acknowledgeFailure(state, 'LatestWhileApproving'), sharedData };
   }
 
   // else if we don't have the last two states
@@ -235,96 +244,107 @@ function challengeApproved(state: NonTerminalCState, storage: Storage): ReturnVa
     toSignature,
   );
   // initialize transaction state machine
-  const returnVal = initializeTransaction(transactionRequest, state.processId, storage);
+  const returnVal = initializeTransaction(transactionRequest, state.processId, sharedData);
   const transactionSubmission = returnVal.state;
 
   // transition to wait for transaction
   const newState = waitForTransaction({ ...state, transactionSubmission });
-  return { state: newState, storage: returnVal.storage };
+  return { state: newState, sharedData: returnVal.storage };
 }
 
-function challengeDenied(state: NonTerminalCState, storage: Storage): ReturnVal {
+function challengeDenied(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
   if (state.type !== 'Challenging.ApproveChallenge') {
-    return { state, storage };
+    return { state, sharedData };
   }
 
   state = acknowledgeFailure(state, 'DeclinedByUser');
-  return { state, storage };
+  return { state, sharedData };
 }
 
-function refuteReceived(state: NonTerminalCState, storage: Storage): ReturnVal {
+function refuteReceived(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
-    return { state, storage };
+    return { state, sharedData };
   }
 
   state = acknowledgeResponse(state);
-  return { state, storage };
+  return { state, sharedData };
 }
 
 function challengeResponseReceived(
   state: NonTerminalCState,
-  storage: Storage,
+  sharedData: SharedData,
   challengeCommitment: Commitment,
   challengeSignature: string,
 ): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
-    return { state, storage };
+    return { state, sharedData };
   }
 
   state = acknowledgeResponse(state);
-  storage = sendChallengeCommitmentReceived(storage, challengeCommitment);
+  sharedData = sendChallengeCommitmentReceived(sharedData, challengeCommitment);
 
   const signedCommitment: SignedCommitment = {
     commitment: challengeCommitment,
     signature: challengeSignature,
   };
-  const checkResult = checkAndStore(storage, signedCommitment);
+  const checkResult = checkAndStore(sharedData, signedCommitment);
   if (checkResult.isSuccess) {
-    return { state, storage: checkResult.store };
+    return { state, sharedData: checkResult.store };
   }
 
-  return { state, storage };
+  return { state, sharedData };
 }
 
-function challengeTimedOut(state: NonTerminalCState, storage: Storage): ReturnVal {
+function challengeTimedOut(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
-    return { state, storage };
+    return { state, sharedData };
   }
 
   state = acknowledgeTimeout(state);
-  return { state, storage };
+  return { state, sharedData };
 }
 
-function challengeResponseAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
+function challengeResponseAcknowledged(
+  state: NonTerminalCState,
+  sharedData: SharedData,
+): ReturnVal {
   if (state.type !== 'Challenging.AcknowledgeResponse') {
-    return { state, storage };
+    return { state, sharedData };
   }
-  storage = sendChallengeComplete(hideWallet(storage));
-  return { state: successOpen(), storage };
+  sharedData = sendChallengeComplete(hideWallet(sharedData));
+  return { state: successOpen(), sharedData };
 }
 
-function challengeFailureAcknowledged(state: NonTerminalCState, storage: Storage): ReturnVal {
+function challengeFailureAcknowledged(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
   if (state.type !== 'Challenging.AcknowledgeFailure') {
-    return { state, storage };
+    return { state, sharedData };
   }
 
-  return { state: failure(state), storage: hideWallet(storage) };
+  return { state: failure(state), sharedData: hideWallet(sharedData) };
 }
 
-function defundChosen(state: NonTerminalCState, storage: Storage) {
+function defundChosen(state: NonTerminalCState, sharedData: SharedData) {
   if (state.type !== 'Challenging.AcknowledgeTimeout') {
-    return { state, storage };
+    return { state, sharedData };
   }
-  return transitionToWaitForDefunding(state, storage);
+  return transitionToWaitForDefunding(state, sharedData);
 }
-function acknowledged(state: NonTerminalCState, storage: Storage) {
+function acknowledged(state: NonTerminalCState, sharedData: SharedData) {
   if (state.type === 'Challenging.AcknowledgeClosedButNotDefunded') {
-    return { state: successClosedButNotDefunded(), storage: hideWallet(storage) };
+    return {
+      state: successClosedButNotDefunded(),
+      sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+    };
+    // From the point of view of the app, it is as if we have concluded
   }
   if (state.type === 'Challenging.AcknowledgeSuccess') {
-    return { state: successClosedAndDefunded(), storage: hideWallet(storage) };
+    return {
+      state: successClosedAndDefunded(),
+      sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+    };
+    // From the point of view of the app, it is as if we have concluded
   }
-  return { state, storage };
+  return { state, sharedData };
 }
 // Helpers
 
@@ -339,21 +359,21 @@ function acknowledgeFailure(props: ChannelProps, reason: FailureReason): NonTerm
 
 const transitionToWaitForDefunding = (
   state: NonTerminalCState,
-  storage: Storage,
-): { state: WaitForDefund; storage: Storage } => {
+  sharedData: SharedData,
+): { state: WaitForDefund; sharedData: SharedData } => {
   // initialize defunding state machine
   const protocolStateWithSharedData = initializeDefunding(
     state.processId,
     state.channelId,
-    storage,
+    sharedData,
   );
   const defundingState = protocolStateWithSharedData.protocolState;
-  storage = protocolStateWithSharedData.sharedData;
+  sharedData = protocolStateWithSharedData.sharedData;
   return {
     state: waitForDefund({
       ...state,
       defundingState,
     }),
-    storage,
+    sharedData,
   };
 };

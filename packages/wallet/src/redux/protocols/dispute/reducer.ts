@@ -24,8 +24,12 @@ export const initializeChallengerState = (
   channelId: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<DisputeState> => {
-  const { storage, state: protocolState } = challengerInitialize(processId, channelId, sharedData);
-  return { protocolState, sharedData: storage };
+  const { sharedData: updatedSharedData, state: protocolState } = challengerInitialize(
+    processId,
+    channelId,
+    sharedData,
+  );
+  return { protocolState, sharedData: updatedSharedData };
 };
 
 export const challengingReducer = (
@@ -42,7 +46,11 @@ export const challengingReducer = (
   if (isNonTerminalResponderState(protocolState)) {
     return responderReducer(protocolState, sharedData, action);
   } else {
-    const { state, storage } = challengerReducer(protocolState, sharedData, action);
-    return { protocolState: state, sharedData: storage };
+    const { state, sharedData: updatedSharedData } = challengerReducer(
+      protocolState,
+      sharedData,
+      action,
+    );
+    return { protocolState: state, sharedData: updatedSharedData };
   }
 };

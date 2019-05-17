@@ -214,6 +214,7 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
 
     const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, states.ACKNOWLEDGE_TIMEOUT);
+    itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
   });
 
   describe(`when in ${states.ACKNOWLEDGE_TIMEOUT}`, () => {
