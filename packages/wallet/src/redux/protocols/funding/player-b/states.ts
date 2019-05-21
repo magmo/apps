@@ -1,7 +1,7 @@
 import { ProtocolState } from '../..';
 import { FundingStrategy } from '..';
 import { NonTerminalIndirectFundingState } from '../../indirect-funding/states';
-import { Constructor } from '../../../utils';
+import { StateConstructor } from '../../../utils';
 
 // -------
 // States
@@ -46,7 +46,7 @@ export interface Success {
 // Constructors
 // ------------
 
-export const waitForStrategyProposal: Constructor<WaitForStrategyProposal> = p => {
+export const waitForStrategyProposal: StateConstructor<WaitForStrategyProposal> = p => {
   const { processId, opponentAddress, targetChannelId } = p;
   return {
     type: 'Funding.PlayerB.WaitForStrategyProposal',
@@ -56,7 +56,7 @@ export const waitForStrategyProposal: Constructor<WaitForStrategyProposal> = p =
   };
 };
 
-export const waitForStrategyApproval: Constructor<WaitForStrategyApproval> = p => {
+export const waitForStrategyApproval: StateConstructor<WaitForStrategyApproval> = p => {
   const { processId, opponentAddress, targetChannelId, strategy } = p;
   return {
     type: 'Funding.PlayerB.WaitForStrategyApproval',
@@ -67,7 +67,7 @@ export const waitForStrategyApproval: Constructor<WaitForStrategyApproval> = p =
   };
 };
 
-export const waitForFunding: Constructor<WaitForFunding> = p => {
+export const waitForFunding: StateConstructor<WaitForFunding> = p => {
   const { processId, opponentAddress, fundingState, targetChannelId } = p;
   return {
     type: 'Funding.PlayerB.WaitForFunding',
@@ -78,7 +78,7 @@ export const waitForFunding: Constructor<WaitForFunding> = p => {
   };
 };
 
-export const waitForSuccessConfirmation: Constructor<WaitForSuccessConfirmation> = p => {
+export const waitForSuccessConfirmation: StateConstructor<WaitForSuccessConfirmation> = p => {
   const { processId, opponentAddress, targetChannelId } = p;
   return {
     type: 'Funding.PlayerB.WaitForSuccessConfirmation',
@@ -88,11 +88,11 @@ export const waitForSuccessConfirmation: Constructor<WaitForSuccessConfirmation>
   };
 };
 
-export const success: Constructor<Success> = p => {
+export const success: StateConstructor<Success> = p => {
   return { type: 'Funding.PlayerB.Success' };
 };
 
-export const failure: Constructor<Failure> = p => {
+export const failure: StateConstructor<Failure> = p => {
   const { reason } = p;
   return { type: 'Funding.PlayerB.Failure', reason };
 };

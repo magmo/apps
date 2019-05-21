@@ -65,12 +65,12 @@ const failure2 = states.failure({ reason: 'Opponent refused' });
 // Actions
 // -------
 const strategyProposed = actions.strategyProposed(processId, strategy);
-const strategyApproved = actions.strategyApproved(processId, strategy);
-const successConfirmed = actions.fundingSuccessAcknowledged(processId);
+const strategyApproved = actions.strategyApproved({ processId, strategy });
+const successConfirmed = actions.fundingSuccessAcknowledged({ processId });
 const fundingSuccess = indirectFundingTests.successTrigger;
-const strategyRejected = actions.strategyRejected(processId);
-const cancelledByB = actions.cancelled(processId, PlayerIndex.B);
-const cancelledByA = actions.cancelled(processId, PlayerIndex.A);
+const strategyRejected = actions.strategyRejected({ processId });
+const cancelledByB = actions.cancelled({ processId, by: PlayerIndex.B });
+const cancelledByA = actions.cancelled({ processId, by: PlayerIndex.A });
 
 // ---------
 // Scenarios

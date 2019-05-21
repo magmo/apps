@@ -3,7 +3,7 @@ import { PlayerBState } from './player-b/states';
 
 export * from './player-a/states';
 export * from './player-b/states';
-import { Constructor } from '../../utils';
+import { StateConstructor } from '../../utils';
 
 // -------
 // States
@@ -21,11 +21,11 @@ export interface Failure {
 // Constructors
 // ------------
 
-export const success: Constructor<Success> = p => {
+export const success: StateConstructor<Success> = p => {
   return { type: 'IndirectFunding.Success' };
 };
 
-export const failure: Constructor<Failure> = p => {
+export const failure: StateConstructor<Failure> = p => {
   return { type: 'IndirectFunding.Failure' };
 };
 

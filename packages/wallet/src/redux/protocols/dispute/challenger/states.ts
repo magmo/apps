@@ -1,7 +1,7 @@
 import { NonTerminalTransactionSubmissionState } from '../../transaction-submission';
 import { ProtocolState } from '../..';
 import { DefundingState } from '../../defunding';
-import { Constructor } from '../../../utils';
+import { StateConstructor } from '../../../utils';
 
 // -------
 // States
@@ -93,12 +93,12 @@ export interface SuccessClosedButNotDefunded {
 // Constructors
 // ------------
 
-export const approveChallenge: Constructor<ApproveChallenge> = p => {
+export const approveChallenge: StateConstructor<ApproveChallenge> = p => {
   const { processId, channelId } = p;
   return { type: 'Challenging.ApproveChallenge', processId, channelId };
 };
 
-export const waitForTransaction: Constructor<WaitForTransaction> = p => {
+export const waitForTransaction: StateConstructor<WaitForTransaction> = p => {
   const { processId, channelId, transactionSubmission, expiryTime } = p;
   return {
     type: 'Challenging.WaitForTransaction',
@@ -109,55 +109,57 @@ export const waitForTransaction: Constructor<WaitForTransaction> = p => {
   };
 };
 
-export const waitForResponseOrTimeout: Constructor<WaitForResponseOrTimeout> = p => {
+export const waitForResponseOrTimeout: StateConstructor<WaitForResponseOrTimeout> = p => {
   const { processId, channelId, expiryTime } = p;
   return { type: 'Challenging.WaitForResponseOrTimeout', processId, channelId, expiryTime };
 };
 
-export const acknowledgeResponse: Constructor<AcknowledgeResponse> = p => {
+export const acknowledgeResponse: StateConstructor<AcknowledgeResponse> = p => {
   const { processId, channelId } = p;
   return { type: 'Challenging.AcknowledgeResponse', processId, channelId };
 };
 
-export const acknowledgeTimeout: Constructor<AcknowledgeTimeout> = p => {
+export const acknowledgeTimeout: StateConstructor<AcknowledgeTimeout> = p => {
   const { processId, channelId } = p;
   return { type: 'Challenging.AcknowledgeTimeout', processId, channelId };
 };
 
-export const acknowledgeFailure: Constructor<AcknowledgeFailure> = p => {
+export const acknowledgeFailure: StateConstructor<AcknowledgeFailure> = p => {
   const { processId, channelId, reason } = p;
   return { type: 'Challenging.AcknowledgeFailure', processId, channelId, reason };
 };
 
-export const waitForDefund: Constructor<WaitForDefund> = p => {
+export const waitForDefund: StateConstructor<WaitForDefund> = p => {
   const { processId, channelId, defundingState } = p;
   return { type: 'Challenging.WaitForDefund', processId, channelId, defundingState };
 };
 
-export const acknowledgeClosedButNotDefunded: Constructor<AcknowledgeClosedButNotDefunded> = p => {
+export const acknowledgeClosedButNotDefunded: StateConstructor<
+  AcknowledgeClosedButNotDefunded
+> = p => {
   const { processId, channelId } = p;
   return { type: 'Challenging.AcknowledgeClosedButNotDefunded', processId, channelId };
 };
 
-export const acknowledgeSuccess: Constructor<AcknowledgeSuccess> = p => {
+export const acknowledgeSuccess: StateConstructor<AcknowledgeSuccess> = p => {
   const { processId, channelId } = p;
   return { type: 'Challenging.AcknowledgeSuccess', processId, channelId };
 };
 
-export const failure: Constructor<Failure> = p => {
+export const failure: StateConstructor<Failure> = p => {
   const { reason } = p;
   return { type: 'Challenging.Failure', reason };
 };
 
-export const successClosedAndDefunded: Constructor<SuccessClosedAndDefunded> = p => {
+export const successClosedAndDefunded: StateConstructor<SuccessClosedAndDefunded> = p => {
   return { type: 'Challenging.SuccessClosedAndDefunded' };
 };
 
-export const successClosedButNotDefunded: Constructor<SuccessClosedButNotDefunded> = p => {
+export const successClosedButNotDefunded: StateConstructor<SuccessClosedButNotDefunded> = p => {
   return { type: 'Challenging.SuccessClosedButNotDefunded' };
 };
 
-export const successOpen: Constructor<SuccessOpen> = p => {
+export const successOpen: StateConstructor<SuccessOpen> = p => {
   return { type: 'Challenging.SuccessOpen' };
 };
 

@@ -49,11 +49,11 @@ export function applicationReducer(
     return { protocolState, sharedData };
   }
   switch (action.type) {
-    case actions.OPPONENT_COMMITMENT_RECEIVED:
+    case 'WALLET.APPLICATION.OPPONENT_COMMITMENT_RECEIVED':
       return opponentCommitmentReceivedReducer(protocolState, sharedData, action);
-    case actions.OWN_COMMITMENT_RECEIVED:
+    case 'WALLET.APPLICATION.OWN_COMMITMENT_RECEIVED':
       return ownCommitmentReceivedReducer(protocolState, sharedData, action);
-    case actions.CONCLUDE_REQUESTED:
+    case 'WALLET.APPLICATION.CONCLUDE_REQUESTED':
       return { sharedData, protocolState: states.success({}) };
     default:
       return unreachable(action);

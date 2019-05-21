@@ -5,7 +5,7 @@ export type Properties<T> = Pick<T, Exclude<keyof T, 'type' | 'stage' | 'player'
   [x: string]: any;
 };
 
-// Constructs the type of our typical state constructors
+// Constructs the type of our state constructors
 //
 // Example:
 //
@@ -13,7 +13,11 @@ export type Properties<T> = Pick<T, Exclude<keyof T, 'type' | 'stage' | 'player'
 //       const { processId } = p;
 //       return { type: 'WaitForSend', processId };
 //    }
-export type Constructor<T> = (p: Properties<T>) => T;
+export type StateConstructor<T> = (p: Properties<T>) => T;
+
+// Constructs the type of our action constructors
+// Note: extraneous keys not accepted
+export type ActionConstructor<T> = (p: Pick<T, Exclude<keyof T, 'type' | 'protocol'>>) => T;
 
 export interface StateWithSideEffects<T> {
   state: T;

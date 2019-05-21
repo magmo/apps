@@ -1,6 +1,6 @@
 import { DirectFundingState } from '../../direct-funding/states';
 import { NonTerminalIndirectFundingState } from '../states';
-import { Constructor } from '../../../utils';
+import { StateConstructor } from '../../../utils';
 
 // -------
 // States
@@ -36,12 +36,12 @@ export interface BWaitForPostFundSetup0 {
 // Constructors
 // ------------
 
-export const bWaitForPreFundSetup0: Constructor<BWaitForPreFundSetup0> = p => {
+export const bWaitForPreFundSetup0: StateConstructor<BWaitForPreFundSetup0> = p => {
   const { channelId, processId } = p;
   return { type: 'IndirectFunding.BWaitForPreFundSetup0', channelId, processId };
 };
 
-export const bWaitForDirectFunding: Constructor<BWaitForDirectFunding> = p => {
+export const bWaitForDirectFunding: StateConstructor<BWaitForDirectFunding> = p => {
   const { channelId, ledgerId, directFundingState, processId } = p;
   return {
     type: 'IndirectFunding.BWaitForDirectFunding',
@@ -52,12 +52,12 @@ export const bWaitForDirectFunding: Constructor<BWaitForDirectFunding> = p => {
   };
 };
 
-export const bWaitForPostFundSetup0: Constructor<BWaitForPostFundSetup0> = p => {
+export const bWaitForPostFundSetup0: StateConstructor<BWaitForPostFundSetup0> = p => {
   const { channelId, ledgerId, processId } = p;
   return { type: 'IndirectFunding.BWaitForPostFundSetup0', channelId, ledgerId, processId };
 };
 
-export const bWaitForLedgerUpdate0: Constructor<BWaitForLedgerUpdate0> = p => {
+export const bWaitForLedgerUpdate0: StateConstructor<BWaitForLedgerUpdate0> = p => {
   const { channelId, ledgerId, processId } = p;
   return { type: 'IndirectFunding.BWaitForLedgerUpdate0', channelId, ledgerId, processId };
 };

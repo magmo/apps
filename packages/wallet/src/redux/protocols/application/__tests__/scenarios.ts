@@ -46,25 +46,32 @@ const success = states.success({});
 // Actions
 // -------
 const initializeChannel = protocolActions.initializeChannel();
-const receivePreFundSetup = actions.ownCommitmentReceived(processId, preFundCommitment0);
-const receiveOurCommitment = actions.ownCommitmentReceived(
+const receivePreFundSetup = actions.ownCommitmentReceived({
   processId,
-  signedCommitment22.commitment,
-);
+  commitment: preFundCommitment0,
+});
+const receiveOurCommitment = actions.ownCommitmentReceived({
+  processId,
+  commitment: signedCommitment22.commitment,
+});
 const { commitment, signature } = signedCommitment21;
-const receiveTheirCommitment = actions.opponentCommitmentReceived(processId, commitment, signature);
-
-const receiveTheirInvalidCommitment = actions.opponentCommitmentReceived(
+const receiveTheirCommitment = actions.opponentCommitmentReceived({
   processId,
-  signedCommitment19.commitment,
-  signedCommitment19.signature,
-);
-const receiveOurInvalidCommitment = actions.ownCommitmentReceived(
-  processId,
-  signedCommitment20.commitment,
-);
+  commitment,
+  signature,
+});
 
-const concludeRequested = actions.concludeRequested(APPLICATION_PROCESS_ID);
+const receiveTheirInvalidCommitment = actions.opponentCommitmentReceived({
+  processId,
+  commitment: signedCommitment19.commitment,
+  signature: signedCommitment19.signature,
+});
+const receiveOurInvalidCommitment = actions.ownCommitmentReceived({
+  processId,
+  commitment: signedCommitment20.commitment,
+});
+
+const concludeRequested = actions.concludeRequested({ processId: APPLICATION_PROCESS_ID });
 // -------
 // Scenarios
 // -------

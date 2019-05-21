@@ -4,7 +4,7 @@ import { createDepositTransaction } from '../../../utils/transaction-generator';
 import { SharedData } from '../../state';
 import { initialize as initTransactionState } from '../transaction-submission/reducer';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
-import { Properties, Constructor } from '../../utils';
+import { Properties, StateConstructor } from '../../utils';
 import { DirectFundingRequested } from './actions';
 
 // -------
@@ -58,7 +58,7 @@ export interface FundingFailure extends BaseDirectFundingState {
 // Constructors
 // ------------
 
-export const baseDirectFundingState: Constructor<BaseDirectFundingState> = params => {
+export const baseDirectFundingState: StateConstructor<BaseDirectFundingState> = params => {
   const {
     processId,
     requestedTotalFunds,
@@ -79,7 +79,7 @@ export const baseDirectFundingState: Constructor<BaseDirectFundingState> = param
   };
 };
 
-export const notSafeToDeposit: Constructor<NotSafeToDeposit> = params => {
+export const notSafeToDeposit: StateConstructor<NotSafeToDeposit> = params => {
   return {
     ...baseDirectFundingState(params),
     type: 'DirectFunding.NotSafeToDeposit',
@@ -96,7 +96,7 @@ export function waitForDepositTransaction(
     transactionSubmissionState,
   };
 }
-export const waitForFundingAndPostFundSetup: Constructor<
+export const waitForFundingAndPostFundSetup: StateConstructor<
   WaitForFundingAndPostFundSetup
 > = params => {
   return {
@@ -107,14 +107,14 @@ export const waitForFundingAndPostFundSetup: Constructor<
   };
 };
 
-export const fundingSuccess: Constructor<FundingSuccess> = params => {
+export const fundingSuccess: StateConstructor<FundingSuccess> = params => {
   return {
     ...baseDirectFundingState(params),
     type: 'DirectFunding.FundingSuccess',
   };
 };
 
-export const fundingFailure: Constructor<FundingFailure> = params => {
+export const fundingFailure: StateConstructor<FundingFailure> = params => {
   return {
     ...baseDirectFundingState(params),
     type: 'DirectFunding.FundingFailure',

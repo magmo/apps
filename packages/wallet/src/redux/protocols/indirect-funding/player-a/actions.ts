@@ -1,22 +1,44 @@
+import { ActionConstructor } from 'src/redux/utils';
 import { Commitment } from '../../../../domain';
 
-export const STRATEGY_APPROVED = 'WALLET.INDIRECT_FUNDING.STRATEGY_APPROVED';
-export const strategyApproved = (channelId: string, consensusLibrary: string) => ({
-  type: STRATEGY_APPROVED as typeof STRATEGY_APPROVED,
-  processId: channelId,
-  channelId,
-  consensusLibrary,
+// -------
+// Actions
+// -------
+export interface StrategyApproved {
+  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.STRATEGY_APPROVED';
+  processId: string;
+  channelId: string;
+  consensusLibrary: string;
+}
+
+export interface AllocationChanged {
+  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.ALLOCATION_CHANGED';
+  processId: string;
+  channelId: string;
+  consensusLibrary: string;
+  commitment: Commitment;
+}
+// --------
+// Constructors
+// --------
+
+export const strategyApproved: ActionConstructor<StrategyApproved> = p => ({
+  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.STRATEGY_APPROVED',
+  processId: p.processId,
+  channelId: p.channelId,
+  consensusLibrary: p.consensusLibrary,
 });
 
-export type StrategyApproved = ReturnType<typeof strategyApproved>;
-
-export const ALLOCATION_CHANGED = 'WALLET.INDIRECT_FUNDING.ALLOCATION_CHANGED';
-export const allocationChanged = (channelId: string, commitment: Commitment) => ({
-  type: ALLOCATION_CHANGED as typeof ALLOCATION_CHANGED,
-  processId: channelId,
-  channelId,
-  commitment,
+export const allocationChanged: ActionConstructor<AllocationChanged> = p => ({
+  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.ALLOCATION_CHANGED',
+  processId: p.processId,
+  channelId: p.channelId,
+  consensusLibrary: p.consensusLibrary,
+  commitment: p.commitment,
 });
-export type AllocationChanged = ReturnType<typeof allocationChanged>;
+
+// --------
+// Unions and Guards
+// --------
 
 export type Action = StrategyApproved | AllocationChanged;

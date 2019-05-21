@@ -85,11 +85,11 @@ const channelNotClosedFailure = states.failure(states.FailureReason.ChannelNotCl
 // Actions
 // -------
 
-const approved = actions.withdrawalApproved(processId, channelId);
-const rejected = actions.withdrawalRejected(processId);
-const successAcknowledged = actions.withdrawalSuccessAcknowledged(processId);
-const transactionConfirmed = transactionActions.transactionConfirmed(processId);
-const transactionFailed = transactionActions.transactionFailed(processId);
+const approved = actions.withdrawalApproved({ processId, withdrawalAddress });
+const rejected = actions.withdrawalRejected({ processId });
+const successAcknowledged = actions.withdrawalSuccessAcknowledged({ processId });
+const transactionConfirmed = transactionActions.transactionConfirmed({ processId });
+const transactionFailed = transactionActions.transactionFailed({ processId });
 
 // ---------
 // Scenarios

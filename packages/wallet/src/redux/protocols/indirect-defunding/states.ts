@@ -1,4 +1,4 @@
-import { Constructor } from '../../utils';
+import { StateConstructor } from '../../utils';
 // -------
 // States
 // -------
@@ -24,7 +24,7 @@ export interface Success {
 // Constructors
 // -------
 
-export const waitForConclude: Constructor<WaitForConclude> = p => {
+export const waitForConclude: StateConstructor<WaitForConclude> = p => {
   const { processId, ledgerId, channelId } = p;
   return {
     type: 'IndirectDefunding.WaitForConclude',
@@ -33,7 +33,7 @@ export const waitForConclude: Constructor<WaitForConclude> = p => {
     channelId,
   };
 };
-export const waitForLedgerUpdate: Constructor<WaitForLedgerUpdate> = p => {
+export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
   const { processId, ledgerId, channelId, proposedAllocation, proposedDestination } = p;
   return {
     type: 'IndirectDefunding.WaitForLedgerUpdate',
@@ -45,11 +45,11 @@ export const waitForLedgerUpdate: Constructor<WaitForLedgerUpdate> = p => {
   };
 };
 
-export const success: Constructor<Success> = p => {
+export const success: StateConstructor<Success> = p => {
   return { type: 'IndirectDefunding.Success' };
 };
 
-export const failure: Constructor<Failure> = p => {
+export const failure: StateConstructor<Failure> = p => {
   const { reason } = p;
   return { type: 'IndirectDefunding.Failure', reason };
 };

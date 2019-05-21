@@ -1,4 +1,4 @@
-import { Constructor } from '../../../utils';
+import { StateConstructor } from '../../../utils';
 import { DefundingState } from '../../defunding';
 export type InstigatorConcludingState =
   | InstigatorNonTerminalState
@@ -64,34 +64,34 @@ export function isConcludingInstigatorState(
 // Constructors
 // ------------
 
-export const instigatorApproveConcluding: Constructor<ApproveConcluding> = p => {
+export const instigatorApproveConcluding: StateConstructor<ApproveConcluding> = p => {
   const { processId, channelId } = p;
   return { type: 'ConcludingInstigator.ApproveConcluding', processId, channelId };
 };
 
-export const instigatorWaitForOpponentConclude: Constructor<WaitForOpponentConclude> = p => {
+export const instigatorWaitForOpponentConclude: StateConstructor<WaitForOpponentConclude> = p => {
   const { processId, channelId } = p;
   return { type: 'ConcludingInstigator.WaitForOpponentConclude', processId, channelId };
 };
 
-export const instigatorAcknowledgeConcludeReceived: Constructor<
+export const instigatorAcknowledgeConcludeReceived: StateConstructor<
   AcknowledgeConcludeReceived
 > = p => {
   const { processId, channelId } = p;
   return { type: 'ConcludingInstigator.AcknowledgeConcludeReceived', processId, channelId };
 };
 
-export const instigatorAcknowledgeSuccess: Constructor<AcknowledgeSuccess> = p => {
+export const instigatorAcknowledgeSuccess: StateConstructor<AcknowledgeSuccess> = p => {
   const { processId, channelId } = p;
   return { type: 'ConcludingInstigator.AcknowledgeSuccess', processId, channelId };
 };
 
-export const instigatorAcknowledgeFailure: Constructor<AcknowledgeFailure> = p => {
+export const instigatorAcknowledgeFailure: StateConstructor<AcknowledgeFailure> = p => {
   const { processId, channelId, reason } = p;
   return { type: 'ConcludingInstigator.AcknowledgeFailure', processId, channelId, reason };
 };
 
-export const instigatorWaitForDefund: Constructor<WaitForDefund> = p => {
+export const instigatorWaitForDefund: StateConstructor<WaitForDefund> = p => {
   const { processId, channelId, defundingState } = p;
   return { type: 'ConcludingInstigator.WaitForDefund', processId, channelId, defundingState };
 };

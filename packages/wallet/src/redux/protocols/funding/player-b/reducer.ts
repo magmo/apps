@@ -50,13 +50,13 @@ export function fundingReducer(
   switch (action.type) {
     case actions.STRATEGY_PROPOSED:
       return strategyProposed(state, sharedData, action);
-    case actions.STRATEGY_APPROVED:
+    case 'WALLET.FUNDING.PLAYER_B.STRATEGY_APPROVED':
       return strategyApproved(state, sharedData, action);
-    case actions.STRATEGY_REJECTED:
+    case 'WALLET.FUNDING.PLAYER_B.STRATEGY_REJECTED':
       return strategyRejected(state, sharedData, action);
-    case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
+    case 'WALLET.FUNDING.PLAYER_B.FUNDING_SUCCESS_ACKNOWLEDGED':
       return fundingSuccessAcknowledged(state, sharedData, action);
-    case actions.CANCELLED:
+    case 'WALLET.FUNDING.PLAYER_B.CANCELLED':
       return cancelled(state, sharedData, action);
     default:
       return unreachable(action);

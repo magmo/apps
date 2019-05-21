@@ -1,4 +1,89 @@
 import { WalletAction } from '../../actions';
+import { ActionConstructor } from 'src/redux/utils';
+
+// -------
+// Actions
+// -------
+
+export interface TransactionSent {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SENT';
+  processId: string;
+}
+
+export interface TransactionSubmissionFailed {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMISSION_FAILED';
+  processId: string;
+  error: { message?: string; code };
+}
+
+export interface TransactionSubmitted {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMITTED';
+  processId: string;
+  transactionHash: string;
+}
+
+export interface TransactionConfirmed {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_CONFIRMED';
+  processId: string;
+  contractAddress?: string;
+}
+export interface TransactionRetryApproved {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_APPROVED';
+  processId: string;
+}
+export interface TransactionRetryDenied {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_DENIED';
+  processId: string;
+}
+
+export interface TransactionFailed {
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_FAILED';
+  processId: string;
+}
+// --------
+// Constructors
+// --------
+
+export const transactionSent: ActionConstructor<TransactionSent> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SENT',
+  processId: p.processId,
+});
+
+export const transactionSubmissionFailed: ActionConstructor<TransactionSubmissionFailed> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMISSION_FAILED',
+  error: p.error,
+  processId: p.processId,
+});
+
+export const transactionSubmitted: ActionConstructor<TransactionSubmitted> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMITTED',
+  processId: p.processId,
+  transactionHash: p.transactionHash,
+});
+
+export const transactionConfirmed: ActionConstructor<TransactionConfirmed> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_CONFIRMED',
+  processId: p.processId,
+  contractAddress: p.contractAddress,
+});
+
+export const transactionRetryApproved: ActionConstructor<TransactionRetryApproved> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_APPROVED',
+  processId: p.processId,
+});
+
+export const transactionRetryDenied: ActionConstructor<TransactionRetryDenied> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_DENIED',
+  processId: p.processId,
+});
+
+export const transactionFailed: ActionConstructor<TransactionFailed> = p => ({
+  type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_FAILED',
+  processId: p.processId,
+});
+// --------
+// Unions and Guards
+// --------
 
 export type TransactionAction =
   | TransactionSent
@@ -9,124 +94,14 @@ export type TransactionAction =
   | TransactionRetryDenied
   | TransactionFailed;
 
-export const TRANSACTION_SENT = 'WALLET.TRANSACTION_SENT';
-export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED';
-export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.TRANSACTION_SUBMISSION_FAILED';
-export const TRANSACTION_CONFIRMED = 'WALLET.TRANSACTION_CONFIRMED';
-export const TRANSACTION_FAILED = 'WALLET.TRANSACTION_FAILED';
-export const TRANSACTION_RETRY_APPROVED = 'WALLET.TRANSACTION_RETRY_APPROVED';
-export const TRANSACTION_RETRY_DENIED = 'WALLET.TRANSACTION_RETRY_DENIED';
-export const TRANSACTION_FINALIZED = 'WALLET.TRANSACTION_FINALIZED'; // currently unused
-
-export interface TransactionSent {
-  type: typeof TRANSACTION_SENT;
-  processId: string;
-}
-
-export interface TransactionSubmissionFailed {
-  type: typeof TRANSACTION_SUBMISSION_FAILED;
-  processId: string;
-  error: { message?: string; code };
-}
-
-export interface TransactionSubmitted {
-  type: typeof TRANSACTION_SUBMITTED;
-  processId: string;
-  transactionHash: string;
-}
-
-export interface TransactionConfirmed {
-  type: typeof TRANSACTION_CONFIRMED;
-  processId: string;
-  contractAddress?: string;
-}
-
-export interface TransactionFinalized {
-  type: typeof TRANSACTION_FINALIZED;
-  processId: string;
-}
-
-export interface TransactionRetryApproved {
-  type: typeof TRANSACTION_RETRY_APPROVED;
-  processId: string;
-}
-export interface TransactionRetryDenied {
-  type: typeof TRANSACTION_RETRY_DENIED;
-  processId: string;
-}
-
-export interface TransactionFailed {
-  type: typeof TRANSACTION_FAILED;
-  processId: string;
-}
-
-// --------
-// Creators
-// --------
-
-export const transactionSent = (processId: string): TransactionSent => ({
-  type: TRANSACTION_SENT,
-  processId,
-});
-
-export const transactionSubmissionFailed = (
-  processId: string,
-  error: { message?: string; code },
-): TransactionSubmissionFailed => ({
-  type: TRANSACTION_SUBMISSION_FAILED,
-  error,
-  processId,
-});
-
-export const transactionSubmitted = (
-  processId: string,
-  transactionHash: string,
-): TransactionSubmitted => ({
-  type: TRANSACTION_SUBMITTED,
-  processId,
-  transactionHash,
-});
-
-export const transactionConfirmed = (
-  processId: string,
-  contractAddress?: string,
-): TransactionConfirmed => ({
-  type: TRANSACTION_CONFIRMED,
-  processId,
-  contractAddress,
-});
-
-export const transactionFinalized = (processId: string): TransactionFinalized => ({
-  type: TRANSACTION_FINALIZED,
-  processId,
-});
-
-export const transactionRetryApproved = (processId: string): TransactionRetryApproved => ({
-  type: TRANSACTION_RETRY_APPROVED,
-  processId,
-});
-
-export const transactionRetryDenied = (processId: string): TransactionRetryDenied => ({
-  type: TRANSACTION_RETRY_DENIED,
-  processId,
-});
-
-export const transactionFailed = (processId: string): TransactionFailed => ({
-  type: TRANSACTION_FAILED,
-  processId,
-});
-
-// -------
-// Helpers
-// -------
 export const isTransactionAction = (action: WalletAction): action is TransactionAction => {
   return (
-    action.type === TRANSACTION_CONFIRMED ||
-    action.type === TRANSACTION_FAILED ||
-    action.type === TRANSACTION_RETRY_APPROVED ||
-    action.type === TRANSACTION_RETRY_DENIED ||
-    action.type === TRANSACTION_SENT ||
-    action.type === TRANSACTION_SUBMISSION_FAILED ||
-    action.type === TRANSACTION_SUBMITTED
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_CONFIRMED' ||
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_FAILED' ||
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_APPROVED' ||
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_DENIED' ||
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SENT' ||
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMISSION_FAILED' ||
+    action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMITTED'
   );
 };

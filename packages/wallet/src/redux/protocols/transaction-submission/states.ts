@@ -1,4 +1,4 @@
-import { Constructor } from '../../utils';
+import { StateConstructor } from '../../utils';
 import { TransactionRequest } from 'ethers/providers';
 
 // -------
@@ -63,22 +63,22 @@ export function isFailure(state: TransactionSubmissionState): state is Failure {
 // Constructors
 // ------------
 
-export const waitForSend: Constructor<WaitForSend> = p => {
+export const waitForSend: StateConstructor<WaitForSend> = p => {
   const { transaction, processId } = p;
   return { type: 'TransactionSubmission.WaitForSend', transaction, processId };
 };
 
-export const waitForSubmission: Constructor<WaitForSubmission> = p => {
+export const waitForSubmission: StateConstructor<WaitForSubmission> = p => {
   const { transaction, processId } = p;
   return { type: 'TransactionSubmission.WaitForSubmission', transaction, processId };
 };
 
-export const approveRetry: Constructor<ApproveRetry> = p => {
+export const approveRetry: StateConstructor<ApproveRetry> = p => {
   const { transaction, processId } = p;
   return { type: 'TransactionSubmission.ApproveRetry', transaction, processId };
 };
 
-export const waitForConfirmation: Constructor<WaitForConfirmation> = p => {
+export const waitForConfirmation: StateConstructor<WaitForConfirmation> = p => {
   const { transaction, transactionHash, processId } = p;
   return {
     type: 'TransactionSubmission.WaitForConfirmation',

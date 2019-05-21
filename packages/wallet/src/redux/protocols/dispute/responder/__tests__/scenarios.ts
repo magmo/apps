@@ -100,11 +100,14 @@ const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded({
 // ------
 // Actions
 // ------
-const approve = actions.respondApproved(processId);
-const acknowledge = actions.respondSuccessAcknowledged(processId);
-const responseProvided = actions.responseProvided(processId, testScenarios.gameCommitment3);
-const defundChosen = actions.defundChosen(processId);
-const acknowledged = actions.acknowledged(processId);
+const approve = actions.respondApproved({ processId });
+const acknowledge = actions.respondSuccessAcknowledged({ processId });
+const responseProvided = actions.responseProvided({
+  processId,
+  commitment: testScenarios.gameCommitment3,
+});
+const defundChosen = actions.defundChosen({ processId });
+const acknowledged = actions.acknowledged({ processId });
 const challengeTimedOut = challengeExpiredEvent(processId, channelId, 1000);
 
 // ---------

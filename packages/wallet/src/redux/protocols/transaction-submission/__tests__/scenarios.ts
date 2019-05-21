@@ -27,16 +27,19 @@ const failure2 = states.failure('TransactionFailed');
 // -------
 // Actions
 // -------
-const sent = actions.transactionSent(processId);
-const submitted = actions.transactionSubmitted(processId, transactionHash);
-const submissionFailed = actions.transactionSubmissionFailed(processId, {
-  message: 'Insufficient funds',
-  code: 123,
+const sent = actions.transactionSent({ processId });
+const submitted = actions.transactionSubmitted({ processId, transactionHash });
+const submissionFailed = actions.transactionSubmissionFailed({
+  processId,
+  error: {
+    message: 'Insufficient funds',
+    code: 123,
+  },
 });
-const confirmed = actions.transactionConfirmed(processId);
-const retryApproved = actions.transactionRetryApproved(processId);
-const retryDenied = actions.transactionRetryDenied(processId);
-const failed = actions.transactionFailed(processId);
+const confirmed = actions.transactionConfirmed({ processId });
+const retryApproved = actions.transactionRetryApproved({ processId });
+const retryDenied = actions.transactionRetryDenied({ processId });
+const failed = actions.transactionFailed({ processId });
 
 // ---------
 // Scenarios

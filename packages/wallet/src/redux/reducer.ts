@@ -4,12 +4,7 @@ import * as actions from './actions';
 import { accumulateSideEffects } from './outbox';
 import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
-import {
-  isNewProcessAction,
-  isProtocolAction,
-  NewProcessAction,
-  INITIALIZE_CHANNEL,
-} from './protocols/actions';
+import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
 import {
   challengingReducer,
@@ -82,7 +77,7 @@ function routeToProtocolReducer(
 ): states.Initialized {
   const processState = state.processStore[action.processId];
   if (!processState) {
-    // Log warning?
+    console.warn('No process');
     return state;
   } else {
     switch (processState.protocol) {
@@ -148,7 +143,7 @@ function updatedState(
 export function getProcessId(action: NewProcessAction): string {
   if (isStartProcessAction(action)) {
     return communication.getProcessId(action);
-  } else if (action.type === INITIALIZE_CHANNEL) {
+  } else if (action.type === 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL') {
     return APPLICATION_PROCESS_ID;
   } else if ('channelId' in action) {
     return `${action.protocol}-${action.channelId}`;
@@ -163,11 +158,11 @@ function initializeNewProtocol(
   const processId = getProcessId(action);
   const incomingSharedData = states.sharedData(state);
   switch (action.type) {
-    case actions.protocol.FUNDING_REQUESTED: {
+    case 'WALLET.NEW_PROCESS.FUNDING_REQUESTED': {
       const { channelId } = action;
       return fundProtocol.initialize(incomingSharedData, channelId, processId, action.playerIndex);
     }
-    case actions.protocol.CONCLUDE_REQUESTED: {
+    case 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED': {
       const { channelId } = action;
       const { protocolState, sharedData } = concludingProtocol.initializeInstigatorState(
         channelId,
@@ -185,7 +180,7 @@ function initializeNewProtocol(
       );
       return { protocolState, sharedData };
     }
-    case actions.protocol.CREATE_CHALLENGE_REQUESTED: {
+    case 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED': {
       const { channelId } = action;
       const { protocolState, sharedData } = initializeChallengerState(
         channelId,
@@ -194,14 +189,14 @@ function initializeNewProtocol(
       );
       return { protocolState, sharedData };
     }
-    case actions.protocol.CHALLENGE_CREATED:
+    case 'WALLET.NEW_PROCESS.CHALLENGE_CREATED':
       return initializeResponderState(
         processId,
         action.channelId,
         incomingSharedData,
         action.commitment,
       );
-    case actions.protocol.INITIALIZE_CHANNEL:
+    case 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL':
       return applicationProtocol.initialize(incomingSharedData);
 
     default:

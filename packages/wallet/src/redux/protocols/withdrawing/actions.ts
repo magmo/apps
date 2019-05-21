@@ -1,58 +1,62 @@
 import { BaseProcessAction } from '../actions';
 import { TransactionAction } from '../transaction-submission/actions';
 import { WalletAction, isTransactionAction } from '../../actions';
+import { ActionConstructor } from 'src/redux/utils';
 
-export const WITHDRAWAL_APPROVED = 'WALLET.WITHDRAWAL_APPROVED';
-export const WITHDRAWAL_SUCCESS_ACKNOWLEDGED = 'WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
-export const WITHDRAWAL_REJECTED = 'WITHDRAWAL_REJECTED';
+// -------
+// Actions
+// -------
+export interface WithdrawalApproved extends BaseProcessAction {
+  type: 'WALLET.WITHDRAWING.WITHDRAWAL_APPROVED';
+  processId: string;
+  withdrawalAddress: string;
+}
 
+export interface WithdrawalRejected extends BaseProcessAction {
+  type: 'WALLET.WITHDRAWING.WITHDRAWAL_REJECTED';
+  processId: string;
+}
+export interface WithdrawalSuccessAcknowledged extends BaseProcessAction {
+  type: 'WALLET.WITHDRAWING.WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
+  processId: string;
+}
+
+// -------
+// Constructors
+// -------
+
+export const withdrawalApproved: ActionConstructor<WithdrawalApproved> = p => ({
+  type: 'WALLET.WITHDRAWING.WITHDRAWAL_APPROVED',
+  withdrawalAddress: p.withdrawalAddress,
+  processId: p.processId,
+});
+
+export const withdrawalRejected: ActionConstructor<WithdrawalRejected> = p => ({
+  type: 'WALLET.WITHDRAWING.WITHDRAWAL_REJECTED',
+  processId: p.processId,
+});
+
+export const withdrawalSuccessAcknowledged: ActionConstructor<
+  WithdrawalSuccessAcknowledged
+> = p => ({
+  type: 'WALLET.WITHDRAWING.WITHDRAWAL_SUCCESS_ACKNOWLEDGED',
+  processId: p.processId,
+});
+
+// -------
+// Types and Guards
+// -------
 export type WithdrawalAction =
   | WithdrawalApproved
   | WithdrawalRejected
   | WithdrawalSuccessAcknowledged
   | TransactionAction;
 
-export interface WithdrawalApproved extends BaseProcessAction {
-  type: typeof WITHDRAWAL_APPROVED;
-  processId: string;
-  withdrawalAddress: string;
-}
-
-export interface WithdrawalRejected extends BaseProcessAction {
-  type: typeof WITHDRAWAL_REJECTED;
-  processId: string;
-}
-export interface WithdrawalSuccessAcknowledged extends BaseProcessAction {
-  type: typeof WITHDRAWAL_SUCCESS_ACKNOWLEDGED;
-  processId: string;
-}
-
-export const withdrawalApproved = (
-  processId: string,
-  withdrawalAddress: string,
-): WithdrawalApproved => ({
-  type: WITHDRAWAL_APPROVED as typeof WITHDRAWAL_APPROVED,
-  withdrawalAddress,
-  processId,
-});
-
-export const withdrawalRejected = (processId: string): WithdrawalRejected => ({
-  type: WITHDRAWAL_REJECTED as typeof WITHDRAWAL_REJECTED,
-  processId,
-});
-
-export const withdrawalSuccessAcknowledged = (
-  processId: string,
-): WithdrawalSuccessAcknowledged => ({
-  type: WITHDRAWAL_SUCCESS_ACKNOWLEDGED as typeof WITHDRAWAL_SUCCESS_ACKNOWLEDGED,
-  processId,
-});
-
 export const isWithdrawalAction = (action: WalletAction): action is WithdrawalAction => {
   return (
     isTransactionAction(action) ||
-    action.type === WITHDRAWAL_APPROVED ||
-    action.type === WITHDRAWAL_SUCCESS_ACKNOWLEDGED ||
-    action.type === WITHDRAWAL_REJECTED
+    action.type === 'WALLET.WITHDRAWING.WITHDRAWAL_APPROVED' ||
+    action.type === 'WALLET.WITHDRAWING.WITHDRAWAL_SUCCESS_ACKNOWLEDGED' ||
+    action.type === 'WALLET.WITHDRAWING.WITHDRAWAL_REJECTED'
   );
 };

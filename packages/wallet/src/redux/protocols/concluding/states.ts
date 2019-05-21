@@ -1,6 +1,6 @@
 import { InstigatorConcludingState, isConcludingInstigatorState } from './instigator/states';
 import { ResponderConcludingState, isConcludingResponderState } from './responder/states';
-import { Constructor } from '../../utils';
+import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 
 export * from './instigator/states';
@@ -23,11 +23,11 @@ export interface Success {
 // Constructors
 // -------
 
-export const success: Constructor<Success> = p => {
+export const success: StateConstructor<Success> = p => {
   return { type: 'Concluding.Success' };
 };
 
-export const failure: Constructor<Failure> = p => {
+export const failure: StateConstructor<Failure> = p => {
   const { reason } = p;
   return { type: 'Concluding.Failure', reason };
 };

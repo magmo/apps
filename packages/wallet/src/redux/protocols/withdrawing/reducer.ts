@@ -1,6 +1,5 @@
 import { ProtocolStateWithSharedData } from '..';
 import * as states from './states';
-import * as actions from './actions';
 import { WithdrawalAction } from './actions';
 import * as selectors from '../../selectors';
 import { CommitmentType } from '../../../domain';
@@ -65,7 +64,7 @@ const waitForAcknowledgementReducer = (
   sharedData: SharedData,
   action: WithdrawalAction,
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
-  if (action.type === actions.WITHDRAWAL_SUCCESS_ACKNOWLEDGED) {
+  if (action.type === 'WALLET.WITHDRAWING.WITHDRAWAL_SUCCESS_ACKNOWLEDGED') {
     return { protocolState: states.success({}), sharedData };
   }
   return { protocolState, sharedData };
@@ -99,7 +98,7 @@ const waitForApprovalReducer = (
   action: WithdrawalAction,
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
   switch (action.type) {
-    case actions.WITHDRAWAL_APPROVED:
+    case 'WALLET.WITHDRAWING.WITHDRAWAL_APPROVED':
       const { channelId, withdrawalAmount, processId } = protocolState;
       const { withdrawalAddress } = action;
       const transaction = createConcludeAndWithTransaction(
@@ -122,7 +121,7 @@ const waitForApprovalReducer = (
         }),
         sharedData: newSharedData,
       };
-    case actions.WITHDRAWAL_REJECTED:
+    case 'WALLET.WITHDRAWING.WITHDRAWAL_REJECTED':
       return {
         protocolState: states.failure(states.FailureReason.UserRejected),
         sharedData,

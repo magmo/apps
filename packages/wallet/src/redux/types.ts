@@ -3,7 +3,6 @@ export const enum WalletProtocol {
   Funding = 'Funding',
   Dispute = 'Dispute',
   Concluding = 'Concluding',
-
   Withdrawing = 'Withdrawing',
   DirectFunding = 'DirectFunding',
   IndirectFunding = 'IndirectFunding',

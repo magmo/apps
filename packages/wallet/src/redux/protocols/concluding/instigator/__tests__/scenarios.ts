@@ -73,11 +73,11 @@ const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived
 // -------
 // Actions
 // -------
-const concludeSent = actions.concludeApproved(processId);
-const acknowledged = actions.acknowledged(processId);
+const concludeSent = actions.concludeApproved({ processId });
+const acknowledged = actions.acknowledged({ processId });
 const commitmentReceivedAction = commitmentReceived(processId, app53);
-const defundChosen = actions.defundChosen(processId);
-const cancelled = actions.cancelled(processId);
+const defundChosen = actions.defundChosen({ processId });
+const cancelled = actions.cancelled({ processId });
 
 // -------
 // Scenarios

@@ -84,9 +84,9 @@ const acknowledgeSuccess = states.acknowledgeSuccess(defaults);
 // -------
 // Actions
 // -------
-const concludeSent = actions.concludeApproved(processId);
-const defundChosen = actions.defundChosen(processId);
-const acknowledged = actions.acknowledged(processId);
+const concludeSent = actions.concludeApproved({ processId });
+const defundChosen = actions.defundChosen({ processId });
+const acknowledged = actions.acknowledged({ processId });
 
 // -------
 // Scenarios

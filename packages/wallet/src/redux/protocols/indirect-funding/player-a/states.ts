@@ -1,6 +1,6 @@
 import { DirectFundingState } from '../../direct-funding/states';
 import { IndirectFundingState } from '../states';
-import { Constructor } from '../../../utils';
+import { StateConstructor } from '../../../utils';
 
 // -------
 // States
@@ -37,12 +37,12 @@ export interface AWaitForLedgerUpdate1 {
 // Constructors
 // ------------
 
-export const aWaitForPreFundSetup1: Constructor<AWaitForPreFundSetup1> = p => {
+export const aWaitForPreFundSetup1: StateConstructor<AWaitForPreFundSetup1> = p => {
   const { channelId, ledgerId, processId } = p;
   return { type: 'IndirectFunding.AWaitForPreFundSetup1', channelId, ledgerId, processId };
 };
 
-export const aWaitForDirectFunding: Constructor<AWaitForDirectFunding> = p => {
+export const aWaitForDirectFunding: StateConstructor<AWaitForDirectFunding> = p => {
   const { channelId, ledgerId, directFundingState, processId } = p;
   return {
     type: 'IndirectFunding.AWaitForDirectFunding',
@@ -53,12 +53,12 @@ export const aWaitForDirectFunding: Constructor<AWaitForDirectFunding> = p => {
   };
 };
 
-export const aWaitForPostFundSetup1: Constructor<AWaitForPostFundSetup1> = p => {
+export const aWaitForPostFundSetup1: StateConstructor<AWaitForPostFundSetup1> = p => {
   const { channelId, ledgerId, processId } = p;
   return { type: 'IndirectFunding.AWaitForPostFundSetup1', channelId, ledgerId, processId };
 };
 
-export const aWaitForLedgerUpdate1: Constructor<AWaitForLedgerUpdate1> = p => {
+export const aWaitForLedgerUpdate1: StateConstructor<AWaitForLedgerUpdate1> = p => {
   const { channelId, ledgerId, processId } = p;
   return { type: 'IndirectFunding.AWaitForLedgerUpdate1', channelId, ledgerId, processId };
 };

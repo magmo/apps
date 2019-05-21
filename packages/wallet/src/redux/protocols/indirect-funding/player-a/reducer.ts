@@ -208,14 +208,14 @@ function handleWaitForPreFundSetup(
   const total = theirCommitment.allocation.reduce(addHex);
   const ourAmount = theirCommitment.allocation[0];
   // update the state
-  const directFundingAction = directFundingRequested(
-    protocolState.processId,
-    ledgerId,
-    '0x0',
-    total,
-    ourAmount,
-    0,
-  );
+  const directFundingAction = directFundingRequested({
+    processId: protocolState.processId,
+    channelId: ledgerId,
+    safeToDepositLevel: '0x0',
+    totalFundingRequired: total,
+    requiredDeposit: ourAmount,
+    ourIndex: 0,
+  });
   const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
   const newProtocolState = states.aWaitForDirectFunding({
     ...protocolState,

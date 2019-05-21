@@ -2,50 +2,82 @@ import { ProtocolAction, WalletAction } from '../actions';
 import { PlayerIndex, WalletProtocol } from '../types';
 import { Commitment } from '../../domain';
 import { ConcludeInstigated, CONCLUDE_INSTIGATED } from '../../communication';
+import { ActionConstructor } from '../utils';
 export { BaseProcessAction } from '../../communication';
 
-export const INITIALIZE_CHANNEL = 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL';
-export const initializeChannel = () => ({
-  type: INITIALIZE_CHANNEL as typeof INITIALIZE_CHANNEL,
+// -------
+// Actions
+// -------
+export interface InitializeChannel {
+  type: 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL';
+  protocol: WalletProtocol.Application;
+}
+export interface FundingRequested {
+  type: 'WALLET.NEW_PROCESS.FUNDING_REQUESTED';
+  channelId: string;
+  playerIndex: PlayerIndex;
+  protocol: WalletProtocol.Funding;
+}
+
+export interface ConcludeRequested {
+  type: 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED';
+  channelId: string;
+  protocol: WalletProtocol.Concluding;
+}
+
+export interface CreateChallengeRequested {
+  type: 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
+  channelId: string;
+  commitment: Commitment;
+  protocol: WalletProtocol.Dispute;
+}
+
+export interface ChallengeCreated {
+  type: 'WALLET.NEW_PROCESS.CHALLENGE_CREATED';
+  commitment: Commitment;
+  expiresAt: number;
+  channelId: string;
+  protocol: WalletProtocol.Dispute;
+}
+// -------
+// Constructors
+// -------
+export const initializeChannel: ActionConstructor<InitializeChannel> = p => ({
+  type: 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL',
   protocol: WalletProtocol.Application,
 });
-export type InitializeChannel = ReturnType<typeof initializeChannel>;
 
-export const FUNDING_REQUESTED = 'WALLET.NEW_PROCESS.FUNDING_REQUESTED';
-export const fundingRequested = (channelId: string, playerIndex: PlayerIndex) => ({
-  type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
-  channelId,
-  playerIndex,
+export const fundingRequested: ActionConstructor<FundingRequested> = p => ({
+  type: 'WALLET.NEW_PROCESS.FUNDING_REQUESTED',
+  channelId: p.channelId,
+  playerIndex: p.playerIndex,
   protocol: WalletProtocol.Funding,
 });
-export type FundingRequested = ReturnType<typeof fundingRequested>;
 
-export const CONCLUDE_REQUESTED = 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED';
-export const concludeRequested = (channelId: string) => ({
-  type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
-  channelId,
+export const concludeRequested: ActionConstructor<ConcludeRequested> = p => ({
+  type: 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED',
+  channelId: p.channelId,
   protocol: WalletProtocol.Concluding,
 });
-export type ConcludeRequested = ReturnType<typeof concludeRequested>;
 
-export const CREATE_CHALLENGE_REQUESTED = 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
-export const createChallengeRequested = (channelId: string, commitment: Commitment) => ({
-  type: CREATE_CHALLENGE_REQUESTED as typeof CREATE_CHALLENGE_REQUESTED,
-  channelId,
-  commitment,
+export const createChallengeRequested: ActionConstructor<CreateChallengeRequested> = p => ({
+  type: 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED',
+  channelId: p.channelId,
+  commitment: p.commitment,
   protocol: WalletProtocol.Dispute,
 });
-export type CreateChallengeRequested = ReturnType<typeof createChallengeRequested>;
 
-export const CHALLENGE_CREATED = 'WALLET.NEW_PROCESS.CHALLENGE_CREATED';
-export const challengeCreated = (commitment: Commitment, expiresAt: number, channelId: string) => ({
-  type: CHALLENGE_CREATED as typeof CHALLENGE_CREATED,
-  commitment,
-  expiresAt,
-  channelId,
+export const challengeCreated: ActionConstructor<ChallengeCreated> = p => ({
+  type: 'WALLET.NEW_PROCESS.CHALLENGE_CREATED',
+  commitment: p.commitment,
+  expiresAt: p.expiresAt,
+  channelId: p.channelId,
   protocol: WalletProtocol.Dispute,
 });
-export type ChallengeCreated = ReturnType<typeof challengeCreated>;
+
+// -------
+// Types and Guards
+// -------
 
 export type NewProcessAction =
   | InitializeChannel
@@ -57,12 +89,12 @@ export type NewProcessAction =
 
 export function isNewProcessAction(action: WalletAction): action is NewProcessAction {
   return (
-    action.type === INITIALIZE_CHANNEL ||
-    action.type === FUNDING_REQUESTED ||
-    action.type === CONCLUDE_REQUESTED ||
+    action.type === 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL' ||
+    action.type === 'WALLET.NEW_PROCESS.FUNDING_REQUESTED' ||
+    action.type === 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED' ||
     action.type === CONCLUDE_INSTIGATED ||
-    action.type === CREATE_CHALLENGE_REQUESTED ||
-    action.type === CHALLENGE_CREATED
+    action.type === 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED' ||
+    action.type === 'WALLET.NEW_PROCESS.CHALLENGE_CREATED'
   );
 }
 

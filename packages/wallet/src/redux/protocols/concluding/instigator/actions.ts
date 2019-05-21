@@ -1,17 +1,13 @@
 import { WalletAction, CommitmentReceived, COMMITMENT_RECEIVED } from '../../../actions';
+import { ActionConstructor } from '../../../utils';
 
-export type ConcludingAction =
-  | Cancelled
-  | ConcludeApproved
-  | CommitmentReceived
-  | DefundChosen
-  | Acknowledged
-  | CommitmentReceived;
+// -------
+// Actions
+// -------
 export interface Cancelled {
   type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED';
   processId: string;
 }
-// TODO: This should probably be called ApproveConclude.
 export interface ConcludeApproved {
   type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED';
   processId: string;
@@ -27,33 +23,41 @@ export interface Acknowledged {
   processId: string;
 }
 
-// --------
-// Creators
-// --------
+// -------
+// Constructors
+// -------
 
-export const cancelled = (processId: string): Cancelled => ({
+export const cancelled: ActionConstructor<Cancelled> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED',
-  processId,
+  processId: p.processId,
 });
 
-export const concludeApproved = (processId: string): ConcludeApproved => ({
+export const concludeApproved: ActionConstructor<ConcludeApproved> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED',
-  processId,
+  processId: p.processId,
 });
 
-export const defundChosen = (processId: string): DefundChosen => ({
+export const defundChosen: ActionConstructor<DefundChosen> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN',
-  processId,
+  processId: p.processId,
 });
 
-export const acknowledged = (processId: string): Acknowledged => ({
+export const acknowledged: ActionConstructor<Acknowledged> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED',
-  processId,
+  processId: p.processId,
 });
 
-// --------
-// Helpers
-// --------
+// -------
+// Unions and Guards
+// -------
+
+export type ConcludingAction =
+  | Cancelled
+  | ConcludeApproved
+  | CommitmentReceived
+  | DefundChosen
+  | Acknowledged
+  | CommitmentReceived;
 
 export const isConcludingAction = (action: WalletAction): action is ConcludingAction => {
   if (action.type === COMMITMENT_RECEIVED) {

@@ -1,4 +1,4 @@
-import { Constructor } from '../../utils';
+import { StateConstructor } from '../../utils';
 
 // -------
 // States
@@ -22,17 +22,17 @@ export interface Success {
 // Constructors
 // -------
 
-export const addressKnown: Constructor<AddressKnown> = p => {
+export const addressKnown: StateConstructor<AddressKnown> = p => {
   const { address, privateKey } = p;
   return { type: 'Application.AddressKnown', address, privateKey };
 };
 
-export const ongoing: Constructor<Ongoing> = p => {
+export const ongoing: StateConstructor<Ongoing> = p => {
   const { channelId } = p;
   return { type: 'Application.Ongoing', channelId };
 };
 
-export const success: Constructor<Success> = p => {
+export const success: StateConstructor<Success> = p => {
   return { type: 'Application.Success' };
 };
 
