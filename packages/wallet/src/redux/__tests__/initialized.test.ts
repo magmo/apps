@@ -45,7 +45,7 @@ describe('when a NewProcessAction arrives', () => {
 });
 
 describe('when a ProcessAction arrives', () => {
-  const processId = channelId;
+  const processId = '0xprocessId';
   const protocolState = {};
   const processState: states.ProcessState = {
     processId,
@@ -57,7 +57,7 @@ describe('when a ProcessAction arrives', () => {
 
   const action = actions.indirectFunding.playerA.strategyApproved({
     channelId,
-    processId: 'processId',
+    processId: '0xprocessId',
     consensusLibrary: '0xf00',
   });
   const indirectFundingReducer = jest.fn(() => ({
