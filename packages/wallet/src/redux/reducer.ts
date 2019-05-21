@@ -23,7 +23,7 @@ import { WalletProtocol } from './types';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
 import { CONCLUDE_INSTIGATED, isStartProcessAction } from '../communication';
-import { communication } from '../..';
+import * as communication from '../communication';
 
 const initialState = states.waitForLogin();
 
