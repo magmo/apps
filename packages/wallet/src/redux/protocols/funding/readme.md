@@ -22,6 +22,7 @@ The protocol is implemented with the following state machines
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   S((start)) --> WFSC(WaitForStrategyChoice)
 
   WFSC --> |StrategyChosen| WFSR(WaitForStrategyResponse)
@@ -36,12 +37,22 @@ graph TD
   WFSC --> |Cancel| F((failure))
   WFSR --> |Cancel| F
   WFSR --> |CanceledByB| F
+
+  classDef logic fill:#efdd20;
+  classDef Success fill:#58ef21;
+  classDef Failure fill:#f45941;
+  classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
+  class S logic;
+  class SS Success;
+  class F Failure;
+  class WFF WaitForChildProtocol;
 ```
 
 ### Player B
 
 ```mermaid
 graph TD
+linkStyle default interpolate basis
   S((start)) --> WFSP(WaitForStrategyProposal)
 
   WFSP --> |StrategyProposed| WFSA(WaitForStrategyApproved)
@@ -58,6 +69,15 @@ graph TD
   WFSA --> |CanceledByB| F
   WFSP --> |Cancel| F((failure))
   WFSA --> |Cancel| F
+
+  classDef logic fill:#efdd20;
+  classDef Success fill:#58ef21;
+  classDef Failure fill:#f45941;
+  classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
+  class S logic;
+  class SS Success;
+  class F Failure;
+  class WFF WaitForChildProtocol;
 ```
 
 ### Communication

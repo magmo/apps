@@ -42,6 +42,17 @@ Authoring a new protocol begins with a state machine diagram, using the followin
 
 Various scenarios -- namely, different routes through this state machine diagram -- should also be laid out. Scenarios need not repeat identical steps from prior scenarios.
 
+Often it is useful to split a protocol into two subprotocols, one for each player. In that case, the subprotocols are subdirectories with their own readmes and state machine diagrams, and the parent directory should have a short readme explaining the interaction of the two sub state machines, possibly with the inclusion of a sequence diagram:
+
+```mermaid
+sequenceDiagram
+  participant I as I's wallet
+  participant R as R's wallet
+  Note  over I, R: Title for parent protocol
+  I->>R: Message
+  R->>I: Message
+```
+
 ## States
 
 <a name="states"></a>
