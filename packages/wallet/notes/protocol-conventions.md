@@ -46,11 +46,11 @@ Various scenarios -- namely, different routes through this state machine diagram
 
 <a name="states"></a>
 
-Define an interface and constructor function for each state in the state machine diagram. For a protocol named `protocol`, the `type` property should be a string formatted as `protocol.StateType`. Also define `TerminalProtocolState`, `NonTerminalProtocolState` and `XState` types as well as `isProtocolState` and `isTerminal` type guards.
+Define an interface and constructor function for each state in the state machine diagram. For a protocol named `protocol`, the `type` property should be a string formatted as `Protocol.StateType`. Also define `TerminalProtocolState`, `NonTerminalProtocolState` and `ProtocolState` types as well as `isProtocolState` and `isTerminal` type guards. A `type ProtocolStateType = ProtocolState['type']` should be exported to enable type safety in tests and elsewhere.
 
 To reduce boilerplate, simply enter the type string directly rather than defining a named constant string and using `type: typeof CONSTANT_STRING`.
 
-Constructor functions should be typed as `Constructor<InterfaceName>` by using `import { Properties, Constructor } from '../../utils';`.
+Constructor functions should be typed as `Constructor<InterfaceName>` by using `import { Constructor } from '../../utils';`.
 
 ## Actions
 
@@ -62,7 +62,7 @@ Actions should have a `processId` property.
 
 To reduce boilerplate, simply enter the type string directly rather than defining a named constant string and using `type: typeof CONSTANT_STRING`.
 
-Constructor functions should be typed as `Constructor<InterfaceName>` by using `import { Properties, Constructor } from '../../utils';`.
+Constructor functions should be typed as `Constructor<InterfaceName>` by using `import { Constructor } from '../../utils';`.
 
 ## Reducer
 
