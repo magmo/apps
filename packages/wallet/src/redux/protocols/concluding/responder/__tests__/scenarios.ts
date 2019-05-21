@@ -38,6 +38,16 @@ const app51 = appCommitment({ turnNum: 51, balances: twoThree, isFinal: false })
 const app52 = appCommitment({ turnNum: 52, balances: twoThree, isFinal: true });
 const app53 = appCommitment({ turnNum: 53, balances: twoThree, isFinal: true });
 
+// --------
+// Defaults
+// --------
+const processId = 'processId';
+
+const defaults = { processId, channelId };
+
+// ------
+// SharedData
+// ------
 const initialStore = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(app50, app51, bsAddress, bsPrivateKey),
 ]);
@@ -57,12 +67,6 @@ const firstConcludeReceived = setFundingState(firstConcludeReceivedChannelState,
 const secondConcludeReceived = setFundingState(secondConcludeReceivedChannelState, channelId, {
   directlyFunded: true,
 });
-// --------
-// Defaults
-// --------
-const processId = 'processId';
-
-const defaults = { processId, channelId };
 
 // ------
 // States
@@ -93,18 +97,22 @@ const acknowledged = actions.acknowledged({ processId });
 // -------
 export const happyPath = {
   ...defaults,
-  initialize: { store: initialStore, commitment: app52 },
+  initialize: { sharedData: initialStore, commitment: app52 },
   approveConcluding: {
     state: approveConcluding,
-    store: firstConcludeReceived,
+    sharedData: firstConcludeReceived,
     action: concludeSent,
     reply: app53.commitment,
   },
-  decideDefund: { state: decideDefund, store: secondConcludeReceived, action: defundChosen },
-  waitForDefund: { state: waitForDefund, store: secondConcludeReceived, action: successTrigger },
+  decideDefund: { state: decideDefund, sharedData: secondConcludeReceived, action: defundChosen },
+  waitForDefund: {
+    state: waitForDefund,
+    sharedData: secondConcludeReceived,
+    action: successTrigger,
+  },
   acknowledgeSuccess: {
     state: acknowledgeSuccess,
-    store: secondConcludeReceived,
+    sharedData: secondConcludeReceived,
     action: acknowledged,
   },
 };
@@ -114,7 +122,7 @@ export const happyPathAlternative = {
 
   decideDefund: {
     state: decideDefund,
-    store: setFundingStateAlt(
+    sharedData: setFundingStateAlt(
       setChannels(EMPTY_SHARED_DATA, [
         channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),
         channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
@@ -127,20 +135,20 @@ export const happyPathAlternative = {
 
 export const channelDoesntExist = {
   ...defaults,
-  initialize: { channelId, store: setChannels(EMPTY_SHARED_DATA, []), commitment: app52 },
+  initialize: { channelId, sharedData: setChannels(EMPTY_SHARED_DATA, []), commitment: app52 },
   acknowledgeFailure: {
     state: states.acknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };
 
 export const concludingNotPossible = {
   ...defaults,
-  initialize: { store: initialStoreYourTurn, commitment: app53 },
+  initialize: { sharedData: initialStoreYourTurn, commitment: app53 },
   acknowledgeFailure: {
     state: states.acknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };
@@ -149,12 +157,12 @@ export const defundFailed = {
   ...defaults,
   waitForDefund: {
     state: waitForDefundPreFailure,
-    store: initialStore,
+    sharedData: initialStore,
     action: failureTrigger,
   },
   acknowledgeFailure: {
     state: states.acknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };

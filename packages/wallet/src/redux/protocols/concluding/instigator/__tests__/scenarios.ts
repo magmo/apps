@@ -29,23 +29,6 @@ const app51 = appCommitment({ turnNum: 51, balances: twoThree, isFinal: false })
 const app52 = appCommitment({ turnNum: 52, balances: twoThree, isFinal: true });
 const app53 = appCommitment({ turnNum: 53, balances: twoThree, isFinal: true });
 
-const initialStore = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app50, app51, asAddress, asPrivateKey),
-]);
-
-const firstConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app51, app52, asAddress, asPrivateKey),
-]);
-const secondConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app52, app53, asAddress, asPrivateKey),
-]);
-
-const firstConcludeReceived = setFundingState(firstConcludeReceivedChannelState, channelId, {
-  directlyFunded: true,
-});
-const secondConcludeReceived = setFundingState(secondConcludeReceivedChannelState, channelId, {
-  directlyFunded: true,
-});
 // --------
 // Defaults
 // --------
@@ -71,6 +54,27 @@ const waitforOpponentConclude = states.instigatorWaitForOpponentConclude(default
 const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived(defaults);
 
 // -------
+// Shared Data
+// -------
+const initialStore = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app50, app51, asAddress, asPrivateKey),
+]);
+
+const firstConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app51, app52, asAddress, asPrivateKey),
+]);
+const secondConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(app52, app53, asAddress, asPrivateKey),
+]);
+
+const firstConcludeReceived = setFundingState(firstConcludeReceivedChannelState, channelId, {
+  directlyFunded: true,
+});
+const secondConcludeReceived = setFundingState(secondConcludeReceivedChannelState, channelId, {
+  directlyFunded: true,
+});
+
+// -------
 // Actions
 // -------
 const concludeSent = actions.concludeApproved({ processId });
@@ -84,62 +88,66 @@ const cancelled = actions.cancelled({ processId });
 // -------
 export const happyPath = {
   ...defaults,
-  initialize: { channelId, store: initialStore },
+  initialize: { channelId, sharedData: initialStore },
   approveConcluding: {
     state: approveConcluding,
-    store: initialStore,
+    sharedData: initialStore,
     action: concludeSent,
     reply: app52.commitment,
   },
   waitforOpponentConclude: {
     state: waitforOpponentConclude,
-    store: firstConcludeReceived,
+    sharedData: firstConcludeReceived,
     action: commitmentReceivedAction,
   },
   acknowledgeConcludeReceived: {
     state: acknowledgeConcludeReceived,
-    store: secondConcludeReceived,
+    sharedData: secondConcludeReceived,
     action: defundChosen,
   },
-  waitForDefund: { state: waitForDefund, store: secondConcludeReceived, action: successTrigger },
+  waitForDefund: {
+    state: waitForDefund,
+    sharedData: secondConcludeReceived,
+    action: successTrigger,
+  },
   acknowledgeSuccess: {
     state: acknowledgeSuccess,
-    store: secondConcludeReceived,
+    sharedData: secondConcludeReceived,
     action: acknowledged,
   },
 };
 
 export const channelDoesntExist = {
   ...defaults,
-  initialize: { channelId, store: setChannels(EMPTY_SHARED_DATA, []) },
+  initialize: { channelId, sharedData: setChannels(EMPTY_SHARED_DATA, []) },
   acknowledgeFailure: {
     state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'ChannelDoesntExist' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };
 
 export const concludingNotPossible = {
   ...defaults,
-  initialize: { channelId, store: firstConcludeReceived },
+  initialize: { channelId, sharedData: firstConcludeReceived },
   acknowledgeFailure: {
     state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'NotYourTurn' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };
 
 export const concludingCancelled = {
   ...defaults,
-  initialize: { channelId, store: firstConcludeReceived },
+  initialize: { channelId, sharedData: firstConcludeReceived },
   approveConcluding: {
     state: approveConcluding,
-    store: initialStore,
+    sharedData: initialStore,
     action: cancelled,
   },
   acknowledgeFailure: {
     state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'ConcludeCancelled' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };
@@ -148,12 +156,12 @@ export const defundFailed = {
   ...defaults,
   waitForDefund: {
     state: waitForDefundPreFailure,
-    store: initialStore,
+    sharedData: initialStore,
     action: failureTrigger,
   },
   acknowledgeFailure: {
     state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
-    store: initialStore,
+    sharedData: initialStore,
     action: acknowledged,
   },
 };
