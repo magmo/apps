@@ -12,12 +12,13 @@ import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
 import AcknowledgeX from '../../../../components/acknowledge-x';
 import { FundingStrategy } from '..';
 import { IndirectFunding } from '../../indirect-funding/container';
+import { ActionDispatcher } from '../../../utils';
 interface Props {
   state: states.OngoingFundingState;
-  strategyApproved: (processId: string, strategy: FundingStrategy) => void;
-  strategyRejected: (processId: string) => void;
-  fundingSuccessAcknowledged: (processId: string) => void;
-  cancelled: (processId: string, by: PlayerIndex) => void;
+  strategyApproved: ActionDispatcher<actions.StrategyApproved>;
+  strategyRejected: ActionDispatcher<actions.StrategyRejected>;
+  fundingSuccessAcknowledged: ActionDispatcher<actions.FundingSuccessAcknowledged>;
+  cancelled: ActionDispatcher<actions.Cancelled>;
 }
 
 class FundingContainer extends PureComponent<Props> {
@@ -31,8 +32,10 @@ class FundingContainer extends PureComponent<Props> {
       case 'Funding.PlayerB.WaitForStrategyApproval':
         return (
           <ApproveStrategy
-            strategyChosen={(strategy: FundingStrategy) => strategyApproved(processId, strategy)}
-            cancelled={() => cancelled(processId, PlayerIndex.B)}
+            strategyChosen={(strategy: FundingStrategy) =>
+              strategyApproved({ processId, strategy })
+            }
+            cancelled={() => cancelled({ processId, by: PlayerIndex.B })}
           />
         );
       case 'Funding.PlayerB.WaitForFunding':
@@ -41,7 +44,7 @@ class FundingContainer extends PureComponent<Props> {
         return (
           <AcknowledgeX
             title="Channel funded!"
-            action={() => fundingSuccessAcknowledged(processId)}
+            action={() => fundingSuccessAcknowledged({ processId })}
             description="You have successfully funded your channel"
             actionTitle="Ok!"
           />

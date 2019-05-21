@@ -77,7 +77,7 @@ function handleWaitForPreFundSetup(
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   const unchangedState = { protocolState, sharedData };
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, protocolState.channelId);
@@ -197,7 +197,7 @@ function handleWaitForLedgerUpdate(
     );
     return unchangedState;
   }
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
@@ -251,7 +251,7 @@ export function handleWaitForPostFundSetup(
   // TODO: There is a lot of repetitive code here
   // We should probably refactor and clean this up
   const unchangedState = { protocolState, sharedData };
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);

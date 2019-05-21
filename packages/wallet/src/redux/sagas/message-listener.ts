@@ -27,17 +27,27 @@ export function* messageListener() {
     switch (messageEvent.data.type) {
       // Events that need a new process
       case incoming.INITIALIZE_CHANNEL_REQUEST:
-        yield put(actions.protocol.initializeChannel());
+        yield put(actions.protocol.initializeChannel({}));
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.protocol.concludeRequested(action.channelId));
-        yield put(actions.application.concludeRequested(getProcessId(action)));
+        yield put(actions.application.concludeRequested({ processId: getProcessId(action) }));
         break;
       case incoming.CREATE_CHALLENGE_REQUEST:
-        yield put(actions.protocol.createChallengeRequested(action.channelId, action.commitment));
+        yield put(
+          actions.protocol.createChallengeRequested({
+            channelId: action.channelId,
+            commitment: action.commitment,
+          }),
+        );
         break;
       case incoming.FUNDING_REQUEST:
-        yield put(actions.protocol.fundingRequested(action.channelId, action.playerIndex));
+        yield put(
+          actions.protocol.fundingRequested({
+            channelId: action.channelId,
+            playerIndex: action.playerIndex,
+          }),
+        );
         break;
 
       // Events that do not need a new process
@@ -46,26 +56,26 @@ export function* messageListener() {
         break;
       case incoming.SIGN_COMMITMENT_REQUEST:
         yield put(
-          actions.application.ownCommitmentReceived(
-            application.APPLICATION_PROCESS_ID,
-            action.commitment,
-          ),
+          actions.application.ownCommitmentReceived({
+            processId: application.APPLICATION_PROCESS_ID,
+            commitment: action.commitment,
+          }),
         );
         break;
       case incoming.VALIDATE_COMMITMENT_REQUEST:
         yield put(
-          actions.application.opponentCommitmentReceived(
-            application.APPLICATION_PROCESS_ID,
-            action.commitment,
-            action.signature,
-          ),
+          actions.application.opponentCommitmentReceived({
+            processId: application.APPLICATION_PROCESS_ID,
+            commitment: action.commitment,
+            signature: action.signature,
+          }),
         );
         break;
       case incoming.RESPOND_TO_CHALLENGE:
         // TODO: This probably should be in a function
         const channelId = getChannelId(action.commitment);
         const processId = `${WalletProtocol.Dispute}-${channelId}`;
-        yield put(responseProvided(processId, action.commitment));
+        yield put(responseProvided({ processId, commitment: action.commitment }));
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(handleIncomingMessage(action));

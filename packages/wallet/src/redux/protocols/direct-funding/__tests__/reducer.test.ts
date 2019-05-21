@@ -95,7 +95,7 @@ describe(startingIn('DirectFunding.NotSafeToDeposit'), () => {
 });
 
 describe(startingIn('DirectFunding.WaitForDepositTransaction'), () => {
-  describe(whenActionArrives(actions.TRANSACTION_CONFIRMED), () => {
+  describe(whenActionArrives('TransactionConfirmed'), () => {
     const state = scenarios.aEachDepositsInSequenceHappyStates.waitForDepositTransactionEnd;
     const action = actions.transactionConfirmed(channelId);
 
@@ -103,7 +103,7 @@ describe(startingIn('DirectFunding.WaitForDepositTransaction'), () => {
     itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
   });
 
-  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+  describe(whenActionArrives('CommitmentReceived'), () => {
     const state = scenarios.bEachDepositsInSequenceHappyStates.waitForDepositTransactionEnd;
 
     const updatedState = directFundingStateReducer(
@@ -162,7 +162,7 @@ describe(startingIn('DirectFunding.WaitForFundingAndPostFundSetup'), () => {
     });
   });
 
-  describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
+  describe(whenActionArrives('CommitmentReceived'), () => {
     describe('Player B: channel is funded', () => {
       const state = scenarios.bEachDepositsInSequenceHappyStates.waitForPostFundSetup;
       const updatedState = directFundingStateReducer(

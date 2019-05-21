@@ -84,8 +84,8 @@ const success = states.success({});
 const transactionFailedFailure = states.failure({
   reason: states.FailureReason.TransactionFailure,
 });
-const transactionConfirmed = transactionActions.transactionConfirmed(processId);
-const transactionFailed = transactionActions.transactionFailed(processId);
+const transactionConfirmed = transactionActions.transactionConfirmed({ processId });
+const transactionFailed = transactionActions.transactionFailed({ processId });
 const acknowledgeTimeout = states.acknowledgeTimeout(props);
 const waitForDefund1 = states.waitForDefund({
   ...props,

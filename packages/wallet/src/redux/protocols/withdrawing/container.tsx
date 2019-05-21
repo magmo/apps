@@ -9,12 +9,13 @@ import WaitForApproval from './components/wait-for-approval';
 import Failure from '../shared-components/failure';
 import Success from '../shared-components/success';
 import Acknowledge from '../shared-components/acknowledge';
+import { ActionConstructor } from '../../utils';
 
 interface Props {
   state: states.WithdrawalState;
-  withdrawalApproved: (processId: string, withdrawalAddress: string) => void;
-  withdrawalRejected: (processId: string) => void;
-  withdrawalSuccessAcknowledged: (processId: string) => void;
+  withdrawalApproved: ActionConstructor<actions.WithdrawalApproved>;
+  withdrawalRejected: ActionConstructor<actions.WithdrawalRejected>;
+  withdrawalSuccessAcknowledged: ActionConstructor<actions.WithdrawalSuccessAcknowledged>;
 }
 
 class WithdrawalContainer extends PureComponent<Props> {
@@ -30,8 +31,10 @@ class WithdrawalContainer extends PureComponent<Props> {
         return (
           <WaitForApproval
             withdrawalAmount={state.withdrawalAmount}
-            approve={address => withdrawalApproved(state.processId, address)}
-            deny={() => withdrawalRejected(state.processId)}
+            approve={withdrawalAddress =>
+              withdrawalApproved({ processId: state.processId, withdrawalAddress })
+            }
+            deny={() => withdrawalRejected({ processId: state.processId })}
           />
         );
       case 'Withdrawing.WaitForTransaction':
@@ -46,7 +49,7 @@ class WithdrawalContainer extends PureComponent<Props> {
           <Acknowledge
             title="Withdraw Complete"
             description="You have successfully withdrawn your funds."
-            acknowledge={() => withdrawalSuccessAcknowledged(state.processId)}
+            acknowledge={() => withdrawalSuccessAcknowledged({ processId: state.processId })}
           />
         );
       case 'Withdrawing.Failure':

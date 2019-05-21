@@ -8,12 +8,13 @@ import WaitForSubmission from './components/wait-for-submission';
 import { NETWORK_ID } from '../../../constants';
 import ApproveRetry from './components/approve-retry';
 import * as actions from './actions';
+import { ActionConstructor } from '../../utils';
 
 interface Props {
   state: NonTerminalTransactionSubmissionState;
   transactionName: string;
-  transactionRetryApproved: (processId: string) => void;
-  transactionRetryDenied: (processId: string) => void;
+  transactionRetryApproved: ActionConstructor<actions.TransactionRetryApproved>;
+  transactionRetryDenied: ActionConstructor<actions.TransactionRetryDenied>;
 }
 
 class TransactionSubmissionContainer extends PureComponent<Props> {
@@ -32,11 +33,12 @@ class TransactionSubmissionContainer extends PureComponent<Props> {
           />
         );
       case 'TransactionSubmission.ApproveRetry':
+        const { processId } = state;
         return (
           <ApproveRetry
             name={transactionName}
-            approve={() => transactionRetryApproved(state.processId)}
-            deny={() => transactionRetryDenied(state.processId)}
+            approve={() => transactionRetryApproved({ processId })}
+            deny={() => transactionRetryDenied({ processId })}
           />
         );
       default:

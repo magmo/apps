@@ -2,7 +2,6 @@ import { ProtocolStateWithSharedData } from '..';
 import { SharedData, signAndStore, queueMessage, checkAndStore } from '../../state';
 import * as states from './states';
 import { IndirectDefundingAction } from './actions';
-import { COMMITMENT_RECEIVED } from '../../actions';
 import * as helpers from '../reducer-helpers';
 import { unreachable } from '../../../utils/reducer-utils';
 import * as selectors from '../../selectors';
@@ -96,7 +95,7 @@ const waitForConcludeReducer = (
   sharedData: SharedData,
   action: IndirectDefundingAction,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
-  if (action.type !== COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Invalid action ${action.type}`);
   }
 
@@ -127,7 +126,7 @@ const waitForLedgerUpdateReducer = (
   sharedData: SharedData,
   action: IndirectDefundingAction,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
-  if (action.type !== COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Invalid action ${action.type}`);
   }
 

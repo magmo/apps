@@ -19,6 +19,8 @@ export type StateConstructor<T> = (p: Properties<T>) => T;
 // Note: extraneous keys not accepted
 export type ActionConstructor<T> = (p: Pick<T, Exclude<keyof T, 'type' | 'protocol'>>) => T;
 
+export type ActionDispatcher<T> = (p: Pick<T, Exclude<keyof T, 'type' | 'protocol'>>) => void;
+
 export interface StateWithSideEffects<T> {
   state: T;
   sideEffects?: SideEffects;

@@ -1,4 +1,4 @@
-import { CommitmentReceived, COMMITMENT_RECEIVED, WalletAction } from '../../actions';
+import { CommitmentReceived, WalletAction } from '../../actions';
 // -------
 // Actions
 // -------
@@ -14,5 +14,5 @@ import { CommitmentReceived, COMMITMENT_RECEIVED, WalletAction } from '../../act
 export type IndirectDefundingAction = CommitmentReceived;
 
 export function isIndirectDefundingAction(action: WalletAction): action is IndirectDefundingAction {
-  return action.type === COMMITMENT_RECEIVED;
+  return action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED';
 }

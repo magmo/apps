@@ -31,7 +31,7 @@ export const directFundingStateReducer: DFReducer = (
     }
   }
 
-  if (action.type === actions.COMMITMENT_RECEIVED) {
+  if (action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     return commitmentReceivedReducer(state, sharedData, action);
   }
 

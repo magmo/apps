@@ -106,7 +106,7 @@ function handleWaitForPostFundSetup(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
@@ -139,7 +139,7 @@ function handleWaitForLedgerUpdate(
     );
     return unchangedState;
   }
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
@@ -184,7 +184,7 @@ function handleWaitForPreFundSetup(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, protocolState.channelId);

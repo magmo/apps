@@ -45,7 +45,7 @@ const success = states.success({});
 // -------
 // Actions
 // -------
-const initializeChannel = protocolActions.initializeChannel();
+const initializeChannel = protocolActions.initializeChannel({});
 const receivePreFundSetup = actions.ownCommitmentReceived({
   processId,
   commitment: preFundCommitment0,

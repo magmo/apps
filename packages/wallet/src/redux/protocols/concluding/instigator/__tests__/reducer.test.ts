@@ -10,7 +10,6 @@ import {
   itSendsThisDisplayEventType,
 } from '../../../../__tests__/helpers';
 import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
-import { CONCLUDE_INSTIGATED } from '../../../../../communication';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -140,7 +139,11 @@ describe('[ Defund failed ]', () => {
 
 function itSendsConcludeInstigated(sharedData: SharedData, commitment: Commitment) {
   it('sends a conclude instigated message with the correct commitment', () => {
-    expectThisMessageAndCommitmentSent(sharedData, commitment, CONCLUDE_INSTIGATED);
+    expectThisMessageAndCommitmentSent(
+      sharedData,
+      commitment,
+      'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED',
+    );
   });
 }
 

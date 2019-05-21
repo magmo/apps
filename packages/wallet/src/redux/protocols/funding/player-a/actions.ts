@@ -1,8 +1,8 @@
 import { BaseProcessAction } from '../../actions';
 import { PlayerIndex } from '../../../types';
 import { FundingStrategy } from '../../../../communication';
-import { strategyApproved, StrategyApproved, STRATEGY_APPROVED } from '../../../../communication';
-export { strategyApproved, StrategyApproved, STRATEGY_APPROVED };
+import { strategyApproved, StrategyApproved } from '../../../../communication';
+export { strategyApproved, StrategyApproved };
 import { ActionConstructor } from '../../../utils';
 
 // -------
