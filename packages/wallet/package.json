@@ -12,6 +12,7 @@
     "build": "run-s clearContracts build:typescript build:webpack",
     "build:typescript": "npx tsc",
     "build:webpack": "node scripts/build.js",
+    "prepare": "npx tsc",
     "test": "run-s prettier:check 'test:app --all'",
     "test:ci": "GANACHE_PORT=8503 run-s prettier:check test:ci:contracts test:ci:app build",
     "test:ci:contracts": "yarn test:contracts --all --ci",
