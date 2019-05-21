@@ -12,10 +12,10 @@ linkStyle default interpolate basis
     ST((Start))-->NSD(NotSafeToDeposit)
     NSD-->|FUNDING_RECEIVED|WFDT(WaitForDepositTransaction)
     ST-->WFDT
-    WFDT-->|TRANSACTION_SUCCESS|WFFCPF(WaitForFundingConfirmationAndPostFund)
+    WFDT-->|TransactionSubmission succeeded|WFFCPF(WaitForFundingConfirmationAndPostFund)
     WFDT-->|FUNDING_RECEIVED|WFFCPF
     WFDT-->|COMMITMENT_RECEIVED|WFFCPF
-    WFDT-->|TRANSACTION_FAILURE|F((Failure))
+    WFDT-->|TransactionSubmission failed|F((Failure))
     WFFCPF-->|FUNDING_RECEIVED|WFFCPF
     WFFCPF-->|COMMITMENT_RECEIVED|WFFCPF
     WFFCPF-->|FUNDING_RECEIVED + COMMITMENT_RECEIVED|CF((ChannelFunded))

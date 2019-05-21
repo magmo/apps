@@ -25,14 +25,14 @@ graph TD
 linkStyle default interpolate basis
   S((start)) --> WFSC(WaitForStrategyChoice)
 
-  WFSC --> |StrategyChosen| WFSR(WaitForStrategyResponse)
-  WFSR --> |StrategyApproved| WFF(WaitForFunding)
+  WFSC --> |WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN| WFSR(WaitForStrategyResponse)
+  WFSR --> |WALLET.FUNDING.STRATEGY_APPROVED| WFF(WaitForFunding)
   WFF --> |FundingStrategyAction| WFF
   WFF --> |FundingStrategyAction| WFSConf(WaitForSuccessConfirmation)
 
-  WFSConf --> |ConfirmSuccess| SS((success))
+  WFSConf --> |WALLET.FUNDING.PLAYER_A.FUNDING_SUCCESS_ACKNOWLEDGED| SS((success))
 
-  WFSR --> |StrategyRejected| WFSC
+  WFSR --> |WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED| WFSC
 
   WFSC --> |Cancel| F((failure))
   WFSR --> |Cancel| F
@@ -57,16 +57,16 @@ linkStyle default interpolate basis
 
   WFSP --> |StrategyProposed| WFSA(WaitForStrategyApproved)
 
-  WFSA --> |StrategyApproved| WFF(WaitForFunding)
+  WFSA --> |WALLET.FUNDING.PLAYER_B.STRATEGY_APPROVED| WFF(WaitForFunding)
   WFF --> |FundingStrategyAction| WFF
   WFF --> |FundingStrategyAction| WFSC(WaitForSuccessConfirmation)
 
-  WFSC --> |ConfirmSuccess| SS((success))
+  WFSC --> |WALLET.FUNDING.PLAYER_B.FUNDING_SUCCESS_ACKNOWLEDGED| SS((success))
 
   WFSA --> |StrategyRejected| WFSP
 
-  WFSP --> |CanceledByB| F
-  WFSA --> |CanceledByB| F
+  WFSP --> |WALLET.FUNDING.PLAYER_B.CANCELLED| F
+  WFSA --> |WALLET.FUNDING.PLAYER_B.CANCELLED| F
   WFSP --> |Cancel| F((failure))
   WFSA --> |Cancel| F
 
@@ -79,6 +79,8 @@ linkStyle default interpolate basis
   class F Failure;
   class WFF WaitForChildProtocol;
 ```
+
+Note: `WaitForFunding` should be `WaitForIndirectFunding`, since that is the child reducer currently being called. In future, the direct funding protocol may be called instead (optionally).
 
 ### Communication
 

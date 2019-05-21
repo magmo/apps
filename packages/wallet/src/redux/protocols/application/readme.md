@@ -17,10 +17,10 @@ The protocol is implemented with the following state machine.
 graph TD
 linkStyle default interpolate basis
   S((start)) --> AK(AddressKnown)
-  AK-->|COMMITMENT_RECEIVED|O(Ongoing)
-  O-->|COMMITMENT_RECEIVED|O(Ongoing)
-  AK-->|CONCLUDE_REQUESTED|Su((success))
-  O-->|CONCLUDE_REQUESTED|Su((success))
+  AK-->|WALLET.APPLICATION.COMMITMENT_RECEIVED|O(Ongoing)
+  O-->|WALLET.APPLICATION.COMMITMENT_RECEIVED|O(Ongoing)
+  AK-->|WALLET.APPLICATION.CONCLUDE_REQUESTED|Su((success))
+  O-->|WALLET.APPLICATION.CONCLUDE_REQUESTED|Su((success))
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
