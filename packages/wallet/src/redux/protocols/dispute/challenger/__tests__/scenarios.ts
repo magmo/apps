@@ -68,7 +68,7 @@ const waitForTransactionFailure = states.waitForTransaction({
 const waitForResponseOrTimeout = states.waitForResponseOrTimeout({ ...defaults, expiryTime: 0 });
 const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
-const successOpen = states.successOpen();
+const successOpen = states.successOpen({});
 const acknowledge = (reason: Reason) => states.acknowledgeFailure({ ...defaults, reason });
 const waitForDefund1 = states.waitForDefund({
   ...defaults,
@@ -79,7 +79,7 @@ const waitForDefund2 = states.waitForDefund({
   defundingState: defundingPreFailureState,
 });
 const acknowledgeSuccess = states.acknowledgeSuccess({ ...defaults });
-const acknowledgeClosedButNotDefunded = states.AcknowledgeClosedButNotDefunded({ ...defaults });
+const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded({ ...defaults });
 
 // -------
 // Actions

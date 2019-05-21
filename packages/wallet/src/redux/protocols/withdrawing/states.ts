@@ -1,28 +1,18 @@
 import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../transaction-submission/states';
 import { Properties } from '../../utils';
-export type WithdrawalState =
-  | WaitForApproval
-  | WaitForTransaction
-  | WaitForAcknowledgement
-  | Failure
-  | Success;
 
-export const WAIT_FOR_APPROVAL = 'WaitforApproval';
-export const WAIT_FOR_TRANSACTION = 'WaitForTransaction';
-export const WAIT_FOR_ACKNOWLEDGEMENT = 'WaitForAcknowledgement';
-export const SUCCESS = 'Success';
-export const REJECTED = 'Rejected';
-export const FAILURE = 'Failure';
-
+// -------
+// States
+// -------
 export interface WaitForApproval {
-  type: typeof WAIT_FOR_APPROVAL;
+  type: 'Withdrawing.WaitforApproval';
   processId: string;
   channelId: string;
   withdrawalAmount: string;
 }
 
 export interface WaitForTransaction {
-  type: typeof WAIT_FOR_TRANSACTION;
+  type: 'Withdrawing.WaitForTransaction';
   processId: string;
   channelId: string;
   transactionSubmissionState: NonTerminalTSState;
@@ -30,37 +20,33 @@ export interface WaitForTransaction {
 }
 
 export interface WaitForAcknowledgement {
-  type: typeof WAIT_FOR_ACKNOWLEDGEMENT;
+  type: 'Withdrawing.WaitForAcknowledgement';
   processId: string;
   channelId: string;
 }
 
 export interface Failure {
-  type: typeof FAILURE;
+  type: 'Withdrawing.Failure';
   reason: string;
 }
 
 export interface Success {
-  type: typeof SUCCESS;
+  type: 'Withdrawing.Success';
 }
 
-// -------
-// Helpers
-// -------
-
-export function isTerminal(state: WithdrawalState): state is Failure | Success {
-  return state.type === FAILURE || state.type === SUCCESS;
-}
+// ------------
+// Constructors
+// ------------
 
 export function waitForApproval(properties: Properties<WaitForApproval>): WaitForApproval {
   const { processId, withdrawalAmount, channelId } = properties;
-  return { type: WAIT_FOR_APPROVAL, withdrawalAmount, processId, channelId };
+  return { type: 'Withdrawing.WaitforApproval', withdrawalAmount, processId, channelId };
 }
 
 export function waitForTransaction(properties: Properties<WaitForTransaction>): WaitForTransaction {
   const { processId, transactionSubmissionState, channelId, withdrawalAddress } = properties;
   return {
-    type: WAIT_FOR_TRANSACTION,
+    type: 'Withdrawing.WaitForTransaction',
     transactionSubmissionState,
     processId,
     channelId,
@@ -72,19 +58,36 @@ export function waitForAcknowledgement(
   properties: Properties<WaitForAcknowledgement>,
 ): WaitForAcknowledgement {
   const { processId, channelId } = properties;
-  return { type: WAIT_FOR_ACKNOWLEDGEMENT, processId, channelId };
+  return { type: 'Withdrawing.WaitForAcknowledgement', processId, channelId };
 }
 
-export function success(): Success {
-  return { type: SUCCESS };
+export function success({}): Success {
+  return { type: 'Withdrawing.Success' };
 }
 
 export function failure(reason: FailureReason): Failure {
-  return { type: FAILURE, reason };
+  return { type: 'Withdrawing.Failure', reason };
 }
 
 export const enum FailureReason {
   TransactionFailure = 'Transaction failed',
   ChannelNotClosed = 'Channel not closed',
   UserRejected = 'User rejected',
+}
+
+// -------
+// Unions and Guards
+// -------
+
+export type WithdrawalState =
+  | WaitForApproval
+  | WaitForTransaction
+  | WaitForAcknowledgement
+  | Failure
+  | Success;
+
+export type WithdrawalStateType = WithdrawalState['type'];
+
+export function isTerminal(state: WithdrawalState): state is Failure | Success {
+  return state.type === 'Withdrawing.Failure' || state.type === 'Withdrawing.Success';
 }

@@ -6,17 +6,11 @@ export type ResponderConcludingState =
   | TerminalState;
 export type ResponderConcludingStateType = ResponderConcludingState['type'];
 import { ProtocolState } from '../..';
-import { TerminalState, FailureReason } from '../state';
+import { TerminalState, FailureReason } from '../states';
 
-export type ResponderNonTerminalState =
-  | ResponderApproveConcluding
-  | ResponderDecideDefund
-  | ResponderWaitForDefund
-  | ResponderAcknowledgeFailure
-  | ResponderAcknowledgeSuccess;
-
-export type ResponderPreTerminalState = ResponderAcknowledgeSuccess | ResponderAcknowledgeFailure;
-
+// -------
+// States
+// -------
 export interface ResponderAcknowledgeSuccess {
   type: 'ConcludingResponder.AcknowledgeSuccess';
   processId: string;
@@ -87,3 +81,16 @@ export const waitForDefund: Constructor<ResponderWaitForDefund> = p => {
   const { processId, channelId, defundingState } = p;
   return { type: 'ConcludingResponder.WaitForDefund', processId, channelId, defundingState };
 };
+
+// -------
+// Unions and Guards
+// -------
+
+export type ResponderNonTerminalState =
+  | ResponderApproveConcluding
+  | ResponderDecideDefund
+  | ResponderWaitForDefund
+  | ResponderAcknowledgeFailure
+  | ResponderAcknowledgeSuccess;
+
+export type ResponderPreTerminalState = ResponderAcknowledgeSuccess | ResponderAcknowledgeFailure;

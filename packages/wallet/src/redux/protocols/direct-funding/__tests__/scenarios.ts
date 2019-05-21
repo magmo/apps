@@ -7,7 +7,7 @@ import * as globalTestScenarios from '../../../__tests__/test-scenarios';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__';
-import * as states from '../state';
+import * as states from '../states';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 
 const { channelId, twoThree } = scenarios;
@@ -67,7 +67,7 @@ const defaultsForA: states.DirectFundingState = {
   channelId,
   ourIndex: 0,
   safeToDepositLevel: '0x',
-  type: states.NOT_SAFE_TO_DEPOSIT,
+  type: 'DirectFunding.NotSafeToDeposit',
 };
 
 const defaultsForB: states.DirectFundingState = {

@@ -1,33 +1,49 @@
-export const ADDRESS_KNOWN = 'Application.AddressKnown';
+import { Constructor } from '../../utils';
+
+// -------
+// States
+// -------
 export interface AddressKnown {
-  type: typeof ADDRESS_KNOWN;
+  type: 'Application.AddressKnown';
   address: string;
   privateKey: string;
 }
-export function addressKnown(address: string, privateKey: string): AddressKnown {
-  return { type: ADDRESS_KNOWN, address, privateKey };
-}
 
-export const ONGOING = 'Application.Ongoing';
 export interface Ongoing {
-  type: typeof ONGOING;
+  type: 'Application.Ongoing';
   channelId: string;
 }
-export function ongoing(channelId: string): Ongoing {
-  return { type: ONGOING, channelId };
-}
-export const SUCCESS = 'Application.Success';
+
 export interface Success {
-  type: typeof SUCCESS;
+  type: 'Application.Success';
 }
 
-export function success(): Success {
-  return { type: SUCCESS };
-}
+// -------
+// Constructors
+// -------
 
-export function isTerminal(state: ApplicationState): state is Success {
-  return state.type === SUCCESS;
-}
+export const addressKnown: Constructor<AddressKnown> = p => {
+  const { address, privateKey } = p;
+  return { type: 'Application.AddressKnown', address, privateKey };
+};
+
+export const ongoing: Constructor<Ongoing> = p => {
+  const { channelId } = p;
+  return { type: 'Application.Ongoing', channelId };
+};
+
+export const success: Constructor<Success> = p => {
+  return { type: 'Application.Success' };
+};
+
+// -------
+// Unions and Guards
+// -------
 
 export type ApplicationState = AddressKnown | Ongoing | Success;
 export type NonTerminalApplicationState = AddressKnown | Ongoing;
+export type ApplicationStateType = ApplicationState['type'];
+
+export function isTerminal(state: ApplicationState): state is Success {
+  return state.type === 'Application.Success';
+}

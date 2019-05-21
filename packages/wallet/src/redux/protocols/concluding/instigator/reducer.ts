@@ -38,7 +38,7 @@ import {
   COMMITMENT_RECEIVED,
   CommitmentReceived,
 } from '../../../../communication';
-import { failure, success } from '../state';
+import { failure, success } from '../states';
 import { getChannelId } from '../../../../domain';
 import { ProtocolStateWithSharedData } from '../..';
 
@@ -205,7 +205,10 @@ function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): Re
 function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
   switch (protocolState.type) {
     case 'ConcludingInstigator.AcknowledgeSuccess':
-      return { protocolState: success(), sharedData: sendConcludeSuccess(hideWallet(sharedData)) };
+      return {
+        protocolState: success({}),
+        sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+      };
     case 'ConcludingInstigator.AcknowledgeFailure':
       return {
         protocolState: failure({ reason: protocolState.reason }),

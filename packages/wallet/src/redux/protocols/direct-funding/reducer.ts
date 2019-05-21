@@ -13,7 +13,7 @@ import {
   transactionReducer,
 } from '../transaction-submission/reducer';
 import { isTerminal, isSuccess } from '../transaction-submission/states';
-import * as states from './state';
+import * as states from './states';
 import { theirAddress } from '../../channel-store';
 import * as channelStoreReducer from '../../channel-store/reducer';
 import { sendCommitmentReceived } from '../../../communication';
@@ -36,15 +36,15 @@ export const directFundingStateReducer: DFReducer = (
   }
 
   switch (state.type) {
-    case states.NOT_SAFE_TO_DEPOSIT:
+    case 'DirectFunding.NotSafeToDeposit':
       return notSafeToDepositReducer(state, sharedData, action);
-    case states.WAIT_FOR_DEPOSIT_TRANSACTION:
+    case 'DirectFunding.WaitForDepositTransaction':
       return waitForDepositTransactionReducer(state, sharedData, action);
-    case states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP:
+    case 'DirectFunding.WaitForFundingAndPostFundSetup':
       return waitForFundingAndPostFundSetupReducer(state, sharedData, action);
-    case states.FUNDING_SUCCESS:
+    case 'DirectFunding.FundingSuccess':
       return channelFundedReducer(state, sharedData, action);
-    case states.FUNDING_FAILURE:
+    case 'DirectFunding.FundingFailure':
       // todo: restrict the reducer to only accept non-terminal states
       return { protocolState: state, sharedData };
     default:
@@ -79,7 +79,7 @@ const fundingReceiveEventReducer: DFReducer = (
 
   // Player B case
   if (
-    protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
+    protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
     protocolState.postFundSetupReceived
   ) {
     const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
@@ -109,7 +109,7 @@ const commitmentReceivedReducer: DFReducer = (
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
   if (protocolState.ourIndex === PlayerIndex.A) {
     if (
-      protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
+      protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
       protocolState.channelFunded
     ) {
       const checkResult = channelStoreReducer.checkAndStore(
@@ -135,7 +135,7 @@ const commitmentReceivedReducer: DFReducer = (
 
   // Player B logic
   if (
-    protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP &&
+    protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
     protocolState.channelFunded
   ) {
     const checkResult = channelStoreReducer.checkAndStore(

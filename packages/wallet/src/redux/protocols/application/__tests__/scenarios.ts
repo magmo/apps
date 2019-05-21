@@ -38,9 +38,9 @@ const defaults = { processId, channelId };
 // ------
 // States
 // ------
-const addressKnown = states.addressKnown(address, privateKey);
-const ongoing = states.ongoing(channelId);
-const success = states.success();
+const addressKnown = states.addressKnown({ address, privateKey });
+const ongoing = states.ongoing({ channelId });
+const success = states.success({});
 
 // -------
 // Actions

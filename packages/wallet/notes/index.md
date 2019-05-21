@@ -2,7 +2,7 @@
 
 - [Wallet architecture](./structuring-the-wallet.md)
 - [Action routing](./action-routing.md)
-- [Protovcol Conventions](./protocol-conventions.md)
+- [Protocol Conventions](./protocol-conventions.md)
 
 ## Protocols
 

@@ -1,4 +1,4 @@
-import * as states from '../state';
+import * as states from '../states';
 import * as actions from '../actions';
 import * as testScenarios from '../../../../__tests__/test-scenarios';
 import * as transactionScenarios from '../../../transaction-submission/__tests__';
@@ -80,8 +80,10 @@ const waitForApprovalRequiresResponse = states.waitForApproval({
 const waitForTransaction = states.waitForTransaction(props);
 const waitForAcknowledgement = states.waitForAcknowledgement(props);
 const waitForResponse = states.waitForResponse(props);
-const success = states.success();
-const transactionFailedFailure = states.failure(states.FailureReason.TransactionFailure);
+const success = states.success({});
+const transactionFailedFailure = states.failure({
+  reason: states.FailureReason.TransactionFailure,
+});
 const transactionConfirmed = transactionActions.transactionConfirmed(processId);
 const transactionFailed = transactionActions.transactionFailed(processId);
 const acknowledgeTimeout = states.acknowledgeTimeout(props);

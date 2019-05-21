@@ -1,7 +1,7 @@
 import * as scenarios from './scenarios';
 import { instigatorConcludingReducer, initialize, ReturnVal } from '../reducer';
 import { InstigatorConcludingStateType } from '../states';
-import { FailureReason } from '../../state';
+import { FailureReason } from '../../states';
 import { SharedData } from '../../../../state';
 import { Commitment } from '../../../../../domain';
 import {
@@ -54,7 +54,7 @@ describe('[ Happy path ]', () => {
     const { state, action, store } = scenario.acknowledgeSuccess;
     const result = instigatorConcludingReducer(state, store, action);
 
-    itTransitionsTo(result, 'Success');
+    itTransitionsTo(result, 'Concluding.Success');
     itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
@@ -152,8 +152,8 @@ function itTransitionsTo(result: ReturnVal, type: InstigatorConcludingStateType)
 
 function itTransitionsToFailure(result: ReturnVal, reason: FailureReason) {
   it(`transitions to Failure with reason ${reason}`, () => {
-    expect(result.protocolState.type).toEqual('Failure');
-    if (result.protocolState.type === 'Failure') {
+    expect(result.protocolState.type).toEqual('Concluding.Failure');
+    if (result.protocolState.type === 'Concluding.Failure') {
       expect(result.protocolState.reason).toEqual(reason);
     }
   });

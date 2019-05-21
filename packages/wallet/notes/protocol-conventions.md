@@ -50,6 +50,8 @@ Define an interface and constructor function for each state in the state machine
 
 To reduce boilerplate, simply enter the type string directly rather than defining a named constant string and using `type: typeof CONSTANT_STRING`.
 
+Constructor functions should be typed as `Constructor<InterfaceName>` by using `import { Properties, Constructor } from '../../utils';`.
+
 ## Actions
 
 <a name="actions"></a>
@@ -59,6 +61,8 @@ Define an interface and constructor function for each action in the state machin
 Actions should have a `processId` property.
 
 To reduce boilerplate, simply enter the type string directly rather than defining a named constant string and using `type: typeof CONSTANT_STRING`.
+
+Constructor functions should be typed as `Constructor<InterfaceName>` by using `import { Properties, Constructor } from '../../utils';`.
 
 ## Reducer
 

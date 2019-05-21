@@ -1,6 +1,6 @@
 import { ProtocolStateWithSharedData } from '..';
 import { SharedData, signAndStore, queueMessage, checkAndStore } from '../../state';
-import * as states from './state';
+import * as states from './states';
 import { IndirectDefundingAction } from './actions';
 import { COMMITMENT_RECEIVED } from '../../actions';
 import * as helpers from '../reducer-helpers';
@@ -23,7 +23,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   if (!helpers.channelIsClosed(channelId, sharedData)) {
     return {
-      protocolState: states.failure('Channel Not Closed'),
+      protocolState: states.failure({ reason: 'Channel Not Closed' }),
       sharedData,
     };
   }
@@ -39,7 +39,10 @@ export const initialize = (
     );
     const signResult = signAndStore(sharedData, ourCommitment);
     if (!signResult.isSuccess) {
-      return { protocolState: states.failure('Received Invalid Commitment'), sharedData };
+      return {
+        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+        sharedData,
+      };
     }
     newSharedData = signResult.store;
 
@@ -76,12 +79,12 @@ export const indirectDefundingReducer = (
   action: IndirectDefundingAction,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   switch (protocolState.type) {
-    case states.WAIT_FOR_LEDGER_UPDATE:
+    case 'IndirectDefunding.WaitForLedgerUpdate':
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
-    case states.WAIT_FOR_CONCLUDE:
+    case 'IndirectDefunding.WaitForConclude':
       return waitForConcludeReducer(protocolState, sharedData, action);
-    case states.SUCCESS:
-    case states.FAILURE:
+    case 'IndirectDefunding.Success':
+    case 'IndirectDefunding.Failure':
       return { protocolState, sharedData };
     default:
       return unreachable(protocolState);
@@ -101,7 +104,7 @@ const waitForConcludeReducer = (
 
   const checkResult = checkAndStore(newSharedData, action.signedCommitment);
   if (!checkResult.isSuccess) {
-    return { protocolState: states.failure('Received Invalid Commitment'), sharedData };
+    return { protocolState: states.failure({ reason: 'Received Invalid Commitment' }), sharedData };
   }
   newSharedData = checkResult.store;
 
@@ -114,7 +117,7 @@ const waitForConcludeReducer = (
   }
 
   return {
-    protocolState: states.success(),
+    protocolState: states.success({}),
     sharedData: newSharedData,
   };
 };
@@ -132,7 +135,7 @@ const waitForLedgerUpdateReducer = (
 
   const checkResult = checkAndStore(newSharedData, action.signedCommitment);
   if (!checkResult.isSuccess) {
-    return { protocolState: states.failure('Received Invalid Commitment'), sharedData };
+    return { protocolState: states.failure({ reason: 'Received Invalid Commitment' }), sharedData };
   }
   newSharedData = checkResult.store;
 
@@ -142,7 +145,7 @@ const waitForLedgerUpdateReducer = (
     const signResult = signAndStore(newSharedData, ourCommitment);
     if (!signResult.isSuccess) {
       return {
-        protocolState: states.failure('Received Invalid Commitment'),
+        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
         sharedData: newSharedData,
       };
     }

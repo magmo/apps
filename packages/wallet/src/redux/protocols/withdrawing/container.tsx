@@ -26,7 +26,7 @@ class WithdrawalContainer extends PureComponent<Props> {
       withdrawalSuccessAcknowledged,
     } = this.props;
     switch (state.type) {
-      case states.WAIT_FOR_APPROVAL:
+      case 'Withdrawing.WaitforApproval':
         return (
           <WaitForApproval
             withdrawalAmount={state.withdrawalAmount}
@@ -34,14 +34,14 @@ class WithdrawalContainer extends PureComponent<Props> {
             deny={() => withdrawalRejected(state.processId)}
           />
         );
-      case states.WAIT_FOR_TRANSACTION:
+      case 'Withdrawing.WaitForTransaction':
         return (
           <TransactionSubmission
             state={state.transactionSubmissionState}
             transactionName="Withdraw"
           />
         );
-      case states.WAIT_FOR_ACKNOWLEDGEMENT:
+      case 'Withdrawing.WaitForAcknowledgement':
         return (
           <Acknowledge
             title="Withdraw Complete"
@@ -49,9 +49,9 @@ class WithdrawalContainer extends PureComponent<Props> {
             acknowledge={() => withdrawalSuccessAcknowledged(state.processId)}
           />
         );
-      case states.FAILURE:
+      case 'Withdrawing.Failure':
         return <Failure name="withdraw" reason={state.reason} />;
-      case states.SUCCESS:
+      case 'Withdrawing.Success':
         return <Success name="withdraw" />;
       default:
         return unreachable(state);

@@ -64,14 +64,14 @@ export function initialize(
 }
 
 function transactionSent(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForSend') {
+  if (state.type !== 'TransactionSubmission.WaitForSend') {
     return { state, storage };
   }
   return { state: waitForSubmission(state), storage };
 }
 
 function transactionSubmissionFailed(state: TSState, storage: Storage): ReturnVal {
-  if (state.type !== 'WaitForSubmission') {
+  if (state.type !== 'TransactionSubmission.WaitForSubmission') {
     return { state, storage };
   }
   return { state: approveRetry(state), storage };
@@ -83,8 +83,8 @@ function transactionSubmitted(
   transactionHash: string,
 ): ReturnVal {
   switch (state.type) {
-    case 'WaitForSubmission':
-    case 'WaitForSend': // just in case we didn't hear the TRANSACTION_SENT
+    case 'TransactionSubmission.WaitForSubmission':
+    case 'TransactionSubmission.WaitForSend': // just in case we didn't hear the TRANSACTION_SENT
       return { state: waitForConfirmation({ ...state, transactionHash }), storage };
     default:
       return { state, storage };
@@ -93,17 +93,17 @@ function transactionSubmitted(
 
 function transactionConfirmed(state: NonTerminalTSState, storage: Storage): ReturnVal {
   switch (state.type) {
-    case 'WaitForConfirmation':
-    case 'WaitForSubmission': // in case we didn't hear the TRANSACTION_SUBMITTED
-    case 'WaitForSend': // in case we didn't hear the TRANSACTION_SENT
-      return { state: success(), storage };
+    case 'TransactionSubmission.WaitForConfirmation':
+    case 'TransactionSubmission.WaitForSubmission': // in case we didn't hear the TRANSACTION_SUBMITTED
+    case 'TransactionSubmission.WaitForSend': // in case we didn't hear the TRANSACTION_SENT
+      return { state: success({}), storage };
     default:
       return { state, storage };
   }
 }
 
 function transactionRetryApproved(state: NonTerminalTSState, storage: Storage): ReturnVal {
-  if (state.type !== 'ApproveRetry') {
+  if (state.type !== 'TransactionSubmission.ApproveRetry') {
     return { state, storage };
   }
   const { transaction, processId } = state;

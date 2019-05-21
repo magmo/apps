@@ -28,18 +28,18 @@ class FundingContainer extends PureComponent<Props> {
     const { processId } = state;
 
     switch (state.type) {
-      case states.WAIT_FOR_STRATEGY_CHOICE:
+      case 'Funding.PlayerA.WaitForStrategyChoice':
         return (
           <ChooseStrategy
             strategyChosen={(strategy: FundingStrategy) => strategyChosen(processId, strategy)}
             cancelled={() => cancelled(processId, PlayerIndex.B)}
           />
         );
-      case states.WAIT_FOR_STRATEGY_RESPONSE:
+      case 'Funding.PlayerA.WaitForStrategyResponse':
         return <WaitForOtherPlayer name={'strategy response'} />;
-      case states.WAIT_FOR_FUNDING:
+      case 'Funding.PlayerA.WaitForFunding':
         return <IndirectFunding state={state.fundingState} />;
-      case states.WAIT_FOR_SUCCESS_CONFIRMATION:
+      case 'Funding.PlayerA.WaitForSuccessConfirmation':
         return (
           <AcknowledgeX
             title="Channel funded!"

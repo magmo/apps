@@ -1,4 +1,4 @@
-import * as states from './state';
+import * as states from './states';
 import * as actions from './actions';
 import { PureComponent } from 'react';
 import { Commitment } from '../../../../domain';
@@ -29,7 +29,7 @@ class ResponderContainer extends PureComponent<Props> {
       defundChosen,
     } = this.props;
     switch (state.type) {
-      case states.WAIT_FOR_ACKNOWLEDGEMENT:
+      case 'Responding.WaitForAcknowledgement':
         return (
           <Acknowledge
             title="Response Complete"
@@ -37,19 +37,19 @@ class ResponderContainer extends PureComponent<Props> {
             acknowledge={() => respondSuccessAcknowledged(state.processId)}
           />
         );
-      case states.WAIT_FOR_APPROVAL:
+      case 'Responding.WaitForApproval':
         return <WaitForApproval approve={() => respondApproved(state.processId)} />;
-      case states.WAIT_FOR_RESPONSE:
+      case 'Responding.WaitForResponse':
         // TODO: Should this ever been seen? We expect protocol above this to figure out getting the response
         return <div>Waiting for response</div>;
-      case states.WAIT_FOR_TRANSACTION:
+      case 'Responding.WaitForTransaction':
         return (
           <TransactionSubmission
             state={state.transactionSubmissionState}
             transactionName="Respond"
           />
         );
-      case states.ACKNOWLEDGE_CLOSED_BUT_NOT_DEFUNDED:
+      case 'Responding.AcknowledgeClosedButNotDefunded':
         return (
           <Acknowledge
             title="Defunding failed!"
@@ -57,7 +57,7 @@ class ResponderContainer extends PureComponent<Props> {
             acknowledge={() => acknowledged(state.processId)}
           />
         );
-      case states.ACKNOWLEDGE_DEFUNDING_SUCCESS:
+      case 'Responding.AcknowledgeDefundingSuccess':
         return (
           <Acknowledge
             title="Defunding success!"
@@ -65,7 +65,7 @@ class ResponderContainer extends PureComponent<Props> {
             acknowledge={() => acknowledged(state.processId)}
           />
         );
-      case states.ACKNOWLEDGE_TIMEOUT:
+      case 'Responding.AcknowledgeTimeout':
         return (
           <Acknowledge
             title="Challenge timeout!"
@@ -73,7 +73,7 @@ class ResponderContainer extends PureComponent<Props> {
             acknowledge={() => defundChosen(state.processId)}
           />
         );
-      case states.WAIT_FOR_DEFUND:
+      case 'Responding.WaitForDefund':
         return <Defunding state={state.defundingState} />;
       default:
         return unreachable(state);

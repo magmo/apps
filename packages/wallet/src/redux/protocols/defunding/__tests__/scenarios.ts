@@ -76,7 +76,7 @@ const waitForLedgerFailure = states.waitForLedgerDefunding({
   channelId,
   indirectDefundingState: indirectDefunding.preFailureState.state,
 });
-const success = states.success();
+const success = states.success({});
 const channelNotClosedFailure = states.failure('Channel Not Closed');
 const withdrawalFailure = states.failure('Withdrawal Failure');
 

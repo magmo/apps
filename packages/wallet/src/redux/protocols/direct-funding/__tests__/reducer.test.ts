@@ -1,7 +1,7 @@
 import * as actions from '../../../actions';
 import * as globalTestScenarios from '../../../__tests__/test-scenarios';
 import { directFundingStateReducer } from '../reducer';
-import * as states from '../state';
+import * as states from '../states';
 import * as scenarios from './scenarios';
 import * as transactionSubmissionStates from '../../transaction-submission/states';
 import { ProtocolStateWithSharedData } from '../..';
@@ -29,7 +29,7 @@ describe(startingIn('Any state'), () => {
           state.sharedData,
           action,
         );
-        itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+        itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
         expectThisCommitmentSent(updatedState.sharedData, globalTestScenarios.postFundCommitment0);
       });
       describe('when the channel is still not funded', () => {
@@ -45,7 +45,7 @@ describe(startingIn('Any state'), () => {
           state.sharedData,
           action,
         );
-        itTransitionsTo(updatedState, states.NOT_SAFE_TO_DEPOSIT);
+        itTransitionsTo(updatedState, 'DirectFunding.NotSafeToDeposit');
       });
     });
 
@@ -58,12 +58,12 @@ describe(startingIn('Any state'), () => {
         scenarios.TOTAL_REQUIRED,
       );
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
-      itTransitionsTo(updatedState, states.NOT_SAFE_TO_DEPOSIT);
+      itTransitionsTo(updatedState, 'DirectFunding.NotSafeToDeposit');
     });
   });
 });
 
-describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
+describe(startingIn('DirectFunding.NotSafeToDeposit'), () => {
   // player B scenario
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     describe('when it is now safe to deposit', () => {
@@ -76,11 +76,11 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
       );
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
-      itTransitionsTo(updatedState, states.WAIT_FOR_DEPOSIT_TRANSACTION);
+      itTransitionsTo(updatedState, 'DirectFunding.WaitForDepositTransaction');
       itChangesTransactionSubmissionStatusTo(
         ((updatedState.protocolState as any) as states.WaitForDepositTransaction)
           .transactionSubmissionState,
-        'WaitForSend',
+        'TransactionSubmission.WaitForSend',
       );
     });
 
@@ -89,18 +89,18 @@ describe(startingIn(states.NOT_SAFE_TO_DEPOSIT), () => {
       const action = actions.fundingReceivedEvent(channelId, channelId, '0x', '0x');
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
-      itTransitionsTo(updatedState, states.NOT_SAFE_TO_DEPOSIT);
+      itTransitionsTo(updatedState, 'DirectFunding.NotSafeToDeposit');
     });
   });
 });
 
-describe(startingIn(states.WAIT_FOR_DEPOSIT_TRANSACTION), () => {
+describe(startingIn('DirectFunding.WaitForDepositTransaction'), () => {
   describe(whenActionArrives(actions.TRANSACTION_CONFIRMED), () => {
     const state = scenarios.aEachDepositsInSequenceHappyStates.waitForDepositTransactionEnd;
     const action = actions.transactionConfirmed(channelId);
 
     const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
-    itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+    itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
   });
 
   describe(whenActionArrives(actions.COMMITMENT_RECEIVED), () => {
@@ -111,16 +111,16 @@ describe(startingIn(states.WAIT_FOR_DEPOSIT_TRANSACTION), () => {
       state.sharedData,
       scenarios.actions.postFundSetup0,
     );
-    itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+    itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
     const protocolState = updatedState.protocolState;
-    if (protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+    if (protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup') {
       expect(protocolState.channelFunded).toBeFalsy();
       expect(protocolState.postFundSetupReceived).toBeTruthy();
     }
   });
 });
 
-describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
+describe(startingIn('DirectFunding.WaitForFundingAndPostFundSetup'), () => {
   describe(whenActionArrives(actions.FUNDING_RECEIVED_EVENT), () => {
     describe('when it is now fully funded', () => {
       const state = scenarios.bEachDepositsInSequenceHappyStates.waitForFundingAndPostFundSetup;
@@ -132,7 +132,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
       );
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
-      itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+      itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
     });
 
     describe('when it is still not fully funded', () => {
@@ -145,7 +145,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
       );
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
-      itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+      itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
     });
 
     describe('when it is for the wrong channel', () => {
@@ -158,7 +158,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
       );
       const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
-      itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+      itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
     });
   });
 
@@ -170,7 +170,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
         state.sharedData,
         scenarios.actions.postFundSetup0,
       );
-      itTransitionsTo(updatedState, states.FUNDING_SUCCESS);
+      itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
       it('sends a commitment', () => {
         expectThisCommitmentSent(updatedState.sharedData, globalTestScenarios.postFundCommitment1);
       });
@@ -184,9 +184,9 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
         state.sharedData,
         scenarios.actions.postFundSetup0,
       );
-      itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+      itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
       const protocolState = updatedState.protocolState;
-      if (protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+      if (protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup') {
         expect(protocolState.channelFunded).toBeFalsy();
         expect(protocolState.postFundSetupReceived).toBeTruthy();
       }
@@ -201,7 +201,7 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
         state.sharedData,
         scenarios.actions.postFundSetup1,
       );
-      itTransitionsTo(updatedState, states.FUNDING_SUCCESS);
+      itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
     });
 
     describe('Player A: channel is not funded', () => {
@@ -211,9 +211,9 @@ describe(startingIn(states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP), () => {
         state.sharedData,
         scenarios.actions.postFundSetup0,
       );
-      itTransitionsTo(updatedState, states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP);
+      itTransitionsTo(updatedState, 'DirectFunding.WaitForFundingAndPostFundSetup');
       const protocolState = updatedState.protocolState;
-      if (protocolState.type === states.WAIT_FOR_FUNDING_AND_POST_FUND_SETUP) {
+      if (protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup') {
         expect(protocolState.channelFunded).toBeFalsy();
         expect(protocolState.postFundSetupReceived).toBeFalsy();
       }
@@ -227,13 +227,13 @@ describe('transaction-fails scenario', () => {
     const action = scenarios.transactionFails.failureTrigger;
     const updatedState = directFundingStateReducer(state.protocolState, state.sharedData, action);
 
-    itTransitionsTo(updatedState, states.FUNDING_FAILURE);
+    itTransitionsTo(updatedState, 'DirectFunding.FundingFailure');
   });
 });
 
 function itTransitionsTo(
   state: ProtocolStateWithSharedData<states.DirectFundingState>,
-  type: string,
+  type: states.DirectFundingStateType,
 ) {
   it(`transitions state to ${type}`, () => {
     expect(state.protocolState.type).toEqual(type);

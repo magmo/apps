@@ -1,5 +1,5 @@
-import * as states from '../state';
-import { PlayerBState } from '../state';
+import * as states from '../states';
+import { PlayerBState } from '../states';
 
 import * as actions from '../../../actions';
 
@@ -14,7 +14,7 @@ import {
   getAddressAndPrivateKey,
   registerChannelToMonitor,
 } from '../../../state';
-import { IndirectFundingState, failure, success } from '../state';
+import { IndirectFundingState, failure, success } from '../states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import {
   BWaitForPreFundSetup0,
@@ -24,16 +24,16 @@ import {
   bWaitForDirectFunding,
   bWaitForLedgerUpdate0,
   bWaitForPostFundSetup0,
-} from './state';
+} from './states';
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { theirAddress } from '../../../../redux/channel-store';
-import { initialDirectFundingState } from '../../direct-funding/state';
+import { initialDirectFundingState } from '../../direct-funding/states';
 
 import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
-import { isSuccess, isFailure } from '../../direct-funding/state';
+import { isSuccess, isFailure } from '../../direct-funding/states';
 import { acceptConsensus } from '../../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../../communication';
 import { addHex } from '../../../../utils/hex-utils';
@@ -58,13 +58,13 @@ export function playerBReducer(
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   switch (protocolState.type) {
-    case 'BWaitForPreFundSetup0':
+    case 'IndirectFunding.BWaitForPreFundSetup0':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
-    case 'BWaitForDirectFunding': // defer to child reducer
+    case 'IndirectFunding.BWaitForDirectFunding': // defer to child reducer
       return handleWaitForDirectFunding(protocolState, sharedData, action);
-    case 'BWaitForLedgerUpdate0':
+    case 'IndirectFunding.BWaitForLedgerUpdate0':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
-    case 'BWaitForPostFundSetup0':
+    case 'IndirectFunding.BWaitForPostFundSetup0':
       return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);
@@ -162,7 +162,7 @@ function handleWaitForDirectFunding(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  if (protocolState.type !== 'BWaitForDirectFunding') {
+  if (protocolState.type !== 'IndirectFunding.BWaitForDirectFunding') {
     return { protocolState, sharedData };
   }
 
@@ -179,7 +179,7 @@ function handleWaitForDirectFunding(
   if (isSuccess(newDirectFundingState)) {
     return { protocolState: bWaitForLedgerUpdate0(newProtocolState), sharedData };
   } else if (isFailure(newDirectFundingState)) {
-    return { protocolState: failure(), sharedData };
+    return { protocolState: failure({}), sharedData };
   }
 
   return { protocolState: newProtocolState, sharedData };
@@ -296,7 +296,7 @@ export function handleWaitForPostFundSetup(
 
   sharedData.fundingState[protocolState.channelId] = fundingState;
 
-  const newProtocolState = success();
+  const newProtocolState = success({});
   const newReturnVal = { protocolState: newProtocolState, sharedData };
   return newReturnVal;
 }

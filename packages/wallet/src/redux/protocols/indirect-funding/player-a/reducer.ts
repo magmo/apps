@@ -1,4 +1,4 @@
-import * as states from './state';
+import * as states from './states';
 
 import * as actions from '../../../actions';
 
@@ -11,7 +11,7 @@ import {
   signAndStore,
   registerChannelToMonitor,
 } from '../../../state';
-import { IndirectFundingState, failure, success } from '../state';
+import { IndirectFundingState, failure, success } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../../domain';
@@ -26,7 +26,7 @@ import {
   isSuccess,
   isFailure,
   isTerminal,
-} from '../../direct-funding/state';
+} from '../../direct-funding/states';
 import { directFundingStateReducer } from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
 import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
@@ -88,13 +88,13 @@ export function playerAReducer(
   action: actions.indirectFunding.Action,
 ): ReturnVal {
   switch (protocolState.type) {
-    case 'AWaitForPreFundSetup1':
+    case 'IndirectFunding.AWaitForPreFundSetup1':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
-    case 'AWaitForDirectFunding':
+    case 'IndirectFunding.AWaitForDirectFunding':
       return handleWaitForDirectFunding(protocolState, sharedData, action);
-    case 'AWaitForLedgerUpdate1':
+    case 'IndirectFunding.AWaitForLedgerUpdate1':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
-    case 'AWaitForPostFundSetup1':
+    case 'IndirectFunding.AWaitForPostFundSetup1':
       return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);
@@ -122,7 +122,7 @@ function handleWaitForPostFundSetup(
   };
 
   sharedData.fundingState[protocolState.channelId] = fundingState;
-  const newProtocolState = success();
+  const newProtocolState = success({});
   const newReturnVal = { protocolState: newProtocolState, sharedData };
   return newReturnVal;
 }
@@ -246,7 +246,7 @@ function handleWaitForDirectFunding(
     return { protocolState: newProtocolState, sharedData };
   }
   if (isFailure(newDirectFundingState)) {
-    return { protocolState: failure(), sharedData };
+    return { protocolState: failure({}), sharedData };
   }
   if (isSuccess(newDirectFundingState)) {
     const channel = getChannel(sharedData.channelStore, newProtocolState.ledgerId);

@@ -47,14 +47,14 @@ export const withdrawalReducer = (
   action: WithdrawalAction,
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
   switch (protocolState.type) {
-    case states.WAIT_FOR_APPROVAL:
+    case 'Withdrawing.WaitforApproval':
       return waitForApprovalReducer(protocolState, sharedData, action);
-    case states.WAIT_FOR_TRANSACTION:
+    case 'Withdrawing.WaitForTransaction':
       return waitForTransactionReducer(protocolState, sharedData, action);
-    case states.WAIT_FOR_ACKNOWLEDGEMENT:
+    case 'Withdrawing.WaitForAcknowledgement':
       return waitForAcknowledgementReducer(protocolState, sharedData, action);
-    case states.FAILURE:
-    case states.SUCCESS:
+    case 'Withdrawing.Failure':
+    case 'Withdrawing.Success':
       return { protocolState, sharedData };
     default:
       return unreachable(protocolState);
@@ -66,7 +66,7 @@ const waitForAcknowledgementReducer = (
   action: WithdrawalAction,
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
   if (action.type === actions.WITHDRAWAL_SUCCESS_ACKNOWLEDGED) {
-    return { protocolState: states.success(), sharedData };
+    return { protocolState: states.success({}), sharedData };
   }
   return { protocolState, sharedData };
 };

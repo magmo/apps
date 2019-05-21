@@ -20,10 +20,10 @@ class TransactionSubmissionContainer extends PureComponent<Props> {
   render() {
     const { state, transactionName, transactionRetryApproved, transactionRetryDenied } = this.props;
     switch (state.type) {
-      case 'WaitForSend':
-      case 'WaitForSubmission':
+      case 'TransactionSubmission.WaitForSend':
+      case 'TransactionSubmission.WaitForSubmission':
         return <WaitForSubmission name={transactionName} />;
-      case 'WaitForConfirmation':
+      case 'TransactionSubmission.WaitForConfirmation':
         return (
           <WaitForConfirmation
             name={transactionName}
@@ -31,7 +31,7 @@ class TransactionSubmissionContainer extends PureComponent<Props> {
             networkId={NETWORK_ID}
           />
         );
-      case 'ApproveRetry':
+      case 'TransactionSubmission.ApproveRetry':
         return (
           <ApproveRetry
             name={transactionName}

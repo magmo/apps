@@ -57,9 +57,9 @@ const waitForSuccessConfirmation = {
   state: states.waitForSuccessConfirmation(props),
   store: indirectFundingTests.successState.store,
 };
-const success = states.success();
-const failure = states.failure('User refused');
-const failure2 = states.failure('Opponent refused');
+const success = states.success({});
+const failure = states.failure({ reason: 'User refused' });
+const failure2 = states.failure({ reason: 'Opponent refused' });
 
 // -------
 // Actions

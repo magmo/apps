@@ -5,7 +5,7 @@ import {
   bWaitForDirectFunding,
   bWaitForLedgerUpdate0,
   bWaitForPostFundSetup0,
-} from '../state';
+} from '../states';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 
@@ -24,7 +24,7 @@ import {
   ledgerId,
   channelId,
 } from '../../../../../domain/commitments/__tests__';
-import { success } from '../../../indirect-defunding/state';
+import { success } from '../../../indirect-defunding/states';
 
 // -----------
 // Commitments
@@ -100,7 +100,7 @@ const waitForDirectFundingFailure = {
 };
 
 const successState = {
-  state: success(),
+  state: success({}),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app2, app3, asAddress, bsPrivateKey),
     channelFromCommitments(ledger4, ledger5, asAddress, bsPrivateKey),
