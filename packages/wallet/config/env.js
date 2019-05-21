@@ -40,7 +40,7 @@ const MAGMO_VALUES = [
   'CHAIN_NETWORK_ID',
   'FIREBASE_PROJECT',
   'FIREBASE_API_KEY',
-  'DEV_GANACHE_PORT',
+  'GANACHE_PORT',
 ];
 
 function getClientEnvironment(publicUrl) {
