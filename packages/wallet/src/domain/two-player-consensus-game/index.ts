@@ -7,12 +7,18 @@ import {
   appAttributesFromBytes,
   finalVote,
   propose,
+  AppAttributes,
 } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { Commitment } from 'fmg-core';
 import { CommitmentType } from '../commitments';
 /////////////
 // Helpers //
 /////////////
+
+export function appAttributes(commitment: ConsensusBaseCommitment): AppAttributes {
+  const { updateType, furtherVotesRequired, proposedAllocation, proposedDestination } = commitment;
+  return { updateType, furtherVotesRequired, proposedAllocation, proposedDestination };
+}
 
 export function acceptConsensus(commitment: Commitment): Commitment {
   const fromCommitment = fromCoreCommitment(commitment);
