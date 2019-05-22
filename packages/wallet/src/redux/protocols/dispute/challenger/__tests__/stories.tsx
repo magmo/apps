@@ -2,7 +2,7 @@ import { storiesOf } from '@storybook/react';
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
-import { Challenging } from '../../challenger';
+import { Challenger } from '../../challenger';
 import { fakeStore } from '../../../../../__stories__/index';
 import StatusBarLayout from '../../../../../components/status-bar-layout';
 import * as scenarios from './scenarios';
@@ -37,7 +37,7 @@ addStories(scenarios.transactionFails, 'Challenging / Transaction fails');
 function addStories(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {
-      storiesOf(chapter, module).add(key, render(<Challenging state={scenario[key].state} />));
+      storiesOf(chapter, module).add(key, render(<Challenger state={scenario[key].state} />));
     }
   });
 }
