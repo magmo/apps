@@ -16,24 +16,21 @@ describe('happy-path scenario', () => {
   });
 
   describe('when in WaitForSend', () => {
-    const state = scenario.waitForSend;
-    const action = scenario.sent;
+    const { state, action } = scenario.waitForSend;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.WaitForSubmission');
   });
 
   describe('when in WaitForSubmission', () => {
-    const state = scenario.waitForSubmission;
-    const action = scenario.submitted;
+    const { state, action } = scenario.waitForSubmission;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.WaitForConfirmation');
   });
 
   describe('when in WaitForConfirmation', () => {
-    const state = scenario.waitForConfirmation;
-    const action = scenario.confirmed;
+    const { state, action } = scenario.waitForConfirmation;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.Success');
@@ -45,16 +42,14 @@ describe('retry-and-approve scenario', () => {
   const storage = scenario.sharedData;
 
   describe('when in WaitForSubmission', () => {
-    const state = scenario.waitForSubmission;
-    const action = scenario.submissionFailed;
+    const { state, action } = scenario.waitForSubmission;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.ApproveRetry');
   });
 
   describe('when in ApproveRetry', () => {
-    const state = scenario.approveRetry;
-    const action = scenario.retryApproved;
+    const { state, action } = scenario.approveRetry;
     const result = reducer(state, storage, action);
     const { transaction, processId } = scenario;
 
@@ -70,16 +65,14 @@ describe('retry-and-deny scenario', () => {
   const storage = scenario.sharedData;
 
   describe('when in WaitForSubmission', () => {
-    const state = scenario.waitForSubmission;
-    const action = scenario.submissionFailed;
+    const { state, action } = scenario.waitForSubmission;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.ApproveRetry');
   });
 
   describe('when in ApproveRetry', () => {
-    const state = scenario.approveRetry;
-    const action = scenario.retryDenied;
+    const { state, action } = scenario.approveRetry;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.Failure');
@@ -92,8 +85,7 @@ describe('transaction-failed scenario', () => {
   const storage = scenario.sharedData;
 
   describe('when in ApproveRetry', () => {
-    const state = scenario.waitForConfirmation;
-    const action = scenario.failed;
+    const { state, action } = scenario.waitForConfirmation;
     const result = reducer(state, storage, action);
 
     itTransitionsTo(result, 'TransactionSubmission.Failure');

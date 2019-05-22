@@ -23,36 +23,15 @@ const render = container => () => {
   );
 };
 
-const happyPathStories = {
-  WaitForApproval: scenarios.happyPath.waitForApproval,
-  WaitForTransaction: scenarios.happyPath.waitForTransaction,
-  WaitForAcknowledgement: scenarios.happyPath.waitForAcknowledgement,
-  Success: scenarios.happyPath.success,
-};
+addStories(scenarios.happyPath, 'Withdrawal / Happy path');
+addStories(scenarios.withdrawalRejected, 'Withdrawal / User rejects withdrawal ');
+addStories(scenarios.failedTransaction, 'Withdrawal / Transaction fails');
+addStories(scenarios.channelNotClosed, 'Withdrawal / Channel not closed');
 
-const withdrawalRejectedStories = {
-  WaitForApproval: scenarios.withdrawalRejected.waitForApproval,
-  Failure: scenarios.withdrawalRejected.failure,
-};
-
-const transactionFailureStories = {
-  WaitForApproval: scenarios.failedTransaction.waitForApproval,
-  WaitForTransaction: scenarios.failedTransaction.waitForTransaction,
-  Failure: scenarios.failedTransaction.failure,
-};
-
-const channelNotClosedStories = {
-  Failure: scenarios.channelNotClosed.failure,
-};
-
-addStories(happyPathStories, 'Withdrawal / Happy path');
-addStories(withdrawalRejectedStories, 'Withdrawal / User rejects withdrawal ');
-addStories(transactionFailureStories, 'Withdrawal / Transaction fails');
-addStories(channelNotClosedStories, 'Withdrawal / Channel not closed');
-
-function addStories(collection, chapter) {
-  Object.keys(collection).map(storyName => {
-    const state = collection[storyName];
-    storiesOf(chapter, module).add(storyName, render(<Withdrawal state={state} />));
+function addStories(scenario, chapter) {
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      storiesOf(chapter, module).add(key, render(<Withdrawal state={scenario[key].state} />));
+    }
   });
 }

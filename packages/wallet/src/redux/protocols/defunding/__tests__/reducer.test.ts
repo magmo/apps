@@ -22,15 +22,15 @@ const itTransitionsToFailure = (
 
 describe('directly funded happy path', () => {
   const scenario = scenarios.directlyFundingChannelHappyPath;
-  const { processId, channelId, sharedData } = scenario;
 
   describe('when initializing', () => {
+    const { processId, channelId, sharedData } = scenario.initialize;
     const result = initialize(processId, channelId, sharedData);
     itTransitionsTo(result, 'Defunding.WaitForWithdrawal');
   });
   describe(`when in Defunding.WaitForWithdrawal`, () => {
-    const state = scenario.waitForWithdrawal;
-    const action = scenario.withdrawalSuccessAction;
+    const { state, sharedData, action } = scenario.waitForWithdrawal;
+
     const result = defundingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Defunding.Success');
@@ -39,14 +39,13 @@ describe('directly funded happy path', () => {
 
 describe('directly funded failure', () => {
   const scenario = scenarios.directlyFundingFailure;
-  const { sharedData } = scenario;
 
   describe(`when in Defunding.WaitForWithdrawal`, () => {
-    const state = scenario.waitForWithdrawal;
-    const action = scenario.withdrawalFailureAction;
+    const { state, sharedData, action } = scenario.waitForWithdrawal;
+
     const result = defundingReducer(state, sharedData, action);
 
-    itTransitionsToFailure(result, scenario.failure);
+    itTransitionsToFailure(result, states.failure('Withdrawal Failure'));
   });
 });
 
@@ -64,19 +63,19 @@ describe('indirectly funded happy path', () => {
   const scenario = scenarios.indirectlyFundingChannelHappyPath;
 
   describe('when initializing', () => {
-    const { processId, channelId, store } = scenario.initialize;
-    const result = initialize(processId, channelId, store);
+    const { processId, channelId, sharedData } = scenario.initialize;
+    const result = initialize(processId, channelId, sharedData);
     itTransitionsTo(result, 'Defunding.WaitForIndirectDefunding');
   });
   describe(`when in Defunding.WaitForIndirectDefunding`, () => {
-    const { state, action, store } = scenario.waitForLedgerDefunding;
-    const result = defundingReducer(state, store, action);
+    const { state, action, sharedData } = scenario.waitForLedgerDefunding;
+    const result = defundingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Defunding.WaitForWithdrawal');
   });
   describe(`when in Defunding.WaitForWithdrawal`, () => {
-    const { state, action, store } = scenario.waitForWithdrawal;
-    const result = defundingReducer(state, store, action);
+    const { state, action, sharedData } = scenario.waitForWithdrawal;
+    const result = defundingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Defunding.Success');
   });
@@ -86,8 +85,8 @@ describe('indirectly funded failure', () => {
   const scenario = scenarios.indirectlyFundingFailure;
 
   describe(`when in Defunding.WaitForIndirectDefunding`, () => {
-    const { state, action, store } = scenario.waitForLedgerDefunding;
-    const result = defundingReducer(state, store, action);
+    const { state, action, sharedData } = scenario.waitForLedgerDefunding;
+    const result = defundingReducer(state, sharedData, action);
 
     itTransitionsToFailure(result, states.failure('Ledger De-funding Failure'));
   });

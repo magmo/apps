@@ -1,6 +1,6 @@
 import * as states from '../states';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
-import * as protocolActions from '../../actions';
+
 import * as actions from '../actions';
 
 // -----------------
@@ -40,12 +40,11 @@ const defaults = { processId, channelId };
 // ------
 const addressKnown = states.addressKnown({ address, privateKey });
 const ongoing = states.ongoing({ channelId });
-const success = states.success({});
 
 // -------
 // Actions
 // -------
-const initializeChannel = protocolActions.initializeChannel();
+
 const receivePreFundSetup = actions.ownCommitmentReceived({
   processId,
   commitment: preFundCommitment0,
@@ -72,80 +71,72 @@ const receiveOurInvalidCommitment = actions.ownCommitmentReceived({
 });
 
 const concludeRequested = actions.concludeRequested({ processId: APPLICATION_PROCESS_ID });
+
+// -------
+// SharedData
+// -------
+const emptySharedData = EMPTY_SHARED_DATA;
+const ourTurnSharedData = storage(ourTurn);
+const theirTurnSharedData = storage(theirTurn);
+
 // -------
 // Scenarios
 // -------
 export const initializingApplication = {
   ...defaults,
-  storage: { ...EMPTY_SHARED_DATA },
-  actions: {
-    initializeChannel,
-  },
+  initialize: { sharedData: emptySharedData },
 };
 
 export const startingApplication = {
   ...defaults,
-  storage: { ...EMPTY_SHARED_DATA },
-  states: {
-    addressKnown,
-  },
-  actions: {
-    receivePreFundSetup,
+  addressKnown: {
+    state: addressKnown,
+    sharedData: emptySharedData,
+    action: receivePreFundSetup,
   },
 };
 
 export const receivingACloseRequest = {
   ...defaults,
-  storage: storage(ourTurn),
-  states: {
-    ongoing,
-    success,
-  },
-  actions: {
-    concludeRequested,
+  ongoing: {
+    state: ongoing,
+    sharedData: ourTurnSharedData,
+    action: concludeRequested,
   },
 };
 
 export const receivingOurCommitment = {
   ...defaults,
-  storage: storage(ourTurn),
-  states: {
-    ongoing,
-  },
-  actions: {
-    receiveOurCommitment,
+  ongoing: {
+    sharedData: ourTurnSharedData,
+    state: ongoing,
+    action: receiveOurCommitment,
   },
 };
 
 export const receivingTheirCommitment = {
   ...defaults,
-  storage: storage(theirTurn),
-  states: {
-    ongoing,
-  },
-  actions: {
-    receiveTheirCommitment,
+  ongoing: {
+    state: ongoing,
+    sharedData: theirTurnSharedData,
+    action: receiveTheirCommitment,
   },
 };
 
 export const receivingTheirInvalidCommitment = {
   ...defaults,
-  storage: storage(theirTurn),
-  states: {
-    ongoing,
-  },
-  actions: {
-    receiveTheirInvalidCommitment,
+  ongoing: {
+    state: ongoing,
+    sharedData: theirTurnSharedData,
+    action: receiveTheirInvalidCommitment,
   },
 };
 
 export const receivingOurInvalidCommitment = {
   ...defaults,
-  storage: storage(ourTurn),
-  states: {
-    ongoing,
-  },
-  actions: {
-    receiveOurInvalidCommitment,
+  ongoing: {
+    state: ongoing,
+    sharedData: ourTurnSharedData,
+    action: receiveOurInvalidCommitment,
   },
 };

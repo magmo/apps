@@ -1,20 +1,20 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../../redux/actions';
-import { WalletProtocol } from '../../../redux/types';
 import { unreachable } from '../../../utils/reducer-utils';
 import { FundingStep } from './components/funding-step';
 import * as directFundingStates from './states';
 import { TransactionSubmission } from '../../protocols/transaction-submission/container';
+import { ActionDispatcher } from '../../utils';
 
 interface Props {
-  directFundingState: directFundingStates.DirectFundingState;
-  transactionRetryApprovedAction: (channelId: string, protocol: WalletProtocol) => void;
+  state: directFundingStates.DirectFundingState;
+  transactionRetryApprovedAction: ActionDispatcher<actions.TransactionRetryApproved>;
 }
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { directFundingState } = this.props;
+    const { state: directFundingState } = this.props;
     switch (directFundingState.type) {
       case 'DirectFunding.NotSafeToDeposit':
       case 'DirectFunding.WaitForFundingAndPostFundSetup':

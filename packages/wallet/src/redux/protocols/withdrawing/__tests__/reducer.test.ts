@@ -39,7 +39,7 @@ const itSendsConcludeAndWithdrawTransaction = (result: { sharedData: SharedData 
 };
 
 // Scenario tests
-describe('happy-path scenario', () => {
+describe('HAPPY PATH', () => {
   const scenario = scenarios.happyPath;
   const { sharedData } = scenario;
 
@@ -51,8 +51,7 @@ describe('happy-path scenario', () => {
   });
 
   describe(`when in Withdrawing.WaitforApproval`, () => {
-    const state = scenario.waitForApproval;
-    const action = scenario.approved;
+    const { state, action } = scenario.waitForApproval;
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Withdrawing.WaitForTransaction');
@@ -60,29 +59,26 @@ describe('happy-path scenario', () => {
   });
 
   describe(`when in Withdrawing.WaitForTransaction}`, () => {
-    const state = scenario.waitForTransaction;
-    const action = scenario.transactionConfirmed;
+    const { state, action } = scenario.waitForTransaction;
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Withdrawing.WaitForAcknowledgement');
   });
 
   describe(`when in Withdrawing.WaitForAcknowledgement`, () => {
-    const state = scenario.waitForAcknowledgement;
-    const action = scenario.successAcknowledged;
+    const { state, action } = scenario.waitForAcknowledgement;
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Withdrawing.Success');
   });
 });
 
-describe('withdrawal rejected scenario', () => {
+describe('WITHDRAWAL REJECTED', () => {
   const scenario = scenarios.withdrawalRejected;
   const { sharedData } = scenario;
 
   describe(`when in Withdrawing.WaitForApproval`, () => {
-    const state = scenario.waitForApproval;
-    const action = scenario.rejected;
+    const { state, action } = scenario.waitForApproval;
     const result = reducer(state, sharedData, action);
 
     itTransitionsToFailure(result, scenario.failure);
@@ -94,14 +90,13 @@ describe('transaction failed scenario', () => {
   const { sharedData } = scenario;
 
   describe(`when in Withdrawing.WaitForTransaction`, () => {
-    const state = scenario.waitForTransaction;
-    const action = scenario.transactionFailed;
+    const { state, action } = scenario.waitForTransaction;
     const result = reducer(state, sharedData, action);
     itTransitionsToFailure(result, scenario.failure);
   });
 });
 
-describe('channel not closed scenario', () => {
+describe('CHANNEL NOT CLOSED', () => {
   const scenario = scenarios.channelNotClosed;
   const { sharedData } = scenario;
 

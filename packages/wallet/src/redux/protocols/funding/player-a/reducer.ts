@@ -49,7 +49,7 @@ export function fundingReducer(
   switch (action.type) {
     case 'WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN':
       return strategyChosen(state, sharedData, action);
-    case actions.STRATEGY_APPROVED:
+    case 'WALLET.FUNDING.STRATEGY_APPROVED':
       return strategyApproved(state, sharedData, action);
     case 'WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED':
       return strategyRejected(state, sharedData, action);

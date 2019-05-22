@@ -16,17 +16,16 @@ function whenIn(state) {
 
 describe('initializing the application', () => {
   const scenario = scenarios.initializingApplication;
-  const result = initialize(scenario.storage);
+  const result = initialize(scenario.initialize.sharedData);
   itTransitionsTo(result, 'Application.AddressKnown');
 });
 
 describe('starting the application', () => {
   const scenario = scenarios.startingApplication;
-  const sharedData = scenario.storage;
 
   describe(whenIn('Application.AddressKnown'), () => {
-    const state = scenario.states.addressKnown;
-    const action = scenario.actions.receivePreFundSetup;
+    const { state, sharedData, action } = scenario.addressKnown;
+
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
@@ -36,11 +35,9 @@ describe('starting the application', () => {
 
 describe('signing a commitment', () => {
   const scenario = scenarios.receivingOurCommitment;
-  const sharedData = scenario.storage;
 
   describe(whenIn('Application.Ongoing'), () => {
-    const state = scenario.states.ongoing;
-    const action = scenario.actions.receiveOurCommitment;
+    const { state, sharedData, action } = scenario.ongoing;
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
@@ -50,11 +47,10 @@ describe('signing a commitment', () => {
 
 describe('signing an invalid commitment', () => {
   const scenario = scenarios.receivingOurInvalidCommitment;
-  const sharedData = scenario.storage;
 
   describe(whenIn('Application.Ongoing'), () => {
-    const state = scenario.states.ongoing;
-    const action = scenario.actions.receiveOurInvalidCommitment;
+    const { state, sharedData, action } = scenario.ongoing;
+
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
@@ -64,11 +60,10 @@ describe('signing an invalid commitment', () => {
 
 describe('validating a commitment', () => {
   const scenario = scenarios.receivingTheirCommitment;
-  const sharedData = scenario.storage;
 
   describe(whenIn('Application.Ongoing'), () => {
-    const state = scenario.states.ongoing;
-    const action = scenario.actions.receiveTheirCommitment;
+    const { state, sharedData, action } = scenario.ongoing;
+
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
@@ -78,11 +73,10 @@ describe('validating a commitment', () => {
 
 describe('validating an invalid commitment', () => {
   const scenario = scenarios.receivingTheirInvalidCommitment;
-  const sharedData = scenario.storage;
 
   describe(whenIn('Application.Ongoing'), () => {
-    const state = scenario.states.ongoing;
-    const action = scenario.actions.receiveTheirInvalidCommitment;
+    const { state, sharedData, action } = scenario.ongoing;
+
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
@@ -92,11 +86,10 @@ describe('validating an invalid commitment', () => {
 
 describe('receiving a close request', () => {
   const scenario = scenarios.receivingACloseRequest;
-  const sharedData = scenario.storage;
 
   describe(whenIn('Application.Ongoing'), () => {
-    const state = scenario.states.ongoing;
-    const action = scenario.actions.concludeRequested;
+    const { state, sharedData, action } = scenario.ongoing;
+
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Success');

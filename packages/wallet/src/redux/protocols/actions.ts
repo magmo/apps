@@ -1,7 +1,7 @@
 import { ProtocolAction, WalletAction } from '../actions';
 import { PlayerIndex, WalletProtocol } from '../types';
 import { Commitment } from '../../domain';
-import { ConcludeInstigated, CONCLUDE_INSTIGATED } from '../../communication';
+import { ConcludeInstigated } from '../../communication';
 import { ActionConstructor } from '../utils';
 export { BaseProcessAction } from '../../communication';
 
@@ -92,7 +92,7 @@ export function isNewProcessAction(action: WalletAction): action is NewProcessAc
     action.type === 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL' ||
     action.type === 'WALLET.NEW_PROCESS.FUNDING_REQUESTED' ||
     action.type === 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED' ||
-    action.type === CONCLUDE_INSTIGATED ||
+    action.type === 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED' ||
     action.type === 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED' ||
     action.type === 'WALLET.NEW_PROCESS.CHALLENGE_CREATED'
   );

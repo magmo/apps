@@ -28,11 +28,13 @@ import {
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { theirAddress } from '../../../../redux/channel-store';
-import { initialDirectFundingState } from '../../direct-funding/states';
 
 import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
-import { directFundingStateReducer } from '../../direct-funding/reducer';
+import {
+  directFundingStateReducer,
+  initialize as initializeDirectFunding,
+} from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/states';
 import { acceptConsensus } from '../../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../../communication';
@@ -77,7 +79,7 @@ function handleWaitForPreFundSetup(
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   const unchangedState = { protocolState, sharedData };
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, protocolState.channelId);
@@ -147,7 +149,7 @@ function handleWaitForPreFundSetup(
     requiredDeposit: ourAmount,
     ourIndex: 1,
   });
-  const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
+  const directFundingState = initializeDirectFunding(directFundingAction, sharedData);
   const newProtocolState = bWaitForDirectFunding({
     ...protocolState,
     ledgerId,
@@ -197,7 +199,7 @@ function handleWaitForLedgerUpdate(
     );
     return unchangedState;
   }
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
@@ -251,7 +253,7 @@ export function handleWaitForPostFundSetup(
   // TODO: There is a lot of repetitive code here
   // We should probably refactor and clean this up
   const unchangedState = { protocolState, sharedData };
-  if (action.type !== actions.COMMITMENT_RECEIVED) {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Incorrect action ${action.type}`);
   }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);

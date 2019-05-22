@@ -1,8 +1,8 @@
 import { BaseProcessAction } from '../../actions';
 import { PlayerIndex } from '../../../types';
 import { FundingStrategy } from '..';
-import { strategyProposed, StrategyProposed, STRATEGY_PROPOSED } from '../../../../communication';
-export { strategyProposed, StrategyProposed, STRATEGY_PROPOSED };
+import { strategyProposed, StrategyProposed } from '../../../../communication';
+export { strategyProposed, StrategyProposed };
 import { ActionConstructor } from '../../../utils';
 
 // -------

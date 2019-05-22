@@ -38,28 +38,21 @@ const props = {
 // ------
 // States
 // ------
-const waitForStrategyProposal = {
-  state: states.waitForStrategyProposal(props),
-  store: EMPTY_SHARED_DATA,
-};
-const waitForStrategyApproval = {
-  state: states.waitForStrategyApproval(props),
-  store: indirectFundingTests.preSuccessState.store,
-};
-const waitForFunding = {
-  state: states.waitForFunding({
-    ...props,
-    fundingState: indirectFundingTests.preSuccessState.state,
-  }),
-  store: indirectFundingTests.preSuccessState.store,
-};
-const waitForSuccessConfirmation = {
-  state: states.waitForSuccessConfirmation(props),
-  store: indirectFundingTests.successState.store,
-};
-const success = states.success({});
-const failure = states.failure({ reason: 'User refused' });
-const failure2 = states.failure({ reason: 'Opponent refused' });
+const waitForStrategyProposal = states.waitForStrategyProposal(props);
+
+const waitForStrategyApproval = states.waitForStrategyApproval(props);
+const waitForFunding = states.waitForFunding({
+  ...props,
+  fundingState: indirectFundingTests.preSuccessState.state,
+});
+const waitForSuccessConfirmation = states.waitForSuccessConfirmation(props);
+
+// ------
+// Shared Data
+// ------
+const emptySharedData = EMPTY_SHARED_DATA;
+const preSuccessSharedData = indirectFundingTests.preSuccessState.store;
+const successSharedData = indirectFundingTests.successState.store;
 
 // -------
 // Actions
@@ -77,51 +70,61 @@ const cancelledByA = actions.cancelled({ processId, by: PlayerIndex.A });
 // ---------
 export const happyPath = {
   ...props,
-  states: {
-    waitForStrategyProposal,
-    waitForStrategyApproval,
-    waitForFunding,
-    waitForSuccessConfirmation,
-    success,
+  waitForStrategyProposal: {
+    state: waitForStrategyProposal,
+    sharedData: emptySharedData,
+    action: strategyProposed,
   },
-  actions: {
-    strategyProposed,
-    strategyApproved,
-    fundingSuccess,
-    successConfirmed,
+  waitForStrategyApproval: {
+    state: waitForStrategyApproval,
+    sharedData: preSuccessSharedData,
+    action: strategyApproved,
+  },
+  waitForFunding: {
+    state: waitForFunding,
+    sharedData: preSuccessSharedData,
+    action: fundingSuccess,
+  },
+  waitForSuccessConfirmation: {
+    state: waitForSuccessConfirmation,
+    sharedData: successSharedData,
+    action: successConfirmed,
   },
 };
 
 export const rejectedStrategy = {
   ...props,
-  states: {
-    waitForStrategyApproval,
-  },
-  actions: {
-    strategyRejected,
+  waitForStrategyApproval: {
+    state: waitForStrategyApproval,
+    sharedData: preSuccessSharedData,
+    action: strategyRejected,
   },
 };
 
 export const cancelledByOpponent = {
   ...props,
-  states: {
-    waitForStrategyProposal,
-    waitForStrategyApproval,
-    failure,
+  waitForStrategyApproval: {
+    state: waitForStrategyApproval,
+    sharedData: preSuccessSharedData,
+    action: cancelledByA,
   },
-  actions: {
-    cancelledByA,
+  waitForStrategyProposal: {
+    state: waitForStrategyProposal,
+    sharedData: emptySharedData,
+    action: cancelledByA,
   },
 };
 
 export const cancelledByUser = {
   ...props,
-  states: {
-    waitForStrategyProposal,
-    waitForStrategyApproval,
-    failure2,
+  waitForStrategyApproval: {
+    state: waitForStrategyApproval,
+    sharedData: preSuccessSharedData,
+    action: cancelledByB,
   },
-  actions: {
-    cancelledByB,
+  waitForStrategyProposal: {
+    state: waitForStrategyProposal,
+    sharedData: emptySharedData,
+    action: cancelledByB,
   },
 };

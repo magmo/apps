@@ -1,4 +1,4 @@
-import { WalletAction, CommitmentReceived, COMMITMENT_RECEIVED } from '../../../actions';
+import { WalletAction, CommitmentReceived } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
 
 // -------
@@ -60,10 +60,8 @@ export type ConcludingAction =
   | CommitmentReceived;
 
 export const isConcludingAction = (action: WalletAction): action is ConcludingAction => {
-  if (action.type === COMMITMENT_RECEIVED) {
-    return true;
-  }
   return (
+    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN' ||
