@@ -1,9 +1,10 @@
+import { StateConstructor } from '../../utils';
 import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../transaction-submission/states';
-import { Properties } from '../../utils';
 
 // -------
 // States
 // -------
+
 export interface WaitForApproval {
   type: 'Withdrawing.WaitforApproval';
   processId: string;
@@ -25,6 +26,11 @@ export interface WaitForAcknowledgement {
   channelId: string;
 }
 
+export const enum FailureReason {
+  TransactionFailure = 'Transaction failed',
+  ChannelNotClosed = 'Channel not closed',
+  UserRejected = 'User rejected',
+}
 export interface Failure {
   type: 'Withdrawing.Failure';
   reason: string;
@@ -38,42 +44,25 @@ export interface Success {
 // Constructors
 // ------------
 
-export function waitForApproval(properties: Properties<WaitForApproval>): WaitForApproval {
-  const { processId, withdrawalAmount, channelId } = properties;
-  return { type: 'Withdrawing.WaitforApproval', withdrawalAmount, processId, channelId };
-}
+export const waitForApproval: StateConstructor<WaitForApproval> = p => {
+  return { ...p, type: 'Withdrawing.WaitforApproval' };
+};
 
-export function waitForTransaction(properties: Properties<WaitForTransaction>): WaitForTransaction {
-  const { processId, transactionSubmissionState, channelId, withdrawalAddress } = properties;
-  return {
-    type: 'Withdrawing.WaitForTransaction',
-    transactionSubmissionState,
-    processId,
-    channelId,
-    withdrawalAddress,
-  };
-}
+export const waitForTransaction: StateConstructor<WaitForTransaction> = p => {
+  return { ...p, type: 'Withdrawing.WaitForTransaction' };
+};
 
-export function waitForAcknowledgement(
-  properties: Properties<WaitForAcknowledgement>,
-): WaitForAcknowledgement {
-  const { processId, channelId } = properties;
-  return { type: 'Withdrawing.WaitForAcknowledgement', processId, channelId };
-}
+export const waitForAcknowledgement: StateConstructor<WaitForAcknowledgement> = p => {
+  return { ...p, type: 'Withdrawing.WaitForAcknowledgement' };
+};
 
-export function success({}): Success {
-  return { type: 'Withdrawing.Success' };
-}
+export const success: StateConstructor<Success> = p => {
+  return { ...p, type: 'Withdrawing.Success' };
+};
 
-export function failure(reason: FailureReason): Failure {
-  return { type: 'Withdrawing.Failure', reason };
-}
-
-export const enum FailureReason {
-  TransactionFailure = 'Transaction failed',
-  ChannelNotClosed = 'Channel not closed',
-  UserRejected = 'User rejected',
-}
+export const failure: StateConstructor<Failure> = p => {
+  return { ...p, type: 'Withdrawing.Failure' };
+};
 
 // -------
 // Unions and Guards

@@ -23,38 +23,18 @@ const render = container => () => {
   );
 };
 
-const happyPathStories = {
-  WaitForSend: scenarios.happyPath.waitForSend,
-  WaitForSubmission: scenarios.happyPath.waitForSubmission,
-  WaitForConfirmation: scenarios.happyPath.waitForConfirmation,
-};
+addStories(scenarios.happyPath, 'Transaction Submission / Happy path');
+addStories(scenarios.retryAndApprove, 'Transaction Submission / User approves retry');
+addStories(scenarios.retryAndDeny, 'Transaction Submission / User denies retry');
+addStories(scenarios.transactionFailed, 'Transaction Submission / Transaction fails');
 
-const retryAndApprove = {
-  WaitForSubmission: scenarios.retryAndApprove.waitForSubmission,
-  ApproveRetry: scenarios.retryAndApprove.approveRetry,
-  WaitForSend: scenarios.retryAndApprove.waitForSend,
-};
-
-const retryAndDeny = {
-  WaitForSubmission: scenarios.retryAndDeny.waitForSubmission,
-  ApproveRetry: scenarios.retryAndDeny.approveRetry,
-};
-
-const transactionFails = {
-  WaitForConfirmation: scenarios.transactionFailed.waitForConfirmation,
-};
-
-addStories(happyPathStories, 'Transaction Submission / Happy path');
-addStories(retryAndApprove, 'Transaction Submission / User approves retry');
-addStories(retryAndDeny, 'Transaction Submission / User denies retry');
-addStories(transactionFails, 'Transaction Submission / Transaction fails');
-
-function addStories(collection, chapter) {
-  Object.keys(collection).map(storyName => {
-    const state = collection[storyName];
-    storiesOf(chapter, module).add(
-      storyName,
-      render(<TransactionSubmission transactionName="deposit" state={state} />),
-    );
+function addStories(scenario, chapter) {
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      storiesOf(chapter, module).add(
+        key,
+        render(<TransactionSubmission transactionName="deposit" state={scenario[key].state} />),
+      );
+    }
   });
 }

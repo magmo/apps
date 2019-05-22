@@ -30,7 +30,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.WithdrawalState> => {
   if (!channelIsClosed(channelId, sharedData)) {
     return {
-      protocolState: states.failure(states.FailureReason.ChannelNotClosed),
+      protocolState: states.failure({ reason: states.FailureReason.ChannelNotClosed }),
       sharedData,
     };
   }
@@ -123,7 +123,7 @@ const waitForApprovalReducer = (
       };
     case 'WALLET.WITHDRAWING.WITHDRAWAL_REJECTED':
       return {
-        protocolState: states.failure(states.FailureReason.UserRejected),
+        protocolState: states.failure({ reason: states.FailureReason.UserRejected }),
         sharedData,
       };
     default:
@@ -143,7 +143,7 @@ const handleTransactionSubmissionComplete = (
     };
   } else {
     return {
-      protocolState: states.failure(states.FailureReason.TransactionFailure),
+      protocolState: states.failure({ reason: states.FailureReason.TransactionFailure }),
       sharedData,
     };
   }
