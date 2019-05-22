@@ -31,10 +31,7 @@ addStories(scenarios.channelNotClosed, 'Withdrawal / Channel not closed');
 function addStories(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {
-      storiesOf(chapter, module).add(
-        key,
-        render(<Withdrawal transactionName="deposit" state={scenario[key].state} />),
-      );
+      storiesOf(chapter, module).add(key, render(<Withdrawal state={scenario[key].state} />));
     }
   });
 }
