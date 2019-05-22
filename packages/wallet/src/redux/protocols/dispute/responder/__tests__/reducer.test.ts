@@ -6,6 +6,7 @@ import { Commitment } from '../../../../../domain';
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
 import { SHOW_WALLET, HIDE_WALLET, CHALLENGE_COMPLETE } from 'magmo-wallet-client';
 import { itSendsThisDisplayEventType, itSendsThisMessage } from '../../../../__tests__/helpers';
+import { describeScenarioStep } from '../../../../__tests__/helpers';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };
@@ -19,9 +20,6 @@ Object.defineProperty(TransactionGenerator, 'createRefuteTransaction', {
 });
 
 // helpers
-function describeScenarioStep(scenarioStep, fn) {
-  return describe(`${scenarioStep.state.type} + \n    ${scenarioStep.action.type} =>`, fn);
-}
 
 const itTransitionsToFailure = (
   result: { protocolState: states.ResponderState },

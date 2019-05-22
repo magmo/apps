@@ -136,6 +136,9 @@ Jest tests for each scenario. Helper functions should be imported and not replic
 - Commitment side effects
   <!-- TODO -->
 
+Use `import { describeScenarioStep } from '../../../../__tests__/helpers';`.
+This will print out the state and action in a unified format.
+
 ## Stories
 
 <a name="stories"></a>
