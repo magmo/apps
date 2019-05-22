@@ -1,11 +1,6 @@
 import * as states from '../../states';
 
-import {
-  preSuccessState,
-  successTrigger,
-  preFailureState,
-  failureTrigger,
-} from '../../../defunding/__tests__';
+import { preSuccess, preFailure } from '../../../defunding/__tests__';
 import * as actions from '../actions';
 import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
@@ -76,12 +71,12 @@ const decideDefund = states.decideDefund(defaults);
 
 const waitForDefund = states.waitForDefund({
   ...defaults,
-  defundingState: preSuccessState,
+  defundingState: preSuccess.state,
 });
 
 const waitForDefundPreFailure = states.waitForDefund({
   ...defaults,
-  defundingState: preFailureState,
+  defundingState: preFailure.state,
 });
 const acknowledgeSuccess = states.acknowledgeSuccess(defaults);
 
@@ -108,7 +103,7 @@ export const happyPath = {
   waitForDefund: {
     state: waitForDefund,
     sharedData: secondConcludeReceived,
-    action: successTrigger,
+    action: preSuccess.action,
   },
   acknowledgeSuccess: {
     state: acknowledgeSuccess,
@@ -158,7 +153,7 @@ export const defundFailed = {
   waitForDefund: {
     state: waitForDefundPreFailure,
     sharedData: initialStore,
-    action: failureTrigger,
+    action: preFailure.action,
   },
   acknowledgeFailure: {
     state: states.acknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),

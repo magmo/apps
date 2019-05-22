@@ -8,10 +8,8 @@ import { ChannelState, ChannelStore } from '../../../../channel-store';
 import * as transactionActions from '../../../transaction-submission/actions';
 import { challengeExpiredEvent } from '../../../../actions';
 import {
-  preSuccessState as defundingPreSuccessState,
-  successTrigger as defundingSuccessTrigger,
-  preFailureState as defundingPreFailureState,
-  failureTrigger as defundingFailureTrigger,
+  preSuccess as defundingPreSuccess,
+  preFailure as defundingPreFailure,
 } from '../../../defunding/__tests__';
 
 // ---------
@@ -89,11 +87,11 @@ const transactionFailed = transactionActions.transactionFailed({ processId });
 const acknowledgeTimeout = states.acknowledgeTimeout(props);
 const waitForDefund1 = states.waitForDefund({
   ...props,
-  defundingState: defundingPreSuccessState,
+  defundingState: defundingPreSuccess.state,
 });
 const waitForDefund2 = states.waitForDefund({
   ...props,
-  defundingState: defundingPreFailureState,
+  defundingState: defundingPreFailure.state,
 });
 const acknowledgeDefundingSuccess = states.acknowledgeDefundingSuccess({ ...props });
 const acknowledgeClosedButNotDefunded = states.acknowledgeClosedButNotDefunded({ ...props });
@@ -182,7 +180,7 @@ export const challengeExpiresChannelDefunded = {
   // Actions
   challengeTimedOut,
   defundChosen,
-  defundingSuccessTrigger,
+  defundingSuccessTrigger: defundingPreSuccess.action,
   acknowledged,
 };
 
@@ -192,7 +190,7 @@ export const challengeExpiresButChannelNotDefunded = {
   waitForDefund2,
   acknowledgeClosedButNotDefunded,
   // Actions
-  defundingFailureTrigger,
+  defundingFailureTrigger: defundingPreFailure.action,
   acknowledged,
 };
 
@@ -212,5 +210,5 @@ export const defundActionComesDuringAcknowledgeTimeout = {
   ...props,
   acknowledgeTimeout,
 
-  defundingSuccessTrigger,
+  defundingSuccessTrigger: defundingPreSuccess.action,
 };
