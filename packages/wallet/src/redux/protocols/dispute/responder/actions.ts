@@ -47,27 +47,28 @@ export interface Acknowledged extends BaseProcessAction {
 
 export const respondApproved: ActionConstructor<RespondApproved> = p => ({
   type: 'WALLET.CHALLENGING.RESPONDER.RESPOND_APPROVED',
-  ...p,
+  processId: p.processId,
 });
 
 export const respondSuccessAcknowledged: ActionConstructor<RespondSuccessAcknowledged> = p => ({
   type: 'WALLET.CHALLENGING.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED',
-  ...p,
+  processId: p.processId,
 });
 
 export const responseProvided: ActionConstructor<ResponseProvided> = p => ({
   type: 'WALLET.CHALLENGING.RESPONDER.RESPONSE_PROVIDED',
-  ...p,
+  processId: p.processId,
+  commitment: p.commitment,
 });
 
 export const defundChosen: ActionConstructor<DefundChosen> = p => ({
   type: 'WALLET.CHALLENGING.RESPONDER.DEFUND_CHOSEN',
-  ...p,
+  processId: p.processId,
 });
 
 export const acknowledged: ActionConstructor<Acknowledged> = p => ({
   type: 'WALLET.CHALLENGING.RESPONDER.ACKNOWLEDGED',
-  ...p,
+  processId: p.processId,
 });
 
 // -------

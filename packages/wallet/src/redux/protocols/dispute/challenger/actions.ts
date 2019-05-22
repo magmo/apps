@@ -53,34 +53,34 @@ export interface Acknowledged {
 
 export const challengeApproved: ActionConstructor<ChallengeApproved> = p => ({
   type: 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_APPROVED',
-  ...p,
+  processId: p.processId,
 });
 
 export const challengeDenied: ActionConstructor<ChallengeDenied> = p => ({
   type: 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_DENIED',
-  ...p,
+  processId: p.processId,
 });
 
 export const challengeResponseAcknowledged: ActionConstructor<
   ChallengeResponseAcknowledged
 > = p => ({
   type: 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED',
-  ...p,
+  processId: p.processId,
 });
 
 export const challengeFailureAcknowledged: ActionConstructor<ChallengeFailureAcknowledged> = p => ({
   type: 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED',
-  ...p,
+  processId: p.processId,
 });
 
 export const defundChosen: ActionConstructor<DefundChosen> = p => ({
   type: 'WALLET.CHALLENGING.CHALLENGER.DEFUND_CHOSEN',
-  ...p,
+  processId: p.processId,
 });
 
 export const acknowledged: ActionConstructor<Acknowledged> = p => ({
   type: 'WALLET.CHALLENGING.CHALLENGER.ACKNOWLEDGED',
-  ...p,
+  processId: p.processId,
 });
 
 // -------

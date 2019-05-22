@@ -49,25 +49,29 @@ export const initializeChannel: ActionConstructor<InitializeChannel> = p => ({
 
 export const fundingRequested: ActionConstructor<FundingRequested> = p => ({
   type: 'WALLET.NEW_PROCESS.FUNDING_REQUESTED',
-  ...p,
+  channelId: p.channelId,
+  playerIndex: p.playerIndex,
   protocol: WalletProtocol.Funding,
 });
 
 export const concludeRequested: ActionConstructor<ConcludeRequested> = p => ({
   type: 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED',
-  ...p,
+  channelId: p.channelId,
   protocol: WalletProtocol.Concluding,
 });
 
 export const createChallengeRequested: ActionConstructor<CreateChallengeRequested> = p => ({
   type: 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED',
-  ...p,
+  channelId: p.channelId,
+  commitment: p.commitment,
   protocol: WalletProtocol.Dispute,
 });
 
 export const challengeCreated: ActionConstructor<ChallengeCreated> = p => ({
   type: 'WALLET.NEW_PROCESS.CHALLENGE_CREATED',
-  ...p,
+  commitment: p.commitment,
+  expiresAt: p.expiresAt,
+  channelId: p.channelId,
   protocol: WalletProtocol.Dispute,
 });
 

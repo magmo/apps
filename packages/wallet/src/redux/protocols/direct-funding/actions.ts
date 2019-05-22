@@ -19,9 +19,13 @@ export interface DirectFundingRequested {
 // -------
 export const directFundingRequested: ActionConstructor<DirectFundingRequested> = p => ({
   type: 'WALLET.DIRECT_FUNDING.DIRECT_FUNDING_REQUESTED',
-  ...p,
+  processId: p.processId,
+  channelId: p.channelId,
+  totalFundingRequired: p.totalFundingRequired,
+  safeToDepositLevel: p.safeToDepositLevel,
+  requiredDeposit: p.requiredDeposit,
+  ourIndex: p.ourIndex,
 });
-
 // -------
 // Unions and Guards
 // -------

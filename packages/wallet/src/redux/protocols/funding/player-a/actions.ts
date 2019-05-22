@@ -33,22 +33,24 @@ export interface Cancelled extends BaseProcessAction {
 
 export const strategyChosen: ActionConstructor<StrategyChosen> = p => ({
   type: 'WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN',
-  ...p,
+  processId: p.processId,
+  strategy: p.strategy,
 });
 
 export const fundingSuccessAcknowledged: ActionConstructor<FundingSuccessAcknowledged> = p => ({
   type: 'WALLET.FUNDING.PLAYER_A.FUNDING_SUCCESS_ACKNOWLEDGED',
-  ...p,
+  processId: p.processId,
 });
 
 export const strategyRejected: ActionConstructor<StrategyRejected> = p => ({
   type: 'WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED',
-  ...p,
+  processId: p.processId,
 });
 
 export const cancelled: ActionConstructor<Cancelled> = p => ({
   type: 'WALLET.FUNDING.PLAYER_A.CANCELLED',
-  ...p,
+  processId: p.processId,
+  by: p.by,
 });
 
 // -------
