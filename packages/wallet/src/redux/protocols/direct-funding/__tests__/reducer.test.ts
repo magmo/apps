@@ -7,7 +7,7 @@ import { describeScenarioStep } from '../../../__tests__/helpers';
 
 describe('Player A Happy path', () => {
   const scenario = scenarios.aHappyPath;
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { action, sharedData } = scenario.initialize;
     const updatedState = initialize(action, sharedData);
     itTransitionsTo(updatedState, 'DirectFunding.WaitForDepositTransaction');
@@ -35,7 +35,7 @@ describe('when initializing', () => {
 
 describe('Player B Happy path', () => {
   const scenario = scenarios.bHappyPath;
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { action, sharedData } = scenario.initialize;
     const updatedState = initialize(action, sharedData);
     itTransitionsTo(updatedState, 'DirectFunding.NotSafeToDeposit');

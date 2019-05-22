@@ -16,7 +16,7 @@ describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
   const { processId } = scenario;
 
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { commitment, sharedData } = scenario.initialize;
     const result = initialize(commitment, processId, sharedData);
 
@@ -84,7 +84,7 @@ describe('[ Channel doesnt exist ]', () => {
   const scenario = scenarios.channelDoesntExist;
   const { processId } = scenario;
 
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { commitment, sharedData } = scenario.initialize;
     const result = initialize(commitment, processId, sharedData);
 
@@ -105,7 +105,7 @@ describe('[ Concluding Not Possible ]', () => {
   const scenario = scenarios.concludingNotPossible;
   const { processId } = scenario;
 
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { commitment, sharedData } = scenario.initialize;
     const result = initialize(commitment, processId, sharedData);
 

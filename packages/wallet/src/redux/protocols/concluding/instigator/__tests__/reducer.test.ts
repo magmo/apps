@@ -16,7 +16,7 @@ describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
   const { channelId, processId } = scenario;
 
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { sharedData } = scenario.initialize;
     const result = initialize(channelId, processId, sharedData);
     itTransitionsTo(result, 'ConcludingInstigator.ApproveConcluding');
@@ -64,7 +64,7 @@ describe('[ Channel doesnt exist ]', () => {
   const scenario = scenarios.channelDoesntExist;
   const { channelId, processId } = scenario;
 
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { sharedData } = scenario.initialize;
     const result = initialize(channelId, processId, sharedData);
 
@@ -85,7 +85,7 @@ describe('[ Concluding Not Possible ]', () => {
   const scenario = scenarios.concludingNotPossible;
   const { channelId, processId } = scenario;
 
-describe('when initializing', () => {
+  describe('when initializing', () => {
     const { sharedData } = scenario.initialize;
     const result = initialize(channelId, processId, sharedData);
 
