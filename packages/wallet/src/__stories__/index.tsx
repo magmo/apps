@@ -5,8 +5,7 @@ import '../index.scss';
 import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
 import { initializedState } from './dummy-wallet-states';
-import { ProtocolState } from 'src/redux/protocols';
-import { isTerminal } from 'src/redux/protocols/defunding/states';
+import { ProtocolState } from '../redux/protocols';
 
 const walletStateRender = state => () => {
   return (
@@ -35,7 +34,7 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
 
 export function addStoriesFromScenario(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
-    if (scenario[key].state && !isTerminal(scenario[key].state)) {
+    if (scenario[key].state) {
       storiesOf(chapter, module).add(key, protocolStateRender(scenario[key].state));
     }
   });

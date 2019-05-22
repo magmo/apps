@@ -1,6 +1,6 @@
 import { DirectFundingState } from '../../direct-funding/states';
-import { IndirectFundingState } from '../states';
 import { StateConstructor } from '../../../utils';
+import { ProtocolState } from '../..';
 
 // -------
 // States
@@ -73,7 +73,7 @@ export type PlayerAState =
   | AWaitForPostFundSetup1
   | AWaitForLedgerUpdate1;
 
-export function isPlayerAState(state: IndirectFundingState): state is PlayerAState {
+export function isPlayerAState(state: ProtocolState): state is PlayerAState {
   return (
     state.type === 'IndirectFunding.AWaitForPreFundSetup1' ||
     state.type === 'IndirectFunding.AWaitForDirectFunding' ||

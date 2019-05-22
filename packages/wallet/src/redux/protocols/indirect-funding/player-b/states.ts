@@ -1,6 +1,6 @@
 import { DirectFundingState } from '../../direct-funding/states';
-import { NonTerminalIndirectFundingState } from '../states';
 import { StateConstructor } from '../../../utils';
+import { ProtocolState } from '../..';
 
 // -------
 // States
@@ -72,7 +72,7 @@ export type PlayerBState =
   | BWaitForLedgerUpdate0
   | BWaitForPostFundSetup0;
 
-export function isPlayerBState(state: NonTerminalIndirectFundingState): state is PlayerBState {
+export function isPlayerBState(state: ProtocolState): state is PlayerBState {
   return (
     state.type === 'IndirectFunding.BWaitForPreFundSetup0' ||
     state.type === 'IndirectFunding.BWaitForDirectFunding' ||

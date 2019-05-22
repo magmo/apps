@@ -136,12 +136,23 @@ Jest tests for each scenario. Helper functions should be imported and not replic
 - Commitment side effects
   <!-- TODO -->
 
-Use `import { describeScenarioStep } from '../../../../__tests__/helpers';`.
+Use
+
+```typescript
+import { describeScenarioStep } from '../../../../__tests__/helpers';
+```
+
 This will print out the state and action in a unified format.
 
 ## Stories
 
 <a name="stories"></a>
-Screens should be added from each scenario.
+Screens should be added from each scenario, using the helper function
+
+```typescript
+import { addStoriesFromScenario as addStories } from '../../../../../__stories__';
+```
+
+which builds a full wallet dummy state around each `protocolState` in the scenario, and renders that into the top level wallet container. The function should automatically exclude terminal states (todo).
 
 <!-- TODO -->
