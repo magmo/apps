@@ -25,33 +25,24 @@ export interface Success {
 // -------
 
 export const waitForConclude: StateConstructor<WaitForConclude> = p => {
-  const { processId, ledgerId, channelId } = p;
   return {
+    ...p,
     type: 'IndirectDefunding.WaitForConclude',
-    processId,
-    ledgerId,
-    channelId,
   };
 };
 export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
-  const { processId, ledgerId, channelId, proposedAllocation, proposedDestination } = p;
   return {
+    ...p,
     type: 'IndirectDefunding.WaitForLedgerUpdate',
-    processId,
-    ledgerId,
-    channelId,
-    proposedAllocation,
-    proposedDestination,
   };
 };
 
 export const success: StateConstructor<Success> = p => {
-  return { type: 'IndirectDefunding.Success' };
+  return { ...p, type: 'IndirectDefunding.Success' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  const { reason } = p;
-  return { type: 'IndirectDefunding.Failure', reason };
+  return { ...p, type: 'IndirectDefunding.Failure' };
 };
 
 // -------

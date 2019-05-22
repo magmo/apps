@@ -65,35 +65,29 @@ export function isConcludingInstigatorState(
 // ------------
 
 export const instigatorApproveConcluding: StateConstructor<ApproveConcluding> = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingInstigator.ApproveConcluding', processId, channelId };
+  return { ...p, type: 'ConcludingInstigator.ApproveConcluding' };
 };
 
 export const instigatorWaitForOpponentConclude: StateConstructor<WaitForOpponentConclude> = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingInstigator.WaitForOpponentConclude', processId, channelId };
+  return { ...p, type: 'ConcludingInstigator.WaitForOpponentConclude' };
 };
 
 export const instigatorAcknowledgeConcludeReceived: StateConstructor<
   AcknowledgeConcludeReceived
 > = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingInstigator.AcknowledgeConcludeReceived', processId, channelId };
+  return { ...p, type: 'ConcludingInstigator.AcknowledgeConcludeReceived' };
 };
 
 export const instigatorAcknowledgeSuccess: StateConstructor<AcknowledgeSuccess> = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingInstigator.AcknowledgeSuccess', processId, channelId };
+  return { ...p, type: 'ConcludingInstigator.AcknowledgeSuccess' };
 };
 
 export const instigatorAcknowledgeFailure: StateConstructor<AcknowledgeFailure> = p => {
-  const { processId, channelId, reason } = p;
-  return { type: 'ConcludingInstigator.AcknowledgeFailure', processId, channelId, reason };
+  return { ...p, type: 'ConcludingInstigator.AcknowledgeFailure' };
 };
 
 export const instigatorWaitForDefund: StateConstructor<WaitForDefund> = p => {
-  const { processId, channelId, defundingState } = p;
-  return { type: 'ConcludingInstigator.WaitForDefund', processId, channelId, defundingState };
+  return { ...p, type: 'ConcludingInstigator.WaitForDefund' };
 };
 
 // -------

@@ -23,17 +23,15 @@ export interface Success {
 // -------
 
 export const addressKnown: StateConstructor<AddressKnown> = p => {
-  const { address, privateKey } = p;
-  return { type: 'Application.AddressKnown', address, privateKey };
+  return { ...p, type: 'Application.AddressKnown' };
 };
 
 export const ongoing: StateConstructor<Ongoing> = p => {
-  const { channelId } = p;
-  return { type: 'Application.Ongoing', channelId };
+  return { ...p, type: 'Application.Ongoing' };
 };
 
 export const success: StateConstructor<Success> = p => {
-  return { type: 'Application.Success' };
+  return { ...p, type: 'Application.Success' };
 };
 
 // -------

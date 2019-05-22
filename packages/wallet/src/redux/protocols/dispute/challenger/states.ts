@@ -94,73 +94,60 @@ export interface SuccessClosedButNotDefunded {
 // ------------
 
 export const approveChallenge: StateConstructor<ApproveChallenge> = p => {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.ApproveChallenge', processId, channelId };
+  return { ...p, type: 'Challenging.ApproveChallenge' };
 };
 
 export const waitForTransaction: StateConstructor<WaitForTransaction> = p => {
-  const { processId, channelId, transactionSubmission, expiryTime } = p;
   return {
+    ...p,
     type: 'Challenging.WaitForTransaction',
-    processId,
-    channelId,
-    transactionSubmission,
-    expiryTime,
   };
 };
 
 export const waitForResponseOrTimeout: StateConstructor<WaitForResponseOrTimeout> = p => {
-  const { processId, channelId, expiryTime } = p;
-  return { type: 'Challenging.WaitForResponseOrTimeout', processId, channelId, expiryTime };
+  return { ...p, type: 'Challenging.WaitForResponseOrTimeout' };
 };
 
 export const acknowledgeResponse: StateConstructor<AcknowledgeResponse> = p => {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.AcknowledgeResponse', processId, channelId };
+  return { ...p, type: 'Challenging.AcknowledgeResponse' };
 };
 
 export const acknowledgeTimeout: StateConstructor<AcknowledgeTimeout> = p => {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.AcknowledgeTimeout', processId, channelId };
+  return { ...p, type: 'Challenging.AcknowledgeTimeout' };
 };
 
 export const acknowledgeFailure: StateConstructor<AcknowledgeFailure> = p => {
-  const { processId, channelId, reason } = p;
-  return { type: 'Challenging.AcknowledgeFailure', processId, channelId, reason };
+  return { ...p, type: 'Challenging.AcknowledgeFailure' };
 };
 
 export const waitForDefund: StateConstructor<WaitForDefund> = p => {
-  const { processId, channelId, defundingState } = p;
-  return { type: 'Challenging.WaitForDefund', processId, channelId, defundingState };
+  return { ...p, type: 'Challenging.WaitForDefund' };
 };
 
 export const acknowledgeClosedButNotDefunded: StateConstructor<
   AcknowledgeClosedButNotDefunded
 > = p => {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.AcknowledgeClosedButNotDefunded', processId, channelId };
+  return { ...p, type: 'Challenging.AcknowledgeClosedButNotDefunded' };
 };
 
 export const acknowledgeSuccess: StateConstructor<AcknowledgeSuccess> = p => {
-  const { processId, channelId } = p;
-  return { type: 'Challenging.AcknowledgeSuccess', processId, channelId };
+  return { ...p, type: 'Challenging.AcknowledgeSuccess' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  const { reason } = p;
-  return { type: 'Challenging.Failure', reason };
+  return { ...p, type: 'Challenging.Failure' };
 };
 
 export const successClosedAndDefunded: StateConstructor<SuccessClosedAndDefunded> = p => {
-  return { type: 'Challenging.SuccessClosedAndDefunded' };
+  return { ...p, type: 'Challenging.SuccessClosedAndDefunded' };
 };
 
 export const successClosedButNotDefunded: StateConstructor<SuccessClosedButNotDefunded> = p => {
-  return { type: 'Challenging.SuccessClosedButNotDefunded' };
+  return { ...p, type: 'Challenging.SuccessClosedButNotDefunded' };
 };
 
 export const successOpen: StateConstructor<SuccessOpen> = p => {
-  return { type: 'Challenging.SuccessOpen' };
+  return { ...p, type: 'Challenging.SuccessOpen' };
 };
 
 // -------

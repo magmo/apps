@@ -64,27 +64,21 @@ export function isFailure(state: TransactionSubmissionState): state is Failure {
 // ------------
 
 export const waitForSend: StateConstructor<WaitForSend> = p => {
-  const { transaction, processId } = p;
-  return { type: 'TransactionSubmission.WaitForSend', transaction, processId };
+  return { ...p, type: 'TransactionSubmission.WaitForSend' };
 };
 
 export const waitForSubmission: StateConstructor<WaitForSubmission> = p => {
-  const { transaction, processId } = p;
-  return { type: 'TransactionSubmission.WaitForSubmission', transaction, processId };
+  return { ...p, type: 'TransactionSubmission.WaitForSubmission' };
 };
 
 export const approveRetry: StateConstructor<ApproveRetry> = p => {
-  const { transaction, processId } = p;
-  return { type: 'TransactionSubmission.ApproveRetry', transaction, processId };
+  return { ...p, type: 'TransactionSubmission.ApproveRetry' };
 };
 
 export const waitForConfirmation: StateConstructor<WaitForConfirmation> = p => {
-  const { transaction, transactionHash, processId } = p;
   return {
+    ...p,
     type: 'TransactionSubmission.WaitForConfirmation',
-    transaction,
-    transactionHash,
-    processId,
   };
 };
 
