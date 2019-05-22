@@ -1,11 +1,5 @@
-import { bigNumberify } from 'ethers/utils';
-import { ProtocolStateWithSharedData } from '..';
-import { createDepositTransaction } from '../../../utils/transaction-generator';
-import { SharedData } from '../../state';
-import { initialize as initTransactionState } from '../transaction-submission/reducer';
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
 import { Properties, StateConstructor } from '../../utils';
-import { DirectFundingRequested } from './actions';
 
 // -------
 // States
@@ -27,8 +21,8 @@ export interface BaseDirectFundingState {
   processId: string;
   safeToDepositLevel: string;
   type: ChannelFundingStatus;
-  requestedTotalFunds: string;
-  requestedYourContribution: string;
+  totalFundingRequired: string;
+  requiredDeposit: string;
   channelId: string;
   ourIndex: number;
 }
@@ -61,8 +55,8 @@ export interface FundingFailure extends BaseDirectFundingState {
 export const baseDirectFundingState: StateConstructor<BaseDirectFundingState> = params => {
   const {
     processId,
-    requestedTotalFunds,
-    requestedYourContribution,
+    totalFundingRequired: requestedTotalFunds,
+    requiredDeposit: requestedYourContribution,
     channelId,
     ourIndex,
     safeToDepositLevel,
@@ -70,8 +64,8 @@ export const baseDirectFundingState: StateConstructor<BaseDirectFundingState> = 
   } = params;
   return {
     processId,
-    requestedTotalFunds,
-    requestedYourContribution,
+    totalFundingRequired: requestedTotalFunds,
+    requiredDeposit: requestedYourContribution,
     channelId,
     ourIndex,
     safeToDepositLevel,
@@ -120,68 +114,6 @@ export const fundingFailure: StateConstructor<FundingFailure> = params => {
     type: 'DirectFunding.FundingFailure',
   };
 };
-
-export function initialDirectFundingState(
-  action: DirectFundingRequested,
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<DirectFundingState> {
-  const { safeToDepositLevel, totalFundingRequired, requiredDeposit, channelId, ourIndex } = action;
-
-  const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
-  const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
-
-  if (alreadyFunded) {
-    return {
-      protocolState: fundingSuccess({
-        processId: action.processId,
-        requestedTotalFunds: totalFundingRequired,
-        requestedYourContribution: requiredDeposit,
-        channelId,
-        ourIndex,
-        safeToDepositLevel,
-      }),
-      sharedData,
-    };
-  }
-
-  if (alreadySafeToDeposit) {
-    const depositTransaction = createDepositTransaction(
-      action.channelId,
-      action.requiredDeposit,
-      action.safeToDepositLevel,
-    );
-    const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
-      depositTransaction,
-      action.processId,
-      sharedData,
-    );
-
-    return {
-      protocolState: waitForDepositTransaction({
-        processId: action.processId,
-        requestedTotalFunds: totalFundingRequired,
-        requestedYourContribution: requiredDeposit,
-        channelId,
-        ourIndex,
-        safeToDepositLevel,
-        transactionSubmissionState,
-      }),
-      sharedData: newSharedData,
-    };
-  }
-
-  return {
-    protocolState: notSafeToDeposit({
-      processId: action.processId,
-      requestedTotalFunds: totalFundingRequired,
-      requestedYourContribution: requiredDeposit,
-      channelId,
-      ourIndex,
-      safeToDepositLevel,
-    }),
-    sharedData,
-  };
-}
 
 // -------
 // Unions and Guards

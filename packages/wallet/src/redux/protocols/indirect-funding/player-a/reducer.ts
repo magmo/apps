@@ -21,13 +21,11 @@ import { getChannel, theirAddress } from '../../../channel-store';
 import { sendCommitmentReceived } from '../../../../communication';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingRequested } from '../../direct-funding/actions';
+import { isSuccess, isFailure, isTerminal } from '../../direct-funding/states';
 import {
-  initialDirectFundingState,
-  isSuccess,
-  isFailure,
-  isTerminal,
-} from '../../direct-funding/states';
-import { directFundingStateReducer } from '../../direct-funding/reducer';
+  directFundingStateReducer,
+  initialize as initializeDirectFunding,
+} from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
 import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { proposeNewConsensus } from '../../../../domain/two-player-consensus-game';
@@ -216,7 +214,7 @@ function handleWaitForPreFundSetup(
     requiredDeposit: ourAmount,
     ourIndex: 0,
   });
-  const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
+  const directFundingState = initializeDirectFunding(directFundingAction, sharedData);
   const newProtocolState = states.aWaitForDirectFunding({
     ...protocolState,
     ledgerId,

@@ -1,13 +1,14 @@
 import React from 'react';
 import Modal from 'react-modal';
 import { Provider } from 'react-redux';
-import DirectFundingContainer from '../container';
-import { aEachDepositsInSequenceHappyStates } from './scenarios';
+import DirectFunding from '../container';
+import * as scenarios from './scenarios';
 import * as storybookUtils from '../../../../__stories__/index';
 import StatusBarLayout from '../../../../components/status-bar-layout';
+import { storiesOf } from '@storybook/react';
 
-const render = state => () => {
-  const container = <DirectFundingContainer directFundingState={state} />;
+const render = container => () => {
+  // todo: rework this modal stuff
   return (
     <Provider store={storybookUtils.fakeStore({})}>
       <Modal
@@ -21,16 +22,14 @@ const render = state => () => {
     </Provider>
   );
 };
+// Convention is to add all scenarios here, and allow the
+// addStories function to govern what ends up being shown.
+addStories(scenarios.aHappyPath, 'Indirect Defunding / PlayerA / Happy Path');
 
-const directFundingScreens = {
-  NotSafeToDeposit: aEachDepositsInSequenceHappyStates.notSafeToDeposit.protocolState,
-  WaitForTransactionSubmissionStart:
-    aEachDepositsInSequenceHappyStates.waitForDepositTransactionStart.protocolState,
-  WaitForTransactionSubmissionEnd:
-    aEachDepositsInSequenceHappyStates.waitForDepositTransactionEnd.protocolState,
-  WaitForFundingConfirmation:
-    aEachDepositsInSequenceHappyStates.waitForFundingAndPostFundSetup.protocolState,
-  ChannelFunded: aEachDepositsInSequenceHappyStates.fundingSuccess.protocolState,
-};
-
-storybookUtils.addStoriesFromCollection(directFundingScreens, 'Direct Funding Happy Path', render);
+function addStories(scenario, chapter) {
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      storiesOf(chapter, module).add(key, render(<DirectFunding state={scenario[key].state} />));
+    }
+  });
+}

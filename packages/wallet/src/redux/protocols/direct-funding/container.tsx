@@ -8,13 +8,13 @@ import { TransactionSubmission } from '../../protocols/transaction-submission/co
 import { ActionDispatcher } from '../../utils';
 
 interface Props {
-  directFundingState: directFundingStates.DirectFundingState;
+  state: directFundingStates.DirectFundingState;
   transactionRetryApprovedAction: ActionDispatcher<actions.TransactionRetryApproved>;
 }
 
 class DirectFundingContainer extends PureComponent<Props> {
   render() {
-    const { directFundingState } = this.props;
+    const { state: directFundingState } = this.props;
     switch (directFundingState.type) {
       case 'DirectFunding.NotSafeToDeposit':
       case 'DirectFunding.WaitForFundingAndPostFundSetup':

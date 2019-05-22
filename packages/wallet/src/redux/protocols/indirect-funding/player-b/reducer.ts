@@ -28,11 +28,13 @@ import {
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { theirAddress } from '../../../../redux/channel-store';
-import { initialDirectFundingState } from '../../direct-funding/states';
 
 import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
-import { directFundingStateReducer } from '../../direct-funding/reducer';
+import {
+  directFundingStateReducer,
+  initialize as initializeDirectFunding,
+} from '../../direct-funding/reducer';
 import { isSuccess, isFailure } from '../../direct-funding/states';
 import { acceptConsensus } from '../../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../../communication';
@@ -147,7 +149,7 @@ function handleWaitForPreFundSetup(
     requiredDeposit: ourAmount,
     ourIndex: 1,
   });
-  const directFundingState = initialDirectFundingState(directFundingAction, sharedData);
+  const directFundingState = initializeDirectFunding(directFundingAction, sharedData);
   const newProtocolState = bWaitForDirectFunding({
     ...protocolState,
     ledgerId,

@@ -9,13 +9,7 @@ import {
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 
-import {
-  preSuccessStateB,
-  preFailureState,
-  failureTrigger,
-  successTriggerA,
-  preSuccessStateA,
-} from '../../../direct-funding/__tests__';
+import { preSuccessB, preFailure, preSuccessA } from '../../../direct-funding/__tests__';
 import {
   appCommitment,
   ledgerCommitment,
@@ -66,8 +60,8 @@ const waitForPreFundL1 = {
   ]),
 };
 const waitForDirectFunding = {
-  state: aWaitForDirectFunding({ ...props, directFundingState: preSuccessStateA.protocolState }), //
-  store: setChannels(preSuccessStateB.sharedData, [
+  state: aWaitForDirectFunding({ ...props, directFundingState: preSuccessA.state }), //
+  store: setChannels(preSuccessB.sharedData, [
     channelFromCommitments(app1, app2, asAddress, asPrivateKey),
     channelFromCommitments(ledger2, ledger3, asAddress, asPrivateKey),
   ]),
@@ -96,8 +90,8 @@ const successState = {
 };
 
 const waitForDirectFundingFailure = {
-  state: aWaitForDirectFunding({ ...props, directFundingState: preFailureState.protocolState }), //
-  store: setChannels(preFailureState.sharedData, [
+  state: aWaitForDirectFunding({ ...props, directFundingState: preFailure.state }), //
+  store: setChannels(preFailure.sharedData, [
     channelFromCommitments(app0, app1, asAddress, asPrivateKey),
     channelFromCommitments(ledger0, ledger1, asAddress, asPrivateKey),
   ]),
@@ -119,7 +113,7 @@ export const happyPath = {
     ledgerId,
   },
   waitForPreFundL1: { state: waitForPreFundL1, action: preFundL1Received },
-  waitForDirectFunding: { state: waitForDirectFunding, action: successTriggerA, reply: ledger4 },
+  waitForDirectFunding: { state: waitForDirectFunding, action: preSuccessA.action, reply: ledger4 },
   waitForLedgerUpdate1: {
     state: waitForLedgerUpdate1,
     action: ledgerUpdate1Received,
@@ -130,5 +124,5 @@ export const happyPath = {
 };
 
 export const ledgerFundingFails = {
-  waitForDirectFunding: { state: waitForDirectFundingFailure, action: failureTrigger },
+  waitForDirectFunding: { state: waitForDirectFundingFailure, action: preFailure.action },
 };
