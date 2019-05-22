@@ -24,18 +24,18 @@ export interface Acknowledged {
 // -------
 
 export const concludeApproved: ActionConstructor<ConcludeApproved> = p => ({
+  ...p,
   type: 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED',
-  processId: p.processId,
 });
 
 export const defundChosen: ActionConstructor<DefundChosen> = p => ({
+  ...p,
   type: 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN',
-  processId: p.processId,
 });
 
 export const acknowledged: ActionConstructor<Acknowledged> = p => ({
+  ...p,
   type: 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED',
-  processId: p.processId,
 });
 
 // -------
