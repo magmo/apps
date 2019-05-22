@@ -46,44 +46,55 @@ const failed = actions.transactionFailed({ processId });
 // ---------
 export const happyPath = {
   ...props,
-  // States
-  waitForSend,
-  waitForSubmission,
-  waitForConfirmation,
+  waitForSend: {
+    state: waitForSend,
+    action: sent,
+  },
+  waitForSubmission: {
+    state: waitForSubmission,
+    action: submitted,
+  },
+  waitForConfirmation: {
+    state: waitForConfirmation,
+    action: confirmed,
+  },
   success,
-  // Actions
-  sent,
-  submitted,
-  confirmed,
 };
 
 export const retryAndApprove = {
   ...props,
   // States
-  waitForSubmission,
-  approveRetry,
-  waitForSend: waitForSend2,
-  // Actions
-  submissionFailed,
-  retryApproved,
+  waitForSubmission: {
+    state: waitForSubmission,
+    action: submissionFailed,
+  },
+  approveRetry: {
+    state: approveRetry,
+    action: retryApproved,
+  },
+  waitForSend2: {
+    state: waitForSend2,
+  },
 };
 
 export const retryAndDeny = {
   ...props,
-  // States
-  waitForSubmission,
-  approveRetry,
+  waitForSubmission: {
+    state: waitForSubmission,
+    action: submissionFailed,
+  },
+  approveRetry: {
+    state: approveRetry,
+    action: retryDenied,
+  },
   failure,
-  // Actions
-  submissionFailed,
-  retryDenied,
 };
 
 export const transactionFailed = {
   ...props,
-  // States
-  waitForConfirmation,
-  failure: failure2,
-  // Actions
-  failed,
+  waitForConfirmation: {
+    state: waitForConfirmation,
+    action: failed,
+  },
+  failure2,
 };
