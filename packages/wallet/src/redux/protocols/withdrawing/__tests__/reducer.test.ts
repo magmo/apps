@@ -3,6 +3,7 @@ import { withdrawalReducer as reducer, initialize } from '../reducer';
 import * as states from '../states';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import { SharedData } from '../../../state';
+import { describeScenarioStep } from '../../../__tests__/helpers';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };
@@ -50,7 +51,7 @@ describe('HAPPY PATH', () => {
     itTransitionsTo(result, 'Withdrawing.WaitforApproval');
   });
 
-  describe(`when in Withdrawing.WaitforApproval`, () => {
+  describeScenarioStep(scenario.waitForApproval, () => {
     const { state, action } = scenario.waitForApproval;
     const result = reducer(state, sharedData, action);
 
@@ -58,14 +59,14 @@ describe('HAPPY PATH', () => {
     itSendsConcludeAndWithdrawTransaction(result);
   });
 
-  describe(`when in Withdrawing.WaitForTransaction}`, () => {
+  describeScenarioStep(scenario.waitForTransaction, () => {
     const { state, action } = scenario.waitForTransaction;
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Withdrawing.WaitForAcknowledgement');
   });
 
-  describe(`when in Withdrawing.WaitForAcknowledgement`, () => {
+  describeScenarioStep(scenario.waitForAcknowledgement, () => {
     const { state, action } = scenario.waitForAcknowledgement;
     const result = reducer(state, sharedData, action);
 
@@ -77,7 +78,7 @@ describe('WITHDRAWAL REJECTED', () => {
   const scenario = scenarios.withdrawalRejected;
   const { sharedData } = scenario;
 
-  describe(`when in Withdrawing.WaitForApproval`, () => {
+  describeScenarioStep(scenario.waitForApproval, () => {
     const { state, action } = scenario.waitForApproval;
     const result = reducer(state, sharedData, action);
 
@@ -89,7 +90,7 @@ describe('transaction failed scenario', () => {
   const scenario = scenarios.failedTransaction;
   const { sharedData } = scenario;
 
-  describe(`when in Withdrawing.WaitForTransaction`, () => {
+  describeScenarioStep(scenario.waitForTransaction, () => {
     const { state, action } = scenario.waitForTransaction;
     const result = reducer(state, sharedData, action);
     itTransitionsToFailure(result, scenario.failure);

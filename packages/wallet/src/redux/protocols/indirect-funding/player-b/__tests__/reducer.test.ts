@@ -4,37 +4,38 @@ import { ProtocolStateWithSharedData } from '../../../../protocols';
 import { IndirectFundingState, IndirectFundingStateType } from '../../states';
 import { SignedCommitment } from '../../../../../domain';
 import { getLastMessage } from '../../../../state';
+import { describeScenarioStep } from '../../../../__tests__/helpers';
 
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
-  describe('initializing', () => {
+  describe('when initializing', () => {
     const { channelId, store, processId } = scenario.initialParams;
     const initialState = initialize(processId, channelId, store);
 
     itTransitionsTo(initialState, 'IndirectFunding.BWaitForPreFundSetup0');
   });
 
-  describe('when in WaitForPreFundSetup0', () => {
+  describeScenarioStep(scenario.waitForPreFundSetup0, () => {
     const { state, action, reply } = scenario.waitForPreFundSetup0;
     const updatedState = playerBReducer(state.state, state.store, action);
 
     itSendsMessage(updatedState, reply);
     itTransitionsTo(updatedState, 'IndirectFunding.BWaitForDirectFunding');
   });
-  describe('when in WaitForDirectFunding', () => {
+  describeScenarioStep(scenario.waitForDirectFunding, () => {
     const { state, action } = scenario.waitForDirectFunding;
     const updatedState = playerBReducer(state.state, state.store, action);
 
     itTransitionsTo(updatedState, 'IndirectFunding.BWaitForLedgerUpdate0');
   });
-  describe('when in WaitForLedgerUpdate0', () => {
+  describeScenarioStep(scenario.waitForLedgerUpdate0, () => {
     const { state, action, reply } = scenario.waitForLedgerUpdate0;
     const updatedState = playerBReducer(state.state, state.store, action);
 
     itTransitionsTo(updatedState, 'IndirectFunding.BWaitForPostFundSetup0');
     itSendsMessage(updatedState, reply);
   });
-  describe('when in WaitForPostFund0', () => {
+  describeScenarioStep(scenario.waitForPostFund0, () => {
     const { state, action, reply } = scenario.waitForPostFund0;
     const updatedState = playerBReducer(state.state, state.store, action);
     itUpdatesFundingState(
@@ -49,7 +50,7 @@ describe('happy-path scenario', () => {
 
 describe('ledger-funding-fails scenario', () => {
   const scenario = scenarios.ledgerFundingFails;
-  describe('when in WaitForDirectFunding', () => {
+  describeScenarioStep(scenario.waitForDirectFunding, () => {
     const { state, action } = scenario.waitForDirectFunding;
     const updatedState = playerBReducer(state.state, state.store, action);
 

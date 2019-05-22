@@ -2,19 +2,19 @@ import * as scenarios from './scenarios';
 import * as states from '../states';
 import { fundingReducer as reducer } from '../reducer';
 import { ProtocolStateWithSharedData } from '../../..';
-import { itSendsThisMessage, itSendsThisDisplayEventType } from '../../../../__tests__/helpers';
+import {
+  itSendsThisMessage,
+  itSendsThisDisplayEventType,
+  describeScenarioStep,
+} from '../../../../__tests__/helpers';
 import { sendStrategyProposed } from '../../../../../communication';
 import { FUNDING_SUCCESS, HIDE_WALLET } from 'magmo-wallet-client';
 import { FundingStateType } from '../../states';
 
-function whenIn(state) {
-  return `when in ${state}`;
-}
-
 describe('happyPath', () => {
   const scenario = scenarios.happyPath;
 
-  describe(whenIn('Funding.PlayerA.WaitForStrategyChoice'), () => {
+  describeScenarioStep(scenario.waitForStrategyChoice, () => {
     const { state, sharedData, action } = scenario.waitForStrategyChoice;
 
     const result = reducer(state, sharedData, action);
@@ -24,7 +24,7 @@ describe('happyPath', () => {
     itSendsThisMessage(result, sendStrategyProposed(opponentAddress, processId, strategy));
   });
 
-  describe(whenIn('Funding.PlayerA.WaitForStrategyResponse'), () => {
+  describeScenarioStep(scenario.waitForStrategyResponse, () => {
     const { state, sharedData, action } = scenario.waitForStrategyResponse;
 
     const result = reducer(state, sharedData, action);
@@ -32,7 +32,7 @@ describe('happyPath', () => {
     itTransitionsTo(result, 'Funding.PlayerA.WaitForFunding');
   });
 
-  describe(whenIn('Funding.PlayerA.WaitForFunding'), () => {
+  describeScenarioStep(scenario.waitForFunding, () => {
     const { state, sharedData, action } = scenario.waitForFunding;
 
     const result = reducer(state, sharedData, action);
@@ -40,7 +40,7 @@ describe('happyPath', () => {
     itTransitionsTo(result, 'Funding.PlayerA.WaitForSuccessConfirmation');
   });
 
-  describe(whenIn('Funding.PlayerA.WaitForSuccessConfirmation'), () => {
+  describeScenarioStep(scenario.waitForSuccessConfirmation, () => {
     const { state, sharedData, action } = scenario.waitForSuccessConfirmation;
 
     const result = reducer(state, sharedData, action);
@@ -54,7 +54,7 @@ describe('happyPath', () => {
 describe('When a strategy is rejected', () => {
   const scenario = scenarios.rejectedStrategy;
 
-  describe(whenIn('Funding.PlayerA.WaitForStrategyResponse'), () => {
+  describeScenarioStep(scenario.waitForStrategyResponse, () => {
     const { state, sharedData, action } = scenario.waitForStrategyResponse;
 
     const result = reducer(state, sharedData, action);
@@ -66,7 +66,7 @@ describe('When a strategy is rejected', () => {
 describe('when cancelled by the opponent', () => {
   const scenario = scenarios.cancelledByOpponent;
 
-  describe(whenIn('Funding.PlayerA.WaitForStrategyChoice'), () => {
+  describeScenarioStep(scenario.waitForStrategyChoice, () => {
     const { state, sharedData, action } = scenario.waitForStrategyChoice;
 
     const result = reducer(state, sharedData, action);
@@ -75,7 +75,7 @@ describe('when cancelled by the opponent', () => {
     itSendsThisMessage(result, 'WALLET.FUNDING.FAILURE');
   });
 
-  describe(whenIn('Funding.PlayerA.WaitForStrategyResponse'), () => {
+  describeScenarioStep(scenario.waitForStrategyResponse, () => {
     const { state, sharedData, action } = scenario.waitForStrategyResponse;
 
     const result = reducer(state, sharedData, action);
@@ -87,7 +87,7 @@ describe('when cancelled by the opponent', () => {
 
 describe('when cancelled by the user', () => {
   const scenario = scenarios.cancelledByUser;
-  describe(whenIn('Funding.PlayerA.WaitForStrategyChoice'), () => {
+  describeScenarioStep(scenario.waitForStrategyChoice, () => {
     const { state, sharedData, action } = scenario.waitForStrategyChoice;
 
     const result = reducer(state, sharedData, action);
@@ -96,7 +96,7 @@ describe('when cancelled by the user', () => {
     itSendsThisMessage(result, 'WALLET.FUNDING.FAILURE');
   });
 
-  describe(whenIn('Funding.PlayerA.WaitForStrategyResponse'), () => {
+  describeScenarioStep(scenario.waitForStrategyResponse, () => {
     const { state, sharedData, action } = scenario.waitForStrategyResponse;
 
     const result = reducer(state, sharedData, action);

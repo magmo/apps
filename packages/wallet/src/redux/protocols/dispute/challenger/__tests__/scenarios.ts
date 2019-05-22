@@ -114,7 +114,7 @@ export const opponentResponds = {
   },
   waitForResponseOrTimeout: {
     state: waitForResponseOrTimeout,
-    action1: challengeExpirySet,
+    action: challengeExpirySet,
     action2: responseReceived,
     commitment: signedCommitment21,
   },
@@ -226,7 +226,9 @@ export const transactionFails = {
 
 export const defundActionComesDuringAcknowledgeTimeout = {
   ...defaults,
-  sharedData: sharedData(ourTurn),
-  acknowledgeTimeout,
-  defundingSuccessTrigger: defundingPreSuccess.action,
+  acknowledgeTimeout: {
+    state: acknowledgeTimeout,
+    sharedData: sharedData(ourTurn),
+    action: defundingPreSuccess.action,
+  },
 };
