@@ -101,6 +101,29 @@ An exhasutive switch on state type, returning a suitable UI component. When wait
 <a name="scenarios"></a>
 Objects containing the states, actions and commitments necessary to simulate each scenario described in the readme. May import triggers from child reducers. The format should be:
 
+```typescript
+// -------
+// Scenarios
+// -------
+
+export const scenarioName = {
+  ...defaults,
+  firstProtocolState: {
+    state: firstProtocolState,
+    sharedData: sharedDataAtTimeOfFirstProtocolState,
+    action: actionTriggeredWhenInFirstState,
+  },
+  secondProtocolState: {
+    state: secondProtocolState,
+    sharedData: sharedDataAtTimeOfSecondProtocolState,
+    action: actionTriggeredWhenInSecondState,
+    commitment: optional
+  },
+  andSoOn...
+};
+
+```
+
 <!-- TODO -->
 
 ## Reducer test
