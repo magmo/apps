@@ -24,17 +24,12 @@ export interface AllocationChanged {
 
 export const strategyApproved: ActionConstructor<StrategyApproved> = p => ({
   type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.STRATEGY_APPROVED',
-  processId: p.processId,
-  channelId: p.channelId,
-  consensusLibrary: p.consensusLibrary,
+  ...p,
 });
 
 export const allocationChanged: ActionConstructor<AllocationChanged> = p => ({
   type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.ALLOCATION_CHANGED',
-  processId: p.processId,
-  channelId: p.channelId,
-  consensusLibrary: p.consensusLibrary,
-  commitment: p.commitment,
+  ...p,
 });
 
 // --------

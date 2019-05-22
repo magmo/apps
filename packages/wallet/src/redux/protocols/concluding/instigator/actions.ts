@@ -29,22 +29,22 @@ export interface Acknowledged {
 
 export const cancelled: ActionConstructor<Cancelled> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED',
-  processId: p.processId,
+  ...p,
 });
 
 export const concludeApproved: ActionConstructor<ConcludeApproved> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED',
-  processId: p.processId,
+  ...p,
 });
 
 export const defundChosen: ActionConstructor<DefundChosen> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN',
-  processId: p.processId,
+  ...p,
 });
 
 export const acknowledged: ActionConstructor<Acknowledged> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED',
-  processId: p.processId,
+  ...p,
 });
 
 // -------
