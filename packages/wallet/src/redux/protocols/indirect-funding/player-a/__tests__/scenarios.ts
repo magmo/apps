@@ -81,7 +81,7 @@ const waitForPostFund1 = {
   ]),
 };
 
-const successState = {
+export const successState = {
   state: success({}),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app2, app3, asAddress, asPrivateKey),
@@ -120,7 +120,6 @@ export const happyPath = {
     reply: app2,
   },
   waitForPostFund1: { state: waitForPostFund1, action: postFund1Received },
-  success: { state: successState },
 };
 
 export const ledgerFundingFails = {
