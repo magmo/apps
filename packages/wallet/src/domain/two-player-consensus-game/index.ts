@@ -67,9 +67,6 @@ export function asCoreCommitment(commitment: ConsensusBaseCommitment): Commitmen
 export function fromCoreCommitment(
   commitment: Commitment,
 ): ConsensusReachedCommitment | ProposalCommitment {
-  if (commitment.commitmentType !== CommitmentType.App) {
-    throw new Error('Unsupported commitment type');
-  }
   const appAttributes: ProposalAppAttrs | ConsensusAppAttrs = appAttributesFromBytes(
     commitment.appAttributes,
   );
