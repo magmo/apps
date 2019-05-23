@@ -1,8 +1,8 @@
 import { ProtocolAction, WalletAction } from '../actions';
-import { PlayerIndex, WalletProtocol } from '../types';
+import { PlayerIndex } from '../types';
 import { Commitment } from '../../domain';
-import { ConcludeInstigated } from '../../communication';
 import { ActionConstructor } from '../utils';
+import { ConcludeInstigated, WalletProtocol } from '../../communication';
 export { BaseProcessAction } from '../../communication';
 
 // -------

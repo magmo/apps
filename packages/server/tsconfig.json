@@ -6,6 +6,8 @@
     "rootDir": "./src",
     "outDir": "./lib",
     "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
     "resolveJsonModule": true
   },
   "include": ["./src/**/*"],
