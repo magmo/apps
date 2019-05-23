@@ -5,6 +5,7 @@ import {
   expectThisCommitmentSent,
   itSendsThisMessage,
   itSendsThisDisplayEventType,
+  describeScenarioStep,
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../states';
 import { HIDE_WALLET, CONCLUDE_FAILURE, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
@@ -21,7 +22,7 @@ describe('[ Happy path ]', () => {
 
     itTransitionsTo(result, 'ConcludingResponder.ApproveConcluding');
   });
-  describe('when in ApproveConcluding', () => {
+  describeScenarioStep(scenario.approveConcluding, () => {
     const { state, sharedData, action, reply } = scenario.approveConcluding;
     const result = responderConcludingReducer(state, sharedData, action);
 
@@ -29,21 +30,21 @@ describe('[ Happy path ]', () => {
     itTransitionsTo(result, 'ConcludingResponder.DecideDefund');
   });
 
-  describe('when in DecideDefund', () => {
+  describeScenarioStep(scenario.decideDefund, () => {
     const { state, sharedData, action } = scenario.decideDefund;
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingResponder.WaitForDefund');
   });
 
-  describe('when in WaitForDefund', () => {
+  describeScenarioStep(scenario.waitForDefund, () => {
     const { state, sharedData, action } = scenario.waitForDefund;
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingResponder.AcknowledgeSuccess');
   });
 
-  describe('when in AcknowledgeSuccess', () => {
+  describeScenarioStep(scenario.acknowledgeSuccess, () => {
     const { state, sharedData, action } = scenario.acknowledgeSuccess;
     const result = responderConcludingReducer(state, sharedData, action);
 
@@ -56,7 +57,7 @@ describe('[ Happy path ]', () => {
 describe('[ Happy path (alternative) ]', () => {
   const scenario = scenarios.happyPathAlternative;
 
-  describe('when in DecideDefund', () => {
+  describeScenarioStep(scenario.decideDefund, () => {
     const { state, sharedData, action, reply } = scenario.decideDefund;
     const result = responderConcludingReducer(state, sharedData, action);
 
@@ -90,7 +91,7 @@ describe('[ Channel doesnt exist ]', () => {
     itTransitionsToAcknowledgeFailure(result, 'ChannelDoesntExist');
   });
 
-  describe('when in AcknowledgeFailure', () => {
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
     const { state, action, sharedData } = scenario.acknowledgeFailure;
     const result = responderConcludingReducer(state, sharedData, action);
 
@@ -111,7 +112,7 @@ describe('[ Concluding Not Possible ]', () => {
     itTransitionsToAcknowledgeFailure(result, 'NotYourTurn');
   });
 
-  describe('when in AcknowledgeFailure', () => {
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
     const { state, action, sharedData } = scenario.acknowledgeFailure;
     const result = responderConcludingReducer(state, sharedData, action);
 
@@ -124,14 +125,14 @@ describe('[ Concluding Not Possible ]', () => {
 describe('[ Defund failed ]', () => {
   const scenario = scenarios.defundFailed;
 
-  describe('when in WaitForDefund', () => {
+  describeScenarioStep(scenario.waitForDefund, () => {
     const { state, action, sharedData } = scenario.waitForDefund;
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
   });
 
-  describe('when in AcknowledgeFailure', () => {
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
     const { state, action, sharedData } = scenario.acknowledgeFailure;
     const result = responderConcludingReducer(state, sharedData, action);
 

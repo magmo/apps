@@ -53,6 +53,7 @@ export function initialize(
     const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
       action.processId,
+      action.channelId,
       sharedData,
     );
 
@@ -260,7 +261,7 @@ const notSafeToDepositReducer: DFReducer = (
         const {
           storage: sharedDataWithTransactionState,
           state: transactionSubmissionState,
-        } = initTransactionState(depositTransaction, state.processId, sharedData);
+        } = initTransactionState(depositTransaction, state.processId, state.channelId, sharedData);
         return {
           protocolState: states.waitForDepositTransaction({ ...state, transactionSubmissionState }),
           sharedData: sharedDataWithTransactionState,

@@ -8,6 +8,7 @@ import {
   expectThisMessageAndCommitmentSent,
   itSendsThisMessage,
   itSendsThisDisplayEventType,
+  describeScenarioStep,
 } from '../../../../__tests__/helpers';
 import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
 
@@ -20,7 +21,7 @@ describe('[ Happy path ]', () => {
     const result = initialize(channelId, processId, sharedData);
     itTransitionsTo(result, 'ConcludingInstigator.ApproveConcluding');
   });
-  describe('when in ApproveConcluding', () => {
+  describeScenarioStep(scenario.approveConcluding, () => {
     const { state, action, sharedData, reply } = scenario.approveConcluding;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
@@ -28,28 +29,28 @@ describe('[ Happy path ]', () => {
     itTransitionsTo(result, 'ConcludingInstigator.WaitForOpponentConclude');
   });
 
-  describe('when in WaitForOpponentConclude', () => {
+  describeScenarioStep(scenario.waitforOpponentConclude, () => {
     const { state, action, sharedData } = scenario.waitforOpponentConclude;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingInstigator.AcknowledgeConcludeReceived');
   });
 
-  describe('when in AcknowledgeConcludeReceived', () => {
+  describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
     const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingInstigator.WaitForDefund');
   });
 
-  describe('when in WaitForDefund', () => {
+  describeScenarioStep(scenario.waitForDefund, () => {
     const { state, action, sharedData } = scenario.waitForDefund;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingInstigator.AcknowledgeSuccess');
   });
 
-  describe('when in AcknowledgeSuccess', () => {
+  describeScenarioStep(scenario.acknowledgeSuccess, () => {
     const { state, action, sharedData } = scenario.acknowledgeSuccess;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
@@ -70,7 +71,7 @@ describe('[ Channel doesnt exist ]', () => {
     itTransitionsToAcknowledgeFailure(result, 'ChannelDoesntExist');
   });
 
-  describe('when in AcknowledgeFailure', () => {
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
     const { state, action, sharedData } = scenario.acknowledgeFailure;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
@@ -91,7 +92,7 @@ describe('[ Concluding Not Possible ]', () => {
     itTransitionsToAcknowledgeFailure(result, 'NotYourTurn');
   });
 
-  describe('when in AcknowledgeFailure', () => {
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
     const { state, action, sharedData } = scenario.acknowledgeFailure;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
@@ -104,7 +105,7 @@ describe('[ Concluding Not Possible ]', () => {
 describe('[ Concluding Cancelled ]', () => {
   const scenario = scenarios.concludingCancelled;
 
-  describe('when in ApproveConcluding', () => {
+  describeScenarioStep(scenario.approveConcluding, () => {
     const { state, action, sharedData } = scenario.approveConcluding;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
@@ -116,14 +117,14 @@ describe('[ Concluding Cancelled ]', () => {
 describe('[ Defund failed ]', () => {
   const scenario = scenarios.defundFailed;
 
-  describe('when in WaitForDefund', () => {
+  describeScenarioStep(scenario.waitForDefund, () => {
     const { state, action, sharedData } = scenario.waitForDefund;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
   });
 
-  describe('when in AcknowledgeFailure', () => {
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
     const { state, action, sharedData } = scenario.acknowledgeFailure;
     const result = instigatorConcludingReducer(state, sharedData, action);
 

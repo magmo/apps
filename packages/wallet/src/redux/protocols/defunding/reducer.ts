@@ -23,7 +23,7 @@ export const initialize = (
   action?: CommitmentReceived,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
   if (!helpers.channelIsClosed(channelId, sharedData)) {
-    return { protocolState: states.failure('Channel Not Closed'), sharedData };
+    return { protocolState: states.failure({ reason: 'Channel Not Closed' }), sharedData };
   }
   if (helpers.isChannelDirectlyFunded(channelId, sharedData)) {
     return createWaitForWithdrawal(sharedData, processId, channelId);
@@ -95,7 +95,7 @@ const waitForIndirectDefundingReducer = (
       return createWaitForWithdrawal(updatedSharedData, protocolState.processId, fundingChannelId);
     } else {
       return {
-        protocolState: states.failure('Ledger De-funding Failure'),
+        protocolState: states.failure({ reason: 'Ledger De-funding Failure' }),
         sharedData: updatedSharedData,
       };
     }
@@ -130,7 +130,7 @@ const waitForWithdrawalReducer = (
     };
   } else if (newWithdrawalState.type === 'Withdrawing.Failure') {
     return {
-      protocolState: states.failure('Withdrawal Failure'),
+      protocolState: states.failure({ reason: 'Withdrawal Failure' }),
       sharedData: newSharedData,
     };
   } else {

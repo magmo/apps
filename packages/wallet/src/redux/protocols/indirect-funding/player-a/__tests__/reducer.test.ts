@@ -4,10 +4,11 @@ import { ProtocolStateWithSharedData } from '../../../../protocols';
 import { IndirectFundingState } from '../../states';
 import { SignedCommitment } from '../../../../../domain';
 import { getLastMessage } from '../../../../state';
+import { describeScenarioStep } from '../../../../__tests__/helpers';
 
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
-  describe('initializing', () => {
+  describe('when initializing', () => {
     const { channelId, store, reply, processId } = scenario.initialParams;
     const initialState = initialize(processId, channelId, store);
 
@@ -15,13 +16,14 @@ describe('happy-path scenario', () => {
     itSendsMessage(initialState, reply);
   });
 
-  describe('when in IndirectFunding.WaitForPreFundL1', () => {
+  describeScenarioStep(scenario.waitForPreFundL1, () => {
     const { state, action } = scenario.waitForPreFundL1;
     const updatedState = playerAReducer(state.state, state.store, action);
 
     itTransitionsTo(updatedState, 'IndirectFunding.AWaitForDirectFunding');
   });
-  describe('when in IndirectFunding.WaitForDirectFunding', () => {
+
+  describeScenarioStep(scenario.waitForDirectFunding, () => {
     const { state, action, reply } = scenario.waitForDirectFunding;
     const updatedState = playerAReducer(state.state, state.store, action);
 
@@ -29,14 +31,15 @@ describe('happy-path scenario', () => {
     itSendsMessage(updatedState, reply);
   });
 
-  describe('when in WaitForLedgerUpdate1', () => {
+  describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
     const { state, action, reply } = scenario.waitForLedgerUpdate1;
     const updatedState = playerAReducer(state.state, state.store, action);
 
     itTransitionsTo(updatedState, 'IndirectFunding.AWaitForPostFundSetup1');
     itSendsMessage(updatedState, reply);
   });
-  describe('when in IndirectFunding.WaitForPostFund1', () => {
+
+  describeScenarioStep(scenario.waitForPostFund1, () => {
     const { state, action } = scenario.waitForPostFund1;
     const updatedState = playerAReducer(state.state, state.store, action);
 
@@ -51,7 +54,8 @@ describe('happy-path scenario', () => {
 
 describe('ledger-funding-fails scenario', () => {
   const scenario = scenarios.ledgerFundingFails;
-  describe('when in IndirectFunding.WaitForDirectFunding', () => {
+
+  describeScenarioStep(scenario.waitForDirectFunding, () => {
     const { state, action } = scenario.waitForDirectFunding;
     const updatedState = playerAReducer(state.state, state.store, action);
 

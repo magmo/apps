@@ -24,12 +24,11 @@ export interface Success {
 // -------
 
 export const success: StateConstructor<Success> = p => {
-  return { type: 'Concluding.Success' };
+  return { ...p, type: 'Concluding.Success' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  const { reason } = p;
-  return { type: 'Concluding.Failure', reason };
+  return { ...p, type: 'Concluding.Failure' };
 };
 
 // -------

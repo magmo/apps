@@ -47,54 +47,39 @@ export interface Success {
 // ------------
 
 export const waitForStrategyProposal: StateConstructor<WaitForStrategyProposal> = p => {
-  const { processId, opponentAddress, targetChannelId } = p;
   return {
+    ...p,
     type: 'Funding.PlayerB.WaitForStrategyProposal',
-    processId,
-    opponentAddress,
-    targetChannelId,
   };
 };
 
 export const waitForStrategyApproval: StateConstructor<WaitForStrategyApproval> = p => {
-  const { processId, opponentAddress, targetChannelId, strategy } = p;
   return {
+    ...p,
     type: 'Funding.PlayerB.WaitForStrategyApproval',
-    processId,
-    opponentAddress,
-    targetChannelId,
-    strategy,
   };
 };
 
 export const waitForFunding: StateConstructor<WaitForFunding> = p => {
-  const { processId, opponentAddress, fundingState, targetChannelId } = p;
   return {
+    ...p,
     type: 'Funding.PlayerB.WaitForFunding',
-    processId,
-    opponentAddress,
-    fundingState,
-    targetChannelId,
   };
 };
 
 export const waitForSuccessConfirmation: StateConstructor<WaitForSuccessConfirmation> = p => {
-  const { processId, opponentAddress, targetChannelId } = p;
   return {
+    ...p,
     type: 'Funding.PlayerB.WaitForSuccessConfirmation',
-    processId,
-    opponentAddress,
-    targetChannelId,
   };
 };
 
 export const success: StateConstructor<Success> = p => {
-  return { type: 'Funding.PlayerB.Success' };
+  return { ...p, type: 'Funding.PlayerB.Success' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  const { reason } = p;
-  return { type: 'Funding.PlayerB.Failure', reason };
+  return { ...p, type: 'Funding.PlayerB.Failure' };
 };
 
 // -------

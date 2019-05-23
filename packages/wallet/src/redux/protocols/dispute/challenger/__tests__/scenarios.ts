@@ -66,7 +66,6 @@ const waitForTransactionFailure = states.waitForTransaction({
 const waitForResponseOrTimeout = states.waitForResponseOrTimeout({ ...defaults, expiryTime: 0 });
 const acknowledgeTimeout = states.acknowledgeTimeout(defaults);
 const acknowledgeResponse = states.acknowledgeResponse(defaults);
-const successOpen = states.successOpen({});
 const acknowledge = (reason: Reason) => states.acknowledgeFailure({ ...defaults, reason });
 const waitForDefund1 = states.waitForDefund({
   ...defaults,
@@ -114,16 +113,13 @@ export const opponentResponds = {
   },
   waitForResponseOrTimeout: {
     state: waitForResponseOrTimeout,
-    action1: challengeExpirySet,
+    action: challengeExpirySet,
     action2: responseReceived,
     commitment: signedCommitment21,
   },
   acknowledgeResponse: {
     state: acknowledgeResponse,
     action: responseAcknowledged,
-  },
-  successOpen: {
-    state: successOpen,
   },
 };
 
@@ -226,7 +222,9 @@ export const transactionFails = {
 
 export const defundActionComesDuringAcknowledgeTimeout = {
   ...defaults,
-  sharedData: sharedData(ourTurn),
-  acknowledgeTimeout,
-  defundingSuccessTrigger: defundingPreSuccess.action,
+  acknowledgeTimeout: {
+    state: acknowledgeTimeout,
+    sharedData: sharedData(ourTurn),
+    action: defundingPreSuccess.action,
+  },
 };

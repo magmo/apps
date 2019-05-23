@@ -26,21 +26,20 @@ export interface WithdrawalSuccessAcknowledged extends BaseProcessAction {
 // -------
 
 export const withdrawalApproved: ActionConstructor<WithdrawalApproved> = p => ({
+  ...p,
   type: 'WALLET.WITHDRAWING.WITHDRAWAL_APPROVED',
-  withdrawalAddress: p.withdrawalAddress,
-  processId: p.processId,
 });
 
 export const withdrawalRejected: ActionConstructor<WithdrawalRejected> = p => ({
+  ...p,
   type: 'WALLET.WITHDRAWING.WITHDRAWAL_REJECTED',
-  processId: p.processId,
 });
 
 export const withdrawalSuccessAcknowledged: ActionConstructor<
   WithdrawalSuccessAcknowledged
 > = p => ({
+  ...p,
   type: 'WALLET.WITHDRAWING.WITHDRAWAL_SUCCESS_ACKNOWLEDGED',
-  processId: p.processId,
 });
 
 // -------

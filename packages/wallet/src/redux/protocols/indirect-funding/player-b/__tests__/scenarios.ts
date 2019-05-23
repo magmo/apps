@@ -94,7 +94,7 @@ const waitForDirectFundingFailure = {
   ]),
 };
 
-const successState = {
+export const successState = {
   state: success({}),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(app2, app3, asAddress, bsPrivateKey),
@@ -132,7 +132,6 @@ export const happyPath = {
     action: postFund0Received,
     reply: app3,
   },
-  success: { state: successState },
 };
 
 export const ledgerFundingFails = {

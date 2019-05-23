@@ -8,8 +8,8 @@ describe('happy-path scenario', () => {
   const storage = scenario.sharedData;
 
   describe('when initializing', () => {
-    const { transaction, processId } = scenario;
-    const result = initialize(transaction, processId, storage);
+    const { transaction, processId, channelId } = scenario;
+    const result = initialize(transaction, processId, channelId, storage);
 
     itTransitionsTo(result, 'TransactionSubmission.WaitForSend');
     itQueuesATransaction(result, transaction, processId);

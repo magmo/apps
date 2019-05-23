@@ -1,6 +1,7 @@
 import { WithdrawalState } from '../withdrawing/states';
-import { Properties } from '../../utils';
+import { StateConstructor } from '../../utils';
 import { IndirectDefundingState } from '../indirect-defunding/states';
+import { ProtocolState } from '..';
 
 // -------
 // States
@@ -38,30 +39,21 @@ export interface Success {
 // Constructors
 // -------
 
-export function waitForWithdrawal(properties: Properties<WaitForWithdrawal>): WaitForWithdrawal {
-  const { processId, withdrawalState, channelId } = properties;
-  return { type: 'Defunding.WaitForWithdrawal', processId, withdrawalState, channelId };
-}
+export const waitForWithdrawal: StateConstructor<WaitForWithdrawal> = p => {
+  return { ...p, type: 'Defunding.WaitForWithdrawal' };
+};
 
-export function waitForLedgerDefunding(
-  properties: Properties<WaitForIndirectDefunding>,
-): WaitForIndirectDefunding {
-  const { processId, indirectDefundingState: ledgerDefundingState, channelId } = properties;
-  return {
-    type: 'Defunding.WaitForIndirectDefunding',
-    processId,
-    indirectDefundingState: ledgerDefundingState,
-    channelId,
-  };
-}
+export const waitForLedgerDefunding: StateConstructor<WaitForIndirectDefunding> = p => {
+  return { ...p, type: 'Defunding.WaitForIndirectDefunding' };
+};
 
-export function success({}): Success {
-  return { type: 'Defunding.Success' };
-}
+export const success: StateConstructor<Success> = p => {
+  return { ...p, type: 'Defunding.Success' };
+};
 
-export function failure(reason: FailureReason): Failure {
-  return { type: 'Defunding.Failure', reason };
-}
+export const failure: StateConstructor<Failure> = p => {
+  return { ...p, type: 'Defunding.Failure' };
+};
 
 // -------
 // Unions and Guards
@@ -73,6 +65,15 @@ export type DefundingStateType = DefundingState['type'];
 
 export function isTerminal(state: DefundingState): state is Failure | Success {
   return state.type === 'Defunding.Failure' || state.type === 'Defunding.Success';
+}
+
+export function isDefundingState(state: ProtocolState): state is DefundingState {
+  return (
+    state.type === 'Defunding.WaitForWithdrawal' ||
+    state.type === 'Defunding.WaitForIndirectDefunding' ||
+    state.type === 'Defunding.Failure' ||
+    state.type === 'Defunding.Success'
+  );
 }
 
 export function isSuccess(state: DefundingState): state is Success {

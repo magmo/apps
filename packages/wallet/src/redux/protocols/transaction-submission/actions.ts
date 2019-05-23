@@ -45,41 +45,38 @@ export interface TransactionFailed {
 // --------
 
 export const transactionSent: ActionConstructor<TransactionSent> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SENT',
-  processId: p.processId,
 });
 
 export const transactionSubmissionFailed: ActionConstructor<TransactionSubmissionFailed> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMISSION_FAILED',
-  error: p.error,
-  processId: p.processId,
 });
 
 export const transactionSubmitted: ActionConstructor<TransactionSubmitted> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMITTED',
-  processId: p.processId,
-  transactionHash: p.transactionHash,
 });
 
 export const transactionConfirmed: ActionConstructor<TransactionConfirmed> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_CONFIRMED',
-  processId: p.processId,
-  contractAddress: p.contractAddress,
 });
 
 export const transactionRetryApproved: ActionConstructor<TransactionRetryApproved> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_APPROVED',
-  processId: p.processId,
 });
 
 export const transactionRetryDenied: ActionConstructor<TransactionRetryDenied> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_DENIED',
-  processId: p.processId,
 });
 
 export const transactionFailed: ActionConstructor<TransactionFailed> = p => ({
+  ...p,
   type: 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_FAILED',
-  processId: p.processId,
 });
 // --------
 // Unions and Guards

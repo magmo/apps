@@ -58,28 +58,23 @@ export function isConcludingResponderState(
 // ------------
 
 export const approveConcluding: StateConstructor<ResponderApproveConcluding> = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingResponder.ApproveConcluding', processId, channelId };
+  return { ...p, type: 'ConcludingResponder.ApproveConcluding' };
 };
 
 export const decideDefund: StateConstructor<ResponderDecideDefund> = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingResponder.DecideDefund', processId, channelId };
+  return { ...p, type: 'ConcludingResponder.DecideDefund' };
 };
 
 export const acknowledgeSuccess: StateConstructor<ResponderAcknowledgeSuccess> = p => {
-  const { processId, channelId } = p;
-  return { type: 'ConcludingResponder.AcknowledgeSuccess', processId, channelId };
+  return { ...p, type: 'ConcludingResponder.AcknowledgeSuccess' };
 };
 
 export const acknowledgeFailure: StateConstructor<ResponderAcknowledgeFailure> = p => {
-  const { processId, channelId, reason } = p;
-  return { type: 'ConcludingResponder.AcknowledgeFailure', processId, channelId, reason };
+  return { ...p, type: 'ConcludingResponder.AcknowledgeFailure' };
 };
 
 export const waitForDefund: StateConstructor<ResponderWaitForDefund> = p => {
-  const { processId, channelId, defundingState } = p;
-  return { type: 'ConcludingResponder.WaitForDefund', processId, channelId, defundingState };
+  return { ...p, type: 'ConcludingResponder.WaitForDefund' };
 };
 
 // -------

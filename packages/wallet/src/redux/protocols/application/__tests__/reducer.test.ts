@@ -1,7 +1,7 @@
 import * as scenarios from './scenarios';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { itSendsThisMessage } from '../../../__tests__/helpers';
+import { itSendsThisMessage, describeScenarioStep } from '../../../__tests__/helpers';
 import { initialize, applicationReducer } from '../reducer';
 import {
   VALIDATION_SUCCESS,
@@ -14,7 +14,7 @@ function whenIn(state) {
   return `when in ${state}`;
 }
 
-describe('initializing the application', () => {
+describe('when initializing', () => {
   const scenario = scenarios.initializingApplication;
   const result = initialize(scenario.initialize.sharedData);
   itTransitionsTo(result, 'Application.AddressKnown');
@@ -23,7 +23,7 @@ describe('initializing the application', () => {
 describe('starting the application', () => {
   const scenario = scenarios.startingApplication;
 
-  describe(whenIn('Application.AddressKnown'), () => {
+  describeScenarioStep(scenario.addressKnown, () => {
     const { state, sharedData, action } = scenario.addressKnown;
 
     const result = applicationReducer(state, sharedData, action);
@@ -36,7 +36,7 @@ describe('starting the application', () => {
 describe('signing a commitment', () => {
   const scenario = scenarios.receivingOurCommitment;
 
-  describe(whenIn('Application.Ongoing'), () => {
+  describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
     const result = applicationReducer(state, sharedData, action);
 
@@ -48,7 +48,7 @@ describe('signing a commitment', () => {
 describe('signing an invalid commitment', () => {
   const scenario = scenarios.receivingOurInvalidCommitment;
 
-  describe(whenIn('Application.Ongoing'), () => {
+  describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
 
     const result = applicationReducer(state, sharedData, action);
@@ -74,7 +74,7 @@ describe('validating a commitment', () => {
 describe('validating an invalid commitment', () => {
   const scenario = scenarios.receivingTheirInvalidCommitment;
 
-  describe(whenIn('Application.Ongoing'), () => {
+  describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
 
     const result = applicationReducer(state, sharedData, action);
@@ -87,7 +87,7 @@ describe('validating an invalid commitment', () => {
 describe('receiving a close request', () => {
   const scenario = scenarios.receivingACloseRequest;
 
-  describe(whenIn('Application.Ongoing'), () => {
+  describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
 
     const result = applicationReducer(state, sharedData, action);

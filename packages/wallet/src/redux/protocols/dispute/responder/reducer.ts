@@ -292,10 +292,11 @@ const transitionToWaitForTransaction = (
   protocolState: states.WaitForResponse | states.WaitForApproval,
   sharedData: SharedData,
 ) => {
-  const { processId } = protocolState;
+  const { processId, channelId } = protocolState;
   const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
     transaction,
     processId,
+    channelId,
     sharedData,
   );
   const newProtocolState = states.waitForTransaction({

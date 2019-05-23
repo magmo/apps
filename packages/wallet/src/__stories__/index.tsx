@@ -6,8 +6,9 @@ import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
 import { initializedState } from './dummy-wallet-states';
 import { ProtocolState } from '../redux/protocols';
-
+import { nestProtocolState } from './nesters';
 const walletStateRender = state => () => {
+  console.log(state);
   return (
     <Provider store={fakeStore(state)}>
       <WalletContainer position="center" />
@@ -22,7 +23,7 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
       dummyProcessId: {
         processId: 'dummyProcessId',
         protocol: 0, // at the moment this is not used by containers
-        protocolState,
+        protocolState: nestProtocolState(protocolState),
         channelsToMonitor: [],
       },
     },

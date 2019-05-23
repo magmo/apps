@@ -38,29 +38,22 @@ export interface AWaitForLedgerUpdate1 {
 // ------------
 
 export const aWaitForPreFundSetup1: StateConstructor<AWaitForPreFundSetup1> = p => {
-  const { channelId, ledgerId, processId } = p;
-  return { type: 'IndirectFunding.AWaitForPreFundSetup1', channelId, ledgerId, processId };
+  return { ...p, type: 'IndirectFunding.AWaitForPreFundSetup1' };
 };
 
 export const aWaitForDirectFunding: StateConstructor<AWaitForDirectFunding> = p => {
-  const { channelId, ledgerId, directFundingState, processId } = p;
   return {
+    ...p,
     type: 'IndirectFunding.AWaitForDirectFunding',
-    channelId,
-    ledgerId,
-    directFundingState,
-    processId,
   };
 };
 
 export const aWaitForPostFundSetup1: StateConstructor<AWaitForPostFundSetup1> = p => {
-  const { channelId, ledgerId, processId } = p;
-  return { type: 'IndirectFunding.AWaitForPostFundSetup1', channelId, ledgerId, processId };
+  return { ...p, type: 'IndirectFunding.AWaitForPostFundSetup1' };
 };
 
 export const aWaitForLedgerUpdate1: StateConstructor<AWaitForLedgerUpdate1> = p => {
-  const { channelId, ledgerId, processId } = p;
-  return { type: 'IndirectFunding.AWaitForLedgerUpdate1', channelId, ledgerId, processId };
+  return { ...p, type: 'IndirectFunding.AWaitForLedgerUpdate1' };
 };
 
 // -------

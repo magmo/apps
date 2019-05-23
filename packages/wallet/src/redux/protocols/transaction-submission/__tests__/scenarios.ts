@@ -10,7 +10,7 @@ const processId = 'process-id.123';
 const transactionHash = 'transaction-hash.123';
 const sharedData = EMPTY_SHARED_DATA;
 
-const props = { transaction, processId, transactionHash, sharedData };
+const props = { transaction, processId, transactionHash, sharedData, channelId: '0xChannel' };
 
 // ------
 // States

@@ -1,5 +1,6 @@
 import { StateConstructor } from '../../utils';
 import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../transaction-submission/states';
+import { ProtocolState } from '..';
 
 // -------
 // States
@@ -68,15 +69,25 @@ export const failure: StateConstructor<Failure> = p => {
 // Unions and Guards
 // -------
 
-export type WithdrawalState =
+export type NonTerminalWithdrawalState =
   | WaitForApproval
   | WaitForTransaction
-  | WaitForAcknowledgement
-  | Failure
-  | Success;
+  | WaitForAcknowledgement;
+
+export type WithdrawalState = NonTerminalWithdrawalState | Failure | Success;
 
 export type WithdrawalStateType = WithdrawalState['type'];
 
 export function isTerminal(state: WithdrawalState): state is Failure | Success {
   return state.type === 'Withdrawing.Failure' || state.type === 'Withdrawing.Success';
+}
+
+export function isWithdrawalState(state: ProtocolState): state is WithdrawalState {
+  return (
+    state.type === 'Withdrawing.Failure' ||
+    state.type === 'Withdrawing.Success' ||
+    state.type === 'Withdrawing.WaitForAcknowledgement' ||
+    state.type === 'Withdrawing.WaitforApproval' ||
+    state.type === 'Withdrawing.WaitForTransaction'
+  );
 }

@@ -1,5 +1,6 @@
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
 import { Properties, StateConstructor } from '../../utils';
+import { ProtocolState } from '..';
 
 // -------
 // States
@@ -119,18 +120,28 @@ export const fundingFailure: StateConstructor<FundingFailure> = params => {
 // Unions and Guards
 // -------
 
-export type DirectFundingState =
+export type NonTerminalDirectFundingState =
   | NotSafeToDeposit
   | WaitForDepositTransaction
-  | WaitForFundingAndPostFundSetup
-  | FundingSuccess
-  | FundingFailure;
+  | WaitForFundingAndPostFundSetup;
+
+export type DirectFundingState = NonTerminalDirectFundingState | FundingSuccess | FundingFailure;
 
 export type DirectFundingStateType = DirectFundingState['type'];
 
 export function isTerminal(state: DirectFundingState): state is FundingFailure | FundingSuccess {
   return (
     state.type === 'DirectFunding.FundingFailure' || state.type === 'DirectFunding.FundingSuccess'
+  );
+}
+
+export function isDirectFundingState(state: ProtocolState): state is DirectFundingState {
+  return (
+    state.type === 'DirectFunding.NotSafeToDeposit' ||
+    state.type === 'DirectFunding.WaitForDepositTransaction' ||
+    state.type === 'DirectFunding.WaitForFundingAndPostFundSetup' ||
+    state.type === 'DirectFunding.FundingFailure' ||
+    state.type === 'DirectFunding.FundingSuccess'
   );
 }
 
