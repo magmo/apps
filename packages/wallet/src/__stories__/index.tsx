@@ -6,7 +6,9 @@ import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
 import { initializedState } from './dummy-wallet-states';
 import { ProtocolState } from '../redux/protocols';
-
+import * as concludingScenarios from '../redux/protocols/concluding/instigator/__tests__/scenarios';
+import * as defundingScenarios from '../redux/protocols/defunding/__tests__/scenarios';
+import { isWithdrawalState } from '../redux/protocols/withdrawing/states';
 const walletStateRender = state => () => {
   return (
     <Provider store={fakeStore(state)}>
@@ -22,7 +24,7 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
       dummyProcessId: {
         processId: 'dummyProcessId',
         protocol: 0, // at the moment this is not used by containers
-        protocolState,
+        protocolState: nestProtocolState(protocolState),
         channelsToMonitor: [],
       },
     },
@@ -31,7 +33,17 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
 
   return walletStateRender(walletState);
 };
-
+function nestProtocolState(protocolState: ProtocolState): ProtocolState {
+  if (isWithdrawalState(protocolState)) {
+    const defundingState = {
+      ...defundingScenarios.directlyFundingChannelHappyPath.waitForWithdrawal.state,
+      withdrawalState: protocolState,
+    };
+    return { ...concludingScenarios.happyPath.waitForDefund.state, defundingState };
+  } else {
+    return protocolState;
+  }
+}
 export function addStoriesFromScenario(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {
