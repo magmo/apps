@@ -1,5 +1,5 @@
-import { ActionConstructor } from 'src/redux/utils';
 import { Commitment } from '../../../../domain';
+import { ActionConstructor } from '../../../utils';
 
 // -------
 // Actions

@@ -1,5 +1,5 @@
 import { WalletAction } from '../../actions';
-import { ActionConstructor } from 'src/redux/utils';
+import { ActionConstructor } from '../../utils';
 
 // -------
 // Actions

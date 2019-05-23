@@ -1,7 +1,7 @@
 import { BaseProcessAction } from '../actions';
 import { TransactionAction } from '../transaction-submission/actions';
 import { WalletAction, isTransactionAction } from '../../actions';
-import { ActionConstructor } from 'src/redux/utils';
+import { ActionConstructor } from '../../utils';
 
 // -------
 // Actions
