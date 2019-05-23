@@ -244,7 +244,12 @@ function challengeApproved(state: NonTerminalCState, sharedData: SharedData): Re
     toSignature,
   );
   // initialize transaction state machine
-  const returnVal = initializeTransaction(transactionRequest, state.processId, sharedData);
+  const returnVal = initializeTransaction(
+    transactionRequest,
+    state.processId,
+    state.channelId,
+    sharedData,
+  );
   const transactionSubmission = returnVal.state;
 
   // transition to wait for transaction

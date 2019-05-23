@@ -12,12 +12,14 @@ export interface WaitForSend {
   type: 'TransactionSubmission.WaitForSend';
   transaction: TransactionRequest;
   processId: string;
+  channelId: string;
 }
 
 export interface WaitForSubmission {
   type: 'TransactionSubmission.WaitForSubmission';
   transaction: TransactionRequest;
   processId: string;
+  channelId: string;
 }
 
 export interface WaitForConfirmation {
@@ -25,12 +27,14 @@ export interface WaitForConfirmation {
   transaction: TransactionRequest;
   transactionHash: string;
   processId: string;
+  channelId: string;
 }
 
 export interface ApproveRetry {
   type: 'TransactionSubmission.ApproveRetry';
   transaction: TransactionRequest;
   processId: string;
+  channelId: string;
 }
 
 export interface Failure {

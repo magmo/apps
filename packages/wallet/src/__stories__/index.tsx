@@ -7,9 +7,20 @@ import WalletContainer from '../containers/wallet';
 import { initializedState } from './dummy-wallet-states';
 import { ProtocolState } from '../redux/protocols';
 import { nestInConcluding } from '../redux/protocols/concluding/states';
-import { nestInDefunding } from '../redux/protocols/defunding/states';
+import { nestInDefunding, isDefundingState } from '../redux/protocols/defunding/states';
 import { isTerminal as iddfIsTerminal } from '../redux/protocols/indirect-defunding/states';
+import { isTerminal as tsIsTerminal } from '../redux/protocols/transaction-submission/states';
+import { isTerminal as wIsTerminal } from '../redux/protocols/withdrawing/states';
+import { isTerminal as dFIsTerminal } from '../redux/protocols/defunding/states';
+import { isTerminal as idFIsTerminal } from '../redux/protocols/indirect-funding/states';
+
 import { isIndirectDefundingState } from '../redux/protocols/indirect-defunding/states';
+import { isTransactionSubmissionState } from '../redux/protocols/transaction-submission/states';
+import { nestInDispute } from '../redux/protocols/dispute/responder/states';
+import { isWithdrawalState } from '../redux/protocols/withdrawing/states';
+import { isIndirectFundingState } from '../redux/protocols/indirect-funding/states';
+
+import { nestInFunding } from '../redux/protocols/funding/player-a/states';
 
 const walletStateRender = state => () => {
   console.log(state);
@@ -38,15 +49,31 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
 };
 
 function nestProtocolState(protocolState: ProtocolState): ProtocolState {
-  // if (isTransactionSubmissionState(protocolState)) {
-  //   return nestinDispute(protocolState);
-  // }
-  if (isIndirectDefundingState(protocolState) && !iddfIsTerminal(protocolState)) {
+  if (isTransactionSubmissionState(protocolState) && !tsIsTerminal(protocolState)) {
+    return nestInDispute(protocolState);
+  }
+
+  if (
+    (isIndirectDefundingState(protocolState) && !iddfIsTerminal(protocolState)) ||
+    (isWithdrawalState(protocolState) && !wIsTerminal(protocolState))
+  ) {
     return nestInConcluding(nestInDefunding(protocolState));
   }
 
+  if (isDefundingState(protocolState) && !dFIsTerminal(protocolState)) {
+    return nestInConcluding(protocolState);
+  }
+
+  if (
+    isIndirectFundingState(protocolState) &&
+    !idFIsTerminal(protocolState)
+    // || (isDirectFundingState(protocolState) && !DFIsTerminal(protocolState))
+  ) {
+    return nestInFunding(protocolState);
+  }
   return protocolState;
 }
+
 export function addStoriesFromScenario(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {

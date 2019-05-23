@@ -110,6 +110,7 @@ const waitForApprovalReducer = (
       const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
         transaction,
         processId,
+        channelId,
         sharedData,
       );
 

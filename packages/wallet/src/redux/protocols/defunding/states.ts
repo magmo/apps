@@ -8,6 +8,7 @@ import {
   IndirectDefundingState,
   NonTerminalIndirectDefundingState,
 } from '../indirect-defunding/states';
+import { ProtocolState } from '..';
 
 // -------
 // States
@@ -71,6 +72,15 @@ export type DefundingStateType = DefundingState['type'];
 
 export function isTerminal(state: DefundingState): state is Failure | Success {
   return state.type === 'Defunding.Failure' || state.type === 'Defunding.Success';
+}
+
+export function isDefundingState(state: ProtocolState): state is DefundingState {
+  return (
+    state.type === 'Defunding.WaitForWithdrawal' ||
+    state.type === 'Defunding.WaitForIndirectDefunding' ||
+    state.type === 'Defunding.Failure' ||
+    state.type === 'Defunding.Success'
+  );
 }
 
 export function isSuccess(state: DefundingState): state is Success {

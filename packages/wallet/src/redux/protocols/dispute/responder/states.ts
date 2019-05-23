@@ -188,3 +188,11 @@ export function isTerminal(state: ResponderState): state is TerminalResponderSta
     state.type === 'Responding.ClosedButNotDefunded'
   );
 }
+
+// -------
+// Nester
+// -------
+
+export function nestInDispute(transactionSubmissionState: NonTerminalTSState) {
+  return waitForTransaction({ ...transactionSubmissionState, transactionSubmissionState });
+}

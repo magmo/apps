@@ -48,10 +48,11 @@ export function transactionReducer(
 export function initialize(
   transaction: TransactionRequest,
   processId: string,
+  channelId: string,
   storage: Storage,
 ): { state: NonTerminalTSState; storage: SharedData } {
   storage = queueTransaction(storage, transaction, processId);
-  return { state: waitForSend({ transaction, processId }), storage };
+  return { state: waitForSend({ transaction, processId, channelId }), storage };
 }
 
 function transactionSent(state: TSState, storage: Storage): ReturnVal {
@@ -97,9 +98,9 @@ function transactionRetryApproved(state: NonTerminalTSState, storage: Storage): 
   if (state.type !== 'TransactionSubmission.ApproveRetry') {
     return { state, storage };
   }
-  const { transaction, processId } = state;
+  const { transaction, processId, channelId } = state;
   storage = queueTransaction(storage, transaction, processId);
-  return { state: waitForSend({ transaction, processId }), storage };
+  return { state: waitForSend({ transaction, processId, channelId }), storage };
 }
 
 function transactionRetryDenied(state: NonTerminalTSState, storage: Storage): ReturnVal {
