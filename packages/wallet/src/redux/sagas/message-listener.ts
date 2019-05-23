@@ -5,7 +5,6 @@ import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
 import * as application from '../protocols/application/reducer';
 import { isRelayableAction, WalletProtocol } from '../../communication';
-import { getProcessId } from '../reducer';
 import { responseProvided } from '../protocols/dispute/responder/actions';
 import { getChannelId } from '../../domain';
 
@@ -29,8 +28,10 @@ export function* messageListener() {
         yield put(actions.protocol.initializeChannel({}));
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
-        yield put(actions.protocol.concludeRequested(action.channelId));
-        yield put(actions.application.concludeRequested({ processId: getProcessId(action) }));
+        yield put(actions.protocol.concludeRequested({ channelId: action.channelId }));
+        yield put(
+          actions.application.concludeRequested({ processId: application.APPLICATION_PROCESS_ID }),
+        );
         break;
       case incoming.CREATE_CHALLENGE_REQUEST:
         yield put(
