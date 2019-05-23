@@ -1,13 +1,6 @@
-import {
-  WithdrawalState,
-  NonTerminalWithdrawalState,
-  isWithdrawalState,
-} from '../withdrawing/states';
+import { WithdrawalState } from '../withdrawing/states';
 import { StateConstructor } from '../../utils';
-import {
-  IndirectDefundingState,
-  NonTerminalIndirectDefundingState,
-} from '../indirect-defunding/states';
+import { IndirectDefundingState } from '../indirect-defunding/states';
 import { ProtocolState } from '..';
 
 // -------
@@ -89,17 +82,4 @@ export function isSuccess(state: DefundingState): state is Success {
 
 export function isFailure(state: DefundingState): state is Failure {
   return state.type === 'Defunding.Failure';
-}
-
-// -------
-// Nester
-// -------
-
-export function nestInDefunding(
-  protocolState: NonTerminalWithdrawalState | NonTerminalIndirectDefundingState,
-) {
-  if (isWithdrawalState(protocolState)) {
-    return waitForWithdrawal({ ...protocolState, withdrawalState: protocolState });
-  }
-  return waitForLedgerDefunding({ ...protocolState, indirectDefundingState: protocolState });
 }

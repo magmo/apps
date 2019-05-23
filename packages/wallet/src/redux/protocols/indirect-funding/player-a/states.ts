@@ -1,4 +1,4 @@
-import { DirectFundingState, NonTerminalDirectFundingState } from '../../direct-funding/states';
+import { DirectFundingState } from '../../direct-funding/states';
 import { StateConstructor } from '../../../utils';
 import { ProtocolState } from '../..';
 
@@ -73,18 +73,4 @@ export function isPlayerAState(state: ProtocolState): state is PlayerAState {
     state.type === 'IndirectFunding.AWaitForPostFundSetup1' ||
     state.type === 'IndirectFunding.AWaitForLedgerUpdate1'
   );
-}
-
-// -------
-// Nester
-// -------
-
-export function nestInIndirectFunding(directFundingState: NonTerminalDirectFundingState) {
-  return aWaitForDirectFunding({
-    ...directFundingState,
-    directFundingState,
-    targetChannelId: 'dummy',
-    opponentAddress: 'dummy',
-    ledgerId: 'dummy',
-  });
 }

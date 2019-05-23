@@ -111,16 +111,3 @@ export function isFundingState(state: ProtocolState): state is FundingState {
 export function isTerminal(state: FundingState): state is TerminalFundingState {
   return state.type === 'Funding.PlayerA.Failure' || state.type === 'Funding.PlayerA.Success';
 }
-
-// -------
-// Nester
-// -------
-
-export function nestInFunding(protocolState: NonTerminalIndirectFundingState) {
-  return waitForFunding({
-    ...protocolState,
-    fundingState: protocolState,
-    targetChannelId: 'dummy',
-    opponentAddress: 'dummy',
-  });
-}

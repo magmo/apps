@@ -1,5 +1,5 @@
 import { StateConstructor } from '../../../utils';
-import { DefundingState, NonTerminalDefundingState } from '../../defunding';
+import { DefundingState } from '../../defunding';
 export type InstigatorConcludingState =
   | InstigatorNonTerminalState
   | InstigatorPreTerminalState
@@ -101,12 +101,4 @@ export function isConcludingInstigatorState(
     state.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' ||
     state.type === 'ConcludingInstigator.WaitForDefund'
   );
-}
-
-// -------
-// Nester
-// -------
-
-export function nestInConcluding(defundingState: NonTerminalDefundingState) {
-  return instigatorWaitForDefund({ ...defundingState, defundingState });
 }
