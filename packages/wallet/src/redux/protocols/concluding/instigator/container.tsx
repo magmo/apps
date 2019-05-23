@@ -12,10 +12,10 @@ import Acknowledge from '../../shared-components/acknowledge';
 
 interface Props {
   state: NonTerminalConcludingState;
-  approve: ({ processId }) => void;
-  deny: ({ processId }) => void;
-  defund: ({ processId }) => void;
-  acknowledge: ({ processId }) => void;
+  approve: typeof actions.concludeApproved;
+  deny: typeof actions.cancelled;
+  defund: typeof actions.defundChosen;
+  acknowledge: typeof actions.acknowledged;
 }
 
 class ConcludingContainer extends PureComponent<Props> {
