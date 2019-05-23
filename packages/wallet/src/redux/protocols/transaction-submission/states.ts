@@ -1,5 +1,6 @@
 import { StateConstructor } from '../../utils';
 import { TransactionRequest } from 'ethers/providers';
+import { ProtocolState } from '..';
 
 // -------
 // States
@@ -102,3 +103,14 @@ export type NonTerminalTransactionSubmissionState =
   | WaitForSubmission
   | WaitForConfirmation
   | ApproveRetry;
+
+export function isTransactionSubmissionState(
+  state: ProtocolState,
+): state is TransactionSubmissionState {
+  return (
+    state.type === 'TransactionSubmission.WaitForSend' ||
+    state.type === 'TransactionSubmission.WaitForSubmission' ||
+    state.type === 'TransactionSubmission.WaitForConfirmation' ||
+    state.type === 'TransactionSubmission.ApproveRetry'
+  );
+}

@@ -1,6 +1,13 @@
-import { WithdrawalState } from '../withdrawing/states';
-import { Properties } from '../../utils';
-import { IndirectDefundingState } from '../indirect-defunding/states';
+import {
+  WithdrawalState,
+  NonTerminalWithdrawalState,
+  isWithdrawalState,
+} from '../withdrawing/states';
+import { StateConstructor } from '../../utils';
+import {
+  IndirectDefundingState,
+  NonTerminalIndirectDefundingState,
+} from '../indirect-defunding/states';
 
 // -------
 // States
@@ -38,30 +45,21 @@ export interface Success {
 // Constructors
 // -------
 
-export function waitForWithdrawal(properties: Properties<WaitForWithdrawal>): WaitForWithdrawal {
-  const { processId, withdrawalState, channelId } = properties;
-  return { type: 'Defunding.WaitForWithdrawal', processId, withdrawalState, channelId };
-}
+export const waitForWithdrawal: StateConstructor<WaitForWithdrawal> = p => {
+  return { ...p, type: 'Defunding.WaitForWithdrawal' };
+};
 
-export function waitForLedgerDefunding(
-  properties: Properties<WaitForIndirectDefunding>,
-): WaitForIndirectDefunding {
-  const { processId, indirectDefundingState: ledgerDefundingState, channelId } = properties;
-  return {
-    type: 'Defunding.WaitForIndirectDefunding',
-    processId,
-    indirectDefundingState: ledgerDefundingState,
-    channelId,
-  };
-}
+export const waitForLedgerDefunding: StateConstructor<WaitForIndirectDefunding> = p => {
+  return { ...p, type: 'Defunding.WaitForIndirectDefunding' };
+};
 
-export function success({}): Success {
-  return { type: 'Defunding.Success' };
-}
+export const success: StateConstructor<Success> = p => {
+  return { ...p, type: 'Defunding.Success' };
+};
 
-export function failure(reason: FailureReason): Failure {
-  return { type: 'Defunding.Failure', reason };
-}
+export const failure: StateConstructor<Failure> = p => {
+  return { ...p, type: 'Defunding.Failure' };
+};
 
 // -------
 // Unions and Guards
@@ -81,4 +79,17 @@ export function isSuccess(state: DefundingState): state is Success {
 
 export function isFailure(state: DefundingState): state is Failure {
   return state.type === 'Defunding.Failure';
+}
+
+// -------
+// Nester
+// -------
+
+export function nestInDefunding(
+  protocolState: NonTerminalWithdrawalState | NonTerminalIndirectDefundingState,
+) {
+  if (isWithdrawalState(protocolState)) {
+    return waitForWithdrawal({ ...protocolState, withdrawalState: protocolState });
+  }
+  return waitForLedgerDefunding({ ...protocolState, indirectDefundingState: protocolState });
 }

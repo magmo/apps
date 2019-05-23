@@ -1,5 +1,5 @@
 import { StateConstructor } from '../../../utils';
-import { DefundingState } from '../../defunding';
+import { DefundingState, NonTerminalDefundingState } from '../../defunding';
 export type InstigatorConcludingState =
   | InstigatorNonTerminalState
   | InstigatorPreTerminalState
@@ -47,19 +47,6 @@ export interface WaitForDefund {
   defundingState: DefundingState;
 }
 
-export function isConcludingInstigatorState(
-  state: ProtocolState,
-): state is InstigatorConcludingState {
-  return (
-    state.type === 'ConcludingInstigator.AcknowledgeSuccess' ||
-    state.type === 'ConcludingInstigator.AcknowledgeFailure' ||
-    state.type === 'ConcludingInstigator.ApproveConcluding' ||
-    state.type === 'ConcludingInstigator.WaitForOpponentConclude' ||
-    state.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' ||
-    state.type === 'ConcludingInstigator.WaitForDefund'
-  );
-}
-
 // ------------
 // Constructors
 // ------------
@@ -102,3 +89,24 @@ export type InstigatorNonTerminalState =
   | WaitForDefund;
 
 export type InstigatorPreTerminalState = AcknowledgeSuccess | AcknowledgeFailure;
+
+export function isConcludingInstigatorState(
+  state: ProtocolState,
+): state is InstigatorConcludingState {
+  return (
+    state.type === 'ConcludingInstigator.AcknowledgeSuccess' ||
+    state.type === 'ConcludingInstigator.AcknowledgeFailure' ||
+    state.type === 'ConcludingInstigator.ApproveConcluding' ||
+    state.type === 'ConcludingInstigator.WaitForOpponentConclude' ||
+    state.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' ||
+    state.type === 'ConcludingInstigator.WaitForDefund'
+  );
+}
+
+// -------
+// Nester
+// -------
+
+export function nestInConcluding(defundingState: NonTerminalDefundingState) {
+  return instigatorWaitForDefund({ ...defundingState, defundingState });
+}

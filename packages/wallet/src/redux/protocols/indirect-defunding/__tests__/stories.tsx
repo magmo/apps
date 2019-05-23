@@ -1,4 +1,16 @@
 import * as scenarios from './scenarios';
 import { addStoriesFromScenario as addStories } from '../../../../__stories__';
 
-addStories(scenarios.playerAHappyPath, 'Indirect Defunding / PlayerA / Happy Path');
+function flattenScenario(scenario) {
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      scenario[key].state = scenario[key].state.state;
+    }
+  });
+  return scenario;
+}
+
+addStories(
+  flattenScenario(scenarios.playerAHappyPath),
+  'Indirect Defunding / PlayerA / Happy Path',
+);

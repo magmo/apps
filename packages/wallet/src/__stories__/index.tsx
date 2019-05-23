@@ -6,10 +6,13 @@ import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
 import { initializedState } from './dummy-wallet-states';
 import { ProtocolState } from '../redux/protocols';
-import * as concludingScenarios from '../redux/protocols/concluding/instigator/__tests__/scenarios';
-import * as defundingScenarios from '../redux/protocols/defunding/__tests__/scenarios';
-import { isWithdrawalState } from '../redux/protocols/withdrawing/states';
+import { nestInConcluding } from '../redux/protocols/concluding/states';
+import { nestInDefunding } from '../redux/protocols/defunding/states';
+import { isTerminal as iddfIsTerminal } from '../redux/protocols/indirect-defunding/states';
+import { isIndirectDefundingState } from '../redux/protocols/indirect-defunding/states';
+
 const walletStateRender = state => () => {
+  console.log(state);
   return (
     <Provider store={fakeStore(state)}>
       <WalletContainer position="center" />
@@ -33,16 +36,16 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
 
   return walletStateRender(walletState);
 };
+
 function nestProtocolState(protocolState: ProtocolState): ProtocolState {
-  if (isWithdrawalState(protocolState)) {
-    const defundingState = {
-      ...defundingScenarios.directlyFundingChannelHappyPath.waitForWithdrawal.state,
-      withdrawalState: protocolState,
-    };
-    return { ...concludingScenarios.happyPath.waitForDefund.state, defundingState };
-  } else {
-    return protocolState;
+  // if (isTransactionSubmissionState(protocolState)) {
+  //   return nestinDispute(protocolState);
+  // }
+  if (isIndirectDefundingState(protocolState) && !iddfIsTerminal(protocolState)) {
+    return nestInConcluding(nestInDefunding(protocolState));
   }
+
+  return protocolState;
 }
 export function addStoriesFromScenario(scenario, chapter) {
   Object.keys(scenario).forEach(key => {

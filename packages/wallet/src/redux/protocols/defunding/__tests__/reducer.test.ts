@@ -46,7 +46,7 @@ describe('directly funded failure', () => {
 
     const result = defundingReducer(state, sharedData, action);
 
-    itTransitionsToFailure(result, states.failure('Withdrawal Failure'));
+    itTransitionsToFailure(result, states.failure({ reason: 'Withdrawal Failure' }));
   });
 });
 
@@ -89,6 +89,6 @@ describe('indirectly funded failure', () => {
     const { state, action, sharedData } = scenario.waitForLedgerDefunding;
     const result = defundingReducer(state, sharedData, action);
 
-    itTransitionsToFailure(result, states.failure('Ledger De-funding Failure'));
+    itTransitionsToFailure(result, states.failure({ reason: 'Ledger De-funding Failure' }));
   });
 });

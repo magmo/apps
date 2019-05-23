@@ -69,12 +69,12 @@ export const failure: StateConstructor<Failure> = p => {
 // Unions and Guards
 // -------
 
-export type WithdrawalState =
+export type NonTerminalWithdrawalState =
   | WaitForApproval
   | WaitForTransaction
-  | WaitForAcknowledgement
-  | Failure
-  | Success;
+  | WaitForAcknowledgement;
+
+export type WithdrawalState = NonTerminalWithdrawalState | Failure | Success;
 
 export type WithdrawalStateType = WithdrawalState['type'];
 
