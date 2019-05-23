@@ -12,7 +12,11 @@ import { isTerminal as iddfIsTerminal } from '../redux/protocols/indirect-defund
 import { isTerminal as tsIsTerminal } from '../redux/protocols/transaction-submission/states';
 import { isTerminal as wIsTerminal } from '../redux/protocols/withdrawing/states';
 import { isTerminal as dFIsTerminal } from '../redux/protocols/defunding/states';
-import { isTerminal as idFIsTerminal } from '../redux/protocols/indirect-funding/states';
+import { isTerminal as DFIsTerminal } from '../redux/protocols/direct-funding/states';
+import {
+  isTerminal as idFIsTerminal,
+  nestInIndirectFunding,
+} from '../redux/protocols/indirect-funding/states';
 
 import { isIndirectDefundingState } from '../redux/protocols/indirect-defunding/states';
 import { isTransactionSubmissionState } from '../redux/protocols/transaction-submission/states';
@@ -21,6 +25,7 @@ import { isWithdrawalState } from '../redux/protocols/withdrawing/states';
 import { isIndirectFundingState } from '../redux/protocols/indirect-funding/states';
 
 import { nestInFunding } from '../redux/protocols/funding/player-a/states';
+import { isDirectFundingState } from '../redux/protocols/direct-funding/states';
 
 const walletStateRender = state => () => {
   console.log(state);
@@ -64,12 +69,12 @@ function nestProtocolState(protocolState: ProtocolState): ProtocolState {
     return nestInConcluding(protocolState);
   }
 
-  if (
-    isIndirectFundingState(protocolState) &&
-    !idFIsTerminal(protocolState)
-    // || (isDirectFundingState(protocolState) && !DFIsTerminal(protocolState))
-  ) {
+  if (isIndirectFundingState(protocolState) && !idFIsTerminal(protocolState)) {
     return nestInFunding(protocolState);
+  }
+
+  if (isDirectFundingState(protocolState) && !DFIsTerminal(protocolState)) {
+    return nestInFunding(nestInIndirectFunding(protocolState));
   }
   return protocolState;
 }

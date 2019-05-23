@@ -25,7 +25,7 @@ graph TD
 
     A{Application}
     F{Funding}--> idF(IndirectFunding)
-    F--> dF
+
     D{Dispute}--> Df(Defunding)
     D-->TS
     C{Concluding}-->Df(Defunding)
