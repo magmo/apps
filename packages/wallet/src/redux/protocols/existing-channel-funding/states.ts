@@ -7,6 +7,8 @@ export interface WaitForLedgerTopUp {
   ledgerTopUpState: any;
   channelId: string;
   ledgerId: string;
+  proposedAllocation: string[];
+  proposedDestination: string[];
 }
 
 export interface WaitForLedgerUpdate {
@@ -14,6 +16,8 @@ export interface WaitForLedgerUpdate {
   processId: string;
   channelId: string;
   ledgerId: string;
+  proposedAllocation: string[];
+  proposedDestination: string[];
 }
 
 export interface Failure {

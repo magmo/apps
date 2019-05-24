@@ -15,18 +15,18 @@ import * as globalActions from '../../../actions';
 
 const processId = 'processId';
 
-const twoThree = [
+const twoTwo = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+  { address: bsAddress, wei: bigNumberify(2).toHexString() },
 ];
 
-const fiveToApp = [{ address: channelId, wei: bigNumberify(5).toHexString() }];
+const fourToApp = [{ address: channelId, wei: bigNumberify(4).toHexString() }];
 const props = {
   channelId,
   ledgerId,
   processId,
-  proposedAllocation: twoThree.map(a => a.wei),
-  proposedDestination: twoThree.map(a => a.address),
+  proposedAllocation: twoTwo.map(a => a.wei),
+  proposedDestination: twoTwo.map(a => a.address),
 };
 
 const setFundingState = (sharedData: SharedData): SharedData => {
@@ -39,10 +39,10 @@ const setFundingState = (sharedData: SharedData): SharedData => {
 // -----------
 // Commitments
 // -----------
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoThree });
-const ledger6 = ledgerCommitment({ turnNum: 6, balances: twoThree, proposedBalances: fiveToApp });
-const ledger7 = ledgerCommitment({ turnNum: 7, balances: fiveToApp });
+const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoTwo });
+const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoTwo });
+const ledger6 = ledgerCommitment({ turnNum: 6, balances: twoTwo, proposedBalances: fourToApp });
+const ledger7 = ledgerCommitment({ turnNum: 7, balances: fourToApp });
 
 // -----------
 // Shared Data
@@ -76,7 +76,11 @@ const ledgerUpdate1Received = globalActions.commitmentReceived(processId, ledger
 const invalidLedgerUpdateReceived = globalActions.commitmentReceived(processId, ledger5);
 
 export const playerAFullyFundedHappyPath = {
-  initialize: { sharedData: initialPlayerALedgerSharedData, ledgerId, channelId, reply: ledger6 },
+  initialize: {
+    sharedData: initialPlayerALedgerSharedData,
+    ...props,
+    reply: ledger6,
+  },
   waitForLedgerUpdate: {
     state: waitForLedgerUpdate,
     sharedData: playerAFirstCommitmentReceived,
@@ -85,7 +89,10 @@ export const playerAFullyFundedHappyPath = {
 };
 
 export const playerBFullyFundedHappyPath = {
-  initialize: { sharedData: initialPlayerBLedgerSharedData, ledgerId, channelId },
+  initialize: {
+    sharedData: initialPlayerBLedgerSharedData,
+    ...props,
+  },
   waitForLedgerUpdate: {
     state: waitForLedgerUpdate,
     sharedData: initialPlayerBLedgerSharedData,
