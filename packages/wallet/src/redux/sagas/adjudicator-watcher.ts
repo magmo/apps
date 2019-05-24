@@ -57,7 +57,7 @@ function* dispatchProcessEventAction(event: AdjudicatorEvent, processId: string)
       yield put(actions.challengeExpirySetEvent(processId, channelId, finalizedAt * 1000));
       break;
     case AdjudicatorEventType.Concluded:
-      yield put(actions.concludedEvent(processId, channelId));
+      yield put(actions.concludedEvent(channelId));
       break;
     case AdjudicatorEventType.Refuted:
       yield put(

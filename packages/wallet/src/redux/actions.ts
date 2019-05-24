@@ -165,7 +165,7 @@ export type AdjudicatorEventAction =
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent;
 
-export type CommonAction = MessageReceived | CommitmentReceived | AdjudicatorEventAction;
+export type CommonAction = MessageReceived | CommitmentReceived;
 export type ProtocolAction =
   | CommonAction
   | FundingAction
@@ -183,6 +183,7 @@ export type ProtocolAction =
 
 export type WalletAction =
   | AdjudicatorKnown
+  | AdjudicatorEventAction
   | BlockMined
   | DisplayMessageSent
   | LoggedIn
