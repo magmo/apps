@@ -99,8 +99,7 @@ export const challengeCreatedEvent = (channelId: string, commitment: Commitment,
 export type ChallengeCreatedEvent = ReturnType<typeof challengeCreatedEvent>;
 
 export const CONCLUDED_EVENT = 'WALLET.ADJUDICATOR.CONCLUDED_EVENT';
-export const concludedEvent = (processId: string, channelId: string) => ({
-  processId,
+export const concludedEvent = (channelId: string) => ({
   channelId,
   type: CONCLUDED_EVENT as typeof CONCLUDED_EVENT,
 });

@@ -76,7 +76,7 @@ describe('adjudicator state reducer', () => {
 
   describe('when a concluded event arrives', () => {
     const state = {};
-    const action = actions.concludedEvent('0x0', channelId);
+    const action = actions.concludedEvent(channelId);
     const updatedState = adjudicatorStateReducer(state, action);
 
     it('marks a channel as finalized', () => {
