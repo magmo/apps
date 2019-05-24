@@ -2,6 +2,7 @@ import { SharedData } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
 import { CommitmentReceived } from '../../actions';
+import { ExistingChannelFundingAction } from './actions';
 
 export const initialize = (processId: string,
   channelId: string,
@@ -15,7 +16,7 @@ export const initialize = (processId: string,
   export const existingChannelFundingReducer =(
     protocolState: states.ExistingChannelFundingState,
     sharedData:SharedData,
-    action: CommitmentReceived
+    action: ExistingChannelFundingAction
   ): ProtocolStateWithSharedData<states.ExistingChannelFundingState>{
     return {protocolState,sharedData};
   }
