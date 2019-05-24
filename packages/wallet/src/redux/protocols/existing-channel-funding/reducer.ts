@@ -1,7 +1,6 @@
 import { SharedData } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
-import { CommitmentReceived } from '../../actions';
 import { ExistingChannelFundingAction } from './actions';
 
 export const initialize = (processId: string,
