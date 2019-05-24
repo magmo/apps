@@ -9,7 +9,7 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { Action as IndirectFundingAction } from '../indirect-funding/actions';
 import * as playerAStates from './player-a/states';
 import * as selectors from '../../selectors';
-import { getOpponentAddress } from '../reducer-helpers';
+import { getOpponentAddress, getOurAddress } from '../reducer-helpers';
 
 export function initialize(
   sharedData: SharedData,
@@ -19,9 +19,10 @@ export function initialize(
 ): ProtocolStateWithSharedData<states.FundingState> {
   const channelState = selectors.getChannelState(sharedData, channelId);
   const opponentAddress = getOpponentAddress(channelState, playerIndex);
+  const ourAddress = getOurAddress(channelState, playerIndex);
   switch (playerIndex) {
     case PlayerIndex.A:
-      return initializeA(sharedData, processId, channelId, opponentAddress);
+      return initializeA(sharedData, processId, channelId, ourAddress, opponentAddress);
     case PlayerIndex.B:
       return initializeB(sharedData, processId, channelId, opponentAddress);
     default:

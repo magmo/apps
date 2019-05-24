@@ -19,12 +19,24 @@ import {
 import * as indirectFundingStates from '../../indirect-funding/states';
 import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
+import {
+  initialize as initializeExistingChannelFunding,
+  existingChannelFundingReducer,
+} from '../../existing-channel-funding/reducer';
+import * as existingChannelFundingStates from '../../existing-channel-funding/states';
+import { addHex } from '../../../../utils/hex-utils';
+import {
+  ExistingChannelFundingAction,
+  isExistingChannelFundingAction,
+} from '../../existing-channel-funding/actions';
+
 type EmbeddedAction = IndirectFundingAction;
 
 export function initialize(
   sharedData: SharedData,
   processId: string,
   channelId: string,
+  ourAddress: string,
   opponentAddress: string,
 ): ProtocolStateWithSharedData<states.FundingState> {
   return {
@@ -32,6 +44,7 @@ export function initialize(
       processId,
       targetChannelId: channelId,
       opponentAddress,
+      ourAddress,
     }),
     sharedData: showWallet(sharedData),
   };
@@ -42,8 +55,8 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (isIndirectFundingAction(action)) {
-    return handleIndirectFundingAction(state, sharedData, action);
+  if (isIndirectFundingAction(action) || isExistingChannelFundingAction(action)) {
+    return handleFundingAction(state, sharedData, action);
   }
 
   switch (action.type) {
@@ -62,7 +75,7 @@ export function fundingReducer(
   }
 }
 
-function handleIndirectFundingAction(
+function handleFundingAction(
   protocolState: states.FundingState,
   sharedData: SharedData,
   action: IndirectFundingAction,
@@ -76,6 +89,57 @@ function handleIndirectFundingAction(
     return { protocolState, sharedData };
   }
 
+  if (
+    isExistingChannelFundingAction(action) &&
+    existingChannelFundingStates.isExistingChannelFundingState(protocolState.fundingState)
+  ) {
+    return handleExistingChannelFundingAction(protocolState, sharedData, action);
+  } else {
+    return handleIndirectFundingAction(protocolState, sharedData, action);
+  }
+}
+
+function handleExistingChannelFundingAction(
+  protocolState: states.WaitForFunding,
+  sharedData: SharedData,
+  action: ExistingChannelFundingAction,
+): ProtocolStateWithSharedData<states.FundingState> {
+  if (!existingChannelFundingStates.isExistingChannelFundingState(protocolState.fundingState)) {
+    console.error(
+      `Funding reducer received indirect funding action ${
+        action.type
+      } but is currently in funding state ${protocolState.fundingState.type}`,
+    );
+    return { protocolState, sharedData };
+  }
+  const {
+    protocolState: updatedFundingState,
+    sharedData: updatedSharedData,
+  } = existingChannelFundingReducer(protocolState.fundingState, sharedData, action);
+
+  if (!existingChannelFundingStates.isTerminal(updatedFundingState)) {
+    return {
+      protocolState: states.waitForFunding({ ...protocolState, fundingState: updatedFundingState }),
+      sharedData: updatedSharedData,
+    };
+  } else {
+    return handleFundingComplete(protocolState, updatedFundingState, updatedSharedData);
+  }
+}
+
+function handleIndirectFundingAction(
+  protocolState: states.WaitForFunding,
+  sharedData: SharedData,
+  action: IndirectFundingAction,
+): ProtocolStateWithSharedData<states.FundingState> {
+  if (!indirectFundingStates.isIndirectFundingState(protocolState.fundingState)) {
+    console.error(
+      `Funding reducer received indirect funding action ${
+        action.type
+      } but is currently in funding state ${protocolState.fundingState.type}`,
+    );
+    return { protocolState, sharedData };
+  }
   const {
     protocolState: updatedFundingState,
     sharedData: updatedSharedData,
@@ -100,7 +164,16 @@ function strategyChosen(
     return { protocolState: state, sharedData };
   }
   const { processId, opponentAddress } = state;
-  const { strategy } = action;
+  let { strategy } = action;
+  const existingLedgerChannel = selectors.getExistingLedgerChannelForParticipants(
+    sharedData,
+    state.ourAddress,
+    state.opponentAddress,
+  );
+  // TODO: We probably want to let the user select this
+  if (existingLedgerChannel) {
+    strategy = 'ExistingChannelStrategy';
+  }
   const message = sendStrategyProposed(opponentAddress, processId, strategy);
   return {
     protocolState: states.waitForStrategyResponse({ ...state, strategy }),
@@ -117,19 +190,55 @@ function strategyApproved(
     return { protocolState: state, sharedData };
   }
   const channelState = selectors.getChannelState(sharedData, state.targetChannelId);
-  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
-    state.processId,
-    channelState,
-    sharedData,
-  );
-  if (indirectFundingStates.isTerminal(fundingState)) {
-    console.error('Indirect funding strate initialized to terminal state.');
-    return handleFundingComplete(state, fundingState, newSharedData);
+
+  if (state.strategy === 'ExistingChannelStrategy') {
+    const existingLedgerChannel = selectors.getExistingLedgerChannelForParticipants(
+      sharedData,
+      state.ourAddress,
+      state.opponentAddress,
+    );
+    if (!existingLedgerChannel) {
+      throw new Error(
+        `Could not find existing ledger channel with participants ${state.ourAddress} and ${
+          state.opponentAddress
+        }.`,
+      );
+    }
+    const total = channelState.lastCommitment.commitment.allocation.reduce(addHex);
+    const {
+      protocolState: fundingState,
+      sharedData: newSharedData,
+    } = initializeExistingChannelFunding(
+      state.processId,
+      channelState.channelId,
+      existingLedgerChannel.channelId,
+      total,
+      sharedData,
+    );
+
+    if (existingChannelFundingStates.isTerminal(fundingState)) {
+      console.error('Indirect funding strate initialized to terminal state.');
+      return handleFundingComplete(state, fundingState, newSharedData);
+    }
+    return {
+      protocolState: states.waitForFunding({ ...state, fundingState }),
+      sharedData: newSharedData,
+    };
+  } else {
+    const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
+      state.processId,
+      channelState,
+      sharedData,
+    );
+    if (indirectFundingStates.isTerminal(fundingState)) {
+      console.error('Indirect funding strate initialized to terminal state.');
+      return handleFundingComplete(state, fundingState, newSharedData);
+    }
+    return {
+      protocolState: states.waitForFunding({ ...state, fundingState }),
+      sharedData: newSharedData,
+    };
   }
-  return {
-    protocolState: states.waitForFunding({ ...state, fundingState }),
-    sharedData: newSharedData,
-  };
 }
 
 function strategyRejected(
@@ -186,10 +295,15 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 
 function handleFundingComplete(
   protocolState: Properties<states.WaitForSuccessConfirmation>,
-  fundingState: indirectFundingStates.IndirectFundingState,
+  fundingState:
+    | indirectFundingStates.IndirectFundingState
+    | existingChannelFundingStates.ExistingChannelFundingState,
   sharedData: SharedData,
 ) {
-  if (fundingState.type === 'IndirectFunding.Success') {
+  if (
+    fundingState.type === 'IndirectFunding.Success' ||
+    fundingState.type === 'ExistingChannelFunding.Success'
+  ) {
     return {
       protocolState: states.waitForSuccessConfirmation(protocolState),
       sharedData,

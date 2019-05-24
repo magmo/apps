@@ -183,3 +183,9 @@ export function getOpponentAddress(channelState: ChannelState, playerIndex: Play
   const opponentAddress = participants[(playerIndex + 1) % participants.length];
   return opponentAddress;
 }
+
+export function getOurAddress(channelState: ChannelState, playerIndex: PlayerIndex) {
+  const { participants } = channelState;
+  const ourAddress = participants[playerIndex];
+  return ourAddress;
+}
