@@ -7,24 +7,11 @@ import { SignedCommitment } from '../../../../domain';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAFullyFundedHappyPath;
-  const {
-    processId,
-    channelId,
-    ledgerId,
-    sharedData,
-    proposedAllocation,
-    proposedDestination,
-  } = scenario.initialize;
 
   describe('when initializing', () => {
-    const result = initialize(
-      processId,
-      channelId,
-      ledgerId,
-      proposedAllocation,
-      proposedDestination,
-      sharedData,
-    );
+    const { processId, channelId, ledgerId, sharedData, proposedAmount } = scenario.initialize;
+
+    const result = initialize(processId, channelId, ledgerId, proposedAmount, sharedData);
     itTransitionsTo(result, 'ExistingChannelFunding.WaitForLedgerUpdate');
     itSendsMessage(result, scenario.initialize.reply);
   });
@@ -33,6 +20,42 @@ describe('player A happy path', () => {
     const { state, action, sharedData } = scenario.waitForLedgerUpdate;
     const updatedState = existingChannelFundingReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'ExistingChannelFunding.Success');
+  });
+});
+
+describe('player B happy path', () => {
+  const scenario = scenarios.playerBFullyFundedHappyPath;
+
+  describe('when initializing', () => {
+    const { processId, channelId, ledgerId, sharedData, proposedAmount } = scenario.initialize;
+
+    const result = initialize(processId, channelId, ledgerId, proposedAmount, sharedData);
+    itTransitionsTo(result, 'ExistingChannelFunding.WaitForLedgerUpdate');
+  });
+
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action, sharedData, reply } = scenario.waitForLedgerUpdate;
+    const updatedState = existingChannelFundingReducer(state, sharedData, action);
+    itTransitionsTo(updatedState, 'ExistingChannelFunding.Success');
+    itSendsMessage(updatedState, reply);
+  });
+});
+
+describe('player A invalid commitment', () => {
+  const scenario = scenarios.playerAInvalidCommitment;
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action, sharedData } = scenario.waitForLedgerUpdate;
+    const updatedState = existingChannelFundingReducer(state, sharedData, action);
+    itTransitionsTo(updatedState, 'ExistingChannelFunding.Failure');
+  });
+});
+
+describe('player B invalid commitment', () => {
+  const scenario = scenarios.playerBInvalidCommitment;
+  describe('when in WaitForLedgerUpdate', () => {
+    const { state, action, sharedData } = scenario.waitForLedgerUpdate;
+    const updatedState = existingChannelFundingReducer(state, sharedData, action);
+    itTransitionsTo(updatedState, 'ExistingChannelFunding.Failure');
   });
 });
 

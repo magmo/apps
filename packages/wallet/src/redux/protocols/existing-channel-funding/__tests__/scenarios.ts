@@ -25,8 +25,7 @@ const props = {
   channelId,
   ledgerId,
   processId,
-  proposedAllocation: twoTwo.map(a => a.wei),
-  proposedDestination: twoTwo.map(a => a.address),
+  proposedAmount: fourToApp[0].wei,
 };
 
 const setFundingState = (sharedData: SharedData): SharedData => {

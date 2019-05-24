@@ -1,21 +1,168 @@
-import { SharedData } from '../../state';
+import { SharedData, signAndStore, queueMessage, checkAndStore } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
 import { ExistingChannelFundingAction } from './actions';
+import * as helpers from '../reducer-helpers';
+import * as selectors from '../../selectors';
+import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
+import { theirAddress } from '../../channel-store';
+import { Commitment } from '../../../domain';
+import { bigNumberify } from 'ethers/utils';
+import { sendCommitmentReceived } from '../../../communication';
 
-export const initialize = (processId: string,
+export const initialize = (
+  processId: string,
   channelId: string,
   ledgerId: string,
-  proposedAllocation: string[],
-  proposedDestination: string[],
-  sharedData: SharedData): ProtocolStateWithSharedData<states.ExistingChannelFundingState> {
-  return {sharedData, protocolState: states.success({})};
+  proposedAmount: string,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
+  let newSharedData = { ...sharedData };
+  const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
+  const theirCommitment = ledgerChannel.lastCommitment.commitment;
+  if (ledgerChannelNeedsTopUp(theirCommitment, proposedAmount)) {
+    const ledgerTopUpState = {};
+    return {
+      protocolState: states.waitForLedgerTopUp({
+        ledgerTopUpState,
+        processId,
+        channelId,
+        ledgerId,
+        proposedAmount,
+      }),
+      sharedData: newSharedData,
+    };
   }
 
-  export const existingChannelFundingReducer =(
-    protocolState: states.ExistingChannelFundingState,
-    sharedData:SharedData,
-    action: ExistingChannelFundingAction
-  ): ProtocolStateWithSharedData<states.ExistingChannelFundingState>{
-    return {protocolState,sharedData};
+  if (helpers.isFirstPlayer(ledgerId, sharedData)) {
+    const { proposedAllocation, proposedDestination } = craftNewAllocationAndDestination(
+      theirCommitment,
+      proposedAmount,
+      channelId,
+    );
+    const ourCommitment = proposeNewConsensus(
+      theirCommitment,
+      proposedAllocation,
+      proposedDestination,
+    );
+    const signResult = signAndStore(sharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      return {
+        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+        sharedData,
+      };
+    }
+    newSharedData = signResult.store;
+
+    const messageRelay = sendCommitmentReceived(
+      theirAddress(ledgerChannel),
+      processId,
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
+    );
+    newSharedData = queueMessage(newSharedData, messageRelay);
   }
+
+  const protocolState = states.waitForLedgerUpdate({
+    processId,
+    ledgerId,
+    channelId,
+    proposedAmount,
+  });
+
+  return { protocolState, sharedData: newSharedData };
+};
+
+export const existingChannelFundingReducer = (
+  protocolState: states.ExistingChannelFundingState,
+  sharedData: SharedData,
+  action: ExistingChannelFundingAction,
+): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
+  switch (protocolState.type) {
+    case 'ExistingChannelFunding.WaitForLedgerUpdate':
+      return waitForLedgerUpdateReducer(protocolState, sharedData, action);
+  }
+  return { protocolState, sharedData };
+};
+
+const waitForLedgerUpdateReducer = (
+  protocolState: states.WaitForLedgerUpdate,
+  sharedData: SharedData,
+  action: ExistingChannelFundingAction,
+) => {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
+    throw new Error(`Invalid action ${action.type}`);
+  }
+  const { ledgerId, processId } = protocolState;
+  let newSharedData = { ...sharedData };
+  const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
+  const theirCommitment = action.signedCommitment.commitment;
+
+  const checkResult = checkAndStore(newSharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    return {
+      protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      sharedData,
+    };
+  }
+  newSharedData = checkResult.store;
+
+  if (!helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
+    const ourCommitment = acceptConsensus(theirCommitment);
+    const signResult = signAndStore(newSharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      return {
+        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+        sharedData,
+      };
+    }
+    newSharedData = signResult.store;
+
+    const messageRelay = sendCommitmentReceived(
+      theirAddress(ledgerChannel),
+      processId,
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
+    );
+    newSharedData = queueMessage(newSharedData, messageRelay);
+  }
+
+  return { protocolState: states.success({}), sharedData: newSharedData };
+};
+
+function craftNewAllocationAndDestination(
+  latestCommitment: Commitment,
+  proposedAmount: string,
+  channelId: string,
+): { proposedAllocation: string[]; proposedDestination: string[] } {
+  const numParticipants = latestCommitment.channel.participants.length;
+  const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
+
+  const proposedAllocation: string[] = [];
+  const proposedDestination: string[] = [];
+
+  for (let i = 0; i < latestCommitment.allocation.length; i++) {
+    const allocation = latestCommitment.allocation[i];
+
+    const newAmount = bigNumberify(allocation).sub(amountRequiredFromEachParticipant);
+
+    if (newAmount.gt('0x0')) {
+      proposedAllocation.push(newAmount.toHexString());
+      proposedDestination.push(latestCommitment.destination[i]);
+    }
+  }
+
+  proposedAllocation.push(proposedAmount);
+  proposedDestination.push(channelId);
+
+  return { proposedAllocation, proposedDestination };
+}
+
+function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAmount: string) {
+  const numParticipants = latestCommitment.channel.participants.length;
+  const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
+
+  return !latestCommitment.allocation.every(a =>
+    bigNumberify(a).gte(amountRequiredFromEachParticipant),
+  );
+}
