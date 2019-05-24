@@ -11,6 +11,7 @@ import { IndirectDefundingState } from './indirect-defunding/states';
 import { DefundingState } from './defunding/states';
 import { ConcludingState } from './concluding/states';
 import { TransactionSubmissionState } from './transaction-submission';
+import { ExistingChannelFundingState } from './existing-channel-funding/states';
 
 export type ProtocolState =
   | ApplicationState
@@ -23,7 +24,8 @@ export type ProtocolState =
   | ChallengerState
   | ConcludingState
   | IndirectDefundingState
-  | TransactionSubmissionState;
+  | TransactionSubmissionState
+  | ExistingChannelFundingState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
   protocolState: T,
