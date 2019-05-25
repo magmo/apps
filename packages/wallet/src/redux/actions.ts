@@ -13,7 +13,7 @@ import { DisputeAction, isDisputeAction } from './protocols/dispute';
 import { ConcludingAction, isConcludingAction } from './protocols/concluding';
 import { ApplicationAction } from './protocols/application/actions';
 import { ActionConstructor } from './utils';
-import { Commitment } from 'src/domain';
+import { Commitment } from '../domain';
 
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };

@@ -156,7 +156,7 @@ describe('adjudicator listener', () => {
     await sagaTester.waitFor('WALLET.ADJUDICATOR.CONCLUDED_EVENT');
     const action: actions.ConcludedEvent = sagaTester.getLatestCalledAction();
 
-    expect(action).toEqual(actions.concludedEvent(channelId));
+    expect(action).toEqual(actions.concludedEvent({ channelId }));
   });
 
   it('should handle a refute event when registered for that channel', async () => {

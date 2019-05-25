@@ -2,7 +2,7 @@ import { SignedCommitment } from '../domain';
 import { WalletAction } from '../redux/actions';
 import { FundingStrategy } from './index';
 import { WalletProtocol } from '.';
-import { ActionConstructor } from 'src/redux/utils';
+import { ActionConstructor } from '../redux/utils';
 
 export interface BaseProcessAction {
   processId: string;

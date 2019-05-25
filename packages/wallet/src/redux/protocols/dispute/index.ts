@@ -1,6 +1,6 @@
 import { ChallengerAction, isChallengerAction } from './challenger/actions';
 import { ResponderAction, isResponderAction } from './responder/actions';
-import { WalletAction } from 'src/redux/actions';
+import { WalletAction } from '../../../redux/actions';
 
 export type DisputeAction = ChallengerAction | ResponderAction;
 
