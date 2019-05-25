@@ -160,7 +160,7 @@ const waitForResponseReducer = (
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
-    case 'WALLET.DISUTE.RESPONDER.RESPONSE_PROVIDED':
+    case 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED':
       const { commitment } = action;
       const signResult = signAndStore(sharedData, commitment);
       if (!signResult.isSuccess) {
@@ -188,7 +188,7 @@ const waitForAcknowledgementReducer = (
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
-    case 'WALLET.DISUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED':
+    case 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED':
       return {
         protocolState: states.success({}),
         sharedData: sendChallengeComplete(hideWallet(sharedData)),
@@ -204,7 +204,7 @@ const waitForApprovalReducer = (
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
-    case 'WALLET.DISUTE.RESPONDER.RESPOND_APPROVED':
+    case 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED':
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
         return {
@@ -233,7 +233,7 @@ function acknowledgeTimeoutReducer(
   sharedData: SharedData,
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> {
-  if (action.type !== 'WALLET.DISUTE.RESPONDER.DEFUND_CHOSEN') {
+  if (action.type !== 'WALLET.DISPUTE.RESPONDER.DEFUND_CHOSEN') {
     return { protocolState, sharedData };
   }
   return transitionToWaitForDefunding(protocolState, sharedData);
@@ -244,7 +244,7 @@ function acknowledgeDefundingSuccessReducer(
   sharedData: SharedData,
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> {
-  if (action.type !== 'WALLET.DISUTE.RESPONDER.ACKNOWLEDGED') {
+  if (action.type !== 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
   return {
@@ -259,7 +259,7 @@ function acknowledgeClosedButNotDefundedReducer(
   sharedData: SharedData,
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> {
-  if (action.type !== 'WALLET.DISUTE.RESPONDER.ACKNOWLEDGED') {
+  if (action.type !== 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED') {
     return { protocolState, sharedData };
   }
   return {
