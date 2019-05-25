@@ -80,9 +80,9 @@ export function challengerReducer(
   }
 
   switch (action.type) {
-    case 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_APPROVED':
+    case 'WALLET.DISUTE.CHALLENGER.CHALLENGE_APPROVED':
       return challengeApproved(state, sharedData);
-    case 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_DENIED':
+    case 'WALLET.DISUTE.CHALLENGER.CHALLENGE_DENIED':
       return challengeDenied(state, sharedData);
     case RESPOND_WITH_MOVE_EVENT:
       return challengeResponseReceived(
@@ -97,13 +97,13 @@ export function challengerReducer(
       return challengeTimedOut(state, sharedData);
     case CHALLENGE_EXPIRY_SET_EVENT:
       return handleChallengeCreatedEvent(state, sharedData, action.expiryTime);
-    case 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED':
+    case 'WALLET.DISUTE.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED':
       return challengeResponseAcknowledged(state, sharedData);
-    case 'WALLET.CHALLENGING.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED':
+    case 'WALLET.DISUTE.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED':
       return challengeFailureAcknowledged(state, sharedData);
-    case 'WALLET.CHALLENGING.CHALLENGER.DEFUND_CHOSEN':
+    case 'WALLET.DISUTE.CHALLENGER.DEFUND_CHOSEN':
       return defundChosen(state, sharedData);
-    case 'WALLET.CHALLENGING.CHALLENGER.ACKNOWLEDGED':
+    case 'WALLET.DISUTE.CHALLENGER.ACKNOWLEDGED':
       return acknowledged(state, sharedData);
     default:
       return unreachable(action);
