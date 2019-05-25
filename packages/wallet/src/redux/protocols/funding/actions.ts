@@ -1,9 +1,6 @@
 import * as playerA from './player-a/actions';
 import * as playerB from './player-b/actions';
-import {
-  isIndirectFundingAction,
-  Action as IndirectFundingAction,
-} from '../indirect-funding/actions';
+import { isIndirectFundingAction, IndirectFundingAction } from '../indirect-funding/actions';
 // -------
 // Actions
 // -------

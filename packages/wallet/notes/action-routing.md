@@ -91,3 +91,171 @@ but I can't quite see how this would play out and it might not be worth it.
 Here are some alternatives for the name of the `processLocator` property:
 `location`, `processLocation`, `route`, `path`, `executionPath`, `protocolLocation`,
 `protocolPath`, `breadcrumbs`, `routeInfo`, `destinationInfo`, `directions`.
+
+## Taxonomy of Actions
+
+```mermaid
+graph LR
+linkStyle default interpolate basis
+WalletAction --> WALLET.ADJUDICATOR_KNOWN
+WalletAction --> AdjudicatorEventAction
+WalletAction --> BLOCK_MINED
+WalletAction --> WALLET.DISPLAY_MESSAGE_SENT
+WalletAction --> WALLET.LOGGED_IN
+WalletAction --> WALLET.MESSAGE_SENT
+WalletAction --> METAMASK_LOAD_ERROR
+WalletAction --> ProtocolAction
+WalletAction --> NewProcessAction
+WalletAction --> ChannelAction
+WalletAction --> WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT
+WalletAction --> RelayableAction
+
+subgraph AdjudicatorEventAction
+AdjudicatorEventAction --> WALLET.ADJUDICATOR.CONCLUDED_EVENT
+AdjudicatorEventAction --> WALLET.ADJUDICATOR.REFUTED_EVENT
+AdjudicatorEventAction --> WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT
+AdjudicatorEventAction --> WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT
+AdjudicatorEventAction --> WALLET.ADJUDICATOR.CHALLENGE_EXPIRED_EVENT
+AdjudicatorEventAction --> WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_SET_EVENT;
+end
+
+subgraph ProtocolAction
+ProtocolAction --> CommonAction
+ProtocolAction --> FundingAction
+ProtocolAction --> TransactionAction
+ProtocolAction --> ChallengerAction
+ProtocolAction --> ResponderAction
+ProtocolAction --> DirectFundingAction
+ProtocolAction --> IndirectFundingAction
+ProtocolAction --> WithdrawalAction
+ProtocolAction --> ApplicationAction
+ProtocolAction --> DefundingAction
+ProtocolAction --> ConcludingActionInstigator
+ProtocolAction --> ConcludingActionResponder;
+end
+
+subgraph NewProcessAction
+NewProcessAction --> WALLET.NEW_PROCESS.INITIALIZE_CHANNEL
+NewProcessAction --> WALLET.NEW_PROCESS.FUNDING_REQUESTED
+NewProcessAction --> WALLET.NEW_PROCESS.CONCLUDE_REQUESTED
+NewProcessAction --> WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED
+NewProcessAction --> WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED
+NewProcessAction --> WALLET.NEW_PROCESS.CHALLENGE_CREATED
+end
+
+subgraph ChannelAction
+ChannelAction --> WALLET.CHANNEL.OPPONENT_COMMITMENT_RECEIVED
+ChannelAction --> WALLET.CHANNEL.OWN_COMMITMENT_RECEIVED
+end
+
+subgraph RelayableAction
+RelayableAction --> WALLET.FUNDING.STRATEGY_PROPOSED
+RelayableAction --> WALLET.FUNDING.STRATEGY_APPROVED
+RelayableAction --> WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED
+RelayableAction --> WALLET.COMMON.COMMITMENT_RECEIVED
+end
+
+subgraph CommonAction
+CommonAction --> WALLET.COMMON.MESSAGE_RECEIVED
+CommonAction --> WALLET.COMMON.COMMITMENT_RECEIVED
+end
+
+subgraph FundingAction
+FundingAction --> WALLET.FUNDING.PLAYER_A.CANCELLED
+FundingAction --> WALLET.FUNDING.PLAYER_A.FUNDING_SUCCESS_ACKNOWLEDGED
+FundingAction --> WALLET.FUNDING.STRATEGY_APPROVED
+FundingAction --> WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN
+FundingAction --> WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED
+FundingAction --> WALLET.FUNDING.PLAYER_B.CANCELLED
+FundingAction --> WALLET.FUNDING.PLAYER_B.FUNDING_SUCCESS_ACKNOWLEDGED
+FundingAction --> WALLET.FUNDING.PLAYER_B.STRATEGY_APPROVED
+FundingAction --> WALLET.FUNDING.STRATEGY_PROPOSED
+FundingAction --> WALLET.FUNDING.PLAYER_B.STRATEGY_REJECTED
+FundingAction --> EmbeddedAction
+end
+
+subgraph TransactionAction
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_CONFIRMED
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_FAILED
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_APPROVED
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_RETRY_DENIED
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SENT
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMISSION_FAILED
+TransactionAction --> WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SUBMIT
+end
+
+subgraph ChallengerAction
+ChallengerAction --> TransactionAction
+ChallengerAction --> DefundingAction
+ChallengerAction --> WALLET.CHALLENGING.CHALLENGER.CHALLENGE_APPROVED
+ChallengerAction --> WALLET.CHALLENGING.CHALLENGER.CHALLENGE_DENIED
+ChallengerAction --> WALLET.CHALLENGING.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED
+ChallengerAction --> WALLET.CHALLENGING.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED
+ChallengerAction --> CHALLENGE_EXPIRED_EVENT
+ChallengerAction --> RESPOND_WITH_MOVE_EVENT
+ChallengerAction --> REFUTED_EVENT
+ChallengerAction --> CHALLENGE_EXPIRY_SET_EVENT
+ChallengerAction --> WALLET.CHALLENGING.CHALLENGER.DEFUND_CHOSEN
+ChallengerAction --> WALLET.CHALLENGING.CHALLENGER.ACKNOWLEDGED
+end
+
+subgraph ResponderAction
+ResponderAction --> TransactionAction
+ResponderAction --> DefundingAction
+ResponderAction --> WALLET.CHALLENGING.RESPONDER.RESPOND_APPROVED
+ResponderAction --> WALLET.CHALLENGING.RESPONDER.RESPONSE_PROVIDED
+ResponderAction --> WALLET.CHALLENGING.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED
+ResponderAction --> CHALLENGE_EXPIRY_SET_EVENT
+ResponderAction --> CHALLENGE_EXPIRED_EVENT
+ResponderAction --> WALLET.CHALLENGING.RESPONDER.DEFUND_CHOSEN
+ResponderAction --> WALLET.CHALLENGING.RESPONDER.ACKNOWLEDGED
+end
+
+subgraph DirectFundingAction
+DirectFundingAction --> WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT
+DirectFundingAction --> WALLET.DIRECT_FUNDING.DIRECT_FUNDING_REQUESTED
+DirectFundingAction --> WALLET.COMMON.COMMITMENT_RECEIVED
+DirectFundingAction --> TransactionAction
+end
+
+subgraph IndirectFundingAction
+IndirectFundingAction --> CommonAction
+IndirectFundingAction --> DirectFundingAction
+IndirectFundingAction --> WALLET.INDIRECT_FUNDING.PLAYER_A.STRATEGY_APPROVED
+IndirectFundingAction --> WALLET.INDIRECT_FUNDING.PLAYER_A.ALLOCATION_CHANGED
+end
+
+subgraph WithdrawalAction
+WithdrawalAction --> TransactionAction
+WithdrawalAction --> WALLET.WITHDRAWING.WITHDRAWAL_APPROVED
+WithdrawalAction --> WALLET.WITHDRAWING.WITHDRAWAL_SUCCESS_ACKNOWLEDGED
+WithdrawalAction --> WALLET.WITHDRAWING.WITHDRAWAL_REJECTED
+end
+
+subgraph ApplicationAction
+ApplicationAction --> WALLET.APPLICATION.OPPONENT_COMMITMENT_RECEIVED
+ApplicationAction --> WALLET.APPLICATION.OWN_COMMITMENT_RECEIVED
+ApplicationAction --> WALLET.APPLICATION.CONCLUDE_REQUESTED
+end
+
+subgraph DefundingAction
+DefundingAction --> WithdrawalAction
+DefundingAction --> IndirectDefundingAction
+end
+
+subgraph ConcludingActionInstigator
+ConcludingActionInstigator --> WALLET.COMMON.COMMITMENT_RECEIVED
+ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED
+ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED
+ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN
+ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED
+end
+
+subgraph ConcludingActionResponder
+ConcludingActionResponder --> WALLET.COMMON.COMMITMENT_RECEIVED
+ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED
+ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN
+ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED
+end
+
+```

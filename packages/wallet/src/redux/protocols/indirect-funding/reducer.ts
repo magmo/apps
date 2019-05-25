@@ -32,7 +32,7 @@ export function initialize(
 export const indirectFundingReducer = (
   protocolState: NonTerminalIndirectFundingState,
   sharedData: SharedData,
-  action: actions.indirectFunding.Action,
+  action: actions.indirectFunding.IndirectFundingAction,
 ): ReturnVal => {
   if (isPlayerAState(protocolState)) {
     return playerAReducer(protocolState, sharedData, action);

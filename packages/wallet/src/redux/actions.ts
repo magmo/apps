@@ -172,10 +172,9 @@ export type ProtocolAction =
   | TransactionAction
   | challenging.ChallengerAction
   | ResponderAction
-  | directFunding.FundingAction
-  | indirectFunding.Action
+  | directFunding.DirectFundingAction
+  | indirectFunding.IndirectFundingAction
   | WithdrawalAction
-  | ResponderAction
   | application.ApplicationAction
   | DefundingAction
   | ConcludingActionInstigator

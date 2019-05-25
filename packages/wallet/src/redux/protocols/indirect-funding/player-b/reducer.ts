@@ -43,7 +43,7 @@ import { isTransactionAction } from '../../../actions';
 import { ChannelFundingState } from '../../../state';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
-type IDFAction = actions.indirectFunding.Action;
+type IDFAction = actions.indirectFunding.IndirectFundingAction;
 
 export function initialize(
   processId: string,
