@@ -7,7 +7,7 @@ export {
 
 import { ConcludingInstigatorAction, isConcludingInstigatorAction } from './instigator/actions';
 import { ConcludingResponderAction, isConcludingResponderAction } from './responder/actions';
-import { ProtocolAction } from 'src/redux/actions';
+import { ProtocolAction } from '../../../redux/actions';
 
 export type ConcludingAction = ConcludingInstigatorAction | ConcludingResponderAction;
 
