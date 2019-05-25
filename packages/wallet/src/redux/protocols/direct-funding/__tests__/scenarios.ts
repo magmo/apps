@@ -78,14 +78,14 @@ const bFundingReceivedEvent = globalActions.fundingReceivedEvent({
   amount: YOUR_DEPOSIT_B,
   totalForDestination: TOTAL_REQUIRED,
 });
-const postFundSetup0 = globalActions.commitmentReceived(
-  channelId,
-  globalTestScenarios.signedCommitment2,
-);
-const postFundSetup1 = globalActions.commitmentReceived(
-  channelId,
-  globalTestScenarios.signedCommitment3,
-);
+const postFundSetup0 = globalActions.commitmentReceived({
+  processId: channelId,
+  signedCommitment: globalTestScenarios.signedCommitment2,
+});
+const postFundSetup1 = globalActions.commitmentReceived({
+  processId: channelId,
+  signedCommitment: globalTestScenarios.signedCommitment3,
+});
 
 export const aHappyPath = {
   initialize: { sharedData: aHasBothPrefundsSharedData, action: aInitializeAction },

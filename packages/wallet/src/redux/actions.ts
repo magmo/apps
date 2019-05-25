@@ -4,12 +4,7 @@ import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as application from './protocols/application/actions';
 import * as protocol from './protocols/actions';
 import { FundingAction, isFundingAction } from './protocols/funding/actions';
-import {
-  COMMITMENT_RECEIVED,
-  CommitmentReceived,
-  commitmentReceived,
-  RelayableAction,
-} from '../communication';
+import { CommitmentReceived, commitmentReceived, RelayableAction } from '../communication';
 import {
   TransactionAction as TA,
   isTransactionAction as isTA,
@@ -21,7 +16,7 @@ import { ActionConstructor } from './utils';
 import { Commitment } from 'src/domain';
 
 export * from './protocols/transaction-submission/actions';
-export { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived };
+export { CommitmentReceived, commitmentReceived };
 
 export type TransactionAction = TA;
 export const isTransactionAction = isTA;
@@ -223,15 +218,8 @@ export type WalletAction =
 
 export function isCommonAction(action: WalletAction): action is CommonAction {
   return (
-    [
-      'WALLET.COMMON.MESSAGE_RECEIVED',
-      COMMITMENT_RECEIVED,
-      'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT',
-      'WALLET.ADJUDICATOR.CONCLUDED_EVENT',
-      'WALLET.ADJUDICATOR.REFUTED_EVENT',
-      'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT',
-      'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT',
-    ].indexOf(action.type) >= 0
+    ['WALLET.COMMON.MESSAGE_RECEIVED', 'WALLET.COMMON.COMMITMENT_RECEIVED'].indexOf(action.type) >=
+    0
   );
 }
 
