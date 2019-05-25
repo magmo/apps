@@ -120,16 +120,10 @@ AdjudicatorEventAction --> WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_SET_EVENT;
 end
 
 subgraph ProtocolAction
-ProtocolAction --> CommonAction
 ProtocolAction --> FundingAction
-ProtocolAction --> TransactionAction
 ProtocolAction --> ChallengerAction
 ProtocolAction --> ResponderAction
-ProtocolAction --> DirectFundingAction
-ProtocolAction --> IndirectFundingAction
-ProtocolAction --> WithdrawalAction
 ProtocolAction --> ApplicationAction
-ProtocolAction --> DefundingAction
 ProtocolAction --> ConcludingActionInstigator
 ProtocolAction --> ConcludingActionResponder;
 end
@@ -171,7 +165,7 @@ FundingAction --> WALLET.FUNDING.PLAYER_B.FUNDING_SUCCESS_ACKNOWLEDGED
 FundingAction --> WALLET.FUNDING.PLAYER_B.STRATEGY_APPROVED
 FundingAction --> WALLET.FUNDING.STRATEGY_PROPOSED
 FundingAction --> WALLET.FUNDING.PLAYER_B.STRATEGY_REJECTED
-FundingAction --> EmbeddedAction
+FundingAction --> IndirectFundingAction
 end
 
 subgraph TransactionAction

@@ -16,9 +16,7 @@ import {
   TransactionAction as TA,
   isTransactionAction as isTA,
 } from './protocols/transaction-submission/actions';
-import { WithdrawalAction } from './protocols/withdrawing/actions';
 import { ResponderAction } from './protocols/dispute/responder/actions';
-import { DefundingAction } from './protocols/defunding/actions';
 import { ConcludingAction as ConcludingActionInstigator } from './protocols/concluding/instigator/actions';
 import { ConcludingAction as ConcludingActionResponder } from './protocols/concluding/responder/actions';
 export * from './protocols/transaction-submission/actions';
@@ -167,16 +165,11 @@ export type AdjudicatorEventAction =
 
 export type CommonAction = MessageReceived | CommitmentReceived;
 export type ProtocolAction =
-  | CommonAction
+  // only list top level protocol actions
   | FundingAction
-  | TransactionAction
   | challenging.ChallengerAction
   | ResponderAction
-  | directFunding.DirectFundingAction
-  | indirectFunding.IndirectFundingAction
-  | WithdrawalAction
   | application.ApplicationAction
-  | DefundingAction
   | ConcludingActionInstigator
   | ConcludingActionResponder;
 
