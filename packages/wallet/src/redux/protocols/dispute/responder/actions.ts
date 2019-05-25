@@ -9,7 +9,7 @@ import {
   CHALLENGE_EXPIRY_SET_EVENT,
   CHALLENGE_EXPIRED_EVENT,
 } from '../../../actions';
-import { isDefundingAction } from '../../defunding/actions';
+import { isDefundingAction, DefundingAction } from '../../defunding/actions';
 import { ActionConstructor } from '../../../utils';
 
 // -------
@@ -75,10 +75,11 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => ({
 // -------
 
 export type ResponderAction =
+  | TransactionAction
+  | DefundingAction
   | RespondApproved
   | ResponseProvided
   | RespondSuccessAcknowledged
-  | TransactionAction
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
   | DefundChosen
