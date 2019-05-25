@@ -259,4 +259,7 @@ ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN
 ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED
 end
 
+classDef TopLevelProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
+
+class DisputeAction,FundingAction,ApplicationAction,ConcludingAction TopLevelProtocol
 ```
