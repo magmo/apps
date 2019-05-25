@@ -56,7 +56,6 @@ export type ConcludingInstigatorAction =
   | DefundingAction
   | Cancelled
   | ConcludeApproved
-  | CommitmentReceived
   | DefundChosen
   | Acknowledged
   | CommitmentReceived;
