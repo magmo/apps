@@ -107,7 +107,6 @@ WalletAction --> METAMASK_LOAD_ERROR
 WalletAction --> ProtocolAction
 WalletAction --> NewProcessAction
 WalletAction --> ChannelAction
-WalletAction --> WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT
 WalletAction --> RelayableAction
 
 subgraph AdjudicatorEventAction

@@ -152,7 +152,7 @@ export function getProcessId(action: NewProcessAction): string {
 
 function initializeNewProtocol(
   state: states.Initialized,
-  action: actions.protocol.NewProcessAction,
+  action: NewProcessAction,
 ): { protocolState: ProtocolState; sharedData: states.SharedData } {
   const processId = getProcessId(action);
   const incomingSharedData = states.sharedData(state);
@@ -205,7 +205,7 @@ function initializeNewProtocol(
 
 function routeToNewProcessInitializer(
   state: states.Initialized,
-  action: actions.protocol.NewProcessAction,
+  action: NewProcessAction,
 ): states.Initialized {
   const processId = getProcessId(action);
   const { protocolState, sharedData } = initializeNewProtocol(state, action);

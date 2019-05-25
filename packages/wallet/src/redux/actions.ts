@@ -159,6 +159,7 @@ export type AdjudicatorEventAction =
   | RespondWithMoveEvent
   | FundingReceivedEvent
   | ChallengeExpiredEvent
+  | ChallengeCreatedEvent
   | ChallengeExpirySetEvent;
 
 export type CommonAction = MessageReceived | CommitmentReceived;
@@ -178,7 +179,6 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | ChallengeCreatedEvent
   | RelayableAction;
 
 export function isCommonAction(action: WalletAction): action is CommonAction {
