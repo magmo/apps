@@ -1,5 +1,4 @@
 import {
-  ProtocolAction,
   ChallengeExpiredEvent,
   RefutedEvent,
   RespondWithMoveEvent,
@@ -8,6 +7,7 @@ import {
   REFUTED_EVENT,
   ChallengeExpirySetEvent,
   CHALLENGE_EXPIRY_SET_EVENT,
+  WalletAction,
 } from '../../../actions';
 import { isTransactionAction, TransactionAction } from '../../transaction-submission/actions';
 import { isDefundingAction, DefundingAction } from '../../defunding/actions';
@@ -101,7 +101,7 @@ export type ChallengerAction =
   | DefundChosen
   | Acknowledged;
 
-export function isChallengerAction(action: ProtocolAction): action is ChallengerAction {
+export function isChallengerAction(action: WalletAction): action is ChallengerAction {
   return (
     isTransactionAction(action) ||
     isDefundingAction(action) ||

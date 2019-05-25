@@ -7,10 +7,10 @@ export {
 
 import { ConcludingInstigatorAction, isConcludingInstigatorAction } from './instigator/actions';
 import { ConcludingResponderAction, isConcludingResponderAction } from './responder/actions';
-import { ProtocolAction } from '../../../redux/actions';
+import { WalletAction } from '../../../redux/actions';
 
 export type ConcludingAction = ConcludingInstigatorAction | ConcludingResponderAction;
 
-export function isConcludingAction(action: ProtocolAction): action is ConcludingAction {
+export function isConcludingAction(action: WalletAction): action is ConcludingAction {
   return isConcludingInstigatorAction(action) || isConcludingResponderAction(action);
 }

@@ -3,7 +3,7 @@ import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as application from './protocols/application/actions';
 import * as protocol from './protocols/actions';
-import { FundingAction } from './protocols/funding/actions';
+import { FundingAction, isFundingAction } from './protocols/funding/actions';
 import { Commitment } from '../domain';
 import {
   COMMITMENT_RECEIVED,
@@ -15,8 +15,8 @@ import {
   TransactionAction as TA,
   isTransactionAction as isTA,
 } from './protocols/transaction-submission/actions';
-import { DisputeAction } from './protocols/dispute';
-import { ConcludingAction } from './protocols/concluding';
+import { DisputeAction, isDisputeAction } from './protocols/dispute';
+import { ConcludingAction, isConcludingAction } from './protocols/concluding';
 import { ApplicationAction } from './protocols/application/actions';
 export * from './protocols/transaction-submission/actions';
 export { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived };
@@ -168,6 +168,15 @@ export type CommonAction = MessageReceived | CommitmentReceived;
 export type ProtocolAction =
   // only list top level protocol actions
   FundingAction | DisputeAction | ApplicationAction | ConcludingAction;
+
+export function isProtocolAction(action: WalletAction): action is ProtocolAction {
+  return (
+    isFundingAction(action) ||
+    isDisputeAction(action) ||
+    application.isApplicationAction(action) ||
+    isConcludingAction(action)
+  );
+}
 
 export type WalletAction =
   | AdjudicatorKnown

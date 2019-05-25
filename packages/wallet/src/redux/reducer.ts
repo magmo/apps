@@ -4,7 +4,7 @@ import * as actions from './actions';
 import { accumulateSideEffects } from './outbox';
 import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
-import { isNewProcessAction, isProtocolAction, NewProcessAction } from './protocols/actions';
+import { isNewProcessAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
 import {
   challengingReducer,
@@ -52,7 +52,7 @@ export function initializedReducer(
 
   if (isNewProcessAction(action)) {
     return routeToNewProcessInitializer(newState, action);
-  } else if (isProtocolAction(action)) {
+  } else if (actions.isProtocolAction(action)) {
     return routeToProtocolReducer(newState, action);
   }
 

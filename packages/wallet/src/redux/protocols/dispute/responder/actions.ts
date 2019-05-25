@@ -2,12 +2,12 @@ import { BaseProcessAction } from '../../actions';
 import { Commitment } from '../../../../domain';
 import { TransactionAction } from '../../transaction-submission/actions';
 import {
-  ProtocolAction,
   isTransactionAction,
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
   CHALLENGE_EXPIRY_SET_EVENT,
   CHALLENGE_EXPIRED_EVENT,
+  WalletAction,
 } from '../../../actions';
 import { isDefundingAction, DefundingAction } from '../../defunding/actions';
 import { ActionConstructor } from '../../../utils';
@@ -85,7 +85,7 @@ export type ResponderAction =
   | DefundChosen
   | Acknowledged;
 
-export function isResponderAction(action: ProtocolAction): action is ResponderAction {
+export function isResponderAction(action: WalletAction): action is ResponderAction {
   return (
     isTransactionAction(action) ||
     isDefundingAction(action) ||
