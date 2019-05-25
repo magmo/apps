@@ -121,11 +121,19 @@ end
 
 subgraph ProtocolAction
 ProtocolAction --> FundingAction
-ProtocolAction --> ChallengerAction
-ProtocolAction --> ResponderAction
+ProtocolAction --> DisputeAction
 ProtocolAction --> ApplicationAction
-ProtocolAction --> ConcludingActionInstigator
-ProtocolAction --> ConcludingActionResponder;
+ProtocolAction --> ConcludingAction
+end
+
+subgraph DisputeAction
+DisputeAction --> ChallengerAction
+DisputeAction --> ResponderAction
+end
+
+subgraph ConcludingAction
+ConcludingAction --> ConcludingActionInstigator
+ConcludingAction --> ConcludingActionResponder
 end
 
 subgraph NewProcessAction

@@ -1,9 +1,7 @@
 import * as channel from './channel-store/actions';
-import * as directFunding from './protocols/direct-funding/actions';
-import * as indirectFunding from './protocols/indirect-funding/actions';
+// import * as directFunding from './protocols/direct-funding/actions';
+// import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as protocol from './protocols/actions';
-import * as challenging from './protocols/dispute/challenger/actions';
-import * as application from './protocols/application/actions';
 import { FundingAction } from './protocols/funding/actions';
 import { Commitment } from '../domain';
 import {
@@ -16,9 +14,9 @@ import {
   TransactionAction as TA,
   isTransactionAction as isTA,
 } from './protocols/transaction-submission/actions';
-import { ResponderAction } from './protocols/dispute/responder/actions';
-import { ConcludingAction as ConcludingActionInstigator } from './protocols/concluding/instigator/actions';
-import { ConcludingAction as ConcludingActionResponder } from './protocols/concluding/responder/actions';
+import { DisputeAction } from './protocols/dispute';
+import { ConcludingAction } from './protocols/concluding';
+import { ApplicationAction } from './protocols/application/actions';
 export * from './protocols/transaction-submission/actions';
 export { COMMITMENT_RECEIVED, CommitmentReceived, commitmentReceived };
 
@@ -164,14 +162,10 @@ export type AdjudicatorEventAction =
   | ChallengeExpirySetEvent;
 
 export type CommonAction = MessageReceived | CommitmentReceived;
+
 export type ProtocolAction =
   // only list top level protocol actions
-  | FundingAction
-  | challenging.ChallengerAction
-  | ResponderAction
-  | application.ApplicationAction
-  | ConcludingActionInstigator
-  | ConcludingActionResponder;
+  FundingAction | DisputeAction | ApplicationAction | ConcludingAction;
 
 export type WalletAction =
   | AdjudicatorKnown
@@ -187,7 +181,7 @@ export type WalletAction =
   | ChallengeCreatedEvent
   | RelayableAction;
 
-function isCommonAction(action: WalletAction): action is CommonAction {
+export function isCommonAction(action: WalletAction): action is CommonAction {
   return (
     [
       MESSAGE_RECEIVED,
@@ -200,14 +194,8 @@ function isCommonAction(action: WalletAction): action is CommonAction {
     ].indexOf(action.type) >= 0
   );
 }
-export {
-  channel,
-  directFunding as funding,
-  indirectFunding,
-  protocol,
-  isCommonAction,
-  application,
-};
+
+// export { channel, directFunding as funding, indirectFunding, protocol, isCommonAction };
 
 // These are any actions that update shared data directly without any protocol
 export type SharedDataUpdateAction = AdjudicatorEventAction;
