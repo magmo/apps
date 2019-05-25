@@ -2,11 +2,7 @@ import {
   ChallengeExpiredEvent,
   RefutedEvent,
   RespondWithMoveEvent,
-  CHALLENGE_EXPIRED_EVENT,
-  RESPOND_WITH_MOVE_EVENT,
-  REFUTED_EVENT,
   ChallengeExpirySetEvent,
-  CHALLENGE_EXPIRY_SET_EVENT,
   WalletAction,
 } from '../../../actions';
 import { isTransactionAction, TransactionAction } from '../../transaction-submission/actions';
@@ -109,10 +105,10 @@ export function isChallengerAction(action: WalletAction): action is ChallengerAc
     action.type === 'WALLET.DISUTE.CHALLENGER.CHALLENGE_DENIED' ||
     action.type === 'WALLET.DISUTE.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED' ||
     action.type === 'WALLET.DISUTE.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED' ||
-    action.type === CHALLENGE_EXPIRED_EVENT ||
-    action.type === RESPOND_WITH_MOVE_EVENT ||
-    action.type === REFUTED_EVENT ||
-    action.type === CHALLENGE_EXPIRY_SET_EVENT ||
+    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
+    action.type === 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT' ||
+    action.type === 'WALLET.ADJUDICATOR.REFUTED_EVENT' ||
+    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.DISUTE.CHALLENGER.DEFUND_CHOSEN' ||
     action.type === 'WALLET.DISUTE.CHALLENGER.ACKNOWLEDGED'
   );

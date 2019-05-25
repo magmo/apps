@@ -5,8 +5,6 @@ import {
   isTransactionAction,
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
-  CHALLENGE_EXPIRY_SET_EVENT,
-  CHALLENGE_EXPIRED_EVENT,
   WalletAction,
 } from '../../../actions';
 import { isDefundingAction, DefundingAction } from '../../defunding/actions';
@@ -92,8 +90,8 @@ export function isResponderAction(action: WalletAction): action is ResponderActi
     action.type === 'WALLET.DISUTE.RESPONDER.RESPOND_APPROVED' ||
     action.type === 'WALLET.DISUTE.RESPONDER.RESPONSE_PROVIDED' ||
     action.type === 'WALLET.DISUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED' ||
-    action.type === CHALLENGE_EXPIRY_SET_EVENT ||
-    action.type === CHALLENGE_EXPIRED_EVENT ||
+    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
+    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.DISUTE.RESPONDER.DEFUND_CHOSEN' ||
     action.type === 'WALLET.DISUTE.RESPONDER.ACKNOWLEDGED'
   );

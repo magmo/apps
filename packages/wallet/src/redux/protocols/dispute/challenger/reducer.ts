@@ -22,14 +22,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { SharedData, registerChannelToMonitor, checkAndStore } from '../../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../../transaction-submission/actions';
-import {
-  isTransactionAction,
-  ProtocolAction,
-  CHALLENGE_EXPIRED_EVENT,
-  REFUTED_EVENT,
-  RESPOND_WITH_MOVE_EVENT,
-  CHALLENGE_EXPIRY_SET_EVENT,
-} from '../../../actions';
+import { isTransactionAction, ProtocolAction } from '../../../actions';
 import {
   transactionReducer,
   initialize as initializeTransaction,
@@ -84,18 +77,18 @@ export function challengerReducer(
       return challengeApproved(state, sharedData);
     case 'WALLET.DISUTE.CHALLENGER.CHALLENGE_DENIED':
       return challengeDenied(state, sharedData);
-    case RESPOND_WITH_MOVE_EVENT:
+    case 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT':
       return challengeResponseReceived(
         state,
         sharedData,
         action.responseCommitment,
         action.responseSignature,
       );
-    case REFUTED_EVENT:
+    case 'WALLET.ADJUDICATOR.REFUTED_EVENT':
       return refuteReceived(state, sharedData);
-    case CHALLENGE_EXPIRED_EVENT:
+    case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED':
       return challengeTimedOut(state, sharedData);
-    case CHALLENGE_EXPIRY_SET_EVENT:
+    case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET':
       return handleChallengeCreatedEvent(state, sharedData, action.expiryTime);
     case 'WALLET.DISUTE.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED':
       return challengeResponseAcknowledged(state, sharedData);

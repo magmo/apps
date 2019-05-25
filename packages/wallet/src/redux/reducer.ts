@@ -217,7 +217,7 @@ const waitForLoginReducer = (
   action: actions.WalletAction,
 ): states.WalletState => {
   switch (action.type) {
-    case actions.LOGGED_IN:
+    case 'WALLET.LOGGED_IN':
       return states.initialized({
         ...state,
         uid: action.uid,

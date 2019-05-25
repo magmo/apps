@@ -84,7 +84,11 @@ describe('when a updateSharedData action arrives', () => {
   const reducer = jest.fn(() => ({}));
   Object.defineProperty(adjudicatorState, 'adjudicatorStateReducer', { value: reducer });
 
-  const action = actions.challengeExpiredEvent('123', '123', 1);
+  const action = actions.challengeExpiredEvent({
+    processId: '123',
+    channelId: '123',
+    timestamp: 1,
+  });
   const state = { ...initializedState, adjudicatorState: {} };
   walletReducer(initializedState, action);
 
