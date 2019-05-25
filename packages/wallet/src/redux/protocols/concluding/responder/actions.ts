@@ -42,13 +42,13 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => ({
 // Unions and Guards
 // -------
 
-export type ConcludingActionResponder =
+export type ConcludingResponderAction =
   | CommitmentReceived
   | ConcludeApproved
   | DefundChosen
   | Acknowledged;
 
-export const isConcludingAction = (action: WalletAction): action is ConcludingActionResponder => {
+export const isConcludingAction = (action: WalletAction): action is ConcludingResponderAction => {
   return (
     action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED' ||

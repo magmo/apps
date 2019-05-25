@@ -51,7 +51,7 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => ({
 // Unions and Guards
 // -------
 
-export type ConcludingActionInstigator =
+export type ConcludingInstigatorAction =
   | Cancelled
   | ConcludeApproved
   | CommitmentReceived
@@ -59,7 +59,7 @@ export type ConcludingActionInstigator =
   | Acknowledged
   | CommitmentReceived;
 
-export const isConcludingAction = (action: WalletAction): action is ConcludingActionInstigator => {
+export const isConcludingAction = (action: WalletAction): action is ConcludingInstigatorAction => {
   return (
     action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||

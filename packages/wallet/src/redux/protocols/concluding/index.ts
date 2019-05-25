@@ -5,7 +5,7 @@ export {
   concludingReducer as reducer,
 } from './reducer';
 
-import { ConcludingActionInstigator } from './instigator/actions';
-import { ConcludingActionResponder } from './responder/actions';
+import { ConcludingInstigatorAction } from './instigator/actions';
+import { ConcludingResponderAction } from './responder/actions';
 
-export type ConcludingAction = ConcludingActionInstigator | ConcludingActionResponder;
+export type ConcludingAction = ConcludingInstigatorAction | ConcludingResponderAction;

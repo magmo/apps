@@ -131,8 +131,8 @@ DisputeAction --> ResponderAction
 end
 
 subgraph ConcludingAction
-ConcludingAction --> ConcludingActionInstigator
-ConcludingAction --> ConcludingActionResponder
+ConcludingAction --> ConcludingInstigatorAction
+ConcludingAction --> ConcludingResponderAction
 end
 
 subgraph NewProcessAction
@@ -244,19 +244,19 @@ DefundingAction --> WithdrawalAction
 DefundingAction --> IndirectDefundingAction
 end
 
-subgraph ConcludingActionInstigator
-ConcludingActionInstigator --> WALLET.COMMON.COMMITMENT_RECEIVED
-ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED
-ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED
-ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN
-ConcludingActionInstigator --> WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED
+subgraph ConcludingInstigatorAction
+ConcludingInstigatorAction --> WALLET.COMMON.COMMITMENT_RECEIVED
+ConcludingInstigatorAction --> WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED
+ConcludingInstigatorAction --> WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED
+ConcludingInstigatorAction --> WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN
+ConcludingInstigatorAction --> WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED
 end
 
-subgraph ConcludingActionResponder
-ConcludingActionResponder --> WALLET.COMMON.COMMITMENT_RECEIVED
-ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED
-ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN
-ConcludingActionResponder --> WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED
+subgraph ConcludingResponderAction
+ConcludingResponderAction --> WALLET.COMMON.COMMITMENT_RECEIVED
+ConcludingResponderAction --> WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED
+ConcludingResponderAction --> WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN
+ConcludingResponderAction --> WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED
 end
 
 classDef TopLevelProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
