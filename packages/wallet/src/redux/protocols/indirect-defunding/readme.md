@@ -23,6 +23,7 @@ linkStyle default interpolate basis
   DF --> |Yes, Player B| WLU(WaitForLedgerUpdate)
 
   CLU-->|UPDATE_CONFIRMED|WLU
+  CLU-->|UPDATE_CONFIRMED| ALF(AcknowledgeLedgerFinalized)
   CLU.->|CHALLENGE_EXPIRED| ALF(AcknowledgeLedgerFinalized)
   CLU.->|CHALLENGE_DETECTED|CLU
 
