@@ -53,8 +53,8 @@ linkStyle default interpolate basis
   W4DR.->|Closed|ALFoff
   W4DR.->|TxFailed|W4DR
 
-  ALFoff-->Soff((SuccessOff))
-  ALFon-->Son((SuccessOn))
+  ALFoff-->|ACKNOWLEDGED|Soff((SuccessOff))
+  ALFon-->|ACKNOWLEDGED|Son((SuccessOn))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
