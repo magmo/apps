@@ -8,11 +8,13 @@ import {
   channelId,
 } from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils/bignumber';
-import { waitForLedgerUpdate, waitForConclude } from '../states';
+import { waitForLedgerUpdate, confirmLedgerUpdate } from '../states';
 import { setChannels, EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
 import * as globalActions from '../../../actions';
+import { updateConfirmed } from '../actions';
+import { CommitmentType } from 'fmg-core';
 
 const processId = 'processId';
 
@@ -74,8 +76,17 @@ const notDefundableInitialStore = setFundingState(
   ]),
 );
 
+const playerAConfirmLedgerUpdate0 = {
+  state: confirmLedgerUpdate({ ...props, commitmentType: CommitmentType.App }),
+  store: setFundingState(
+    setChannels(EMPTY_SHARED_DATA, [
+      channelFromCommitments(app10, app11, asAddress, asPrivateKey),
+      channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
+    ]),
+  ),
+};
 const playerAWaitForUpdate = {
-  state: waitForLedgerUpdate(props),
+  state: waitForLedgerUpdate({ ...props, commitmentType: CommitmentType.App }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments([app10, app11], asAddress, asPrivateKey),
@@ -84,8 +95,17 @@ const playerAWaitForUpdate = {
   ),
 };
 
+const playerAConfirmConclude = {
+  state: confirmLedgerUpdate({ ...props, commitmentType: CommitmentType.Conclude }),
+  store: setFundingState(
+    setChannels(EMPTY_SHARED_DATA, [
+      channelFromCommitments(app10, app11, asAddress, asPrivateKey),
+      channelFromCommitments(ledger7, ledger8, asAddress, asPrivateKey),
+    ]),
+  ),
+};
 const playerAWaitForConclude = {
-  state: waitForConclude(props),
+  state: waitForLedgerUpdate({ ...props, commitmentType: CommitmentType.Conclude }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments([app10, app11], asAddress, asPrivateKey),
@@ -95,7 +115,7 @@ const playerAWaitForConclude = {
 };
 
 const playerBWaitForUpdate = {
-  state: waitForLedgerUpdate(props),
+  state: waitForLedgerUpdate({ ...props, commitmentType: CommitmentType.App }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments([app10, app11], bsAddress, bsPrivateKey),
@@ -105,7 +125,7 @@ const playerBWaitForUpdate = {
 };
 
 const playerBWaitForConclude = {
-  state: waitForConclude(props),
+  state: waitForLedgerUpdate({ ...props, commitmentType: CommitmentType.Conclude }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments([app10, app11], bsAddress, bsPrivateKey),
@@ -117,6 +137,12 @@ const playerBWaitForConclude = {
 // -----------
 // Actions
 // -----------
+const ledgerUpdateConfirmed = updateConfirmed({ ...props, commitmentType: CommitmentType.App });
+const concludeUpdateConfirmed = updateConfirmed({
+  ...props,
+  commitmentType: CommitmentType.Conclude,
+});
+
 export const ledgerUpdate0Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger6,
@@ -133,10 +159,10 @@ const conclude1Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger9,
 });
-const invalidLedgerUpdateReceived = globalActions.commitmentReceived({
-  processId,
-  signedCommitment: ledger5,
-});
+// const invalidLedgerUpdateReceived = globalActions.commitmentReceived({
+//   processId,
+//   signedCommitment: ledger5,
+// });
 // -----------
 // Scenarios
 // -----------
@@ -144,11 +170,19 @@ export const playerAHappyPath = {
   initialParams: {
     store: initialStore,
     ...props,
+  },
+  confirmLedgerUpdate0: {
+    state: playerAConfirmLedgerUpdate0,
+    action: ledgerUpdateConfirmed,
     reply: ledger6,
   },
-  waitForLedgerUpdate: {
+  waitForLedgerUpdate1: {
     state: playerAWaitForUpdate,
     action: ledgerUpdate1Received,
+  },
+  confirmConclude: {
+    state: playerAConfirmConclude,
+    action: concludeUpdateConfirmed,
     reply: ledger8,
   },
   waitForConclude: {
@@ -157,26 +191,35 @@ export const playerAHappyPath = {
   },
 };
 
-export const playerAInvalidCommitment = {
-  waitForLedgerUpdate: { state: playerAWaitForUpdate, action: invalidLedgerUpdateReceived },
-};
-export const playerBInvalidCommitment = {
-  waitForLedgerUpdate: { state: playerBWaitForUpdate, action: invalidLedgerUpdateReceived },
-};
+// export const playerAInvalidCommitment = {
+//   waitForLedgerUpdate: { state: playerAWaitForUpdate, action: invalidLedgerUpdateReceived },
+// };
+// export const playerBInvalidCommitment = {
+//   waitForLedgerUpdate: { state: playerBWaitForUpdate, action: invalidLedgerUpdateReceived },
+// };
 
 export const playerBHappyPath = {
   initialParams: {
     store: initialStore,
     ...props,
   },
-  waitForLedgerUpdate: {
+  waitForLedgerUpdate0: {
     state: playerBWaitForUpdate,
     action: ledgerUpdate0Received,
+    reply: ledger7,
+  },
+  confirmLedgerUpdate1: {
+    state: {},
+    action: {},
     reply: ledger7,
   },
   waitForConclude: {
     state: playerBWaitForConclude,
     action: conclude0Received,
+  },
+  confirmConclude: {
+    state: {},
+    action: {},
     reply: ledger9,
   },
 };
