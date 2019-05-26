@@ -1,6 +1,6 @@
 import { CommitmentReceived, WalletAction, ChallengeCreatedEvent } from '../../actions';
 import { CommitmentType } from 'fmg-core';
-import { Commitment } from 'src/domain';
+import { Commitment, SignedCommitment } from 'src/domain';
 import { ActionConstructor } from 'src/redux/utils';
 
 // -------
@@ -10,6 +10,7 @@ import { ActionConstructor } from 'src/redux/utils';
 export interface UpdateConfirmed {
   type: 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED';
   commitmentType: CommitmentType.App | CommitmentType.Conclude;
+  signedCommitment: SignedCommitment;
 }
 
 export interface ChallengeChosen {
