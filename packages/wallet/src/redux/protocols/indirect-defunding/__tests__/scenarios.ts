@@ -137,10 +137,15 @@ const playerBWaitForConclude = {
 // -----------
 // Actions
 // -----------
-const ledgerUpdateConfirmed = updateConfirmed({ ...props, commitmentType: CommitmentType.App });
+const ledgerUpdateConfirmed = updateConfirmed({
+  ...props,
+  commitmentType: CommitmentType.App,
+  signedCommitment: ledger6,
+});
 const concludeUpdateConfirmed = updateConfirmed({
   ...props,
   commitmentType: CommitmentType.Conclude,
+  signedCommitment: ledger8,
 });
 
 export const ledgerUpdate0Received = globalActions.commitmentReceived({
