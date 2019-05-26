@@ -8,71 +8,75 @@ It covers:
 
 - Checking that a channel is closed (either finalized on chain or a conclusion proof exists)
 - Crafting a ledger update that allocates the funds to the players.
-- Waiting for a ledger response from the opponent.
+- Waiting for a ledger response from the opponent, and offering the option to challenge if they are unresponsive.
 - Crafting a conclude commitment to close the ledger channel.
+- Allowing the ledger channel to be finalized via an expired challenge
 
 ## State machine
 
-### Player A State machine
-
 ```mermaid
 graph TD
 linkStyle default interpolate basis
-  St((start))-->DF{Defundable?}
-  DF --> |No| F((Failure))
-  DF -->|Yes|SC0[SendLedgerUpdate0]
-  SC0-->WFU(WaitForLedgerUpdate)
-  WFU --> |"CommitmentReceived(Accept)"|SCo0[SendConclude0]
-  WFU --> |"CommitmentReceived(Reject)"| F
-  SCo0 -->WFC(WaitForConclude)
-  WFC --> |"CommitmentReceived(Accept)"|Su((success))
-  WFC --> |"CommitmentReceived(Reject)"| F
+  St(( ))-->DF{Defundable?}
+  DF --> |No| F(( ))
+  DF --> |Yes, Player A| CLU(ConfirmLedgerUpdate)
+  DF --> |Yes, Player B| WLU(WaitForLedgerUpdate)
+
+  CLU-->|UPDATE_CONFIRMED|WLU
+  CLU.->|CHALLENGE_EXPIRED| ALF(AcknowledgeLedgerFinalized)
+  CLU.->|CHALLENGE_DETECTED|CLU
+
+  WLU-->|COMMITMENT_RECEIVED|CLU
+  WLU-->|CHALLENGE_RESPONSE_DETECETD|CLU
+  WLU.->|CHALLENGE_CHOSEN|WLU
+  WLU.->|CHALLENGE_EXPIRED|ALF
+  WLU-->|COMMITMENT_RECEIVED|ALF
+
+  ALF-->Su(( ))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
-  classDef NotAState stroke:#333,stroke-width:4px,color:#ffff,fill:#aaaaaa;
+
   class St,DF logic;
   class Su Success;
   class F Failure;
-  class SC0,SCo0 NotAState
 ```
 
-### Player B State machine
-
-```mermaid
-graph TD
-linkStyle default interpolate basis
-  St((start))-->DF{Defundable?}
-  DF --> |No| F((Failure))
-  DF --> |Yes| WFU(WaitForLedgerUpdate)
-  WFU-->|"CommitmentReceived(Accept)"|SC1[SendLedgerUpdate1]
-  WFU --> |"CommitmentReceived(Reject)"| F
-  SC1-->WFC(WaitForConclude)
-  WFC --> |"CommitmentReceived(Accept)"|SCo1[SendConclude1]
-  SCo1-->Su((success))
-  WFC --> |"CommitmentReceived(Reject)"| F
-
-  classDef logic fill:#efdd20;
-  classDef Success fill:#58ef21;
-  classDef Failure fill:#f45941;
-  classDef NotAState stroke:#333,stroke-width:4px,color:#ffff,fill:#aaaaaa;
-  class St,DF logic;
-  class Su Success;
-  class F Failure;
-  class SC1,SCo1 NotAState
-
-```
-
-Notes:
-
-- SendLedgerUpdate is not a state but indicate when the ledger update is sent.
-- A single reducer implements both the player A and B state machine.
+Note: `UPDATE_CONFIRMED` will either send a commitment to the other player or submit a challenge response to the adjudicator.
 
 ## Scenarios
 
-1. **Happy Path - Player A** Start->SendLedgerUpdate->WaitForLedgerUpdate->Success
-2. **Happy Path - Player B** Start->WaitForLedgerUpdate->SendLedgerUpdate->Success
-3. **Not De-fundable** Start->Failure
-4. **Commitment Rejected - Player A** Start->SendLedgerUpdate->WaitForLedgerUpdate->Failure
-5. **Commitment Rejected - Player B** Start->WaitForLedgerUpdate->Failure
+1. **Happy Path - Player A**
+   - Start
+   - ConfirmLedgerUpdate + UPDATE_CONFIRMED
+   - WaitForLedgerUpdate + COMMITMENT_RECEIVED (consensus game update)
+   - ConfirmLedgerUpdate + UPDATE_CONFIRMED
+   - WaitForLedgerUpdate + COMMITMENT_RECEIVED (conclude)
+   - AcknowledgeLedgerFinalized
+2. **Happy Path - Player B**
+   - Start
+   - WaitForLedgerUpdate + COMMITMENT_RECEIVED (consensus game update)
+   - ConfirmLedgerUpdate + UPDATE_CONFIRMED
+   - WaitForLedgerUpdate + COMMITMENT_RECEIVED (conclude)
+   - ConfirmLedgerUpdate + UPDATE_CONFIRMED
+   - AcknowledgeLedgerFinalized
+3. **Not De-fundable**
+   - Start
+   - Failure
+4. **Player A: A ForceMoved by B, A Responds**
+   - ConfirmLedgerUpdate + CHALLENGE_DETECTED
+   - ConfirmLedgerUpdate + UPDATE_CONFIRMED
+   - WaitForLedgerUpdate
+5. **Player B: A ForceMoved by B, A Responds**
+   - WaitForLedgerUpdate + CHALLENGE_CHOSEN
+   - WaitForLedgerUpdate + CHALLENGE_RESPONSE_DETECTED
+   - ConfirmLedgerUpdate
+6. **Player A: A ForceMoved by B, Expires**
+   - ConfirmLedgerUpdate + CHALLENGE_DETECTED
+   - ConfirmLedgerUpdate + CHALLENGE_EXPIRED
+   - AcknowledgeLedgerFinalized
+7. **Player B: A ForceMoved by B, Expires**
+   - WaitForLedgerUpdate + CHALLENGE_CHOSEN
+   - WaitForLedgerUpdate + CHALLENGE_EXPIRED
+   - ConfirmLedgerUpdate
