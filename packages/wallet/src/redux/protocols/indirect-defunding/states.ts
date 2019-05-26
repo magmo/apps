@@ -2,17 +2,20 @@ import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 import { ChallengerState } from '../dispute/challenger/states';
 import { ResponderState } from '../dispute/responder/states';
+import { CommitmentType } from 'fmg-core';
+
 // -------
 // States
 // -------
 
 export interface ConfirmLedgerUpdate {
-  type: 'IndirectDefunding.ConfirmLedgerUpate';
+  type: 'IndirectDefunding.ConfirmLedgerUpdate';
   processId: string;
   ledgerId: string;
   channelId: string;
   proposedAllocation: string[];
   proposedDestination: string[];
+  commitmentType: CommitmentType.App | CommitmentType.Conclude;
 }
 
 export interface WaitForLedgerUpdate {
@@ -22,6 +25,7 @@ export interface WaitForLedgerUpdate {
   channelId: string;
   proposedAllocation: string[];
   proposedDestination: string[];
+  commitmentType: CommitmentType.App | CommitmentType.Conclude;
 }
 
 export interface WaitForDisputeChallenger {
@@ -72,10 +76,10 @@ export interface SuccessOff {
 // Constructors
 // -------
 
-export const confirmLedgerUpate: StateConstructor<ConfirmLedgerUpdate> = p => {
+export const confirmLedgerUpdate: StateConstructor<ConfirmLedgerUpdate> = p => {
   return {
     ...p,
-    type: 'IndirectDefunding.ConfirmLedgerUpate',
+    type: 'IndirectDefunding.ConfirmLedgerUpdate',
   };
 };
 export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
@@ -149,7 +153,7 @@ export function isTerminal(
 
 export function isIndirectDefundingState(state: ProtocolState): state is IndirectDefundingState {
   return (
-    state.type === 'IndirectDefunding.ConfirmLedgerUpate' ||
+    state.type === 'IndirectDefunding.ConfirmLedgerUpdate' ||
     state.type === 'IndirectDefunding.WaitForLedgerUpdate' ||
     state.type === 'IndirectDefunding.WaitForDisputeChallenger' ||
     state.type === 'IndirectDefunding.WaitForDisputeResponder' ||
