@@ -12,6 +12,19 @@ It covers:
 - Crafting a conclude commitment to close the ledger channel.
 - Allowing the ledger channel to be finalized via an expired challenge
 
+```mermaid
+sequenceDiagram
+  participant A as A's wallet
+  participant B as B's wallet
+
+  Note  over A, B: Defund X
+  A->>B: Update L (0)
+  B->>A: Update L (1)
+  Note  over A, B: Conclude L
+  A->>B: Conclude for L (0)
+  B->>A: Conclude for L (1)
+```
+
 ## State machine
 
 ```mermaid
@@ -23,28 +36,36 @@ linkStyle default interpolate basis
   DF --> |Yes, Player B| WLU(WaitForLedgerUpdate)
 
   CLU-->|UPDATE_CONFIRMED|WLU
-  CLU-->|UPDATE_CONFIRMED| ALF(AcknowledgeLedgerFinalized)
-  CLU.->|CHALLENGE_EXPIRED| ALF(AcknowledgeLedgerFinalized)
-  CLU.->|CHALLENGE_DETECTED|CLU
+  CLU-->|UPDATE_CONFIRMED|ALFon(AcknowledgeLedgerFinalizedOffChain)
+  CLU.->|CHALLENGE_DETECTED|W4DR(WaitForDispute.Responder)
 
   WLU-->|COMMITMENT_RECEIVED|CLU
-  WLU-->|CHALLENGE_RESPONSE_DETECETD|CLU
-  WLU.->|CHALLENGE_CHOSEN|WLU
-  WLU.->|CHALLENGE_EXPIRED|ALF
-  WLU-->|COMMITMENT_RECEIVED|ALF
+  WLU.->|CHALLENGE_CHOSEN|W4DC(WaitForDispute.Challenger)
+  WLU-->|COMMITMENT_RECEIVED|ALFon
 
-  ALF-->Su(( ))
+  W4DC.->|Open|CLU
+  W4DC.->|Open|ALFon
+  W4DC.->|TxFailed|W4DC
+  W4DC.->|Closed|ALFoff(AcknowledgeLedgeFinalizedOffChain)
+
+  W4DR.->|Success|WLU
+  W4DR.->|Success|ALFon
+  W4DR.->|Closed|ALFoff
+  W4DR.->|TxFailed|W4DR
+
+  ALFoff-->Soff((Foff))
+  ALFon-->Son((Fin))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
+  classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
 
   class St,DF logic;
-  class Su Success;
+  class Soff,Son Success;
   class F Failure;
+  class W4DR,W4DC WaitForChildProtocol;
 ```
-
-Note: `UPDATE_CONFIRMED` will either send a commitment to the other player or submit a challenge response to the adjudicator.
 
 ## Scenarios
 
@@ -67,17 +88,17 @@ Note: `UPDATE_CONFIRMED` will either send a commitment to the other player or su
    - Failure
 4. **Player A: A ForceMoved by B, A Responds**
    - ConfirmLedgerUpdate + CHALLENGE_DETECTED
-   - ConfirmLedgerUpdate + UPDATE_CONFIRMED
+   - WaitForDisputeResponder + Success
    - WaitForLedgerUpdate
 5. **Player B: A ForceMoved by B, A Responds**
    - WaitForLedgerUpdate + CHALLENGE_CHOSEN
-   - WaitForLedgerUpdate + CHALLENGE_RESPONSE_DETECTED
+   - WaitForDisputeChallenger + Open
    - ConfirmLedgerUpdate
 6. **Player A: A ForceMoved by B, Expires**
    - ConfirmLedgerUpdate + CHALLENGE_DETECTED
-   - ConfirmLedgerUpdate + CHALLENGE_EXPIRED
+   - WaitForDisputeResponder + Closed
    - AcknowledgeLedgerFinalized
 7. **Player B: A ForceMoved by B, Expires**
    - WaitForLedgerUpdate + CHALLENGE_CHOSEN
-   - WaitForLedgerUpdate + CHALLENGE_EXPIRED
+   - WaitForDisputeChallenger + Closed
    - ConfirmLedgerUpdate

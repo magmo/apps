@@ -18,7 +18,8 @@ linkStyle default interpolate basis
   ICC-->|Yes|ID{Is Direct Channel}
   ID-->|Yes|WP(Wait for Withdrawal)
   ID -->|No|LDP(Wait for Indirect De-funding)
-  LDP-->|Indirect de-funding protocol success|WP(Wait for Withdrawal)
+  LDP-->|Success - concluded off chain|WP(Wait for Withdrawal)
+  LDP-->|Success - closed on chain and defunded|Su
   WP-->|Withdrawal protocol success|Su((Success))
   WP-->|Withdrawal protocol failure|F((Failure))
   LDP-->|Indirect de-funding protocol failure|F
