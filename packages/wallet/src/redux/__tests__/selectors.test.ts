@@ -20,6 +20,8 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
       processStore: {},
       adjudicatorStore: {},
       channelSubscriptions,
+      address: 'address',
+      privateKey: 'privateKey',
     });
   };
 
@@ -30,6 +32,8 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
       processStore: {},
       adjudicatorStore: {},
       channelSubscriptions: {},
+      address: 'address',
+      privateKey: 'privateKey',
     });
     expect(selectors.getAdjudicatorWatcherProcessesForChannel(state, '0x0')).toEqual([]);
   });
