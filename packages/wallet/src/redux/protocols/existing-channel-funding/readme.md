@@ -15,13 +15,16 @@ Currently we assume a Ledger Top-up protocol handles both the cases where a curr
 ```mermaid
   graph TD
   linkStyle default interpolate basis
-  St((Start))-->D1
+  St((Start))-->L
   L{Does Player channel have enough funds?}-->|No|LT(WaitForLedgerTopup)
   L{Does existing channel have enough funds?}-->|Yes|SC0[SendLedgerUpdate0]
   LT-->|LedgerChannelToppedUp|SC0[SendLedgerUpdate0]
   SC0-->WC(WaitForLedgerUpdate)
   WC-->|"CommitmentReceived(Reject)"|F((failure))
-  WC-->|"CommitmentReceived(accept)"|Su((success))
+  WC-->|"CommitmentReceived(Accept)"|SP0[SendPostFundSetup1]
+  SP0-->WP(WaitForPostFundSetup)
+  WP-->|"CommitmentReceived(Reject)"|F((failure))
+  WP-->|"CommitmentReceived(Accept)"|Su((success))
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
@@ -32,6 +35,8 @@ Currently we assume a Ledger Top-up protocol handles both the cases where a curr
   class LT WaitForChildProtocol;
 ```
 
+### Player B State Machine
+
 ```mermaid
   graph TD
   linkStyle default interpolate basis
@@ -39,10 +44,12 @@ Currently we assume a Ledger Top-up protocol handles both the cases where a curr
   L{Does existing channel have enough funds?}-->|No|LT(WaitForLedgerTopup)
   L{Does existing channel have enough funds?}-->|Yes|WC(WaitForLedgerUpdate)
   LT-->|LedgerChannelToppedUp|WC(WaitForLedgerUpdate)
-  WC-->|"CommitmentReceived(accept)"|SC1[SendLedgerUpdate1]
-  SC1-->Su((success))
+  WC-->|"CommitmentReceived(Accept)"|SC1[SendLedgerUpdate1]
+  SC1-->WP(WaitForPostFundSetup)
+  WP-->|"CommitmentReceived(Accept)"|SP1[SendPostFundSetup1]
+  SP1-->Su((success))
   WC-->|"CommitmentReceived(Reject)"|F((failure))
-
+  WP-->|"CommitmentReceived(Reject)"|F((failure))
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
@@ -55,12 +62,13 @@ Currently we assume a Ledger Top-up protocol handles both the cases where a curr
 
 ### Scenarios:
 
-1. **Player A has funds Happy Path** Start->WaitForLedgerUpdate->Success
-2. **Player B has funds Happy Path** Start->WaitForLedgerUpdate->Success
-3. **Player A receives invalid commitment** Start->WaitForLedgerUpdate->Failure
-4. **Player B receives invalid commitment** Start->WaitForLedgerUpdate->Failure
-
+1. **Player A has funds Happy Path** Start->WaitForLedgerUpdate->WaitForPostFundSetup->Success
+2. **Player B has funds Happy Path** Start->WaitForLedgerUpdate->WaitForPostFundSetup->Success
+3. **Player A receives invalid update commitment** WaitForLedgerUpdate->Failure
+4. **Player B receives invalid update commitment** WaitForLedgerUpdate->Failure
+5. **Player A receives invalid post fund commitment** WaitForPostFundSetup->Failure
+6. **Player B receives invalid post fund commitment** WaitForPostFundSetup->Failure
    These scenarios depend on Ledger Top-Up:
 
-5. **Player A requires top-up** Start->WaitForLedgerTopUp->WaitForLedgerUpdate->Success
-6. **Player requires top-up** Start->WaitForLedgerTopUp->WaitForLedgerUpdate->Success
+7. **Player A requires top-up** Start->WaitForLedgerTopUp->WaitForLedgerUpdate->Success
+8. **Player requires top-up** Start->WaitForLedgerTopUp->WaitForLedgerUpdate->Success

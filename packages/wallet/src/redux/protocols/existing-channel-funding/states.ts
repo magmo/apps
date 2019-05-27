@@ -10,6 +10,14 @@ export interface WaitForLedgerTopUp {
   proposedAmount: string;
 }
 
+export interface WaitForPostFundSetup {
+  type: 'ExistingChannelFunding.WaitForPostFundSetup';
+  processId: string;
+  channelId: string;
+  ledgerId: string;
+  proposedAmount: string;
+}
+
 export interface WaitForLedgerUpdate {
   type: 'ExistingChannelFunding.WaitForLedgerUpdate';
   processId: string;
@@ -40,6 +48,14 @@ export const waitForLedgerTopUp: StateConstructor<WaitForLedgerTopUp> = p => {
     type: 'ExistingChannelFunding.WaitForLedgerTopUp',
   };
 };
+
+export const waitForPostFundSetup: StateConstructor<WaitForPostFundSetup> = p => {
+  return {
+    ...p,
+    type: 'ExistingChannelFunding.WaitForPostFundSetup',
+  };
+};
+
 export const success: StateConstructor<Success> = p => {
   return { ...p, type: 'ExistingChannelFunding.Success' };
 };
@@ -51,6 +67,7 @@ export const failure: StateConstructor<Failure> = p => {
 export type ExistingChannelFundingState =
   | WaitForLedgerTopUp
   | WaitForLedgerUpdate
+  | WaitForPostFundSetup
   | Success
   | Failure;
 

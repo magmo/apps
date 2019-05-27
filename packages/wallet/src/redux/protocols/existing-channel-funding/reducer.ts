@@ -1,4 +1,4 @@
-import { SharedData, signAndStore, queueMessage, checkAndStore } from '../../state';
+import { SharedData, signAndStore, queueMessage, checkAndStore, getChannel } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
 import { ExistingChannelFundingAction } from './actions';
@@ -6,7 +6,7 @@ import * as helpers from '../reducer-helpers';
 import * as selectors from '../../selectors';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
 import { theirAddress } from '../../channel-store';
-import { Commitment } from '../../../domain';
+import { Commitment, nextSetupCommitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
 import { sendCommitmentReceived } from '../../../communication';
 
@@ -81,8 +81,52 @@ export const existingChannelFundingReducer = (
   switch (protocolState.type) {
     case 'ExistingChannelFunding.WaitForLedgerUpdate':
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
+    case 'ExistingChannelFunding.WaitForPostFundSetup':
+      return waitForPostFundSetupReducer(protocolState, sharedData, action);
   }
   return { protocolState, sharedData };
+};
+
+const waitForPostFundSetupReducer = (
+  protocolState: states.WaitForPostFundSetup,
+  sharedData: SharedData,
+  action: ExistingChannelFundingAction,
+) => {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
+    throw new Error(`Invalid action ${action.type}`);
+  }
+
+  let newSharedData = { ...sharedData };
+
+  const checkResult = checkAndStore(newSharedData, action.signedCommitment);
+  if (!checkResult.isSuccess) {
+    return {
+      protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      sharedData,
+    };
+  }
+  newSharedData = checkResult.store;
+
+  if (!helpers.isFirstPlayer(protocolState.channelId, newSharedData)) {
+    const appPostFundSetupSharedData = craftAndSendAppPostFundCommitment(
+      newSharedData,
+      protocolState.channelId,
+      protocolState.processId,
+    );
+    if (
+      appPostFundSetupSharedData === 'CouldNotSign' ||
+      appPostFundSetupSharedData === 'NotASetupCommitment'
+    ) {
+      return {
+        protocolState: states.failure({ reason: appPostFundSetupSharedData }),
+        sharedData,
+      };
+    } else {
+      newSharedData = appPostFundSetupSharedData;
+    }
+  }
+
+  return { protocolState: states.success({}), sharedData: newSharedData };
 };
 
 const waitForLedgerUpdateReducer = (
@@ -106,8 +150,24 @@ const waitForLedgerUpdateReducer = (
     };
   }
   newSharedData = checkResult.store;
-
-  if (!helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
+  if (helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
+    const appPostFundSetupSharedData = craftAndSendAppPostFundCommitment(
+      newSharedData,
+      protocolState.channelId,
+      protocolState.processId,
+    );
+    if (
+      appPostFundSetupSharedData === 'CouldNotSign' ||
+      appPostFundSetupSharedData === 'NotASetupCommitment'
+    ) {
+      return {
+        protocolState: states.failure({ reason: appPostFundSetupSharedData }),
+        sharedData,
+      };
+    } else {
+      newSharedData = appPostFundSetupSharedData;
+    }
+  } else {
     const ourCommitment = acceptConsensus(theirCommitment);
     const signResult = signAndStore(newSharedData, ourCommitment);
     if (!signResult.isSuccess) {
@@ -127,7 +187,7 @@ const waitForLedgerUpdateReducer = (
     newSharedData = queueMessage(newSharedData, messageRelay);
   }
 
-  return { protocolState: states.success({}), sharedData: newSharedData };
+  return { protocolState: states.waitForPostFundSetup(protocolState), sharedData: newSharedData };
 };
 
 function craftNewAllocationAndDestination(
@@ -165,4 +225,38 @@ function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAmount: s
   return !latestCommitment.allocation.every(a =>
     bigNumberify(a).gte(amountRequiredFromEachParticipant),
   );
+}
+
+function craftAndSendAppPostFundCommitment(
+  sharedData: SharedData,
+  appChannelId: string,
+  processId: string,
+): SharedData | 'CouldNotSign' | 'NotASetupCommitment' {
+  let newSharedData = { ...sharedData };
+  const appChannel = getChannel(sharedData, appChannelId);
+  if (!appChannel) {
+    throw new Error(`Could not find application channel ${appChannelId}`);
+  }
+
+  const theirAppCommitment = appChannel.lastCommitment.commitment;
+
+  const ourAppCommitment = nextSetupCommitment(theirAppCommitment);
+  if (ourAppCommitment === 'NotASetupCommitment') {
+    return 'NotASetupCommitment';
+  }
+  const signResult = signAndStore(newSharedData, ourAppCommitment);
+  if (!signResult.isSuccess) {
+    return 'CouldNotSign';
+  }
+  newSharedData = signResult.store;
+
+  // just need to put our message in the outbox
+  const messageRelay = sendCommitmentReceived(
+    theirAddress(appChannel),
+    processId,
+    signResult.signedCommitment.commitment,
+    signResult.signedCommitment.signature,
+  );
+  newSharedData = queueMessage(newSharedData, messageRelay);
+  return newSharedData;
 }
