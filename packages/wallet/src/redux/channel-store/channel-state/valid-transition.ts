@@ -1,7 +1,7 @@
 import { ChannelState } from './states';
 import { Commitment, getChannelId, fromCoreCommitment } from '../../../domain';
 import { isAppCommitment } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { validTransition as validConsensusTransition } from 'fmg-nitro-adjudicator/lib/validTransition';
+import { validTransition as validConsensusTransition } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { getConsensusContractAddress } from '../../../utils/contract-utils';
 
 const ledgerAddress = getConsensusContractAddress();
