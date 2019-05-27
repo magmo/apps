@@ -24,7 +24,7 @@ export function initialize(
     case PlayerIndex.A:
       return initializeA(sharedData, processId, channelId, ourAddress, opponentAddress);
     case PlayerIndex.B:
-      return initializeB(sharedData, processId, channelId, opponentAddress);
+      return initializeB(sharedData, processId, channelId, ourAddress, opponentAddress);
     default:
       return unreachable(playerIndex);
   }
