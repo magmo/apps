@@ -230,7 +230,7 @@ const waitForLoginReducer = (
         ...state,
         uid: action.uid,
         outboxState: accumulateSideEffects(state.outboxState, {
-          messageOutbox: [initializationSuccess()],
+          messageOutbox: [initializationSuccess(address)],
         }),
         processStore: {},
         adjudicatorStore: {},
