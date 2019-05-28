@@ -67,3 +67,24 @@ export const getProtocolForProcessId = (
 export const getProtocolState = (state: walletStates.Initialized, processId: string) => {
   return state.processStore[processId].protocolState;
 };
+
+export const getLatestNonce = (
+  state: SharedData,
+  participantA: string,
+  participantB: string,
+  libraryAddress: string,
+): number => {
+  let highestNonce = 0;
+  for (const channelId of Object.keys(state.channelStore)) {
+    const channel = state.channelStore[channelId];
+    if (
+      channel.participants.indexOf(participantA) > -1 &&
+      channel.participants.indexOf(participantB) > -1 &&
+      channel.libraryAddress === libraryAddress &&
+      channel.channelNonce > highestNonce
+    ) {
+      highestNonce = channel.channelNonce;
+    }
+  }
+  return highestNonce;
+};
