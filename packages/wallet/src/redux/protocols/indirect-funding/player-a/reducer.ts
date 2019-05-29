@@ -288,12 +288,7 @@ function createInitialSetupCommitment(
     updateType: UpdateType.Consensus,
   };
 
-  const nonce = selectors.getLatestNonce(
-    sharedData,
-    destination[0],
-    destination[1],
-    CONSENSUS_LIBRARY_ADDRESS,
-  );
+  const nonce = selectors.getNextNonce(sharedData, CONSENSUS_LIBRARY_ADDRESS);
   const channel: Channel = {
     nonce,
     participants: destination,

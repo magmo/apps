@@ -65,7 +65,7 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
   });
 });
 
-describe('getLatestChannelNonce', () => {
+describe('getNextNonce', () => {
   const defaultChannelState: ChannelState = {
     channelId: '0x0',
     libraryAddress: '0x0',
@@ -84,40 +84,31 @@ describe('getLatestChannelNonce', () => {
     channelStore: {
       ['0x1']: {
         ...defaultChannelState,
-        participants: ['0xA', '0xB'] as [string, string],
         libraryAddress: '0x1',
         channelNonce: 1,
       },
       ['0x2']: {
         ...defaultChannelState,
-        participants: ['0xA', '0xB'] as [string, string],
         libraryAddress: '0x1',
         channelNonce: 2,
       },
       ['0x3']: {
         ...defaultChannelState,
-        participants: ['0xA', '0xB'] as [string, string],
         libraryAddress: '0x2',
         channelNonce: 3,
-      },
-      ['0x4']: {
-        ...defaultChannelState,
-        participants: ['0xA', '0xC'] as [string, string],
-        libraryAddress: '0x1',
-        channelNonce: 4,
       },
     },
   };
 
-  it('gets the latest nonce when multiple matching channels exist', () => {
-    expect(selectors.getLatestNonce(state, '0xA', '0xB', '0x1')).toEqual(2);
+  it('gets the next nonce when multiple matching channels exist', () => {
+    expect(selectors.getNextNonce(state, '0x1')).toEqual(3);
   });
 
-  it('returns 0 when no matching channels exist', () => {
-    expect(selectors.getLatestNonce(state, '0xA', '0xB', '0x3')).toEqual(0);
+  it('returns 1 when no matching channels exist', () => {
+    expect(selectors.getNextNonce(state, '0x3')).toEqual(1);
   });
 
-  it('returns the latest nonce when one matching channel exists', () => {
-    expect(selectors.getLatestNonce(state, '0xA', '0xC', '0x1')).toEqual(4);
+  it('returns the next nonce when one matching channel exists', () => {
+    expect(selectors.getNextNonce(state, '0x2')).toEqual(2);
   });
 });
