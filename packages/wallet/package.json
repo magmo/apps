@@ -1,8 +1,7 @@
 {
-  "name": "magmo-wallet",
+  "name": "@magmo/magmo-wallet",
   "version": "0.1.0",
   "license": "MIT",
-  "private": true,
   "main": "lib/index.js",
   "resolutions": {
     "firebase/**/grpc": "^1.16.1"

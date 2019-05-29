@@ -12,7 +12,7 @@
     "node_modules",
     "packages/wallet/node_modules",
     "packages/server/node_modules",
-    "packages/magmo-wallet-client/node_modules",
+    "packages/@magmo/magmo-wallet-client/node_modules",
     "packages/rps/node_modules",
     "packages/tictactoe/node_modules",
     "packages/wallet-common/node_modules"
