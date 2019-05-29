@@ -85,30 +85,30 @@ describe('getNextNonce', () => {
       ['0x1']: {
         ...defaultChannelState,
         libraryAddress: '0x1',
-        channelNonce: 1,
+        channelNonce: 0,
       },
       ['0x2']: {
         ...defaultChannelState,
         libraryAddress: '0x1',
-        channelNonce: 2,
+        channelNonce: 1,
       },
       ['0x3']: {
         ...defaultChannelState,
         libraryAddress: '0x2',
-        channelNonce: 3,
+        channelNonce: 2,
       },
     },
   };
 
   it('gets the next nonce when multiple matching channels exist', () => {
-    expect(selectors.getNextNonce(state, '0x1')).toEqual(3);
+    expect(selectors.getNextNonce(state, '0x1')).toEqual(2);
   });
 
-  it('returns 1 when no matching channels exist', () => {
-    expect(selectors.getNextNonce(state, '0x3')).toEqual(1);
+  it('returns 0 when no matching channels exist', () => {
+    expect(selectors.getNextNonce(state, '0x3')).toEqual(0);
   });
 
   it('returns the next nonce when one matching channel exists', () => {
-    expect(selectors.getNextNonce(state, '0x2')).toEqual(2);
+    expect(selectors.getNextNonce(state, '0x2')).toEqual(3);
   });
 });

@@ -73,7 +73,7 @@ export const getNextNonce = (
 
   libraryAddress: string,
 ): number => {
-  let highestNonce = 0;
+  let highestNonce = -1;
   for (const channelId of Object.keys(state.channelStore)) {
     const channel = state.channelStore[channelId];
     if (channel.libraryAddress === libraryAddress && channel.channelNonce > highestNonce) {
