@@ -87,7 +87,10 @@ const waitForIndirectDefundingReducer = (
     protocolState: updatedIndirectDefundingState,
   } = indirectDefundingReducer(protocolState.indirectDefundingState, sharedData, action);
   if (indirectDefundingStates.isTerminal(updatedIndirectDefundingState)) {
-    if (updatedIndirectDefundingState.type === 'IndirectDefunding.Success') {
+    if (
+      updatedIndirectDefundingState.type === 'IndirectDefunding.FinalizedOffChain' ||
+      updatedIndirectDefundingState.type === 'IndirectDefunding.FinalizedOnChain'
+    ) {
       const fundingChannelId = helpers.getFundingChannelId(
         protocolState.channelId,
         updatedSharedData,

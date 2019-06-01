@@ -39,6 +39,7 @@ import { ProtocolStateWithSharedData } from '../..';
 import { waitForLedgerUpdate } from '../../indirect-defunding/states';
 import { waitForLedgerDefunding } from '../../defunding/states';
 import { indirectDefundingReducer } from '../../indirect-defunding/reducer';
+import { CommitmentType } from 'fmg-core';
 
 export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
 export type Storage = SharedData;
@@ -128,6 +129,7 @@ function handleDefundingAction(
       channelId: protocolState.channelId,
       proposedAllocation: channel.lastCommitment.commitment.allocation,
       proposedDestination: channel.lastCommitment.commitment.destination,
+      commitmentType: CommitmentType.Conclude,
     });
     const postActionIndirectDefundingState = indirectDefundingReducer(
       preActionIndirectDefundingState,

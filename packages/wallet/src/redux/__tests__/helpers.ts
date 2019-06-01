@@ -11,7 +11,11 @@ type SideEffectState =
   | { sharedData: SharedData };
 
 export function describeScenarioStep(scenarioStep, fn) {
-  return describe(`${scenarioStep.state.type} + \n    ${scenarioStep.action.type} =>`, fn);
+  if (scenarioStep.state.type) {
+    return describe(`${scenarioStep.state.type} + \n    ${scenarioStep.action.type} =>`, fn);
+  } else if (scenarioStep.state.state.type) {
+    return describe(`${scenarioStep.state.state.type} + \n    ${scenarioStep.action.type} =>`, fn);
+  }
 }
 export const itSendsAMessage = (state: SideEffectState) => {
   it(`sends a message`, () => {

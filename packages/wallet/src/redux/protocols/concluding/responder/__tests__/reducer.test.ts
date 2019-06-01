@@ -9,8 +9,6 @@ import {
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../states';
 import { HIDE_WALLET, CONCLUDE_FAILURE, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
-import { SharedData, getLastMessage } from '../../../../state';
-import { SignedCommitment } from '../../../../../domain';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;
@@ -58,7 +56,7 @@ describe('[ Happy path (alternative) ]', () => {
   const scenario = scenarios.happyPathAlternative;
 
   describeScenarioStep(scenario.decideDefund, () => {
-    const { state, sharedData, action, reply } = scenario.decideDefund;
+    const { state, sharedData, action } = scenario.decideDefund;
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingResponder.WaitForDefund');
@@ -73,10 +71,9 @@ describe('[ Happy path (alternative) ]', () => {
     it(`transitions indirectDefundingState to WaitForConclude`, () => {
       expect(result.protocolState).toHaveProperty(
         'defundingState.indirectDefundingState.type',
-        'IndirectDefunding.WaitForConclude',
+        'IndirectDefunding.ConfirmLedgerUpdate',
       );
     });
-    itSendsMessage(result.sharedData, reply);
   });
 });
 
@@ -162,23 +159,6 @@ function itTransitionsToAcknowledgeFailure(result: ReturnVal, reason: FailureRea
     expect(result.protocolState.type).toEqual('ConcludingResponder.AcknowledgeFailure');
     if (result.protocolState.type === 'ConcludingResponder.AcknowledgeFailure') {
       expect(result.protocolState.reason).toEqual(reason);
-    }
-  });
-}
-
-function itSendsMessage(sharedData: SharedData, message: SignedCommitment) {
-  it('sends a message', () => {
-    const lastMessage = getLastMessage(sharedData);
-    if (lastMessage && 'messagePayload' in lastMessage) {
-      const dataPayload = lastMessage.messagePayload;
-      // This is yuk. The data in a message is currently of 'any' type..
-      if (!('signedCommitment' in dataPayload)) {
-        fail('No signedCommitment in the last message.');
-      }
-      const { commitment, signature } = dataPayload.signedCommitment;
-      expect({ commitment, signature }).toEqual(message);
-    } else {
-      fail('No messages in the outbox.');
     }
   });
 }

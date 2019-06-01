@@ -61,7 +61,7 @@ describe('channel not closed', () => {
 });
 
 describe('indirectly funded happy path', () => {
-  const scenario = scenarios.indirectlyFundingChannelHappyPath;
+  const scenario = scenarios.indirectlyFundedChannelHappyPath;
 
   describe('when initializing', () => {
     const { processId, channelId, sharedData } = scenario.initialize;

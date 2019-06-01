@@ -69,6 +69,7 @@ export interface ChallengeExpirySetEvent {
 
 export interface ChallengeCreatedEvent {
   type: 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT';
+  processId: string;
   channelId: string;
   commitment: Commitment;
   finalizedAt: number;

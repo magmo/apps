@@ -4,7 +4,7 @@ import { ProtocolStateWithSharedData } from '../..';
 import { getLastMessage } from '../../../state';
 import { SignedCommitment } from '../../../../domain';
 import { initialize, indirectDefundingReducer } from '../reducer';
-import { describeScenarioStep } from 'src/redux/__tests__/helpers';
+import { describeScenarioStep } from '../../../../redux/__tests__/helpers';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAHappyPath;
@@ -29,30 +29,44 @@ describe('player A happy path', () => {
     itTransitionsTo(result, 'IndirectDefunding.ConfirmLedgerUpdate');
   });
 
-  describeScenarioStep(scenario.confirmLedgerUpdate0, () => {
-    const { state, action, reply } = scenario.confirmLedgerUpdate0;
-    const updatedState = indirectDefundingReducer(state.state, state.store, action);
-    itTransitionsTo(updatedState, 'IndirectDefunding.WaitForLedgerUpdate');
-    itSendsMessage(updatedState, reply);
+  describe('(ledger update)', () => {
+    describeScenarioStep(scenario.confirmLedgerUpdate0, () => {
+      const { state, action, reply } = scenario.confirmLedgerUpdate0;
+      const updatedState = indirectDefundingReducer(state.state, state.store, action);
+      itTransitionsTo(updatedState, 'IndirectDefunding.WaitForLedgerUpdate');
+      itSendsMessage(updatedState, reply);
+    });
   });
 
-  describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
-    const { state, action } = scenario.waitForLedgerUpdate1;
-    const updatedState = indirectDefundingReducer(state.state, state.store, action);
-    itTransitionsTo(updatedState, 'IndirectDefunding.ConfirmLedgerUpdate');
+  describe('(ledger update)', () => {
+    describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
+      const { state, action } = scenario.waitForLedgerUpdate1;
+      const updatedState = indirectDefundingReducer(state.state, state.store, action);
+      itTransitionsTo(updatedState, 'IndirectDefunding.ConfirmLedgerUpdate');
+    });
   });
 
-  describeScenarioStep(scenario.confirmConclude, () => {
-    const { state, action, reply } = scenario.confirmConclude;
-    const updatedState = indirectDefundingReducer(state.state, state.store, action);
-    itTransitionsTo(updatedState, 'IndirectDefunding.WaitForLedgerUpdate');
-    itSendsMessage(updatedState, reply);
+  describe('(conclude)', () => {
+    describeScenarioStep(scenario.confirmConclude, () => {
+      const { state, action, reply } = scenario.confirmConclude;
+      const updatedState = indirectDefundingReducer(state.state, state.store, action);
+      itTransitionsTo(updatedState, 'IndirectDefunding.WaitForLedgerUpdate');
+      itSendsMessage(updatedState, reply);
+    });
   });
 
-  describeScenarioStep(scenario.waitForConclude, () => {
-    const { state, action } = scenario.waitForConclude;
+  describe('(conclude)', () => {
+    describeScenarioStep(scenario.waitForConclude, () => {
+      const { state, action } = scenario.waitForConclude;
+      const updatedState = indirectDefundingReducer(state.state, state.store, action);
+      itTransitionsTo(updatedState, 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain');
+    });
+  });
+
+  describeScenarioStep(scenario.acknowledgeLedgerFinalizedOffChain, () => {
+    const { state, action } = scenario.acknowledgeLedgerFinalizedOffChain;
     const updatedState = indirectDefundingReducer(state.state, state.store, action);
-    itTransitionsTo(updatedState, 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain');
+    itTransitionsTo(updatedState, 'IndirectDefunding.FinalizedOffChain');
   });
 });
 
