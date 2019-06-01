@@ -11,15 +11,18 @@ export interface UpdateConfirmed {
   type: 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED';
   commitmentType: CommitmentType.App | CommitmentType.Conclude;
   signedCommitment: SignedCommitment;
+  processId: string;
 }
 
 export interface ChallengeChosen {
   type: 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_CHOSEN';
   challengeCommitment: Commitment;
+  processId: string;
 }
 
 export interface Acknowledged {
   type: 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED';
+  processId: string;
 }
 
 // --------

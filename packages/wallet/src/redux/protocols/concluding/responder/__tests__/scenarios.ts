@@ -10,7 +10,6 @@ import {
   ledgerUpdate0Received,
   ledger4,
   ledger5,
-  ledger7,
   app10,
   app11,
   setFundingState as setFundingStateAlt,
@@ -152,7 +151,6 @@ export const happyPathAlternative = {
       ]),
     ),
     action: ledgerUpdate0Received,
-    reply: ledger7,
   },
 };
 

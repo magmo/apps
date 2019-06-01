@@ -73,6 +73,8 @@ describe('[ Happy path No Defunding]', () => {
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
     const { state, sharedData, action } = scenario.waitForLedgerUpdate;
+  describeScenarioStep(scenario.decideDefund, () => {
+    const { state, sharedData, action } = scenario.decideDefund;
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingResponder.AcknowledgeSuccess');
@@ -84,6 +86,12 @@ describe('[ Happy path No Defunding]', () => {
 
     itTransitionsTo(result, 'Concluding.Success');
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+    it(`transitions indirectDefundingState to WaitForConclude`, () => {
+      expect(result.protocolState).toHaveProperty(
+        'defundingState.indirectDefundingState.type',
+        'IndirectDefunding.ConfirmLedgerUpdate',
+      );
+    });
   });
 });
 

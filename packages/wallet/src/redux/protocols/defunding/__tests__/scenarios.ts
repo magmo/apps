@@ -107,7 +107,7 @@ export const directlyFundingChannelHappyPath = {
   },
 };
 
-export const indirectlyFundingChannelHappyPath = {
+export const indirectlyFundedChannelHappyPath = {
   initialize: { processId, channelId, sharedData: indirectDefunding.initialStore },
   // States
   waitForLedgerDefunding: {

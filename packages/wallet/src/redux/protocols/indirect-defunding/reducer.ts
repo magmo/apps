@@ -5,7 +5,7 @@ import { IndirectDefundingAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import { unreachable } from '../../../utils/reducer-utils';
 import * as selectors from '../../selectors';
-import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-app';
+import { proposeNewConsensus } from '../../../domain/consensus-app';
 import { sendCommitmentReceived } from '../../../communication';
 import { theirAddress, getLastCommitment } from '../../channel-store';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
@@ -104,9 +104,17 @@ export const indirectDefundingReducer = (
     case 'IndirectDefunding.WaitForDisputeResponder':
     // todo (call dispute reducer)
     case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
-    // todo
+      if (action.type === 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED') {
+        return { protocolState: states.successOff({ ...protocolState }), sharedData };
+      } else {
+        return { protocolState, sharedData };
+      }
     case 'IndirectDefunding.AcknowledgeLedgerFinalizedOnChain':
-    // todo
+      if (action.type === 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED') {
+        return { protocolState: states.successOn({ ...protocolState }), sharedData };
+      } else {
+        return { protocolState, sharedData };
+      }
     case 'IndirectDefunding.FinalizedOffChain':
     case 'IndirectDefunding.FinalizedOnChain':
     case 'IndirectDefunding.Failure':
@@ -125,14 +133,15 @@ const confirmLedgerUpdateReducer = (
   const { ledgerId, proposedAllocation, proposedDestination, processId } = protocolState;
   switch (action.type) {
     case 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED':
-      const checkResult = checkAndStore(newSharedData, action.signedCommitment);
-      if (!checkResult.isSuccess) {
-        return {
-          protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
-          sharedData,
-        };
-      }
-      newSharedData = checkResult.store;
+      // const checkResult = checkAndStore(newSharedData, action.signedCommitment);
+      // if (!checkResult.isSuccess) {
+      //   console.warn('Received Invalid Commitment');
+      //   return {
+      //     protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      //     sharedData,
+      //   };
+      // }
+      // newSharedData = checkResult.store;
 
       if (action.commitmentType === CommitmentType.Conclude) {
         newSharedData = createAndSendConcludeCommitment(
@@ -140,8 +149,9 @@ const confirmLedgerUpdateReducer = (
           protocolState.processId,
           protocolState.ledgerId,
         );
+        // TODO check which player we are
         return {
-          protocolState: states.acknowledgeLedgerFinalizedOffChain({ ...protocolState }),
+          protocolState: states.waitForLedgerUpdate({ ...protocolState }),
           sharedData: newSharedData,
         };
       }
@@ -202,50 +212,63 @@ const waitForLedgerUpdateReducer = (
   sharedData: SharedData,
   action: IndirectDefundingAction,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
-  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
-    throw new Error(`Invalid action ${action.type}`);
-  }
-
   let newSharedData = { ...sharedData };
+  switch (action.type) {
+    case 'WALLET.COMMON.COMMITMENT_RECEIVED':
+      const checkResult = checkAndStore(newSharedData, action.signedCommitment);
+      if (!checkResult.isSuccess) {
+        return {
+          protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+          sharedData,
+        };
+      }
+      newSharedData = checkResult.store;
+      switch (action.signedCommitment.commitment.commitmentType) {
+        case CommitmentType.App:
+          return { protocolState: states.confirmLedgerUpdate({ ...protocolState }), sharedData };
+        case CommitmentType.Conclude:
+          return {
+            protocolState: states.acknowledgeLedgerFinalizedOffChain({ ...protocolState }),
+            sharedData,
+          };
+      }
+      // if (!helpers.isFirstPlayer(protocolState.channelId, sharedData)) {
+      //   const theirCommitment = action.signedCommitment.commitment;
+      //   const ourCommitment = acceptConsensus(theirCommitment);
+      //   const signResult = signAndStore(newSharedData, ourCommitment);
+      //   if (!signResult.isSuccess) {
+      //     return {
+      //       protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      //       sharedData: newSharedData,
+      //     };
+      //   }
+      //   newSharedData = signResult.store;
+      //   const { ledgerId, processId } = protocolState;
+      //   const ledgerChannel = selectors.getChannelState(newSharedData, ledgerId);
 
-  const checkResult = checkAndStore(newSharedData, action.signedCommitment);
-  if (!checkResult.isSuccess) {
-    return { protocolState: states.failure({ reason: 'Received Invalid Commitment' }), sharedData };
-  }
-  newSharedData = checkResult.store;
-
-  if (!helpers.isFirstPlayer(protocolState.channelId, sharedData)) {
-    const theirCommitment = action.signedCommitment.commitment;
-    const ourCommitment = acceptConsensus(theirCommitment);
-    const signResult = signAndStore(newSharedData, ourCommitment);
-    if (!signResult.isSuccess) {
+      //   const messageRelay = sendCommitmentReceived(
+      //     theirAddress(ledgerChannel),
+      //     processId,
+      //     signResult.signedCommitment.commitment,
+      //     signResult.signedCommitment.signature,
+      //   );
+      //   newSharedData = queueMessage(newSharedData, messageRelay);
+      // } else {
+      //   newSharedData = createAndSendConcludeCommitment(
+      //     newSharedData,
+      //     protocolState.processId,
+      //     protocolState.ledgerId,
+      //   );
+      // }
+      // ^ move to confirmLedgerUpdateReducer
       return {
-        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+        protocolState: states.confirmLedgerUpdate({ ...protocolState }),
         sharedData: newSharedData,
       };
-    }
-    newSharedData = signResult.store;
-    const { ledgerId, processId } = protocolState;
-    const ledgerChannel = selectors.getChannelState(newSharedData, ledgerId);
-
-    const messageRelay = sendCommitmentReceived(
-      theirAddress(ledgerChannel),
-      processId,
-      signResult.signedCommitment.commitment,
-      signResult.signedCommitment.signature,
-    );
-    newSharedData = queueMessage(newSharedData, messageRelay);
-  } else {
-    newSharedData = createAndSendConcludeCommitment(
-      newSharedData,
-      protocolState.processId,
-      protocolState.ledgerId,
-    );
+    case 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_CHOSEN':
+    default:
+      throw new Error(`Invalid action ${action.type}`);
   }
-  return {
-    protocolState: states.confirmLedgerUpdate({ ...protocolState }),
-    sharedData: newSharedData,
-  };
 };
 
 // Helpers

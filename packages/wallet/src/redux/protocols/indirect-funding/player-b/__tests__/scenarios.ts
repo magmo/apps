@@ -19,7 +19,7 @@ import {
   ledgerId,
   channelId,
 } from '../../../../../domain/commitments/__tests__';
-import { success } from '../../../indirect-defunding/states';
+import { success } from '../../states';
 
 // -----------
 // Commitments
