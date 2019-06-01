@@ -1,7 +1,7 @@
 import { CommitmentReceived, WalletAction } from '../../actions';
 import { CommitmentType } from 'fmg-core';
-import { Commitment, SignedCommitment } from 'src/domain';
-import { ActionConstructor } from 'src/redux/utils';
+import { Commitment, SignedCommitment } from '../../../domain';
+import { ActionConstructor } from '../../../redux/utils';
 
 // -------
 // Actions
