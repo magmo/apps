@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import WaitForLedgerUpdate from './components/wait-for-ledger-update';
 import { unreachable } from '../../../utils/reducer-utils';
 import WaitForLedgerConclude from './components/wait-for-ledger-conclude';
+import { CommitmentType } from 'fmg-core';
 
 interface Props {
   state: states.IndirectDefundingState;
@@ -17,12 +18,28 @@ class IndirectDefundingContainer extends PureComponent<Props> {
     const { state } = this.props;
     switch (state.type) {
       case 'IndirectDefunding.WaitForLedgerUpdate':
-        return <WaitForLedgerUpdate ledgerId={state.ledgerId} />;
-      case 'IndirectDefunding.WaitForConclude':
-        return <WaitForLedgerConclude ledgerId={state.ledgerId} />;
+        if (state.commitmentType === CommitmentType.App) {
+          return <WaitForLedgerUpdate ledgerId={state.ledgerId} />;
+        }
+        if (state.commitmentType === CommitmentType.Conclude) {
+          return <WaitForLedgerConclude ledgerId={state.ledgerId} />;
+        }
+        return unreachable(state.commitmentType);
       case 'IndirectDefunding.Failure':
         return <Failure name="indirect-de-funding" reason={state.reason} />;
-      case 'IndirectDefunding.Success':
+      case 'IndirectDefunding.ConfirmLedgerUpdate':
+      // todo
+      case 'IndirectDefunding.WaitForDisputeChallenger':
+      // todo
+      case 'IndirectDefunding.WaitForDisputeResponder':
+      // todo
+      case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
+      // todo
+      case 'IndirectDefunding.AcknowledgeLedgerFinalizedOnChain':
+      // todo
+      case 'IndirectDefunding.FinalizedOnChain':
+      // todo
+      case 'IndirectDefunding.FinalizedOffChain':
         return <Success name="indirect-de-funding" />;
       default:
         return unreachable(state);
