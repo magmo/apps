@@ -188,7 +188,7 @@ const confirmLedgerUpdateReducer = (
         };
       }
       return { protocolState, sharedData }; // should never happen
-    case 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT':
+    case 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED':
       const disputeState = disputeResponderInitialize(
         processId,
         ledgerId,
