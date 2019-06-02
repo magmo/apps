@@ -237,7 +237,7 @@ const waitForLedgerUpdateReducer = (
             ...protocolState,
             commitmentType: CommitmentType.Conclude,
           }),
-          sharedData,
+          sharedData: newSharedData,
         };
       }
 
@@ -247,14 +247,14 @@ const waitForLedgerUpdateReducer = (
             ...protocolState,
             commitmentType: CommitmentType.App,
           }),
-          sharedData,
+          sharedData: newSharedData,
         };
       }
 
       if (playerA && conclude) {
         return {
           protocolState: states.acknowledgeLedgerFinalizedOffChain({ ...protocolState }),
-          sharedData,
+          sharedData: newSharedData,
         };
       }
 
@@ -264,7 +264,7 @@ const waitForLedgerUpdateReducer = (
             ...protocolState,
             commitmentType: CommitmentType.Conclude,
           }),
-          sharedData,
+          sharedData: newSharedData,
         };
       }
       return {
