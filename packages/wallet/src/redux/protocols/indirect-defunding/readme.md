@@ -35,26 +35,18 @@ linkStyle default interpolate basis
   DF --> |Yes, Player A| CLU(ConfirmLedgerUpdate)
   DF --> |Yes, Player B| WLU(WaitForLedgerUpdate)
 
-  CLU-->|UPDATE_CONFIRMED|WLU
-  CLU-->|UPDATE_CONFIRMED|ALFon(AcknowledgeLedgerFinalizedOffChain)
-  CLU.->|CHALLENGE_DETECTED|W4DR(WaitForDispute.Responder)
+  CLU-->|UPDATE_CONFIRMED/RESPONSE_PROVIDED|WLU
+  CLU-->|UPDATE_CONFIRMED/RESPONSE_PROVIDED|ALFoff(AcknowledgeLedgerFinalizedOffChain)
+  CLU.->|CHALLENGE_EXPIRED|ALFon
 
-  WLU-->|COMMITMENT_RECEIVED|CLU
-  WLU.->|CHALLENGE_CHOSEN|W4DC(WaitForDispute.Challenger)
-  WLU-->|COMMITMENT_RECEIVED|ALFon
+  WLU-->|COMMITMENT_RECEIVED/CHALLENGE_RESPONSE_DETECTED|CLU
+  WLU.->|CHALLENGE_CHOSEN|WLU
+  WLU-->|COMMITMENT_RECEIVED/CHALLENGE_RESPONSE_DETECTED|ALFoff
+  WLU.->|CHALLENGE_EXPIRED|ALFon
 
-  W4DC.->|Open|CLU
-  W4DC.->|Open|ALFon
-  W4DC.->|TxFailed|W4DC
-  W4DC.->|Closed|ALFoff(AcknowledgeLedgeFinalizedOffChain)
-
-  W4DR.->|Success|WLU
-  W4DR.->|Success|ALFon
-  W4DR.->|Closed|ALFoff
-  W4DR.->|TxFailed|W4DR
-
-  ALFoff-->|ACKNOWLEDGED|Soff((SuccessOff))
-  ALFon-->|ACKNOWLEDGED|Son((SuccessOn))
+  ALFoff-->|ACKNOWLEDGED|S(( ))
+  ALFon(AcknowledgeLedgerFinalizedOnChain)
+  ALFon-->|ACKNOWLEDGED|S
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
@@ -62,9 +54,8 @@ linkStyle default interpolate basis
   classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
 
   class St,DF logic;
-  class Soff,Son Success;
+  class S Success;
   class F Failure;
-  class W4DR,W4DC WaitForChildProtocol;
 ```
 
 ## Scenarios
@@ -87,18 +78,15 @@ linkStyle default interpolate basis
    - Start
    - Failure
 4. **Player A: A ForceMoved by B, A Responds**
-   - ConfirmLedgerUpdate + CHALLENGE_DETECTED
-   - WaitForDisputeResponder + Success
+   - ConfirmLedgerUpdate + RESPONSE_PROVIDED
    - WaitForLedgerUpdate
 5. **Player B: A ForceMoved by B, A Responds**
    - WaitForLedgerUpdate + CHALLENGE_CHOSEN
-   - WaitForDisputeChallenger + Open
+   - WaitForLedgerUpdate + RESPONSE_DETECTED
    - ConfirmLedgerUpdate
 6. **Player A: A ForceMoved by B, Expires**
-   - ConfirmLedgerUpdate + CHALLENGE_DETECTED
-   - WaitForDisputeResponder + Closed
-   - AcknowledgeLedgerFinalized
+   - ConfirmLedgerUpdate + CHALLENGE_EXPIRED
+   - AcknowledgeLedgerFinalizedOnChain
 7. **Player B: A ForceMoved by B, Expires**
-   - WaitForLedgerUpdate + CHALLENGE_CHOSEN
-   - WaitForDisputeChallenger + Closed
-   - ConfirmLedgerUpdate
+   - WaitForLedgerUpdate + CHALLENGE_EXPIRED
+   - AcknowledgeLedgerFinalizedOnChain

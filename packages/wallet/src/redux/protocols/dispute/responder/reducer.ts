@@ -209,7 +209,7 @@ const waitForApprovalReducer = (
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
         return {
           protocolState: states.waitForResponse(protocolState),
-          sharedData: hideWallet(sharedData),
+          sharedData: hideWallet(sharedData), // don't do this if a ledger challenge, instead modify container to show indirect-defunding screen
         };
       } else {
         const transaction = craftResponseTransactionWithExistingCommitment(
