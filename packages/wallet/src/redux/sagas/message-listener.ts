@@ -37,7 +37,6 @@ export function* messageListener() {
         yield put(
           actions.protocol.createChallengeRequested({
             channelId: action.channelId,
-            commitment: action.commitment,
           }),
         );
         break;

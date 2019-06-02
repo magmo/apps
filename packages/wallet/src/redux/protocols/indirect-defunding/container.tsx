@@ -11,10 +11,11 @@ import ConfirmLedgerUpdate from './components/confirm-ledger-update';
 import * as actions from './actions';
 import Acknowledge from '../shared-components/acknowledge';
 import { Dispute } from '../dispute/container';
+import { createChallengeRequested } from '../actions';
 
 interface Props {
   state: states.IndirectDefundingState;
-  challengeChosen: typeof actions.challengeChosen;
+  challengeChosen: typeof createChallengeRequested;
   updateConfirmed: typeof actions.updateConfirmed;
   acknowledged: typeof actions.acknowledged;
 }
@@ -28,7 +29,11 @@ class IndirectDefundingContainer extends PureComponent<Props> {
           <WaitForLedgerUpdate
             ledgerId={state.ledgerId}
             isConclude={state.commitmentType === CommitmentType.Conclude}
-            challenge={() => challengeChosen({ processId: state.processId })}
+            challenge={() =>
+              challengeChosen({
+                channelId: state.ledgerId,
+              })
+            }
           />
         );
       case 'IndirectDefunding.Failure':
@@ -76,7 +81,7 @@ class IndirectDefundingContainer extends PureComponent<Props> {
 
 const mapDispatchToProps = {
   updateConfirmed: actions.updateConfirmed,
-  challengeChosen: actions.challengeChosen,
+  challengeChosen: createChallengeRequested,
   acknowledged: actions.acknowledged,
 };
 

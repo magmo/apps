@@ -28,7 +28,6 @@ export interface ConcludeRequested {
 export interface CreateChallengeRequested {
   type: 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
   channelId: string;
-  commitment: Commitment;
   protocol: WalletProtocol.Dispute;
 }
 
