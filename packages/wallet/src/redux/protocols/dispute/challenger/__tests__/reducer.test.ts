@@ -1,10 +1,11 @@
 import * as scenarios from './scenarios';
-import { challengerReducer, initialize, ReturnVal } from '../reducer';
+import { challengerReducer, initialize } from '../reducer';
 import {
   FailureReason,
   ChallengerStateType,
   WaitForTransaction,
   WaitForResponseOrTimeout,
+  ChallengerState,
 } from '../states';
 import {
   itSendsThisMessage,
@@ -42,7 +43,7 @@ describe('OPPONENT RESPONDS', () => {
 
     itTransitionsTo(result, 'Challenging.WaitForTransaction');
     it('updates the expiry time', () => {
-      expect((result.state as WaitForTransaction).expiryTime).toEqual(action2.expiryTime);
+      expect((result.protocolState as WaitForTransaction).expiryTime).toEqual(action2.expiryTime);
     });
   });
   describeScenarioStep(scenario.waitForTransaction, () => {
@@ -58,7 +59,9 @@ describe('OPPONENT RESPONDS', () => {
 
     itTransitionsTo(result, 'Challenging.WaitForResponseOrTimeout');
     it('updates the expiry time', () => {
-      expect((result.state as WaitForResponseOrTimeout).expiryTime).toEqual(action1.expiryTime);
+      expect((result.protocolState as WaitForResponseOrTimeout).expiryTime).toEqual(
+        action1.expiryTime,
+      );
     });
   });
   describeScenarioStep(scenario.waitForResponseOrTimeoutReceiveResponse, () => {
@@ -235,21 +238,30 @@ describe('TRANSACTION FAILS  ', () => {
   });
 });
 
-function itTransitionsTo(result: ReturnVal, type: ChallengerStateType) {
-  if (!result.state) {
-    console.log(result);
-  }
-  it(`transitions to ${type}`, () => {
-    expect(result.state.type).toEqual(type);
-  });
-}
+describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
+  const scenario = scenarios.defundActionComesDuringAcknowledgeTimeout;
 
-function itHasFailureReason(result: ReturnVal, reason: FailureReason) {
+  describeScenarioStep(scenario.acknowledgeTimeout, () => {
+    const { state, sharedData, action } = scenario.acknowledgeTimeout;
+
+    const result = challengerReducer(state, sharedData, action);
+    // TODO: Is this the correct state?
+    itTransitionsTo(result, 'Challenging.AcknowledgeClosedButNotDefunded');
+  });
+});
+
+const itTransitionsTo = (result: { protocolState: ChallengerState }, type: ChallengerStateType) => {
+  it(`transitions to ${type}`, () => {
+    expect(result.protocolState.type).toEqual(type);
+  });
+};
+
+const itHasFailureReason = (result: { protocolState: ChallengerState }, reason: FailureReason) => {
   it(`has failure reason ${reason}`, () => {
-    if ('reason' in result.state) {
-      expect(result.state.reason).toEqual(reason);
+    if ('reason' in result.protocolState) {
+      expect(result.protocolState.reason).toEqual(reason);
     } else {
-      fail(`State ${result.state.type} doesn't have a failure reason.`);
+      fail(`State ${result.protocolState.type} doesn't have a failure reason.`);
     }
   });
-}
+};

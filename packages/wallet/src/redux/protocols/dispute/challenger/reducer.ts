@@ -1,5 +1,4 @@
 import {
-  ChallengerState as CState,
   NonTerminalChallengerState as NonTerminalCState,
   approveChallenge,
   waitForResponseOrTimeout,
@@ -10,8 +9,15 @@ import {
   acknowledgeTimeout,
   successOpen,
   failure,
-  successClosed,
+  waitForDefund,
+  acknowledgeSuccess,
+  acknowledgeClosedButNotDefunded,
+  WaitForDefund,
+  NonTerminalChallengerState,
+  ChallengerState,
 } from './states';
+import { ProtocolStateWithSharedData } from '../..';
+import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { SharedData, registerChannelToMonitor, checkAndStore } from '../../../state';
 import * as actions from './actions';
@@ -36,62 +42,52 @@ import { Commitment, SignedCommitment } from '../../../../domain';
 
 const CHALLENGE_TIMEOUT = 5 * 60000;
 
-export interface ReturnVal {
-  state: CState;
-  sharedData: SharedData;
-}
-
 export function challengerReducer(
-  state: NonTerminalCState,
+  protocolState: NonTerminalCState,
   sharedData: SharedData,
   action: ProtocolAction,
-): ReturnVal {
+): ProtocolStateWithSharedData<ChallengerState> {
   if (!actions.isChallengerAction(action)) {
     console.warn(`Challenging reducer received non-challenging action ${action.type}.`);
-    return { state, sharedData };
+    return { protocolState, sharedData };
   }
-  if (isTransactionAction(action) && state.type === 'Challenging.WaitForTransaction') {
-    return handleTransactionAction(state, sharedData, action);
+  if (
+    isTransactionAction(action) &&
+    (protocolState.type === 'Challenging.WaitForResponseOrTimeout' ||
+      protocolState.type === 'Challenging.WaitForTransaction')
+  ) {
+    return handleTransactionAction(protocolState, sharedData, action);
   }
-  if (isTransactionAction(action)) {
-    console.warn(`Challenging reducer received transaction action in state ${state.type}.`);
-    return { state, sharedData };
+  if (isDefundingAction(action)) {
+    return handleDefundingAction(protocolState, sharedData, action);
   }
 
   switch (action.type) {
     case 'WALLET.DISPUTE.CHALLENGER.CHALLENGE_APPROVED':
-      return challengeApproved(state, sharedData);
+      return challengeApproved(protocolState, sharedData);
     case 'WALLET.DISPUTE.CHALLENGER.CHALLENGE_DENIED':
-      return challengeDenied(state, sharedData);
+      return challengeDenied(protocolState, sharedData);
     case 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT':
       return challengeResponseReceived(
-        state,
+        protocolState,
         sharedData,
         action.responseCommitment,
         action.responseSignature,
       );
     case 'WALLET.ADJUDICATOR.REFUTED_EVENT':
-      return refuteReceived(state, sharedData);
+      return refuteReceived(protocolState, sharedData);
     case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED':
-      return challengeTimedOut(state, sharedData);
+      return challengeTimedOut(protocolState, sharedData);
     case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET':
-      return handleChallengeCreatedEvent(state, sharedData, action.expiryTime);
+      return handleChallengeCreatedEvent(protocolState, sharedData, action.expiryTime);
+    case 'WALLET.DISPUTE.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED':
+      return challengeResponseAcknowledged(protocolState, sharedData);
+    case 'WALLET.DISPUTE.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED':
+      return challengeFailureAcknowledged(protocolState, sharedData);
+    case 'WALLET.DISPUTE.CHALLENGER.DEFUND_CHOSEN':
+      return defundChosen(protocolState, sharedData);
     case 'WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED':
-      switch (state.type) {
-        case 'Challenging.AcknowledgeResponse':
-          return challengeResponseAcknowledged(state, sharedData);
-        case 'Challenging.AcknowledgeFailure':
-          return challengeFailureAcknowledged(state, sharedData);
-        case 'Challenging.AcknowledgeTimeout':
-          return timeoutAcknowledged(state, sharedData);
-        default:
-          return { state, sharedData };
-      }
-    case 'WALLET.DISPUTE.CHALLENGER.EXIT_CHALLENGE':
-      return {
-        state: successClosed({}),
-        sharedData,
-      };
+      return acknowledged(protocolState, sharedData);
     default:
       return unreachable(action);
   }
@@ -101,93 +97,133 @@ export function initialize(
   channelId: string,
   processId: string,
   sharedData: SharedData,
-): ReturnVal {
+): ProtocolStateWithSharedData<NonTerminalChallengerState> {
   const channelState = getChannel(sharedData, channelId);
   const props = { processId, channelId };
 
   if (!channelState) {
     return {
-      state: acknowledgeFailure(props, 'ChannelDoesntExist'),
+      protocolState: acknowledgeFailure(props, 'ChannelDoesntExist'),
       sharedData: showWallet(sharedData),
     };
   }
 
   if (!isFullyOpen(channelState)) {
-    return { state: acknowledgeFailure(props, 'NotFullyOpen'), sharedData: showWallet(sharedData) };
+    return {
+      protocolState: acknowledgeFailure(props, 'NotFullyOpen'),
+      sharedData: showWallet(sharedData),
+    };
   }
 
   if (ourTurn(channelState)) {
     // if it's our turn we don't need to challenge
     return {
-      state: acknowledgeFailure(props, 'AlreadyHaveLatest'),
+      protocolState: acknowledgeFailure(props, 'AlreadyHaveLatest'),
       sharedData: showWallet(sharedData),
     };
   }
   sharedData = registerChannelToMonitor(sharedData, processId, channelId);
-  return { state: approveChallenge({ channelId, processId }), sharedData: showWallet(sharedData) };
+  return {
+    protocolState: approveChallenge({ channelId, processId }),
+    sharedData: showWallet(sharedData),
+  };
 }
 
 function handleChallengeCreatedEvent(
-  state: NonTerminalCState,
+  protocolState: NonTerminalCState,
   sharedData: SharedData,
   expiryTime: number,
-): ReturnVal {
+): ProtocolStateWithSharedData<ChallengerState> {
   if (
-    state.type !== 'Challenging.WaitForResponseOrTimeout' &&
-    state.type !== 'Challenging.WaitForTransaction'
+    protocolState.type !== 'Challenging.WaitForResponseOrTimeout' &&
+    protocolState.type !== 'Challenging.WaitForTransaction'
   ) {
-    return { state, sharedData };
+    return { protocolState, sharedData };
   } else {
-    const updatedState = { ...state, expiryTime };
-    return { state: updatedState, sharedData };
+    const updatedState = { ...protocolState, expiryTime };
+    return { protocolState: updatedState, sharedData };
   }
 }
 
 function handleTransactionAction(
-  state: NonTerminalCState,
+  protocolState: NonTerminalCState,
   sharedData: SharedData,
   action: TransactionAction,
-): ReturnVal {
-  if (state.type !== 'Challenging.WaitForTransaction') {
-    return { state, sharedData };
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.WaitForTransaction') {
+    return { protocolState, sharedData };
   }
-  const transactionSubmission = state.transactionSubmission;
+  const transactionSubmission = protocolState.transactionSubmission;
 
   const retVal = transactionReducer(transactionSubmission, sharedData, action);
   const transactionState = retVal.state;
 
   if (isSuccess(transactionState)) {
     // We use an estimate if we haven't received a real expiry time yet.
-    const expiryTime = state.expiryTime || new Date(Date.now() + CHALLENGE_TIMEOUT).getTime();
-    state = waitForResponseOrTimeout({ ...state, expiryTime });
+    const expiryTime =
+      protocolState.expiryTime || new Date(Date.now() + CHALLENGE_TIMEOUT).getTime();
+    protocolState = waitForResponseOrTimeout({ ...protocolState, expiryTime });
   } else if (isFailure(transactionState)) {
-    state = acknowledgeFailure(state, 'TransactionFailed');
+    protocolState = acknowledgeFailure(protocolState, 'TransactionFailed');
   } else {
     // update the transaction state
-    state = { ...state, transactionSubmission: transactionState };
+    protocolState = { ...protocolState, transactionSubmission: transactionState };
   }
 
-  return { state, sharedData: retVal.storage };
+  return { protocolState, sharedData: retVal.storage };
 }
 
-function challengeApproved(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
-  if (state.type !== 'Challenging.ApproveChallenge') {
-    return { state, sharedData };
+function handleDefundingAction(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+  action: DefundingAction,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (
+    protocolState.type !== 'Challenging.WaitForDefund' &&
+    protocolState.type !== 'Challenging.AcknowledgeTimeout'
+  ) {
+    return { protocolState, sharedData };
   }
-  const channelState = getChannel(sharedData, state.channelId);
+  if (protocolState.type === 'Challenging.AcknowledgeTimeout') {
+    const updatedState = transitionToWaitForDefunding(protocolState, sharedData);
+    protocolState = updatedState.protocolState;
+    sharedData = updatedState.sharedData;
+  }
+  const retVal = defundingReducer(protocolState.defundingState, sharedData, action);
+  const defundingState = retVal.protocolState;
+
+  if (isDefundingSuccess(defundingState)) {
+    protocolState = acknowledgeSuccess({ ...protocolState });
+  } else if (isDefundingFailure(defundingState)) {
+    protocolState = acknowledgeClosedButNotDefunded(protocolState);
+  } else {
+    // update the transaction state
+    protocolState = { ...protocolState, defundingState };
+  }
+  return { protocolState, sharedData: retVal.sharedData };
+}
+
+function challengeApproved(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.ApproveChallenge') {
+    return { protocolState, sharedData };
+  }
+  const channelState = getChannel(sharedData, protocolState.channelId);
 
   // These shouldn't have changed but the type system doesn't know that. In any case, we
   // might as well be safe. And type-safe...
   if (!channelState) {
-    return { state: acknowledgeFailure(state, 'ChannelDoesntExist'), sharedData };
+    return { protocolState: acknowledgeFailure(protocolState, 'ChannelDoesntExist'), sharedData };
   }
   if (!isFullyOpen(channelState)) {
-    return { state: acknowledgeFailure(state, 'NotFullyOpen'), sharedData };
+    return { protocolState: acknowledgeFailure(protocolState, 'NotFullyOpen'), sharedData };
   }
 
   if (ourTurn(channelState)) {
     // if it's our turn now, a commitment must have arrived while we were approving
-    return { state: acknowledgeFailure(state, 'LatestWhileApproving'), sharedData };
+    return { protocolState: acknowledgeFailure(protocolState, 'LatestWhileApproving'), sharedData };
   }
 
   // else if we don't have the last two states
@@ -204,46 +240,52 @@ function challengeApproved(state: NonTerminalCState, sharedData: SharedData): Re
   // initialize transaction state machine
   const returnVal = initializeTransaction(
     transactionRequest,
-    state.processId,
-    state.channelId,
+    protocolState.processId,
+    protocolState.channelId,
     sharedData,
   );
   const transactionSubmission = returnVal.state;
 
   // transition to wait for transaction
-  const newState = waitForTransaction({ ...state, transactionSubmission });
-  return { state: newState, sharedData: returnVal.storage };
+  const newState = waitForTransaction({ ...protocolState, transactionSubmission });
+  return { protocolState: newState, sharedData: returnVal.storage };
 }
 
-function challengeDenied(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
-  if (state.type !== 'Challenging.ApproveChallenge') {
-    return { state, sharedData };
+function challengeDenied(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.ApproveChallenge') {
+    return { protocolState, sharedData };
   }
 
-  state = acknowledgeFailure(state, 'DeclinedByUser');
-  return { state, sharedData };
+  protocolState = acknowledgeFailure(protocolState, 'DeclinedByUser');
+  return { protocolState, sharedData };
 }
 
-function refuteReceived(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
-  if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
-    return { state, sharedData };
+function refuteReceived(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.WaitForResponseOrTimeout') {
+    return { protocolState, sharedData };
   }
 
-  state = acknowledgeResponse(state);
-  return { state, sharedData };
+  protocolState = acknowledgeResponse(protocolState);
+  return { protocolState, sharedData };
 }
 
 function challengeResponseReceived(
-  state: NonTerminalCState,
+  protocolState: NonTerminalCState,
   sharedData: SharedData,
   challengeCommitment: Commitment,
   challengeSignature: string,
-): ReturnVal {
-  if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
-    return { state, sharedData };
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.WaitForResponseOrTimeout') {
+    return { protocolState, sharedData };
   }
 
-  state = acknowledgeResponse(state);
+  protocolState = acknowledgeResponse(protocolState);
   sharedData = sendChallengeCommitmentReceived(sharedData, challengeCommitment);
 
   const signedCommitment: SignedCommitment = {
@@ -252,50 +294,71 @@ function challengeResponseReceived(
   };
   const checkResult = checkAndStore(sharedData, signedCommitment);
   if (checkResult.isSuccess) {
-    return { state, sharedData: checkResult.store };
+    return { protocolState, sharedData: checkResult.store };
   }
 
-  return { state, sharedData };
+  return { protocolState, sharedData };
 }
 
-function challengeTimedOut(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
-  if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
-    return { state, sharedData };
+function challengeTimedOut(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.WaitForResponseOrTimeout') {
+    return { protocolState, sharedData };
   }
 
-  state = acknowledgeTimeout(state);
-
-  return { state, sharedData: sendConcludeSuccess(sharedData) };
-  // From the point of view of the app, it is as if we have concluded
+  protocolState = acknowledgeTimeout(protocolState);
+  return { protocolState, sharedData };
 }
 
 function challengeResponseAcknowledged(
-  state: NonTerminalCState,
+  protocolState: NonTerminalCState,
   sharedData: SharedData,
-): ReturnVal {
-  if (state.type !== 'Challenging.AcknowledgeResponse') {
-    return { state, sharedData };
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.AcknowledgeResponse') {
+    return { protocolState, sharedData };
   }
   sharedData = sendChallengeComplete(hideWallet(sharedData));
-  return { state: successOpen({}), sharedData };
+  return { protocolState: successOpen({}), sharedData };
 }
 
-function challengeFailureAcknowledged(state: NonTerminalCState, sharedData: SharedData): ReturnVal {
-  if (state.type !== 'Challenging.AcknowledgeFailure') {
-    return { state, sharedData };
+function challengeFailureAcknowledged(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type !== 'Challenging.AcknowledgeFailure') {
+    return { protocolState, sharedData };
   }
 
-  return { state: failure(state), sharedData: hideWallet(sharedData) };
+  return { protocolState: failure(protocolState), sharedData: hideWallet(sharedData) };
 }
 
-function timeoutAcknowledged(state: NonTerminalCState, sharedData: SharedData) {
-  if (state.type !== 'Challenging.AcknowledgeTimeout') {
-    return { state, sharedData };
+function defundChosen(protocolState: NonTerminalCState, sharedData: SharedData) {
+  if (protocolState.type !== 'Challenging.AcknowledgeTimeout') {
+    return { protocolState, sharedData };
   }
-  return {
-    state: successClosed({}),
-    sharedData: hideWallet(sharedData),
-  };
+  return transitionToWaitForDefunding(protocolState, sharedData);
+}
+function acknowledged(
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<ChallengerState> {
+  if (protocolState.type === 'Challenging.AcknowledgeClosedButNotDefunded') {
+    return {
+      protocolState: successClosedButNotDefunded({}),
+      sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+    };
+    // From the point of view of the app, it is as if we have concluded
+  }
+  if (protocolState.type === 'Challenging.AcknowledgeSuccess') {
+    return {
+      protocolState: successClosedAndDefunded({}),
+      sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+    };
+    // From the point of view of the app, it is as if we have concluded
+  }
+  return { protocolState, sharedData };
 }
 // Helpers
 
@@ -307,3 +370,24 @@ interface ChannelProps {
 function acknowledgeFailure(props: ChannelProps, reason: FailureReason): NonTerminalCState {
   return acknowledgeFailureState({ ...props, reason });
 }
+
+const transitionToWaitForDefunding = (
+  protocolState: NonTerminalCState,
+  sharedData: SharedData,
+): { protocolState: WaitForDefund; sharedData: SharedData } => {
+  // initialize defunding state machine
+  const protocolStateWithSharedData = initializeDefunding(
+    protocolState.processId,
+    protocolState.channelId,
+    sharedData,
+  );
+  const defundingState = protocolStateWithSharedData.protocolState;
+  sharedData = protocolStateWithSharedData.sharedData;
+  return {
+    protocolState: waitForDefund({
+      ...protocolState,
+      defundingState,
+    }),
+    sharedData,
+  };
+};
