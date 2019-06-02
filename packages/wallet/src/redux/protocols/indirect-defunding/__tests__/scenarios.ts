@@ -182,12 +182,10 @@ const playerBConfirmConclude = {
 const playerALedgerUpdateConfirmed = updateConfirmed({
   ...props,
   commitmentType: CommitmentType.App,
-  signedCommitment: ledger6,
 });
 const playerAConcludeUpdateConfirmed = updateConfirmed({
   ...props,
   commitmentType: CommitmentType.Conclude,
-  signedCommitment: ledger8,
 });
 
 export const ledgerUpdate0Received = globalActions.commitmentReceived({
@@ -214,13 +212,13 @@ const invalidLedgerUpdateReceived = globalActions.commitmentReceived({
 const playerBLedgerUpdateConfirmed = updateConfirmed({
   ...props,
   commitmentType: CommitmentType.App,
-  signedCommitment: ledger7,
+  // signedCommitment: ledger7,
 });
 
 const playerBConcludeUpdateConfirmed = updateConfirmed({
   ...props,
   commitmentType: CommitmentType.Conclude,
-  signedCommitment: ledger9,
+  // signedCommitment: ledger9,
 });
 
 // -----------
