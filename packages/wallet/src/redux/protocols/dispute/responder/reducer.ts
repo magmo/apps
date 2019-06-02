@@ -28,6 +28,17 @@ import {
 } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../actions';
 import * as _ from 'lodash';
+<<<<<<< HEAD
+=======
+import { isDefundingAction, DefundingAction } from '../../defunding/actions';
+import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
+import {
+  isSuccess as isDefundingSuccess,
+  isFailure as isDefundingFailure,
+} from '../../defunding/states';
+import { getChannel } from '../../../../redux/channel-store';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
+>>>>>>> 97481d92... Do not hide wallet when a ledger challenge
 export const initialize = (
   processId: string,
   channelId: string,
@@ -161,9 +172,20 @@ const waitForApprovalReducer = (
     case 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED':
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
+        const channelState = getChannel(sharedData.channelStore, protocolState.channelId);
+        const isLedgerChannel = channelState
+          ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
+          : false;
+        if (!isLedgerChannel) {
+          sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead modify container to show indirect-defunding screen
+        }
         return {
           protocolState: states.waitForResponse(protocolState),
+<<<<<<< HEAD
           sharedData: hideWallet(sharedData),
+=======
+          sharedData,
+>>>>>>> 97481d92... Do not hide wallet when a ledger challenge
         };
       } else {
         const transaction = craftResponseTransactionWithExistingCommitment(
