@@ -34,6 +34,8 @@ import {
   isSuccess as isDefundingSuccess,
   isFailure as isDefundingFailure,
 } from '../../defunding/states';
+import { getChannel } from '../../../../redux/channel-store';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 export const initialize = (
   processId: string,
   channelId: string,
@@ -207,9 +209,16 @@ const waitForApprovalReducer = (
     case 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED':
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
+        const channelState = getChannel(sharedData.channelStore, protocolState.channelId);
+        const isLedgerChannel = channelState
+          ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
+          : false;
+        if (!isLedgerChannel) {
+          sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead modify container to show indirect-defunding screen
+        }
         return {
           protocolState: states.waitForResponse(protocolState),
-          sharedData: hideWallet(sharedData), // don't do this if a ledger challenge, instead modify container to show indirect-defunding screen
+          sharedData,
         };
       } else {
         const transaction = craftResponseTransactionWithExistingCommitment(
