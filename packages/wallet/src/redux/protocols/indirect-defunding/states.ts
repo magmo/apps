@@ -1,7 +1,7 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
-import { ChallengerState } from '../dispute/challenger/states';
-import { ResponderState } from '../dispute/responder/states';
+import { NonTerminalChallengerState } from '../dispute/challenger/states';
+import { NonTerminalResponderState } from '../dispute/responder/states';
 import { CommitmentType } from 'fmg-core';
 
 // -------
@@ -33,7 +33,7 @@ export interface WaitForDisputeChallenger {
   processId: string;
   ledgerId: string;
   channelId: string;
-  disputeState: ChallengerState;
+  disputeState: NonTerminalChallengerState;
 }
 
 export interface WaitForDisputeResponder {
@@ -41,7 +41,7 @@ export interface WaitForDisputeResponder {
   processId: string;
   ledgerId: string;
   channelId: string;
-  disputeState: ResponderState;
+  disputeState: NonTerminalResponderState;
 }
 
 export interface AcknowledgeLedgerFinalizedOffChain {

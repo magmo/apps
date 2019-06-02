@@ -39,7 +39,7 @@ export const initialize = (
   channelId: string,
   sharedData: SharedData,
   challengeCommitment: Commitment,
-): ProtocolStateWithSharedData<states.ResponderState> => {
+): ProtocolStateWithSharedData<states.NonTerminalResponderState> => {
   return {
     protocolState: states.waitForApproval({ processId, channelId, challengeCommitment }),
     sharedData: showWallet(
