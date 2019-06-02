@@ -6,8 +6,9 @@ import Success from '../shared-components/success';
 import { connect } from 'react-redux';
 import WaitForLedgerUpdate from './components/wait-for-ledger-update';
 import { unreachable } from '../../../utils/reducer-utils';
-import WaitForLedgerConclude from './components/wait-for-ledger-conclude';
 import { CommitmentType } from 'fmg-core';
+import ConfirmLedgerUpdate from './components/confirm-ledger-update';
+// import { challengeChosen, updateConfirmed } from './actions';
 
 interface Props {
   state: states.IndirectDefundingState;
@@ -18,17 +19,33 @@ class IndirectDefundingContainer extends PureComponent<Props> {
     const { state } = this.props;
     switch (state.type) {
       case 'IndirectDefunding.WaitForLedgerUpdate':
-        if (state.commitmentType === CommitmentType.App) {
-          return <WaitForLedgerUpdate ledgerId={state.ledgerId} />;
-        }
-        if (state.commitmentType === CommitmentType.Conclude) {
-          return <WaitForLedgerConclude ledgerId={state.ledgerId} />;
-        }
-        return unreachable(state.commitmentType);
+        return (
+          <WaitForLedgerUpdate
+            ledgerId={state.ledgerId}
+            isConclude={state.commitmentType === CommitmentType.Conclude}
+            challenge={() => null}
+            // challenge={() =>
+            //   challengeChosen({ processId: state.processId, challengeCommitment: {} })
+            // } // the challenge commitment should probably be crafted in the reducer
+          />
+        );
       case 'IndirectDefunding.Failure':
         return <Failure name="indirect-de-funding" reason={state.reason} />;
       case 'IndirectDefunding.ConfirmLedgerUpdate':
-      // todo
+        return (
+          <ConfirmLedgerUpdate
+            ledgerId={state.ledgerId}
+            isConclude={state.commitmentType === CommitmentType.Conclude}
+            confirm={() => null}
+            // confirm={
+            //   () =>
+            //     updateConfirmed({
+            //       processId: state.processId,
+            //       commitmentType: state.commitmentType,
+            //     }) // the ledger update commitment should probably be crafted in the reducer
+            // }
+          />
+        );
       case 'IndirectDefunding.WaitForDisputeChallenger':
       // todo
       case 'IndirectDefunding.WaitForDisputeResponder':
