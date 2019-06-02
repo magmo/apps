@@ -8,25 +8,24 @@ import WaitForLedgerUpdate from './components/wait-for-ledger-update';
 import { unreachable } from '../../../utils/reducer-utils';
 import { CommitmentType } from 'fmg-core';
 import ConfirmLedgerUpdate from './components/confirm-ledger-update';
-// import { challengeChosen, updateConfirmed } from './actions';
+import * as actions from './actions';
 
 interface Props {
   state: states.IndirectDefundingState;
+  challengeChosen: typeof actions.challengeChosen;
+  updateConfirmed: typeof actions.updateConfirmed;
 }
 
 class IndirectDefundingContainer extends PureComponent<Props> {
   render() {
-    const { state } = this.props;
+    const { state, challengeChosen, updateConfirmed } = this.props;
     switch (state.type) {
       case 'IndirectDefunding.WaitForLedgerUpdate':
         return (
           <WaitForLedgerUpdate
             ledgerId={state.ledgerId}
             isConclude={state.commitmentType === CommitmentType.Conclude}
-            challenge={() => null}
-            // challenge={() =>
-            //   challengeChosen({ processId: state.processId, challengeCommitment: {} })
-            // } // the challenge commitment should probably be crafted in the reducer
+            challenge={() => challengeChosen({ processId: state.processId })}
           />
         );
       case 'IndirectDefunding.Failure':
@@ -36,14 +35,12 @@ class IndirectDefundingContainer extends PureComponent<Props> {
           <ConfirmLedgerUpdate
             ledgerId={state.ledgerId}
             isConclude={state.commitmentType === CommitmentType.Conclude}
-            confirm={() => null}
-            // confirm={
-            //   () =>
-            //     updateConfirmed({
-            //       processId: state.processId,
-            //       commitmentType: state.commitmentType,
-            //     }) // the ledger update commitment should probably be crafted in the reducer
-            // }
+            confirm={() =>
+              updateConfirmed({
+                processId: state.processId,
+                commitmentType: state.commitmentType,
+              })
+            }
           />
         );
       case 'IndirectDefunding.WaitForDisputeChallenger':
@@ -63,7 +60,13 @@ class IndirectDefundingContainer extends PureComponent<Props> {
     }
   }
 }
+
+const mapDispatchToProps = {
+  updateConfirmed: actions.updateConfirmed,
+  challengeChosen: actions.challengeChosen,
+};
+
 export const IndirectDefunding = connect(
   () => ({}),
-  () => ({}),
+  mapDispatchToProps,
 )(IndirectDefundingContainer);

@@ -106,8 +106,7 @@ const confirmLedgerUpdateReducer = (
   switch (action.type) {
     case 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED':
       const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
-      const conclude =
-        action.signedCommitment.commitment.commitmentType === CommitmentType.Conclude;
+      const conclude = protocolState.commitmentType === CommitmentType.Conclude;
       const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
       const theirCommitment = ledgerChannel.lastCommitment.commitment;
       const channelState = selectors.getOpenedChannelState(sharedData, ledgerId);
