@@ -14,3 +14,7 @@ addStories(
   flattenScenario(scenarios.playerAHappyPath),
   'Indirect Defunding / PlayerA / Happy Path',
 );
+addStories(
+  flattenScenario(scenarios.playerBHappyPath),
+  'Indirect Defunding / PlayerB / Happy Path',
+);

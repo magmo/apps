@@ -9,16 +9,18 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { CommitmentType } from 'fmg-core';
 import ConfirmLedgerUpdate from './components/confirm-ledger-update';
 import * as actions from './actions';
+import Acknowledge from '../shared-components/acknowledge';
 
 interface Props {
   state: states.IndirectDefundingState;
   challengeChosen: typeof actions.challengeChosen;
   updateConfirmed: typeof actions.updateConfirmed;
+  acknowledged: typeof actions.acknowledged;
 }
 
 class IndirectDefundingContainer extends PureComponent<Props> {
   render() {
-    const { state, challengeChosen, updateConfirmed } = this.props;
+    const { state, challengeChosen, updateConfirmed, acknowledged } = this.props;
     switch (state.type) {
       case 'IndirectDefunding.WaitForLedgerUpdate':
         return (
@@ -48,11 +50,22 @@ class IndirectDefundingContainer extends PureComponent<Props> {
       case 'IndirectDefunding.WaitForDisputeResponder':
       // todo
       case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
-      // todo
+        return (
+          <Acknowledge
+            title="Concluding Succesful"
+            description="Your channel was closed and defunded (off chain)."
+            acknowledge={() => acknowledged({ processId: state.processId })}
+          />
+        );
       case 'IndirectDefunding.AcknowledgeLedgerFinalizedOnChain':
-      // todo
+        return (
+          <Acknowledge
+            title="Concluding Succesful"
+            description="Your channel was closed and defunded (on chain)."
+            acknowledge={() => acknowledged({ processId: state.processId })}
+          />
+        );
       case 'IndirectDefunding.FinalizedOnChain':
-      // todo
       case 'IndirectDefunding.FinalizedOffChain':
         return <Success name="indirect-de-funding" />;
       default:
@@ -64,6 +77,7 @@ class IndirectDefundingContainer extends PureComponent<Props> {
 const mapDispatchToProps = {
   updateConfirmed: actions.updateConfirmed,
   challengeChosen: actions.challengeChosen,
+  acknowledged: actions.acknowledged,
 };
 
 export const IndirectDefunding = connect(

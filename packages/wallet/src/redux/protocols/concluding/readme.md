@@ -8,7 +8,7 @@ The concluding protocol involves two parties: instigator and responder.
 The instigator is identified by being a participant who has chosen to conclude the channel. The responder is a participant who has received a conclude commitment and responds in kind.
 
 We therefore split the overall indirect-funding protocol into two sub state machines:
-[instigator](./instigator) and [responder](./responder).
+[instigator](./instigator/readme.md) and [responder](./responder/readme.md).
 
 The two state machines interact through the following messages:
 
