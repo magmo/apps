@@ -5,7 +5,7 @@ import { IndirectDefundingAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import { unreachable } from '../../../utils/reducer-utils';
 import * as selectors from '../../selectors';
-import { proposeNewConsensus } from '../../../domain/two-player-consensus-game';
+import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../communication';
 import { theirAddress } from '../../channel-store';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
@@ -30,7 +30,9 @@ export const initialize = (
   }
   const newSharedData = { ...sharedData };
   let protocolState;
+
   if (helpers.isFirstPlayer(ledgerId, sharedData)) {
+    // player A
     protocolState = states.confirmLedgerUpdate({
       processId,
       ledgerId,
@@ -41,9 +43,9 @@ export const initialize = (
     });
   }
 
-  if (!helpers.isFirstPlayer && action) {
-    // are we second player?
-    protocolState = states.confirmLedgerUpdate({
+  if (!helpers.isFirstPlayer(ledgerId, sharedData)) {
+    // player B
+    protocolState = states.waitForLedgerUpdate({
       processId,
       ledgerId,
       channelId,
@@ -51,6 +53,7 @@ export const initialize = (
       proposedDestination,
       commitmentType: CommitmentType.App,
     });
+    // todo deal with a CommitmentReceived action if it exists
   }
   return {
     protocolState,
@@ -102,61 +105,64 @@ const confirmLedgerUpdateReducer = (
   const { ledgerId, proposedAllocation, proposedDestination, processId } = protocolState;
   switch (action.type) {
     case 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED':
-      // const checkResult = checkAndStore(newSharedData, action.signedCommitment);
-      // if (!checkResult.isSuccess) {
-      //   console.warn('Received Invalid Commitment');
-      //   return {
-      //     protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
-      //     sharedData,
-      //   };
-      // }
-      // newSharedData = checkResult.store;
-
-      if (action.commitmentType === CommitmentType.Conclude) {
-        newSharedData = createAndSendConcludeCommitment(
-          newSharedData,
-          protocolState.processId,
-          protocolState.ledgerId,
-        );
-        // TODO check which player we are
-        return {
-          protocolState: states.waitForLedgerUpdate({ ...protocolState }),
-          sharedData: newSharedData,
-        };
-      }
-
-      if (action.commitmentType === CommitmentType.App) {
-        const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
-
-        const theirCommitment = ledgerChannel.lastCommitment.commitment;
-        const ourCommitment = proposeNewConsensus(
+      const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
+      const conclude =
+        action.signedCommitment.commitment.commitmentType === CommitmentType.Conclude;
+      const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
+      const theirCommitment = ledgerChannel.lastCommitment.commitment;
+      const channelState = selectors.getOpenedChannelState(sharedData, ledgerId);
+      let ourCommitment;
+      let newProtocolState;
+      if (playerA && !conclude) {
+        ourCommitment = proposeNewConsensus(
           theirCommitment,
           proposedAllocation,
           proposedDestination,
         );
-        const signResult = signAndStore(sharedData, ourCommitment);
-        if (!signResult.isSuccess) {
-          return {
-            protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
-            sharedData,
-          };
-        }
-        newSharedData = signResult.store;
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.App,
+        });
+      }
 
-        const messageRelay = sendCommitmentReceived(
-          theirAddress(ledgerChannel),
-          processId,
-          signResult.signedCommitment.commitment,
-          signResult.signedCommitment.signature,
-        );
-        newSharedData = queueMessage(newSharedData, messageRelay);
+      if (!playerA && !conclude) {
+        ourCommitment = acceptConsensus(theirCommitment);
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.Conclude,
+        });
+      }
 
+      if (playerA && conclude) {
+        ourCommitment = composeConcludeCommitment(channelState);
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.Conclude,
+        });
+      }
+
+      if (!playerA && conclude) {
+        ourCommitment = composeConcludeCommitment(channelState);
+        newProtocolState = states.acknowledgeLedgerFinalizedOffChain({ ...protocolState });
+      }
+
+      const signResult = signAndStore(sharedData, ourCommitment);
+      if (!signResult.isSuccess) {
         return {
-          protocolState: states.waitForLedgerUpdate({ ...protocolState }),
-          sharedData: newSharedData,
+          protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+          sharedData,
         };
       }
-      return { protocolState, sharedData }; // should never happen
+      newSharedData = signResult.store;
+      const messageRelay = sendCommitmentReceived(
+        theirAddress(ledgerChannel),
+        processId,
+        signResult.signedCommitment.commitment,
+        signResult.signedCommitment.signature,
+      );
+      newSharedData = queueMessage(newSharedData, messageRelay);
+
+      return { protocolState: newProtocolState, sharedData: newSharedData };
     case 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED':
       const disputeState = disputeResponderInitialize(
         processId,
@@ -192,44 +198,46 @@ const waitForLedgerUpdateReducer = (
         };
       }
       newSharedData = checkResult.store;
-      switch (action.signedCommitment.commitment.commitmentType) {
-        case CommitmentType.App:
-          return { protocolState: states.confirmLedgerUpdate({ ...protocolState }), sharedData };
-        case CommitmentType.Conclude:
-          return {
-            protocolState: states.acknowledgeLedgerFinalizedOffChain({ ...protocolState }),
-            sharedData,
-          };
-      }
-      // if (!helpers.isFirstPlayer(protocolState.channelId, sharedData)) {
-      //   const theirCommitment = action.signedCommitment.commitment;
-      //   const ourCommitment = acceptConsensus(theirCommitment);
-      //   const signResult = signAndStore(newSharedData, ourCommitment);
-      //   if (!signResult.isSuccess) {
-      //     return {
-      //       protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
-      //       sharedData: newSharedData,
-      //     };
-      //   }
-      //   newSharedData = signResult.store;
-      //   const { ledgerId, processId } = protocolState;
-      //   const ledgerChannel = selectors.getChannelState(newSharedData, ledgerId);
+      const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
+      const conclude =
+        action.signedCommitment.commitment.commitmentType === CommitmentType.Conclude;
 
-      //   const messageRelay = sendCommitmentReceived(
-      //     theirAddress(ledgerChannel),
-      //     processId,
-      //     signResult.signedCommitment.commitment,
-      //     signResult.signedCommitment.signature,
-      //   );
-      //   newSharedData = queueMessage(newSharedData, messageRelay);
-      // } else {
-      //   newSharedData = createAndSendConcludeCommitment(
-      //     newSharedData,
-      //     protocolState.processId,
-      //     protocolState.ledgerId,
-      //   );
-      // }
-      // ^ move to confirmLedgerUpdateReducer
+      if (playerA && !conclude) {
+        return {
+          protocolState: states.confirmLedgerUpdate({
+            ...protocolState,
+            commitmentType: CommitmentType.Conclude,
+          }),
+          sharedData,
+        };
+      }
+
+      if (!playerA && !conclude) {
+        return {
+          protocolState: states.confirmLedgerUpdate({
+            ...protocolState,
+            commitmentType: CommitmentType.App,
+          }),
+          sharedData,
+        };
+      }
+
+      if (playerA && conclude) {
+        return {
+          protocolState: states.acknowledgeLedgerFinalizedOffChain({ ...protocolState }),
+          sharedData,
+        };
+      }
+
+      if (!playerA && conclude) {
+        return {
+          protocolState: states.confirmLedgerUpdate({
+            ...protocolState,
+            commitmentType: CommitmentType.Conclude,
+          }),
+          sharedData,
+        };
+      }
       return {
         protocolState: states.confirmLedgerUpdate({ ...protocolState }),
         sharedData: newSharedData,
@@ -238,29 +246,4 @@ const waitForLedgerUpdateReducer = (
     default:
       throw new Error(`Invalid action ${action.type}`);
   }
-};
-
-// Helpers
-
-const createAndSendConcludeCommitment = (
-  sharedData: SharedData,
-  processId: string,
-  channelId: string,
-): SharedData => {
-  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-
-  const commitment = composeConcludeCommitment(channelState);
-
-  const signResult = signAndStore(sharedData, commitment);
-  if (!signResult.isSuccess) {
-    throw new Error(`Could not sign commitment due to  ${signResult.reason}`);
-  }
-
-  const messageRelay = sendCommitmentReceived(
-    theirAddress(channelState),
-    processId,
-    signResult.signedCommitment.commitment,
-    signResult.signedCommitment.signature,
-  );
-  return queueMessage(signResult.store, messageRelay);
 };
