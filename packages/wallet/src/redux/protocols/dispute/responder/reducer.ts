@@ -34,7 +34,7 @@ export const initialize = (
   expiryTime: number,
   sharedData: SharedData,
   challengeCommitment: Commitment,
-): ProtocolStateWithSharedData<states.ResponderState> => {
+): ProtocolStateWithSharedData<states.NonTerminalResponderState> => {
   return {
     protocolState: states.waitForApproval({
       processId,

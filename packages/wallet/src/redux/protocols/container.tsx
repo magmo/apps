@@ -9,9 +9,9 @@ import { Concluding } from './concluding/container';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { Challenging } from './dispute/container';
 import { isDefundingState } from './defunding/states';
 import { Defunding } from './defunding';
+import { Dispute } from './dispute/container';
 
 interface Props {
   protocolState: ProtocolState;
@@ -26,7 +26,7 @@ class ProtocolContainer extends PureComponent<Props> {
     if (fundingStates.isNonTerminalFundingState(protocolState)) {
       return <Funding state={protocolState} />;
     } else if (DisputeStates.isNonTerminalDisputeState(protocolState)) {
-      return <Challenging state={protocolState} />;
+      return <Dispute state={protocolState} />;
     } else if (concludingStates.isConcludingState(protocolState)) {
       return <Concluding state={protocolState} />;
     } else if (isDefundingState(protocolState)) {
