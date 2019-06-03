@@ -30,6 +30,11 @@ export interface Acknowledged {
   processId: string;
 }
 
+export interface ResponseProvided {
+  type: 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED';
+  processId: string;
+}
+
 // --------
 // Constructors
 // --------
@@ -50,12 +55,17 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => {
   return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED' };
 };
 
+export const responseProvided: ActionConstructor<ResponseProvided> = p => {
+  return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED' };
+};
+
 // --------
 // Unions and Guards
 // --------
 
 export type IndirectDefundingAction =
   | CommitmentReceived
+  | ResponseProvided
   | UpdateConfirmed
   | ChallengeChosen
   | LedgerChallengeCreated
@@ -64,6 +74,7 @@ export type IndirectDefundingAction =
 export function isIndirectDefundingAction(action: WalletAction): action is IndirectDefundingAction {
   return (
     action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
+    action.type === 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED' ||
