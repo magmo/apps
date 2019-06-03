@@ -10,6 +10,8 @@ import { Defunding } from '../../defunding/container';
 
 import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
+import ConfirmLedgerUpdate from '../../indirect-defunding/components/confirm-ledger-update';
+import { CommitmentType } from 'fmg-core';
 
 interface Props {
   state: states.NonTerminalResponderState;
@@ -25,6 +27,7 @@ class ResponderContainer extends PureComponent<Props> {
       state,
       respondSuccessAcknowledged,
       respondApproved,
+      responseProvided,
       acknowledged,
       defundChosen,
     } = this.props;
@@ -41,8 +44,18 @@ class ResponderContainer extends PureComponent<Props> {
       case 'Responding.WaitForApproval':
         return <WaitForApproval approve={() => respondApproved({ processId })} />;
       case 'Responding.WaitForResponse':
-        // TODO: Should this ever been seen? We expect protocol above this to figure out getting the response
-        return <div>Waiting for response</div>;
+        if (state.ledgerChallenge && state.ourCommitment) {
+          const ourCommitment = state.ourCommitment;
+          return (
+            <ConfirmLedgerUpdate
+              ledgerId={state.channelId}
+              isConclude={state.ledgerChallenge.commitmentType === CommitmentType.Conclude}
+              respond={() => responseProvided({ processId, commitment: ourCommitment })}
+            />
+          );
+        } else {
+          return <div>Waiting for response</div>;
+        }
       case 'Responding.WaitForTransaction':
         return (
           <TransactionSubmission
