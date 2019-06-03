@@ -133,10 +133,10 @@ const confirmLedgerUpdateReducer = (
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   let newSharedData = { ...sharedData };
   const { ledgerId, proposedAllocation, proposedDestination, processId } = protocolState;
+  const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
+  const conclude = protocolState.commitmentType === CommitmentType.Conclude;
   switch (action.type) {
     case 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED':
-      const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
-      const conclude = protocolState.commitmentType === CommitmentType.Conclude;
       const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
       const theirCommitment = ledgerChannel.lastCommitment.commitment;
       const channelState = selectors.getOpenedChannelState(sharedData, ledgerId);
@@ -192,7 +192,25 @@ const confirmLedgerUpdateReducer = (
       newSharedData = queueMessage(newSharedData, messageRelay);
 
       return { protocolState: newProtocolState, sharedData: newSharedData };
-    case 'WALLET.DISPUTE'
+    case 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED':
+      if (!playerA && !conclude) {
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.Conclude,
+        });
+      }
+
+      if (playerA && conclude) {
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.Conclude,
+        });
+      }
+
+      if (!playerA && conclude) {
+        newProtocolState = states.acknowledgeLedgerFinalizedOffChain({ ...protocolState });
+      }
+      return { protocolState: newProtocolState, sharedData };
     case 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED': // TODO remove
       const disputeState = disputeResponderInitialize(
         processId,
