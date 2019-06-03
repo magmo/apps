@@ -2,6 +2,7 @@ import { Commitment } from '../../../../domain';
 import { ProtocolStateWithSharedData } from '../..';
 import * as states from './states';
 import * as actions from './actions';
+import * as helpers from '../../reducer-helpers';
 import { unreachable } from '../../../../utils/reducer-utils';
 import * as selectors from '../../../selectors';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
@@ -28,17 +29,12 @@ import {
 } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../actions';
 import * as _ from 'lodash';
-<<<<<<< HEAD
-=======
-import { isDefundingAction, DefundingAction } from '../../defunding/actions';
-import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
-import {
-  isSuccess as isDefundingSuccess,
-  isFailure as isDefundingFailure,
-} from '../../defunding/states';
 import { getChannel } from '../../../../redux/channel-store';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
->>>>>>> 97481d92... Do not hide wallet when a ledger challenge
+import { confirmLedgerUpdate } from '../../indirect-defunding/states';
+import { CommitmentType } from 'fmg-core';
+import { proposeNewConsensus, acceptConsensus } from '../../../../domain/two-player-consensus-game';
+
 export const initialize = (
   processId: string,
   channelId: string,
@@ -176,16 +172,37 @@ const waitForApprovalReducer = (
         const isLedgerChannel = channelState
           ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
           : false;
+        const newProtocolState = states.waitForResponse(protocolState);
+        if (channelState && isLedgerChannel) {
+          const proposedAllocation = channelState.lastCommitment.commitment.allocation;
+          const proposedDestination = channelState.lastCommitment.commitment.destination;
+          newProtocolState.ledgerChallenge = confirmLedgerUpdate({
+            ...protocolState,
+            ledgerId: protocolState.channelId,
+            commitmentType: CommitmentType.App,
+            proposedAllocation,
+            proposedDestination,
+          });
+          const theirCommitment = channelState.lastCommitment.commitment;
+          const playerA = helpers.isFirstPlayer(protocolState.channelId, sharedData);
+          if (playerA) {
+            newProtocolState.ourCommitment = proposeNewConsensus(
+              theirCommitment,
+              newProtocolState.ledgerChallenge.proposedAllocation,
+              newProtocolState.ledgerChallenge.proposedDestination,
+            );
+          }
+          if (!playerA) {
+            newProtocolState.ourCommitment = acceptConsensus(theirCommitment);
+            newProtocolState.ledgerChallenge.commitmentType = CommitmentType.Conclude;
+          }
+        }
         if (!isLedgerChannel) {
-          sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead modify container to show indirect-defunding screen
+          sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead container shows indirect-defunding screen
         }
         return {
           protocolState: states.waitForResponse(protocolState),
-<<<<<<< HEAD
-          sharedData: hideWallet(sharedData),
-=======
           sharedData,
->>>>>>> 97481d92... Do not hide wallet when a ledger challenge
         };
       } else {
         const transaction = craftResponseTransactionWithExistingCommitment(

@@ -2,6 +2,7 @@ import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../
 import { Commitment } from '../../../../domain';
 import { ProtocolState } from '../..';
 import { StateConstructor } from '../../../utils';
+import { ConfirmLedgerUpdate } from '../../indirect-defunding/states';
 
 // -------
 // States
@@ -36,6 +37,8 @@ export interface WaitForResponse {
   type: 'Responding.WaitForResponse';
   processId: string;
   channelId: string;
+  ledgerChallenge?: ConfirmLedgerUpdate;
+  ourCommitment?: Commitment;
 }
 
 export interface AcknowledgeTimeout {
