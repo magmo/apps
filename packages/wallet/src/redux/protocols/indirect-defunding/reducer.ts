@@ -162,6 +162,7 @@ const confirmLedgerUpdateReducer = (
       newSharedData = queueMessage(newSharedData, messageRelay);
 
       return { protocolState: newProtocolState, sharedData: newSharedData };
+    case 'WALLET.DISPUTE'
     case 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED': // TODO remove
       const disputeState = disputeResponderInitialize(
         processId,

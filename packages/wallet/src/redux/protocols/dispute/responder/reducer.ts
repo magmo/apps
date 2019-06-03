@@ -195,6 +195,16 @@ const waitForAcknowledgementReducer = (
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
     case 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED':
+      const channelState = getChannel(sharedData.channelStore, protocolState.channelId);
+      const isLedgerChannel = channelState
+        ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
+        : false;
+      if (isLedgerChannel) {
+        return {
+          protocolState: states.success({}),
+          sharedData: sendChallengeComplete(sharedData),
+        };
+      }
       return {
         protocolState: states.success({}),
         sharedData: sendChallengeComplete(hideWallet(sharedData)),
