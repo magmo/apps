@@ -72,6 +72,8 @@ export function instigatorConcludingReducer(
       return defundChosen(protocolState, sharedData);
     case 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED':
       return acknowledged(protocolState, sharedData);
+    case 'WALLET.CONCLUDING.INSTIGATOR.KEEP_OPEN_CHOSEN':
+      return keepOpenChosen(protocolState, sharedData);
     default:
       return unreachable(action);
   }
@@ -176,6 +178,16 @@ function concludeReceived(
   return {
     protocolState: instigatorAcknowledgeConcludeReceived(protocolState),
     sharedData: updatedStorage,
+  };
+}
+
+function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'ConcludingInstigator.AcknowledgeConcludeReceived') {
+    return { protocolState, sharedData };
+  }
+  return {
+    protocolState: instigatorAcknowledgeSuccess(protocolState),
+    sharedData,
   };
 }
 

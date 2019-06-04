@@ -63,6 +63,8 @@ export function responderConcludingReducer(
       return defundChosen(protocolState, sharedData);
     case 'WALLET.CONCLUDING.RESPONDER.ACKNOWLEDGED':
       return acknowledged(protocolState, sharedData);
+    case 'WALLET.CONCLUDING.RESPONDER.KEEP_OPEN_CHOSEN':
+      return keepOpenChosen(protocolState, sharedData);
     default:
       return unreachable(action);
   }
@@ -187,6 +189,16 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
   } else {
     return { protocolState, sharedData };
   }
+}
+
+function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
+  if (protocolState.type !== 'ConcludingResponder.DecideDefund') {
+    return { protocolState, sharedData };
+  }
+  return {
+    protocolState: acknowledgeSuccess(protocolState),
+    sharedData,
+  };
 }
 
 function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {

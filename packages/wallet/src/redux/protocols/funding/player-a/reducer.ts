@@ -29,6 +29,7 @@ import {
   ExistingChannelFundingAction,
   isExistingChannelFundingAction,
 } from '../../existing-channel-funding/actions';
+import { CommitmentType } from 'fmg-core';
 
 type EmbeddedAction = IndirectFundingAction;
 
@@ -171,7 +172,10 @@ function strategyChosen(
     state.opponentAddress,
   );
   // TODO: We probably want to let the user select this
-  if (existingLedgerChannel) {
+  if (
+    existingLedgerChannel &&
+    existingLedgerChannel.lastCommitment.commitment.commitmentType === CommitmentType.App
+  ) {
     strategy = 'ExistingChannelStrategy';
   }
   const message = sendStrategyProposed(opponentAddress, processId, strategy);
@@ -197,9 +201,12 @@ function strategyApproved(
       state.ourAddress,
       state.opponentAddress,
     );
-    if (!existingLedgerChannel) {
+    if (
+      !existingLedgerChannel ||
+      existingLedgerChannel.lastCommitment.commitment.commitmentType !== CommitmentType.App
+    ) {
       throw new Error(
-        `Could not find existing ledger channel with participants ${state.ourAddress} and ${
+        `Could not find open existing ledger channel with participants ${state.ourAddress} and ${
           state.opponentAddress
         }.`,
       );

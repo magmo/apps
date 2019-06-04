@@ -29,6 +29,7 @@ import {
   initialize as initializeExistingChannelFunding,
 } from '../../existing-channel-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
+import { CommitmentType } from 'fmg-core';
 type EmbeddedAction = IndirectFundingAction;
 
 export function initialize(
@@ -187,9 +188,12 @@ function strategyApproved(
       state.ourAddress,
       state.opponentAddress,
     );
-    if (!existingLedgerChannel) {
+    if (
+      !existingLedgerChannel ||
+      existingLedgerChannel.lastCommitment.commitment.commitmentType !== CommitmentType.App
+    ) {
       throw new Error(
-        `Could not find existing ledger channel with participants ${state.ourAddress} and ${
+        `Could not find open existing ledger channel with participants ${state.ourAddress} and ${
           state.opponentAddress
         }.`,
       );

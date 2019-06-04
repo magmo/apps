@@ -18,6 +18,11 @@ export interface DefundChosen {
   processId: string;
 }
 
+export interface KeepOpenChosen {
+  type: 'WALLET.CONCLUDING.INSTIGATOR.KEEP_OPEN_CHOSEN';
+  processId: string;
+}
+
 export interface Acknowledged {
   type: 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED';
   processId: string;
@@ -42,6 +47,11 @@ export const defundChosen: ActionConstructor<DefundChosen> = p => ({
   type: 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN',
 });
 
+export const keepOpenChosen: ActionConstructor<KeepOpenChosen> = p => ({
+  ...p,
+  type: 'WALLET.CONCLUDING.INSTIGATOR.KEEP_OPEN_CHOSEN',
+});
+
 export const acknowledged: ActionConstructor<Acknowledged> = p => ({
   ...p,
   type: 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED',
@@ -56,6 +66,7 @@ export type ConcludingAction =
   | ConcludeApproved
   | CommitmentReceived
   | DefundChosen
+  | KeepOpenChosen
   | Acknowledged
   | CommitmentReceived;
 
@@ -65,6 +76,7 @@ export const isConcludingAction = (action: WalletAction): action is ConcludingAc
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN' ||
+    action.type === 'WALLET.CONCLUDING.INSTIGATOR.KEEP_OPEN_CHOSEN' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.ACKNOWLEDGED'
   );
 };

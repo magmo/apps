@@ -13,12 +13,13 @@ interface Props {
   state: NonTerminalConcludingState;
   approve: typeof actions.concludeApproved;
   defund: typeof actions.defundChosen;
+  keepOpen: typeof actions.keepOpenChosen;
   acknowledge: typeof actions.acknowledged;
 }
 
 class ConcludingContainer extends PureComponent<Props> {
   render() {
-    const { state, approve, defund, acknowledge } = this.props;
+    const { state, approve, defund, keepOpen, acknowledge } = this.props;
     const processId = state.processId;
     switch (state.type) {
       case 'ConcludingResponder.AcknowledgeSuccess':
@@ -38,7 +39,12 @@ class ConcludingContainer extends PureComponent<Props> {
           />
         );
       case 'ConcludingResponder.DecideDefund':
-        return <ApproveDefunding approve={() => defund({ processId })} />;
+        return (
+          <ApproveDefunding
+            approve={() => defund({ processId })}
+            keepOpen={() => keepOpen({ processId })}
+          />
+        );
       case 'ConcludingResponder.WaitForDefund':
         return <Defunding state={state.defundingState} />;
       case 'ConcludingResponder.ApproveConcluding':
@@ -53,6 +59,7 @@ const mapDispatchToProps = {
   approve: actions.concludeApproved,
   defund: actions.defundChosen,
   acknowledge: actions.acknowledged,
+  keepOpen: actions.keepOpenChosen,
 };
 
 export const Concluding = connect(

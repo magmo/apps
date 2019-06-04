@@ -9,6 +9,7 @@ import { theirAddress } from '../../channel-store';
 import { Commitment, nextSetupCommitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
 import { sendCommitmentReceived } from '../../../communication';
+import { CommitmentType } from 'fmg-core';
 
 export const initialize = (
   processId: string,
@@ -219,6 +220,9 @@ function craftNewAllocationAndDestination(
 }
 
 function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAmount: string) {
+  if (latestCommitment.commitmentType !== CommitmentType.App) {
+    throw new Error('Ledger channel is already closed.');
+  }
   const numParticipants = latestCommitment.channel.participants.length;
   const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
 
