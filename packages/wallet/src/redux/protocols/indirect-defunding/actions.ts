@@ -13,6 +13,12 @@ export interface UpdateConfirmed {
   processId: string;
 }
 
+export interface ChallengeResponseConfirmed {
+  type: 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED';
+  commitmentType: CommitmentType.App | CommitmentType.Conclude;
+  processId: string;
+}
+
 export interface LedgerChallengeCreated {
   type: 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED';
   commitment: Commitment;
@@ -30,8 +36,8 @@ export interface Acknowledged {
   processId: string;
 }
 
-export interface ResponseProvided {
-  type: 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED';
+export interface ResponseSuccess {
+  type: 'WALLET.INDIRECT_DEFUNDING.RESPONSE_SUCCESS';
   processId: string;
 }
 
@@ -55,18 +61,17 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => {
   return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED' };
 };
 
-export const responseProvided: ActionConstructor<ResponseProvided> = p => {
-  return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED' };
+export const challengeResponseConfirmed: ActionConstructor<ChallengeResponseConfirmed> = p => {
+  return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED' };
 };
-
 // --------
 // Unions and Guards
 // --------
 
 export type IndirectDefundingAction =
   | CommitmentReceived
-  | ResponseProvided
   | UpdateConfirmed
+  | ChallengeResponseConfirmed
   | ChallengeChosen
   | LedgerChallengeCreated
   | Acknowledged;
@@ -74,10 +79,10 @@ export type IndirectDefundingAction =
 export function isIndirectDefundingAction(action: WalletAction): action is IndirectDefundingAction {
   return (
     action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
-    action.type === 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED' ||
+    action.type === 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_CHOSEN' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED'
   );

@@ -227,7 +227,10 @@ const waitForApprovalReducer = (
         const isLedgerChannel = channelState
           ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
           : false;
-        const newProtocolState = states.waitForResponse(protocolState);
+        const newProtocolState = states.waitForResponse({
+          ...protocolState,
+          yieldingProcessId: sharedData.yieldingProcessId,
+        });
         if (channelState && isLedgerChannel) {
           const proposedAllocation = channelState.lastCommitment.commitment.allocation;
           const proposedDestination = channelState.lastCommitment.commitment.destination;

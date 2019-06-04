@@ -11,7 +11,6 @@ import { theirAddress } from '../../channel-store';
 import { composeConcludeCommitment } from '../../../utils/commitment-utils';
 import { CommitmentReceived } from '../../actions';
 import { CommitmentType } from 'fmg-core';
-import { initialize as disputeResponderInitialize } from '../dispute/responder/reducer';
 
 export const initialize = (
   processId: string,
@@ -71,10 +70,6 @@ export const indirectDefundingReducer = (
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
     case 'IndirectDefunding.ConfirmLedgerUpdate':
       return confirmLedgerUpdateReducer(protocolState, sharedData, action);
-    case 'IndirectDefunding.WaitForDisputeChallenger':
-    // todo (call dispute reducer)
-    case 'IndirectDefunding.WaitForDisputeResponder':
-    // todo (call dispute reducer)
     case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
       if (action.type === 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED') {
         return { protocolState: states.successOff({ ...protocolState }), sharedData };
@@ -105,13 +100,38 @@ const confirmLedgerUpdateReducer = (
   const { ledgerId, proposedAllocation, proposedDestination, processId } = protocolState;
   const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
   const conclude = protocolState.commitmentType === CommitmentType.Conclude;
+  const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
+  const theirCommitment = ledgerChannel.lastCommitment.commitment;
+  const channelState = selectors.getOpenedChannelState(sharedData, ledgerId);
+  let ourCommitment;
+  let newProtocolState;
   switch (action.type) {
+    case 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED':
+      if (playerA && !conclude) {
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.App,
+        });
+      }
+      if (!playerA && !conclude) {
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.Conclude,
+        });
+      }
+
+      if (playerA && conclude) {
+        newProtocolState = states.waitForLedgerUpdate({
+          ...protocolState,
+          commitmentType: CommitmentType.Conclude,
+        });
+      }
+
+      if (!playerA && conclude) {
+        newProtocolState = states.acknowledgeLedgerFinalizedOffChain({ ...protocolState });
+      }
+      return { protocolState: newProtocolState, sharedData };
     case 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED':
-      const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
-      const theirCommitment = ledgerChannel.lastCommitment.commitment;
-      const channelState = selectors.getOpenedChannelState(sharedData, ledgerId);
-      let ourCommitment;
-      let newProtocolState;
       if (playerA && !conclude) {
         ourCommitment = proposeNewConsensus(
           theirCommitment,
@@ -160,41 +180,8 @@ const confirmLedgerUpdateReducer = (
         signResult.signedCommitment.signature,
       );
       newSharedData = queueMessage(newSharedData, messageRelay);
-
       return { protocolState: newProtocolState, sharedData: newSharedData };
-    case 'WALLET.INDIRECT_DEFUNDING.RESPONSE_PROVIDED':
-      if (!playerA && !conclude) {
-        newProtocolState = states.waitForLedgerUpdate({
-          ...protocolState,
-          commitmentType: CommitmentType.Conclude,
-        });
-      }
 
-      if (playerA && conclude) {
-        newProtocolState = states.waitForLedgerUpdate({
-          ...protocolState,
-          commitmentType: CommitmentType.Conclude,
-        });
-      }
-
-      if (!playerA && conclude) {
-        newProtocolState = states.acknowledgeLedgerFinalizedOffChain({ ...protocolState });
-      }
-      return { protocolState: newProtocolState, sharedData };
-    case 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED': // TODO remove
-      const disputeState = disputeResponderInitialize(
-        processId,
-        ledgerId,
-        sharedData,
-        action.commitment,
-      );
-      return {
-        protocolState: states.waitForDisputeResponder({
-          ...protocolState,
-          disputeState: disputeState.protocolState,
-        }),
-        sharedData: newSharedData,
-      };
     default:
       throw new Error(`Invalid action ${action.type}`);
   }

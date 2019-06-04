@@ -10,7 +10,6 @@ import { CommitmentType } from 'fmg-core';
 import ConfirmLedgerUpdate from './components/confirm-ledger-update';
 import * as actions from './actions';
 import Acknowledge from '../shared-components/acknowledge';
-import { Dispute } from '../dispute/container';
 import { createChallengeRequested } from '../actions';
 
 interface Props {
@@ -51,9 +50,6 @@ class IndirectDefundingContainer extends PureComponent<Props> {
             }
           />
         );
-      case 'IndirectDefunding.WaitForDisputeChallenger':
-      case 'IndirectDefunding.WaitForDisputeResponder':
-        return <Dispute state={state.disputeState} />;
       case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
         return (
           <Acknowledge

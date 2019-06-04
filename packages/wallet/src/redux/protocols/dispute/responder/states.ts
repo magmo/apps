@@ -38,6 +38,7 @@ export interface WaitForResponse {
   channelId: string;
   ledgerChallenge?: ConfirmLedgerUpdate;
   ourCommitment?: Commitment;
+  yieldingProcessId?: string;
 }
 
 export interface AcknowledgeTimeout {

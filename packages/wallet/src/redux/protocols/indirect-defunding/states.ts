@@ -1,7 +1,5 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
-import { NonTerminalChallengerState } from '../dispute/challenger/states';
-import { NonTerminalResponderState } from '../dispute/responder/states';
 import { CommitmentType } from 'fmg-core';
 
 // -------
@@ -26,22 +24,6 @@ export interface WaitForLedgerUpdate {
   proposedAllocation: string[];
   proposedDestination: string[];
   commitmentType: CommitmentType.App | CommitmentType.Conclude;
-}
-
-export interface WaitForDisputeChallenger {
-  type: 'IndirectDefunding.WaitForDisputeChallenger';
-  processId: string;
-  ledgerId: string;
-  channelId: string;
-  disputeState: NonTerminalChallengerState;
-}
-
-export interface WaitForDisputeResponder {
-  type: 'IndirectDefunding.WaitForDisputeResponder';
-  processId: string;
-  ledgerId: string;
-  channelId: string;
-  disputeState: NonTerminalResponderState;
 }
 
 export interface AcknowledgeLedgerFinalizedOffChain {
@@ -89,14 +71,6 @@ export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
   };
 };
 
-export const waitForDisputeChallenger: StateConstructor<WaitForDisputeChallenger> = p => {
-  return { ...p, type: 'IndirectDefunding.WaitForDisputeChallenger' };
-};
-
-export const waitForDisputeResponder: StateConstructor<WaitForDisputeResponder> = p => {
-  return { ...p, type: 'IndirectDefunding.WaitForDisputeResponder' };
-};
-
 export const acknowledgeLedgerFinalizedOffChain: StateConstructor<
   AcknowledgeLedgerFinalizedOffChain
 > = p => {
@@ -128,8 +102,6 @@ export const failure: StateConstructor<Failure> = p => {
 export type NonTerminalIndirectDefundingState =
   | WaitForLedgerUpdate
   | ConfirmLedgerUpdate
-  | WaitForDisputeChallenger
-  | WaitForDisputeResponder
   | AcknowledgeLedgerFinalizedOffChain
   | AcknowledgeLedgerFinalizedOnChain;
 
@@ -155,8 +127,6 @@ export function isIndirectDefundingState(state: ProtocolState): state is Indirec
   return (
     state.type === 'IndirectDefunding.ConfirmLedgerUpdate' ||
     state.type === 'IndirectDefunding.WaitForLedgerUpdate' ||
-    state.type === 'IndirectDefunding.WaitForDisputeChallenger' ||
-    state.type === 'IndirectDefunding.WaitForDisputeResponder' ||
     state.type === 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain' ||
     state.type === 'IndirectDefunding.AcknowledgeLedgerFinalizedOnChain' ||
     state.type === 'IndirectDefunding.Failure' ||

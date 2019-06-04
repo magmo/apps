@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
 import ConfirmLedgerUpdate from '../../indirect-defunding/components/confirm-ledger-update';
 import { CommitmentType } from 'fmg-core';
+import { challengeResponseConfirmed } from '../../indirect-defunding/actions';
 
 interface Props {
   state: states.NonTerminalResponderState;
@@ -46,11 +47,23 @@ class ResponderContainer extends PureComponent<Props> {
       case 'Responding.WaitForResponse':
         if (state.ledgerChallenge && state.ourCommitment) {
           const ourCommitment = state.ourCommitment;
+          const ledgerChallenge = state.ledgerChallenge;
           return (
             <ConfirmLedgerUpdate
               ledgerId={state.channelId}
               isConclude={state.ledgerChallenge.commitmentType === CommitmentType.Conclude}
-              respond={() => responseProvided({ processId, commitment: ourCommitment })}
+              respond={() =>
+                responseProvided({
+                  processId,
+                  commitment: ourCommitment,
+                  action: challengeResponseConfirmed({
+                    commitmentType: ledgerChallenge.commitmentType,
+                    processId: state.yieldingProcessId
+                      ? state.yieldingProcessId
+                      : 'no-yielding-process-id',
+                  }),
+                })
+              }
             />
           );
         } else {
