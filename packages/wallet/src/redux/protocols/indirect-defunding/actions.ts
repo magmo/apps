@@ -35,12 +35,6 @@ export interface Acknowledged {
   type: 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED';
   processId: string;
 }
-
-export interface ResponseSuccess {
-  type: 'WALLET.INDIRECT_DEFUNDING.RESPONSE_SUCCESS';
-  processId: string;
-}
-
 // --------
 // Constructors
 // --------
