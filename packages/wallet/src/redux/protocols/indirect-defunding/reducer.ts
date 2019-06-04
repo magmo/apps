@@ -236,6 +236,33 @@ const waitForLedgerUpdateReducer = (
   action: IndirectDefundingAction,
 ): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   let newSharedData = { ...sharedData };
+  const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
+  const conclude = protocolState.commitmentType === CommitmentType.Conclude;
+  let newProtocolState;
+  if (playerA && !conclude) {
+    newProtocolState = states.confirmLedgerUpdate({
+      ...protocolState,
+      commitmentType: CommitmentType.Conclude,
+    });
+  }
+
+  if (!playerA && !conclude) {
+    newProtocolState = states.confirmLedgerUpdate({
+      ...protocolState,
+      commitmentType: CommitmentType.App,
+    });
+  }
+
+  if (playerA && conclude) {
+    newProtocolState = states.acknowledgeLedgerFinalizedOffChain({ ...protocolState });
+  }
+
+  if (!playerA && conclude) {
+    newProtocolState = states.confirmLedgerUpdate({
+      ...protocolState,
+      commitmentType: CommitmentType.Conclude,
+    });
+  }
   switch (action.type) {
     case 'WALLET.COMMON.COMMITMENT_RECEIVED':
       const checkResult = checkAndStore(newSharedData, action.signedCommitment);
@@ -246,51 +273,15 @@ const waitForLedgerUpdateReducer = (
         };
       }
       newSharedData = checkResult.store;
-      const playerA = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
-      const conclude =
-        action.signedCommitment.commitment.commitmentType === CommitmentType.Conclude;
-
-      if (playerA && !conclude) {
-        return {
-          protocolState: states.confirmLedgerUpdate({
-            ...protocolState,
-            commitmentType: CommitmentType.Conclude,
-          }),
-          sharedData: newSharedData,
-        };
-      }
-
-      if (!playerA && !conclude) {
-        return {
-          protocolState: states.confirmLedgerUpdate({
-            ...protocolState,
-            commitmentType: CommitmentType.App,
-          }),
-          sharedData: newSharedData,
-        };
-      }
-
-      if (playerA && conclude) {
-        return {
-          protocolState: states.acknowledgeLedgerFinalizedOffChain({ ...protocolState }),
-          sharedData: newSharedData,
-        };
-      }
-
-      if (!playerA && conclude) {
-        return {
-          protocolState: states.confirmLedgerUpdate({
-            ...protocolState,
-            commitmentType: CommitmentType.Conclude,
-          }),
-          sharedData: newSharedData,
-        };
-      }
       return {
-        protocolState: states.confirmLedgerUpdate({ ...protocolState }),
+        protocolState: newProtocolState,
         sharedData: newSharedData,
       };
     case 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_CHOSEN':
+      return {
+        protocolState: newProtocolState,
+        sharedData,
+      };
     default:
       throw new Error(`Invalid action ${action.type}`);
   }
