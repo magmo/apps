@@ -183,3 +183,9 @@ export function getOpponentAddress(channelState: ChannelState, playerIndex: Play
   const opponentAddress = participants[(playerIndex + 1) % participants.length];
   return opponentAddress;
 }
+
+export function yieldToProcess(sharedData: SharedData): SharedData {
+  const newSharedData = sharedData;
+  newSharedData.currentProcessId = sharedData.yieldingProcessId;
+  return newSharedData;
+}

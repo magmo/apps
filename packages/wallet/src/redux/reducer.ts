@@ -150,7 +150,7 @@ export function getProcessId(action: NewProcessAction): string {
   throw new Error('Invalid action');
 }
 
-function initializeNewProtocol(
+function initializeNewProcess(
   state: states.Initialized,
   action: NewProcessAction,
 ): { protocolState: ProtocolState; sharedData: states.SharedData } {
@@ -208,7 +208,7 @@ function routeToNewProcessInitializer(
   action: NewProcessAction,
 ): states.Initialized {
   const processId = getProcessId(action);
-  const { protocolState, sharedData } = initializeNewProtocol(state, action);
+  const { protocolState, sharedData } = initializeNewProcess(state, action);
   return startProcess(state, sharedData, action, protocolState, processId);
 }
 
@@ -248,6 +248,7 @@ function startProcess(
   // TODO: Right now any new processId get sets to the current process Id.
   // We probably need a priority queue so some protocols can override another
   // IE: Responding to a challenge is higher priority than funding.
+  newState.yieldingProcessId = state.currentProcessId;
   newState.currentProcessId = processId;
 
   return newState;

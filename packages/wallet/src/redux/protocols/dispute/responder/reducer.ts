@@ -202,7 +202,7 @@ const waitForAcknowledgementReducer = (
       if (isLedgerChannel) {
         return {
           protocolState: states.success({}),
-          sharedData: sendChallengeComplete(sharedData),
+          sharedData: sendChallengeComplete(helpers.yieldToProcess(sharedData)),
         };
       }
       return {

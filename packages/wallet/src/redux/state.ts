@@ -46,6 +46,8 @@ export interface SharedData {
   channelSubscriptions: ChannelSubscriptions;
   adjudicatorState: AdjudicatorState;
   fundingState: FundingState;
+  currentProcessId?: string;
+  yieldingProcessId?: string;
   activeAppChannelId?: string;
 }
 
@@ -64,8 +66,6 @@ export interface Initialized extends SharedData {
   type: typeof WALLET_INITIALIZED;
   uid: string;
   processStore: ProcessStore;
-  currentProcessId?: string;
-  activeAppChannelId?: string;
 }
 
 // TODO: Once these are fleshed out they should be moved to their own file.
@@ -125,6 +125,8 @@ export function sharedData(params: SharedData): SharedData {
     adjudicatorState,
     fundingState,
     activeAppChannelId,
+    currentProcessId,
+    yieldingProcessId,
     channelSubscriptions,
   } = params;
   return {
@@ -133,6 +135,8 @@ export function sharedData(params: SharedData): SharedData {
     adjudicatorState,
     fundingState,
     activeAppChannelId,
+    currentProcessId,
+    yieldingProcessId,
     channelSubscriptions,
   };
 }
