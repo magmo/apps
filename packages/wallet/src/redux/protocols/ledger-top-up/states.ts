@@ -30,7 +30,7 @@ export interface WaitForLedgerUpdateForPlayerA {
   proposedDestination: string[];
 }
 export interface WaitForLedgerUpdateForPlayerB {
-  type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerA';
+  type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerB';
   channelId: string;
   ledgerId: string;
   processId: string;
@@ -70,6 +70,12 @@ export const waitForLedgerUpdateForPlayerA: StateConstructor<WaitForLedgerUpdate
   };
 };
 
+export const waitForLedgerUpdateForPlayerB: StateConstructor<WaitForLedgerUpdateForPlayerB> = p => {
+  return {
+    ...p,
+    type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerB',
+  };
+};
 export const success: StateConstructor<Success> = p => {
   return { ...p, type: 'LedgerTopUp.Success' };
 };
