@@ -12,7 +12,9 @@ The protocol has three main steps:
 ```mermaid
 graph TD
   linkStyle default interpolate basis
-  St((Start))-->WFLU(WaitForLedgerUpdate)
+  St((Start))-->NT{Is top up required?}
+  NT-->|No|Su((success))
+  NT-->|Yes|WFLU(WaitForLedgerUpdate)
   WFLU-->|"CommitmentReceived(Accept)"|WFDF(WaitForDirectFunding)
   WFDF-->|FundingAction|WFDF(WaitForDirectFunding)
   WFDF-->|Success|WFLR(WaitForLedgerReorg)
@@ -23,10 +25,17 @@ graph TD
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
   classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
-  class St,ANF,BNF logic;
+  class St,NT logic;
   class Su Success;
   class F Failure;
   class LT WaitForChildProtocol;
 ```
 
 ## Scenarios
+
+1. **Both Players need top-up** Start->WaitForLedgerUpdate->WaitForDirectFunding->WaitForLedgerReorg->Success
+2. **Only Player A needs top-up** Start->WaitForLedgerUpdate->WaitForDirectFunding->WaitForLedgerReorg->Success
+3. **Only Player B needs top-up** Start->WaitForLedgerUpdate->WaitForDirectFunding->WaitForLedgerReorg->Success
+4. **No players need top-up** Start-->Success
+5. **Ledger Update Rejected** WaitForLedgerUpdate-->Failure
+6. **Ledger Reorg Rejected** WaitForLedgerReorg->Failure
