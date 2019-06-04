@@ -31,6 +31,7 @@ class IndirectDefundingContainer extends PureComponent<Props> {
             challenge={() =>
               challengeChosen({
                 channelId: state.ledgerId,
+                action: actions.challengeChosen({ processId: state.processId }),
               })
             }
           />

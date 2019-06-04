@@ -295,6 +295,7 @@ function challengeResponseReceived(
 
   protocolState = acknowledgeResponse(protocolState);
   sharedData = sendChallengeCommitmentReceived(sharedData, challengeCommitment);
+  // ^ TODO don't send a message to the app if it is a ledger challenge commitment.
 
   const signedCommitment: SignedCommitment = {
     commitment: challengeCommitment,

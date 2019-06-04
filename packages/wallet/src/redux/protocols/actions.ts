@@ -2,7 +2,7 @@ import { PlayerIndex } from '../types';
 import { Commitment } from '../../domain';
 import { ActionConstructor } from '../utils';
 import { ConcludeInstigated, WalletProtocol } from '../../communication';
-import { WalletAction } from '../actions';
+import { WalletAction, ProtocolAction } from '../actions';
 export { BaseProcessAction } from '../../communication';
 
 // -------
@@ -29,6 +29,7 @@ export interface CreateChallengeRequested {
   type: 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
   channelId: string;
   protocol: WalletProtocol.Dispute;
+  action?: ProtocolAction;
 }
 
 export interface ChallengeCreated {
