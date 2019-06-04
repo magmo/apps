@@ -37,8 +37,11 @@ import {
   sendChallengeCommitmentReceived,
   sendChallengeComplete,
   sendConcludeSuccess,
+  yieldToProcess,
 } from '../../reducer-helpers';
 import { Commitment, SignedCommitment } from '../../../../domain';
+import { isDefundingAction, DefundingAction } from '../../defunding/actions';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 
 const CHALLENGE_TIMEOUT = 5 * 60000;
 
@@ -319,7 +322,15 @@ function challengeResponseAcknowledged(
   if (protocolState.type !== 'Challenging.AcknowledgeResponse') {
     return { protocolState, sharedData };
   }
-  sharedData = sendChallengeComplete(hideWallet(sharedData));
+  const channelState = getChannel(sharedData, protocolState.channelId);
+  const isLedgerChannel = channelState
+    ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
+    : false;
+  if (isLedgerChannel) {
+    sharedData = yieldToProcess(sharedData);
+  } else {
+    sharedData = sendChallengeComplete(hideWallet(sharedData));
+  }
   return { protocolState: successOpen({}), sharedData };
 }
 
