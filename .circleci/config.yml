@@ -92,4 +92,4 @@ jobs:
             echo Failed waiting for Postgres && exit 1
 
       # run tests!
-      - run: npx lerna run test:ci --stream --concurrency 2 --since origin/master
+      - run: npx lerna run test:ci --stream --concurrency 2
