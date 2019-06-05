@@ -27,29 +27,29 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v2-dependencies-{{ checksum "yarn.lock" }}
+            - v3-dependencies-{{ checksum "yarn.lock" }}
             # fallback to using the latest cache if no exact match is found
-            - v2-dependencies-
+            - v3-dependencies-
       - restore_cache:
           keys:
-            - v2-dependencies-rps-{{ checksum "yarn.lock" }}
-            - v2-dependencies-rps
+            - v3-dependencies-rps-{{ checksum "yarn.lock" }}
+            - v3-dependencies-rps
       - restore_cache:
           keys:
-            - v2-dependencies-tictactoe-{{ checksum "yarn.lock" }}
-            - v2-dependencies-tictactoe
+            - v3-dependencies-tictactoe-{{ checksum "yarn.lock" }}
+            - v3-dependencies-tictactoe
       - restore_cache:
           keys:
-            - v2-dependencies-server-{{ checksum "yarn.lock" }}
-            - v2-dependencies-server
+            - v3-dependencies-server-{{ checksum "yarn.lock" }}
+            - v3-dependencies-server
       - restore_cache:
           keys:
-            - v2-dependencies-wallet-{{ checksum "yarn.lock" }}
-            - v2-dependencies-wallet
+            - v3-dependencies-wallet-{{ checksum "yarn.lock" }}
+            - v3-dependencies-wallet
       - restore_cache:
           keys:
-            - v2-dependencies-magmo-wallet-client-{{ checksum "yarn.lock" }}
-            - v2-dependencies-magmo-wallet-client
+            - v3-dependencies-magmo-wallet-client-{{ checksum "yarn.lock" }}
+            - v3-dependencies-magmo-wallet-client
 
       - run: yarn install
       - run: npx lerna run prepare
@@ -57,28 +57,28 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: v2-dependencies-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-{{ checksum "yarn.lock" }}
       - save_cache:
           paths:
             - packages/rps/node_modules
-          key: v2-dependencies-rps-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-rps-{{ checksum "yarn.lock" }}
       - save_cache:
           paths:
             - packages/tictactoe/node_modules
-          key: v2-dependencies-tictactoe-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-tictactoe-{{ checksum "yarn.lock" }}
       - save_cache:
           paths:
             - packages/server/node_modules
-          key: v2-dependencies-server-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-server-{{ checksum "yarn.lock" }}
 
       - save_cache:
           paths:
             - packages/wallet/node_modules
-          key: v2-dependencies-wallet-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-wallet-{{ checksum "yarn.lock" }}
       - save_cache:
           paths:
             - packages/magmo-wallet-client/node_modules
-          key: v2-dependencies-magmo-wallet-client-{{ checksum "yarn.lock" }}
+          key: v3-dependencies-magmo-wallet-client-{{ checksum "yarn.lock" }}
 
       - run:
           name: Waiting for Postgres to be ready
