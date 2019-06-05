@@ -223,7 +223,7 @@ const waitForApprovalReducer = (
     case 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED':
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
-        const channelState = getChannel(sharedData.channelStore, protocolState.channelId);
+        const channelState = selectors.getChannelState(sharedData, protocolState.channelId);
         const isLedgerChannel = channelState
           ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
           : false;
