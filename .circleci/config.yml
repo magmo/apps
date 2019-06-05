@@ -15,7 +15,7 @@ jobs:
 
       - image: circleci/postgres:11.2-alpine-postgis
         environment:
-          POSTGRES_USER: root
+          POSTGRES_USER: magmo
           POSTGRES_DB: server_wallet_test
           POSTGRES_PASSWORD: ''
 
