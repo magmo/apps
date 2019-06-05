@@ -12,6 +12,7 @@ import { DefundingState } from './defunding/states';
 import { ConcludingState } from './concluding/states';
 import { TransactionSubmissionState } from './transaction-submission';
 import { ExistingChannelFundingState } from './existing-channel-funding/states';
+import { LedgerTopUpState } from './ledger-top-up/states';
 
 export type ProtocolState =
   | ApplicationState
@@ -25,7 +26,8 @@ export type ProtocolState =
   | ConcludingState
   | IndirectDefundingState
   | TransactionSubmissionState
-  | ExistingChannelFundingState;
+  | ExistingChannelFundingState
+  | LedgerTopUpState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
   protocolState: T,
