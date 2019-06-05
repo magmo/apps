@@ -20,6 +20,22 @@ import {
   SHOW_WALLET,
 } from 'magmo-wallet-client';
 
+const itTransitionsTo = (result: { protocolState: ChallengerState }, type: ChallengerStateType) => {
+  it(`transitions to ${type}`, () => {
+    expect(result.protocolState.type).toEqual(type);
+  });
+};
+
+const itHasFailureReason = (result: { protocolState: ChallengerState }, reason: FailureReason) => {
+  it(`has failure reason ${reason}`, () => {
+    if ('reason' in result.protocolState) {
+      expect(result.protocolState.reason).toEqual(reason);
+    } else {
+      fail(`State ${result.protocolState.type} doesn't have a failure reason.`);
+    }
+  });
+};
+
 describe('OPPONENT RESPONDS', () => {
   const scenario = scenarios.opponentResponds;
   const { channelId, processId, sharedData } = scenario;
@@ -249,19 +265,3 @@ describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
     itTransitionsTo(result, 'Challenging.AcknowledgeClosedButNotDefunded');
   });
 });
-
-const itTransitionsTo = (result: { protocolState: ChallengerState }, type: ChallengerStateType) => {
-  it(`transitions to ${type}`, () => {
-    expect(result.protocolState.type).toEqual(type);
-  });
-};
-
-const itHasFailureReason = (result: { protocolState: ChallengerState }, reason: FailureReason) => {
-  it(`has failure reason ${reason}`, () => {
-    if ('reason' in result.protocolState) {
-      expect(result.protocolState.reason).toEqual(reason);
-    } else {
-      fail(`State ${result.protocolState.type} doesn't have a failure reason.`);
-    }
-  });
-};
