@@ -33,9 +33,20 @@ graph TD
 
 ## Scenarios
 
+### Player A Scenarios
+
 1. **Both Players need top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->WaitForLedgerUpdatePlayerB-->WaitForDirectFunding->Success
 2. **Only Player A needs top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->Success
 3. **Only Player B needs top-up** Start->WaitForLedgerUpdatePlayerB->WaitForDirectFunding->Success
 4. **No players need top-up** Start-->Success
 5. **Player A Ledger Update Rejected** WaitForLedgerUpdatePlayerA-->Failure
-6. **Player B Ledger Reorg Rejected** WaitForLedgerUpdatePlayerB->Failure
+6. **Player B Ledger Update Rejected** WaitForLedgerUpdatePlayerB->Failure
+
+### Player B Scenarios
+
+1. **Both Players need top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->WaitForLedgerUpdatePlayerB-->WaitForDirectFunding->Success
+2. **Only Player A needs top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->Success
+3. **Only Player B needs top-up** Start->WaitForLedgerUpdatePlayerB->WaitForDirectFunding->Success
+4. **No players need top-up** Start-->Success
+5. **Player A Ledger Update Rejected** WaitForLedgerUpdatePlayerA-->Failure
+6. **Player B Ledger Update Rejected** WaitForLedgerUpdatePlayerB->Failure
