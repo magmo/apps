@@ -86,8 +86,10 @@ export const failure: StateConstructor<Failure> = p => {
 
 export type LedgerTopUpState =
   | WaitForLedgerUpdateForPlayerA
-  | WaitForDirectFundingForPlayerB
+  | WaitForLedgerUpdateForPlayerB
   | WaitForDirectFundingForPlayerA
   | WaitForDirectFundingForPlayerB
   | Success
   | Failure;
+
+export type LedgerTopUpStateType = LedgerTopUpState['type'];

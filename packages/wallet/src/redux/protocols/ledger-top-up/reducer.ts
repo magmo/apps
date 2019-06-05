@@ -3,12 +3,12 @@ import * as states from './states';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import * as actions from './actions';
 export function initialize(
-  sharedData: SharedData,
+  processId: string,
   channelId: string,
   ledgerId: string,
-  processId: string,
   proposedAllocation: string[],
   proposedDestination: string[],
+  sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.LedgerTopUpState> {
   return {
     protocolState: states.success({}),
