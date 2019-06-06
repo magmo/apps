@@ -1,4 +1,4 @@
-import { CommitmentReceived, WalletAction } from '../../actions';
+import { CommitmentReceived, WalletAction, LedgerDisputeDetected } from '../../actions';
 import { CommitmentType } from 'fmg-core';
 import { Commitment } from '../../../domain';
 import { ActionConstructor } from '../../../redux/utils';
@@ -9,12 +9,6 @@ import { ActionConstructor } from '../../../redux/utils';
 
 export interface UpdateConfirmed {
   type: 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED';
-  commitmentType: CommitmentType.App | CommitmentType.Conclude;
-  processId: string;
-}
-
-export interface ChallengeResponseConfirmed {
-  type: 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED';
   commitmentType: CommitmentType.App | CommitmentType.Conclude;
   processId: string;
 }
@@ -55,9 +49,6 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => {
   return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED' };
 };
 
-export const challengeResponseConfirmed: ActionConstructor<ChallengeResponseConfirmed> = p => {
-  return { ...p, type: 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED' };
-};
 // --------
 // Unions and Guards
 // --------
@@ -65,19 +56,18 @@ export const challengeResponseConfirmed: ActionConstructor<ChallengeResponseConf
 export type IndirectDefundingAction =
   | CommitmentReceived
   | UpdateConfirmed
-  | ChallengeResponseConfirmed
   | ChallengeChosen
   | LedgerChallengeCreated
-  | Acknowledged;
+  | Acknowledged
+  | LedgerDisputeDetected;
 
 export function isIndirectDefundingAction(action: WalletAction): action is IndirectDefundingAction {
   return (
     action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.LEDGER_CHALLENGE_CREATED' ||
-    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.UPDATE_CONFIRMED' ||
-    action.type === 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_REPSONSE_CONFIRMED' ||
     action.type === 'WALLET.INDIRECT_DEFUNDING.CHALLENGE_CHOSEN' ||
-    action.type === 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED'
+    action.type === 'WALLET.INDIRECT_DEFUNDING.ACKNOWLEDGED' ||
+    action.type === 'WALLET.COMMON.LEDGER_DISPUTE_DETECTED'
   );
 }

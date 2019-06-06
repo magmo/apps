@@ -10,15 +10,12 @@ import { Defunding } from '../../defunding/container';
 
 import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
-import ConfirmLedgerUpdate from '../../indirect-defunding/components/confirm-ledger-update';
-import { CommitmentType } from 'fmg-core';
-import { challengeResponseConfirmed } from '../../indirect-defunding/actions';
+import { ledgerDisputeDetected } from '../../../../redux/actions';
 
 interface Props {
   state: states.NonTerminalResponderState;
-  respondApproved: ActionDispatcher<actions.RespondApproved>;
+  respondApproved: typeof actions.respondApproved;
   respondSuccessAcknowledged: ActionDispatcher<actions.RespondSuccessAcknowledged>;
-  responseProvided: ActionDispatcher<actions.ResponseProvided>;
   acknowledged: ActionDispatcher<actions.Acknowledged>;
   defundChosen: ActionDispatcher<actions.DefundChosen>;
 }
@@ -28,7 +25,6 @@ class ResponderContainer extends PureComponent<Props> {
       state,
       respondSuccessAcknowledged,
       respondApproved,
-      responseProvided,
       acknowledged,
       defundChosen,
     } = this.props;
@@ -43,32 +39,21 @@ class ResponderContainer extends PureComponent<Props> {
           />
         );
       case 'Responding.WaitForApproval':
-        return <WaitForApproval approve={() => respondApproved({ processId })} />;
-      case 'Responding.WaitForResponse':
-        if (state.ledgerChallenge && state.ourCommitment) {
-          const ourCommitment = state.ourCommitment;
-          const ledgerChallenge = state.ledgerChallenge;
-          return (
-            <ConfirmLedgerUpdate
-              ledgerId={state.channelId}
-              isConclude={state.ledgerChallenge.commitmentType === CommitmentType.Conclude}
-              respond={() =>
-                responseProvided({
-                  processId,
-                  commitment: ourCommitment,
-                  action: challengeResponseConfirmed({
-                    commitmentType: ledgerChallenge.commitmentType,
-                    processId: state.yieldingProcessId
-                      ? state.yieldingProcessId
-                      : 'no-yielding-process-id',
-                  }),
-                })
-              }
-            />
-          );
+        let embeddedProtocolAction;
+        if (state.yieldingProcessId) {
+          // TODO more robust check here ^
+          embeddedProtocolAction = ledgerDisputeDetected({
+            processId: state.yieldingProcessId,
+            channelId: state.channelId,
+          });
         } else {
-          return <div>Waiting for response</div>;
+          embeddedProtocolAction = undefined;
         }
+        return (
+          <WaitForApproval approve={() => respondApproved({ processId, embeddedProtocolAction })} />
+        );
+      case 'Responding.WaitForResponse':
+        return <div>Waiting for response</div>;
       case 'Responding.WaitForTransaction':
         return (
           <TransactionSubmission
@@ -110,7 +95,6 @@ class ResponderContainer extends PureComponent<Props> {
 
 const mapDispatchToProps = {
   respondApproved: actions.respondApproved,
-  responseProvided: actions.responseProvided,
   respondSuccessAcknowledged: actions.respondSuccessAcknowledged,
   acknowledged: actions.acknowledged,
   defundChosen: actions.defundChosen,

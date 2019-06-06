@@ -3,6 +3,7 @@ import {
   emptyDisplayOutboxState,
   SideEffects,
   queueMessage as queueMessageOutbox,
+  queueInternalMessage as queueInternalMessageOutbox,
   queueTransaction as queueTransactionOutbox,
   getLastMessage as getLastMessageFromOutbox,
 } from './outbox/state';
@@ -21,7 +22,7 @@ import {
 import { Properties } from './utils';
 import * as indirectFunding from './protocols/indirect-funding/states';
 import { accumulateSideEffects } from './outbox';
-import { WalletEvent } from 'magmo-wallet-client';
+import { WalletEvent, MessageRelayRequested } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
 import { AdjudicatorState } from './adjudicator-state/state';
 import { SignedCommitment, Commitment } from '../domain';
@@ -184,6 +185,13 @@ export function getChannel(state: SharedData, channelId: string): ChannelState |
 
 export function queueMessage(state: SharedData, message: WalletEvent): SharedData {
   return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
+}
+
+export function queueInternalMessage(
+  state: SharedData,
+  message: MessageRelayRequested,
+): SharedData {
+  return { ...state, outboxState: queueInternalMessageOutbox(state.outboxState, message) };
 }
 
 export function setChannelStore(state: SharedData, channelStore: ChannelStore): SharedData {

@@ -37,24 +37,34 @@ import {
 } from '../../defunding/states';
 import { getChannel } from '../../../../redux/channel-store';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { confirmLedgerUpdate } from '../../indirect-defunding/states';
-import { CommitmentType } from 'fmg-core';
-import { proposeNewConsensus, acceptConsensus } from '../../../../domain/two-player-consensus-game';
 export const initialize = (
   processId: string,
   channelId: string,
   sharedData: SharedData,
   challengeCommitment: Commitment,
 ): ProtocolStateWithSharedData<states.NonTerminalResponderState> => {
-  return {
-    protocolState: states.waitForApproval({ processId, channelId, challengeCommitment }),
-    sharedData: showWallet(
+  let newSharedData = sharedData;
+  if (helpers.isYieldingProcessApplication(sharedData)) {
+    // we are responding to an application challenge
+    newSharedData = showWallet(
       registerChannelToMonitor(
         sendChallengeResponseRequested(sharedData, channelId),
         processId,
         channelId,
       ),
-    ),
+    );
+  } else {
+    // we are responding to a ledger challenge
+    newSharedData = registerChannelToMonitor(sharedData, processId, channelId);
+  }
+  return {
+    protocolState: states.waitForApproval({
+      processId,
+      channelId,
+      challengeCommitment,
+      yieldingProcessId: newSharedData.currentProcessId || 'No Yielding Process!', // TODO This is unexpected (would have expected yieldingProcessId)
+    }),
+    sharedData: newSharedData,
   };
 };
 
@@ -224,36 +234,13 @@ const waitForApprovalReducer = (
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
         const channelState = selectors.getChannelState(sharedData, protocolState.channelId);
-        const isLedgerChannel = channelState
-          ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
-          : false;
+        const isLedgerChannel = channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS;
         const newProtocolState = states.waitForResponse({
           ...protocolState,
           yieldingProcessId: sharedData.yieldingProcessId,
         });
         if (channelState && isLedgerChannel) {
-          const proposedAllocation = channelState.lastCommitment.commitment.allocation;
-          const proposedDestination = channelState.lastCommitment.commitment.destination;
-          newProtocolState.ledgerChallenge = confirmLedgerUpdate({
-            ...protocolState,
-            ledgerId: protocolState.channelId,
-            commitmentType: CommitmentType.App,
-            proposedAllocation,
-            proposedDestination,
-          });
-          const theirCommitment = channelState.lastCommitment.commitment;
-          const playerA = helpers.isFirstPlayer(protocolState.channelId, sharedData);
-          if (playerA) {
-            newProtocolState.ourCommitment = proposeNewConsensus(
-              theirCommitment,
-              newProtocolState.ledgerChallenge.proposedAllocation,
-              newProtocolState.ledgerChallenge.proposedDestination,
-            );
-          }
-          if (!playerA) {
-            newProtocolState.ourCommitment = acceptConsensus(theirCommitment);
-            newProtocolState.ledgerChallenge.commitmentType = CommitmentType.Conclude;
-          }
+          sharedData = helpers.yieldToProcess(sharedData);
         }
         if (!isLedgerChannel) {
           sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead container shows indirect-defunding screen

@@ -2,6 +2,7 @@ import { select, take, fork, actionChannel, cancel } from 'redux-saga/effects';
 
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
+import { internalMessageSender } from './internal-message-sender';
 import { transactionSender } from './transaction-sender';
 import { adjudicatorWatcher } from './adjudicator-watcher';
 import { challengeWatcher } from './challenge-watcher';
@@ -13,7 +14,7 @@ import { displaySender } from './display-sender';
 import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
-import { challengeResponseRelay } from './challenge-response-relay';
+import { ledgerDisputeRelay } from './ledger-dispute-relay';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -23,7 +24,7 @@ export function* sagaManager(): IterableIterator<any> {
 
   // always want the message listenter to be running
   yield fork(messageListener);
-  yield fork(challengeResponseRelay);
+  yield fork(ledgerDisputeRelay);
 
   // todo: restrict just to wallet actions
   const channel = yield actionChannel('*');
@@ -71,6 +72,10 @@ export function* sagaManager(): IterableIterator<any> {
     if (outboxState.messageOutbox.length) {
       const messageToSend = outboxState.messageOutbox[0];
       yield messageSender(messageToSend);
+    }
+    if (outboxState.internalMessageOutbox.length) {
+      const messageToSend = outboxState.internalMessageOutbox[0];
+      yield internalMessageSender(messageToSend);
     }
     if (outboxState.displayOutbox.length) {
       const displayMessageToSend = outboxState.displayOutbox[0];

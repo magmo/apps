@@ -58,7 +58,13 @@ const refuteChannelState = {
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
 const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
-const defaults = { processId, transactionSubmissionState, sharedData, channelId };
+const defaults = {
+  processId,
+  transactionSubmissionState,
+  sharedData,
+  channelId,
+  yieldingProcessId: 'yieldingProcessId',
+};
 
 // ------
 // States

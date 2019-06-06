@@ -31,7 +31,7 @@ class IndirectDefundingContainer extends PureComponent<Props> {
             challenge={() =>
               challengeChosen({
                 channelId: state.ledgerId,
-                action: actions.challengeChosen({ processId: state.processId }),
+                embeddedProtocolAction: actions.challengeChosen({ processId: state.processId }),
               })
             }
           />
@@ -39,18 +39,33 @@ class IndirectDefundingContainer extends PureComponent<Props> {
       case 'IndirectDefunding.Failure':
         return <Failure name="indirect-de-funding" reason={state.reason} />;
       case 'IndirectDefunding.ConfirmLedgerUpdate':
-        return (
-          <ConfirmLedgerUpdate
-            ledgerId={state.ledgerId}
-            isConclude={state.commitmentType === CommitmentType.Conclude}
-            confirm={() =>
-              updateConfirmed({
-                processId: state.processId,
-                commitmentType: state.commitmentType,
-              })
-            }
-          />
-        );
+        if (state.isRespondingToChallenge) {
+          return (
+            <ConfirmLedgerUpdate
+              ledgerId={state.ledgerId}
+              isConclude={state.commitmentType === CommitmentType.Conclude}
+              respond={() =>
+                updateConfirmed({
+                  processId: state.processId,
+                  commitmentType: state.commitmentType,
+                })
+              }
+            />
+          );
+        } else {
+          return (
+            <ConfirmLedgerUpdate
+              ledgerId={state.ledgerId}
+              isConclude={state.commitmentType === CommitmentType.Conclude}
+              confirm={() =>
+                updateConfirmed({
+                  processId: state.processId,
+                  commitmentType: state.commitmentType,
+                })
+              }
+            />
+          );
+        }
       case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
         return (
           <Acknowledge

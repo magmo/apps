@@ -1,10 +1,16 @@
 import { OutboxState } from './state';
 import * as actions from '../actions';
 
-export function clearOutbox(state: OutboxState, action: actions.WalletAction): OutboxState {
+export function clearOutbox(
+  state: OutboxState,
+  action: actions.WalletAction | actions.InternalMessageSent,
+): OutboxState {
   const nextOutbox = { ...state };
   if (action.type === 'WALLET.MESSAGE_SENT') {
     nextOutbox.messageOutbox = nextOutbox.messageOutbox.slice(1);
+  }
+  if (action.type === 'WALLET.INTERNAL_MESSAGE_SENT') {
+    nextOutbox.internalMessageOutbox = nextOutbox.internalMessageOutbox.slice(1);
   }
   if (action.type === 'WALLET.DISPLAY_MESSAGE_SENT') {
     nextOutbox.displayOutbox = nextOutbox.displayOutbox.slice(1);

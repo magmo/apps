@@ -135,7 +135,7 @@ These are values for `channelStage` rather than `type`:
     WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| APPROVE_CHALLENGE
 ```
 
-## challengingReducer
+## disputeReducer
 
 [`/packages/wallet/src/redux/reducers/channels/challenging/index.ts`](../src/redux/reducers/channels/challenging/index.ts)
 

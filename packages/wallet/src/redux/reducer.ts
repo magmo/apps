@@ -7,7 +7,7 @@ import { ProtocolState } from './protocols';
 import { isNewProcessAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
 import {
-  challengingReducer,
+  disputeReducer,
   initializeChallengerState,
   initializeResponderState,
 } from './protocols/dispute/reducer';
@@ -100,10 +100,10 @@ function routeToProtocolReducer(
         return updatedState(state, appSharedData, processState, appProtocolState);
       case WalletProtocol.Dispute:
         const {
-          protocolState: challengingProtocolState,
+          protocolState: disputeProtocolState,
           sharedData: challengingSharedData,
-        } = challengingReducer(processState.protocolState, states.sharedData(state), action);
-        return updatedState(state, challengingSharedData, processState, challengingProtocolState);
+        } = disputeReducer(processState.protocolState, states.sharedData(state), action);
+        return updatedState(state, challengingSharedData, processState, disputeProtocolState);
 
       case WalletProtocol.Concluding:
         const {

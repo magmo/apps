@@ -18,13 +18,14 @@ import { ActionConstructor } from '../../../utils';
 export interface RespondApproved extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED';
   processId: string;
+  embeddedProtocolAction?: ProtocolAction;
 }
 
 export interface ResponseProvided extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED';
   processId: string;
   commitment: Commitment;
-  action?: ProtocolAction;
+  embeddedProtocolAction?: ProtocolAction;
 }
 
 export interface RespondSuccessAcknowledged extends BaseProcessAction {

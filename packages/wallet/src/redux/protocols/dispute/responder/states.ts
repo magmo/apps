@@ -3,7 +3,6 @@ import { Commitment } from '../../../../domain';
 import { ProtocolState } from '../..';
 import { DefundingState } from '../../defunding';
 import { StateConstructor } from '../../../utils';
-import { ConfirmLedgerUpdate } from '../../indirect-defunding/states';
 
 // -------
 // States
@@ -18,6 +17,7 @@ export interface WaitForApproval {
   processId: string;
   channelId: string;
   challengeCommitment: Commitment;
+  yieldingProcessId: string;
 }
 
 export interface WaitForTransaction {
@@ -36,9 +36,8 @@ export interface WaitForResponse {
   type: 'Responding.WaitForResponse';
   processId: string;
   channelId: string;
-  ledgerChallenge?: ConfirmLedgerUpdate;
-  ourCommitment?: Commitment;
-  yieldingProcessId?: string;
+  // ledgerChallenge?: ConfirmLedgerUpdate;
+  // ourCommitment?: Commitment;
 }
 
 export interface AcknowledgeTimeout {

@@ -10,6 +10,7 @@ import { CommitmentType } from 'fmg-core/lib/commitment';
 import * as magmoWalletClient from 'magmo-wallet-client';
 import { ChannelState } from '../channel-store';
 import { Commitment } from '../../domain';
+import { APPLICATION_PROCESS_ID } from './application/reducer';
 
 export const updateChannelState = (
   sharedData: SharedData,
@@ -106,11 +107,14 @@ export function sendChallengeResponseRequested(
 
 export function sendChallengeCommitmentReceived(sharedData: SharedData, commitment: Commitment) {
   const newSharedData = { ...sharedData };
-  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
-    messageOutbox: magmoWalletClient.challengeCommitmentReceived(commitment),
-  });
+  if (isYieldingProcessApplication(sharedData)) {
+    newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
+      messageOutbox: magmoWalletClient.challengeCommitmentReceived(commitment),
+    });
+  }
   return newSharedData;
 }
+// ^ don't send a message to the app if it is a ledger challenge commitment.
 
 // TODO 'Complete' here means the challenge was successfully responded to
 export function sendChallengeComplete(sharedData: SharedData) {
@@ -185,7 +189,14 @@ export function getOpponentAddress(channelState: ChannelState, playerIndex: Play
 }
 
 export function yieldToProcess(sharedData: SharedData): SharedData {
-  const newSharedData = sharedData;
+  const newSharedData = { ...sharedData };
+  newSharedData.yieldingProcessId = sharedData.currentProcessId;
   newSharedData.currentProcessId = sharedData.yieldingProcessId;
   return newSharedData;
+}
+
+export function isYieldingProcessApplication(sharedData: SharedData): boolean {
+  return sharedData.yieldingProcessId
+    ? sharedData.yieldingProcessId.includes(APPLICATION_PROCESS_ID)
+    : false;
 }

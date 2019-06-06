@@ -39,6 +39,10 @@ export interface MessageSent {
   type: 'WALLET.MESSAGE_SENT';
 }
 
+export interface InternalMessageSent {
+  type: 'WALLET.INTERNAL_MESSAGE_SENT';
+}
+
 export interface DisplayMessageSent {
   type: 'WALLET.DISPLAY_MESSAGE_SENT';
 }
@@ -109,6 +113,12 @@ export interface ChallengeExpiredEvent {
   timestamp: number;
 }
 
+export interface LedgerDisputeDetected {
+  type: 'WALLET.COMMON.LEDGER_DISPUTE_DETECTED';
+  processId: string;
+  channelId: string;
+}
+
 // -------
 // Constructors
 // -------
@@ -123,6 +133,11 @@ export const adjudicatorKnown: ActionConstructor<AdjudicatorKnown> = p => ({
 export const messageSent: ActionConstructor<MessageSent> = p => ({
   ...p,
   type: 'WALLET.MESSAGE_SENT',
+});
+
+export const internalMessageSent: ActionConstructor<InternalMessageSent> = p => ({
+  ...p,
+  type: 'WALLET.INTERNAL_MESSAGE_SENT',
 });
 
 export const displayMessageSent: ActionConstructor<DisplayMessageSent> = p => ({
@@ -175,6 +190,11 @@ export const challengeExpiredEvent: ActionConstructor<ChallengeExpiredEvent> = p
   type: 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED',
 });
 
+export const ledgerDisputeDetected: ActionConstructor<LedgerDisputeDetected> = p => ({
+  ...p,
+  type: 'WALLET.COMMON.LEDGER_DISPUTE_DETECTED',
+});
+
 // -------
 // Unions and Guards
 // -------
@@ -188,7 +208,7 @@ export type AdjudicatorEventAction =
   | ChallengeCreatedEvent
   | ChallengeExpirySetEvent;
 
-export type CommonAction = MessageReceived | CommitmentReceived;
+export type CommonAction = MessageReceived | CommitmentReceived | LedgerDisputeDetected;
 
 export type ProtocolAction =
   // only list top level protocol actions
@@ -218,8 +238,11 @@ export type WalletAction =
 
 export function isCommonAction(action: WalletAction): action is CommonAction {
   return (
-    ['WALLET.COMMON.MESSAGE_RECEIVED', 'WALLET.COMMON.COMMITMENT_RECEIVED'].indexOf(action.type) >=
-    0
+    [
+      'WALLET.COMMON.MESSAGE_RECEIVED',
+      'WALLET.COMMON.COMMITMENT_RECEIVED',
+      'WALLET.COMMON.LEDGER_DISPUTE_DETECTED',
+    ].indexOf(action.type) >= 0
   );
 }
 

@@ -136,7 +136,7 @@ These are values for `channelStage` rather than `type`:
     WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| APPROVE_CHALLENGE
 ```
 
-## challengingReducer
+## disputeReducer
 
 [`/packages/wallet/src/redux/reducers/channels/challenging/index.ts`](../src/redux/reducers/channels/challenging/index.ts)
 
@@ -346,7 +346,7 @@ Absorb the above as subgraphs of a single diagram:
       WAIT_FOR_UPDATE --> |CHALLENGE_REQUESTED| APPROVE_CHALLENGE
     end
 
-    subgraph challengingReducer
+    subgraph disputeReducer
       APPROVE_CHALLENGE --> |CHALLENGE_APPROVED|WAIT_FOR_CHALLENGE_INITIATION
       APPROVE_CHALLENGE --> |CHALLENGE_REJECTED|WAIT_FOR_UPDATE
 

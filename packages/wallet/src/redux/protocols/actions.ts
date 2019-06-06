@@ -29,7 +29,7 @@ export interface CreateChallengeRequested {
   type: 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED';
   channelId: string;
   protocol: WalletProtocol.Dispute;
-  action?: ProtocolAction;
+  embeddedProtocolAction?: ProtocolAction;
 }
 
 export interface ChallengeCreated {

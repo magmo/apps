@@ -18,6 +18,7 @@ describe('when a side effect occured', () => {
   const state: OutboxState = {
     displayOutbox,
     transactionOutbox,
+    internalMessageOutbox: [],
     messageOutbox,
   };
 

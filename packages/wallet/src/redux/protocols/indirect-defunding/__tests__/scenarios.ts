@@ -89,7 +89,11 @@ const notDefundableInitialStore = setFundingState(
 );
 
 const playerAConfirmLedgerUpdate0 = {
-  state: confirmLedgerUpdate({ ...props, commitmentType: CommitmentType.App }),
+  state: confirmLedgerUpdate({
+    ...props,
+    commitmentType: CommitmentType.App,
+    isRespondingToChallenge: false,
+  }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments(app10, app11, asAddress, asPrivateKey),
@@ -108,7 +112,11 @@ const playerAWaitForUpdate = {
 };
 
 const playerAConfirmConclude = {
-  state: confirmLedgerUpdate({ ...props, commitmentType: CommitmentType.Conclude }),
+  state: confirmLedgerUpdate({
+    ...props,
+    commitmentType: CommitmentType.Conclude,
+    isRespondingToChallenge: false,
+  }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments(app10, app11, asAddress, asPrivateKey),
@@ -147,7 +155,11 @@ const playerBWaitForUpdate = {
 };
 
 const playerBConfirmLedgerUpdate1 = {
-  state: confirmLedgerUpdate({ ...props, commitmentType: CommitmentType.App }),
+  state: confirmLedgerUpdate({
+    ...props,
+    commitmentType: CommitmentType.App,
+    isRespondingToChallenge: false,
+  }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),
@@ -167,7 +179,11 @@ const playerBWaitForConclude = {
 };
 
 const playerBConfirmConclude = {
-  state: confirmLedgerUpdate({ ...props, commitmentType: CommitmentType.Conclude }),
+  state: confirmLedgerUpdate({
+    ...props,
+    commitmentType: CommitmentType.Conclude,
+    isRespondingToChallenge: false,
+  }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments(app10, app11, bsAddress, bsPrivateKey),

@@ -14,6 +14,7 @@ export interface ConfirmLedgerUpdate {
   proposedAllocation: string[];
   proposedDestination: string[];
   commitmentType: CommitmentType.App | CommitmentType.Conclude;
+  isRespondingToChallenge: boolean;
 }
 
 export interface WaitForLedgerUpdate {

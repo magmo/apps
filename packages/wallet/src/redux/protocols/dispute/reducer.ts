@@ -32,7 +32,7 @@ export const initializeChallengerState = (
   return { protocolState, sharedData: updatedSharedData };
 };
 
-export const challengingReducer = (
+export const disputeReducer = (
   protocolState: ChallengerState,
   sharedData: SharedData,
   action: ProtocolAction,
