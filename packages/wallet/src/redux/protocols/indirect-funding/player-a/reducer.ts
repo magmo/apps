@@ -30,6 +30,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { isTransactionAction } from '../../../actions';
 import { ChannelFundingState } from '../../../state';
 import { IndirectFundingAction } from '../actions';
+import * as selectors from '../../../selectors';
 
 type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
 type IDFAction = IndirectFundingAction;
@@ -45,7 +46,7 @@ export function initialize(
   }
   // TODO: Should we have to pull these of the commitment or should they just be arguments to initialize?
   const { allocation, destination } = channel.lastCommitment.commitment;
-  const ourCommitment = createInitialSetupCommitment(allocation, destination);
+  const ourCommitment = createInitialSetupCommitment(sharedData, allocation, destination);
 
   const addressAndPrivateKey = getAddressAndPrivateKey(sharedData, channelId);
   if (!addressAndPrivateKey) {
@@ -273,15 +274,19 @@ function handleWaitForDirectFunding(
   return { protocolState, sharedData };
 }
 
-function createInitialSetupCommitment(allocation: string[], destination: string[]): Commitment {
+function createInitialSetupCommitment(
+  sharedData: SharedData,
+  allocation: string[],
+  destination: string[],
+): Commitment {
   const appAttributes = {
     proposedAllocation: [],
     proposedDestination: [],
     furtherVotesRequired: 0,
     updateType: UpdateType.Consensus,
   };
-  // TODO: We'll run into collisions if we reuse the same nonce
-  const nonce = 0;
+
+  const nonce = selectors.getNextNonce(sharedData, CONSENSUS_LIBRARY_ADDRESS);
   const channel: Channel = {
     nonce,
     participants: destination,

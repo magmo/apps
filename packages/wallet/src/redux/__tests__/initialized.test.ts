@@ -16,6 +16,8 @@ const defaults = {
   uid: 'uid',
   processStore: {},
   adjudicatorStore: {},
+  address: 'address',
+  privateKey: 'privateKey',
 };
 
 const initializedState = states.initialized({ ...defaults });

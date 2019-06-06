@@ -1,4 +1,5 @@
 import { unreachable } from './src/utils/reducer-utils';
-import { getChannelId } from './src/domain';
+import { addHex } from './src/utils/hex-utils';
+export * from './src/domain';
 
-export { unreachable, getChannelId };
+export { unreachable, addHex };
