@@ -16,7 +16,6 @@ import {
 import * as indirectFundingStates from '../../indirect-funding/states';
 import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
-type EmbeddedAction = IndirectFundingAction;
 
 export function initialize(
   sharedData: SharedData,
@@ -37,7 +36,7 @@ export function initialize(
 export function fundingReducer(
   state: states.FundingState,
   sharedData: SharedData,
-  action: actions.FundingAction | EmbeddedAction,
+  action: actions.FundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (isIndirectFundingAction(action)) {
     return handleIndirectFundingAction(state, sharedData, action);

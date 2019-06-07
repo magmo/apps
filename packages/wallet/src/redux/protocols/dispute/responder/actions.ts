@@ -6,7 +6,6 @@ import {
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
   WalletAction,
-  ProtocolAction,
 } from '../../../actions';
 import { isDefundingAction, DefundingAction } from '../../defunding/actions';
 import { ActionConstructor } from '../../../utils';
@@ -18,14 +17,12 @@ import { ActionConstructor } from '../../../utils';
 export interface RespondApproved extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED';
   processId: string;
-  embeddedProtocolAction?: ProtocolAction;
 }
 
 export interface ResponseProvided extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED';
   processId: string;
   commitment: Commitment;
-  embeddedProtocolAction?: ProtocolAction;
 }
 
 export interface RespondSuccessAcknowledged extends BaseProcessAction {
