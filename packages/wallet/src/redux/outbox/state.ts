@@ -1,6 +1,7 @@
 import { TransactionRequest } from 'ethers/providers';
-import { WalletEvent, DisplayAction, MessageRelayRequested } from 'magmo-wallet-client';
+import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { accumulateSideEffects } from '.';
+import { WalletAction } from '../actions';
 
 export function emptyDisplayOutboxState(): OutboxState {
   return { displayOutbox: [], messageOutbox: [], internalMessageOutbox: [], transactionOutbox: [] };
@@ -13,7 +14,7 @@ export interface QueuedTransaction {
 export interface OutboxState {
   displayOutbox: DisplayAction[];
   messageOutbox: WalletEvent[];
-  internalMessageOutbox: WalletEvent[];
+  internalMessageOutbox: WalletAction[];
   transactionOutbox: QueuedTransaction[];
 }
 
@@ -29,10 +30,7 @@ export function queueMessage(state: OutboxState, message: WalletEvent): OutboxSt
   return accumulateSideEffects(state, { messageOutbox: [message] });
 }
 
-export function queueInternalMessage(
-  state: OutboxState,
-  message: MessageRelayRequested,
-): OutboxState {
+export function queueInternalMessage(state: OutboxState, message: WalletAction): OutboxState {
   return accumulateSideEffects(state, { internalMessageOutbox: [message] });
 }
 

@@ -10,7 +10,6 @@ import { Defunding } from '../../defunding/container';
 
 import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
-import { ledgerDisputeDetected } from '../../../../redux/actions';
 
 interface Props {
   state: states.NonTerminalResponderState;
@@ -39,20 +38,10 @@ class ResponderContainer extends PureComponent<Props> {
           />
         );
       case 'Responding.WaitForApproval':
-        let embeddedProtocolAction;
-        if (state.yieldingProcessId) {
-          // TODO more robust check here ^
-          embeddedProtocolAction = ledgerDisputeDetected({
-            processId: state.yieldingProcessId,
-            channelId: state.channelId,
-          });
-        } else {
-          embeddedProtocolAction = undefined;
-        }
         return (
           <WaitForApproval
             expirationTime={state.expiryTime}
-            approve={() => respondApproved({ processId, embeddedProtocolAction })}
+            approve={() => respondApproved({ processId })}
           />
         );
       case 'Responding.WaitForResponse':

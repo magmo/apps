@@ -14,7 +14,6 @@ import { displaySender } from './display-sender';
 import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
-import { ledgerDisputeRelay } from './ledger-dispute-relay';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -24,7 +23,6 @@ export function* sagaManager(): IterableIterator<any> {
 
   // always want the message listenter to be running
   yield fork(messageListener);
-  yield fork(ledgerDisputeRelay);
 
   // todo: restrict just to wallet actions
   const channel = yield actionChannel('*');

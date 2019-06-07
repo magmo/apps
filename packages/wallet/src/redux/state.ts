@@ -22,11 +22,14 @@ import {
 import { Properties } from './utils';
 import * as indirectFunding from './protocols/indirect-funding/states';
 import { accumulateSideEffects } from './outbox';
-import { WalletEvent, MessageRelayRequested } from 'magmo-wallet-client';
+import { WalletEvent } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
 import { AdjudicatorState } from './adjudicator-state/state';
 import { SignedCommitment, Commitment } from '../domain';
 import { WalletProtocol } from '../communication';
+import { LedgerDisputeDetected } from './actions';
+import { CreateChallengeRequested } from './protocols/actions';
+import { ResponseProvided } from './protocols/dispute/responder/actions';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -189,10 +192,9 @@ export function queueMessage(state: SharedData, message: WalletEvent): SharedDat
   return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
 }
 
-export function queueInternalMessage(
-  state: SharedData,
-  message: MessageRelayRequested,
-): SharedData {
+type InternalMessage = CreateChallengeRequested | ResponseProvided | LedgerDisputeDetected;
+
+export function queueInternalMessage(state: SharedData, message: InternalMessage): SharedData {
   return { ...state, outboxState: queueInternalMessageOutbox(state.outboxState, message) };
 }
 

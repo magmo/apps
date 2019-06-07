@@ -134,7 +134,8 @@ export function initialize(
   sharedData = registerChannelToMonitor(sharedData, processId, channelId);
   return {
     protocolState: approveChallenge({ channelId, processId }),
-    sharedData: showWallet(sharedData),
+    sharedData: showWallet(sharedData), // TODO repetition on showWallet could be refactored to tidy up
+    // TODO wallet is already showing when challenging a ledger channel (but harmless to send this message)
   };
 }
 

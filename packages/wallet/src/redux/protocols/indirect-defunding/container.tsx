@@ -10,11 +10,10 @@ import { CommitmentType } from 'fmg-core';
 import ConfirmLedgerUpdate from './components/confirm-ledger-update';
 import * as actions from './actions';
 import Acknowledge from '../shared-components/acknowledge';
-import { createChallengeRequested } from '../actions';
 
 interface Props {
   state: states.IndirectDefundingState;
-  challengeChosen: typeof createChallengeRequested;
+  challengeChosen: typeof actions.challengeChosen;
   updateConfirmed: typeof actions.updateConfirmed;
   acknowledged: typeof actions.acknowledged;
 }
@@ -28,44 +27,25 @@ class IndirectDefundingContainer extends PureComponent<Props> {
           <WaitForLedgerUpdate
             ledgerId={state.ledgerId}
             isConclude={state.commitmentType === CommitmentType.Conclude}
-            challenge={() =>
-              challengeChosen({
-                channelId: state.ledgerId,
-                embeddedProtocolAction: actions.challengeChosen({ processId: state.processId }),
-              })
-            }
+            challenge={() => challengeChosen({ processId: state.processId })}
           />
         );
       case 'IndirectDefunding.Failure':
         return <Failure name="indirect-de-funding" reason={state.reason} />;
       case 'IndirectDefunding.ConfirmLedgerUpdate':
-        if (state.isRespondingToChallenge) {
-          return (
-            <ConfirmLedgerUpdate
-              ledgerId={state.ledgerId}
-              isConclude={state.commitmentType === CommitmentType.Conclude}
-              respond={() =>
-                updateConfirmed({
-                  processId: state.processId,
-                  commitmentType: state.commitmentType,
-                })
-              }
-            />
-          );
-        } else {
-          return (
-            <ConfirmLedgerUpdate
-              ledgerId={state.ledgerId}
-              isConclude={state.commitmentType === CommitmentType.Conclude}
-              confirm={() =>
-                updateConfirmed({
-                  processId: state.processId,
-                  commitmentType: state.commitmentType,
-                })
-              }
-            />
-          );
-        }
+        return (
+          <ConfirmLedgerUpdate
+            ledgerId={state.ledgerId}
+            isConclude={state.commitmentType === CommitmentType.Conclude}
+            confirm={() =>
+              updateConfirmed({
+                processId: state.processId,
+                commitmentType: state.commitmentType,
+              })
+            }
+            isRespondingToChallenge={state.isRespondingToChallenge}
+          />
+        );
       case 'IndirectDefunding.AcknowledgeLedgerFinalizedOffChain':
         return (
           <Acknowledge
@@ -93,7 +73,7 @@ class IndirectDefundingContainer extends PureComponent<Props> {
 
 const mapDispatchToProps = {
   updateConfirmed: actions.updateConfirmed,
-  challengeChosen: createChallengeRequested,
+  challengeChosen: actions.challengeChosen,
   acknowledged: actions.acknowledged,
 };
 

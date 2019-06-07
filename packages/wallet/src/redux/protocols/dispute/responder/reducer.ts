@@ -12,7 +12,12 @@ import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../../transaction-submission/reducer';
-import { SharedData, signAndStore, registerChannelToMonitor } from '../../../state';
+import {
+  SharedData,
+  signAndStore,
+  registerChannelToMonitor,
+  queueInternalMessage,
+} from '../../../state';
 import { isTransactionAction } from '../../transaction-submission/actions';
 import {
   isTerminal,
@@ -27,7 +32,7 @@ import {
   sendChallengeComplete,
   sendOpponentConcluded,
 } from '../../reducer-helpers';
-import { ProtocolAction } from '../../../actions';
+import { ProtocolAction, ledgerDisputeDetected } from '../../../actions';
 import * as _ from 'lodash';
 import { isDefundingAction, DefundingAction } from '../../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
@@ -235,14 +240,19 @@ const waitForApprovalReducer = (
     case 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED':
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
-        const channelState = selectors.getChannelState(sharedData, protocolState.channelId);
-        const isLedgerChannel = channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS;
+        const isLedgerChannel = !helpers.isYieldingProcessApplication(sharedData);
         const newProtocolState = states.waitForResponse({
           ...protocolState,
           yieldingProcessId: sharedData.yieldingProcessId,
         });
-        if (channelState && isLedgerChannel) {
-          sharedData = helpers.yieldToProcess(sharedData);
+        if (isLedgerChannel) {
+          const ledgerDisputeDetectedAction = ledgerDisputeDetected({
+            processId: sharedData.yieldingProcessId || 'No Yielding ProcessId',
+            channelId: protocolState.channelId,
+          });
+          sharedData = helpers.yieldToProcess(
+            queueInternalMessage(sharedData, ledgerDisputeDetectedAction),
+          );
         }
         if (!isLedgerChannel) {
           sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead container shows indirect-defunding screen
