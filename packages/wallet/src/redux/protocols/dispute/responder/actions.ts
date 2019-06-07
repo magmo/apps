@@ -6,7 +6,6 @@ import {
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
   WalletAction,
-  ProtocolAction,
 } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
 
@@ -23,7 +22,6 @@ export interface ResponseProvided extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED';
   processId: string;
   commitment: Commitment;
-  action?: ProtocolAction;
 }
 
 export interface ExitChallenge {

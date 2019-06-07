@@ -16,17 +16,6 @@ import {
 import * as indirectFundingStates from '../../indirect-funding/states';
 import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
-import {
-  initializeExistingChannelFunding,
-  existingChannelFundingReducer,
-  ExistingChannelFundingAction,
-  isExistingChannelFundingAction,
-} from '../../existing-channel-funding';
-import * as existingChannelFundingStates from '../../existing-channel-funding/states';
-import { CommitmentType } from 'fmg-core';
-import { getLastCommitment } from '../../../channel-store';
-
-type EmbeddedAction = IndirectFundingAction;
 
 export function initialize(
   sharedData: SharedData,
@@ -49,7 +38,7 @@ export function initialize(
 export function fundingReducer(
   state: states.FundingState,
   sharedData: SharedData,
-  action: actions.FundingAction | EmbeddedAction,
+  action: actions.FundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (isIndirectFundingAction(action) || isExistingChannelFundingAction(action)) {
     return handleFundingAction(state, sharedData, action);

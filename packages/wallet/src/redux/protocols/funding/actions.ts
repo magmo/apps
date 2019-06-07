@@ -1,6 +1,5 @@
 import * as playerA from './player-a/actions';
 import * as playerB from './player-b/actions';
-import { isIndirectFundingAction, IndirectFundingAction } from '../indirect-funding/actions';
 import { WalletAction } from '../../../redux/actions';
 // -------
 // Actions
@@ -13,10 +12,8 @@ import { WalletAction } from '../../../redux/actions';
 // --------
 // Unions and Guards
 // --------
-type EmbeddedAction = IndirectFundingAction;
-const isEmbeddedAction = isIndirectFundingAction;
 
-export type FundingAction = playerA.FundingAction | playerB.FundingAction | EmbeddedAction;
+export type FundingAction = playerA.FundingAction | playerB.FundingAction;
 
 export function isPlayerAFundingAction(action: WalletAction): action is playerA.FundingAction {
   return (
@@ -24,8 +21,7 @@ export function isPlayerAFundingAction(action: WalletAction): action is playerA.
     action.type === 'WALLET.FUNDING.PLAYER_A.FUNDING_SUCCESS_ACKNOWLEDGED' ||
     action.type === 'WALLET.FUNDING.STRATEGY_APPROVED' ||
     action.type === 'WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN' ||
-    action.type === 'WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED' ||
-    isEmbeddedAction(action)
+    action.type === 'WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED'
   );
 }
 export function isPlayerBFundingAction(action: WalletAction): action is playerB.FundingAction {
@@ -34,8 +30,7 @@ export function isPlayerBFundingAction(action: WalletAction): action is playerB.
     action.type === 'WALLET.FUNDING.PLAYER_B.FUNDING_SUCCESS_ACKNOWLEDGED' ||
     action.type === 'WALLET.FUNDING.PLAYER_B.STRATEGY_APPROVED' ||
     action.type === 'WALLET.FUNDING.STRATEGY_PROPOSED' ||
-    action.type === 'WALLET.FUNDING.PLAYER_B.STRATEGY_REJECTED' ||
-    isEmbeddedAction(action)
+    action.type === 'WALLET.FUNDING.PLAYER_B.STRATEGY_REJECTED'
   );
 }
 
