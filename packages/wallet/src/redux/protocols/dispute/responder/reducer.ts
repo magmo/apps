@@ -72,7 +72,6 @@ export const initialize = (
       channelId,
       expiryTime,
       challengeCommitment,
-      // yieldingProcessId: sharedData.currentProcessId, // TODO This is unexpected (would have expected yieldingProcessId)
     }),
     sharedData: newSharedData,
   };
