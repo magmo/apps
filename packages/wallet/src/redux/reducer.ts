@@ -151,7 +151,7 @@ export function getProcessId(action: NewProcessAction): string {
   throw new Error('Invalid action');
 }
 
-function initializeNewProcess(
+function initializeNewProtocol(
   state: states.Initialized,
   action: NewProcessAction,
 ): { protocolState: ProtocolState; sharedData: states.SharedData } {
@@ -215,7 +215,7 @@ function routeToNewProcessInitializer(
   action: NewProcessAction,
 ): states.Initialized {
   const processId = getProcessId(action);
-  const { protocolState, sharedData } = initializeNewProcess(state, action);
+  const { protocolState, sharedData } = initializeNewProtocol(state, action);
   return startProcess(state, sharedData, action, protocolState, processId);
 }
 
