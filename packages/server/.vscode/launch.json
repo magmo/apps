@@ -5,6 +5,25 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Jest Current",
+      "type": "node",
+      "request": "launch",
+      "args": [
+        "node_modules/.bin/jest",
+        "--runInBand",
+        "--env=jsdom",
+        "--config=${workspaceRoot}/config/jest/jest.config.js",
+        "${relativeFile}"
+      ],
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
       "name": "Jest Chain Current",
       "type": "node",
       "request": "launch",
@@ -21,6 +40,19 @@
       "internalConsoleOptions": "neverOpen",
       "env": {
         "NODE_ENV": "test"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Server",
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${workspaceFolder}/src/app/server.ts"],
+      "env": {
+        "NODE_ENV": "development"
       }
     }
   ]

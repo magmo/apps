@@ -64,6 +64,7 @@ const defaults = {
   sharedData,
   channelId,
   yieldingProcessId: 'yieldingProcessId',
+  expiryTime: 0,
 };
 
 // ------

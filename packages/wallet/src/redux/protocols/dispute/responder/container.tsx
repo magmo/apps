@@ -50,7 +50,10 @@ class ResponderContainer extends PureComponent<Props> {
           embeddedProtocolAction = undefined;
         }
         return (
-          <WaitForApproval approve={() => respondApproved({ processId, embeddedProtocolAction })} />
+          <WaitForApproval
+            expirationTime={state.expiryTime}
+            approve={() => respondApproved({ processId, embeddedProtocolAction })}
+          />
         );
       case 'Responding.WaitForResponse':
         return <div>Waiting for response</div>;

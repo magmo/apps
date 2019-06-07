@@ -40,6 +40,7 @@ import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 export const initialize = (
   processId: string,
   channelId: string,
+  expiryTime: number,
   sharedData: SharedData,
   challengeCommitment: Commitment,
 ): ProtocolStateWithSharedData<states.NonTerminalResponderState> => {
@@ -61,6 +62,7 @@ export const initialize = (
     protocolState: states.waitForApproval({
       processId,
       channelId,
+      expiryTime,
       challengeCommitment,
       yieldingProcessId: newSharedData.currentProcessId || 'No Yielding Process!', // TODO This is unexpected (would have expected yieldingProcessId)
     }),

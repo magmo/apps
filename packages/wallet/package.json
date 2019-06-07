@@ -2,7 +2,6 @@
   "name": "magmo-wallet",
   "version": "0.1.0",
   "license": "MIT",
-  "private": true,
   "main": "lib/index.js",
   "resolutions": {
     "firebase/**/grpc": "^1.16.1"
@@ -108,7 +107,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "extract-text-webpack-plugin": "4.0.0-beta.0",
     "file-loader": "^2.0.0",
-    "fmg-nitro-adjudicator": "0.0.16",
+    "fmg-nitro-adjudicator": "0.1.2",
     "fork-ts-checker-webpack-plugin": "0.4.9",
     "ganache-cli": "^6.3.0",
     "html-webpack-plugin": "4.0.0-beta.5",
