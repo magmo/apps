@@ -4,6 +4,7 @@ import { FundingStrategy } from '..';
 import { strategyProposed, StrategyProposed } from '../../../../communication';
 export { strategyProposed, StrategyProposed };
 import { ActionConstructor } from '../../../utils';
+import { IndirectFundingAction } from '../../indirect-funding/actions';
 
 // -------
 // Actions
@@ -59,4 +60,5 @@ export type FundingAction =
   | StrategyApproved
   | FundingSuccessAcknowledged
   | StrategyRejected
-  | Cancelled;
+  | Cancelled
+  | IndirectFundingAction;

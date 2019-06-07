@@ -17,7 +17,6 @@ export interface WaitForApproval {
   processId: string;
   channelId: string;
   challengeCommitment: Commitment;
-  yieldingProcessId: string;
   expiryTime: number;
 }
 
@@ -37,8 +36,6 @@ export interface WaitForResponse {
   type: 'Responding.WaitForResponse';
   processId: string;
   channelId: string;
-  // ledgerChallenge?: ConfirmLedgerUpdate;
-  // ourCommitment?: Commitment;
 }
 
 export interface AcknowledgeTimeout {

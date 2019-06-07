@@ -17,6 +17,7 @@ import {
   preSuccess as defundingPreSuccess,
   preFailure as defundingPreFailure,
 } from '../../../defunding/__tests__';
+import { APPLICATION_PROCESS_ID } from '../../../../../redux/protocols/application/reducer';
 
 type Reason = states.FailureReason;
 
@@ -49,7 +50,11 @@ const tsPreSuccess = tsScenarios.preSuccessState;
 const tsPreFailure = tsScenarios.preFailureState;
 const sharedData = (channelState: ChannelState) => setChannel(EMPTY_SHARED_DATA, channelState);
 
-const defaults = { processId, channelId, sharedData: sharedData(theirTurn) };
+const defaults = {
+  processId,
+  channelId,
+  sharedData: { ...sharedData(theirTurn), yieldingProcessId: APPLICATION_PROCESS_ID },
+};
 
 // ------
 // States
@@ -111,10 +116,13 @@ export const opponentResponds = {
     action: transactionSuccessTrigger,
     action2: challengeExpirySet,
   },
-  waitForResponseOrTimeout: {
+  waitForResponseOrTimeout1: {
     state: waitForResponseOrTimeout,
     action: challengeExpirySet,
-    action2: responseReceived,
+  },
+  waitForResponseOrTimeout2: {
+    state: waitForResponseOrTimeout,
+    action: responseReceived,
     commitment: signedCommitment21,
   },
   acknowledgeResponse: {
@@ -167,7 +175,7 @@ export const channelDoesntExist = {
 
 export const channelNotFullyOpen = {
   ...defaults,
-  sharedData: sharedData(partiallyOpen),
+  sharedData: { ...sharedData(partiallyOpen), yieldingProcessId: APPLICATION_PROCESS_ID },
   acknowledgeFailure: {
     state: acknowledge('NotFullyOpen'),
     action: failureAcknowledged,
@@ -176,7 +184,7 @@ export const channelNotFullyOpen = {
 
 export const alreadyHaveLatest = {
   ...defaults,
-  sharedData: sharedData(ourTurn),
+  sharedData: { ...sharedData(ourTurn), yieldingProcessId: APPLICATION_PROCESS_ID },
   acknowledgeFailure: {
     state: acknowledge('AlreadyHaveLatest'),
     action: failureAcknowledged,
@@ -197,7 +205,7 @@ export const userDeclinesChallenge = {
 
 export const receiveCommitmentWhileApproving = {
   ...defaults,
-  sharedData: sharedData(ourTurn),
+  sharedData: { ...sharedData(ourTurn), yieldingProcessId: APPLICATION_PROCESS_ID },
   approveChallenge: {
     state: approveChallenge,
     action: challengeApproved,
@@ -224,7 +232,7 @@ export const defundActionComesDuringAcknowledgeTimeout = {
   ...defaults,
   acknowledgeTimeout: {
     state: acknowledgeTimeout,
-    sharedData: sharedData(ourTurn),
+    sharedData: { ...sharedData(ourTurn), yieldingProcessId: APPLICATION_PROCESS_ID },
     action: defundingPreSuccess.action,
   },
 };

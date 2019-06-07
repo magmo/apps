@@ -50,6 +50,9 @@ export const initialize = (
   challengeCommitment: Commitment,
 ): ProtocolStateWithSharedData<states.NonTerminalResponderState> => {
   let newSharedData = sharedData;
+  if (!sharedData.yieldingProcessId) {
+    throw new Error('No yielding process');
+  }
   if (helpers.isYieldingProcessApplication(sharedData)) {
     // we are responding to an application challenge
     newSharedData = showWallet(
@@ -69,7 +72,7 @@ export const initialize = (
       channelId,
       expiryTime,
       challengeCommitment,
-      yieldingProcessId: newSharedData.currentProcessId || 'No Yielding Process!', // TODO This is unexpected (would have expected yieldingProcessId)
+      // yieldingProcessId: sharedData.currentProcessId, // TODO This is unexpected (would have expected yieldingProcessId)
     }),
     sharedData: newSharedData,
   };
@@ -243,11 +246,13 @@ const waitForApprovalReducer = (
         const isLedgerChannel = !helpers.isYieldingProcessApplication(sharedData);
         const newProtocolState = states.waitForResponse({
           ...protocolState,
-          yieldingProcessId: sharedData.yieldingProcessId,
         });
         if (isLedgerChannel) {
+          if (!sharedData.yieldingProcessId) {
+            throw new Error('No Yielding ProcessId');
+          }
           const ledgerDisputeDetectedAction = ledgerDisputeDetected({
-            processId: sharedData.yieldingProcessId || 'No Yielding ProcessId',
+            processId: sharedData.yieldingProcessId,
             channelId: protocolState.channelId,
           });
           sharedData = helpers.yieldToProcess(

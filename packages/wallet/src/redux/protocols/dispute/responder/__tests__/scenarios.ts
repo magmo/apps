@@ -11,6 +11,7 @@ import {
   preSuccess as defundingPreSuccess,
   preFailure as defundingPreFailure,
 } from '../../../defunding/__tests__';
+import { APPLICATION_PROCESS_ID } from '../../../../../redux/protocols/application/reducer';
 
 // ---------
 // Test data
@@ -57,13 +58,16 @@ const refuteChannelState = {
 };
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
+const sharedData: SharedData = {
+  ...EMPTY_SHARED_DATA,
+  channelStore,
+  yieldingProcessId: APPLICATION_PROCESS_ID, // anything else will trigger ledger challenge behaviour
+};
 const defaults = {
   processId,
   transactionSubmissionState,
   sharedData,
   channelId,
-  yieldingProcessId: 'yieldingProcessId',
   expiryTime: 0,
 };
 
