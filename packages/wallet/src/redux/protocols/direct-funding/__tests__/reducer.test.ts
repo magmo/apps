@@ -4,6 +4,13 @@ import * as scenarios from './scenarios';
 import { ProtocolStateWithSharedData } from '../..';
 import { itSendsATransaction } from '../../../__tests__/helpers';
 import { describeScenarioStep } from '../../../__tests__/helpers';
+import { SharedData } from 'src/redux/state';
+
+const itUpdatesFundingState = (state: states.DirectFundingState, sharedData: SharedData) => {
+  it(`It updates the funding state`, () => {
+    expect(sharedData.fundingState[state.channelId]).toHaveProperty('directlyFunded', true);
+  });
+};
 
 describe('Player A Happy path', () => {
   const scenario = scenarios.aHappyPath;
@@ -29,7 +36,7 @@ describe('Player A Happy path', () => {
   describeScenarioStep(scenario.waitForPostFundSetup, () => {
     const { action, state, sharedData } = scenario.waitForPostFundSetup;
     const updatedState = directFundingStateReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
+    itUpdatesFundingState(updatedState.protocolState, updatedState.sharedData);
   });
 });
 describe('Player A Happy Path With No Post Fund Setup Exchange', () => {
@@ -89,6 +96,7 @@ describe('Player B Happy path', () => {
     const { action, state, sharedData } = scenario.waitForPostFundSetup;
     const updatedState = directFundingStateReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
+    itUpdatesFundingState(updatedState.protocolState, updatedState.sharedData);
   });
 });
 

@@ -2,8 +2,16 @@ import { bigNumberify } from 'ethers/utils';
 import { unreachable } from '../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 import * as actions from '../../actions';
-import { ProtocolReducer, ProtocolStateWithSharedData, makeLocator } from '../../protocols';
-import { SharedData } from '../../state';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
+import * as selectors from '../../selectors';
+import {
+  SharedData,
+  setChannelStore,
+  queueMessage,
+  checkAndStore,
+  ChannelFundingState,
+} from '../../state';
+import { PlayerIndex } from '../../types';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
@@ -183,7 +191,25 @@ const commitmentsReceivedReducer: DFReducer = (
       }),
       sharedData: newSharedData,
     };
-  } else {
+  }
+
+  // Player B case
+  if (
+    protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
+    protocolState.postFundSetupReceived
+  ) {
+    const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
+      sharedData,
+      protocolState.processId,
+      protocolState.channelId,
+    );
+
+    // update fundingState for ledger channel
+    const fundingState: ChannelFundingState = {
+      directlyFunded: true,
+    };
+    sharedDataWithOwnCommitment.fundingState[protocolState.channelId] = fundingState;
+
     return {
       protocolState: states.waitForFundingAndPostFundSetup({
         ...protocolState,
@@ -209,14 +235,35 @@ const fundingConfirmedReducer: DFReducer = (
   sharedData: SharedData,
   action: actions.FundingReceivedEvent,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  // TODO[Channel state side effect]: update funding level for the channel.
-
-  // If we are not exchanging post fund setups we can return success now that we're funded
-  if (!protocolState.exchangePostFundSetups) {
-    return {
-      protocolState: states.fundingSuccess(protocolState),
-      sharedData,
-    };
+  if (protocolState.ourIndex === PlayerIndex.A) {
+    if (
+      protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
+      protocolState.channelFunded
+    ) {
+      const checkResult = channelStoreReducer.checkAndStore(
+        sharedData.channelStore,
+        action.signedCommitment,
+      );
+      if (!checkResult.isSuccess) {
+        throw new Error(
+          'Direct funding protocol, commitmentReceivedReducer: unable to validate commitment',
+        );
+      }
+      const sharedDataWithReceivedCommitment = setChannelStore(sharedData, checkResult.store);
+      // update fundingState for ledger channel
+      const fundingState: ChannelFundingState = {
+        directlyFunded: true,
+      };
+      sharedDataWithReceivedCommitment.fundingState[protocolState.channelId] = fundingState;
+      return {
+        protocolState: states.fundingSuccess(protocolState),
+        sharedData: sharedDataWithReceivedCommitment,
+      };
+    } else {
+      // In this case: Player B sent a PostFund commitment before Player A sent a PostFund commitment.
+      // Ignore the Player B PostFund commitment.
+      return { protocolState, sharedData };
+    }
   }
 
   // If we are exchanging post fund setups we alert the advanceChannelReducer that it is clearedToSend
@@ -232,7 +279,17 @@ const fundingConfirmedReducer: DFReducer = (
     }),
   );
 
-  if (postFundSetupState.type === 'AdvanceChannel.Success') {
+    const sharedDataWithReceivedCommitment = setChannelStore(sharedData, checkResult.store);
+    const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
+      sharedDataWithReceivedCommitment,
+      protocolState.processId,
+      protocolState.channelId,
+    );
+    // update fundingState for ledger channel
+    const fundingState: ChannelFundingState = {
+      directlyFunded: true,
+    };
+    sharedDataWithOwnCommitment.fundingState[protocolState.channelId] = fundingState;
     return {
       protocolState: states.fundingSuccess({ ...protocolState, postFundSetupState }),
       sharedData: newSharedData,
