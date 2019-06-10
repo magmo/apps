@@ -23,6 +23,14 @@ export const itSendsAMessage = (state: SideEffectState) => {
   });
 };
 
+export const itSendsAnInternalMessage = (state: SideEffectState) => {
+  it(`sends an internal message`, () => {
+    expectSideEffect('internalMessageOutbox', state, item =>
+      expect(item).toEqual(expect.anything()),
+    );
+  });
+};
+
 export const itSendsNoMessage = (state: SideEffectState) => {
   it(`sends no message`, () => {
     expectSideEffect('messageOutbox', state, item => expect(item).toBeUndefined());

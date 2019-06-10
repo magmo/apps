@@ -29,12 +29,6 @@ import {
 } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../actions';
 import * as _ from 'lodash';
-import { getChannel } from '../../../../redux/channel-store';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { confirmLedgerUpdate } from '../../indirect-defunding/states';
-import { CommitmentType } from 'fmg-core';
-import { proposeNewConsensus, acceptConsensus } from '../../../../domain/two-player-consensus-game';
-
 export const initialize = (
   processId: string,
   channelId: string,
@@ -149,15 +143,12 @@ const waitForAcknowledgementReducer = (
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   switch (action.type) {
-    case 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED':
-      const channelState = getChannel(sharedData.channelStore, protocolState.channelId);
-      const isLedgerChannel = channelState
-        ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
-        : false;
-      if (isLedgerChannel) {
+    case 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED':
+      const isLedgerChallenge = !helpers.isYieldingProcessApplication(sharedData);
+      if (isLedgerChallenge) {
         return {
           protocolState: states.success({}),
-          sharedData: sendChallengeComplete(sharedData),
+          sharedData: helpers.yieldToProcess(sharedData),
         };
       }
       return {
@@ -178,20 +169,17 @@ const waitForApprovalReducer = (
     case 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED':
       const { challengeCommitment, processId } = protocolState;
       if (!canRespondWithExistingCommitment(protocolState.challengeCommitment, sharedData)) {
-        const channelState = selectors.getChannelState(sharedData, protocolState.channelId);
-        const isLedgerChannel = channelState
-          ? channelState.libraryAddress === CONSENSUS_LIBRARY_ADDRESS
-          : false;
-        const newProtocolState = states.waitForResponse(protocolState);
-        if (channelState && isLedgerChannel) {
-          const proposedAllocation = channelState.lastCommitment.commitment.allocation;
-          const proposedDestination = channelState.lastCommitment.commitment.destination;
-          newProtocolState.ledgerChallenge = confirmLedgerUpdate({
-            ...protocolState,
-            ledgerId: protocolState.channelId,
-            commitmentType: CommitmentType.App,
-            proposedAllocation,
-            proposedDestination,
+        const isLedgerChallenge = !helpers.isYieldingProcessApplication(sharedData);
+        const newProtocolState = states.waitForResponse({
+          ...protocolState,
+        });
+        if (isLedgerChallenge) {
+          if (!sharedData.yieldingProcessId) {
+            throw new Error('No Yielding ProcessId');
+          }
+          const ledgerDisputeDetectedAction = ledgerDisputeDetected({
+            processId: sharedData.yieldingProcessId,
+            channelId: protocolState.channelId,
           });
           const theirCommitment = channelState.lastCommitment.commitment;
           const playerA = helpers.isFirstPlayer(protocolState.channelId, sharedData);
@@ -207,7 +195,7 @@ const waitForApprovalReducer = (
             newProtocolState.ledgerChallenge.commitmentType = CommitmentType.Conclude;
           }
         }
-        if (!isLedgerChannel) {
+        if (!isLedgerChallenge) {
           sharedData = hideWallet(sharedData); // don't do this if a ledger challenge, instead container shows indirect-defunding screen
         }
         return {
@@ -292,10 +280,18 @@ const transitionToWaitForTransaction = (
     ...protocolState,
     transactionSubmissionState,
   });
-  return {
-    protocolState: newProtocolState,
-    sharedData: showWallet(newSharedData),
-  };
+  const isLedgerChallenge = !helpers.isYieldingProcessApplication(sharedData);
+  if (!isLedgerChallenge) {
+    return {
+      protocolState: newProtocolState,
+      sharedData: showWallet(newSharedData),
+    };
+  } else {
+    return {
+      protocolState: newProtocolState,
+      sharedData: newSharedData,
+    };
+  }
 };
 
 const craftResponseTransactionWithExistingCommitment = (
