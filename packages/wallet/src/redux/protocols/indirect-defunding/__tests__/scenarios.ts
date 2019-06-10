@@ -17,7 +17,7 @@ import { setChannels, EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
 import * as globalActions from '../../../actions';
-import { updateConfirmed, acknowledged } from '../actions';
+import { updateConfirmed, acknowledged, challengeChosen } from '../actions';
 import { CommitmentType } from 'fmg-core';
 
 const processId = 'processId';
@@ -309,5 +309,32 @@ export const notDefundable = {
   initialParams: {
     store: notDefundableInitialStore,
     ...props,
+  },
+};
+
+export const playerBLedgerChallenge = {
+  // challenger
+  waitForLedgerUpdate0: {
+    state: playerBWaitForUpdate,
+    action: challengeChosen({ ...props }), // CHALLENGE_CHOSEN
+  },
+};
+
+export const playerALedgerChallenge = {
+  // responder
+  confirmLedgerUpdate0: {
+    state: playerAConfirmLedgerUpdate0,
+    action: globalActions.ledgerDisputeDetected({ ...props }), // LEDGER_DISPUTE_DETECTED
+  },
+  confirmLedgerUpdate0Respond: {
+    state: {
+      state: { ...playerAConfirmLedgerUpdate0.state, isRespondingToChallenge: true },
+      store: {
+        ...playerAConfirmLedgerUpdate0.store,
+        yieldingProcessId: 'Dispute-0xledgerchannelId',
+      },
+    },
+    action: playerALedgerUpdateConfirmed,
+    reply: ledger6, // check RESPONSE_PROVIDED action queued internally
   },
 };

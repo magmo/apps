@@ -1,10 +1,19 @@
 import * as scenarios from './scenarios';
 import { IndirectDefundingState, IndirectDefundingStateType } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { getLastMessage } from '../../../state';
+import { getLastMessage, SharedData } from '../../../state';
 import { SignedCommitment } from '../../../../domain';
 import { initialize, indirectDefundingReducer } from '../reducer';
-import { describeScenarioStep } from '../../../../redux/__tests__/helpers';
+import {
+  describeScenarioStep,
+  itSendsAnInternalMessage,
+} from '../../../../redux/__tests__/helpers';
+
+const itYieldsToPreviousProcess = (oldSharedData: SharedData, newSharedData: SharedData) => {
+  it(`yields to the previous process`, () => {
+    expect(newSharedData.currentProcessId).toEqual(oldSharedData.yieldingProcessId);
+  });
+};
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAHappyPath;
@@ -131,6 +140,36 @@ describe('player B happy path', () => {
     const { state, action } = scenario.acknowledgeLedgerFinalizedOffChain;
     const updatedState = indirectDefundingReducer(state.state, state.store, action);
     itTransitionsTo(updatedState, 'IndirectDefunding.FinalizedOffChain');
+  });
+});
+
+describe('player B ledger challenge', () => {
+  const scenario = scenarios.playerBLedgerChallenge;
+
+  describeScenarioStep(scenario.waitForLedgerUpdate0, () => {
+    const { state, action } = scenario.waitForLedgerUpdate0;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, 'IndirectDefunding.ConfirmLedgerUpdate');
+    itSendsAnInternalMessage(updatedState.sharedData); // WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED
+  });
+});
+
+describe('player A ledger challenge', () => {
+  const scenario = scenarios.playerALedgerChallenge;
+
+  describeScenarioStep(scenario.confirmLedgerUpdate0, () => {
+    const { state, action } = scenario.confirmLedgerUpdate0;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, 'IndirectDefunding.ConfirmLedgerUpdate');
+    expect(updatedState.protocolState).toHaveProperty('isRespondingToChallenge', true);
+  });
+
+  describeScenarioStep(scenario.confirmLedgerUpdate0Respond, () => {
+    const { state, action } = scenario.confirmLedgerUpdate0Respond;
+    const updatedState = indirectDefundingReducer(state.state, state.store, action);
+    itTransitionsTo(updatedState, 'IndirectDefunding.WaitForLedgerUpdate');
+    itSendsAnInternalMessage(updatedState.sharedData); // WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED
+    itYieldsToPreviousProcess(state.store, updatedState.sharedData);
   });
 });
 
