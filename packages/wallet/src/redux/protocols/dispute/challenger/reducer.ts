@@ -125,10 +125,14 @@ export function initialize(
       sharedData: showWallet(sharedData),
     };
   }
-  sharedData = registerChannelToMonitor(sharedData, processId, channelId);
+  let newSharedData = registerChannelToMonitor(sharedData, processId, channelId);
+  const isLedgerChallenge = !isYieldingProcessApplication(sharedData);
+  if (!isLedgerChallenge) {
+    newSharedData = showWallet(newSharedData);
+  }
   return {
     protocolState: approveChallenge({ channelId, processId }),
-    sharedData: showWallet(sharedData),
+    sharedData: newSharedData,
   };
 }
 
