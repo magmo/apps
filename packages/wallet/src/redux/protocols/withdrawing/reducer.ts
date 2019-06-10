@@ -2,12 +2,12 @@ import { ProtocolStateWithSharedData } from '..';
 import * as states from './states';
 import { WithdrawalAction } from './actions';
 import * as selectors from '../../selectors';
-import { CommitmentType } from '../../../domain';
 import {
   createConcludeAndWithdrawTransaction,
   ConcludeAndWithdrawArgs,
+  createTransferAndWithdrawTransaction,
 } from '../../../utils/transaction-generator';
-import { signVerificationData } from '../../../domain';
+import { signVerificationData, CommitmentType } from '../../../domain';
 import { TransactionRequest } from 'ethers/providers';
 import {
   initialize as initTransactionState,
@@ -101,12 +101,34 @@ const waitForApprovalReducer = (
     case 'WALLET.WITHDRAWING.WITHDRAWAL_APPROVED':
       const { channelId, withdrawalAmount, processId } = protocolState;
       const { withdrawalAddress } = action;
-      const transaction = createConcludeAndWithTransaction(
-        channelId,
-        withdrawalAmount,
-        withdrawalAddress,
-        sharedData,
-      );
+      let transaction;
+      const channelAlreadyClosedOnChain = sharedData.adjudicatorState[channelId].finalized;
+      if (channelAlreadyClosedOnChain) {
+        const channelState = selectors.getOpenedChannelState(sharedData, channelId);
+        const { participants, ourIndex, privateKey } = channelState;
+        const participant = participants[ourIndex];
+        const verificationSignature = signVerificationData(
+          participant,
+          withdrawalAddress,
+          withdrawalAmount,
+          withdrawalAddress,
+          privateKey,
+        );
+        transaction = createTransferAndWithdrawTransaction(
+          channelId,
+          participant,
+          withdrawalAddress,
+          withdrawalAmount,
+          verificationSignature,
+        );
+      } else {
+        transaction = createConcludeAndWithTransaction(
+          channelId,
+          withdrawalAmount,
+          withdrawalAddress,
+          sharedData,
+        );
+      }
       const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
         transaction,
         processId,
@@ -151,13 +173,13 @@ const handleTransactionSubmissionComplete = (
 };
 
 const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {
+  const finalizedOnChain = sharedData.adjudicatorState[channelId].finalized;
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
   const { lastCommitment, penultimateCommitment } = channelState;
-  return (
+  const finalizedOffCHain =
     lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&
-    penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude
-  );
-  // TODO: Check if there is a finalized outcome on chain
+    penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude;
+  return finalizedOffCHain || finalizedOnChain;
 };
 
 const createConcludeAndWithTransaction = (
