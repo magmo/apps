@@ -88,9 +88,12 @@ const existingLedgerInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
 // -------
 // Actions
 // -------
-const indirectStrategyProposed = actions.strategyProposed(processId, strategy);
+const indirectStrategyProposed = actions.strategyProposed({ processId, strategy });
 const indirectStrategyApproved = actions.strategyApproved({ processId, strategy });
-const existingStrategyProposed = actions.strategyProposed(processId, existingChannelStrategy);
+const existingStrategyProposed = actions.strategyProposed({
+  processId,
+  strategy: existingChannelStrategy,
+});
 const existingStrategyApproved = actions.strategyApproved({
   processId,
   strategy: existingChannelStrategy,
