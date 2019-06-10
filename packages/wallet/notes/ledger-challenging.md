@@ -7,7 +7,7 @@ All steps are conditional on inferring that the challenge corresponds to a ledge
 ## Challenger
 
 1. The user clicks 'launch challenge' on a protocol screen displayed inside a running process.
-2. The protocol reducer progresses the state machine optimistically (optimistically, but this is harmless since if the dispute fails to be resolved the channel will be closed on chain), and queues an internal message (or action) 'WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED'. This is automatically dispatched by the `internal-message-sender` saga.
+2. The protocol reducer progresses the state machine optimistically (optimistically, but this is harmless since if the dispute fails to be resolved the channel will be closed on chain), and queues an internal message (or action) `WALLET.NEW_PROCESS.CREATE_CHALLENGE_REQUESTED'. This is automatically dispatched by the`internal-message-sender` saga.
 3. The current process is displaced by (yields to) the dispute process (`currentProcessId` moved to `yieldingProcessId`).
 4. The dispute process handles transaction submission etc in the usual way, but does not hide the wallet on termination, but instead passes back to the yielding process (`yieldingProcessId` becomes `currentProcessId`)
 

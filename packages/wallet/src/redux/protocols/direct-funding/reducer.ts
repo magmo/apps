@@ -5,7 +5,13 @@ import { createDepositTransaction } from '../../../utils/transaction-generator';
 import * as actions from '../../actions';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import * as selectors from '../../selectors';
-import { SharedData, setChannelStore, queueMessage, checkAndStore } from '../../state';
+import {
+  SharedData,
+  setChannelStore,
+  queueMessage,
+  checkAndStore,
+  ChannelFundingState,
+} from '../../state';
 import { PlayerIndex } from '../../types';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
@@ -154,6 +160,13 @@ const fundingReceiveEventReducer: DFReducer = (
       protocolState.processId,
       protocolState.channelId,
     );
+
+    // update fundingState for ledger channel
+    const fundingState: ChannelFundingState = {
+      directlyFunded: true,
+    };
+    sharedDataWithOwnCommitment.fundingState[protocolState.channelId] = fundingState;
+
     return {
       protocolState: states.fundingSuccess(protocolState),
       sharedData: sharedDataWithOwnCommitment,
@@ -189,6 +202,11 @@ const commitmentReceivedReducer: DFReducer = (
         );
       }
       const sharedDataWithReceivedCommitment = setChannelStore(sharedData, checkResult.store);
+      // update fundingState for ledger channel
+      const fundingState: ChannelFundingState = {
+        directlyFunded: true,
+      };
+      sharedDataWithReceivedCommitment.fundingState[protocolState.channelId] = fundingState;
       return {
         protocolState: states.fundingSuccess(protocolState),
         sharedData: sharedDataWithReceivedCommitment,
@@ -221,6 +239,11 @@ const commitmentReceivedReducer: DFReducer = (
       protocolState.processId,
       protocolState.channelId,
     );
+    // update fundingState for ledger channel
+    const fundingState: ChannelFundingState = {
+      directlyFunded: true,
+    };
+    sharedDataWithOwnCommitment.fundingState[protocolState.channelId] = fundingState;
     return {
       protocolState: states.fundingSuccess(protocolState),
       sharedData: sharedDataWithOwnCommitment,
