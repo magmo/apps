@@ -131,11 +131,14 @@ export function initialize(
       sharedData: showWallet(sharedData),
     };
   }
-  sharedData = registerChannelToMonitor(sharedData, processId, channelId);
+  let newSharedData = registerChannelToMonitor(sharedData, processId, channelId);
+  const isLedgerChallenge = !isYieldingProcessApplication(sharedData);
+  if (!isLedgerChallenge) {
+    newSharedData = showWallet(newSharedData);
+  }
   return {
     protocolState: approveChallenge({ channelId, processId }),
-    sharedData: showWallet(sharedData), // TODO repetition on showWallet could be refactored to tidy up
-    // TODO wallet is already showing when challenging a ledger channel (but harmless to send this message)
+    sharedData: newSharedData,
   };
 }
 
