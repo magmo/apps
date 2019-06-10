@@ -91,12 +91,30 @@ const waitForPostFundSetup = states.waitForPostFundSetup(props);
 // -----------
 // Actions
 // -----------
-const ledgerUpdate0Received = globalActions.commitmentReceived(processId, ledger6);
-const ledgerUpdate1Received = globalActions.commitmentReceived(processId, ledger7);
-const appPostFundSetup0Received = globalActions.commitmentReceived(processId, app2);
-const appPostFundSetup1Received = globalActions.commitmentReceived(processId, app3);
-const invalidLedgerUpdateReceived = globalActions.commitmentReceived(processId, ledger5);
-const invalidPostFundReceived = globalActions.commitmentReceived(processId, app0);
+const ledgerUpdate0Received = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger6,
+});
+const ledgerUpdate1Received = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger7,
+});
+const appPostFundSetup0Received = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: app2,
+});
+const appPostFundSetup1Received = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: app3,
+});
+const invalidLedgerUpdateReceived = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger5,
+});
+const invalidPostFundReceived = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: app0,
+});
 
 export const playerAFullyFundedHappyPath = {
   initialize: {

@@ -70,10 +70,10 @@ const playerBUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
 // ------
 // Actions
 // ------
-const playerAUpdate0 = globalActions.commitmentReceived(processId, ledger6);
-const playerAUpdate1 = globalActions.commitmentReceived(processId, ledger7);
-const playerBUpdate0 = globalActions.commitmentReceived(processId, ledger8);
-const playerBUpdate1 = globalActions.commitmentReceived(processId, ledger9);
+const playerAUpdate0 = globalActions.commitmentReceived({ processId, signedCommitment: ledger6 });
+const playerAUpdate1 = globalActions.commitmentReceived({ processId, signedCommitment: ledger7 });
+const playerBUpdate0 = globalActions.commitmentReceived({ processId, signedCommitment: ledger8 });
+const playerBUpdate1 = globalActions.commitmentReceived({ processId, signedCommitment: ledger9 });
 const playerAFundingSuccess = preSuccessA.action;
 export const playerABothPlayersTopUp = {
   initialize: {
