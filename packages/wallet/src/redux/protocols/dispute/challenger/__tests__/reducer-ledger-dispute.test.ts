@@ -1,7 +1,11 @@
 import * as scenarios from './scenarios';
 import { challengerReducer, initialize } from '../reducer';
 import { ChallengerStateType, ChallengerState } from '../states';
-import { itStoresThisCommitment, describeScenarioStep } from '../../../../__tests__/helpers';
+import {
+  itStoresThisCommitment,
+  describeScenarioStep,
+  itSendsNoMessage,
+} from '../../../../__tests__/helpers';
 import { SharedData } from 'src/redux/state';
 
 const itTransitionsTo = (result: { protocolState: ChallengerState }, type: ChallengerStateType) => {
@@ -24,14 +28,6 @@ const itDoesNotSendADisplayMessage = (oldSharedData: SharedData, newSharedData: 
   it(`Does not send a display message`, () => {
     expect(newSharedData.outboxState.displayOutbox).toEqual(
       oldSharedData.outboxState.displayOutbox,
-    );
-  });
-};
-
-const itDoesNotSendAMessageToTheApp = (oldSharedData: SharedData, newSharedData: SharedData) => {
-  it(`Does not send a message to the app`, () => {
-    expect(newSharedData.outboxState.messageOutbox).toEqual(
-      oldSharedData.outboxState.messageOutbox,
     );
   });
 };
@@ -59,7 +55,7 @@ describe('OPPONENT RESPONDS', () => {
     const { state, action, commitment } = scenario.waitForResponseOrTimeout2;
     const result = challengerReducer(state, sharedData, action);
 
-    itDoesNotSendAMessageToTheApp(sharedData, result.sharedData);
+    itSendsNoMessage(sharedData);
     itStoresThisCommitment(result.sharedData, commitment);
     itTransitionsTo(result, 'Challenging.AcknowledgeResponse');
   });
@@ -70,7 +66,7 @@ describe('OPPONENT RESPONDS', () => {
 
     itTransitionsTo(result, 'Challenging.SuccessOpen');
 
-    itDoesNotSendAMessageToTheApp(sharedData, result.sharedData);
+    itSendsNoMessage(sharedData);
     itDoesNotSendADisplayMessage(sharedData, result.sharedData);
     itYieldsToPreviousProcess(sharedData, result.sharedData);
   });
