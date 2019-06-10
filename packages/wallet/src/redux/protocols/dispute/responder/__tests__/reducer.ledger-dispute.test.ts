@@ -86,6 +86,8 @@ const itYieldsToPreviousProcess = (oldSharedData: SharedData, newSharedData: Sha
   });
 };
 
+// Only test the behavior that differs when handling a ledger challenge
+
 // describe('RESPOND WITH EXISTING MOVE HAPPY-PATH', () => {
 //   const scenario = scenarios.respondWithExistingCommitmentHappyPath;
 //   const { sharedData, processId, channelId } = scenario;

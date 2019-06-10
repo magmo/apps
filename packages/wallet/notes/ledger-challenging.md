@@ -2,7 +2,7 @@
 
 Users may need to challenge opponents in ledger channels, for example during `indirect-funding` or `indirect-defunding`. Because the wallet plays the role of the consensus application, the usual message passing to 'the app' needs to be replaced by some other communication mechanism internal to the wallet. This note sets out a proposal for such a mechanism.
 
-All steps are conditional on inferring that the challenge corresponds to a ledger challenge (else use current code to handle application channel challenges). This inference is made based on the application rules being the consensus game.
+All steps are conditional on inferring that the challenge corresponds to a ledger challenge (else use current code to handle application channel challenges). This inference is made based on the yielding process being anything other than `Application-`.
 
 ## Challenger
 
