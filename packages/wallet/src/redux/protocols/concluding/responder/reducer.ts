@@ -31,13 +31,11 @@ import { isConcludingResponderAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
 import { failure, success } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import * as helpers from '../../reducer-helpers';
-import { initializeConsensusUpdate, consensusUpdateReducer } from '../../consensus-update/';
-import { ConsensusUpdateAction, isConsensusUpdateAction } from '../../consensus-update/actions';
-import { waitForLedgerUpdate } from '../../indirect-defunding/states';
+import { waitForLedgerUpdate, confirmLedgerUpdate } from '../../indirect-defunding/states';
 import { waitForLedgerDefunding } from '../../defunding/states';
 import { indirectDefundingReducer } from '../../indirect-defunding/reducer';
 import { CommitmentType } from 'fmg-core';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 
 export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
 export type Storage = SharedData;
@@ -115,9 +113,9 @@ function handleLedgerUpdateAction(
 ): ReturnVal {
   if (
     protocolState.type === 'ConcludingResponder.DecideDefund' &&
-    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED'
+    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' &&
+    action.signedCommitment.commitment.channel.channelType === CONSENSUS_LIBRARY_ADDRESS
   ) {
-    // TODO need stricter tests here (for now assume it is playerA's proposed ledger update)
     // setup preaction FS with sub-IDFS, call IDF reducer with this action
     const { processId } = action;
     const channel = getChannel(sharedData, protocolState.channelId);
@@ -130,7 +128,48 @@ function handleLedgerUpdateAction(
       channelId: protocolState.channelId,
       proposedAllocation: channel.lastCommitment.commitment.allocation,
       proposedDestination: channel.lastCommitment.commitment.destination,
-      commitmentType: CommitmentType.Conclude,
+      commitmentType: CommitmentType.App,
+    });
+    const postActionIndirectDefundingState = indirectDefundingReducer(
+      preActionIndirectDefundingState,
+      sharedData,
+      action,
+    );
+    const postActionDefundingState = waitForLedgerDefunding({
+      processId,
+      channelId: protocolState.channelId,
+      indirectDefundingState: postActionIndirectDefundingState.protocolState,
+    });
+    const postActionConcludingState = waitForDefund({
+      processId,
+      channelId: protocolState.channelId,
+      defundingState: postActionDefundingState,
+    });
+    return {
+      protocolState: postActionConcludingState,
+      sharedData: postActionIndirectDefundingState.sharedData,
+    };
+  }
+  if (
+    protocolState.type === 'ConcludingResponder.DecideDefund' &&
+    action.type === 'WALLET.COMMON.LEDGER_DISPUTE_DETECTED' &&
+    sharedData.fundingState[protocolState.channelId].fundingChannel
+  ) {
+    // setup preaction FS with sub-IDFS, call IDF reducer with this action
+    const { processId } = action;
+    const channel = getChannel(sharedData, protocolState.channelId);
+    if (!channel) {
+      throw new Error(`Channel does not exist with id ${protocolState.channelId}`);
+    }
+    const preActionIndirectDefundingState = confirmLedgerUpdate({
+      processId,
+      ledgerId:
+        sharedData.fundingState[protocolState.channelId].fundingChannel || 'No Funding channel',
+      channelId: protocolState.channelId,
+      proposedAllocation: channel.lastCommitment.commitment.allocation,
+      proposedDestination: channel.lastCommitment.commitment.destination,
+      commitmentType: CommitmentType.App,
+      isRespondingToChallenge: true,
     });
     const postActionIndirectDefundingState = indirectDefundingReducer(
       preActionIndirectDefundingState,
