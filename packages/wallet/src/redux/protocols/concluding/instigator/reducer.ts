@@ -21,7 +21,7 @@ import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
 import { ourTurn } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
-import { isSuccess, isFailure } from '../../defunding/states';
+import { isSuccess, isFailure, waitForLedgerDefunding } from '../../defunding/states';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import * as selectors from '../../../selectors';
 import {
@@ -34,9 +34,12 @@ import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
 import { sendConcludeInstigated, CommitmentReceived } from '../../../../communication';
 import { failure, success } from '../states';
-import { getChannelId } from '../../../../domain';
+import { getChannelId, CommitmentType } from '../../../../domain';
 import { ProtocolStateWithSharedData } from '../..';
 import { isConcludingInstigatorAction } from './actions';
+import { confirmLedgerUpdate, waitForLedgerUpdate } from '../../indirect-defunding/states';
+import { indirectDefundingReducer } from '../../indirect-defunding/reducer';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 
 export type ReturnVal = ProtocolStateWithSharedData<states.InstigatorConcludingState>;
 export type Storage = SharedData;
@@ -108,6 +111,86 @@ function handleDefundingAction(
   sharedData: Storage,
   action: DefundingAction,
 ): ReturnVal {
+  if (
+    protocolState.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' &&
+    action.type === 'WALLET.COMMON.LEDGER_DISPUTE_DETECTED' &&
+    sharedData.fundingState[protocolState.channelId].fundingChannel
+  ) {
+    // setup preaction FS with sub-IDFS, call IDF reducer with this action
+    const { processId } = action;
+    const channel = getChannel(sharedData, protocolState.channelId);
+    if (!channel) {
+      throw new Error(`Channel does not exist with id ${protocolState.channelId}`);
+    }
+    const preActionIndirectDefundingState = confirmLedgerUpdate({
+      processId,
+      ledgerId:
+        sharedData.fundingState[protocolState.channelId].fundingChannel || 'No Funding channel',
+      channelId: protocolState.channelId,
+      proposedAllocation: channel.lastCommitment.commitment.allocation,
+      proposedDestination: channel.lastCommitment.commitment.destination,
+      commitmentType: CommitmentType.App,
+      isRespondingToChallenge: true,
+    });
+    const postActionIndirectDefundingState = indirectDefundingReducer(
+      preActionIndirectDefundingState,
+      sharedData,
+      action,
+    );
+    const postActionDefundingState = waitForLedgerDefunding({
+      processId,
+      channelId: protocolState.channelId,
+      indirectDefundingState: postActionIndirectDefundingState.protocolState,
+    });
+    const postActionConcludingState = instigatorWaitForDefund({
+      processId,
+      channelId: protocolState.channelId,
+      defundingState: postActionDefundingState,
+    });
+    return {
+      protocolState: postActionConcludingState,
+      sharedData: postActionIndirectDefundingState.sharedData,
+    };
+  }
+  if (
+    protocolState.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' &&
+    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' &&
+    action.signedCommitment.commitment.channel.channelType === CONSENSUS_LIBRARY_ADDRESS
+  ) {
+    // setup preaction FS with sub-IDFS, call IDF reducer with this action
+    const { processId } = action;
+    const channel = getChannel(sharedData, protocolState.channelId);
+    if (!channel) {
+      throw new Error(`Channel does not exist with id ${protocolState.channelId}`);
+    }
+    const preActionIndirectDefundingState = waitForLedgerUpdate({
+      processId,
+      ledgerId: getChannelId(action.signedCommitment.commitment),
+      channelId: protocolState.channelId,
+      proposedAllocation: channel.lastCommitment.commitment.allocation,
+      proposedDestination: channel.lastCommitment.commitment.destination,
+      commitmentType: CommitmentType.App,
+    });
+    const postActionIndirectDefundingState = indirectDefundingReducer(
+      preActionIndirectDefundingState,
+      sharedData,
+      action,
+    );
+    const postActionDefundingState = waitForLedgerDefunding({
+      processId,
+      channelId: protocolState.channelId,
+      indirectDefundingState: postActionIndirectDefundingState.protocolState,
+    });
+    const postActionConcludingState = instigatorWaitForDefund({
+      processId,
+      channelId: protocolState.channelId,
+      defundingState: postActionDefundingState,
+    });
+    return {
+      protocolState: postActionConcludingState,
+      sharedData: postActionIndirectDefundingState.sharedData,
+    };
+  }
   if (protocolState.type !== 'ConcludingInstigator.WaitForDefund') {
     return { protocolState, sharedData };
   }
