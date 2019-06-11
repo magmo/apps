@@ -88,7 +88,7 @@ const notDefundableInitialStore = setFundingState(
   ]),
 );
 
-const playerAConfirmLedgerUpdate0 = {
+export const playerAConfirmLedgerUpdate0 = {
   state: confirmLedgerUpdate({
     ...props,
     commitmentType: CommitmentType.App,
@@ -144,7 +144,7 @@ const AcknowledgeLedgerFinalizedOffChain = {
   ),
 };
 
-const playerBWaitForUpdate = {
+export const playerBWaitForUpdate = {
   state: waitForLedgerUpdate({ ...props, commitmentType: CommitmentType.App }),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [

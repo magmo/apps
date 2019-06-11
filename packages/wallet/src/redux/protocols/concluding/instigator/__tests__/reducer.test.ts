@@ -134,6 +134,34 @@ describe('[ Defund failed ]', () => {
   });
 });
 
+describe('[ Ledger Commitment Received ]', () => {
+  const scenario = scenarios.ledgerCommitmentReceived;
+
+  describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
+    const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForDefund');
+    it('Initialises Indirect Defunding State', () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+  });
+});
+
+describe('[ Ledger Challenge Detected ]', () => {
+  const scenario = scenarios.ledgerChallengeDetected;
+
+  describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
+    const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForDefund');
+    it('Initialises Indirect Defunding State', () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+  });
+});
+
 /////////////
 // Helpers //
 /////////////

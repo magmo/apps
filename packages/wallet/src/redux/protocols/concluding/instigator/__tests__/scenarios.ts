@@ -7,7 +7,12 @@ import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../sta
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 import { appCommitment, asPrivateKey } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { commitmentReceived } from '../../../../actions';
+import { commitmentReceived, ledgerDisputeDetected } from '../../../../actions';
+import {
+  ledgerUpdate0Received,
+  playerAConfirmLedgerUpdate0,
+  playerBWaitForUpdate,
+} from '../../../../../redux/protocols/indirect-defunding/__tests__/scenarios';
 
 // -----------------
 // Channel Scenarios
@@ -158,5 +163,21 @@ export const defundFailed = {
     state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
     sharedData: initialStore,
     action: acknowledged,
+  },
+};
+
+export const ledgerCommitmentReceived = {
+  acknowledgeConcludeReceived: {
+    state: acknowledgeConcludeReceived,
+    sharedData: { ...secondConcludeReceived, ...playerAConfirmLedgerUpdate0.store },
+    action: ledgerUpdate0Received,
+  },
+};
+
+export const ledgerChallengeDetected = {
+  acknowledgeConcludeReceived: {
+    state: acknowledgeConcludeReceived,
+    sharedData: { ...secondConcludeReceived, ...playerBWaitForUpdate.store },
+    action: ledgerDisputeDetected({ ...defaults }), // LEDGER_DISPUTE_DETECTED,
   },
 };

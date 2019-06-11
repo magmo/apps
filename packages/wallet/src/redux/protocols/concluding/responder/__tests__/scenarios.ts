@@ -15,7 +15,10 @@ import {
   app10,
   app11,
   setFundingState as setFundingStateAlt,
+  playerAConfirmLedgerUpdate0,
+  playerBWaitForUpdate,
 } from '../../../indirect-defunding/__tests__/scenarios';
+import { ledgerDisputeDetected } from '../../../../../redux/actions';
 
 // -----------------
 // Channel Scenarios
@@ -157,5 +160,21 @@ export const defundFailed = {
     state: states.acknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
     sharedData: initialStore,
     action: acknowledged,
+  },
+};
+
+export const ledgerCommitmentReceived = {
+  decideDefund: {
+    state: decideDefund,
+    sharedData: { ...secondConcludeReceived, ...playerAConfirmLedgerUpdate0.store },
+    action: ledgerUpdate0Received,
+  },
+};
+
+export const ledgerChallengeDetected = {
+  decideDefund: {
+    state: decideDefund,
+    sharedData: { ...secondConcludeReceived, ...playerBWaitForUpdate.store },
+    action: ledgerDisputeDetected({ ...defaults }), // LEDGER_DISPUTE_DETECTED
   },
 };
