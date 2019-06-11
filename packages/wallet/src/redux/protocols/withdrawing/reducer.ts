@@ -102,7 +102,9 @@ const waitForApprovalReducer = (
       const { channelId, withdrawalAmount, processId } = protocolState;
       const { withdrawalAddress } = action;
       let transaction;
-      const channelAlreadyClosedOnChain = sharedData.adjudicatorState[channelId].finalized;
+      const channelAlreadyClosedOnChain = sharedData.adjudicatorState[channelId]
+        ? sharedData.adjudicatorState[channelId].finalized
+        : false;
       if (channelAlreadyClosedOnChain) {
         const channelState = selectors.getOpenedChannelState(sharedData, channelId);
         const { participants, ourIndex, privateKey } = channelState;
@@ -173,7 +175,9 @@ const handleTransactionSubmissionComplete = (
 };
 
 const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {
-  const finalizedOnChain = sharedData.adjudicatorState[channelId].finalized;
+  const finalizedOnChain = sharedData.adjudicatorState[channelId]
+    ? sharedData.adjudicatorState[channelId].finalized
+    : false;
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
   const { lastCommitment, penultimateCommitment } = channelState;
   const finalizedOffCHain =
