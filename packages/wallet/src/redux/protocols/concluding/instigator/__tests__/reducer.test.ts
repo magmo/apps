@@ -153,6 +153,54 @@ describe('[ Concluding Cancelled ]', () => {
   });
 });
 
+describe('[ Defund failed ]', () => {
+  const scenario = scenarios.defundFailed;
+
+  describeScenarioStep(scenario.waitForDefund, () => {
+    const { state, action, sharedData } = scenario.waitForDefund;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
+  });
+
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
+    const { state, action, sharedData } = scenario.acknowledgeFailure;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsToFailure(result, 'DefundFailed');
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});
+
+describe('[ Ledger Commitment Received ]', () => {
+  const scenario = scenarios.ledgerCommitmentReceived;
+
+  describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
+    const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForDefund');
+    it('Initialises Indirect Defunding State', () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+  });
+});
+
+describe('[ Ledger Challenge Detected ]', () => {
+  const scenario = scenarios.ledgerChallengeDetected;
+
+  describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
+    const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForDefund');
+    it('Initialises Indirect Defunding State', () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+  });
+});
+
 /////////////
 // Helpers //
 /////////////

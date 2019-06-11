@@ -11,9 +11,12 @@ import {
   ledgerCommitment,
 } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { commitmentReceived } from '../../../../actions';
-import { twoPlayerPreSuccessA } from '../../../consensus-update/__tests__';
-import { keepLedgerChannelApproved } from '../../../../../communication';
+import { commitmentReceived, ledgerDisputeDetected } from '../../../../actions';
+import {
+  ledgerUpdate0Received,
+  playerAConfirmLedgerUpdate0,
+  playerBWaitForUpdate,
+} from '../../../../../redux/protocols/indirect-defunding/__tests__/scenarios';
 
 // -----------------
 // Channel Scenarios
@@ -189,5 +192,35 @@ export const concludingCancelled = {
     state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'ConcludeCancelled' }),
     sharedData: initialStore,
     action: acknowledged,
+  },
+};
+
+export const defundFailed = {
+  ...defaults,
+  waitForDefund: {
+    state: waitForDefundPreFailure,
+    sharedData: initialStore,
+    action: preFailure.action,
+  },
+  acknowledgeFailure: {
+    state: states.instigatorAcknowledgeFailure({ ...defaults, reason: 'DefundFailed' }),
+    sharedData: initialStore,
+    action: acknowledged,
+  },
+};
+
+export const ledgerCommitmentReceived = {
+  acknowledgeConcludeReceived: {
+    state: acknowledgeConcludeReceived,
+    sharedData: { ...secondConcludeReceived, ...playerAConfirmLedgerUpdate0.store },
+    action: ledgerUpdate0Received,
+  },
+};
+
+export const ledgerChallengeDetected = {
+  acknowledgeConcludeReceived: {
+    state: acknowledgeConcludeReceived,
+    sharedData: { ...secondConcludeReceived, ...playerBWaitForUpdate.store },
+    action: ledgerDisputeDetected({ ...defaults }), // LEDGER_DISPUTE_DETECTED,
   },
 };

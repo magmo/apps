@@ -137,6 +137,54 @@ describe('[ Concluding Not Possible ]', () => {
   });
 });
 
+describe('[ Defund failed ]', () => {
+  const scenario = scenarios.defundFailed;
+
+  describeScenarioStep(scenario.waitForDefund, () => {
+    const { state, action, sharedData } = scenario.waitForDefund;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsToAcknowledgeFailure(result, 'DefundFailed');
+  });
+
+  describeScenarioStep(scenario.acknowledgeFailure, () => {
+    const { state, action, sharedData } = scenario.acknowledgeFailure;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsToFailure(result, 'DefundFailed');
+    itSendsThisMessage(result.sharedData, CONCLUDE_FAILURE);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});
+
+describe('[ Ledger Commitment Received ]', () => {
+  const scenario = scenarios.ledgerCommitmentReceived;
+
+  describeScenarioStep(scenario.decideDefund, () => {
+    const { state, action, sharedData } = scenario.decideDefund;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingResponder.WaitForDefund');
+    it('Initialises Indirect Defunding State', () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+  });
+});
+
+describe('[ Ledger Challenge Detected ]', () => {
+  const scenario = scenarios.ledgerChallengeDetected;
+
+  describeScenarioStep(scenario.decideDefund, () => {
+    const { state, action, sharedData } = scenario.decideDefund;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingResponder.WaitForDefund');
+    it('Initialises Indirect Defunding State', () => {
+      expect(result.protocolState).toHaveProperty('defundingState.indirectDefundingState');
+    });
+  });
+});
+
 function itTransitionsTo(result: ReturnVal, type: ResponderConcludingStateType) {
   it(`transitions to ${type}`, () => {
     expect(result.protocolState.type).toEqual(type);
