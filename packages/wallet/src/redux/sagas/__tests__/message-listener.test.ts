@@ -5,6 +5,7 @@ import { messageListener } from '../message-listener';
 import * as actions from '../../actions';
 import { channel } from 'redux-saga';
 import * as scenarios from '../../__tests__/test-scenarios';
+import { APPLICATION_PROCESS_ID } from '../../../redux/protocols/application/reducer';
 
 describe('message listener', () => {
   const saga = messageListener();
@@ -28,7 +29,14 @@ describe('message listener', () => {
       .value;
     saga.next(); // the take
 
-    expect(output).toEqual(put(actions.channel.ownCommitmentReceived(scenarios.gameCommitment1)));
+    expect(output).toEqual(
+      put(
+        actions.application.ownCommitmentReceived({
+          processId: APPLICATION_PROCESS_ID,
+          commitment: scenarios.gameCommitment1,
+        }),
+      ),
+    );
   });
 
   it('converts VALIDATION_REQUEST into OPPONENT_POSITION_RECEIVED', () => {
@@ -38,7 +46,13 @@ describe('message listener', () => {
     saga.next(); // the take
 
     expect(output).toEqual(
-      put(actions.channel.opponentCommitmentReceived(scenarios.gameCommitment2, 'signature')),
+      put(
+        actions.application.opponentCommitmentReceived({
+          processId: APPLICATION_PROCESS_ID,
+          commitment: scenarios.gameCommitment1,
+          signature: 'signature',
+        }),
+      ),
     );
   });
 });
