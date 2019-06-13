@@ -132,7 +132,7 @@ function concludingCancelled(protocolState: NonTerminalCState, sharedData: Stora
   }
   return {
     protocolState: failure({ reason: 'ConcludeCancelled' }),
-    sharedData: hideWallet(sharedData),
+    sharedData: sendConcludeFailure(hideWallet(sharedData), 'UserDeclined'),
   };
 }
 
