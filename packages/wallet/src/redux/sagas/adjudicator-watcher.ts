@@ -65,8 +65,8 @@ function* dispatchProcessEventAction(event: AdjudicatorEvent, processId: string)
       );
       break;
     case AdjudicatorEventType.Concluded:
-      yield put(actions.concludedEvent({ channelId }));
       yield put(concluded({ processId }));
+      yield put(actions.concludedEvent({ channelId }));
       break;
     case AdjudicatorEventType.Refuted:
       yield put(
