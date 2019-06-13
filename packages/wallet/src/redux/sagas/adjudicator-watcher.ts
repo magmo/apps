@@ -5,6 +5,7 @@ import * as actions from '../actions';
 import { ethers } from 'ethers';
 import { fromParameters } from 'fmg-core/lib/commitment';
 import { getAdjudicatorWatcherProcessesForChannel } from '../selectors';
+import { concluded } from '../protocols/application/actions';
 
 enum AdjudicatorEventType {
   ChallengeCreated,
@@ -65,6 +66,7 @@ function* dispatchProcessEventAction(event: AdjudicatorEvent, processId: string)
       break;
     case AdjudicatorEventType.Concluded:
       yield put(actions.concludedEvent({ channelId }));
+      yield put(concluded({ processId }));
       break;
     case AdjudicatorEventType.Refuted:
       yield put(
