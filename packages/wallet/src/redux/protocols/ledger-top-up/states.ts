@@ -1,8 +1,8 @@
 import { DirectFundingState } from '../direct-funding/states';
 import { StateConstructor } from '../../utils';
 
-export interface WaitForDirectFundingForPlayerA {
-  type: 'LedgerTopUp.WaitForDirectFundingForPlayerA';
+export interface WaitForDirectFunding {
+  type: 'LedgerTopUp.WaitForDirectFunding';
   channelId: string;
   ledgerId: string;
   processId: string;
@@ -11,26 +11,16 @@ export interface WaitForDirectFundingForPlayerA {
   directFundingState: DirectFundingState;
 }
 
-export interface WaitForDirectFundingForPlayerB {
-  type: 'LedgerTopUp.WaitForDirectFundingForPlayerB';
-  channelId: string;
-  ledgerId: string;
-  processId: string;
-  proposedAllocation: string[];
-  proposedDestination: string[];
-  directFundingState: DirectFundingState;
-}
-
-export interface WaitForLedgerUpdateForPlayerA {
-  type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerA';
+export interface WaitForPreTopUpLedgerUpdate {
+  type: 'LedgerTopUp.WaitForPreTopUpLedgerUpdate';
   channelId: string;
   ledgerId: string;
   processId: string;
   proposedAllocation: string[];
   proposedDestination: string[];
 }
-export interface WaitForLedgerUpdateForPlayerB {
-  type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerB';
+export interface WaitForPostTopUpLedgerUpdate {
+  type: 'LedgerTopUp.WaitForPostTopUpLedgerUpdate';
   channelId: string;
   ledgerId: string;
   processId: string;
@@ -46,34 +36,24 @@ export interface Failure {
 export interface Success {
   type: 'LedgerTopUp.Success';
 }
-export const waitForDirectFundingForPlayerA: StateConstructor<
-  WaitForDirectFundingForPlayerA
-> = p => {
+export const waitForDirectFunding: StateConstructor<WaitForDirectFunding> = p => {
   return {
     ...p,
-    type: 'LedgerTopUp.WaitForDirectFundingForPlayerA',
-  };
-};
-export const waitForDirectFundingForPlayerB: StateConstructor<
-  WaitForDirectFundingForPlayerB
-> = p => {
-  return {
-    ...p,
-    type: 'LedgerTopUp.WaitForDirectFundingForPlayerB',
+    type: 'LedgerTopUp.WaitForDirectFunding',
   };
 };
 
-export const waitForLedgerUpdateForPlayerA: StateConstructor<WaitForLedgerUpdateForPlayerA> = p => {
+export const waitForPreTopUpLedgerUpdate: StateConstructor<WaitForPreTopUpLedgerUpdate> = p => {
   return {
     ...p,
-    type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerA',
+    type: 'LedgerTopUp.WaitForPreTopUpLedgerUpdate',
   };
 };
 
-export const waitForLedgerUpdateForPlayerB: StateConstructor<WaitForLedgerUpdateForPlayerB> = p => {
+export const waitForPostTopUpLedgerUpdate: StateConstructor<WaitForPostTopUpLedgerUpdate> = p => {
   return {
     ...p,
-    type: 'LedgerTopUp.WaitForLedgerUpdateForPlayerB',
+    type: 'LedgerTopUp.WaitForPostTopUpLedgerUpdate',
   };
 };
 export const success: StateConstructor<Success> = p => {
@@ -85,10 +65,9 @@ export const failure: StateConstructor<Failure> = p => {
 };
 
 export type LedgerTopUpState =
-  | WaitForLedgerUpdateForPlayerA
-  | WaitForLedgerUpdateForPlayerB
-  | WaitForDirectFundingForPlayerA
-  | WaitForDirectFundingForPlayerB
+  | WaitForPreTopUpLedgerUpdate
+  | WaitForPostTopUpLedgerUpdate
+  | WaitForDirectFunding
   | Success
   | Failure;
 

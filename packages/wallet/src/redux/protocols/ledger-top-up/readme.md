@@ -7,19 +7,13 @@ The purpose of the protocol is to top up an existing ledger channel so that it c
 ```mermaid
 graph TD
   linkStyle default interpolate basis
-  St((Start))-->ANT{Does Player A require top-up?}
-  ANT-->|No|BNT{Does Player B require top-up}
-  ANT-->|Yes|WFLUA(WaitForLedgerUpdateForPlayerA)
-  WFLUA-->|"CommitmentReceived(Accept)"|WFDFA(WaitForDirectFunding)
-  WFDFA-->|FundingAction|WFDFA(WaitForDirectFunding)
-  WFDFA-->|Success|BNT
-  WFLUA-->|"CommitmentReceived(Reject)"|F((failure))
-  BNT-->|No|Su((success))
-  BNT-->|Yes|WFLUB(WaitForLedgerUpdateForPlayerB)
-  WFLUB-->|"CommitmentReceived(Accept)"|WFDFB(WaitForDirectFunding)
-  WFDFB-->|FundingAction|WFDFB(WaitForDirectFunding)
-  WFDFB-->|Success|Su((sucess))
-    WFLUB-->|"CommitmentReceived(Reject)"|F((failure))
+  St((Start))-->WFLU1(WaitForPreTopUpLedgerUpdate)
+  WFLU1-->|"CommitmentReceived(Accept)"|WFDF(WaitForDirectFunding)
+  WFDF-->|FundingAction|WFDF(WaitForDirectFunding)
+  WFDF-->|Success|WFLU2(WaitForPostTopUpLedgerUpdate)
+  WFLU1-->|"CommitmentReceived(Reject)"|F((failure))
+WFLU2-->|"CommitmentReceived(Accept)"|Su((success))
+WFLU2-->|"CommitmentReceived(Reject)"|F((failure))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
@@ -33,20 +27,9 @@ graph TD
 
 ## Scenarios
 
-### Player A Scenarios
+1. **Player A Happy Path** Start->WaitForPreTopUpLedgerUpdate->WaitForDirectFunding->WaitForPostTopUpLedgerUpdate->Success
+2. **Player B Happy Path** Start->WaitForPreTopUpLedgerUpdate->WaitForDirectFunding->WaitForPostTopUpLedgerUpdate->Success
+3. **Pre-TopUp Invalid Update** WaitForPreTopUpLedgerUpdate->Failure
+4. **Post-TopUp Invalid Update** WaitForPostTopUpLedgerUpdate->Failure
 
-1. **Both Players need top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->WaitForLedgerUpdatePlayerB-->WaitForDirectFunding->Success
-2. **Only Player A needs top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->Success
-3. **Only Player B needs top-up** Start->WaitForLedgerUpdatePlayerB->WaitForDirectFunding->Success
-4. **No players need top-up** Start-->Success
-5. **Player A Ledger Update Rejected** WaitForLedgerUpdatePlayerA-->Failure
-6. **Player B Ledger Update Rejected** WaitForLedgerUpdatePlayerB->Failure
-
-### Player B Scenarios
-
-1. **Both Players need top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->WaitForLedgerUpdatePlayerB-->WaitForDirectFunding->Success
-2. **Only Player A needs top-up** Start->WaitForLedgerUpdatePlayerA->WaitForDirectFunding->Success
-3. **Only Player B needs top-up** Start->WaitForLedgerUpdatePlayerB->WaitForDirectFunding->Success
-4. **No players need top-up** Start-->Success
-5. **Player A Ledger Update Rejected** WaitForLedgerUpdatePlayerA-->Failure
-6. **Player B Ledger Update Rejected** WaitForLedgerUpdatePlayerB->Failure
+TODO: Should we have a scenario for cases where only one player needs to top up?

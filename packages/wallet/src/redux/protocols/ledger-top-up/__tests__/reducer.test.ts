@@ -23,25 +23,20 @@ describe('player A both players need a top up', () => {
       sharedData,
     );
 
-    itTransitionsTo(initialState, 'LedgerTopUp.WaitForLedgerUpdateForPlayerA');
+    itTransitionsTo(initialState, 'LedgerTopUp.WaitForPreTopUpLedgerUpdate');
   });
-  describe('when in WaitForLedgerUpdateForPlayerA', () => {
-    const { action, sharedData, state } = scenario.waitForLedgerUpdateForPlayerA;
+  describe('when in WaitForPreTopUpLedgerUpdate', () => {
+    const { action, sharedData, state } = scenario.waitForPreTopUpLedgerUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForPlayerA');
+    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFunding');
   });
-  describe('when in WaitForDirectFundingForPlayerA', () => {
-    const { action, sharedData, state } = scenario.waitForLedgerUpdateForPlayerA;
+  describe('when in WaitForDirectFunding', () => {
+    const { action, sharedData, state } = scenario.waitForDirectFunding;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForLedgerUpdateForPlayerB');
+    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForPostTopUpLedgerUpdate');
   });
-  describe('when in WaitForLedgerUpdateForPlayerB', () => {
-    const { action, sharedData, state } = scenario.waitForLedgerUpdateForPlayerB;
-    const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForPlayerB');
-  });
-  describe('when in WaitForDirectFundingForPlayerB', () => {
-    const { action, sharedData, state } = scenario.waitForDirectFundingForPlayerB;
+  describe('when in WaitForPostTopUpLedgerUpdate', () => {
+    const { action, sharedData, state } = scenario.waitForPostTopUpLedgerUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
