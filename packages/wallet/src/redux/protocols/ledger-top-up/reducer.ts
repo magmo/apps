@@ -72,6 +72,8 @@ export const ledgerTopUpReducer: ProtocolReducer<states.LedgerTopUpState> = (
       return waitForPreTopUpLedgerUpdateReducer(protocolState, sharedData, action);
     case 'LedgerTopUp.WaitForDirectFunding':
       return waitForDirectFundingReducer(protocolState, sharedData, action);
+    case 'LedgerTopUp.WaitForPostTopUpLedgerUpdate':
+      return waitForPostTopUpLedgerUpdateReducer(protocolState, sharedData, action);
     default:
       return { protocolState, sharedData };
   }
@@ -193,6 +195,50 @@ const waitForDirectFundingReducer: ProtocolReducer<states.LedgerTopUpState> = (
 
   return { protocolState, sharedData };
 };
+
+const waitForPostTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpState> = (
+  protocolState: states.WaitForPostTopUpLedgerUpdate,
+  sharedData: SharedData,
+  action: LedgerTopUpAction,
+): ProtocolStateWithSharedData<states.LedgerTopUpState> => {
+  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
+    console.warn(
+      `Ledger Top Up Protocol expected COMMITMENT_RECEIVED received ${action.type} instead.`,
+    );
+    return { protocolState, sharedData };
+  }
+
+  const checkResult = checkAndStore(sharedData, action.signedCommitment);
+
+  if (!checkResult.isSuccess) {
+    return {
+      protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      sharedData,
+    };
+  }
+  sharedData = checkResult.store;
+  const isFirstPlayer = helpers.isFirstPlayer(protocolState.ledgerId, sharedData);
+  // Accept consensus if player B
+  if (!isFirstPlayer) {
+    const ourCommitment = acceptConsensus(action.signedCommitment.commitment);
+    const signResult = signAndStore(sharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      return { protocolState: states.failure({ reason: 'Signature Failure' }), sharedData };
+    }
+    sharedData = signResult.store;
+
+    const messageRelay = sendCommitmentReceived(
+      getOpponentAddress(sharedData, protocolState.ledgerId),
+      protocolState.processId,
+      signResult.signedCommitment.commitment,
+      signResult.signedCommitment.signature,
+    );
+    sharedData = queueMessage(sharedData, messageRelay);
+  }
+
+  return { protocolState: states.success({}), sharedData };
+};
+
 function calculateTotalTopUp(allocation: string[]): string {
   return bigNumberify(allocation[2])
     .add(allocation[3])
