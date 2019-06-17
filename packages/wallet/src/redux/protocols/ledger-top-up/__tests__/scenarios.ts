@@ -1,7 +1,7 @@
 import { bigNumberify } from 'ethers/utils';
 import * as states from '../states';
 import * as globalActions from '../../../actions';
-import { preSuccessA } from '../../direct-funding/__tests__';
+import { noPostFundSetupsPreSuccessA } from '../../direct-funding/__tests__';
 import {
   ledgerCommitment,
   asPrivateKey,
@@ -62,7 +62,7 @@ const waitForPreTopUpUpdate = states.waitForPreTopUpLedgerUpdate(props);
 const waitForPostTopUpUpdate = states.waitForPostTopUpLedgerUpdate(props);
 const waitForDirectFundingForPlayerA = states.waitForDirectFunding({
   ...props,
-  directFundingState: preSuccessA.state,
+  directFundingState: noPostFundSetupsPreSuccessA.state,
 });
 
 // ------
@@ -73,11 +73,17 @@ const initialSharedData = setChannels(EMPTY_SHARED_DATA, [
 ]);
 
 const preTopUpUpdate0ReceivedSharedData = {
-  ...preSuccessA.sharedData,
   ...setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
   ]),
 };
+
+const preTopUpUpdate1ReceivedSharedData = {
+  ...setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(ledger6, ledger7, asAddress, asPrivateKey),
+  ]),
+};
+
 const postTopUpUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(ledger7, ledger8, asAddress, asPrivateKey),
 ]);
@@ -89,7 +95,7 @@ const preTopUpUpdate0 = globalActions.commitmentReceived({ processId, signedComm
 const preTopUpUpdate1 = globalActions.commitmentReceived({ processId, signedCommitment: ledger7 });
 const postTopUpUpdate0 = globalActions.commitmentReceived({ processId, signedCommitment: ledger8 });
 const postTopUpUpdate1 = globalActions.commitmentReceived({ processId, signedCommitment: ledger9 });
-const playerAFundingSuccess = preSuccessA.action;
+const playerAFundingSuccess = noPostFundSetupsPreSuccessA.action;
 export const playerABothPlayersTopUp = {
   initialize: {
     ...props,
@@ -104,7 +110,7 @@ export const playerABothPlayersTopUp = {
   waitForDirectFunding: {
     state: waitForDirectFundingForPlayerA,
     action: playerAFundingSuccess,
-    sharedData: preTopUpUpdate0ReceivedSharedData,
+    sharedData: preTopUpUpdate1ReceivedSharedData,
     reply: postTopUpUpdate0,
   },
   waitForPostTopUpLedgerUpdate: {
