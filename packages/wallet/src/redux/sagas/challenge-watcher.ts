@@ -21,10 +21,10 @@ export function* challengeWatcher() {
           channelId,
         );
         for (const processId of processIdsToAlert) {
-          yield put(concluded({ processId }));
           yield put(
             actions.challengeExpiredEvent({ processId, channelId, timestamp: block.timestamp }),
           );
+          yield put(concluded({ processId }));
         }
       }
     }
