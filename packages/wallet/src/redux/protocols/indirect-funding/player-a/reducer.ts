@@ -212,6 +212,7 @@ function handleWaitForPreFundSetup(
     totalFundingRequired: total,
     requiredDeposit: ourAmount,
     ourIndex: 0,
+    exchangePostFundSetups: true,
   });
   const directFundingState = initializeDirectFunding(directFundingAction, sharedData);
   const newProtocolState = states.aWaitForDirectFunding({

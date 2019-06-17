@@ -1,6 +1,7 @@
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
 import { Properties, StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { PlayerIndex } from '../../types';
 
 // -------
 // States
@@ -25,7 +26,8 @@ export interface BaseDirectFundingState {
   totalFundingRequired: string;
   requiredDeposit: string;
   channelId: string;
-  ourIndex: number;
+  ourIndex: PlayerIndex;
+  exchangePostFundSetups: boolean;
 }
 
 export interface NotSafeToDeposit extends BaseDirectFundingState {
@@ -62,6 +64,7 @@ export const baseDirectFundingState: StateConstructor<BaseDirectFundingState> = 
     ourIndex,
     safeToDepositLevel,
     type: channelFundingStatus,
+    exchangePostFundSetups,
   } = params;
   return {
     processId,
@@ -71,6 +74,7 @@ export const baseDirectFundingState: StateConstructor<BaseDirectFundingState> = 
     ourIndex,
     safeToDepositLevel,
     type: channelFundingStatus,
+    exchangePostFundSetups,
   };
 };
 

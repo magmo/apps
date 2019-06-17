@@ -126,6 +126,7 @@ const waitForPreTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpStat
     requiredDeposit: isFirstPlayer ? lastCommitment.allocation[2] : lastCommitment.allocation[3],
     totalFundingRequired: calculateTotalTopUp(lastCommitment.allocation),
     ourIndex: isFirstPlayer ? PlayerIndex.A : PlayerIndex.B,
+    exchangePostFundSetups: false,
   });
   const { protocolState: directFundingState, sharedData: newSharedData } = initializeDirectFunding(
     directFundingAction,

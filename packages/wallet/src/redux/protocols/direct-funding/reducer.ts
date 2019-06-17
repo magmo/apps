@@ -25,7 +25,14 @@ export function initialize(
   action: DirectFundingRequested,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.DirectFundingState> {
-  const { safeToDepositLevel, totalFundingRequired, requiredDeposit, channelId, ourIndex } = action;
+  const {
+    safeToDepositLevel,
+    totalFundingRequired,
+    requiredDeposit,
+    channelId,
+    ourIndex,
+    exchangePostFundSetups,
+  } = action;
 
   const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
   const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
@@ -39,6 +46,7 @@ export function initialize(
         channelId,
         ourIndex,
         safeToDepositLevel,
+        exchangePostFundSetups,
       }),
       sharedData,
     };
@@ -66,6 +74,7 @@ export function initialize(
         ourIndex,
         safeToDepositLevel,
         transactionSubmissionState,
+        exchangePostFundSetups,
       }),
       sharedData: newSharedData,
     };
@@ -79,6 +88,7 @@ export function initialize(
       channelId,
       ourIndex,
       safeToDepositLevel,
+      exchangePostFundSetups,
     }),
     sharedData,
   };
@@ -127,6 +137,12 @@ const fundingReceiveEventReducer: DFReducer = (
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
   // TODO[Channel state side effect]: update funding level for the channel.
 
+  if (!protocolState.exchangePostFundSetups) {
+    return {
+      protocolState: states.fundingSuccess(protocolState),
+      sharedData,
+    };
+  }
   // If we are player A, the channel is now funded, so we should send the PostFundSetup
   if (protocolState.ourIndex === PlayerIndex.A) {
     const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(

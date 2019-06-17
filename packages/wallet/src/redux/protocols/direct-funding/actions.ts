@@ -1,17 +1,19 @@
 import * as actions from '../../actions';
 import { ActionConstructor } from '../../utils';
+import { PlayerIndex } from '../../types';
 
 // -------
 // Actions
 // -------
 export interface DirectFundingRequested {
   type: 'WALLET.DIRECT_FUNDING.DIRECT_FUNDING_REQUESTED';
-  processId;
-  channelId;
-  totalFundingRequired;
-  safeToDepositLevel;
-  requiredDeposit;
-  ourIndex;
+  processId: string;
+  channelId: string;
+  totalFundingRequired: string;
+  safeToDepositLevel: string;
+  requiredDeposit: string;
+  ourIndex: PlayerIndex;
+  exchangePostFundSetups: boolean;
 }
 
 // -------
