@@ -10,6 +10,8 @@ import { Commitment, nextSetupCommitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
 import { sendCommitmentReceived } from '../../../communication';
 import { CommitmentType } from 'fmg-core';
+import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
+import { isLedgerTopUpAction } from '../ledger-top-up/actions';
 
 export const initialize = (
   processId: string,
@@ -22,7 +24,14 @@ export const initialize = (
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = ledgerChannel.lastCommitment.commitment;
   if (ledgerChannelNeedsTopUp(theirCommitment, proposedAmount)) {
-    const ledgerTopUpState = {};
+    const ledgerTopUpState = initializeLedgerTopUp(
+      processId,
+      channelId,
+      ledgerId,
+      [proposedAmount, proposedAmount],
+      theirCommitment.destination,
+      sharedData,
+    );
     return {
       protocolState: states.waitForLedgerTopUp({
         ledgerTopUpState,
@@ -84,8 +93,68 @@ export const existingChannelFundingReducer = (
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
     case 'ExistingChannelFunding.WaitForPostFundSetup':
       return waitForPostFundSetupReducer(protocolState, sharedData, action);
+    case 'ExistingChannelFunding.WaitForLedgerTopUp':
+      return waitForLedgerTopUpReducer(protocolState, sharedData, action);
   }
   return { protocolState, sharedData };
+};
+
+const waitForLedgerTopUpReducer = (
+  protocolState: states.WaitForLedgerTopUp,
+  sharedData: SharedData,
+  action: ExistingChannelFundingAction,
+): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
+  if (!isLedgerTopUpAction(action)) {
+    console.warn(`Expected a ledger top up action.`);
+  }
+  const { protocolState: ledgerTopUpState, sharedData: newSharedData } = ledgerTopUpReducer(
+    protocolState.ledgerTopUpState,
+    sharedData,
+    action,
+  );
+
+  if (ledgerTopUpState.type === 'LedgerTopUp.Failure') {
+    return {
+      protocolState: states.failure({ reason: 'LedgerTopUp Failure' }),
+      sharedData: newSharedData,
+    };
+  } else if (ledgerTopUpState.type === 'LedgerTopUp.Success') {
+    const { ledgerId, proposedAmount, channelId, processId } = protocolState;
+    const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
+    const theirCommitment = ledgerChannel.lastCommitment.commitment;
+    if (helpers.isFirstPlayer(ledgerId, sharedData)) {
+      const { proposedAllocation, proposedDestination } = craftNewAllocationAndDestination(
+        theirCommitment,
+        proposedAmount,
+        channelId,
+      );
+      const ourCommitment = proposeNewConsensus(
+        theirCommitment,
+        proposedAllocation,
+        proposedDestination,
+      );
+      const signResult = signAndStore(sharedData, ourCommitment);
+      if (!signResult.isSuccess) {
+        return {
+          protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+          sharedData,
+        };
+      }
+      sharedData = signResult.store;
+
+      const messageRelay = sendCommitmentReceived(
+        theirAddress(ledgerChannel),
+        processId,
+        signResult.signedCommitment.commitment,
+        signResult.signedCommitment.signature,
+      );
+      sharedData = queueMessage(newSharedData, messageRelay);
+    }
+  }
+  return {
+    protocolState: states.waitForLedgerUpdate(protocolState),
+    sharedData: newSharedData,
+  };
 };
 
 const waitForPostFundSetupReducer = (
