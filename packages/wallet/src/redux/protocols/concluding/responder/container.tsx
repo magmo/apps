@@ -8,6 +8,7 @@ import ApproveDefunding from './components/approve-defunding';
 import { Defunding } from '../../defunding/container';
 import * as actions from './actions';
 import Acknowledge from '../../shared-components/acknowledge';
+import { ConsensusUpdate } from '../../consensus-update/container';
 
 interface Props {
   state: NonTerminalConcludingState;
@@ -49,6 +50,8 @@ class ConcludingContainer extends PureComponent<Props> {
         return <Defunding state={state.defundingState} />;
       case 'ConcludingResponder.ApproveConcluding':
         return <ApproveConcluding approve={() => approve({ processId })} />;
+      case 'ConcludingResponder.WaitForLedgerUpdate':
+        return <ConsensusUpdate state={state.consensusUpdateState} />;
       default:
         return unreachable(state);
     }

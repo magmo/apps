@@ -7,6 +7,7 @@ export type ResponderConcludingState =
 export type ResponderConcludingStateType = ResponderConcludingState['type'];
 import { ProtocolState } from '../..';
 import { TerminalState, FailureReason } from '../states';
+import { ConsensusUpdateState } from '../../consensus-update/states';
 
 // -------
 // States
@@ -41,6 +42,13 @@ export interface ResponderWaitForDefund {
   defundingState: DefundingState;
 }
 
+export interface ResponderWaitForLedgerUpdate {
+  type: 'ConcludingResponder.WaitForLedgerUpdate';
+  processId: string;
+  channelId: string;
+  consensusUpdateState: ConsensusUpdateState;
+}
+
 export function isConcludingResponderState(
   state: ProtocolState,
 ): state is ResponderConcludingState {
@@ -49,7 +57,8 @@ export function isConcludingResponderState(
     state.type === 'ConcludingResponder.AcknowledgeFailure' ||
     state.type === 'ConcludingResponder.ApproveConcluding' ||
     state.type === 'ConcludingResponder.DecideDefund' ||
-    state.type === 'ConcludingResponder.WaitForDefund'
+    state.type === 'ConcludingResponder.WaitForDefund' ||
+    state.type === 'ConcludingResponder.WaitForLedgerUpdate'
   );
 }
 
@@ -76,7 +85,9 @@ export const acknowledgeFailure: StateConstructor<ResponderAcknowledgeFailure> =
 export const waitForDefund: StateConstructor<ResponderWaitForDefund> = p => {
   return { ...p, type: 'ConcludingResponder.WaitForDefund' };
 };
-
+export const waitForLedgerUpdate: StateConstructor<ResponderWaitForLedgerUpdate> = p => {
+  return { ...p, type: 'ConcludingResponder.WaitForLedgerUpdate' };
+};
 // -------
 // Unions and Guards
 // -------
@@ -86,6 +97,7 @@ export type ResponderNonTerminalState =
   | ResponderDecideDefund
   | ResponderWaitForDefund
   | ResponderAcknowledgeFailure
-  | ResponderAcknowledgeSuccess;
+  | ResponderAcknowledgeSuccess
+  | ResponderWaitForLedgerUpdate;
 
 export type ResponderPreTerminalState = ResponderAcknowledgeSuccess | ResponderAcknowledgeFailure;

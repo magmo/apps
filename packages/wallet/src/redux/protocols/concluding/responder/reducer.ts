@@ -39,7 +39,12 @@ import { ProtocolStateWithSharedData } from '../..';
 import { waitForLedgerUpdate } from '../../indirect-defunding/states';
 import { waitForLedgerDefunding } from '../../defunding/states';
 import { indirectDefundingReducer } from '../../indirect-defunding/reducer';
-
+import * as helpers from '../../reducer-helpers';
+import {
+  initialize as consensusUpdateInitialize,
+  consensusUpdateReducer,
+} from '../../consensus-update/reducer';
+import { ConsensusUpdateAction, isConsensusUpdateAction } from '../../consensus-update/actions';
 export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
 export type Storage = SharedData;
 
@@ -48,6 +53,12 @@ export function responderConcludingReducer(
   sharedData: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
+  if (
+    protocolState.type === 'ConcludingResponder.WaitForLedgerUpdate' &&
+    isConsensusUpdateAction(action)
+  ) {
+    return handleLedgerUpdateAction(protocolState, sharedData, action);
+  }
   if (isDefundingAction(action)) {
     return handleDefundingAction(protocolState, sharedData, action);
   } // COMMITMENT_RECEIVED is a defunding action
@@ -104,6 +115,42 @@ export function initialize(
     return {
       protocolState: acknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
       sharedData: showWallet(sharedData),
+    };
+  }
+}
+
+function handleLedgerUpdateAction(
+  protocolState: NonTerminalCState,
+  sharedData: Storage,
+  action: ConsensusUpdateAction,
+): ReturnVal {
+  if (protocolState.type !== 'ConcludingResponder.WaitForLedgerUpdate') {
+    return { protocolState, sharedData };
+  }
+  const {
+    protocolState: updatedConsensusUpdateState,
+    sharedData: newSharedData,
+  } = consensusUpdateReducer(protocolState.consensusUpdateState, sharedData, action);
+  if (updatedConsensusUpdateState.type === 'ConsensusUpdate.Success') {
+    return {
+      protocolState: states.acknowledgeSuccess(protocolState),
+      sharedData: newSharedData,
+    };
+  } else if (updatedConsensusUpdateState.type === 'ConsensusUpdate.Failure') {
+    return {
+      protocolState: states.acknowledgeFailure({
+        ...protocolState,
+        reason: 'LedgerUpdateFailed',
+      }),
+      sharedData: newSharedData,
+    };
+  } else {
+    return {
+      protocolState: states.waitForLedgerUpdate({
+        ...protocolState,
+        consensusUpdateState: updatedConsensusUpdateState,
+      }),
+      sharedData: newSharedData,
     };
   }
 }
@@ -195,9 +242,26 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
   if (protocolState.type !== 'ConcludingResponder.DecideDefund') {
     return { protocolState, sharedData };
   }
-  return {
-    protocolState: acknowledgeSuccess(protocolState),
+
+  const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
+  const appChannel = getChannel(sharedData, protocolState.channelId);
+  if (!appChannel) {
+    throw new Error(`Could not find channel ${protocolState.channelId}`);
+  }
+  const latestCommitment = appChannel.lastCommitment.commitment;
+  const {
+    protocolState: consensusUpdateState,
+    sharedData: newSharedData,
+  } = consensusUpdateInitialize(
+    protocolState.processId,
+    ledgerId,
+    latestCommitment.allocation,
+    latestCommitment.destination,
     sharedData,
+  );
+  return {
+    protocolState: states.waitForLedgerUpdate({ ...protocolState, consensusUpdateState }),
+    sharedData: newSharedData,
   };
 }
 

@@ -54,6 +54,48 @@ describe('[ Happy path ]', () => {
   });
 });
 
+describe('[ Happy path No Defunding]', () => {
+  const scenario = scenarios.noDefundingHappyPath;
+  const { processId } = scenario;
+
+  describe('when initializing', () => {
+    const { commitment, sharedData } = scenario.initialize;
+    const result = initialize(commitment, processId, sharedData);
+
+    itTransitionsTo(result, 'ConcludingResponder.ApproveConcluding');
+  });
+  describeScenarioStep(scenario.approveConcluding, () => {
+    const { state, sharedData, action, reply } = scenario.approveConcluding;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    expectThisCommitmentSent(result.sharedData, reply);
+    itTransitionsTo(result, 'ConcludingResponder.DecideDefund');
+  });
+
+  describeScenarioStep(scenario.decideDefund, () => {
+    const { state, sharedData, action } = scenario.decideDefund;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingResponder.WaitForLedgerUpdate');
+  });
+
+  describeScenarioStep(scenario.waitForLedgerUpdate, () => {
+    const { state, sharedData, action } = scenario.waitForLedgerUpdate;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingResponder.AcknowledgeSuccess');
+  });
+
+  describeScenarioStep(scenario.acknowledgeSuccess, () => {
+    const { state, sharedData, action } = scenario.acknowledgeSuccess;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'Concluding.Success');
+    itSendsThisMessage(result.sharedData, OPPONENT_CONCLUDED);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});
+
 describe('[ Happy path (alternative) ]', () => {
   const scenario = scenarios.happyPathAlternative;
 
