@@ -38,8 +38,10 @@ Authoring a new protocol begins with a state machine diagram, using the followin
   linkStyle default interpolate basis
   St((Start))-->L
   L{Flow Logic} --> NT1(Non-Terminal States)
-  NT1 -->|ACTION| C
-  C(Call child reducer) -->|child return status| NT2
+  NT1 -->|ACTION| C(Call child reducer: EmbeddedProtocol)
+  C -->|child return status| C2("MultipleEmbeddedProtocols: #60;FirstProtocol, SecondProtocol#62;")
+  C2 -->|child return status| NT2
+  C2 -->|child return status| C2
   NT2(More Non-Terminal States) --> |SUCCESS_TRIGGER| Su
   Su((Success))
   NT2(More Non-Terminal States) --> |FAILURE_TRIGGER| F
@@ -52,6 +54,7 @@ Authoring a new protocol begins with a state machine diagram, using the followin
   class Su Success;
   class F Failure;
   class C WaitForChildProtocol;
+  class C2 WaitForChildProtocol;
 ```
 
 Various scenarios -- namely, different routes through this state machine diagram -- should also be laid out. Scenarios need not repeat identical steps from prior scenarios.
