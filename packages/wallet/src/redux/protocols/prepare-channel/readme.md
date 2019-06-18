@@ -52,6 +52,8 @@ Which of the following should we do? (1) is more flexible, (2) is simpler and mo
 1. The protocol could calculate the correct `CommitmentType` for the next commitment. This is used when progressing a channel directly from turn 0 to the application phase, as might be done when constructing a virtual channel.
 2. It could also be used to progress the channel exactly one round, eg. through the `PreFundSetup` phase, or through the `PostFundSetup` phase, or through the `Conclude` phase.
 
+Should the protocol actually be called something like `AdvancePhase`?
+
 ## State machine diagram
 
 Diagram for approach 1. In this case, you might send a commitment but still have to wait.
