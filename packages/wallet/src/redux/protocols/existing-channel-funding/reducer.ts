@@ -20,11 +20,10 @@ export const initialize = (
   proposedAmount: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
-  let newSharedData = { ...sharedData };
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = ledgerChannel.lastCommitment.commitment;
   if (ledgerChannelNeedsTopUp(theirCommitment, proposedAmount)) {
-    const ledgerTopUpState = initializeLedgerTopUp(
+    const { protocolState: ledgerTopUpState, sharedData: newSharedData } = initializeLedgerTopUp(
       processId,
       channelId,
       ledgerId,
@@ -62,7 +61,7 @@ export const initialize = (
         sharedData,
       };
     }
-    newSharedData = signResult.store;
+    sharedData = signResult.store;
 
     const messageRelay = sendCommitmentReceived(
       theirAddress(ledgerChannel),
@@ -70,7 +69,7 @@ export const initialize = (
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
     );
-    newSharedData = queueMessage(newSharedData, messageRelay);
+    sharedData = queueMessage(sharedData, messageRelay);
   }
 
   const protocolState = states.waitForLedgerUpdate({
@@ -80,7 +79,7 @@ export const initialize = (
     proposedAmount,
   });
 
-  return { protocolState, sharedData: newSharedData };
+  return { protocolState, sharedData };
 };
 
 export const existingChannelFundingReducer = (
