@@ -7,6 +7,7 @@ export type InstigatorConcludingState =
 export type InstigatorConcludingStateType = InstigatorConcludingState['type'];
 import { ProtocolState } from '../..';
 import { FailureReason, TerminalState } from '../states';
+import { ConsensusUpdateState } from '../../consensus-update/states';
 
 // -------
 // States
@@ -47,6 +48,13 @@ export interface WaitForDefund {
   defundingState: DefundingState;
 }
 
+export interface WaitForLedgerUpdate {
+  type: 'ConcludingInstigator.WaitForLedgerUpdate';
+  processId: string;
+  channelId: string;
+  consensusUpdateState: ConsensusUpdateState;
+}
+
 // ------------
 // Constructors
 // ------------
@@ -77,6 +85,10 @@ export const instigatorWaitForDefund: StateConstructor<WaitForDefund> = p => {
   return { ...p, type: 'ConcludingInstigator.WaitForDefund' };
 };
 
+export const instigatorWaitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
+  return { ...p, type: 'ConcludingInstigator.WaitForLedgerUpdate' };
+};
+
 // -------
 // Unions and Guards
 // -------
@@ -86,7 +98,8 @@ export type InstigatorNonTerminalState =
   | AcknowledgeConcludeReceived
   | AcknowledgeFailure
   | AcknowledgeSuccess
-  | WaitForDefund;
+  | WaitForDefund
+  | WaitForLedgerUpdate;
 
 export type InstigatorPreTerminalState = AcknowledgeSuccess | AcknowledgeFailure;
 

@@ -60,6 +60,54 @@ describe('[ Happy path ]', () => {
   });
 });
 
+describe('[ No Defunding Happy path ]', () => {
+  const scenario = scenarios.noDefundingHappyPath;
+  const { channelId, processId } = scenario;
+
+  describe('when initializing', () => {
+    const { sharedData } = scenario.initialize;
+    const result = initialize(channelId, processId, sharedData);
+    itTransitionsTo(result, 'ConcludingInstigator.ApproveConcluding');
+  });
+  describeScenarioStep(scenario.approveConcluding, () => {
+    const { state, action, sharedData, reply } = scenario.approveConcluding;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itSendsConcludeInstigated(result.sharedData, reply);
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForOpponentConclude');
+  });
+
+  describeScenarioStep(scenario.waitforOpponentConclude, () => {
+    const { state, action, sharedData } = scenario.waitforOpponentConclude;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.AcknowledgeConcludeReceived');
+  });
+
+  describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
+    const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForLedgerUpdate');
+  });
+
+  describeScenarioStep(scenario.waitForLedgerUpdate, () => {
+    const { state, action, sharedData } = scenario.waitForLedgerUpdate;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingInstigator.AcknowledgeSuccess');
+  });
+
+  describeScenarioStep(scenario.acknowledgeSuccess, () => {
+    const { state, action, sharedData } = scenario.acknowledgeSuccess;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'Concluding.Success');
+    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});
+
 describe('[ Channel doesnt exist ]', () => {
   const scenario = scenarios.channelDoesntExist;
   const { channelId, processId } = scenario;
