@@ -112,6 +112,7 @@ export function isConcludingInstigatorState(
     state.type === 'ConcludingInstigator.ApproveConcluding' ||
     state.type === 'ConcludingInstigator.WaitForOpponentConclude' ||
     state.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' ||
-    state.type === 'ConcludingInstigator.WaitForDefund'
+    state.type === 'ConcludingInstigator.WaitForDefund' ||
+    state.type === 'ConcludingInstigator.WaitForLedgerUpdate'
   );
 }
