@@ -40,8 +40,7 @@ It can also happen if the `commitmentType` is incompatible with the latest commi
 
 ## Decisions
 
-- To simplify the communication assumptions in a channel with an arbitrary number of participants, each participant sends a full round of commitments.
-- The participant sends the round of commitments to the next participant.
+- To simplify the communication assumptions in a channel with an arbitrary number of participants, each participant sends a valid round of commitments only to the next participant.
 
 ## State machine diagram
 
