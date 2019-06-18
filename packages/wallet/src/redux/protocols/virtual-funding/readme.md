@@ -11,9 +11,9 @@ ledger channels L0, L1, respectively.
 
 ### Decisions
 
-1. Each participant only sends commitments to the next participant. This makes communication predictable in a 3-way channel.
+1. Each participant only sends commitments to the next participant. This makes communication predictable in a 3-way channel. (This decision will actually apply to the `PrepareChannel` and `ReachConsensus` protocols, and not directly to the virtual funding protocol)
 
-2. The post-fund-setup phase is redundant when preparing G or J -- as consensus channels, allocations cannot change until a full round anyway. Therefore, we progress G and J straight to application phase phase.
+2. The post-fund-setup phase is redundant when preparing G or J -- as consensus channels, allocations cannot change until a full round anyway. Therefore, we progress G and J straight to application phase phase. This decision will actually apply to the `PrepareChannel` protocol, and not directly to the virtual funding protocol. However, this precludes the need to further update these channels after the indirect-funding step.
 
 ## The Protocols
 
