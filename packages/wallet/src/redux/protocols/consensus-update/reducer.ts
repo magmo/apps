@@ -49,7 +49,7 @@ export const initialize = (
 };
 
 export const consensusUpdateReducer = (
-  protocolState: states.WaitForUpdate,
+  protocolState: states.ConsensusUpdateState,
   sharedData: SharedData,
   action: ConsensusUpdateAction,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
@@ -57,6 +57,10 @@ export const consensusUpdateReducer = (
     console.warn(
       `Ledger Top Up Protocol expected COMMITMENT_RECEIVED received ${action.type} instead.`,
     );
+    return { protocolState, sharedData };
+  }
+  if (protocolState.type !== 'ConsensusUpdate.WaitForUpdate') {
+    console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
 
