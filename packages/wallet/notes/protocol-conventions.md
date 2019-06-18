@@ -14,6 +14,20 @@ In this wallet client, a protocol is defined by a collection of files, in a name
 - [`/__tests__/reducer.test.ts`](#reducer-test)
 - [`/__tests__/stories.tsx`](#stories)
 
+## TODO list
+
+This template can be used when planning work on a new protocol.
+
+- [ ] Readme
+- [ ] States
+- [ ] Actions
+- [ ] Reducer
+- [ ] Index
+- [ ] Container
+- [ ] Scenarios
+- [ ] Reducer test
+- [ ] Stories
+
 ## State machine diagram
 
 <a name="state-machine-diagram"></a>
