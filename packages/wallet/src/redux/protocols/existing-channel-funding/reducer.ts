@@ -149,11 +149,17 @@ const waitForLedgerTopUpReducer = (
       );
       sharedData = queueMessage(newSharedData, messageRelay);
     }
+
+    return {
+      protocolState: states.waitForLedgerUpdate(protocolState),
+      sharedData: newSharedData,
+    };
+  } else {
+    return {
+      protocolState: states.waitForLedgerTopUp({ ...protocolState, ledgerTopUpState }),
+      sharedData,
+    };
   }
-  return {
-    protocolState: states.waitForLedgerUpdate(protocolState),
-    sharedData: newSharedData,
-  };
 };
 
 const waitForPostFundSetupReducer = (
@@ -204,7 +210,7 @@ const waitForLedgerUpdateReducer = (
   action: ExistingChannelFundingAction,
 ) => {
   if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
-    throw new Error(`Invalid action ${action.type}`);
+    return { protocolState, sharedData };
   }
   const { ledgerId, processId } = protocolState;
   let newSharedData = { ...sharedData };
