@@ -115,11 +115,12 @@ const waitForLedgerTopUpReducer = (
     sharedData,
     action,
   );
+  sharedData = newSharedData;
 
   if (ledgerTopUpState.type === 'LedgerTopUp.Failure') {
     return {
       protocolState: states.failure({ reason: 'LedgerTopUp Failure' }),
-      sharedData: newSharedData,
+      sharedData,
     };
   } else if (ledgerTopUpState.type === 'LedgerTopUp.Success') {
     const { ledgerId, proposedAmount, channelId, processId } = protocolState;
@@ -151,17 +152,17 @@ const waitForLedgerTopUpReducer = (
         signResult.signedCommitment.commitment,
         signResult.signedCommitment.signature,
       );
-      sharedData = queueMessage(newSharedData, messageRelay);
+      sharedData = queueMessage(sharedData, messageRelay);
     }
 
     return {
       protocolState: states.waitForLedgerUpdate(protocolState),
-      sharedData: newSharedData,
+      sharedData,
     };
   } else {
     return {
       protocolState: states.waitForLedgerTopUp({ ...protocolState, ledgerTopUpState }),
-      sharedData: newSharedData,
+      sharedData,
     };
   }
 };
