@@ -1,4 +1,4 @@
-import { BaseProcessAction } from '../../actions';
+import { BaseProcessAction, DefundRequested } from '../../actions';
 import { Commitment } from '../../../../domain';
 import { TransactionAction } from '../../transaction-submission/actions';
 import {
@@ -57,7 +57,8 @@ export type ResponderAction =
   | ResponseProvided
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
-  | Acknowledged;
+  | Acknowledged
+  | DefundRequested;
 
 export function isResponderAction(action: WalletAction): action is ResponderAction {
   return (
@@ -66,6 +67,7 @@ export function isResponderAction(action: WalletAction): action is ResponderActi
     action.type === 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
-    action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED'
+    action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED' ||
+    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'
   );
 }

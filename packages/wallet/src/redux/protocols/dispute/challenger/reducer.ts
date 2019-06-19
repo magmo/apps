@@ -87,6 +87,8 @@ export function challengerReducer(
         default:
           return { state, sharedData };
       }
+    case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
+      return timeoutAcknowledged(state, sharedData);
     default:
       return unreachable(action);
   }

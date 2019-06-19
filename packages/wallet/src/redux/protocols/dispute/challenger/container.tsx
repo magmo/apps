@@ -9,6 +9,8 @@ import { TransactionSubmission } from '../../transaction-submission';
 import Acknowledge from '../../shared-components/acknowledge';
 import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout';
 import { ActionDispatcher } from '../../../utils';
+import DefundOrNot from './components/defund-or-not';
+import { defundRequested } from '../../actions';
 
 interface Props {
   state: NonTerminalChallengerState;
@@ -46,10 +48,10 @@ class ChallengerContainer extends PureComponent<Props> {
         );
       case 'Challenging.AcknowledgeTimeout':
         return (
-          <Acknowledge
-            title="Challenge timed out!"
-            description="The challenge timed out. The channel is now finalized."
-            acknowledge={() => acknowledged({ processId })}
+          <DefundOrNot
+            approve={() => defundRequested({ channelId: state.channelId, processId })}
+            deny={() => acknowledged({ processId })}
+            channelId={state.channelId}
           />
         );
       case 'Challenging.AcknowledgeFailure':

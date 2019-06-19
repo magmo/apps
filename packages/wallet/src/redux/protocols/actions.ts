@@ -43,6 +43,7 @@ export interface ChallengeCreated {
 
 export interface DefundRequested {
   type: 'WALLET.NEW_PROCESS.DEFUND_REQUESTED';
+  processId: string; // to allow existing protocol reducer to terminate by consuming this action
   channelId: string;
   protocol: WalletProtocol.Defunding;
 }
@@ -79,7 +80,7 @@ export const challengeCreated: ActionConstructor<ChallengeCreated> = p => ({
   protocol: WalletProtocol.Dispute,
 });
 
-export const DefundRequested: ActionConstructor<DefundRequested> = p => ({
+export const defundRequested: ActionConstructor<DefundRequested> = p => ({
   ...p,
   type: 'WALLET.NEW_PROCESS.DEFUND_REQUESTED',
   protocol: WalletProtocol.Defunding,
