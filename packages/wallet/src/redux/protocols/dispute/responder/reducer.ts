@@ -5,7 +5,7 @@ import * as actions from './actions';
 import { unreachable } from '../../../../utils/reducer-utils';
 import * as selectors from '../../../selectors';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
-import { PlayerIndex } from '../../../types';
+import { TwoPartyPlayerIndex } from '../../../types';
 import { TransactionRequest } from 'ethers/providers';
 import {
   initialize as initTransactionState,
@@ -403,7 +403,7 @@ const canRefuteWithCommitment = (commitment: Commitment, challengeCommitment: Co
   );
 };
 
-const mover = (commitment: Commitment): PlayerIndex => {
+const mover = (commitment: Commitment): TwoPartyPlayerIndex => {
   return commitment.turnNum % 2;
 };
 

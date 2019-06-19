@@ -1,6 +1,6 @@
 import { Commitment, CommitmentType } from '../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator';
-import { PlayerIndex } from '../redux/types';
+import { TwoPartyPlayerIndex } from '../redux/types';
 import { ChannelState } from '../redux/channel-store';
 
 export const hasConsensusBeenReached = (
@@ -25,7 +25,7 @@ export const hasConsensusBeenReached = (
 
 export const composePostFundCommitment = (
   lastCommitment: Commitment,
-  ourIndex: PlayerIndex,
+  ourIndex: TwoPartyPlayerIndex,
 ): Commitment => {
   const {
     channel,

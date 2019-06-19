@@ -6,7 +6,7 @@ import * as actions from '../../actions';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import * as selectors from '../../selectors';
 import { SharedData, setChannelStore, queueMessage, checkAndStore } from '../../state';
-import { PlayerIndex } from '../../types';
+import { TwoPartyPlayerIndex } from '../../types';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
@@ -128,7 +128,7 @@ const fundingReceiveEventReducer: DFReducer = (
   // TODO[Channel state side effect]: update funding level for the channel.
 
   // If we are player A, the channel is now funded, so we should send the PostFundSetup
-  if (protocolState.ourIndex === PlayerIndex.A) {
+  if (protocolState.ourIndex === TwoPartyPlayerIndex.A) {
     const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
       sharedData,
       protocolState.processId,
@@ -174,7 +174,7 @@ const commitmentReceivedReducer: DFReducer = (
   sharedData: SharedData,
   action: actions.CommitmentReceived,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  if (protocolState.ourIndex === PlayerIndex.A) {
+  if (protocolState.ourIndex === TwoPartyPlayerIndex.A) {
     if (
       protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
       protocolState.channelFunded

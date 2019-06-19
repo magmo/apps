@@ -5,7 +5,7 @@ import { accumulateSideEffects } from '../outbox';
 import { SideEffects } from '../outbox/state';
 import { SharedData, queueMessage } from '../state';
 import * as selectors from '../selectors';
-import { PlayerIndex } from '../types';
+import { TwoPartyPlayerIndex } from '../types';
 import { CommitmentType } from 'fmg-core/lib/commitment';
 import * as magmoWalletClient from 'magmo-wallet-client';
 import { ChannelState } from '../channel-store';
@@ -175,10 +175,10 @@ export const getFundingChannelId = (channelId: string, sharedData: SharedData): 
 
 export const isFirstPlayer = (channelId: string, sharedData: SharedData) => {
   const channelState = selectors.getChannelState(sharedData, channelId);
-  return channelState.ourIndex === PlayerIndex.A;
+  return channelState.ourIndex === TwoPartyPlayerIndex.A;
 };
 
-export function getOpponentAddress(channelState: ChannelState, playerIndex: PlayerIndex) {
+export function getOpponentAddress(channelState: ChannelState, playerIndex: TwoPartyPlayerIndex) {
   const { participants } = channelState;
   const opponentAddress = participants[(playerIndex + 1) % participants.length];
   return opponentAddress;

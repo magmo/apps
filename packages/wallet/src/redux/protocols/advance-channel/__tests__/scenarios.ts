@@ -1,5 +1,5 @@
 import * as states from '../states';
-import { PlayerIndex } from '../../../types';
+import { ThreePartyPlayerIndex } from '../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelId } from '../../../../domain/commitments/__tests__';
@@ -48,17 +48,19 @@ const props = {
 
 const propsA = {
   ...props,
-  ourIndex: PlayerIndex.A,
+  ourIndex: ThreePartyPlayerIndex.A,
 };
 
 const propsB = {
   ...props,
-  ourIndex: PlayerIndex.B,
+  ourIndex: ThreePartyPlayerIndex.B,
 };
+
 // ----
 // States
 // ------
 const commitmentSentA = states.commitmentSent(propsA);
+
 const notSafeToSendB = states.notSafeToSend(propsB);
 const commitmentSentB = states.commitmentSent(propsB);
 
