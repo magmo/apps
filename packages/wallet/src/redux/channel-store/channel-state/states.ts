@@ -1,6 +1,6 @@
 import { SignedCommitment, getChannelId, Commitment } from '../../../domain';
 
-export type Round = SignedCommitment[];
+export type Commitments = SignedCommitment[];
 
 export interface ChannelState {
   address: string;
@@ -11,7 +11,7 @@ export interface ChannelState {
   participants: [string, string];
   channelNonce: number;
   turnNum: number;
-  commitments: Round;
+  commitments: Commitments;
   funded: boolean;
 }
 
@@ -57,11 +57,11 @@ export function pushCommitment(
   state: ChannelState,
   signedCommitment: SignedCommitment,
 ): ChannelState {
-  const lastRound = [...state.commitments];
-  lastRound.shift();
-  lastRound.push(signedCommitment);
+  const commitments = [...state.commitments];
+  commitments.shift();
+  commitments.push(signedCommitment);
   const turnNum = signedCommitment.commitment.turnNum;
-  return { ...state, commitments: lastRound, turnNum };
+  return { ...state, commitments, turnNum };
 }
 
 export function ourTurn(state: ChannelState) {

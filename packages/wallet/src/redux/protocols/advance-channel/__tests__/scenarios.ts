@@ -5,7 +5,7 @@ import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelId } from '../../../../domain/commitments/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as scenarios from '../../../__tests__/test-scenarios';
-import { roundReceived } from '../../../../communication';
+import { commitmentsReceived } from '../../../../communication';
 
 // We will use 2 different scenarios:
 //
@@ -88,20 +88,20 @@ const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
 // -------
 
 const action: any = '';
-const aReceivesPreFundSetup = roundReceived({
+const aReceivesPreFundSetup = commitmentsReceived({
   processId,
   signedCommitments: [signedCommitment0, signedCommitment1, signedCommitment2],
 });
-const aReceivesPostFundSetup = roundReceived({
+const aReceivesPostFundSetup = commitmentsReceived({
   processId,
   signedCommitments: [signedCommitment3, signedCommitment4, signedCommitment5],
 });
 
-const bReceivesPreFundSetup = roundReceived({
+const bReceivesPreFundSetup = commitmentsReceived({
   processId,
   signedCommitments: [signedCommitment0],
 });
-const bReceivesPostFundSetup = roundReceived({
+const bReceivesPostFundSetup = commitmentsReceived({
   processId,
   signedCommitments: [signedCommitment1, signedCommitment2, signedCommitment3],
 });
