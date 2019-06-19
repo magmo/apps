@@ -18,7 +18,7 @@ export const defaultParams = {
   libraryAddress,
   participants,
   uid: 'uid',
-  currentRound: [
+  commitments: [
     { commitment: preFundCommitment1, signature: 'fake-sig' },
     { commitment: preFundCommitment2, signature: 'fake-sig' },
   ],

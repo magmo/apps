@@ -2,12 +2,12 @@ import { SignedCommitment, getChannelId } from '../../../../domain';
 import { ChannelState } from '../states';
 
 export function channelFromCommitments(
-  currentRound: SignedCommitment[],
+  commitments: SignedCommitment[],
   ourAddress: string,
   ourPrivateKey: string,
 ): ChannelState {
-  const numCommitments = currentRound.length;
-  const lastCommitment = currentRound[numCommitments - 1];
+  const numCommitments = commitments.length;
+  const lastCommitment = commitments[numCommitments - 1];
   const { turnNum, channel } = lastCommitment.commitment;
   const libraryAddress = channel.channelType;
   const participants: [string, string] = channel.participants as [string, string];
@@ -30,6 +30,6 @@ export function channelFromCommitments(
     privateKey: ourPrivateKey,
     ourIndex,
     turnNum,
-    currentRound,
+    commitments,
   };
 }

@@ -136,7 +136,7 @@ export const channelIsClosed = (channelId: string, sharedData: SharedData): bool
 
 export const channelHasConclusionProof = (channelId: string, sharedData: SharedData): boolean => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const [penultimateCommitment, lastCommitment] = channelState.currentRound;
+  const [penultimateCommitment, lastCommitment] = channelState.commitments;
   return (
     lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&
     penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude

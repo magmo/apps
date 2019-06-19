@@ -356,7 +356,7 @@ const getStoredCommitments = (
 } => {
   const channelId = channelID(challengeCommitment.channel);
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const [penultimateSignedCommitment, lastSignedCommitment] = channelState.currentRound;
+  const [penultimateSignedCommitment, lastSignedCommitment] = channelState.commitments;
   const { signature: lastSignature, commitment: lastCommitment } = lastSignedCommitment;
   const {
     signature: penultimateSignature,

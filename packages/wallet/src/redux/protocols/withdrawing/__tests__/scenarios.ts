@@ -35,7 +35,7 @@ const channelStatus: ChannelState = {
   channelNonce,
   turnNum: concludeCommitment2.turnNum,
   funded: true,
-  currentRound: [
+  commitments: [
     { commitment: concludeCommitment1, signature: '0x0' },
     { commitment: concludeCommitment2, signature: '0x0' },
   ],
@@ -47,7 +47,7 @@ const channelStore: ChannelStore = {
 
 const notClosedChannelStatus: ChannelState = {
   ...channelStatus,
-  currentRound: [
+  commitments: [
     { commitment: gameCommitment1, signature: '0x0' },
     { commitment: gameCommitment2, signature: '0x0' },
   ],

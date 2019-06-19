@@ -189,7 +189,7 @@ const initializedChannel: ChannelState = {
   funded: false,
   address: asAddress,
   privateKey: asPrivateKey,
-  currentRound: [{ commitment: preFundCommitment0, signature: 'signature' }],
+  commitments: [{ commitment: preFundCommitment0, signature: 'signature' }],
   turnNum: 0,
 };
 

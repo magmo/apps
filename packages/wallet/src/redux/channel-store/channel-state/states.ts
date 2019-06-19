@@ -11,18 +11,18 @@ export interface ChannelState {
   participants: [string, string];
   channelNonce: number;
   turnNum: number;
-  currentRound: Round;
+  commitments: Round;
   funded: boolean;
 }
 
 export type OpenChannelState = ChannelState;
 
 export function getLastCommitment(state: ChannelState): Commitment {
-  return state.currentRound.slice(-1)[0].commitment;
+  return state.commitments.slice(-1)[0].commitment;
 }
 
 export function getPenultimateCommitment(state: ChannelState): Commitment {
-  return state.currentRound.slice(-2)[0].commitment;
+  return state.commitments.slice(-2)[0].commitment;
 }
 
 // -------
@@ -48,7 +48,7 @@ export function initializeChannel(
     channelNonce: channel.nonce,
     channelId,
     funded: false,
-    currentRound: [signedCommitment],
+    commitments: [signedCommitment],
   };
 }
 
@@ -57,11 +57,11 @@ export function pushCommitment(
   state: ChannelState,
   signedCommitment: SignedCommitment,
 ): ChannelState {
-  const lastRound = [...state.currentRound];
+  const lastRound = [...state.commitments];
   lastRound.shift();
   lastRound.push(signedCommitment);
   const turnNum = signedCommitment.commitment.turnNum;
-  return { ...state, currentRound: lastRound, turnNum };
+  return { ...state, commitments: lastRound, turnNum };
 }
 
 export function ourTurn(state: ChannelState) {
@@ -71,7 +71,7 @@ export function ourTurn(state: ChannelState) {
 }
 
 export function isFullyOpen(state: ChannelState): state is OpenChannelState {
-  return state.participants.length === state.currentRound.length;
+  return state.participants.length === state.commitments.length;
 }
 
 export function theirAddress(state: ChannelState): string {

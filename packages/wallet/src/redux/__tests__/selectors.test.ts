@@ -75,7 +75,7 @@ describe('getNextNonce', () => {
     funded: false,
     address: 'address',
     privateKey: 'privateKey',
-    currentRound: [
+    commitments: [
       { commitment: {} as Commitment, signature: 'signature' },
       { commitment: {} as Commitment, signature: 'signature' },
     ],

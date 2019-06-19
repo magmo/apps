@@ -152,7 +152,7 @@ const handleTransactionSubmissionComplete = (
 
 const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const [lastCommitment, penultimateCommitment] = channelState.currentRound;
+  const [lastCommitment, penultimateCommitment] = channelState.commitments;
   return (
     lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&
     penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude
@@ -167,7 +167,7 @@ const createConcludeAndWithTransaction = (
   sharedData: SharedData,
 ): TransactionRequest => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const { currentRound: lastRound, participants, ourIndex, privateKey } = channelState;
+  const { commitments: lastRound, participants, ourIndex, privateKey } = channelState;
   const [penultimateCommitment, lastCommitment] = lastRound;
   const participant = participants[ourIndex];
   const verificationSignature = signVerificationData(
