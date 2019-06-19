@@ -2,7 +2,7 @@ import * as states from '../states';
 import { initialize, reducer } from '../reducer';
 import * as scenarios from './scenarios';
 import { CommitmentType } from '../../../../domain';
-import { expectThisCommitmentSent } from '../../../__tests__/helpers';
+import { expectTheseCommitmentsSent } from '../../../__tests__/helpers';
 
 const itTransitionsTo = (
   result: states.AdvanceChannelState,
@@ -15,18 +15,19 @@ const itTransitionsTo = (
 
 describe('sending preFundSetup as A', () => {
   const scenario = scenarios.newChannelAsA;
-  const { channelId } = scenario;
 
-  describe('when initializing', () => {
-    const { sharedData, commitment } = scenario.initialize;
-    const result = initialize(channelId, sharedData, CommitmentType.PreFundSetup);
+  describe.only('when initializing', () => {
+    const { sharedData, commitments, args } = scenario.initialize;
+    const result = initialize(sharedData, CommitmentType.PreFundSetup, args);
     itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
-    expectThisCommitmentSent(result, commitment);
+    expectTheseCommitmentsSent(result, commitments);
+    // expectThisChannelStored(result, channelId);
+    // expectThisChannelRegistered(result, channelId);
   });
 
   describe('when receiving prefund commitments from b', () => {
-    const { sharedData } = scenario.receiveFromB;
-    const result = initialize(channelId, sharedData, CommitmentType.PreFundSetup);
+    const { sharedData, args } = scenario.receiveFromB;
+    const result = initialize(sharedData, CommitmentType.PreFundSetup, args);
     itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
   });
 

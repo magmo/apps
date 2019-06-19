@@ -19,6 +19,9 @@ const {
   hubAddress,
   hubPrivateKey,
   signedJointLedgerCommitments,
+  threeParticipants,
+  oneTwoThree,
+  ledgerLibraryAddress,
 } = scenarios;
 const {
   signedCommitment0,
@@ -128,14 +131,25 @@ const receivePostFundSetupFromHub = commitmentsReceived({
 // ---------
 // Scenarios
 // ---------
+const args = {
+  ourIndex: 0,
+  allocation: oneTwoThree,
+  destination: threeParticipants,
+  channelType: ledgerLibraryAddress,
+  appAttributes: scenarios.jointLedgerCommitments.postFundCommitment0.appAttributes,
+  address: asAddress,
+  privateKey: asPrivateKey,
+};
 
 export const newChannelAsA = {
   ...propsA,
   initialize: {
+    args,
     sharedData: emptySharedData,
-    commitment: signedCommitment0.commitment,
+    commitments: commitments0,
   },
   receiveFromB: {
+    args,
     state: commitmentSentA,
     sharedData: aSentPreFundCommitment,
     action: receivePreFundSetupFromB,
@@ -150,6 +164,7 @@ export const newChannelAsA = {
 export const existingChannelAsA = {
   ...propsA,
   initialize: {
+    args,
     sharedData: aSentPostFundCommitment,
     commitment: signedCommitment3,
   },
