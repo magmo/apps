@@ -1,8 +1,13 @@
 import * as states from '../states';
 import { PlayerIndex } from '../../../types';
 
-import { EMPTY_SHARED_DATA } from '../../../state';
+import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelId } from '../../../../domain/commitments/__tests__';
+import {
+  channelFromCommitments,
+  partiallyOpenChannelFromCommitment,
+} from '../../../channel-store/channel-state/__tests__';
+import * as scenarios from '../../../__tests__/test-scenarios';
 
 // We will use 2 different scenarios:
 //
@@ -24,7 +29,7 @@ import { channelId } from '../../../../domain/commitments/__tests__';
 // ---------
 // Test data
 // ---------
-const processId = 'process-id.123';
+const processId = 'Process.123';
 
 const props = {
   processId,
@@ -52,9 +57,42 @@ const commitmentSentB = states.commitmentSent(propsB);
 // -------
 
 const emptySharedData = { ...EMPTY_SHARED_DATA };
-const channelCreated = { ...EMPTY_SHARED_DATA };
-const channelExists = { ...EMPTY_SHARED_DATA };
-const channelUpdated = { ...EMPTY_SHARED_DATA };
+// const channelCreated = { ...EMPTY_SHARED_DATA };
+const aSentPreFundCommitment = setChannels(EMPTY_SHARED_DATA, [
+  partiallyOpenChannelFromCommitment(
+    scenarios.signedCommitment0,
+    scenarios.asAddress,
+    scenarios.asPrivateKey,
+  ),
+]);
+
+const bHasTwoPreFundCommitments = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(
+    scenarios.signedCommitment0,
+    scenarios.signedCommitment1,
+    scenarios.asAddress,
+    scenarios.asPrivateKey,
+  ),
+]);
+
+const aSentPostFundCommitment = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(
+    scenarios.signedCommitment1,
+    scenarios.signedCommitment2,
+    scenarios.asAddress,
+    scenarios.asPrivateKey,
+  ),
+]);
+
+const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(
+    scenarios.signedCommitment2,
+    scenarios.signedCommitment3,
+    scenarios.asAddress,
+    scenarios.asPrivateKey,
+  ),
+]);
+
 // -------
 // Actions
 // -------
@@ -68,17 +106,16 @@ export const newChannelAsA = {
   ...propsA,
   commitmentSent: {
     state: commitmentSentA,
-    sharedData: channelCreated,
+    sharedData: aSentPreFundCommitment,
     action,
   },
 };
 
 export const existingChannelAsA = {
   ...propsA,
-
   commitmentSent: {
     state: commitmentSentA,
-    sharedData: channelUpdated,
+    sharedData: aSentPostFundCommitment,
     action,
   },
 };
@@ -92,7 +129,7 @@ export const newChannelAsB = {
   },
   commitmentSent: {
     state: commitmentSentB,
-    sharedData: channelCreated,
+    sharedData: bHasTwoPreFundCommitments,
     action,
   },
 };
@@ -102,12 +139,12 @@ export const existingChannelAsB = {
 
   notSafeToSend: {
     state: notSafeToSendB,
-    sharedData: channelExists,
+    sharedData: bHasTwoPreFundCommitments,
     action,
   },
   commitmentSent: {
     state: commitmentSentB,
-    sharedData: channelUpdated,
+    sharedData: bHasTwoPostFundCommitments,
     action,
   },
 };
