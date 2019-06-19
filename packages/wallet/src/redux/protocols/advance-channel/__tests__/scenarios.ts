@@ -8,6 +8,7 @@ import {
   partiallyOpenChannelFromCommitment,
 } from '../../../channel-store/channel-state/__tests__';
 import * as scenarios from '../../../__tests__/test-scenarios';
+import { roundReceived } from '../../../../communication';
 
 // We will use 2 different scenarios:
 //
@@ -30,6 +31,15 @@ import * as scenarios from '../../../__tests__/test-scenarios';
 // Test data
 // ---------
 const processId = 'Process.123';
+const { asAddress, asPrivateKey, signedJointLedgerCommitments } = scenarios;
+const {
+  signedCommitment0,
+  signedCommitment1,
+  signedCommitment2,
+  signedCommitment3,
+  signedCommitment4,
+  signedCommitment5,
+} = signedJointLedgerCommitments;
 
 const props = {
   processId,
@@ -59,38 +69,19 @@ const commitmentSentB = states.commitmentSent(propsB);
 const emptySharedData = { ...EMPTY_SHARED_DATA };
 // const channelCreated = { ...EMPTY_SHARED_DATA };
 const aSentPreFundCommitment = setChannels(EMPTY_SHARED_DATA, [
-  partiallyOpenChannelFromCommitment(
-    scenarios.signedCommitment0,
-    scenarios.asAddress,
-    scenarios.asPrivateKey,
-  ),
+  partiallyOpenChannelFromCommitment(signedCommitment0, asAddress, asPrivateKey),
 ]);
 
 const bHasTwoPreFundCommitments = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(
-    scenarios.signedCommitment0,
-    scenarios.signedCommitment1,
-    scenarios.asAddress,
-    scenarios.asPrivateKey,
-  ),
+  channelFromCommitments(signedCommitment0, signedCommitment1, asAddress, asPrivateKey),
 ]);
 
 const aSentPostFundCommitment = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(
-    scenarios.signedCommitment1,
-    scenarios.signedCommitment2,
-    scenarios.asAddress,
-    scenarios.asPrivateKey,
-  ),
+  channelFromCommitments(signedCommitment1, signedCommitment2, asAddress, asPrivateKey),
 ]);
 
 const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(
-    scenarios.signedCommitment2,
-    scenarios.signedCommitment3,
-    scenarios.asAddress,
-    scenarios.asPrivateKey,
-  ),
+  channelFromCommitments(signedCommitment2, signedCommitment3, asAddress, asPrivateKey),
 ]);
 
 // -------
@@ -98,16 +89,34 @@ const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
 // -------
 
 const action: any = '';
+const aReceivesPreFundSetup = roundReceived({
+  processId,
+  signedCommitments: [signedCommitment0, signedCommitment1, signedCommitment2],
+});
+const aReceivesPostFundSetup = roundReceived({
+  processId,
+  signedCommitments: [signedCommitment3, signedCommitment4, signedCommitment5],
+});
+
+const bReceivesPreFundSetup = roundReceived({
+  processId,
+  signedCommitments: [signedCommitment0],
+});
+const bReceivesPostFundSetup = roundReceived({
+  processId,
+  signedCommitments: [signedCommitment1, signedCommitment2, signedCommitment3],
+});
 
 // ---------
 // Scenarios
 // ---------
+
 export const newChannelAsA = {
   ...propsA,
   commitmentSent: {
     state: commitmentSentA,
     sharedData: aSentPreFundCommitment,
-    action,
+    action: aReceivesPreFundSetup,
   },
 };
 
@@ -116,7 +125,7 @@ export const existingChannelAsA = {
   commitmentSent: {
     state: commitmentSentA,
     sharedData: aSentPostFundCommitment,
-    action,
+    action: aReceivesPostFundSetup,
   },
 };
 
@@ -125,7 +134,7 @@ export const newChannelAsB = {
   notSafeToSend: {
     state: notSafeToSendB,
     sharedData: emptySharedData,
-    action,
+    action: bReceivesPreFundSetup,
   },
   commitmentSent: {
     state: commitmentSentB,
@@ -140,7 +149,7 @@ export const existingChannelAsB = {
   notSafeToSend: {
     state: notSafeToSendB,
     sharedData: bHasTwoPreFundCommitments,
-    action,
+    action: bReceivesPostFundSetup,
   },
   commitmentSent: {
     state: commitmentSentB,
