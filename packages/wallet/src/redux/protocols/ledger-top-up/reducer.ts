@@ -1,4 +1,11 @@
-import { SharedData, getChannel, signAndStore, queueMessage, checkAndStore } from '../../state';
+import {
+  SharedData,
+  getChannel,
+  signAndStore,
+  queueMessage,
+  checkAndStore,
+  registerChannelToMonitor,
+} from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import * as helpers from '../reducer-helpers';
@@ -55,7 +62,7 @@ export function initialize(
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
-
+  sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
   return {
     protocolState: newProtocolState,
     sharedData,
@@ -167,29 +174,29 @@ const waitForDirectFundingReducer: ProtocolReducer<states.LedgerTopUpState> = (
     if (!channel) {
       throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
     }
+    if (helpers.isFirstPlayer(protocolState.ledgerId, sharedData)) {
+      const theirCommitment = channel.lastCommitment.commitment;
+      const { allocation: oldAllocation, destination: oldDestination } = theirCommitment;
+      const newAllocation = [
+        addHex(oldAllocation[0], oldAllocation[2]),
+        addHex(oldAllocation[1], oldAllocation[3]),
+      ];
+      const newDestination = [oldDestination[0], oldDestination[1]];
+      const ourCommitment = proposeNewConsensus(theirCommitment, newAllocation, newDestination);
+      const signResult = signAndStore(sharedData, ourCommitment);
+      if (!signResult.isSuccess) {
+        return { protocolState: newProtocolState, sharedData };
+      }
+      sharedData = signResult.store;
 
-    const theirCommitment = channel.lastCommitment.commitment;
-    const { allocation: oldAllocation, destination: oldDestination } = theirCommitment;
-    const newAllocation = [
-      addHex(oldAllocation[0], oldAllocation[2]),
-      addHex(oldAllocation[1], oldAllocation[3]),
-    ];
-    const newDestination = [oldDestination[0], oldDestination[1]];
-    const ourCommitment = proposeNewConsensus(theirCommitment, newAllocation, newDestination);
-    const signResult = signAndStore(sharedData, ourCommitment);
-    if (!signResult.isSuccess) {
-      return { protocolState: newProtocolState, sharedData };
+      const messageRelay = sendCommitmentReceived(
+        theirAddress(channel),
+        protocolState.processId,
+        signResult.signedCommitment.commitment,
+        signResult.signedCommitment.signature,
+      );
+      sharedData = queueMessage(sharedData, messageRelay);
     }
-    sharedData = signResult.store;
-
-    const messageRelay = sendCommitmentReceived(
-      theirAddress(channel),
-      protocolState.processId,
-      signResult.signedCommitment.commitment,
-      signResult.signedCommitment.signature,
-    );
-    sharedData = queueMessage(sharedData, messageRelay);
-
     return { protocolState: states.waitForPostTopUpLedgerUpdate(protocolState), sharedData };
   }
 
