@@ -194,8 +194,8 @@ describe('TRANSACTION FAILED ', () => {
   });
 });
 
-describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
-  const scenario = scenarios.challengeExpiresChannelDefunded;
+describe('CHALLENGE EXPIRES', () => {
+  const scenario = scenarios.challengeExpires;
   const { sharedData } = scenario;
 
   describeScenarioStep(scenario.waitForResponse, () => {
@@ -208,36 +208,7 @@ describe('CHALLENGE EXPIRES --> DEFUNDED', () => {
   describeScenarioStep(scenario.acknowledgeTimeout, () => {
     const { state, action } = scenario.acknowledgeTimeout;
     const result = responderReducer(state, sharedData, action);
-    itTransitionsTo(result, 'Responding.WaitForDefund');
-  });
-
-  describeScenarioStep(scenario.waitForDefund1, () => {
-    const { state, action } = scenario.waitForDefund1;
-    const result = responderReducer(state, sharedData, action);
-    itTransitionsTo(result, 'Responding.AcknowledgeDefundingSuccess');
-  });
-
-  describeScenarioStep(scenario.acknowledgeDefundingSuccess, () => {
-    const { state, action } = scenario.acknowledgeDefundingSuccess;
-    const result = responderReducer(state, sharedData, action);
-    itTransitionsTo(result, 'Responding.ClosedAndDefunded');
-  });
-});
-
-describe('CHALLENGE EXPIRES --> not DEFUNDED', () => {
-  const scenario = scenarios.challengeExpiresButChannelNotDefunded;
-  const { sharedData } = scenario;
-
-  describeScenarioStep(scenario.waitForDefund2, () => {
-    const { state, action } = scenario.waitForDefund2;
-    const result = responderReducer(state, sharedData, action);
-    itTransitionsTo(result, 'Responding.AcknowledgeClosedButNotDefunded');
-  });
-
-  describeScenarioStep(scenario.acknowledgeClosedButNotDefunded, () => {
-    const { state, action } = scenario.acknowledgeClosedButNotDefunded;
-    const result = responderReducer(state, sharedData, action);
-    itTransitionsTo(result, 'Responding.ClosedButNotDefunded');
+    itTransitionsTo(result, 'Responding.Failure');
   });
 });
 
@@ -260,18 +231,5 @@ describe('CHALLENGE EXPIRES when in WaitForApproval', () => {
     const { state, action } = scenario.waitForApprovalRespond;
     const result = responderReducer(state, sharedData, action);
     itTransitionsTo(result, 'Responding.AcknowledgeTimeout');
-  });
-});
-
-describe('DEFUND ACTION arrives in ACKNOWLEDGE_TIMEOUT', () => {
-  const scenario = scenarios.defundActionComesDuringAcknowledgeTimeout;
-  const { sharedData } = scenario;
-
-  describeScenarioStep(scenario.acknowledgeTimeout, () => {
-    const { state, action } = scenario.acknowledgeTimeout;
-
-    const result = responderReducer(state, sharedData, action);
-    // TODO: Is this the correct state?
-    itTransitionsTo(result, 'Responding.AcknowledgeClosedButNotDefunded');
   });
 });
