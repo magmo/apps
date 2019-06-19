@@ -157,7 +157,7 @@ const waitForLedgerTopUpReducer = (
   } else {
     return {
       protocolState: states.waitForLedgerTopUp({ ...protocolState, ledgerTopUpState }),
-      sharedData,
+      sharedData: newSharedData,
     };
   }
 };
