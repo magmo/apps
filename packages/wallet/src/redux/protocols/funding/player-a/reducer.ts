@@ -79,7 +79,7 @@ function handleFundingAction(
   action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (protocolState.type !== 'Funding.PlayerA.WaitForFunding') {
-    console.error(
+    console.warn(
       `Funding reducer received indirect funding action ${action.type} but is currently in state ${
         protocolState.type
       }`,

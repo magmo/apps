@@ -78,7 +78,7 @@ function handleFundingAction(
   action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (protocolState.type !== 'Funding.PlayerB.WaitForFunding') {
-    console.error(
+    console.warn(
       `Funding reducer received indirect funding action ${action.type} but is currently in state ${
         protocolState.type
       }`,
@@ -102,7 +102,7 @@ function handleExistingChannelFundingAction(
   action: ExistingChannelFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (!existingChannelFundingStates.isExistingChannelFundingState(protocolState.fundingState)) {
-    console.error(
+    console.warn(
       `Funding reducer received indirect funding action ${
         action.type
       } but is currently in funding state ${protocolState.fundingState.type}`,
@@ -130,7 +130,7 @@ function handleIndirectFundingAction(
   action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (!indirectFundingStates.isIndirectFundingState(protocolState.fundingState)) {
-    console.error(
+    console.warn(
       `Funding reducer received indirect funding action ${
         action.type
       } but is currently in funding state ${protocolState.fundingState.type}`,
