@@ -32,7 +32,6 @@ const {
 const partiallyOpen = channelFromCommitments([signedCommitment0], address, privateKey);
 const theirTurn = channelFromCommitments(
   [signedCommitment19, signedCommitment20],
-
   address,
   privateKey,
 );
@@ -112,10 +111,14 @@ export const opponentResponds = {
     action: transactionSuccessTrigger,
     action2: challengeExpirySet,
   },
-  waitForResponseOrTimeout: {
+  waitForResponseOrTimeoutReceiveResponse: {
+    state: waitForResponseOrTimeout,
+    action: responseReceived,
+    commitment: signedCommitment21,
+  },
+  waitForResponseOrTimeoutExpirySet: {
     state: waitForResponseOrTimeout,
     action: challengeExpirySet,
-    action2: responseReceived,
     commitment: signedCommitment21,
   },
   acknowledgeResponse: {

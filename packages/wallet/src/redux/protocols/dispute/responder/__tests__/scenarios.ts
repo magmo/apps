@@ -48,10 +48,12 @@ const channelStore: ChannelStore = {
   [channelId]: channelStatus,
 };
 
-const refuteChannelStatus = {
+const refuteChannelStatus: ChannelState = {
   ...channelStatus,
-  lastCommitment: { commitment: gameCommitment3, signature: '0x0' },
-  penultimateCommitment: { commitment: gameCommitment2, signature: '0x0' },
+  currentRound: [
+    { commitment: gameCommitment2, signature: '0x0' },
+    { commitment: gameCommitment3, signature: '0x0' },
+  ],
   turnNum: gameCommitment2.turnNum,
 };
 const refuteChannelState = {

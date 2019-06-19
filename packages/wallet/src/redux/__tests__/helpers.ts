@@ -1,4 +1,4 @@
-import { ChannelState, ChannelStore, getLastCommitment } from '../channel-store';
+import { ChannelState, ChannelStore } from '../channel-store';
 import { StateWithSideEffects } from '../utils';
 import { Commitment, SignedCommitment, getChannelId } from '../../domain';
 import { QueuedTransaction, OutboxState } from '../outbox/state';
@@ -137,6 +137,7 @@ export const itStoresThisCommitment = (
   it('stores the commitment in the channel state', () => {
     const channelId = getChannelId(signedCommitment.commitment);
     const channelState = state.channelStore[channelId];
-    expect(getLastCommitment(channelState)).toMatchObject(signedCommitment);
+    const lastSignedCommitment = channelState.currentRound.slice(-1)[0];
+    expect(lastSignedCommitment).toMatchObject(signedCommitment);
   });
 };
