@@ -25,7 +25,7 @@ linkStyle default interpolate basis
   WFA --> |WALLET.DISPUTE.CHALLENGER.CHALLENGE_APPROVED| WFT(WaitForTransaction)
   CE --> |No| AF
   WFA --> |WALLET.DISPUTE.CHALLENGER.CHALLENGE_DENIED| AF(AcknowledgeFailure)
-  AF --> |WALLET.DISPUTE.CHALLENGER.CHALLENGE_FAILURE_ACKNOWLEDGED| F((Failure))
+  AF --> |WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED| F((Failure))
   WFT --> |TransactionSuccess| WFRT(WaitForResponseOrTimeout)
   WFT --> |TransactionFailure| AF
   WFRT --> |CHALLENGE_EXPIRED| AT(AcknowledgeTimeout)
@@ -35,7 +35,7 @@ linkStyle default interpolate basis
   AT --> |WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED| SD((Closed))
 
   WFRT --> |ChallengeResponseReceived| AR(AcknowledgeResponse)
-  AR --> |WALLET.DISPUTE.CHALLENGER.CHALLENGE_RESPONSE_ACKNOWLEDGED| SP((Open))
+  AR --> |WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED| SP((Open))
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;

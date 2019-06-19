@@ -7,7 +7,6 @@ import {
   ChallengeExpirySetEvent,
   WalletAction,
 } from '../../../actions';
-import { isDefundingAction, DefundingAction } from '../../defunding/actions';
 import { ActionConstructor } from '../../../utils';
 
 // -------
@@ -27,11 +26,6 @@ export interface ResponseProvided extends BaseProcessAction {
 
 export interface RespondSuccessAcknowledged extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED';
-  processId: string;
-}
-
-export interface DefundChosen extends BaseProcessAction {
-  type: 'WALLET.DISPUTE.RESPONDER.DEFUND_CHOSEN';
   processId: string;
 }
 export interface Acknowledged extends BaseProcessAction {
@@ -58,11 +52,6 @@ export const responseProvided: ActionConstructor<ResponseProvided> = p => ({
   type: 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED',
 });
 
-export const defundChosen: ActionConstructor<DefundChosen> = p => ({
-  ...p,
-  type: 'WALLET.DISPUTE.RESPONDER.DEFUND_CHOSEN',
-});
-
 export const acknowledged: ActionConstructor<Acknowledged> = p => ({
   ...p,
   type: 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED',
@@ -74,25 +63,21 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => ({
 
 export type ResponderAction =
   | TransactionAction
-  | DefundingAction
   | RespondApproved
   | ResponseProvided
   | RespondSuccessAcknowledged
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
-  | DefundChosen
   | Acknowledged;
 
 export function isResponderAction(action: WalletAction): action is ResponderAction {
   return (
     isTransactionAction(action) ||
-    isDefundingAction(action) ||
     action.type === 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
-    action.type === 'WALLET.DISPUTE.RESPONDER.DEFUND_CHOSEN' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED'
   );
 }
