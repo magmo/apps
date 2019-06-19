@@ -17,17 +17,17 @@ export const initialize = (
   processId: string,
   channelId: string,
   ledgerId: string,
-  proposedAmount: string,
+  proposedAllocation: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = ledgerChannel.lastCommitment.commitment;
-  if (ledgerChannelNeedsTopUp(theirCommitment, proposedAmount)) {
+  if (ledgerChannelNeedsTopUp(theirCommitment, proposedAllocation)) {
     const { protocolState: ledgerTopUpState, sharedData: newSharedData } = initializeLedgerTopUp(
       processId,
       channelId,
       ledgerId,
-      [proposedAmount, proposedAmount],
+      proposedAllocation,
       theirCommitment.destination,
       sharedData,
     );
@@ -293,16 +293,17 @@ function craftNewAllocationAndDestination(
   return { proposedAllocation, proposedDestination };
 }
 
-function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAmount: string) {
+function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAllocation: string[]) {
   if (latestCommitment.commitmentType !== CommitmentType.App) {
     throw new Error('Ledger channel is already closed.');
   }
-  const numParticipants = latestCommitment.channel.participants.length;
-  const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
-
-  return !latestCommitment.allocation.every(a =>
-    bigNumberify(a).gte(amountRequiredFromEachParticipant),
-  );
+  // TODO: This assumes allocations are the same length
+  for (let i = 0; i < proposedAllocation.length; i++) {
+    if (bigNumberify(proposedAllocation[i]).gt(latestCommitment.allocation[i])) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function craftAndSendAppPostFundCommitment(
