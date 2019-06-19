@@ -1,8 +1,9 @@
 import * as states from './states';
 import { SharedData } from '../../state';
-import { ProtocolStateWithSharedData } from '..';
+import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import { CommitmentType } from '../../../domain';
 import { getChannel } from '../../channel-store';
+import { WalletAction } from '../../actions';
 
 type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
@@ -25,3 +26,11 @@ export function initialize(
   const { ourIndex } = channel;
   return { protocolState: states.notSafeToSend({ processId, channelId, ourIndex }), sharedData };
 }
+
+export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
+  protocolState: states.AdvanceChannelState,
+  sharedData: SharedData,
+  action: WalletAction,
+) => {
+  return { protocolState, sharedData: ({} as unknown) as SharedData };
+};
