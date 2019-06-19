@@ -30,7 +30,7 @@ linkStyle default interpolate basis
   AT -->|WALLET.DISPUTE.RESPONDER.ACKNOWLEDGE| F
   WFT --> |TransactionSubmitted| WFAc(WaitForAcknowledgement)
   WFT-->|CHALLENGE_EXPIRED| AT(AcknowledgeTimeOut)
-  WFAc-->|WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED| S((success))
+  WFAc-->|WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED| S((success))
   WFT --> |TransactionFailed| F((failure))
 
   classDef logic fill:#efdd20;

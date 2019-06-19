@@ -23,11 +23,6 @@ export interface ResponseProvided extends BaseProcessAction {
   processId: string;
   commitment: Commitment;
 }
-
-export interface RespondSuccessAcknowledged extends BaseProcessAction {
-  type: 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED';
-  processId: string;
-}
 export interface Acknowledged extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED';
   processId: string;
@@ -40,11 +35,6 @@ export interface Acknowledged extends BaseProcessAction {
 export const respondApproved: ActionConstructor<RespondApproved> = p => ({
   ...p,
   type: 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED',
-});
-
-export const respondSuccessAcknowledged: ActionConstructor<RespondSuccessAcknowledged> = p => ({
-  ...p,
-  type: 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED',
 });
 
 export const responseProvided: ActionConstructor<ResponseProvided> = p => ({
@@ -65,7 +55,6 @@ export type ResponderAction =
   | TransactionAction
   | RespondApproved
   | ResponseProvided
-  | RespondSuccessAcknowledged
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
   | Acknowledged;
@@ -75,7 +64,6 @@ export function isResponderAction(action: WalletAction): action is ResponderActi
     isTransactionAction(action) ||
     action.type === 'WALLET.DISPUTE.RESPONDER.RESPOND_APPROVED' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED' ||
-    action.type === 'WALLET.DISPUTE.RESPONDER.RESPOND_SUCCESS_ACKNOWLEDGED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED'
