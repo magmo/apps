@@ -28,7 +28,15 @@ import { commitmentsReceived } from '../../../../communication';
 // Test data
 // ---------
 const processId = 'Process.123';
-const { asAddress, asPrivateKey, signedJointLedgerCommitments } = scenarios;
+const {
+  asAddress,
+  asPrivateKey,
+  bsAddress,
+  bsPrivateKey,
+  hubAddress,
+  hubPrivateKey,
+  signedJointLedgerCommitments,
+} = scenarios;
 const {
   signedCommitment0,
   signedCommitment1,
@@ -53,6 +61,18 @@ const propsB = {
   ourIndex: ThreePartyPlayerIndex.B,
 };
 
+const propsHub = {
+  ...props,
+  ourIndex: ThreePartyPlayerIndex.Hub,
+};
+
+const commitments0 = [signedCommitment0];
+const commitments1 = [signedCommitment0, signedCommitment1];
+const commitments2 = [signedCommitment0, signedCommitment1, signedCommitment2];
+const commitments3 = [signedCommitment1, signedCommitment2, signedCommitment3];
+const commitments4 = [signedCommitment2, signedCommitment3, signedCommitment4];
+const commitments5 = [signedCommitment3, signedCommitment4, signedCommitment5];
+
 // ----
 // States
 // ------
@@ -61,6 +81,8 @@ const commitmentSentA = states.commitmentSent(propsA);
 const notSafeToSendB = states.notSafeToSend(propsB);
 const commitmentSentB = states.commitmentSent(propsB);
 
+const notSafeToSendHub = states.notSafeToSend(propsHub);
+
 // -------
 // Shared Data
 // -------
@@ -68,19 +90,23 @@ const commitmentSentB = states.commitmentSent(propsB);
 const emptySharedData = { ...EMPTY_SHARED_DATA };
 // const channelCreated = { ...EMPTY_SHARED_DATA };
 const aSentPreFundCommitment = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([signedCommitment0], asAddress, asPrivateKey),
+  channelFromCommitments(commitments0, asAddress, asPrivateKey),
 ]);
 
-const bHasTwoPreFundCommitments = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([signedCommitment0, signedCommitment1], asAddress, asPrivateKey),
+const bSentPreFundCommitment = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(commitments1, bsAddress, bsPrivateKey),
+]);
+
+const hubSentPreFundCommitment = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(commitments2, hubAddress, hubPrivateKey),
 ]);
 
 const aSentPostFundCommitment = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([signedCommitment1, signedCommitment2], asAddress, asPrivateKey),
+  channelFromCommitments(commitments3, asAddress, asPrivateKey),
 ]);
 
-const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([signedCommitment2, signedCommitment3], asAddress, asPrivateKey),
+const bSentPostFundSetupCommitment = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments(commitments4, bsAddress, bsPrivateKey),
 ]);
 
 // -------
@@ -90,20 +116,29 @@ const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
 const action: any = '';
 const aReceivesPreFundSetup = commitmentsReceived({
   processId,
-  signedCommitments: [signedCommitment0, signedCommitment1, signedCommitment2],
+  signedCommitments: commitments2,
 });
 const aReceivesPostFundSetup = commitmentsReceived({
   processId,
-  signedCommitments: [signedCommitment3, signedCommitment4, signedCommitment5],
+  signedCommitments: commitments5,
 });
 
 const bReceivesPreFundSetup = commitmentsReceived({
   processId,
-  signedCommitments: [signedCommitment0],
+  signedCommitments: commitments0,
 });
 const bReceivesPostFundSetup = commitmentsReceived({
   processId,
-  signedCommitments: [signedCommitment1, signedCommitment2, signedCommitment3],
+  signedCommitments: commitments3,
+});
+
+const hubReceivesPreFundSetup = commitmentsReceived({
+  processId,
+  signedCommitments: commitments0,
+});
+const hubReceivesPostFundSetup = commitmentsReceived({
+  processId,
+  signedCommitments: commitments3,
 });
 
 // ---------
@@ -137,7 +172,7 @@ export const newChannelAsB = {
   },
   commitmentSent: {
     state: commitmentSentB,
-    sharedData: bHasTwoPreFundCommitments,
+    sharedData: bSentPreFundCommitment,
     action,
   },
 };
@@ -147,12 +182,31 @@ export const existingChannelAsB = {
 
   notSafeToSend: {
     state: notSafeToSendB,
-    sharedData: bHasTwoPreFundCommitments,
+    sharedData: bSentPreFundCommitment,
     action: bReceivesPostFundSetup,
   },
   commitmentSent: {
     state: commitmentSentB,
-    sharedData: bHasTwoPostFundCommitments,
+    sharedData: bSentPostFundSetupCommitment,
     action,
+  },
+};
+
+export const newChannelAsHuB = {
+  ...propsHub,
+  notSafeToSend: {
+    state: notSafeToSendHub,
+    sharedData: emptySharedData,
+    action: hubReceivesPreFundSetup,
+  },
+};
+
+export const existingChannelAsHuB = {
+  ...propsHub,
+
+  notSafeToSend: {
+    state: notSafeToSendHub,
+    sharedData: hubSentPreFundCommitment,
+    action: hubReceivesPostFundSetup,
   },
 };
