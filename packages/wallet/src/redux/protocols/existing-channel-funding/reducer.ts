@@ -17,17 +17,21 @@ export const initialize = (
   processId: string,
   channelId: string,
   ledgerId: string,
-  proposedAllocation: string[],
+  proposedTotal: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = ledgerChannel.lastCommitment.commitment;
-  if (ledgerChannelNeedsTopUp(theirCommitment, proposedAllocation)) {
+  if (ledgerChannelNeedsTopUp(theirCommitment, proposedTotal)) {
+    const amountRequiredFromEachParticipant = bigNumberify(proposedTotal)
+      .div(theirCommitment.channel.participants.length)
+      .toHexString();
+
     const { protocolState: ledgerTopUpState, sharedData: newSharedData } = initializeLedgerTopUp(
       processId,
       channelId,
       ledgerId,
-      proposedAllocation,
+      [amountRequiredFromEachParticipant, amountRequiredFromEachParticipant],
       theirCommitment.destination,
       sharedData,
     );
@@ -37,7 +41,7 @@ export const initialize = (
         processId,
         channelId,
         ledgerId,
-        proposedAmount,
+        proposedAmount: proposedTotal,
       }),
       sharedData: newSharedData,
     };
@@ -46,7 +50,7 @@ export const initialize = (
   if (helpers.isFirstPlayer(ledgerId, sharedData)) {
     const { proposedAllocation, proposedDestination } = craftNewAllocationAndDestination(
       theirCommitment,
-      proposedAmount,
+      proposedTotal,
       channelId,
     );
     const ourCommitment = proposeNewConsensus(
@@ -76,7 +80,7 @@ export const initialize = (
     processId,
     ledgerId,
     channelId,
-    proposedAmount,
+    proposedAmount: proposedTotal,
   });
 
   return { protocolState, sharedData };
@@ -293,17 +297,16 @@ function craftNewAllocationAndDestination(
   return { proposedAllocation, proposedDestination };
 }
 
-function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAllocation: string[]) {
+function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAmount: string) {
   if (latestCommitment.commitmentType !== CommitmentType.App) {
     throw new Error('Ledger channel is already closed.');
   }
-  // TODO: This assumes allocations are the same length
-  for (let i = 0; i < proposedAllocation.length; i++) {
-    if (bigNumberify(proposedAllocation[i]).gt(latestCommitment.allocation[i])) {
-      return false;
-    }
-  }
-  return true;
+  const numParticipants = latestCommitment.channel.participants.length;
+  const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
+
+  return !latestCommitment.allocation.every(a =>
+    bigNumberify(a).gte(amountRequiredFromEachParticipant),
+  );
 }
 
 function craftAndSendAppPostFundCommitment(
