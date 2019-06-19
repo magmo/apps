@@ -6,6 +6,7 @@ import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
 import { isNewProcessAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
+import * as defundingProtocol from './protocols/defunding';
 import {
   challengingReducer,
   initializeChallengerState,
@@ -204,7 +205,8 @@ function initializeNewProtocol(
         state.address,
         state.privateKey,
       );
-
+    case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
+      return defundingProtocol.initialize(processId, action.channelId, incomingSharedData);
     default:
       return unreachable(action);
   }
