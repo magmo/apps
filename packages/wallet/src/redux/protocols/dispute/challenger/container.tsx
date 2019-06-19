@@ -10,18 +10,19 @@ import Acknowledge from '../../shared-components/acknowledge';
 import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout';
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from './components/defund-or-not';
-import { defundRequested } from '../../actions';
+import { DefundRequested, defundRequested } from '../../actions';
 
 interface Props {
   state: NonTerminalChallengerState;
   approve: ActionDispatcher<actions.ChallengeApproved>;
   deny: ActionDispatcher<actions.ChallengeDenied>;
   acknowledged: ActionDispatcher<actions.Acknowledged>;
+  defund: ActionDispatcher<DefundRequested>;
 }
 
 class ChallengerContainer extends PureComponent<Props> {
   render() {
-    const { state, deny, approve, acknowledged } = this.props;
+    const { state, deny, approve, acknowledged, defund } = this.props;
     const processId = state.processId;
     switch (state.type) {
       case 'Challenging.ApproveChallenge':
@@ -49,7 +50,7 @@ class ChallengerContainer extends PureComponent<Props> {
       case 'Challenging.AcknowledgeTimeout':
         return (
           <DefundOrNot
-            approve={() => defundRequested({ channelId: state.channelId, processId })}
+            approve={() => defund({ channelId: state.channelId, processId })}
             deny={() => acknowledged({ processId })}
             channelId={state.channelId}
           />
@@ -93,6 +94,7 @@ const mapDispatchToProps = {
   approve: actions.challengeApproved,
   deny: actions.challengeDenied,
   acknowledged: actions.acknowledged,
+  defund: defundRequested,
 };
 
 export const Challenger = connect(

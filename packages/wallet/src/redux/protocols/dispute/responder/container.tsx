@@ -10,17 +10,18 @@ import { TransactionSubmission } from '../../transaction-submission/container';
 import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from '../challenger/components/defund-or-not';
-import { defundRequested } from '../../actions';
+import { DefundRequested, defundRequested } from '../../actions';
 
 interface Props {
   state: states.NonTerminalResponderState;
   respondApproved: ActionDispatcher<actions.RespondApproved>;
   responseProvided: ActionDispatcher<actions.ResponseProvided>;
   acknowledged: ActionDispatcher<actions.Acknowledged>;
+  defund: ActionDispatcher<DefundRequested>;
 }
 class ResponderContainer extends PureComponent<Props> {
   render() {
-    const { state, respondApproved, acknowledged } = this.props;
+    const { state, respondApproved, acknowledged, defund } = this.props;
     const { processId } = state;
     switch (state.type) {
       case 'Responding.WaitForAcknowledgement':
@@ -51,7 +52,7 @@ class ResponderContainer extends PureComponent<Props> {
       case 'Responding.AcknowledgeTimeout':
         return (
           <DefundOrNot
-            approve={() => defundRequested({ channelId: state.channelId, processId })}
+            approve={() => defund({ channelId: state.channelId, processId })}
             deny={() => acknowledged({ processId })}
             channelId={state.channelId}
           />
@@ -66,6 +67,7 @@ const mapDispatchToProps = {
   respondApproved: actions.respondApproved,
   responseProvided: actions.responseProvided,
   acknowledged: actions.acknowledged,
+  defund: defundRequested,
 };
 
 export const Responder = connect(
