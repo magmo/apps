@@ -37,8 +37,10 @@ const channelStatus: ChannelState = {
   participants,
   channelNonce,
   funded: true,
-  lastCommitment: { commitment: gameCommitment2, signature: '0x0' },
-  penultimateCommitment: { commitment: gameCommitment1, signature: '0x0' },
+  currentRound: [
+    { commitment: gameCommitment1, signature: '0x0' },
+    { commitment: gameCommitment2, signature: '0x0' },
+  ],
   turnNum: gameCommitment2.turnNum,
 };
 

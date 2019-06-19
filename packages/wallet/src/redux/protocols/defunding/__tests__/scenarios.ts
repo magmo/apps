@@ -29,8 +29,10 @@ const channelStatus: ChannelState = {
   channelNonce,
   turnNum: concludeCommitment2.turnNum,
   funded: true,
-  lastCommitment: { commitment: concludeCommitment2, signature: '0x0' },
-  penultimateCommitment: { commitment: concludeCommitment1, signature: '0x0' },
+  currentRound: [
+    { commitment: concludeCommitment1, signature: '0x0' },
+    { commitment: concludeCommitment2, signature: '0x0' },
+  ],
 };
 
 const channelStore: ChannelStore = {

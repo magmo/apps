@@ -8,7 +8,7 @@ import * as selectors from '../selectors';
 import { TwoPartyPlayerIndex } from '../types';
 import { CommitmentType } from 'fmg-core/lib/commitment';
 import * as magmoWalletClient from 'magmo-wallet-client';
-import { ChannelState } from '../channel-store';
+import { ChannelState, getLastCommitment } from '../channel-store';
 import { Commitment } from '../../domain';
 
 export const updateChannelState = (
@@ -45,18 +45,13 @@ export const filterOutSignatureMessages = (sideEffects?: SideEffects): SideEffec
 
 export function sendFundingComplete(sharedData: SharedData, appChannelId: string) {
   const channelState = selectors.getOpenedChannelState(sharedData, appChannelId);
-  const lastCommitment = channelState.lastCommitment.commitment;
-  if (
-    lastCommitment.commitmentType !== CommitmentType.PostFundSetup ||
-    lastCommitment.turnNum !== 3
-  ) {
+  const c = getLastCommitment(channelState);
+  if (c.commitmentType !== CommitmentType.PostFundSetup || c.turnNum !== 3) {
     throw new Error(
-      `Expected a post fund setup B commitment. Instead received ${JSON.stringify(
-        lastCommitment,
-      )}.`,
+      `Expected a post fund setup B commitment. Instead received ${JSON.stringify(c)}.`,
     );
   }
-  return queueMessage(sharedData, fundingSuccess(appChannelId, lastCommitment));
+  return queueMessage(sharedData, fundingSuccess(appChannelId, c));
 }
 
 export function showWallet(sharedData: SharedData): SharedData {
@@ -141,7 +136,7 @@ export const channelIsClosed = (channelId: string, sharedData: SharedData): bool
 
 export const channelHasConclusionProof = (channelId: string, sharedData: SharedData): boolean => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const { lastCommitment, penultimateCommitment } = channelState;
+  const [penultimateCommitment, lastCommitment] = channelState.currentRound;
   return (
     lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&
     penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude

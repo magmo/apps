@@ -3,10 +3,7 @@ import { ThreePartyPlayerIndex } from '../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelId } from '../../../../domain/commitments/__tests__';
-import {
-  channelFromCommitments,
-  partiallyOpenChannelFromCommitment,
-} from '../../../channel-store/channel-state/__tests__';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { roundReceived } from '../../../../communication';
 
@@ -71,19 +68,19 @@ const commitmentSentB = states.commitmentSent(propsB);
 const emptySharedData = { ...EMPTY_SHARED_DATA };
 // const channelCreated = { ...EMPTY_SHARED_DATA };
 const aSentPreFundCommitment = setChannels(EMPTY_SHARED_DATA, [
-  partiallyOpenChannelFromCommitment(signedCommitment0, asAddress, asPrivateKey),
+  channelFromCommitments([signedCommitment0], asAddress, asPrivateKey),
 ]);
 
 const bHasTwoPreFundCommitments = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(signedCommitment0, signedCommitment1, asAddress, asPrivateKey),
+  channelFromCommitments([signedCommitment0, signedCommitment1], asAddress, asPrivateKey),
 ]);
 
 const aSentPostFundCommitment = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(signedCommitment1, signedCommitment2, asAddress, asPrivateKey),
+  channelFromCommitments([signedCommitment1, signedCommitment2], asAddress, asPrivateKey),
 ]);
 
 const bHasTwoPostFundCommitments = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(signedCommitment2, signedCommitment3, asAddress, asPrivateKey),
+  channelFromCommitments([signedCommitment2, signedCommitment3], asAddress, asPrivateKey),
 ]);
 
 // -------

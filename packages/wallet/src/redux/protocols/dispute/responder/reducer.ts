@@ -34,6 +34,7 @@ import {
   isSuccess as isDefundingSuccess,
   isFailure as isDefundingFailure,
 } from '../../defunding/states';
+
 export const initialize = (
   processId: string,
   channelId: string,
@@ -355,10 +356,12 @@ const getStoredCommitments = (
 } => {
   const channelId = channelID(challengeCommitment.channel);
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const lastCommitment = channelState.lastCommitment.commitment;
-  const penultimateCommitment = channelState.penultimateCommitment.commitment;
-  const lastSignature = channelState.lastCommitment.signature;
-  const penultimateSignature = channelState.penultimateCommitment.signature;
+  const [penultimateSignedCommitment, lastSignedCommitment] = channelState.currentRound;
+  const { signature: lastSignature, commitment: lastCommitment } = lastSignedCommitment;
+  const {
+    signature: penultimateSignature,
+    commitment: penultimateCommitment,
+  } = penultimateSignedCommitment;
   return { lastCommitment, penultimateCommitment, lastSignature, penultimateSignature };
 };
 

@@ -14,7 +14,7 @@ import {
 } from '../transaction-submission/reducer';
 import { isTerminal, isSuccess } from '../transaction-submission/states';
 import * as states from './states';
-import { theirAddress } from '../../channel-store';
+import { theirAddress, getLastCommitment } from '../../channel-store';
 import * as channelStoreReducer from '../../channel-store/reducer';
 import { sendCommitmentReceived } from '../../../communication';
 import { DirectFundingRequested } from './actions';
@@ -340,7 +340,7 @@ const createAndSendPostFundCommitment = (
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
 
   const commitment = composePostFundCommitment(
-    channelState.lastCommitment.commitment,
+    getLastCommitment(channelState),
     channelState.ourIndex,
   );
 
