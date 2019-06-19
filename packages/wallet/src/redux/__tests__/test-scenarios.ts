@@ -366,30 +366,30 @@ export const jointLedgerCommitments = {
   },
 };
 
-let c: Commitment;
+let commitment: Commitment;
 export const signedJointLedgerCommitments = {
   signedCommitment0: {
-    commitment: c = jointLedgerCommitments.preFundCommitment0,
-    signature: signCommitment(c, asPrivateKey),
+    commitment: commitment = jointLedgerCommitments.preFundCommitment0,
+    signature: signCommitment(commitment, asPrivateKey),
   },
   signedCommitment1: {
-    commitment: c = jointLedgerCommitments.preFundCommitment1,
-    signature: signCommitment(c, bsPrivateKey),
+    commitment: commitment = jointLedgerCommitments.preFundCommitment1,
+    signature: signCommitment(commitment, bsPrivateKey),
   },
   signedCommitment2: {
-    commitment: c = jointLedgerCommitments.postFundCommitment0,
-    signature: signCommitment(c, hubPrivateKey),
+    commitment: commitment = jointLedgerCommitments.postFundCommitment0,
+    signature: signCommitment(commitment, hubPrivateKey),
   },
   signedCommitment3: {
-    commitment: c = jointLedgerCommitments.postFundCommitment1,
-    signature: signCommitment(c, asPrivateKey),
+    commitment: commitment = jointLedgerCommitments.postFundCommitment1,
+    signature: signCommitment(commitment, asPrivateKey),
   },
   signedCommitment4: {
-    commitment: c = jointLedgerCommitments.postFundCommitment1,
-    signature: signCommitment(c, bsPrivateKey),
+    commitment: commitment = jointLedgerCommitments.postFundCommitment1,
+    signature: signCommitment(commitment, bsPrivateKey),
   },
   signedCommitment5: {
-    commitment: c = jointLedgerCommitments.postFundCommitment1,
-    signature: signCommitment(c, hubPrivateKey),
+    commitment: commitment = jointLedgerCommitments.postFundCommitment1,
+    signature: signCommitment(commitment, hubPrivateKey),
   },
 };
