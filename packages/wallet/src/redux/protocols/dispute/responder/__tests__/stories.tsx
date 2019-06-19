@@ -7,7 +7,7 @@ addStories(
 );
 addStories(scenarios.requireResponseHappyPath, 'Responding / Requires new Response');
 addStories(scenarios.refuteHappyPath, 'Responding / Refute challenge');
-addStories(scenarios.challengeExpires, 'Responding / Challenge Expires (Defunded)');
+addStories(scenarios.challengeExpires, 'Responding / Challenge Expires');
 addStories(
   scenarios.challengeExpiresDuringWaitForTransaction,
   'Responding / Challenge Expires during WaitForTransaction',
