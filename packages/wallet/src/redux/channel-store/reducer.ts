@@ -97,9 +97,6 @@ export function checkAndInitialize(
 export function signAndStore(store: ChannelStore, commitment: Commitment): SignResult {
   const channelId = getChannelId(commitment);
   let channel = getChannel(store, channelId);
-  if (!channel) {
-    return { isSuccess: false, reason: 'ChannelDoesntExist' };
-  }
   const signedCommitment = signCommitment2(commitment, channel.privateKey);
 
   // this next check is weird. It'll check whether it was our turn.
@@ -142,11 +139,6 @@ export function checkAndStore(
   const commitment = signedCommitment.commitment;
   const channelId = getChannelId(commitment);
   let channel = getChannel(store, channelId);
-
-  if (!channel) {
-    console.log('Cannot store commitment: no channel');
-    return { isSuccess: false };
-  }
 
   if (!isSafeTransition(store, channel, commitment)) {
     console.log('Failed to verify a safe transition');

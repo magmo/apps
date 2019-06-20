@@ -43,11 +43,6 @@ export function initialize(
     if (isNewChannelArgs(args)) {
       throw new Error('Must receive OngoingChannelArgs');
     }
-    const { channelId } = args;
-    const channel = getChannel(sharedData.channelStore, channelId);
-    if (!channel) {
-      throw new Error(`Could not find existing channel ${channelId}`);
-    }
 
     throw new Error('Unimplemented');
   }
@@ -169,9 +164,6 @@ const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
   sharedData = checkResult.store;
   sharedData = checkCommitments(sharedData, 0, action.signedCommitments);
   let channel = getChannel(sharedData.channelStore, channelId);
-  if (!channel) {
-    throw new Error('Channel not stored');
-  }
 
   if (isSafeToSend({ sharedData, ourIndex, channelId })) {
     // First, update the store with our response
@@ -192,10 +184,6 @@ const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
 
     // Finally, send the commitments to the next participant
     channel = getChannel(sharedData.channelStore, channelId);
-    if (!channel) {
-      throw new Error('Channel not stored');
-    }
-
     const { participants } = channel;
     const messageRelay = sendCommitmentsReceived(
       nextParticipant(participants, ourIndex),
@@ -245,10 +233,6 @@ const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelStat
   const { ourIndex, channelId } = protocolState;
 
   const channel = getChannel(sharedData.channelStore, channelId);
-  if (!channel) {
-    return { protocolState, sharedData };
-  }
-
   sharedData = checkCommitments(sharedData, channel.turnNum, action.signedCommitments);
 
   if (isSafeToSend({ sharedData, ourIndex, channelId })) {
@@ -264,17 +248,11 @@ const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
   action: CommitmentsReceived,
 ) => {
   const { channelId, commitmentType } = protocolState;
+
   let channel = getChannel(sharedData.channelStore, channelId);
-  if (!channel) {
-    return { protocolState, sharedData };
-  }
-
   sharedData = checkCommitments(sharedData, channel.turnNum, action.signedCommitments);
-  channel = getChannel(sharedData.channelStore, channelId);
-  if (!channel) {
-    return { protocolState, sharedData };
-  }
 
+  channel = getChannel(sharedData.channelStore, channelId);
   if (channelAdvanced(channel, commitmentType)) {
     return { protocolState: states.success(protocolState), sharedData };
   }
@@ -299,12 +277,6 @@ function isSafeToSend({
 
   if (!channelId) {
     return ourIndex === 0;
-  }
-
-  const channel = getChannel(sharedData.channelStore, channelId);
-  if (!channel) {
-    console.error(`Could not find existing channel ${channelId}`);
-    return false;
   }
 
   return true;
