@@ -56,6 +56,9 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
   }
 
   switch (protocolState.type) {
+    case 'AdvanceChannel.ChannelUnknown': {
+      return channelUnknownReducer(protocolState, sharedData, action);
+    }
     case 'AdvanceChannel.NotSafeToSend': {
       return notSafeToSendReducer(protocolState, sharedData, action);
     }
@@ -73,7 +76,6 @@ interface NewChannelArgs {
   destination: string[];
   channelType: string;
   appAttributes: string;
-  address: string;
   privateKey: string;
 }
 
@@ -151,20 +153,46 @@ function initializeWithExistingChannel(channel, processId, sharedData) {
   return { protocolState: states.notSafeToSend({ processId, channelId, ourIndex }), sharedData };
 }
 
-const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
-  protocolState,
+const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
+  protocolState: states.ChannelUnknown,
   sharedData,
-  action,
+  action: CommitmentsReceived,
 ) => {
-  if (isSafeToSend(sharedData)) {
+  const { ourIndex } = protocolState;
+  const channelId = getChannelId(action.signedCommitments[0].commitment);
+
+  if (isSafeToSend({ sharedData, ourIndex, channelId })) {
+    return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
+  } else {
     return { protocolState, sharedData };
+  }
+};
+
+const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
+  protocolState: states.NotSafeToSend,
+  sharedData,
+  action: CommitmentsReceived,
+) => {
+  const { ourIndex, channelId } = protocolState;
+
+  action.signedCommitments.map(sc => {
+    const result = checkAndStore(sharedData, sc);
+    if (result.isSuccess) {
+      sharedData = result.store;
+    } else {
+      throw new Error('Unable to validate commitment');
+    }
+  });
+
+  if (isSafeToSend({ sharedData, ourIndex, channelId })) {
+    return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
   } else {
     return { protocolState, sharedData };
   }
 };
 
 const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
-  protocolState,
+  protocolState: states.CommitmentSent,
   sharedData,
   action: CommitmentsReceived,
 ) => {

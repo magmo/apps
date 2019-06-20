@@ -45,11 +45,13 @@ const propsA = {
 const propsB = {
   ...props,
   ourIndex: ThreePartyPlayerIndex.B,
+  privateKey: bsPrivateKey,
 };
 
 const propsHub = {
   ...props,
   ourIndex: ThreePartyPlayerIndex.Hub,
+  privateKey: hubPrivateKey,
 };
 
 const commitments0 = [signedCommitment0];
@@ -64,9 +66,11 @@ const commitments5 = [signedCommitment3, signedCommitment4, signedCommitment5];
 // ------
 const commitmentSentA = states.commitmentSent(propsA);
 
+const channelUnknownB = states.channelUnknown(propsB);
 const notSafeToSendB = states.notSafeToSend(propsB);
 const commitmentSentB = states.commitmentSent(propsB);
 
+const channelUnknownHub = states.channelUnknown(propsHub);
 const notSafeToSendHub = states.notSafeToSend(propsHub);
 
 // -------
@@ -188,7 +192,7 @@ export const newChannelAsB = {
     sharedData: emptySharedData,
   },
   receiveFromA: {
-    state: notSafeToSendB,
+    state: channelUnknownB,
     sharedData: emptySharedData,
     action: receivePreFundSetupFromA,
     commitment: signedCommitment1,
@@ -224,7 +228,7 @@ export const newChannelAsHub = {
     sharedData: emptySharedData,
   },
   receiveFromB: {
-    state: notSafeToSendHub,
+    state: channelUnknownHub,
     sharedData: emptySharedData,
     action: receivePreFundSetupFromB,
     commitment: signedCommitment2,
