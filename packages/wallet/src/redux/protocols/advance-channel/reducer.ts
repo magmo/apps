@@ -12,6 +12,7 @@ type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
 
 export function initialize(
+  processId: string,
   sharedData: Storage,
   commitmentType: CommitmentType,
   args: NewChannelArgs | OngoingChannelArgs,
@@ -20,7 +21,7 @@ export function initialize(
     if (!isNewChannelArgs(args)) {
       throw new Error('Must receive NewChannelArgs');
     }
-    return initializeWithNewChannel(sharedData, args);
+    return initializeWithNewChannel(processId, sharedData, args);
   } else {
     if (isNewChannelArgs(args)) {
       throw new Error('Must receive OngoingChannelArgs');
@@ -30,7 +31,7 @@ export function initialize(
     if (!channel) {
       throw new Error(`Could not find existing channel ${channelId}`);
     }
-    return initializeWithExistingChannel(channel, advanceChannelProcessId, sharedData);
+    return initializeWithExistingChannel(channel, processId, sharedData);
   }
 }
 
@@ -41,10 +42,6 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
 ) => {
   throw new Error('Unimplemented');
 };
-
-function advanceChannelProcessId(channelId: string, commitmentType: CommitmentType): string {
-  return `AdvanceChannel-${channelId}-${commitmentType}`;
-}
 
 interface NewChannelArgs {
   ourIndex: number;
@@ -67,7 +64,11 @@ function isNewChannelArgs(args: NewChannelArgs | OngoingChannelArgs): args is Ne
   return true;
 }
 
-function initializeWithNewChannel(sharedData: Storage, initializeChannelArgs: NewChannelArgs) {
+function initializeWithNewChannel(
+  processId,
+  sharedData: Storage,
+  initializeChannelArgs: NewChannelArgs,
+) {
   if (isSafeToSend(sharedData, CommitmentType.PreFundSetup, initializeChannelArgs)) {
     const { channelType, destination, appAttributes, allocation, ourIndex } = initializeChannelArgs;
 
@@ -102,13 +103,12 @@ function initializeWithNewChannel(sharedData: Storage, initializeChannelArgs: Ne
 
     // Register channel to monitor
     const channelId = getChannelId(ourCommitment);
-    const processId = advanceChannelProcessId(channelId, CommitmentType.PreFundSetup);
     sharedData = registerChannelToMonitor(sharedData, processId, channelId);
 
     // Send commitments to next participant
     const messageRelay = sendCommitmentsReceived(
       nextParticipant(participants, ourIndex),
-      advanceChannelProcessId(channelId, CommitmentType.PreFundSetup),
+      processId,
       [signResult.signedCommitment],
     );
     sharedData = queueMessage(sharedData, messageRelay);

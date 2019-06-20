@@ -15,10 +15,11 @@ const itTransitionsTo = (
 
 describe('sending preFundSetup as A', () => {
   const scenario = scenarios.newChannelAsA;
+  const { processId } = scenario;
 
   describe.only('when initializing', () => {
     const { sharedData, commitments, args } = scenario.initialize;
-    const result = initialize(sharedData, CommitmentType.PreFundSetup, args);
+    const result = initialize(processId, sharedData, CommitmentType.PreFundSetup, args);
     itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
     expectTheseCommitmentsSent(result, commitments);
     // expectThisChannelStored(result, channelId);
@@ -27,7 +28,7 @@ describe('sending preFundSetup as A', () => {
 
   describe('when receiving prefund commitments from b', () => {
     const { sharedData, args } = scenario.receiveFromB;
-    const result = initialize(sharedData, CommitmentType.PreFundSetup, args);
+    const result = initialize(processId, sharedData, CommitmentType.PreFundSetup, args);
     itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
   });
 
