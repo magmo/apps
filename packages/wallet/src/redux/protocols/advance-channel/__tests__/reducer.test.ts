@@ -93,3 +93,31 @@ describe('sending preFundSetup as B', () => {
     itSendsNoMessage(result);
   });
 });
+
+describe('sending preFundSetup as Hub', () => {
+  const scenario = scenarios.newChannelAsHub;
+  const { processId, channelId } = scenario;
+
+  describe('when initializing', () => {
+    const { sharedData, args } = scenario.initialize;
+    const { protocolState, sharedData: result } = initialize(
+      processId,
+      sharedData,
+      CommitmentType.PreFundSetup,
+      args,
+    );
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.ChannelUnknown');
+    itSendsNoMessage(result);
+  });
+
+  describe('when receiving prefund commitments from B', () => {
+    const { state, sharedData, action, commitments } = scenario.receiveFromB;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.Success');
+    itStoresThisCommitment(result, commitments[2]);
+    expectTheseCommitmentsSent(result, commitments);
+    itRegistersThisChannel(result, channelId, processId);
+  });
+});

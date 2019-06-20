@@ -154,12 +154,12 @@ function initializeWithNewChannel(
   }
 }
 
-const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
+const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
   protocolState: states.ChannelUnknown,
   sharedData,
   action: CommitmentsReceived,
 ) => {
-  const { ourIndex, privateKey } = protocolState;
+  const { ourIndex, privateKey, commitmentType } = protocolState;
   const channelId = getChannelId(action.signedCommitments[0].commitment);
 
   const checkResult = checkAndInitialize(sharedData, action.signedCommitments[0], privateKey);
@@ -205,7 +205,11 @@ const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelSta
 
     sharedData = queueMessage(sharedData, messageRelay);
 
-    return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
+    if (channelAdvanced(channel, commitmentType)) {
+      return { protocolState: states.success(protocolState), sharedData };
+    } else {
+      return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
+    }
   } else {
     return { protocolState, sharedData };
   }

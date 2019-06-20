@@ -177,6 +177,13 @@ const argsB = {
   ourIndex: 1,
 };
 
+const argsHub = {
+  ...initializeArgs,
+  address: hubAddress,
+  privateKey: hubPrivateKey,
+  ourIndex: 2,
+};
+
 export const newChannelAsA = {
   ...propsA,
   initialize: {
@@ -259,13 +266,14 @@ export const existingChannelAsB = {
 export const newChannelAsHub = {
   ...propsHub,
   initialize: {
+    args: { ...argsHub, commitmentType: CommitmentType.PreFundSetup },
     sharedData: emptySharedData,
   },
   receiveFromB: {
     state: channelUnknownHub,
     sharedData: emptySharedData,
     action: receivePreFundSetupFromB,
-    commitment: signedCommitment2,
+    commitments: commitments2,
   },
 };
 
