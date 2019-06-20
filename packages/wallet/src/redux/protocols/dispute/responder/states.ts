@@ -43,7 +43,7 @@ export interface AcknowledgeTimeout {
   type: 'Responding.AcknowledgeTimeout';
   processId: string;
   channelId: string;
-  action: CommitmentReceived;
+  action?: CommitmentReceived;
 }
 
 export interface Failure {
