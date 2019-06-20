@@ -4,7 +4,7 @@ import { ProtocolStateWithSharedData } from '..';
 import { ConsensusUpdateAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import { theirAddress, getLastCommitment } from '../../channel-store';
-import { proposeNewConsensus, acceptConsensus } from '../../../..';
+import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../communication';
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = 'ConsensusUpdate';
 export const initialize = (
