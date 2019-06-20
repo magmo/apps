@@ -94,7 +94,12 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, sharedData, processState, protocolState);
-
+      case WalletProtocol.Defunding:
+        const {
+          protocolState: defundingProtocolState,
+          sharedData: defundingSharedData,
+        } = defundingProtocol.reducer(processState.protocolState, states.sharedData(state), action);
+        return updatedState(state, defundingSharedData, processState, defundingProtocolState);
       case WalletProtocol.Application:
         const {
           protocolState: appProtocolState,
