@@ -113,13 +113,8 @@ function initializeWithNewChannel(
       destination,
       channel,
     };
-    const { address, privateKey } = initializeChannelArgs;
-    const signResult = signAndInitialize(
-      sharedData.channelStore,
-      ourCommitment,
-      address,
-      privateKey,
-    );
+    const { privateKey } = initializeChannelArgs;
+    const signResult = signAndInitialize(sharedData.channelStore, ourCommitment, privateKey);
     if (!signResult.isSuccess) {
       throw new Error('Could not store new ledger channel commitment.');
     }
