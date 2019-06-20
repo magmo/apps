@@ -2,7 +2,11 @@ import * as states from '../states';
 import { initialize, reducer } from '../reducer';
 import * as scenarios from './scenarios';
 import { CommitmentType } from '../../../../domain';
-import { expectTheseCommitmentsSent } from '../../../__tests__/helpers';
+import {
+  expectTheseCommitmentsSent,
+  itStoresThisCommitment,
+  itRegistersThisChannel,
+} from '../../../__tests__/helpers';
 
 const itTransitionsTo = (
   result: states.AdvanceChannelState,
@@ -15,15 +19,15 @@ const itTransitionsTo = (
 
 describe('sending preFundSetup as A', () => {
   const scenario = scenarios.newChannelAsA;
-  const { processId } = scenario;
+  const { processId, channelId } = scenario;
 
   describe.only('when initializing', () => {
     const { sharedData, commitments, args } = scenario.initialize;
     const result = initialize(processId, sharedData, CommitmentType.PreFundSetup, args);
     itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
     expectTheseCommitmentsSent(result, commitments);
-    // expectThisChannelStored(result, channelId);
-    // expectThisChannelRegistered(result, channelId);
+    itStoresThisCommitment(result.sharedData, commitments[0]);
+    itRegistersThisChannel(result.sharedData, channelId, processId);
   });
 
   describe('when receiving prefund commitments from b', () => {
