@@ -15,7 +15,7 @@ import { isIndirectDefundingAction } from '../indirect-defunding/actions';
 import * as indirectDefundingStates from '../indirect-defunding/states';
 import { CommitmentReceived } from '../../../communication';
 import { getLastCommitment } from '../../channel-store';
-import { ProtocolAction } from 'src/redux/actions';
+import { ProtocolAction } from '../../../redux/actions';
 
 export const initialize = (
   processId: string,
