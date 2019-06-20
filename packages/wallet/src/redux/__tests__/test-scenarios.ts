@@ -99,7 +99,7 @@ export const postFundCommitment1: Commitment = {
 export const signedCommitment3 = signCommitment2(postFundCommitment1, bsPrivateKey);
 export const gameCommitment1: Commitment = {
   channel,
-  commitmentCount: 2,
+  commitmentCount: 0,
   commitmentType: CommitmentType.App,
   appAttributes: '0x0',
   turnNum: 19,
