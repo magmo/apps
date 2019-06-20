@@ -18,9 +18,9 @@ const {
   hubAddress,
   hubPrivateKey,
   signedJointLedgerCommitments,
-  threeParticipants,
-  oneTwoThree,
-  ledgerLibraryAddress,
+  threeParticipants: destination,
+  oneTwoThree: allocation,
+  ledgerLibraryAddress: channelType,
   jointLedgerId: channelId,
 } = scenarios;
 const {
@@ -31,9 +31,18 @@ const {
   signedCommitment4,
   signedCommitment5,
 } = signedJointLedgerCommitments;
+const appAttributes = signedCommitment0.commitment.appAttributes;
+
+const initializeArgs = {
+  allocation,
+  destination,
+  channelType,
+  appAttributes,
+  processId,
+};
 
 const props = {
-  processId,
+  ...initializeArgs,
   channelId,
 };
 
@@ -135,22 +144,15 @@ const receivePostFundSetupFromHub = commitmentsReceived({
 // ---------
 // Scenarios
 // ---------
-const args = {
-  allocation: oneTwoThree,
-  destination: threeParticipants,
-  channelType: ledgerLibraryAddress,
-  appAttributes: scenarios.jointLedgerCommitments.postFundCommitment0.appAttributes,
-};
-
 const argsA = {
-  ...args,
+  ...initializeArgs,
   address: asAddress,
   privateKey: asPrivateKey,
   ourIndex: 0,
 };
 
 const argsB = {
-  ...args,
+  ...initializeArgs,
   address: bsAddress,
   privateKey: bsPrivateKey,
   ourIndex: 1,

@@ -14,6 +14,11 @@ interface BaseState {
 
 export interface ChannelUnknown extends BaseState {
   type: 'AdvanceChannel.ChannelUnknown';
+  ourIndex: number;
+  allocation: string[];
+  destination: string[];
+  channelType: string;
+  appAttributes: string;
   privateKey: string;
 }
 
@@ -49,11 +54,15 @@ const base: StateConstructor<BaseState> = params => {
 };
 
 export const channelUnknown: StateConstructor<ChannelUnknown> = params => {
-  const { privateKey } = params;
+  const { privateKey, allocation, destination, channelType, appAttributes } = params;
   return {
     ...base(params),
     type: 'AdvanceChannel.ChannelUnknown',
     privateKey,
+    allocation,
+    destination,
+    channelType,
+    appAttributes,
   };
 };
 

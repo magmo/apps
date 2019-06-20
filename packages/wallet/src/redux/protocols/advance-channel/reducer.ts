@@ -23,6 +23,7 @@ import { sendCommitmentsReceived, CommitmentsReceived } from '../../../communica
 import { Channel } from 'fmg-core';
 import { isAdvanceChannelAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
+import { Properties } from '../../utils';
 
 type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
@@ -76,14 +77,7 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
   }
 };
 
-interface NewChannelArgs {
-  ourIndex: number;
-  allocation: string[];
-  destination: string[];
-  channelType: string;
-  appAttributes: string;
-  privateKey: string;
-}
+type NewChannelArgs = Properties<states.ChannelUnknown>;
 
 interface OngoingChannelArgs {
   channelId: string;
