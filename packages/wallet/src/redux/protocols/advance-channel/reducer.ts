@@ -298,7 +298,7 @@ function isSafeToSend({
 function channelAdvanced(channel: ChannelState, commitmentType: CommitmentType): boolean {
   const lastCommitment = getLastCommitment(channel);
   return (
-    lastCommitment.commitmentType === commitmentType &&
+    lastCommitment.commitmentType >= commitmentType &&
     lastCommitment.commitmentCount === channel.participants.length - 1
   );
 }
