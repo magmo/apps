@@ -9,7 +9,7 @@
   "scripts": {
     "start": "npm run clearContracts && node scripts/start.js",
     "build": "run-s clearContracts build:typescript build:webpack",
-    "build:typescript": "npx tsc",
+    "build:typescript": "yarn run clearLib && npx tsc",
     "build:webpack": "node scripts/build.js",
     "prepare": "npx tsc",
     "test": "run-s prettier:check 'test:app --all'",
@@ -24,7 +24,8 @@
     "ganache:start": "NODE_ENV=development npx start-ganache",
     "postinstall": "rm -f node_modules/web3/index.d.ts",
     "storybook": "start-storybook -p 9001 -c .storybook",
-    "clearContracts": "rm -rf ./build/contracts"
+    "clearContracts": "rm -rf ./build/contracts",
+    "clearLib": "rm -rf ./lib"
   },
   "dependencies": {
     "@firebase/app-types": "^0.3.2",
