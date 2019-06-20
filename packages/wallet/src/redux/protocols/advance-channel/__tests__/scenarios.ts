@@ -136,24 +136,34 @@ const receivePostFundSetupFromHub = commitmentsReceived({
 // Scenarios
 // ---------
 const args = {
-  ourIndex: 0,
   allocation: oneTwoThree,
   destination: threeParticipants,
   channelType: ledgerLibraryAddress,
   appAttributes: scenarios.jointLedgerCommitments.postFundCommitment0.appAttributes,
+};
+
+const argsA = {
+  ...args,
   address: asAddress,
   privateKey: asPrivateKey,
+  ourIndex: 0,
+};
+
+const argsB = {
+  ...args,
+  address: bsAddress,
+  privateKey: bsPrivateKey,
+  ourIndex: 1,
 };
 
 export const newChannelAsA = {
   ...propsA,
   initialize: {
-    args,
+    args: argsA,
     sharedData: emptySharedData,
     commitments: commitments0,
   },
   receiveFromB: {
-    args,
     state: commitmentSentA,
     sharedData: aSentPreFundCommitment,
     action: receivePreFundSetupFromB,
@@ -170,7 +180,7 @@ export const newChannelAsA = {
 export const existingChannelAsA = {
   ...propsA,
   initialize: {
-    args,
+    args: argsA,
     sharedData: aSentPostFundCommitment,
     commitment: signedCommitment3,
   },
@@ -189,24 +199,27 @@ export const existingChannelAsA = {
 export const newChannelAsB = {
   ...propsB,
   initialize: {
+    args: argsB,
     sharedData: emptySharedData,
   },
   receiveFromA: {
     state: channelUnknownB,
     sharedData: emptySharedData,
     action: receivePreFundSetupFromA,
-    commitment: signedCommitment1,
+    commitments: commitments1,
   },
   receiveFromHub: {
     state: commitmentSentB,
     sharedData: bSentPreFundCommitment,
     action: receivePreFundSetupFromHub,
+    commitments: commitments2,
   },
 };
 
 export const existingChannelAsB = {
   ...propsB,
   initialize: {
+    args: argsB,
     sharedData: bReceivedPreFundSetup,
   },
   receiveFromA: {
