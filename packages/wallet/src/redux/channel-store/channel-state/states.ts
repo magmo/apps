@@ -59,7 +59,7 @@ export function pushCommitment(
   signedCommitment: SignedCommitment,
 ): ChannelState {
   const commitments = [...state.commitments];
-  const numParticipants = commitments[0].commitment.channel.participants.length;
+  const numParticipants = state.participants.length;
   if (commitments.length === numParticipants) {
     // We've got a full round of commitments, and should therefore drop the first one
     commitments.shift();
