@@ -58,8 +58,8 @@ const secondConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([app52, app53], bsAddress, bsPrivateKey),
 ]);
 const secondConcludeReceivedWithLedgerChannelChannelState = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app52, app53, bsAddress, bsPrivateKey),
-  channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+  channelFromCommitments([app52, app53], bsAddress, bsPrivateKey),
+  channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
 ]);
 
 const firstConcludeReceived = setFundingState(firstConcludeReceivedChannelState, channelId, {

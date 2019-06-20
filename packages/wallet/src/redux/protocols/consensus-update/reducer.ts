@@ -3,7 +3,7 @@ import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
 import { ConsensusUpdateAction } from './actions';
 import * as helpers from '../reducer-helpers';
-import { theirAddress } from '../../channel-store';
+import { theirAddress, getLastCommitment } from '../../channel-store';
 import { proposeNewConsensus, acceptConsensus } from '../../../..';
 import { sendCommitmentReceived } from '../../../communication';
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = 'ConsensusUpdate';
@@ -110,5 +110,5 @@ function getLatestCommitment(sharedData: SharedData, channelId: string) {
     throw new Error(`Could not find channel for id ${channelId}`);
   }
 
-  return channel.lastCommitment.commitment;
+  return getLastCommitment(channel);
 }

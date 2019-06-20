@@ -53,34 +53,34 @@ const app3 = appCommitment({ turnNum: 3, balances: twoTwo });
 // -----------
 const initialPlayerALedgerSharedData = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
-    channelFromCommitments(app0, app1, asAddress, asPrivateKey),
+    channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
+    channelFromCommitments([app0, app1], asAddress, asPrivateKey),
   ]),
 );
 const playerAFirstCommitmentReceived = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
-    channelFromCommitments(app0, app1, asAddress, asPrivateKey),
+    channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
+    channelFromCommitments([app0, app1], asAddress, asPrivateKey),
   ]),
 );
 
 const playerAUpdateCommitmentsReceived = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger6, ledger7, asAddress, asPrivateKey),
-    channelFromCommitments(app1, app2, asAddress, asPrivateKey),
+    channelFromCommitments([ledger6, ledger7], asAddress, asPrivateKey),
+    channelFromCommitments([app1, app2], asAddress, asPrivateKey),
   ]),
 );
 
 const playerBFirstPostFundSetupReceived = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger6, ledger7, bsAddress, bsPrivateKey),
-    channelFromCommitments(app0, app1, bsAddress, bsPrivateKey),
+    channelFromCommitments([ledger6, ledger7], bsAddress, bsPrivateKey),
+    channelFromCommitments([app0, app1], bsAddress, bsPrivateKey),
   ]),
 );
 
 const initialPlayerBLedgerSharedData = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+    channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
   ]),
 );
 

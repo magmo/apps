@@ -5,7 +5,7 @@ import { ExistingChannelFundingAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import * as selectors from '../../selectors';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
-import { theirAddress } from '../../channel-store';
+import { theirAddress, getLastCommitment } from '../../channel-store';
 import { Commitment, nextSetupCommitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
 import { sendCommitmentReceived } from '../../../communication';
@@ -21,7 +21,7 @@ export const initialize = (
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
-  const theirCommitment = ledgerChannel.lastCommitment.commitment;
+  const theirCommitment = getLastCommitment(ledgerChannel);
   if (ledgerChannelNeedsTopUp(theirCommitment, proposedTotal)) {
     const amountRequiredFromEachParticipant = bigNumberify(proposedTotal)
       .div(theirCommitment.channel.participants.length)
@@ -126,7 +126,7 @@ const waitForLedgerTopUpReducer = (
   } else if (ledgerTopUpState.type === 'LedgerTopUp.Success') {
     const { ledgerId, proposedAmount, channelId, processId } = protocolState;
     const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
-    const theirCommitment = ledgerChannel.lastCommitment.commitment;
+    const theirCommitment = getLastCommitment(ledgerChannel);
     if (helpers.isFirstPlayer(ledgerId, sharedData)) {
       const { proposedAllocation, proposedDestination } = craftNewAllocationAndDestination(
         theirCommitment,
@@ -324,7 +324,7 @@ function craftAndSendAppPostFundCommitment(
     throw new Error(`Could not find application channel ${appChannelId}`);
   }
 
-  const theirAppCommitment = appChannel.lastCommitment.commitment;
+  const theirAppCommitment = getLastCommitment(appChannel);
 
   const ourAppCommitment = nextSetupCommitment(theirAppCommitment);
   if (ourAppCommitment === 'NotASetupCommitment') {

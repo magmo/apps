@@ -81,8 +81,8 @@ const emptySharedData = EMPTY_SHARED_DATA;
 const preSuccessSharedData = indirectFundingTests.preSuccessState.store;
 const successSharedData = indirectFundingTests.successState.store;
 const existingLedgerInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
-  channelFromCommitments(app0, app1, asAddress, asPrivateKey),
+  channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
+  channelFromCommitments([app0, app1], asAddress, asPrivateKey),
 ]);
 // -------
 // Actions

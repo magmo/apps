@@ -179,7 +179,7 @@ export function getOpponentAddress(channelState: ChannelState, playerIndex: TwoP
   return opponentAddress;
 }
 
-export function getOurAddress(channelState: ChannelState, playerIndex: PlayerIndex) {
+export function getOurAddress(channelState: ChannelState, playerIndex: TwoPartyPlayerIndex) {
   const { participants } = channelState;
   const ourAddress = participants[playerIndex];
   return ourAddress;

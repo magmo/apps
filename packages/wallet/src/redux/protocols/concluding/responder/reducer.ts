@@ -252,7 +252,7 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
   );
 
   if (protocolState.opponentSelectedKeepLedgerChannel) {
-    const latestCommitment = appChannel.lastCommitment.commitment;
+    const latestCommitment = getLastCommitment(appChannel);
     const {
       protocolState: consensusUpdateState,
       sharedData: newSharedData,
@@ -323,7 +323,7 @@ function keepLedgerChannelApproved(protocolState: CState, sharedData: Storage) {
       if (!appChannel) {
         throw new Error(`Could not find channel ${protocolState.channelId}`);
       }
-      const latestCommitment = appChannel.lastCommitment.commitment;
+      const latestCommitment = getLastCommitment(appChannel);
       const {
         protocolState: consensusUpdateState,
         sharedData: newSharedData,

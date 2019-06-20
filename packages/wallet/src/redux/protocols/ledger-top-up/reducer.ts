@@ -10,9 +10,9 @@ import * as states from './states';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import * as helpers from '../reducer-helpers';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain';
-import { PlayerIndex } from '../../types';
+import { TwoPartyPlayerIndex } from '../../types';
 import { bigNumberify } from 'ethers/utils';
-import { theirAddress } from '../../channel-store';
+import { theirAddress, getLastCommitment } from '../../channel-store';
 import { sendCommitmentReceived } from '../../../communication';
 import {
   initialize as initializeDirectFunding,
@@ -136,7 +136,7 @@ const waitForPreTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpStat
     safeToDepositLevel: isFirstPlayer ? '0x0' : lastCommitment.allocation[2],
     requiredDeposit: isFirstPlayer ? lastCommitment.allocation[2] : lastCommitment.allocation[3],
     totalFundingRequired: calculateTotalTopUp(lastCommitment.allocation),
-    ourIndex: isFirstPlayer ? PlayerIndex.A : PlayerIndex.B,
+    ourIndex: isFirstPlayer ? TwoPartyPlayerIndex.A : TwoPartyPlayerIndex.B,
     exchangePostFundSetups: false,
   });
   const { protocolState: directFundingState, sharedData: newSharedData } = initializeDirectFunding(
@@ -177,7 +177,7 @@ const waitForDirectFundingReducer: ProtocolReducer<states.LedgerTopUpState> = (
       throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
     }
     if (helpers.isFirstPlayer(protocolState.ledgerId, sharedData)) {
-      const theirCommitment = channel.lastCommitment.commitment;
+      const theirCommitment = getLastCommitment(channel);
       const { allocation: oldAllocation, destination: oldDestination } = theirCommitment;
       const newAllocation = [
         addHex(oldAllocation[0], oldAllocation[2]),
@@ -269,7 +269,7 @@ function getLatestCommitment(sharedData: SharedData, channelId: string) {
     throw new Error(`Could not find channel for id ${channelId}`);
   }
 
-  return channel.lastCommitment.commitment;
+  return getLastCommitment(channel);
 }
 function calculateTopUpAllocation(
   proposedAllocation: string[],

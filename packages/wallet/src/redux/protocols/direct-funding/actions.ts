@@ -1,6 +1,6 @@
 import * as actions from '../../actions';
 import { ActionConstructor } from '../../utils';
-import { PlayerIndex } from '../../types';
+import { TwoPartyPlayerIndex } from '../../types';
 import { DIRECT_FUNDING_PROTOCOL_LOCATOR } from './reducer';
 
 // -------
@@ -13,7 +13,7 @@ export interface DirectFundingRequested {
   totalFundingRequired: string;
   safeToDepositLevel: string;
   requiredDeposit: string;
-  ourIndex: PlayerIndex;
+  ourIndex: TwoPartyPlayerIndex;
   exchangePostFundSetups: boolean;
 }
 

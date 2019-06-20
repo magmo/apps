@@ -27,6 +27,7 @@ import {
 } from '../../existing-channel-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
 import { CommitmentType } from 'fmg-core';
+import { getLastCommitment } from '../../../channel-store';
 type EmbeddedAction = IndirectFundingAction;
 
 export function initialize(
@@ -187,7 +188,7 @@ function strategyApproved(
     );
     if (
       !existingLedgerChannel ||
-      existingLedgerChannel.lastCommitment.commitment.commitmentType !== CommitmentType.App
+      getLastCommitment(existingLedgerChannel).commitmentType !== CommitmentType.App
     ) {
       throw new Error(
         `Could not find open existing ledger channel with participants ${state.ourAddress} and ${
@@ -195,7 +196,7 @@ function strategyApproved(
         }.`,
       );
     }
-    const total = channelState.lastCommitment.commitment.allocation.reduce(addHex);
+    const total = getLastCommitment(channelState).allocation.reduce(addHex);
     const {
       protocolState: fundingState,
       sharedData: newSharedData,

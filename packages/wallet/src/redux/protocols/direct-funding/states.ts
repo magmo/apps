@@ -1,7 +1,7 @@
 import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
 import { Properties, StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
-import { PlayerIndex } from '../../types';
+import { TwoPartyPlayerIndex } from '../../types';
 
 // -------
 // States
@@ -26,7 +26,7 @@ export interface BaseDirectFundingState {
   totalFundingRequired: string;
   requiredDeposit: string;
   channelId: string;
-  ourIndex: PlayerIndex;
+  ourIndex: TwoPartyPlayerIndex;
   exchangePostFundSetups: boolean;
 }
 

@@ -40,13 +40,13 @@ const ledger7 = ledgerCommitment({
 // SharedData
 // ------
 const aInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+  channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
 ]);
 const aUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
+  channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
 ]);
 const bInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+  channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
 ]);
 
 const proposedAllocation = twoThreeOneTwo.map(b => b.wei);

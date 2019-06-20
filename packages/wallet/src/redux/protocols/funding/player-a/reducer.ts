@@ -27,6 +27,7 @@ import {
   isExistingChannelFundingAction,
 } from '../../existing-channel-funding/actions';
 import { CommitmentType } from 'fmg-core';
+import { getLastCommitment } from '../../../channel-store';
 
 type EmbeddedAction = IndirectFundingAction;
 
@@ -171,7 +172,7 @@ function strategyChosen(
   // TODO: We probably want to let the user select this
   if (
     existingLedgerChannel &&
-    existingLedgerChannel.lastCommitment.commitment.commitmentType === CommitmentType.App
+    getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.App
   ) {
     strategy = 'ExistingChannelStrategy';
   }
@@ -200,7 +201,7 @@ function strategyApproved(
     );
     if (
       !existingLedgerChannel ||
-      existingLedgerChannel.lastCommitment.commitment.commitmentType !== CommitmentType.App
+      getLastCommitment(existingLedgerChannel).commitmentType !== CommitmentType.App
     ) {
       throw new Error(
         `Could not find open existing ledger channel with participants ${state.ourAddress} and ${
@@ -208,7 +209,7 @@ function strategyApproved(
         }.`,
       );
     }
-    const total = channelState.lastCommitment.commitment.allocation.reduce(addHex);
+    const total = getLastCommitment(channelState).allocation.reduce(addHex);
     const {
       protocolState: fundingState,
       sharedData: newSharedData,

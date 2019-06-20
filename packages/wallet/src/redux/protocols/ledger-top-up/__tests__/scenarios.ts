@@ -77,31 +77,31 @@ const waitForDirectFundingForPlayerB = states.waitForDirectFunding({
 // Shared Data
 // ------
 const aInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger4, ledger5, asAddress, asPrivateKey),
+  channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
 ]);
 
 const aPreTopUpUpdate0ReceivedSharedData = {
   ...setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger5, ledger6, asAddress, asPrivateKey),
+    channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
   ]),
 };
 
 const aPreTopUpUpdate1ReceivedSharedData = {
   ...setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger6, ledger7, asAddress, asPrivateKey),
+    channelFromCommitments([ledger6, ledger7], asAddress, asPrivateKey),
   ]),
 };
 
 const aPostTopUpUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger7, ledger8, asAddress, asPrivateKey),
+  channelFromCommitments([ledger7, ledger8], asAddress, asPrivateKey),
 ]);
 
 const bInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(ledger4, ledger5, bsAddress, bsPrivateKey),
+  channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
 ]);
 const bPreTopUpUpdate1ReceivedSharedData = {
   ...setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(ledger6, ledger7, asAddress, asPrivateKey),
+    channelFromCommitments([ledger6, ledger7], asAddress, asPrivateKey),
   ]),
 };
 // ------

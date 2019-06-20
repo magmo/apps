@@ -18,7 +18,7 @@ import {
   checkAndStore,
 } from '../../../state';
 import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
-import { ourTurn } from '../../../channel-store';
+import { ourTurn, getLastCommitment } from '../../../channel-store';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
 import { initialize as initializeDefunding, defundingReducer } from '../../defunding/reducer';
 import { isSuccess, isFailure } from '../../defunding/states';
@@ -131,7 +131,7 @@ function keepLedgerChannelApproved(protocolState: CState, sharedData: Storage) {
       if (!appChannel) {
         throw new Error(`Could not find channel ${protocolState.channelId}`);
       }
-      const latestCommitment = appChannel.lastCommitment.commitment;
+      const latestCommitment = getLastCommitment(appChannel);
       const {
         protocolState: consensusUpdateState,
         sharedData: newSharedData,
@@ -285,7 +285,7 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
   if (protocolState.opponentSelectedKeepLedgerChannel) {
     const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
 
-    const latestCommitment = appChannel.lastCommitment.commitment;
+    const latestCommitment = getLastCommitment(appChannel);
     const {
       protocolState: consensusUpdateState,
       sharedData: newSharedData,
