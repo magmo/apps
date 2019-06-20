@@ -14,6 +14,7 @@ import { TransactionSubmissionState } from './transaction-submission';
 import { ExistingChannelFundingState } from './existing-channel-funding/states';
 import { LedgerTopUpState } from './ledger-top-up/states';
 import { ConsensusUpdateState } from './consensus-update/states';
+import { AdvanceChannelState } from './advance-channel';
 
 export type ProtocolState =
   | ApplicationState
@@ -29,7 +30,9 @@ export type ProtocolState =
   | TransactionSubmissionState
   | ExistingChannelFundingState
   | LedgerTopUpState
-  | ConsensusUpdateState;
+  | ConsensusUpdateState
+  | TransactionSubmissionState
+  | AdvanceChannelState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
   protocolState: T,

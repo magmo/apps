@@ -8,6 +8,7 @@ import {
   concludeInstigated,
   ConcludeInstigated,
   keepLedgerChannelApproved,
+  commitmentsReceived,
 } from './actions';
 export * from './actions';
 
@@ -52,6 +53,15 @@ export const sendCommitmentReceived = (
     signedCommitment: { commitment, signature },
     protocolLocator,
   });
+  return messageRelayRequested(to, payload);
+};
+
+export const sendCommitmentsReceived = (
+  to: string,
+  processId: string,
+  signedCommitments: SignedCommitment[],
+) => {
+  const payload = commitmentsReceived({ processId, signedCommitments });
   return messageRelayRequested(to, payload);
 };
 

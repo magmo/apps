@@ -67,14 +67,14 @@ const waitForOpponentResponse = states.instigatorWaitForOpponentSelection(defaul
 // Shared Data
 // -------
 const initialStore = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app50, app51, asAddress, asPrivateKey),
+  channelFromCommitments([app50, app51], asAddress, asPrivateKey),
 ]);
 
 const firstConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app51, app52, asAddress, asPrivateKey),
+  channelFromCommitments([app51, app52], asAddress, asPrivateKey),
 ]);
 const secondConcludeReceivedChannelState = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(app52, app53, asAddress, asPrivateKey),
+  channelFromCommitments([app52, app53], asAddress, asPrivateKey),
 ]);
 const secondConcludeReceivedWithLedgerChannelChannelState = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(app52, app53, asAddress, asPrivateKey),

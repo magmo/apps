@@ -4,7 +4,7 @@ import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import * as states from './states';
 import { initialize as initializeA, fundingReducer as playerAReducer } from './player-a/reducer';
 import { initialize as initializeB, fundingReducer as playerBReducer } from './player-b/reducer';
-import { PlayerIndex } from '../../types';
+import { TwoPartyPlayerIndex } from '../../types';
 import { unreachable } from '../../../utils/reducer-utils';
 import { IndirectFundingAction } from '../indirect-funding/actions';
 import * as playerAStates from './player-a/states';
@@ -15,15 +15,15 @@ export function initialize(
   sharedData: SharedData,
   channelId: string,
   processId: string,
-  playerIndex: PlayerIndex,
+  playerIndex: TwoPartyPlayerIndex,
 ): ProtocolStateWithSharedData<states.FundingState> {
   const channelState = selectors.getChannelState(sharedData, channelId);
   const opponentAddress = getOpponentAddress(channelState, playerIndex);
   const ourAddress = getOurAddress(channelState, playerIndex);
   switch (playerIndex) {
-    case PlayerIndex.A:
+    case TwoPartyPlayerIndex.A:
       return initializeA(sharedData, processId, channelId, ourAddress, opponentAddress);
-    case PlayerIndex.B:
+    case TwoPartyPlayerIndex.B:
       return initializeB(sharedData, processId, channelId, ourAddress, opponentAddress);
     default:
       return unreachable(playerIndex);

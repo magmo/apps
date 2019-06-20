@@ -1,6 +1,6 @@
 import * as states from '../states';
 import * as actions from '../actions';
-import { PlayerIndex } from '../../../../types';
+import { TwoPartyPlayerIndex } from '../../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 import { FundingStrategy } from '../../../../../communication';
@@ -101,8 +101,8 @@ const existingStrategyApproved = actions.strategyApproved({
 const successConfirmed = actions.fundingSuccessAcknowledged({ processId });
 const fundingSuccess = indirectFundingTests.successTrigger;
 const strategyRejected = actions.strategyRejected({ processId });
-const cancelledByB = actions.cancelled({ processId, by: PlayerIndex.B });
-const cancelledByA = actions.cancelled({ processId, by: PlayerIndex.A });
+const cancelledByB = actions.cancelled({ processId, by: TwoPartyPlayerIndex.B });
+const cancelledByA = actions.cancelled({ processId, by: TwoPartyPlayerIndex.A });
 
 // ---------
 // Scenarios

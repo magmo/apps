@@ -6,7 +6,7 @@ import * as actions from '../../actions';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import * as selectors from '../../selectors';
 import { SharedData, setChannelStore, queueMessage, checkAndStore } from '../../state';
-import { PlayerIndex } from '../../types';
+import { TwoPartyPlayerIndex } from '../../types';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
@@ -14,7 +14,7 @@ import {
 } from '../transaction-submission/reducer';
 import { isTerminal, isSuccess } from '../transaction-submission/states';
 import * as states from './states';
-import { theirAddress } from '../../channel-store';
+import { theirAddress, getLastCommitment } from '../../channel-store';
 import * as channelStoreReducer from '../../channel-store/reducer';
 import { sendCommitmentReceived } from '../../../communication';
 import { DirectFundingRequested } from './actions';
@@ -144,7 +144,7 @@ const fundingReceiveEventReducer: DFReducer = (
     };
   }
   // If we are player A, the channel is now funded, so we should send the PostFundSetup
-  if (protocolState.ourIndex === PlayerIndex.A) {
+  if (protocolState.ourIndex === TwoPartyPlayerIndex.A) {
     const sharedDataWithOwnCommitment = createAndSendPostFundCommitment(
       sharedData,
       protocolState.processId,
@@ -190,7 +190,7 @@ const commitmentReceivedReducer: DFReducer = (
   sharedData: SharedData,
   action: actions.CommitmentReceived,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
-  if (protocolState.ourIndex === PlayerIndex.A) {
+  if (protocolState.ourIndex === TwoPartyPlayerIndex.A) {
     if (
       protocolState.type === 'DirectFunding.WaitForFundingAndPostFundSetup' &&
       protocolState.channelFunded
@@ -356,7 +356,7 @@ const createAndSendPostFundCommitment = (
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
 
   const commitment = composePostFundCommitment(
-    channelState.lastCommitment.commitment,
+    getLastCommitment(channelState),
     channelState.ourIndex,
   );
 
