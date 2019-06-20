@@ -148,6 +148,10 @@ export function checkAndStore(
     return { isSuccess: false };
   }
 
+  if (commitment.turnNum <= channel.turnNum) {
+    return { isSuccess: true, store };
+  }
+
   if (!isSafeTransition(store, channel, commitment)) {
     console.log('Failed to verify a safe transition');
     return { isSuccess: false };
