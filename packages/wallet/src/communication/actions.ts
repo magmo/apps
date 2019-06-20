@@ -59,6 +59,7 @@ export const concludeInstigated: ActionConstructor<ConcludeInstigated> = p => ({
 export interface CommitmentReceived extends BaseProcessAction {
   type: 'WALLET.COMMON.COMMITMENT_RECEIVED';
   signedCommitment: SignedCommitment;
+  protocolLocator?: string;
 }
 
 // -------

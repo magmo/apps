@@ -20,7 +20,7 @@ import { sendCommitmentReceived } from '../../../communication';
 import { DirectFundingRequested } from './actions';
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
-
+export const DIRECT_FUNDING_PROTOCOL_LOCATOR = 'DirectFunding';
 export function initialize(
   action: DirectFundingRequested,
   sharedData: SharedData,
@@ -368,6 +368,7 @@ const createAndSendPostFundCommitment = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      DIRECT_FUNDING_PROTOCOL_LOCATOR,
     );
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {

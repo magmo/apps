@@ -22,7 +22,7 @@ import { LedgerTopUpAction } from './actions';
 import { directFundingRequested } from '../direct-funding/actions';
 import { isTerminal, isFailure, isSuccess } from '../direct-funding/states';
 import { addHex } from '../../../..';
-
+export const LEDGER_TOP_UP_PROTOCOL_LOCATOR = 'LedgerTopUp';
 export function initialize(
   processId: string,
   channelId: string,
@@ -59,6 +59,7 @@ export function initialize(
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      LEDGER_TOP_UP_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
@@ -122,6 +123,7 @@ const waitForPreTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpStat
       protocolState.processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      LEDGER_TOP_UP_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
@@ -194,6 +196,7 @@ const waitForDirectFundingReducer: ProtocolReducer<states.LedgerTopUpState> = (
         protocolState.processId,
         signResult.signedCommitment.commitment,
         signResult.signedCommitment.signature,
+        LEDGER_TOP_UP_PROTOCOL_LOCATOR,
       );
       sharedData = queueMessage(sharedData, messageRelay);
     }
@@ -239,6 +242,7 @@ const waitForPostTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpSta
       protocolState.processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      LEDGER_TOP_UP_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }

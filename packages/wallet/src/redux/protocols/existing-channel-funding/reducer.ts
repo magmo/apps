@@ -12,7 +12,7 @@ import { sendCommitmentReceived } from '../../../communication';
 import { CommitmentType } from 'fmg-core';
 import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
-
+export const EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR = 'ExistingChannelFunding';
 export const initialize = (
   processId: string,
   channelId: string,
@@ -72,6 +72,7 @@ export const initialize = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
@@ -151,6 +152,7 @@ const waitForLedgerTopUpReducer = (
         processId,
         signResult.signedCommitment.commitment,
         signResult.signedCommitment.signature,
+        EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
       );
       sharedData = queueMessage(sharedData, messageRelay);
     }
@@ -263,6 +265,7 @@ const waitForLedgerUpdateReducer = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
     );
     newSharedData = queueMessage(newSharedData, messageRelay);
   }
@@ -339,6 +342,7 @@ function craftAndSendAppPostFundCommitment(
     processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
+    EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
   );
   newSharedData = queueMessage(newSharedData, messageRelay);
   return newSharedData;

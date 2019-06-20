@@ -1,6 +1,7 @@
 import * as actions from '../../actions';
 import { ActionConstructor } from '../../utils';
 import { PlayerIndex } from '../../types';
+import { DIRECT_FUNDING_PROTOCOL_LOCATOR } from './reducer';
 
 // -------
 // Actions
@@ -37,7 +38,8 @@ export function isDirectFundingAction(action: actions.WalletAction): action is D
   return (
     action.type === 'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT' ||
     action.type === 'WALLET.DIRECT_FUNDING.DIRECT_FUNDING_REQUESTED' ||
-    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
+    (action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' &&
+      action.protocolLocator === DIRECT_FUNDING_PROTOCOL_LOCATOR) ||
     actions.isTransactionAction(action)
   );
 }
