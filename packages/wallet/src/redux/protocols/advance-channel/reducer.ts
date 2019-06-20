@@ -6,9 +6,11 @@ import {
   setChannel,
   checkAndStore,
   signAndInitialize,
+  checkAndInitialize,
+  signAndStore,
 } from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
-import { CommitmentType, Commitment, getChannelId } from '../../../domain';
+import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../domain';
 import {
   getChannel,
   nextParticipant,
@@ -163,10 +165,52 @@ const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelSta
   sharedData,
   action: CommitmentsReceived,
 ) => {
-  const { ourIndex } = protocolState;
+  const { ourIndex, privateKey } = protocolState;
   const channelId = getChannelId(action.signedCommitments[0].commitment);
 
+  const checkResult = checkAndInitialize(sharedData, action.signedCommitments[0], privateKey);
+  if (!checkResult.isSuccess) {
+    throw new Error('Could not initialize channel');
+  }
+  sharedData = checkResult.store;
+  sharedData = checkCommitments(sharedData, action.signedCommitments.slice(1));
+  let channel = getChannel(sharedData.channelStore, channelId);
+  if (!channel) {
+    throw new Error('Channel not stored');
+  }
+
   if (isSafeToSend({ sharedData, ourIndex, channelId })) {
+    // First, update the store with our response
+    const theirCommitment = getLastCommitment(channel);
+    const ourCommitment = nextSetupCommitment(theirCommitment);
+    if (ourCommitment === 'NotASetupCommitment') {
+      throw new Error('Not a Setup commitment');
+    }
+
+    const signResult = signAndStore(sharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      throw new Error('Could not sign result');
+    }
+    sharedData = signResult.store;
+
+    // Then, register to monitor the channel
+    sharedData = registerChannelToMonitor(sharedData, protocolState.processId, channelId);
+
+    // Finally, send the commitments to the next participant
+    channel = getChannel(sharedData.channelStore, channelId);
+    if (!channel) {
+      throw new Error('Channel not stored');
+    }
+
+    const { participants } = channel;
+    const messageRelay = sendCommitmentsReceived(
+      nextParticipant(participants, ourIndex),
+      protocolState.processId,
+      channel.commitments,
+    );
+
+    sharedData = queueMessage(sharedData, messageRelay);
+
     return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
   } else {
     return { protocolState, sharedData };
