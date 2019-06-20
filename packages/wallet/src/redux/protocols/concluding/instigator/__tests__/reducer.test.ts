@@ -9,6 +9,7 @@ import {
   itSendsThisMessage,
   itSendsThisDisplayEventType,
   describeScenarioStep,
+  expectThisMessage,
 } from '../../../../__tests__/helpers';
 import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
 
@@ -86,6 +87,12 @@ describe('[ No Defunding Happy path ]', () => {
 
   describeScenarioStep(scenario.acknowledgeConcludeReceived, () => {
     const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
+    const result = instigatorConcludingReducer(state, sharedData, action);
+    expectThisMessage(result.sharedData, 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED');
+    itTransitionsTo(result, 'ConcludingResponder.WaitForOpponentSelection');
+  });
+  describeScenarioStep(scenario.waitForOpponentResponse, () => {
+    const { state, action, sharedData } = scenario.waitForOpponentResponse;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingInstigator.WaitForLedgerUpdate');

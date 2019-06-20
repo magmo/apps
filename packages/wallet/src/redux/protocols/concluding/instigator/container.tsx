@@ -10,6 +10,7 @@ import { Defunding } from '../../defunding/container';
 import * as actions from './actions';
 import Acknowledge from '../../shared-components/acknowledge';
 import { ConsensusUpdate } from '../../consensus-update/container';
+import WaitForOpponentDecision from './components/wait-for-opponent-decision';
 
 interface Props {
   state: NonTerminalConcludingState;
@@ -61,6 +62,8 @@ class ConcludingContainer extends PureComponent<Props> {
         );
       case 'ConcludingInstigator.WaitForLedgerUpdate':
         return <ConsensusUpdate state={state.consensusUpdateState} />;
+      case 'ConcludingResponder.WaitForOpponentSelection':
+        return <WaitForOpponentDecision />;
       default:
         return unreachable(state);
     }

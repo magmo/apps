@@ -1,6 +1,7 @@
 import { WalletAction, CommitmentReceived, isCommonAction } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
 import { DefundingAction, isDefundingAction } from '../../defunding/actions';
+import { KeepLedgerChannelApproved } from '../../../../communication';
 
 // -------
 // Actions
@@ -69,7 +70,8 @@ export type ConcludingInstigatorAction =
   | DefundChosen
   | KeepOpenChosen
   | Acknowledged
-  | CommitmentReceived;
+  | CommitmentReceived
+  | KeepLedgerChannelApproved;
 
 export const isConcludingInstigatorAction = (
   action: WalletAction,
@@ -77,6 +79,7 @@ export const isConcludingInstigatorAction = (
   return (
     isDefundingAction(action) ||
     isCommonAction(action) ||
+    action.type === 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.DEFUND_CHOSEN' ||

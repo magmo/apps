@@ -14,6 +14,7 @@ import {
 import { bigNumberify } from 'ethers/utils';
 import { commitmentReceived } from '../../../../actions';
 import { preSuccessA } from '../../../consensus-update/__tests__';
+import { keepLedgerChannelApproved } from '../../../../../communication';
 
 // -----------------
 // Channel Scenarios
@@ -53,11 +54,15 @@ const waitForDefundPreFailure = states.instigatorWaitForDefund({
 
 const acknowledgeSuccess = states.instigatorAcknowledgeSuccess(defaults);
 const waitforOpponentConclude = states.instigatorWaitForOpponentConclude(defaults);
-const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived(defaults);
+const acknowledgeConcludeReceived = states.instigatorAcknowledgeConcludeReceived({
+  ...defaults,
+  opponentSelectedKeepLedgerChannel: false,
+});
 const waitForLedgerUpdate = states.instigatorWaitForLedgerUpdate({
   ...defaults,
   consensusUpdateState: preSuccessA.state,
 });
+const waitForOpponentResponse = states.waitForOpponentSelection(defaults);
 // -------
 // Shared Data
 // -------
@@ -99,6 +104,7 @@ const commitmentReceivedAction = commitmentReceived({ processId, signedCommitmen
 const defundChosen = actions.defundChosen({ processId });
 const keepOpenChosen = actions.keepOpenChosen({ processId });
 const cancelled = actions.cancelled({ processId });
+const opponentSelectedKeepOpen = keepLedgerChannelApproved({ processId });
 
 // -------
 // Scenarios
@@ -152,6 +158,11 @@ export const noDefundingHappyPath = {
     state: acknowledgeConcludeReceived,
     sharedData: indirectFundedSecondConcludeReceived,
     action: keepOpenChosen,
+  },
+  waitForOpponentResponse: {
+    state: waitForOpponentResponse,
+    sharedData: indirectFundedSecondConcludeReceived,
+    action: opponentSelectedKeepOpen,
   },
   waitForLedgerUpdate: {
     state: waitForLedgerUpdate,

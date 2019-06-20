@@ -39,6 +39,7 @@ export interface AcknowledgeConcludeReceived {
   type: 'ConcludingInstigator.AcknowledgeConcludeReceived';
   processId: string;
   channelId: string;
+  opponentSelectedKeepLedgerChannel: boolean;
 }
 
 export interface WaitForDefund {
@@ -54,7 +55,11 @@ export interface WaitForLedgerUpdate {
   channelId: string;
   consensusUpdateState: ConsensusUpdateState;
 }
-
+export interface WaitForOpponentSelection {
+  type: 'ConcludingResponder.WaitForOpponentSelection';
+  processId: string;
+  channelId: string;
+}
 // ------------
 // Constructors
 // ------------
@@ -89,6 +94,10 @@ export const instigatorWaitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate
   return { ...p, type: 'ConcludingInstigator.WaitForLedgerUpdate' };
 };
 
+export const instigatorWaitForOpponentSelection: StateConstructor<WaitForOpponentSelection> = p => {
+  return { ...p, type: 'ConcludingResponder.WaitForOpponentSelection' };
+};
+
 // -------
 // Unions and Guards
 // -------
@@ -99,7 +108,8 @@ export type InstigatorNonTerminalState =
   | AcknowledgeFailure
   | AcknowledgeSuccess
   | WaitForDefund
-  | WaitForLedgerUpdate;
+  | WaitForLedgerUpdate
+  | WaitForOpponentSelection;
 
 export type InstigatorPreTerminalState = AcknowledgeSuccess | AcknowledgeFailure;
 
@@ -113,6 +123,7 @@ export function isConcludingInstigatorState(
     state.type === 'ConcludingInstigator.WaitForOpponentConclude' ||
     state.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' ||
     state.type === 'ConcludingInstigator.WaitForDefund' ||
-    state.type === 'ConcludingInstigator.WaitForLedgerUpdate'
+    state.type === 'ConcludingInstigator.WaitForLedgerUpdate' ||
+    state.type === 'ConcludingResponder.WaitForOpponentSelection'
   );
 }
