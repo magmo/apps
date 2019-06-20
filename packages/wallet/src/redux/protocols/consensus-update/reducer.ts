@@ -6,7 +6,7 @@ import * as helpers from '../reducer-helpers';
 import { theirAddress } from '../../channel-store';
 import { proposeNewConsensus, acceptConsensus } from '../../../..';
 import { sendCommitmentReceived } from '../../../communication';
-
+export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = 'ConsensusUpdate';
 export const initialize = (
   processId: string,
   channelId: string,
@@ -33,6 +33,7 @@ export const initialize = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
@@ -88,6 +89,7 @@ export const consensusUpdateReducer = (
       protocolState.processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
+      CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
