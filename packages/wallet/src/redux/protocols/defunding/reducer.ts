@@ -131,7 +131,7 @@ const waitForWithdrawalReducer = (
   if (newWithdrawalState.type === 'Withdrawing.Success') {
     return {
       protocolState: states.success({}),
-      sharedData: newSharedData,
+      sharedData: helpers.hideWallet(newSharedData),
     };
   } else if (newWithdrawalState.type === 'Withdrawing.Failure') {
     return {
