@@ -2,7 +2,6 @@ import * as states from '../states';
 import { ThreePartyPlayerIndex } from '../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
-import { channelId } from '../../../../domain/commitments/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { commitmentsReceived } from '../../../../communication';
@@ -22,6 +21,7 @@ const {
   threeParticipants,
   oneTwoThree,
   ledgerLibraryAddress,
+  jointLedgerId: channelId,
 } = scenarios;
 const {
   signedCommitment0,
