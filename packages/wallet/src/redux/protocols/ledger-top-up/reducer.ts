@@ -21,7 +21,7 @@ import {
 import { LedgerTopUpAction } from './actions';
 import { directFundingRequested } from '../direct-funding/actions';
 import { isTerminal, isFailure, isSuccess } from '../direct-funding/states';
-import { addHex } from '../../../..';
+import { addHex } from '../../../utils/hex-utils';
 export const LEDGER_TOP_UP_PROTOCOL_LOCATOR = 'LedgerTopUp';
 export function initialize(
   processId: string,
