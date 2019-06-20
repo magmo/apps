@@ -216,7 +216,12 @@ function initializeNewProtocol(
         state.privateKey,
       );
     case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
-      return defundingProtocol.initialize(processId, action.channelId, incomingSharedData);
+      return defundingProtocol.initialize(
+        processId,
+        action.channelId,
+        incomingSharedData,
+        action.action,
+      );
     default:
       return unreachable(action);
   }
