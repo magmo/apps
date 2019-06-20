@@ -6,6 +6,7 @@ import {
   expectTheseCommitmentsSent,
   itStoresThisCommitment,
   itRegistersThisChannel,
+  itSendsNoMessage,
 } from '../../../__tests__/helpers';
 
 const itTransitionsTo = (
@@ -23,22 +24,35 @@ describe('sending preFundSetup as A', () => {
 
   describe.only('when initializing', () => {
     const { sharedData, commitments, args } = scenario.initialize;
-    const result = initialize(processId, sharedData, CommitmentType.PreFundSetup, args);
-    itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
+    const { protocolState, sharedData: result } = initialize(
+      processId,
+      sharedData,
+      CommitmentType.PreFundSetup,
+      args,
+    );
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
     expectTheseCommitmentsSent(result, commitments);
-    itStoresThisCommitment(result.sharedData, commitments[0]);
-    itRegistersThisChannel(result.sharedData, channelId, processId);
+    itStoresThisCommitment(result, commitments[0]);
+    itRegistersThisChannel(result, channelId, processId);
   });
 
   describe('when receiving prefund commitments from b', () => {
-    const { sharedData, args } = scenario.receiveFromB;
-    const result = initialize(processId, sharedData, CommitmentType.PreFundSetup, args);
-    itTransitionsTo(result.protocolState, 'AdvanceChannel.CommitmentSent');
+    const { commitments } = scenario.receiveFromB;
+    const { state, sharedData, action } = scenario.receiveFromHub;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
+    itSendsNoMessage(result);
+    itStoresThisCommitment(result, commitments[1]);
   });
 
   describe('when receiving prefund commitments from the hub', () => {
+    const { commitments } = scenario.receiveFromB;
     const { state, sharedData, action } = scenario.receiveFromHub;
-    const result = reducer(state, sharedData, action).protocolState;
-    itTransitionsTo(result, 'AdvanceChannel.Success');
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.Success');
+    itStoresThisCommitment(result, commitments[2]);
   });
 });

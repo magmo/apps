@@ -153,11 +153,13 @@ export const newChannelAsA = {
     state: commitmentSentA,
     sharedData: aSentPreFundCommitment,
     action: receivePreFundSetupFromB,
+    commitments: commitments1,
   },
   receiveFromHub: {
     state: commitmentSentA,
     sharedData: aSentPreFundCommitment,
     action: receivePreFundSetupFromHub,
+    commitments: commitments2,
   },
 };
 
