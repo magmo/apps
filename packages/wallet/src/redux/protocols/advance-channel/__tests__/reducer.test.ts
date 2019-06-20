@@ -22,7 +22,7 @@ describe('sending preFundSetup as A', () => {
   const scenario = scenarios.newChannelAsA;
   const { processId, channelId } = scenario;
 
-  describe.only('when initializing', () => {
+  describe('when initializing', () => {
     const { sharedData, commitments, args } = scenario.initialize;
     const { protocolState, sharedData: result } = initialize(
       processId,
@@ -38,18 +38,17 @@ describe('sending preFundSetup as A', () => {
   });
 
   describe('when receiving prefund commitments from b', () => {
-    const { commitments } = scenario.receiveFromB;
-    const { state, sharedData, action } = scenario.receiveFromHub;
+    const { commitments, state, sharedData, action } = scenario.receiveFromB;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
     itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
     itSendsNoMessage(result);
-    itStoresThisCommitment(result, commitments[1]);
+    itStoresThisCommitment(result, commitments[0]);
   });
 
   describe('when receiving prefund commitments from the hub', () => {
-    const { commitments } = scenario.receiveFromB;
-    const { state, sharedData, action } = scenario.receiveFromHub;
+    const { state, sharedData, action, commitments } = scenario.receiveFromHub;
+
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
     itTransitionsTo(protocolState, 'AdvanceChannel.Success');

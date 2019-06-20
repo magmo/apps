@@ -1,12 +1,22 @@
 import * as states from './states';
-import { SharedData, queueMessage, registerChannelToMonitor } from '../../state';
+import { SharedData, queueMessage, registerChannelToMonitor, setChannel } from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import { CommitmentType, Commitment, getChannelId } from '../../../domain';
-import { getChannel, signAndInitialize, nextParticipant } from '../../channel-store';
+import {
+  getChannel,
+  signAndInitialize,
+  nextParticipant,
+  getLastCommitment,
+  validTransitions,
+  ChannelState,
+  Commitments,
+} from '../../channel-store';
 import { WalletAction } from '../../actions';
 import * as selectors from '../../selectors';
-import { sendCommitmentsReceived } from '../../../communication';
+import { sendCommitmentsReceived, CommitmentsReceived } from '../../../communication';
 import { Channel } from 'fmg-core';
+import { isAdvanceChannelAction } from './actions';
+import { unreachable } from '../../../utils/reducer-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
@@ -36,11 +46,25 @@ export function initialize(
 }
 
 export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
-  protocolState: states.AdvanceChannelState,
+  protocolState: states.NonTerminalAdvanceChannelState,
   sharedData: SharedData,
   action: WalletAction,
 ) => {
-  throw new Error('Unimplemented');
+  if (!isAdvanceChannelAction(action)) {
+    console.error('Invalid action: expected WALLET.ADVANCE_CHANNEL.COMMITMENTS_RECEIVED');
+    return { protocolState, sharedData };
+  }
+
+  switch (protocolState.type) {
+    case 'AdvanceChannel.NotSafeToSend': {
+      return notSafeToSendReducer(protocolState, sharedData, action);
+    }
+    case 'AdvanceChannel.CommitmentSent': {
+      return commitmentSentReducer(protocolState, sharedData, action);
+    }
+    default:
+      return unreachable(protocolState);
+  }
 };
 
 interface NewChannelArgs {
@@ -69,7 +93,7 @@ function initializeWithNewChannel(
   sharedData: Storage,
   initializeChannelArgs: NewChannelArgs,
 ) {
-  if (isSafeToSend(sharedData, CommitmentType.PreFundSetup, initializeChannelArgs)) {
+  if (isSafeToSend(sharedData)) {
     const { channelType, destination, appAttributes, allocation, ourIndex } = initializeChannelArgs;
 
     // Initialize the channel in the store
@@ -132,10 +156,48 @@ function initializeWithExistingChannel(channel, processId, sharedData) {
   return { protocolState: states.notSafeToSend({ processId, channelId, ourIndex }), sharedData };
 }
 
-function isSafeToSend(
-  sharedData: SharedData,
-  commitmentType: CommitmentType,
-  initializeChannelArgs: NewChannelArgs,
-): boolean {
+const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
+  protocolState,
+  sharedData,
+  action,
+) => {
+  if (isSafeToSend(sharedData)) {
+    return { protocolState, sharedData };
+  } else {
+    return { protocolState, sharedData };
+  }
+};
+
+const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
+  protocolState,
+  sharedData,
+  action: CommitmentsReceived,
+) => {
+  const { channelId } = protocolState;
+  const channel = getChannel(sharedData.channelStore, channelId);
+  if (!channel) {
+    return { protocolState, sharedData };
+  }
+
+  const { signedCommitments } = action;
+
+  if (advancesChannel(channel, signedCommitments)) {
+    sharedData = setChannel(sharedData, { ...channel, commitments: signedCommitments });
+    return { protocolState: states.success(protocolState), sharedData };
+  }
+
+  return { protocolState, sharedData };
+};
+
+function isSafeToSend(sharedData: SharedData): boolean {
   return true;
+}
+
+function advancesChannel(channel: ChannelState, newCommitments: Commitments): boolean {
+  const lastCommitment = getLastCommitment(channel);
+  return (
+    newCommitments[0].commitment === lastCommitment &&
+    validTransitions(newCommitments) &&
+    newCommitments.length === lastCommitment.channel.participants.length
+  );
 }
