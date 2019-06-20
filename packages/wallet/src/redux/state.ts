@@ -217,7 +217,7 @@ export function signAndInitialize(
   address: string,
   privateKey: string,
 ): SignResult {
-  const result = signAndInitializeChannelStore(state.channelStore, commitment, address, privateKey);
+  const result = signAndInitializeChannelStore(state.channelStore, commitment, privateKey);
   if (result.isSuccess) {
     return { ...result, store: setChannelStore(state, result.store) };
   } else {
@@ -228,15 +228,9 @@ export function signAndInitialize(
 export function checkAndInitialize(
   state: SharedData,
   signedCommitment: SignedCommitment,
-  address: string,
   privateKey: string,
 ): CheckResult {
-  const result = checkAndInitializeChannelStore(
-    state.channelStore,
-    signedCommitment,
-    address,
-    privateKey,
-  );
+  const result = checkAndInitializeChannelStore(state.channelStore, signedCommitment, privateKey);
   if (result.isSuccess) {
     return { ...result, store: setChannelStore(state, result.store) };
   } else {

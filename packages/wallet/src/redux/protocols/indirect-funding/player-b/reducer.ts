@@ -90,7 +90,6 @@ function handleWaitForPreFundSetup(
   const checkResult = checkAndInitialize(
     sharedData,
     action.signedCommitment,
-    addressAndPrivateKey.address,
     addressAndPrivateKey.privateKey,
   );
   if (!checkResult.isSuccess) {

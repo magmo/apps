@@ -60,7 +60,6 @@ type SignResult = SignSuccess | SignFailure;
 export function signAndInitialize(
   store: ChannelStore,
   commitment: Commitment,
-  address: string,
   privateKey: string,
 ): SignResult {
   const signedCommitment = signCommitment2(commitment, privateKey);
@@ -70,7 +69,7 @@ export function signAndInitialize(
   if (signedCommitment.commitment.turnNum !== 0) {
     return { isSuccess: false, reason: 'ChannelDoesntExist' };
   }
-  const channel = initializeChannel(signedCommitment, address, privateKey);
+  const channel = initializeChannel(signedCommitment, privateKey);
   store = setChannel(store, channel);
 
   return { isSuccess: true, signedCommitment, store };
@@ -79,7 +78,6 @@ export function signAndInitialize(
 export function checkAndInitialize(
   store: ChannelStore,
   signedCommitment: SignedCommitment,
-  address: string,
   privateKey: string,
 ): CheckResult {
   if (signedCommitment.commitment.turnNum !== 0) {
@@ -88,7 +86,7 @@ export function checkAndInitialize(
   if (!hasValidSignature(signedCommitment)) {
     return { isSuccess: false };
   }
-  const channel = initializeChannel(signedCommitment, address, privateKey);
+  const channel = initializeChannel(signedCommitment, privateKey);
   store = setChannel(store, channel);
 
   return { isSuccess: true, store };
