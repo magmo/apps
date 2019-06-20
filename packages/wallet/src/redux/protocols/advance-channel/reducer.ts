@@ -284,6 +284,9 @@ function isSafeToSend({
 
 function channelAdvanced(channel: ChannelState, commitmentType: CommitmentType): boolean {
   const lastCommitment = getLastCommitment(channel);
+  // TODO: This is wrong:
+  // B might only notice that the PostFundSetup round is advanced when it receives an
+  // App commitment from A, but that App commitment would have commitmentCount == 0
   return (
     lastCommitment.commitmentType >= commitmentType &&
     lastCommitment.commitmentCount === channel.participants.length - 1
