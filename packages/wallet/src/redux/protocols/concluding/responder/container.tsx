@@ -52,6 +52,8 @@ class ConcludingContainer extends PureComponent<Props> {
         return <ApproveConcluding approve={() => approve({ processId })} />;
       case 'ConcludingResponder.WaitForLedgerUpdate':
         return <ConsensusUpdate state={state.consensusUpdateState} />;
+      case 'ConcludingResponder.WaitForOpponentSelection':
+        return <div>Wait for opponent to select their choice.</div>;
       default:
         return unreachable(state);
     }

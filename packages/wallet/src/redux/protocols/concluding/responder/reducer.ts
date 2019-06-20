@@ -24,7 +24,7 @@ import { isSuccess, isFailure } from '../../defunding/states';
 import * as selectors from '../../../selectors';
 import * as channelStoreReducer from '../../../channel-store/reducer';
 import { theirAddress } from '../../../channel-store';
-import { sendCommitmentReceived } from '../../../../communication';
+import { sendCommitmentReceived, sendKeepLedgerChannelApproved } from '../../../../communication';
 import {
   showWallet,
   hideWallet,
@@ -53,10 +53,7 @@ export function responderConcludingReducer(
   sharedData: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
-  if (
-    protocolState.type === 'ConcludingResponder.WaitForLedgerUpdate' &&
-    isConsensusUpdateAction(action)
-  ) {
+  if (isConsensusUpdateAction(action)) {
     return handleLedgerUpdateAction(protocolState, sharedData, action);
   }
   if (isDefundingAction(action)) {
@@ -68,6 +65,8 @@ export function responderConcludingReducer(
   }
 
   switch (action.type) {
+    case 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED':
+      return keepLedgerChannelApproved(protocolState, sharedData);
     case 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED':
       return concludeApproved(protocolState, sharedData);
     case 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN':
@@ -230,7 +229,7 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
       protocolState.channelId,
     );
     return {
-      protocolState: decideDefund({ ...protocolState }),
+      protocolState: decideDefund({ ...protocolState, opponentSelectedKeepLedgerChannel: false }),
       sharedData: sharedDataWithOwnCommitment,
     };
   } else {
@@ -242,27 +241,37 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
   if (protocolState.type !== 'ConcludingResponder.DecideDefund') {
     return { protocolState, sharedData };
   }
-
   const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
   const appChannel = getChannel(sharedData, protocolState.channelId);
   if (!appChannel) {
     throw new Error(`Could not find channel ${protocolState.channelId}`);
   }
-  const latestCommitment = appChannel.lastCommitment.commitment;
-  const {
-    protocolState: consensusUpdateState,
-    sharedData: newSharedData,
-  } = consensusUpdateInitialize(
-    protocolState.processId,
-    ledgerId,
-    latestCommitment.allocation,
-    latestCommitment.destination,
-    sharedData,
-  );
-  return {
-    protocolState: states.waitForLedgerUpdate({ ...protocolState, consensusUpdateState }),
-    sharedData: newSharedData,
-  };
+  if (protocolState.opponentSelectedKeepLedgerChannel) {
+    const latestCommitment = appChannel.lastCommitment.commitment;
+    const {
+      protocolState: consensusUpdateState,
+      sharedData: newSharedData,
+    } = consensusUpdateInitialize(
+      protocolState.processId,
+      ledgerId,
+      latestCommitment.allocation,
+      latestCommitment.destination,
+      sharedData,
+    );
+    return {
+      protocolState: states.waitForLedgerUpdate({ ...protocolState, consensusUpdateState }),
+      sharedData: newSharedData,
+    };
+  } else {
+    const newSharedData = queueMessage(
+      sharedData,
+      sendKeepLedgerChannelApproved(theirAddress(appChannel), protocolState.processId),
+    );
+    return {
+      protocolState: states.waitForOpponentSelection(protocolState),
+      sharedData: newSharedData,
+    };
+  }
 }
 
 function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): ReturnVal {
@@ -299,6 +308,37 @@ function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
     default:
       return { protocolState, sharedData };
   }
+}
+function keepLedgerChannelApproved(protocolState: CState, sharedData: Storage) {
+  switch (protocolState.type) {
+    case 'ConcludingResponder.DecideDefund':
+      return {
+        protocolState: { ...protocolState, opponentSelectedKeepLedgerChannel: true },
+        sharedData,
+      };
+    case 'ConcludingResponder.WaitForOpponentSelection':
+      const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
+      const appChannel = getChannel(sharedData, protocolState.channelId);
+      if (!appChannel) {
+        throw new Error(`Could not find channel ${protocolState.channelId}`);
+      }
+      const latestCommitment = appChannel.lastCommitment.commitment;
+      const {
+        protocolState: consensusUpdateState,
+        sharedData: newSharedData,
+      } = consensusUpdateInitialize(
+        protocolState.processId,
+        ledgerId,
+        latestCommitment.allocation,
+        latestCommitment.destination,
+        sharedData,
+      );
+      return {
+        protocolState: states.waitForLedgerUpdate({ ...protocolState, consensusUpdateState }),
+        sharedData: newSharedData,
+      };
+  }
+  return { protocolState, sharedData };
 }
 
 //  Helpers

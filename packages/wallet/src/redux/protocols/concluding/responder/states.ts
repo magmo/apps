@@ -33,6 +33,7 @@ export interface ResponderDecideDefund {
   type: 'ConcludingResponder.DecideDefund';
   processId: string;
   channelId: string;
+  opponentSelectedKeepLedgerChannel: boolean;
 }
 
 export interface ResponderWaitForDefund {
@@ -41,7 +42,11 @@ export interface ResponderWaitForDefund {
   channelId: string;
   defundingState: DefundingState;
 }
-
+export interface ResponderWaitForOpponentSelection {
+  type: 'ConcludingResponder.WaitForOpponentSelection';
+  processId: string;
+  channelId: string;
+}
 export interface ResponderWaitForLedgerUpdate {
   type: 'ConcludingResponder.WaitForLedgerUpdate';
   processId: string;
@@ -58,7 +63,8 @@ export function isConcludingResponderState(
     state.type === 'ConcludingResponder.ApproveConcluding' ||
     state.type === 'ConcludingResponder.DecideDefund' ||
     state.type === 'ConcludingResponder.WaitForDefund' ||
-    state.type === 'ConcludingResponder.WaitForLedgerUpdate'
+    state.type === 'ConcludingResponder.WaitForLedgerUpdate' ||
+    state.type === 'ConcludingResponder.WaitForOpponentSelection'
   );
 }
 
@@ -88,6 +94,9 @@ export const waitForDefund: StateConstructor<ResponderWaitForDefund> = p => {
 export const waitForLedgerUpdate: StateConstructor<ResponderWaitForLedgerUpdate> = p => {
   return { ...p, type: 'ConcludingResponder.WaitForLedgerUpdate' };
 };
+export const waitForOpponentSelection: StateConstructor<ResponderWaitForOpponentSelection> = p => {
+  return { ...p, type: 'ConcludingResponder.WaitForOpponentSelection' };
+};
 // -------
 // Unions and Guards
 // -------
@@ -98,6 +107,7 @@ export type ResponderNonTerminalState =
   | ResponderWaitForDefund
   | ResponderAcknowledgeFailure
   | ResponderAcknowledgeSuccess
-  | ResponderWaitForLedgerUpdate;
+  | ResponderWaitForLedgerUpdate
+  | ResponderWaitForOpponentSelection;
 
 export type ResponderPreTerminalState = ResponderAcknowledgeSuccess | ResponderAcknowledgeFailure;

@@ -6,6 +6,7 @@ import {
   itSendsThisMessage,
   itSendsThisDisplayEventType,
   describeScenarioStep,
+  expectThisMessage,
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../states';
 import { HIDE_WALLET, CONCLUDE_FAILURE, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
@@ -74,6 +75,14 @@ describe('[ Happy path No Defunding]', () => {
 
   describeScenarioStep(scenario.decideDefund, () => {
     const { state, sharedData, action } = scenario.decideDefund;
+    const result = responderConcludingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'ConcludingResponder.WaitForOpponentSelection');
+    expectThisMessage(result.sharedData, 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED');
+  });
+
+  describeScenarioStep(scenario.waitForOpponentResponse, () => {
+    const { state, sharedData, action } = scenario.waitForOpponentResponse;
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingResponder.WaitForLedgerUpdate');
