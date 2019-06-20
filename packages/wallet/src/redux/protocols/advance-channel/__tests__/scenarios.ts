@@ -233,11 +233,13 @@ export const existingChannelAsA = {
     state: commitmentSentA,
     sharedData: aSentPostFundCommitment,
     action: receivePostFundSetupFromB,
+    commitments: commitments4,
   },
   receiveFromHub: {
     state: commitmentSentA,
     sharedData: aSentPostFundCommitment,
     action: receivePostFundSetupFromHub,
+    commitments: commitments5,
   },
 };
 
