@@ -16,6 +16,7 @@ import {
 import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
+import { LEDGER_TOP_UP_PROTOCOL_LOCATOR } from '../reducer';
 // ---------
 // Test data
 // ---------
@@ -106,10 +107,26 @@ const bPreTopUpUpdate1ReceivedSharedData = {
 // ------
 // Actions
 // ------
-const preTopUpUpdate0 = globalActions.commitmentReceived({ processId, signedCommitment: ledger6 });
-const preTopUpUpdate1 = globalActions.commitmentReceived({ processId, signedCommitment: ledger7 });
-const postTopUpUpdate0 = globalActions.commitmentReceived({ processId, signedCommitment: ledger8 });
-const postTopUpUpdate1 = globalActions.commitmentReceived({ processId, signedCommitment: ledger9 });
+const preTopUpUpdate0 = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger6,
+  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
+});
+const preTopUpUpdate1 = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger7,
+  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
+});
+const postTopUpUpdate0 = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger8,
+  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
+});
+const postTopUpUpdate1 = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: ledger9,
+  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
+});
 const playerAFundingSuccess = noPostFundSetupsPreSuccessA.action;
 const playerBFundingSuccess = noPostFundSetupsPreSuccessB.action;
 export const playerABothPlayersTopUp = {

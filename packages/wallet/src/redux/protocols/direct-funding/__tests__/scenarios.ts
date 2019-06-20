@@ -9,6 +9,7 @@ import * as states from '../states';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { directFundingRequested } from '../actions';
+import { DIRECT_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
 
 const { channelId, twoThree } = scenarios;
 
@@ -82,10 +83,12 @@ const bFundingReceivedEvent = globalActions.fundingReceivedEvent({
 const postFundSetup0 = globalActions.commitmentReceived({
   processId: channelId,
   signedCommitment: globalTestScenarios.signedCommitment2,
+  protocolLocator: DIRECT_FUNDING_PROTOCOL_LOCATOR,
 });
 const postFundSetup1 = globalActions.commitmentReceived({
   processId: channelId,
   signedCommitment: globalTestScenarios.signedCommitment3,
+  protocolLocator: DIRECT_FUNDING_PROTOCOL_LOCATOR,
 });
 
 export const aHappyPath = {

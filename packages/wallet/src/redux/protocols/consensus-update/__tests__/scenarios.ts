@@ -11,6 +11,7 @@ import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as states from '../states';
 import { commitmentReceived } from '../../../actions';
+import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../reducer';
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
@@ -64,9 +65,21 @@ const waitForUpdate = states.waitForUpdate({
 // ------
 // Actions
 // ------
-const update0Received = commitmentReceived({ processId, signedCommitment: ledger6 });
-const update1Received = commitmentReceived({ processId, signedCommitment: ledger7 });
-const invalidUpdateReceived = commitmentReceived({ processId, signedCommitment: ledger0 });
+const update0Received = commitmentReceived({
+  processId,
+  signedCommitment: ledger6,
+  protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+});
+const update1Received = commitmentReceived({
+  processId,
+  signedCommitment: ledger7,
+  protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+});
+const invalidUpdateReceived = commitmentReceived({
+  processId,
+  signedCommitment: ledger0,
+  protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+});
 export const aHappyPath = {
   initialize: {
     channelId: ledgerId,
