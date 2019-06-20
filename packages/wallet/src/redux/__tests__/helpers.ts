@@ -88,7 +88,9 @@ export const expectThisMessageAndTheseCommitmentsSent = (
   expectSideEffect('messageOutbox', state, item => {
     expect(item.messagePayload.type).toEqual(messageType);
     expect(item.messagePayload.signedCommitments).toMatchObject(
-      commitments.map(({ commitment }) => ({ commitment })), // This has the effect of ignoring the signature
+      // We only care about matching the commitments, not other data that was passed
+      // to this helper. (A test could pass a signedCommitment, for instance)
+      commitments.map(({ commitment }) => ({ commitment })),
     );
   });
 };
