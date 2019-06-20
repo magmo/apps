@@ -84,10 +84,10 @@ interface OngoingChannelArgs {
 }
 
 function isNewChannelArgs(args: NewChannelArgs | OngoingChannelArgs): args is NewChannelArgs {
-  if ('channelId' in args) {
-    return false;
+  if ('privateKey' in args) {
+    return true;
   }
-  return true;
+  return false;
 }
 
 function initializeWithNewChannel(
