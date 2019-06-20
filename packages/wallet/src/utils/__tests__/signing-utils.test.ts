@@ -9,10 +9,9 @@ import {
 
 describe('signing and validating commitments', () => {
   let commitmentSignature;
-  it('should sign a commitment', () => {
-    commitmentSignature = signCommitment(scenarios.gameCommitment1, scenarios.asPrivateKey);
-  });
+
   it('should return true when a signature is valid', () => {
+    commitmentSignature = signCommitment(scenarios.gameCommitment1, scenarios.bsPrivateKey);
     expect(validCommitmentSignature(scenarios.gameCommitment1, commitmentSignature)).toBe(true);
   });
 
