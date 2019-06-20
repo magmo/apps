@@ -167,7 +167,7 @@ const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
     throw new Error('Could not initialize channel');
   }
   sharedData = checkResult.store;
-  sharedData = checkCommitments(sharedData, action.signedCommitments.slice(1));
+  sharedData = checkCommitments(sharedData, 0, action.signedCommitments);
   let channel = getChannel(sharedData.channelStore, channelId);
   if (!channel) {
     throw new Error('Channel not stored');
@@ -183,7 +183,7 @@ const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
 
     const signResult = signAndStore(sharedData, ourCommitment);
     if (!signResult.isSuccess) {
-      throw new Error('Could not sign result');
+      throw new Error(`Could not sign result: ${signResult.reason}`);
     }
     sharedData = signResult.store;
 
@@ -215,15 +215,24 @@ const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
   }
 };
 
-function checkCommitments(sharedData: SharedData, commitments: Commitments): SharedData {
-  commitments.map(sc => {
-    const result = checkAndStore(sharedData, sc);
-    if (result.isSuccess) {
-      sharedData = result.store;
-    } else {
-      throw new Error('Unable to validate commitment');
-    }
-  });
+function checkCommitments(
+  sharedData: SharedData,
+  turnNum: number,
+  commitments: Commitments,
+): SharedData {
+  // We don't bother checking "stale" commitments -- those whose turnNum does not
+  // exceed the current turnNum.
+
+  commitments
+    .filter(sc => sc.commitment.turnNum > turnNum)
+    .map(sc => {
+      const result = checkAndStore(sharedData, sc);
+      if (result.isSuccess) {
+        sharedData = result.store;
+      } else {
+        throw new Error('Unable to validate commitment');
+      }
+    });
 
   return sharedData;
 }
@@ -234,7 +243,13 @@ const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelStat
   action: CommitmentsReceived,
 ) => {
   const { ourIndex, channelId } = protocolState;
-  sharedData = checkCommitments(sharedData, action.signedCommitments);
+
+  const channel = getChannel(sharedData.channelStore, channelId);
+  if (!channel) {
+    return { protocolState, sharedData };
+  }
+
+  sharedData = checkCommitments(sharedData, channel.turnNum, action.signedCommitments);
 
   if (isSafeToSend({ sharedData, ourIndex, channelId })) {
     return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
@@ -254,7 +269,7 @@ const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
     return { protocolState, sharedData };
   }
 
-  sharedData = checkCommitments(sharedData, action.signedCommitments);
+  sharedData = checkCommitments(sharedData, channel.turnNum, action.signedCommitments);
   channel = getChannel(sharedData.channelStore, channelId);
   if (!channel) {
     return { protocolState, sharedData };
