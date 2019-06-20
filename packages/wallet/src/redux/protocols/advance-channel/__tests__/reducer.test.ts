@@ -53,6 +53,7 @@ describe('sending preFundSetup as A', () => {
 
     itTransitionsTo(protocolState, 'AdvanceChannel.Success');
     itStoresThisCommitment(result, commitments[2]);
+    itSendsNoMessage(result);
   });
 });
 
@@ -82,5 +83,13 @@ describe('sending preFundSetup as B', () => {
     expectTheseCommitmentsSent(result, commitments);
     itRegistersThisChannel(result, channelId, processId);
   });
+
+  describe('when receiving prefund commitments from the hub', () => {
+    const { state, sharedData, action, commitments } = scenario.receiveFromHub;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.Success');
+    itStoresThisCommitment(result, commitments[2]);
+    itSendsNoMessage(result);
   });
 });

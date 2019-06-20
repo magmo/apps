@@ -1,5 +1,6 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { CommitmentType } from '../../../domain';
 
 // -------
 // States
@@ -10,6 +11,7 @@ export type AdvanceChannelType = AdvanceChannelState['type'];
 interface BaseState {
   processId: string;
   ourIndex: number;
+  commitmentType: CommitmentType;
 }
 
 export interface ChannelUnknown extends BaseState {
@@ -45,11 +47,12 @@ export interface Failure {
 // ------------
 
 const base: StateConstructor<BaseState> = params => {
-  const { processId, channelId, ourIndex } = params;
+  const { processId, channelId, ourIndex, commitmentType } = params;
   return {
     processId,
     channelId,
     ourIndex,
+    commitmentType,
   };
 };
 

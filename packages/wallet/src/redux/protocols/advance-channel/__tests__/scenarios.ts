@@ -5,6 +5,7 @@ import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { commitmentsReceived } from '../../../../communication';
+import { CommitmentType } from '../../../../domain';
 
 // ---------
 // Test data
@@ -73,14 +74,32 @@ const commitments5 = [signedCommitment3, signedCommitment4, signedCommitment5];
 // ----
 // States
 // ------
-const commitmentSentA = states.commitmentSent(propsA);
+const commitmentSentA = states.commitmentSent({
+  ...propsA,
+  commitmentType: CommitmentType.PreFundSetup,
+});
 
-const channelUnknownB = states.channelUnknown(propsB);
-const notSafeToSendB = states.notSafeToSend(propsB);
-const commitmentSentB = states.commitmentSent(propsB);
+const channelUnknownB = states.channelUnknown({
+  ...propsB,
+  commitmentType: CommitmentType.PreFundSetup,
+});
+const notSafeToSendB = states.notSafeToSend({
+  ...propsB,
+  commitmentType: CommitmentType.PreFundSetup,
+});
+const commitmentSentB = states.commitmentSent({
+  ...propsB,
+  commitmentType: CommitmentType.PreFundSetup,
+});
 
-const channelUnknownHub = states.channelUnknown(propsHub);
-const notSafeToSendHub = states.notSafeToSend(propsHub);
+const channelUnknownHub = states.channelUnknown({
+  ...propsHub,
+  commitmentType: CommitmentType.PreFundSetup,
+});
+const notSafeToSendHub = states.notSafeToSend({
+  ...propsHub,
+  commitmentType: CommitmentType.PreFundSetup,
+});
 
 // -------
 // Shared Data
@@ -161,7 +180,7 @@ const argsB = {
 export const newChannelAsA = {
   ...propsA,
   initialize: {
-    args: argsA,
+    args: { ...argsA, commitmentType: CommitmentType.PreFundSetup },
     sharedData: emptySharedData,
     commitments: commitments0,
   },
@@ -201,7 +220,7 @@ export const existingChannelAsA = {
 export const newChannelAsB = {
   ...propsB,
   initialize: {
-    args: argsB,
+    args: { ...argsB, commitmentType: CommitmentType.PreFundSetup },
     sharedData: emptySharedData,
   },
   receiveFromA: {

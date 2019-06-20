@@ -3,7 +3,6 @@ import {
   SharedData,
   queueMessage,
   registerChannelToMonitor,
-  setChannel,
   checkAndStore,
   signAndInitialize,
   checkAndInitialize,
@@ -15,7 +14,6 @@ import {
   getChannel,
   nextParticipant,
   getLastCommitment,
-  validTransitions,
   ChannelState,
   Commitments,
 } from '../../channel-store';
@@ -50,7 +48,7 @@ export function initialize(
     if (!channel) {
       throw new Error(`Could not find existing channel ${channelId}`);
     }
-    return initializeWithExistingChannel(channel, processId, sharedData);
+    return initializeWithExistingChannel(channel, processId, sharedData, commitmentType);
   }
 }
 
@@ -155,9 +153,17 @@ function initializeWithNewChannel(
   }
 }
 
-function initializeWithExistingChannel(channel, processId, sharedData) {
+function initializeWithExistingChannel(
+  channel,
+  processId,
+  sharedData,
+  commitmentType: CommitmentType,
+) {
   const { ourIndex, channelId } = channel;
-  return { protocolState: states.notSafeToSend({ processId, channelId, ourIndex }), sharedData };
+  return {
+    protocolState: states.notSafeToSend({ processId, channelId, ourIndex, commitmentType }),
+    sharedData,
+  };
 }
 
 const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
@@ -250,16 +256,19 @@ const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
   sharedData,
   action: CommitmentsReceived,
 ) => {
-  const { channelId } = protocolState;
-  const channel = getChannel(sharedData.channelStore, channelId);
+  const { channelId, commitmentType } = protocolState;
+  let channel = getChannel(sharedData.channelStore, channelId);
   if (!channel) {
     return { protocolState, sharedData };
   }
 
-  const { signedCommitments } = action;
+  sharedData = checkCommitments(sharedData, action.signedCommitments);
+  channel = getChannel(sharedData.channelStore, channelId);
+  if (!channel) {
+    return { protocolState, sharedData };
+  }
 
-  if (advancesChannel(channel, signedCommitments)) {
-    sharedData = setChannel(sharedData, { ...channel, commitments: signedCommitments });
+  if (channelAdvanced(channel, commitmentType)) {
     return { protocolState: states.success(protocolState), sharedData };
   }
 
@@ -294,11 +303,10 @@ function isSafeToSend({
   return true;
 }
 
-function advancesChannel(channel: ChannelState, newCommitments: Commitments): boolean {
+function channelAdvanced(channel: ChannelState, commitmentType: CommitmentType): boolean {
   const lastCommitment = getLastCommitment(channel);
   return (
-    newCommitments[0].commitment === lastCommitment &&
-    validTransitions(newCommitments) &&
-    newCommitments.length === lastCommitment.channel.participants.length
+    lastCommitment.commitmentType === commitmentType &&
+    lastCommitment.commitmentCount === channel.participants.length - 1
   );
 }
