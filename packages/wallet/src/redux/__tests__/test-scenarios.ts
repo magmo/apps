@@ -377,11 +377,11 @@ export const signedJointLedgerCommitments = {
     signature: signCommitment(commitment, bsPrivateKey),
   },
   signedCommitment2: {
-    commitment: commitment = jointLedgerCommitments.postFundCommitment0,
+    commitment: commitment = jointLedgerCommitments.preFundCommitment2,
     signature: signCommitment(commitment, hubPrivateKey),
   },
   signedCommitment3: {
-    commitment: commitment = jointLedgerCommitments.postFundCommitment1,
+    commitment: commitment = jointLedgerCommitments.postFundCommitment0,
     signature: signCommitment(commitment, asPrivateKey),
   },
   signedCommitment4: {
@@ -389,7 +389,7 @@ export const signedJointLedgerCommitments = {
     signature: signCommitment(commitment, bsPrivateKey),
   },
   signedCommitment5: {
-    commitment: commitment = jointLedgerCommitments.postFundCommitment1,
+    commitment: commitment = jointLedgerCommitments.postFundCommitment2,
     signature: signCommitment(commitment, hubPrivateKey),
   },
 };
