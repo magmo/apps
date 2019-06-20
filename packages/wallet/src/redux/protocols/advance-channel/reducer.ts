@@ -44,7 +44,7 @@ export function initialize(
       throw new Error('Must receive OngoingChannelArgs');
     }
 
-    throw new Error('Unimplemented');
+    return initializeWithExistingChannel(processId, sharedData, args);
   }
 }
 
@@ -74,10 +74,7 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
 };
 
 type NewChannelArgs = Properties<states.ChannelUnknown>;
-
-interface OngoingChannelArgs {
-  channelId: string;
-}
+type OngoingChannelArgs = Properties<states.NotSafeToSend>;
 
 function isNewChannelArgs(args: NewChannelArgs | OngoingChannelArgs): args is NewChannelArgs {
   if ('privateKey' in args) {
@@ -147,6 +144,14 @@ function initializeWithNewChannel(
 
     return { protocolState, sharedData };
   }
+}
+
+function initializeWithExistingChannel(
+  processId,
+  sharedData: Storage,
+  initializeChannelArgs: OngoingChannelArgs,
+) {
+  return { protocolState: states.notSafeToSend(initializeChannelArgs), sharedData };
 }
 
 const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
