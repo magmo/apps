@@ -55,3 +55,32 @@ describe('sending preFundSetup as A', () => {
     itStoresThisCommitment(result, commitments[2]);
   });
 });
+
+describe('sending preFundSetup as B', () => {
+  const scenario = scenarios.newChannelAsB;
+  const { processId } = scenario;
+
+  describe('when initializing', () => {
+    const { sharedData, args } = scenario.initialize;
+    const { protocolState, sharedData: result } = initialize(
+      processId,
+      sharedData,
+      CommitmentType.PreFundSetup,
+      args,
+    );
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.ChannelUnknown');
+    itSendsNoMessage(result);
+  });
+
+  describe.only('when receiving prefund commitments from A', () => {
+    const { state, sharedData, action, commitments } = scenario.receiveFromA;
+
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
+    itStoresThisCommitment(result, commitments[1]);
+    // expectTheseCommitmentsSent(result, commitments);
+    // itRegistersThisChannel(result, channelId, processId);
+  });
+});

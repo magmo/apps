@@ -1,5 +1,11 @@
 import * as states from './states';
-import { SharedData, queueMessage, registerChannelToMonitor, setChannel } from '../../state';
+import {
+  SharedData,
+  queueMessage,
+  registerChannelToMonitor,
+  setChannel,
+  checkAndStore,
+} from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import { CommitmentType, Commitment, getChannelId } from '../../../domain';
 import {
@@ -144,7 +150,12 @@ function initializeWithNewChannel(
       sharedData,
     };
   } else {
-    throw new Error('Unimplemented');
+    const protocolState = states.channelUnknown({
+      ...initializeChannelArgs,
+      processId,
+    });
+
+    return { protocolState, sharedData };
   }
 }
 
