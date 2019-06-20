@@ -234,11 +234,8 @@ function isSafeToSend({
   // The possibilities are:
   // A. The channel is not in storage and our index is 0.
   // B. The channel is not in storage and our index is not 0.
-  //   B1. It's our turn
-  //   B2. It's not our turn
-  // C. The channel is in storage
-  //   C1. It's our turn
-  //   C2. It's not our turn
+  // C. The channel is in storage and it's our turn
+  // D. The channel is in storage and it's not our turn
 
   if (!channelId) {
     return ourIndex === 0;
