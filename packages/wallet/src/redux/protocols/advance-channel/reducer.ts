@@ -5,12 +5,12 @@ import {
   registerChannelToMonitor,
   setChannel,
   checkAndStore,
+  signAndInitialize,
 } from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import { CommitmentType, Commitment, getChannelId } from '../../../domain';
 import {
   getChannel,
-  signAndInitialize,
   nextParticipant,
   getLastCommitment,
   validTransitions,
@@ -116,11 +116,11 @@ function initializeWithNewChannel(
       channel,
     };
     const { privateKey } = initializeChannelArgs;
-    const signResult = signAndInitialize(sharedData.channelStore, ourCommitment, privateKey);
+    const signResult = signAndInitialize(sharedData, ourCommitment, privateKey);
     if (!signResult.isSuccess) {
       throw new Error('Could not store new ledger channel commitment.');
     }
-    sharedData = { ...sharedData, channelStore: signResult.store };
+    sharedData = signResult.store;
 
     // Register channel to monitor
     const channelId = getChannelId(ourCommitment);
