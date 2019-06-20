@@ -179,14 +179,8 @@ const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelSta
   }
 };
 
-const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
-  protocolState: states.NotSafeToSend,
-  sharedData,
-  action: CommitmentsReceived,
-) => {
-  const { ourIndex, channelId } = protocolState;
-
-  action.signedCommitments.map(sc => {
+function checkCommitments(sharedData: SharedData, commitments: Commitments): SharedData {
+  commitments.map(sc => {
     const result = checkAndStore(sharedData, sc);
     if (result.isSuccess) {
       sharedData = result.store;
@@ -194,6 +188,17 @@ const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelStat
       throw new Error('Unable to validate commitment');
     }
   });
+
+  return sharedData;
+}
+
+const notSafeToSendReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
+  protocolState: states.NotSafeToSend,
+  sharedData,
+  action: CommitmentsReceived,
+) => {
+  const { ourIndex, channelId } = protocolState;
+  sharedData = checkCommitments(sharedData, action.signedCommitments);
 
   if (isSafeToSend({ sharedData, ourIndex, channelId })) {
     return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
