@@ -48,7 +48,8 @@ export function initialize(
     if (!channel) {
       throw new Error(`Could not find existing channel ${channelId}`);
     }
-    return initializeWithExistingChannel(channel, processId, sharedData, commitmentType);
+
+    throw new Error('Unimplemented');
   }
 }
 
@@ -151,19 +152,6 @@ function initializeWithNewChannel(
 
     return { protocolState, sharedData };
   }
-}
-
-function initializeWithExistingChannel(
-  channel,
-  processId,
-  sharedData,
-  commitmentType: CommitmentType,
-) {
-  const { ourIndex, channelId } = channel;
-  return {
-    protocolState: states.notSafeToSend({ processId, channelId, ourIndex, commitmentType }),
-    sharedData,
-  };
 }
 
 const channelUnknownReducer: ProtocolReducer<states.NonTerminalAdvanceChannelState> = (
