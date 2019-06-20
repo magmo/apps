@@ -125,7 +125,7 @@ function keepLedgerChannelApproved(protocolState: CState, sharedData: Storage) {
         protocolState: { ...protocolState, opponentSelectedKeepLedgerChannel: true },
         sharedData,
       };
-    case 'ConcludingResponder.WaitForOpponentSelection':
+    case 'ConcludingInstigator.WaitForOpponentSelection':
       const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
       const appChannel = getChannel(sharedData, protocolState.channelId);
       if (!appChannel) {
@@ -271,10 +271,17 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
   if (protocolState.type !== 'ConcludingInstigator.AcknowledgeConcludeReceived') {
     return { protocolState, sharedData };
   }
+
   const appChannel = getChannel(sharedData, protocolState.channelId);
   if (!appChannel) {
     throw new Error(`Could not find channel ${protocolState.channelId}`);
   }
+
+  sharedData = queueMessage(
+    sharedData,
+    sendKeepLedgerChannelApproved(theirAddress(appChannel), protocolState.processId),
+  );
+
   if (protocolState.opponentSelectedKeepLedgerChannel) {
     const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
 
@@ -297,13 +304,9 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
       sharedData: newSharedData,
     };
   } else {
-    const newSharedData = queueMessage(
-      sharedData,
-      sendKeepLedgerChannelApproved(theirAddress(appChannel), protocolState.processId),
-    );
     return {
       protocolState: states.instigatorWaitForOpponentSelection(protocolState),
-      sharedData: newSharedData,
+      sharedData,
     };
   }
 }

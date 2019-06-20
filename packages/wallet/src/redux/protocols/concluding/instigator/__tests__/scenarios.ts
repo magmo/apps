@@ -62,7 +62,7 @@ const waitForLedgerUpdate = states.instigatorWaitForLedgerUpdate({
   ...defaults,
   consensusUpdateState: preSuccessA.state,
 });
-const waitForOpponentResponse = states.waitForOpponentSelection(defaults);
+const waitForOpponentResponse = states.instigatorWaitForOpponentSelection(defaults);
 // -------
 // Shared Data
 // -------

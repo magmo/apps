@@ -246,6 +246,11 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
   if (!appChannel) {
     throw new Error(`Could not find channel ${protocolState.channelId}`);
   }
+  sharedData = queueMessage(
+    sharedData,
+    sendKeepLedgerChannelApproved(theirAddress(appChannel), protocolState.processId),
+  );
+
   if (protocolState.opponentSelectedKeepLedgerChannel) {
     const latestCommitment = appChannel.lastCommitment.commitment;
     const {
@@ -263,13 +268,9 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
       sharedData: newSharedData,
     };
   } else {
-    const newSharedData = queueMessage(
-      sharedData,
-      sendKeepLedgerChannelApproved(theirAddress(appChannel), protocolState.processId),
-    );
     return {
       protocolState: states.waitForOpponentSelection(protocolState),
-      sharedData: newSharedData,
+      sharedData,
     };
   }
 }

@@ -62,7 +62,7 @@ class ConcludingContainer extends PureComponent<Props> {
         );
       case 'ConcludingInstigator.WaitForLedgerUpdate':
         return <ConsensusUpdate state={state.consensusUpdateState} />;
-      case 'ConcludingResponder.WaitForOpponentSelection':
+      case 'ConcludingInstigator.WaitForOpponentSelection':
         return <WaitForOpponentDecision />;
       default:
         return unreachable(state);

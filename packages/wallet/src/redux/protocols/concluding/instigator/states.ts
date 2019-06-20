@@ -56,7 +56,7 @@ export interface WaitForLedgerUpdate {
   consensusUpdateState: ConsensusUpdateState;
 }
 export interface WaitForOpponentSelection {
-  type: 'ConcludingResponder.WaitForOpponentSelection';
+  type: 'ConcludingInstigator.WaitForOpponentSelection';
   processId: string;
   channelId: string;
 }
@@ -95,7 +95,7 @@ export const instigatorWaitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate
 };
 
 export const instigatorWaitForOpponentSelection: StateConstructor<WaitForOpponentSelection> = p => {
-  return { ...p, type: 'ConcludingResponder.WaitForOpponentSelection' };
+  return { ...p, type: 'ConcludingInstigator.WaitForOpponentSelection' };
 };
 
 // -------
@@ -124,6 +124,6 @@ export function isConcludingInstigatorState(
     state.type === 'ConcludingInstigator.AcknowledgeConcludeReceived' ||
     state.type === 'ConcludingInstigator.WaitForDefund' ||
     state.type === 'ConcludingInstigator.WaitForLedgerUpdate' ||
-    state.type === 'ConcludingResponder.WaitForOpponentSelection'
+    state.type === 'ConcludingInstigator.WaitForOpponentSelection'
   );
 }

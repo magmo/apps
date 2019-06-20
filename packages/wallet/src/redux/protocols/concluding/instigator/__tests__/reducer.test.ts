@@ -89,7 +89,7 @@ describe('[ No Defunding Happy path ]', () => {
     const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
     const result = instigatorConcludingReducer(state, sharedData, action);
     expectThisMessage(result.sharedData, 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED');
-    itTransitionsTo(result, 'ConcludingResponder.WaitForOpponentSelection');
+    itTransitionsTo(result, 'ConcludingInstigator.WaitForOpponentSelection');
   });
   describeScenarioStep(scenario.waitForOpponentResponse, () => {
     const { state, action, sharedData } = scenario.waitForOpponentResponse;
