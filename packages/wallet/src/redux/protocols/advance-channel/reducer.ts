@@ -95,9 +95,9 @@ function initializeWithNewChannel(
   sharedData: Storage,
   initializeChannelArgs: NewChannelArgs,
 ) {
-  if (isSafeToSend(sharedData)) {
-    const { channelType, destination, appAttributes, allocation, ourIndex } = initializeChannelArgs;
+  const { channelType, destination, appAttributes, allocation, ourIndex } = initializeChannelArgs;
 
+  if (isSafeToSend({ sharedData, ourIndex })) {
     // Initialize the channel in the store
     const nonce = selectors.getNextNonce(sharedData, channelType);
     const participants = destination;
@@ -212,7 +212,34 @@ const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
   return { protocolState, sharedData };
 };
 
-function isSafeToSend(sharedData: SharedData): boolean {
+function isSafeToSend({
+  sharedData,
+  channelId,
+  ourIndex,
+}: {
+  sharedData: SharedData;
+  ourIndex: number;
+  channelId?: string;
+}): boolean {
+  // The possibilities are:
+  // A. The channel is not in storage and our index is 0.
+  // B. The channel is not in storage and our index is not 0.
+  //   B1. It's our turn
+  //   B2. It's not our turn
+  // C. The channel is in storage
+  //   C1. It's our turn
+  //   C2. It's not our turn
+
+  if (!channelId) {
+    return ourIndex === 0;
+  }
+
+  const channel = getChannel(sharedData.channelStore, channelId);
+  if (!channel) {
+    console.error(`Could not find existing channel ${channelId}`);
+    return false;
+  }
+
   return true;
 }
 
