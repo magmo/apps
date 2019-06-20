@@ -7,6 +7,7 @@ import {
   signAndInitialize,
   checkAndInitialize,
   signAndStore,
+  getCommitments,
 } from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../domain';
@@ -151,7 +152,45 @@ function initializeWithExistingChannel(
   sharedData: Storage,
   initializeChannelArgs: OngoingChannelArgs,
 ) {
-  return { protocolState: states.notSafeToSend(initializeChannelArgs), sharedData };
+  const { channelId, ourIndex } = initializeChannelArgs;
+  const channel = getChannel(sharedData.channelStore, channelId);
+  if (!channel) {
+    throw new Error('Channel not stored');
+  }
+  if (isSafeToSend({ sharedData, ourIndex })) {
+    const lastCommitment = getLastCommitment(channel);
+    const ourCommitment = nextSetupCommitment(lastCommitment);
+    if (ourCommitment === 'NotASetupCommitment') {
+      // We will have to refactor `nextSetupCommitment` to allow it to construct
+      // conclude commitments
+      throw new Error('lastCommitment was not a setup commitment');
+    }
+    const signResult = signAndStore(sharedData, ourCommitment);
+    if (!signResult.isSuccess) {
+      throw new Error('Could not store new ledger channel commitment.');
+    }
+    sharedData = signResult.store;
+
+    // Send commitments to next participant
+    const messageRelay = sendCommitmentsReceived(
+      nextParticipant(channel.participants, ourIndex),
+      processId,
+      getCommitments(sharedData, channelId),
+    );
+    sharedData = queueMessage(sharedData, messageRelay);
+
+    const protocolState = states.commitmentSent({
+      ...initializeChannelArgs,
+      processId,
+      channelId,
+    });
+    return {
+      protocolState,
+      sharedData,
+    };
+  } else {
+    return { protocolState: states.notSafeToSend(initializeChannelArgs), sharedData };
+  }
 }
 
 const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (

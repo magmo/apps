@@ -121,3 +121,42 @@ describe('sending preFundSetup as Hub', () => {
     itRegistersThisChannel(result, channelId, processId);
   });
 });
+
+describe('sending postFundSetup as A', () => {
+  const scenario = scenarios.existingChannelAsA;
+  const { processId, channelId, commitmentType } = scenario;
+
+  describe.only('when initializing', () => {
+    const { sharedData, commitments, args } = scenario.initialize;
+    const { protocolState, sharedData: result } = initialize(
+      processId,
+      sharedData,
+      commitmentType,
+      args,
+    );
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
+    expectTheseCommitmentsSent(result, commitments);
+    itStoresThisCommitment(result, commitments[0]);
+    itRegistersThisChannel(result, channelId, processId);
+  });
+
+  // describe('when receiving prefund commitments from b', () => {
+  //   const { commitments, state, sharedData, action } = scenario.receiveFromB;
+  //   const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+  //   itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
+  //   itSendsNoMessage(result);
+  //   itStoresThisCommitment(result, commitments[1]);
+  // });
+
+  // describe('when receiving prefund commitments from the hub', () => {
+  //   const { state, sharedData, action, commitments } = scenario.receiveFromHub;
+
+  //   const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+  //   itTransitionsTo(protocolState, 'AdvanceChannel.Success');
+  //   itStoresThisCommitment(result, commitments[2]);
+  //   itSendsNoMessage(result);
+  // });
+});
