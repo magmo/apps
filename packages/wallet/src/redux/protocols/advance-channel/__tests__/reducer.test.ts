@@ -43,7 +43,7 @@ describe('sending preFundSetup as A', () => {
 
     itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
     itSendsNoMessage(result);
-    itStoresThisCommitment(result, commitments[0]);
+    itStoresThisCommitment(result, commitments[1]);
   });
 
   describe('when receiving prefund commitments from the hub', () => {
