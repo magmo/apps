@@ -167,3 +167,10 @@ export const itStoresThisCommitment = (
     expect(lastSignedCommitment).toMatchObject(signedCommitment);
   });
 };
+
+export const itRegistersThisChannel = (state: SharedData, channelId: string, processId: string) => {
+  it('subscribes to channel events in the channel subscriptions', () => {
+    const subscriptionState = state.channelSubscriptions[processId];
+    expect(subscriptionState).toContain(channelId);
+  });
+};
