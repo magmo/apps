@@ -1,35 +1,44 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { CommitmentType } from '../../../domain';
 
 // -------
 // States
 // -------
 
-export type AdvanceChannelType =
-  | 'AdvanceChannel.NotSafeToSend'
-  | 'AdvanceChannel.CommitmentSent'
-  | 'AdvanceChannel.Success'
-  | 'AdvanceChannel.Failure';
+export type AdvanceChannelType = AdvanceChannelState['type'];
 
 interface BaseState {
   processId: string;
-  channelId: string;
   ourIndex: number;
+  commitmentType: CommitmentType;
+}
+
+export interface ChannelUnknown extends BaseState {
+  type: 'AdvanceChannel.ChannelUnknown';
+  ourIndex: number;
+  allocation: string[];
+  destination: string[];
+  channelType: string;
+  appAttributes: string;
+  privateKey: string;
 }
 
 export interface NotSafeToSend extends BaseState {
   type: 'AdvanceChannel.NotSafeToSend';
+  channelId: string;
 }
 
 export interface CommitmentSent extends BaseState {
   type: 'AdvanceChannel.CommitmentSent';
+  channelId: string;
 }
 
-export interface Success extends BaseState {
+export interface Success {
   type: 'AdvanceChannel.Success';
 }
 
-export interface Failure extends BaseState {
+export interface Failure {
   type: 'AdvanceChannel.Failure';
 }
 
@@ -37,41 +46,55 @@ export interface Failure extends BaseState {
 // Constructors
 // ------------
 
-export const baseDirectFundingState: StateConstructor<BaseState> = params => {
-  const { processId, channelId, ourIndex } = params;
+const base: StateConstructor<BaseState> = params => {
+  const { processId, channelId, ourIndex, commitmentType } = params;
   return {
     processId,
     channelId,
     ourIndex,
+    commitmentType,
+  };
+};
+
+export const channelUnknown: StateConstructor<ChannelUnknown> = params => {
+  const { privateKey, allocation, destination, channelType, appAttributes } = params;
+  return {
+    ...base(params),
+    type: 'AdvanceChannel.ChannelUnknown',
+    privateKey,
+    allocation,
+    destination,
+    channelType,
+    appAttributes,
   };
 };
 
 export const notSafeToSend: StateConstructor<NotSafeToSend> = params => {
   return {
-    ...baseDirectFundingState(params),
+    ...base(params),
     type: 'AdvanceChannel.NotSafeToSend',
+    channelId: params.channelId,
   };
 };
 
 export const commitmentSent: StateConstructor<CommitmentSent> = params => {
-  const { transactionSubmissionState } = params;
+  const { transactionSubmissionState, channelId } = params;
   return {
-    ...baseDirectFundingState(params),
+    ...base(params),
     type: 'AdvanceChannel.CommitmentSent',
     transactionSubmissionState,
+    channelId,
   };
 };
 
 export const success: StateConstructor<Success> = params => {
   return {
-    ...baseDirectFundingState(params),
     type: 'AdvanceChannel.Success',
   };
 };
 
 export const failure: StateConstructor<Failure> = params => {
   return {
-    ...baseDirectFundingState(params),
     type: 'AdvanceChannel.Failure',
   };
 };
@@ -80,9 +103,9 @@ export const failure: StateConstructor<Failure> = params => {
 // Unions and Guards
 // -------
 
-export type NonTerminalDirectFundingState = NotSafeToSend | CommitmentSent;
+export type NonTerminalAdvanceChannelState = ChannelUnknown | NotSafeToSend | CommitmentSent;
 
-export type AdvanceChannelState = NonTerminalDirectFundingState | Success | Failure;
+export type AdvanceChannelState = NonTerminalAdvanceChannelState | Success | Failure;
 
 export type AdvanceChannelStateType = AdvanceChannelState['type'];
 
@@ -92,6 +115,7 @@ export function isTerminal(state: AdvanceChannelState): state is Failure | Succe
 
 export function isAdvanceChannelState(state: ProtocolState): state is AdvanceChannelState {
   return (
+    state.type === 'AdvanceChannel.ChannelUnknown' ||
     state.type === 'AdvanceChannel.NotSafeToSend' ||
     state.type === 'AdvanceChannel.CommitmentSent' ||
     state.type === 'AdvanceChannel.Failure' ||
