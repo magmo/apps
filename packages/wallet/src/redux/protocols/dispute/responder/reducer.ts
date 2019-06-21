@@ -86,7 +86,10 @@ const waitForTransactionReducer = (
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> => {
   if (action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED') {
-    return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
+    return {
+      protocolState: states.acknowledgeTimeout({ ...protocolState }),
+      sharedData: sendOpponentConcluded(sharedData),
+    };
   }
   if (!isTransactionAction(action)) {
     return { sharedData, protocolState };
@@ -125,7 +128,7 @@ const waitForResponseReducer = (
     case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED':
       return {
         protocolState: states.acknowledgeTimeout({ ...protocolState }),
-        sharedData: showWallet(sharedData),
+        sharedData: showWallet(sendOpponentConcluded(sharedData)),
       };
 
     default:
@@ -172,7 +175,10 @@ const waitForApprovalReducer = (
         return transitionToWaitForTransaction(transaction, protocolState, sharedData);
       }
     case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED':
-      return { protocolState: states.acknowledgeTimeout({ ...protocolState }), sharedData };
+      return {
+        protocolState: states.acknowledgeTimeout({ ...protocolState }),
+        sharedData: sendOpponentConcluded(sharedData),
+      };
 
     default:
       return { protocolState, sharedData };
@@ -192,7 +198,7 @@ function acknowledgeTimeoutReducer(
   }
   return {
     protocolState: states.failure({ reason: states.FailureReason.TimeOut }),
-    sharedData: sendOpponentConcluded(sharedData),
+    sharedData: hideWallet(sharedData),
   };
 }
 
