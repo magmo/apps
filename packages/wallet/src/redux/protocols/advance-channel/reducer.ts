@@ -337,7 +337,7 @@ function isSafeToSend({
 
   const channel = getChannel(sharedData.channelStore, channelId);
   const numParticipants = channel.participants.length;
-  return channel.turnNum % numParticipants === (ourIndex - 1) % numParticipants;
+  return (channel.turnNum + 1) % numParticipants === ourIndex;
 }
 
 function channelAdvanced(channel: ChannelState, commitmentType: CommitmentType): boolean {
