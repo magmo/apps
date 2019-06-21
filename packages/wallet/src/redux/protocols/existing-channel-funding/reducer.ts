@@ -1,4 +1,10 @@
-import { SharedData, signAndStore, queueMessage, checkAndStore, getChannel } from '../../state';
+import {
+  SharedData,
+  signAndStore,
+  queueMessage,
+  checkAndStore,
+  getExistingChannel,
+} from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
 import { ExistingChannelFundingAction } from './actions';
@@ -319,10 +325,7 @@ function craftAndSendAppPostFundCommitment(
   processId: string,
 ): SharedData | 'CouldNotSign' | 'NotASetupCommitment' {
   let newSharedData = { ...sharedData };
-  const appChannel = getChannel(sharedData, appChannelId);
-  if (!appChannel) {
-    throw new Error(`Could not find application channel ${appChannelId}`);
-  }
+  const appChannel = getExistingChannel(sharedData, appChannelId);
 
   const theirAppCommitment = getLastCommitment(appChannel);
 
