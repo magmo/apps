@@ -90,7 +90,7 @@ export function challengerReducer(
     case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
       return {
         state: successClosed({}),
-        sharedData: sendConcludeSuccess(sharedData),
+        sharedData,
       };
     default:
       return unreachable(action);
@@ -264,7 +264,8 @@ function challengeTimedOut(state: NonTerminalCState, sharedData: SharedData): Re
   }
 
   state = acknowledgeTimeout(state);
-  return { state, sharedData };
+
+  return { state, sharedData: sendConcludeSuccess(sharedData) };
 }
 
 function challengeResponseAcknowledged(
