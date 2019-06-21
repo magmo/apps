@@ -40,6 +40,7 @@ const initializeArgs = {
   channelType,
   appAttributes,
   processId,
+  clearedToSend: true,
 };
 
 const props = {
@@ -191,6 +192,7 @@ const initializeArgsHub = {
 };
 
 const existingArgs = {
+  clearedToSend: true,
   channelId,
   processId,
   commitmentType: CommitmentType.PostFundSetup,
