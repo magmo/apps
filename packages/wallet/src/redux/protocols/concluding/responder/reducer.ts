@@ -126,16 +126,17 @@ function handleLedgerUpdateAction(
   if (protocolState.type !== 'ConcludingResponder.WaitForLedgerUpdate') {
     return { protocolState, sharedData };
   }
-  const {
-    protocolState: updatedConsensusUpdateState,
-    sharedData: newSharedData,
-  } = consensusUpdateReducer(protocolState.consensusUpdateState, sharedData, action);
-  if (updatedConsensusUpdateState.type === 'ConsensusUpdate.Success') {
+  const { protocolState: consensusUpdateState, sharedData: newSharedData } = consensusUpdateReducer(
+    protocolState.consensusUpdateState,
+    sharedData,
+    action,
+  );
+  if (consensusUpdateState.type === 'ConsensusUpdate.Success') {
     return {
       protocolState: states.acknowledgeSuccess(protocolState),
       sharedData: newSharedData,
     };
-  } else if (updatedConsensusUpdateState.type === 'ConsensusUpdate.Failure') {
+  } else if (consensusUpdateState.type === 'ConsensusUpdate.Failure') {
     return {
       protocolState: states.acknowledgeFailure({
         ...protocolState,
@@ -147,7 +148,7 @@ function handleLedgerUpdateAction(
     return {
       protocolState: states.waitForLedgerUpdate({
         ...protocolState,
-        consensusUpdateState: updatedConsensusUpdateState,
+        consensusUpdateState,
       }),
       sharedData: newSharedData,
     };
