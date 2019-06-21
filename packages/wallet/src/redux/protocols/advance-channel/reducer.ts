@@ -79,15 +79,20 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
 };
 
 function clearedToSendReducer(protocolState: states.AdvanceChannelState, sharedData: SharedData) {
-  if (states.commitmentNotSent(protocolState)) {
+  if (protocolState.type === 'AdvanceChannel.NotSafeToSend') {
     protocolState = { ...protocolState, clearedToSend: true };
     if (protocolState.type === 'AdvanceChannel.NotSafeToSend') {
       return attemptToAdvanceChannel(sharedData, protocolState, protocolState.channelId);
     } else {
       return { sharedData, protocolState };
     }
+  } else if (protocolState.type === 'AdvanceChannel.ChannelUnknown') {
+    return {
+      sharedData,
+      protocolState: states.channelUnknown({ ...protocolState, clearedToSend: true }),
+    };
   } else {
-    return { sharedData, protocolState };
+    return { protocolState, sharedData };
   }
 }
 
