@@ -1,10 +1,10 @@
 import {
   SharedData,
-  getChannel,
   signAndStore,
   queueMessage,
   checkAndStore,
   registerChannelToMonitor,
+  getExistingChannel,
 } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
@@ -172,10 +172,8 @@ const waitForDirectFundingReducer: ProtocolReducer<states.LedgerTopUpState> = (
     return { protocolState: states.failure({ reason: 'Direct Funding Failure' }), sharedData };
   }
   if (isSuccess(newDirectFundingState)) {
-    const channel = getChannel(sharedData, newProtocolState.ledgerId);
-    if (!channel) {
-      throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
-    }
+    const channel = getExistingChannel(sharedData, newProtocolState.ledgerId);
+
     if (helpers.isFirstPlayer(protocolState.ledgerId, sharedData)) {
       const theirCommitment = getLastCommitment(channel);
       const { allocation: oldAllocation, destination: oldDestination } = theirCommitment;
@@ -256,18 +254,12 @@ function calculateTotalTopUp(allocation: string[]): string {
     .toHexString();
 }
 function getOpponentAddress(sharedData: SharedData, channelId: string) {
-  const channel = getChannel(sharedData, channelId);
-  if (!channel) {
-    throw new Error(`Could not find channel for id ${channelId}`);
-  }
+  const channel = getExistingChannel(sharedData, channelId);
 
   return theirAddress(channel);
 }
 function getLatestCommitment(sharedData: SharedData, channelId: string) {
-  const channel = getChannel(sharedData, channelId);
-  if (!channel) {
-    throw new Error(`Could not find channel for id ${channelId}`);
-  }
+  const channel = getExistingChannel(sharedData, channelId);
 
   return getLastCommitment(channel);
 }
