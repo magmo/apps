@@ -217,7 +217,7 @@ function concludingCancelled(protocolState: NonTerminalCState, sharedData: Stora
   }
   return {
     protocolState: failure({ reason: 'ConcludeCancelled' }),
-    sharedData: hideWallet(sharedData),
+    sharedData: sendConcludeFailure(hideWallet(sharedData), 'UserDeclined'),
   };
 }
 
@@ -365,7 +365,7 @@ const createAndSendConcludeCommitment = (sharedData: SharedData, channelId: stri
     return queueMessage(sharedDataWithOwnCommitment, messageRelay);
   } else {
     throw new Error(
-      `Direct funding protocol, createAndSendPostFundCommitment, unable to sign commitment: ${
+      `Concluding Instigator protocol, createAndSendConcludeCommitment, unable to sign commitment: ${
         signResult.reason
       }`,
     );
