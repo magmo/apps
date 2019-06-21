@@ -66,18 +66,7 @@ export const consensusUpdateReducer = (
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
-  if (
-    !proposalCommitmentHasExpectedValues(
-      action.signedCommitment.commitment,
-      protocolState.proposedAllocation,
-      protocolState.proposedDestination,
-    )
-  ) {
-    return {
-      protocolState: states.failure({ reason: 'Proposal does not match expected values.' }),
-      sharedData,
-    };
-  }
+
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
 
   if (!checkResult.isSuccess) {
@@ -90,6 +79,18 @@ export const consensusUpdateReducer = (
 
   // Accept consensus if player B
   if (!helpers.isFirstPlayer(protocolState.channelId, sharedData)) {
+    if (
+      !proposalCommitmentHasExpectedValues(
+        action.signedCommitment.commitment,
+        protocolState.proposedAllocation,
+        protocolState.proposedDestination,
+      )
+    ) {
+      return {
+        protocolState: states.failure({ reason: 'Proposal does not match expected values.' }),
+        sharedData,
+      };
+    }
     const ourCommitment = acceptConsensus(action.signedCommitment.commitment);
     const signResult = signAndStore(sharedData, ourCommitment);
     if (!signResult.isSuccess) {
