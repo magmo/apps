@@ -196,3 +196,32 @@ describe('sending postFundSetup as B', () => {
     itSendsNoMessage(result);
   });
 });
+
+describe('sending postFundSetup as Hub', () => {
+  const scenario = scenarios.existingChannelAsHub;
+  const { processId, commitmentType } = scenario;
+
+  describe('when initializing', () => {
+    const { sharedData, commitments, args } = scenario.initialize;
+    const { protocolState, sharedData: result } = initialize(
+      processId,
+      sharedData,
+      commitmentType,
+      args,
+    );
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.NotSafeToSend');
+    itSendsNoMessage(result);
+    itStoresThisCommitment(result, commitments[2]);
+  });
+
+  describe('when receiving postfund commitments from the hub', () => {
+    const { state, sharedData, action, commitments } = scenario.receiveFromB;
+
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.Success');
+    itStoresThisCommitment(result, commitments[2]);
+    expectTheseCommitmentsSent(result, commitments);
+  });
+});

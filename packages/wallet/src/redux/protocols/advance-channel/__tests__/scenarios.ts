@@ -305,11 +305,12 @@ export const existingChannelAsHub = {
   initialize: {
     args: existingArgsHub,
     sharedData: hubSentPreFundCommitment,
+    commitments: commitments2,
   },
   receiveFromB: {
-    state: notSafeToSendHub,
+    state: { ...notSafeToSendHub, commitmentType: CommitmentType.PostFundSetup },
     sharedData: hubSentPreFundCommitment,
     action: receivePostFundSetupFromB,
-    commitment: signedCommitment5,
+    commitments: commitments5,
   },
 };
