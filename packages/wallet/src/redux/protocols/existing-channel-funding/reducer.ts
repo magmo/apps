@@ -67,7 +67,7 @@ export const initialize = (
     const signResult = signAndStore(sharedData, ourCommitment);
     if (!signResult.isSuccess) {
       return {
-        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+        protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
         sharedData,
       };
     }
@@ -126,7 +126,7 @@ const waitForLedgerTopUpReducer = (
 
   if (ledgerTopUpState.type === 'LedgerTopUp.Failure') {
     return {
-      protocolState: states.failure({ reason: 'LedgerTopUp Failure' }),
+      protocolState: states.failure({ reason: 'LedgerTopUpFailure' }),
       sharedData,
     };
   } else if (ledgerTopUpState.type === 'LedgerTopUp.Success') {
@@ -147,7 +147,7 @@ const waitForLedgerTopUpReducer = (
       const signResult = signAndStore(sharedData, ourCommitment);
       if (!signResult.isSuccess) {
         return {
-          protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+          protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
           sharedData,
         };
       }
@@ -189,28 +189,24 @@ const waitForPostFundSetupReducer = (
   const checkResult = checkAndStore(newSharedData, action.signedCommitment);
   if (!checkResult.isSuccess) {
     return {
-      protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
       sharedData,
     };
   }
   newSharedData = checkResult.store;
 
   if (!helpers.isFirstPlayer(protocolState.channelId, newSharedData)) {
-    const appPostFundSetupSharedData = craftAndSendAppPostFundCommitment(
-      newSharedData,
-      protocolState.channelId,
-      protocolState.processId,
-    );
-    if (
-      appPostFundSetupSharedData === 'CouldNotSign' ||
-      appPostFundSetupSharedData === 'NotASetupCommitment'
-    ) {
+    try {
+      newSharedData = craftAndSendAppPostFundCommitment(
+        newSharedData,
+        protocolState.channelId,
+        protocolState.processId,
+      );
+    } catch (error) {
       return {
-        protocolState: states.failure({ reason: appPostFundSetupSharedData }),
+        protocolState: states.failure({ reason: 'PostFundSetupFailure' }),
         sharedData,
       };
-    } else {
-      newSharedData = appPostFundSetupSharedData;
     }
   }
 
@@ -233,34 +229,30 @@ const waitForLedgerUpdateReducer = (
   const checkResult = checkAndStore(newSharedData, action.signedCommitment);
   if (!checkResult.isSuccess) {
     return {
-      protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+      protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
       sharedData,
     };
   }
   newSharedData = checkResult.store;
   if (helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
-    const appPostFundSetupSharedData = craftAndSendAppPostFundCommitment(
-      newSharedData,
-      protocolState.channelId,
-      protocolState.processId,
-    );
-    if (
-      appPostFundSetupSharedData === 'CouldNotSign' ||
-      appPostFundSetupSharedData === 'NotASetupCommitment'
-    ) {
+    try {
+      newSharedData = craftAndSendAppPostFundCommitment(
+        newSharedData,
+        protocolState.channelId,
+        protocolState.processId,
+      );
+    } catch (error) {
       return {
-        protocolState: states.failure({ reason: appPostFundSetupSharedData }),
+        protocolState: states.failure({ reason: 'PostFundSetupFailure' }),
         sharedData,
       };
-    } else {
-      newSharedData = appPostFundSetupSharedData;
     }
   } else {
     const ourCommitment = acceptConsensus(theirCommitment);
     const signResult = signAndStore(newSharedData, ourCommitment);
     if (!signResult.isSuccess) {
       return {
-        protocolState: states.failure({ reason: 'Received Invalid Commitment' }),
+        protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
         sharedData,
       };
     }
@@ -323,7 +315,7 @@ function craftAndSendAppPostFundCommitment(
   sharedData: SharedData,
   appChannelId: string,
   processId: string,
-): SharedData | 'CouldNotSign' | 'NotASetupCommitment' {
+): SharedData {
   let newSharedData = { ...sharedData };
   const appChannel = getExistingChannel(sharedData, appChannelId);
 
@@ -331,11 +323,11 @@ function craftAndSendAppPostFundCommitment(
 
   const ourAppCommitment = nextSetupCommitment(theirAppCommitment);
   if (ourAppCommitment === 'NotASetupCommitment') {
-    return 'NotASetupCommitment';
+    throw new Error('NotASetupCommitment');
   }
   const signResult = signAndStore(newSharedData, ourAppCommitment);
   if (!signResult.isSuccess) {
-    return 'CouldNotSign';
+    throw new Error('CouldNotSign');
   }
   newSharedData = signResult.store;
 

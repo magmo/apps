@@ -1,6 +1,12 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 
+export type FailureReason =
+  | 'ReceivedInvalidCommitment'
+  | 'SignatureFailure'
+  | 'LedgerTopUpFailure'
+  | 'PostFundSetupFailure';
+
 export interface WaitForLedgerTopUp {
   type: 'ExistingChannelFunding.WaitForLedgerTopUp';
   processId: string;
@@ -28,7 +34,7 @@ export interface WaitForLedgerUpdate {
 
 export interface Failure {
   type: 'ExistingChannelFunding.Failure';
-  reason: string;
+  reason: FailureReason;
 }
 
 export interface Success {
