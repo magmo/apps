@@ -190,3 +190,7 @@ export function getLatestCommitment(channelId: string, sharedData: SharedData) {
   const channel = getExistingChannel(sharedData, channelId);
   return getLastCommitment(channel);
 }
+
+export function getNumberOfParticipants(commitment: Commitment): number {
+  return commitment.channel.participants.length;
+}

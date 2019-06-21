@@ -276,7 +276,7 @@ function craftNewAllocationAndDestination(
   proposedAmount: string,
   channelId: string,
 ): { proposedAllocation: string[]; proposedDestination: string[] } {
-  const numParticipants = latestCommitment.channel.participants.length;
+  const numParticipants = helpers.getNumberOfParticipants(latestCommitment);
   const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
 
   const proposedAllocation: string[] = [];
@@ -303,7 +303,7 @@ function ledgerChannelNeedsTopUp(latestCommitment: Commitment, proposedAmount: s
   if (latestCommitment.commitmentType !== CommitmentType.App) {
     throw new Error('Ledger channel is already closed.');
   }
-  const numParticipants = latestCommitment.channel.participants.length;
+  const numParticipants = helpers.getNumberOfParticipants(latestCommitment);
   const amountRequiredFromEachParticipant = bigNumberify(proposedAmount).div(numParticipants);
 
   return !latestCommitment.allocation.every(a =>
