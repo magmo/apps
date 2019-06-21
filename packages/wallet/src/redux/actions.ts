@@ -16,6 +16,7 @@ import { ApplicationAction } from './protocols/application/actions';
 import { ActionConstructor } from './utils';
 import { Commitment } from '../domain';
 import { isDefundingAction, DefundingAction } from './protocols/defunding/actions';
+import { AdvanceChannelAction } from './protocols/advance-channel/actions';
 
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
@@ -207,6 +208,7 @@ export function isProtocolAction(action: WalletAction): action is ProtocolAction
 }
 
 export type WalletAction =
+  | AdvanceChannelAction
   | AdjudicatorKnown
   | AdjudicatorEventAction
   | BlockMined
