@@ -43,6 +43,10 @@ It can also happen if the `commitmentType` is incompatible with the latest commi
 
 - To simplify the communication assumptions in a channel with an arbitrary number of participants, each participant sends a valid round of commitments only to the next participant.
 
+## Open questions
+
+- What should cause the protocol to fail?
+
 ## State machine diagram
 
 ```mermaid
