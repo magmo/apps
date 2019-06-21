@@ -236,7 +236,7 @@ function attemptToAdvanceChannel(
   }
 }
 
-const channelUnknownReducer: ProtocolReducer<states.AdvanceChannelState> = (
+const channelUnknownReducer = (
   protocolState: states.ChannelUnknown,
   sharedData,
   action: CommitmentsReceived,
@@ -285,7 +285,7 @@ function checkCommitments(
   return sharedData;
 }
 
-const notSafeToSendReducer: ProtocolReducer<states.AdvanceChannelState> = (
+const notSafeToSendReducer = (
   protocolState: states.NotSafeToSend,
   sharedData,
   action: CommitmentsReceived,
@@ -298,7 +298,7 @@ const notSafeToSendReducer: ProtocolReducer<states.AdvanceChannelState> = (
   return attemptToAdvanceChannel(sharedData, protocolState, channelId);
 };
 
-const commitmentSentReducer: ProtocolReducer<states.AdvanceChannelState> = (
+const commitmentSentReducer = (
   protocolState: states.CommitmentSent,
   sharedData,
   action: CommitmentsReceived,
