@@ -24,7 +24,7 @@ import {
   hideWallet,
   sendChallengeResponseRequested,
   sendChallengeComplete,
-  sendConcludeSuccess,
+  sendOpponentConcluded,
 } from '../../reducer-helpers';
 import { ProtocolAction } from '../../../actions';
 import * as _ from 'lodash';
@@ -197,7 +197,7 @@ function acknowledgeTimeoutReducer(
   }
   return {
     protocolState: states.failure({ reason: states.FailureReason.TimeOut }),
-    sharedData: sendConcludeSuccess(sharedData),
+    sharedData: sendOpponentConcluded(sharedData),
   };
 }
 
