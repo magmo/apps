@@ -349,4 +349,23 @@ export const notClearedToSend = {
     action: clearSending,
     commitments: commitments3,
   },
+  clearedToSendButUnsafe: {
+    state: {
+      ...notSafeToSendB,
+      commitmentType: CommitmentType.PostFundSetup,
+      clearedToSend: false,
+    },
+    sharedData: bSentPreFundCommitment,
+    action: clearSending,
+    commitments: commitments1,
+  },
+  clearedToSendButChannelUnknown: {
+    state: {
+      ...channelUnknownB,
+      commitmentType: CommitmentType.PreFundSetup,
+      clearedToSend: false,
+    },
+    sharedData: emptySharedData,
+    action: clearSending,
+  },
 };
