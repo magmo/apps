@@ -236,9 +236,9 @@ export const existingChannelAsA = {
     commitments: commitments4,
   },
   receiveFromHub: {
-    state: commitmentSentA,
+    state: { ...commitmentSentA, commitmentType: CommitmentType.PostFundSetup },
     sharedData: aSentPostFundCommitment,
-    action: { ...receivePostFundSetupFromHub, commitmentType: CommitmentType.PostFundSetup },
+    action: receivePostFundSetupFromHub,
     commitments: commitments5,
   },
 };
@@ -269,17 +269,19 @@ export const existingChannelAsB = {
   initialize: {
     args: existingArgsB,
     sharedData: bReceivedPreFundSetup,
+    commitments: commitments2,
   },
   receiveFromA: {
-    state: notSafeToSendB,
+    state: { ...notSafeToSendB, commitmentType: CommitmentType.PostFundSetup },
     sharedData: bSentPreFundCommitment,
-    action: { ...receivePostFundSetupFromA, commitmentType: CommitmentType.PostFundSetup },
-    commitment: signedCommitment4,
+    action: receivePostFundSetupFromA,
+    commitments: commitments4,
   },
   receiveFromHub: {
-    state: commitmentSentB,
+    state: { ...commitmentSentB, commitmentType: CommitmentType.PostFundSetup },
     sharedData: bSentPostFundSetupCommitment,
-    action: { ...receivePostFundSetupFromA, commitmentType: CommitmentType.PostFundSetup },
+    action: receivePostFundSetupFromA,
+    commitments: commitments5,
   },
 };
 
@@ -307,7 +309,7 @@ export const existingChannelAsHub = {
   receiveFromB: {
     state: notSafeToSendHub,
     sharedData: hubSentPreFundCommitment,
-    action: { ...receivePostFundSetupFromB, commitmentType: CommitmentType.PostFundSetup },
+    action: receivePostFundSetupFromB,
     commitment: signedCommitment5,
   },
 };
