@@ -6,7 +6,6 @@ import {
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
   WalletAction,
-  CommitmentReceived,
 } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
 
@@ -59,8 +58,7 @@ export type ResponderAction =
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
   | Acknowledged
-  | DefundRequested
-  | CommitmentReceived;
+  | DefundRequested;
 
 export function isResponderAction(action: WalletAction): action is ResponderAction {
   return (
@@ -70,7 +68,6 @@ export function isResponderAction(action: WalletAction): action is ResponderActi
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED' ||
-    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED' ||
-    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED'
+    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'
   );
 }

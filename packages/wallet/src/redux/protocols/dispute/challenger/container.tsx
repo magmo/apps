@@ -50,7 +50,7 @@ class ChallengerContainer extends PureComponent<Props> {
       case 'Challenging.AcknowledgeTimeout':
         return (
           <DefundOrNot
-            approve={() => defund({ channelId: state.channelId, processId, action: state.action })}
+            approve={() => defund({ channelId: state.channelId, processId })}
             deny={() => acknowledged({ processId })}
             channelId={state.channelId}
           />

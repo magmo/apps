@@ -184,11 +184,6 @@ function acknowledgeTimeoutReducer(
   sharedData: SharedData,
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> {
-  if (action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') {
-    const newState = { ...protocolState };
-    newState.action = action;
-    return { protocolState: newState, sharedData };
-  }
   if (
     action.type !== 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED' &&
     action.type !== 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'

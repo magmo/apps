@@ -92,14 +92,6 @@ export function challengerReducer(
         state: successClosed({}),
         sharedData: sendConcludeSuccess(sharedData),
       };
-    case 'WALLET.COMMON.COMMITMENT_RECEIVED':
-      if (state.type === 'Challenging.AcknowledgeTimeout') {
-        const newState = { ...state };
-        newState.action = action;
-        return { state: newState, sharedData };
-      } else {
-        return { state, sharedData };
-      }
     default:
       return unreachable(action);
   }

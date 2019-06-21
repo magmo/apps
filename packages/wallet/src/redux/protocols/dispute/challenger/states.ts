@@ -1,7 +1,6 @@
 import { NonTerminalTransactionSubmissionState } from '../../transaction-submission';
 import { ProtocolState } from '../..';
 import { StateConstructor } from '../../../utils';
-import { CommitmentReceived } from '../../../../communication';
 
 // -------
 // States
@@ -40,7 +39,6 @@ export interface AcknowledgeTimeout {
   type: 'Challenging.AcknowledgeTimeout';
   processId: string;
   channelId: string;
-  action?: CommitmentReceived;
 }
 
 export interface AcknowledgeFailure {

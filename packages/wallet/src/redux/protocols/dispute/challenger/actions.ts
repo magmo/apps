@@ -4,7 +4,6 @@ import {
   RespondWithMoveEvent,
   ChallengeExpirySetEvent,
   WalletAction,
-  CommitmentReceived,
 } from '../../../actions';
 import { isTransactionAction, TransactionAction } from '../../transaction-submission/actions';
 import { ActionConstructor } from '../../../utils';
@@ -61,8 +60,7 @@ export type ChallengerAction =
   | ChallengeExpiredEvent
   | ChallengeExpirySetEvent
   | Acknowledged
-  | DefundRequested
-  | CommitmentReceived;
+  | DefundRequested;
 
 export function isChallengerAction(action: WalletAction): action is ChallengerAction {
   return (
@@ -74,7 +72,6 @@ export function isChallengerAction(action: WalletAction): action is ChallengerAc
     action.type === 'WALLET.ADJUDICATOR.REFUTED_EVENT' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED' ||
-    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED' ||
-    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED'
+    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'
   );
 }

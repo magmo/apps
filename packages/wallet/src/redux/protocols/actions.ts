@@ -1,7 +1,7 @@
 import { TwoPartyPlayerIndex } from '../types';
 import { Commitment } from '../../domain';
 import { ActionConstructor } from '../utils';
-import { ConcludeInstigated, WalletProtocol, CommitmentReceived } from '../../communication';
+import { ConcludeInstigated, WalletProtocol } from '../../communication';
 import { WalletAction } from '../actions';
 export { BaseProcessAction } from '../../communication';
 
@@ -46,7 +46,6 @@ export interface DefundRequested {
   processId: string; // to allow existing protocol reducer to terminate by consuming this action
   channelId: string;
   protocol: WalletProtocol.Defunding;
-  action?: CommitmentReceived;
 }
 // -------
 // Constructors
