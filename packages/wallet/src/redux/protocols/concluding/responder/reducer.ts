@@ -40,10 +40,7 @@ import { waitForLedgerUpdate } from '../../indirect-defunding/states';
 import { waitForLedgerDefunding } from '../../defunding/states';
 import { indirectDefundingReducer } from '../../indirect-defunding/reducer';
 import * as helpers from '../../reducer-helpers';
-import {
-  initialize as consensusUpdateInitialize,
-  consensusUpdateReducer,
-} from '../../consensus-update/reducer';
+import { initializeConsensusUpdate, consensusUpdateReducer } from '../../consensus-update/';
 import { ConsensusUpdateAction, isConsensusUpdateAction } from '../../consensus-update/actions';
 export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
 export type Storage = SharedData;
@@ -257,7 +254,7 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
     const {
       protocolState: consensusUpdateState,
       sharedData: newSharedData,
-    } = consensusUpdateInitialize(
+    } = initializeConsensusUpdate(
       protocolState.processId,
       ledgerId,
       latestCommitment.allocation,
@@ -328,7 +325,7 @@ function keepLedgerChannelApproved(protocolState: CState, sharedData: Storage) {
       const {
         protocolState: consensusUpdateState,
         sharedData: newSharedData,
-      } = consensusUpdateInitialize(
+      } = initializeConsensusUpdate(
         protocolState.processId,
         ledgerId,
         latestCommitment.allocation,
