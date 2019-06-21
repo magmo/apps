@@ -117,6 +117,14 @@ export function isTerminal(state: AdvanceChannelState): state is Failure | Succe
   return state.type === 'AdvanceChannel.Failure' || state.type === 'AdvanceChannel.Success';
 }
 
+export function commitmentNotSent(
+  state: AdvanceChannelState,
+): state is ChannelUnknown | NotSafeToSend {
+  return (
+    state.type === 'AdvanceChannel.ChannelUnknown' || state.type === 'AdvanceChannel.NotSafeToSend'
+  );
+}
+
 export function isAdvanceChannelState(state: ProtocolState): state is AdvanceChannelState {
   return (
     state.type === 'AdvanceChannel.ChannelUnknown' ||
