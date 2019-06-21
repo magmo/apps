@@ -10,6 +10,7 @@ import {
   respondWithMoveEvent,
   challengeExpirySetEvent,
 } from '../../../../actions';
+import { defundRequested } from '../../../../../redux/protocols/actions';
 type Reason = states.FailureReason;
 
 // -----------------
@@ -110,13 +111,20 @@ export const opponentResponds = {
   },
 };
 
-// Todo: need to figure out how a `ChallengeTimedOut` action should be triggered
-export const challengeTimesOut = {
+export const challengeTimesOutAndIsDefunded = {
   ...defaults,
   waitForResponseOrTimeout: {
     state: waitForResponseOrTimeout,
     action: challengeTimedOut,
   },
+  defund: {
+    state: acknowledgeTimeout,
+    action: defundRequested({ ...defaults }),
+  },
+};
+
+export const challengeTimesOutAndIsNotDefunded = {
+  ...defaults,
   acknowledgeTimeout: {
     state: acknowledgeTimeout,
     action: acknowledged,

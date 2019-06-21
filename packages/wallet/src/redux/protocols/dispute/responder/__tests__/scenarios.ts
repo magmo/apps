@@ -183,6 +183,14 @@ export const challengeExpires = {
   },
 };
 
+export const challengeExpiresAndDefund = {
+  ...defaults,
+  defund: {
+    state: acknowledgeTimeout,
+    action: acknowledged,
+  },
+};
+
 export const challengeExpiresDuringWaitForTransaction = {
   ...defaults,
   waitForTransaction: {

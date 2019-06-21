@@ -266,6 +266,7 @@ function challengeTimedOut(state: NonTerminalCState, sharedData: SharedData): Re
   state = acknowledgeTimeout(state);
 
   return { state, sharedData: sendConcludeSuccess(sharedData) };
+  // From the point of view of the app, it is as if we have concluded
 }
 
 function challengeResponseAcknowledged(
@@ -295,7 +296,6 @@ function timeoutAcknowledged(state: NonTerminalCState, sharedData: SharedData) {
     state: successClosed({}),
     sharedData: hideWallet(sharedData),
   };
-  // From the point of view of the app, it is as if we have concluded
 }
 // Helpers
 

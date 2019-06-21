@@ -80,8 +80,8 @@ describe('OPPONENT RESPONDS', () => {
   });
 });
 
-describe('CHALLENGE TIMES OUT ', () => {
-  const scenario = scenarios.challengeTimesOut;
+describe('CHALLENGE TIMES OUT AND IS DEFUNDED', () => {
+  const scenario = scenarios.challengeTimesOutAndIsDefunded;
   const { sharedData } = scenario;
 
   describeScenarioStep(scenario.waitForResponseOrTimeout, () => {
@@ -90,11 +90,24 @@ describe('CHALLENGE TIMES OUT ', () => {
     itTransitionsTo(result, 'Challenging.AcknowledgeTimeout');
   });
 
+  describeScenarioStep(scenario.defund, () => {
+    const { state, action } = scenario.defund;
+    const result = challengerReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'Challenging.SuccessClosed');
+  });
+});
+
+describe('CHALLENGE TIMES OUT AND IS not DEFUNDED', () => {
+  const scenario = scenarios.challengeTimesOutAndIsNotDefunded;
+  const { sharedData } = scenario;
+
   describeScenarioStep(scenario.acknowledgeTimeout, () => {
     const { state, action } = scenario.acknowledgeTimeout;
     const result = challengerReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Challenging.SuccessClosed');
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 

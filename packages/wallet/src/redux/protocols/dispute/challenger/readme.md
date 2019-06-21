@@ -57,38 +57,45 @@ Note:
 To test all paths through the state machine we will the following scenarios:
 
 1. **Opponent responds**:
+
    - `ApproveChallenge`
    - `WaitForTransaction`
    - `WaitForResponseOrTimeout`
    - `AcknowledgeResponse`
    - `Open`
-2. **Challenge times out**
+
+2. **Challenge times out and is defunded**
 
    - `AcknowledgeTimeout`
    - `Closed`
 
-3. **Channel doesn't exist**:
+3. **Challenge times out and is NOT defunded**
+
+   - `AcknowledgeTimeout`
+   - `Closed`
+
+4. **Channel doesn't exist**:
    (Challenge requested for `channelId` that doesn't exist in the wallet.)
 
    - `AcknowledgeFailure`
    - `Failure`
 
-4. **Channel not fully open**:  
+5. **Channel not fully open**:  
    (Challenge requested for channel which only has one state: two are needed to challenge.)
 
    - `AcknowledgeFailure`
    - `Failure`
 
-5. **Already have latest commitment**:
+6. **Already have latest commitment**:
    - `AcknowledgeFailure`
    - `Failure`
-6. **User declines challenge**:
+7. **User declines challenge**:
    - `ApproveChallenge`
    - `AcknowledgeFailure`
    - `Failure`
-7. **Receive commitment while approving**:
+8. **Receive commitment while approving**:
    The opponent's commitment arrives while the user is approving the challenge - `ApproveChallenge` - `AcknowledgeFailure`
-8. **Transaction fails**:
+9. **Transaction fails**:
    - `WaitForTransaction`
    - `AcknowledgeFailure`
    - `Failure`
