@@ -80,7 +80,7 @@ const indirectFundedSecondConcludeReceived = {
 // States
 // ------
 const approveConcluding = states.approveConcluding(defaults);
-const decideDefund = states.decideDefund({ ...defaults, opponentSelectedKeepLedgerChannel: false });
+const decideDefund = states.decideDefund({ ...defaults, opponentHasSelected: false });
 
 const waitForDefund = states.waitForDefund({
   ...defaults,

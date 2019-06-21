@@ -230,7 +230,7 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
       protocolState.channelId,
     );
     return {
-      protocolState: decideDefund({ ...protocolState, opponentSelectedKeepLedgerChannel: false }),
+      protocolState: decideDefund({ ...protocolState, opponentHasSelected: false }),
       sharedData: sharedDataWithOwnCommitment,
     };
   } else {
@@ -252,7 +252,7 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
     sendKeepLedgerChannelApproved(theirAddress(appChannel), protocolState.processId),
   );
 
-  if (protocolState.opponentSelectedKeepLedgerChannel) {
+  if (protocolState.opponentHasSelected) {
     const latestCommitment = getLastCommitment(appChannel);
     const {
       protocolState: consensusUpdateState,

@@ -33,7 +33,7 @@ export interface ResponderDecideDefund {
   type: 'ConcludingResponder.DecideDefund';
   processId: string;
   channelId: string;
-  opponentSelectedKeepLedgerChannel: boolean;
+  opponentHasSelected: boolean;
 }
 
 export interface ResponderWaitForDefund {
