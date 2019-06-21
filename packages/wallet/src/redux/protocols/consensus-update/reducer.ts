@@ -6,6 +6,8 @@ import * as helpers from '../reducer-helpers';
 import { theirAddress, getLastCommitment } from '../../channel-store';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain/two-player-consensus-game';
 import { sendCommitmentReceived } from '../../../communication';
+import { Commitment } from '../../../domain';
+import { appAttributesFromBytes } from 'fmg-nitro-adjudicator';
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = 'ConsensusUpdate';
 export const initialize = (
   processId: string,
@@ -64,7 +66,18 @@ export const consensusUpdateReducer = (
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
-
+  if (
+    !proposalCommitmentHasExpectedValues(
+      action.signedCommitment.commitment,
+      protocolState.proposedAllocation,
+      protocolState.proposedDestination,
+    )
+  ) {
+    return {
+      protocolState: states.failure({ reason: 'Proposal does not match expected values.' }),
+      sharedData,
+    };
+  }
   const checkResult = checkAndStore(sharedData, action.signedCommitment);
 
   if (!checkResult.isSuccess) {
@@ -111,4 +124,30 @@ function getLatestCommitment(sharedData: SharedData, channelId: string) {
   }
 
   return getLastCommitment(channel);
+}
+
+function proposalCommitmentHasExpectedValues(
+  commitment: Commitment,
+  expectedAllocation: string[],
+  expectedDestination: string[],
+): boolean {
+  const { proposedAllocation, proposedDestination } = appAttributesFromBytes(
+    commitment.appAttributes,
+  );
+  if (
+    proposedAllocation.length !== expectedAllocation.length ||
+    proposedDestination.length !== expectedDestination.length
+  ) {
+    return false;
+  }
+
+  for (let i = 0; i < proposedAllocation.length; i++) {
+    if (
+      proposedAllocation[i] !== expectedAllocation[i] ||
+      proposedDestination[i] !== expectedDestination[i]
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
