@@ -111,6 +111,15 @@ describe('sending preFundSetup as Hub', () => {
     itSendsNoMessage(result);
   });
 
+  describe('when receiving prefund commitments from A', () => {
+    const { state, sharedData, action, commitments } = scenario.receiveFromA;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.ChannelUnknown');
+    itStoresThisCommitment(result, commitments[0]);
+    itSendsNoMessage(result);
+  });
+
   describe('when receiving prefund commitments from B', () => {
     const { state, sharedData, action, commitments } = scenario.receiveFromB;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);

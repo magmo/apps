@@ -291,6 +291,12 @@ export const newChannelAsHub = {
     args: initializeArgsHub,
     sharedData: emptySharedData,
   },
+  receiveFromA: {
+    state: channelUnknownHub,
+    sharedData: emptySharedData,
+    action: receivePreFundSetupFromA,
+    commitments: commitments0,
+  },
   receiveFromB: {
     state: channelUnknownHub,
     sharedData: emptySharedData,
