@@ -66,7 +66,6 @@ describe('Player B Happy path', () => {
 
   describeScenarioStep(scenario.waitForPostFundSetup, () => {
     const { action, state, sharedData } = scenario.waitForPostFundSetup;
-    debugger;
     const updatedState = directFundingStateReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
   });
