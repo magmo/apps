@@ -32,7 +32,7 @@ describe('Player A Happy path', () => {
     itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
   });
 });
-describe('Player A No Exchanging Post Fund Setups Happy path', () => {
+describe('Player A Happy Path With No Post Fund Setup Exchange', () => {
   const scenario = scenarios.aNoPostFundSetupHappyPath;
   describe('when initializing', () => {
     const { action, sharedData } = scenario.initialize;
@@ -92,7 +92,7 @@ describe('Player B Happy path', () => {
   });
 });
 
-describe('Player B No Exchanging Post Fund Setups Happy path', () => {
+describe('Player B Happy Path With No Post Fund Setup Exchange', () => {
   const scenario = scenarios.bNoPostFundSetupsHappyPath;
   describe('when initializing', () => {
     const { action, sharedData } = scenario.initialize;
