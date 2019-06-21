@@ -234,3 +234,32 @@ describe('sending postFundSetup as Hub', () => {
     expectTheseCommitmentsSent(result, commitments);
   });
 });
+
+describe('when not cleared to send', () => {
+  const scenario = scenarios.notClearedToSend;
+  const { processId, commitmentType } = scenario;
+
+  describe('when initializing', () => {
+    const { sharedData, commitments, args } = scenario.initialize;
+    const { protocolState, sharedData: result } = initialize(
+      processId,
+      sharedData,
+      commitmentType,
+      args,
+    );
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.NotSafeToSend');
+    itSendsNoMessage(result);
+    itStoresThisCommitment(result, commitments[2]);
+  });
+
+  describe('when cleared to send', () => {
+    const { state, sharedData, action, commitments } = scenario.clearedToSend;
+
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
+    itStoresThisCommitment(result, commitments[2]);
+    expectTheseCommitmentsSent(result, commitments);
+  });
+});

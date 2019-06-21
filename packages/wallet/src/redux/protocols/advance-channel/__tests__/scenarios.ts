@@ -6,6 +6,7 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { commitmentsReceived } from '../../../../communication';
 import { CommitmentType } from '../../../../domain';
+import { clearedToSend } from '../actions';
 
 // ---------
 // Test data
@@ -164,6 +165,9 @@ const receivePostFundSetupFromHub = commitmentsReceived({
   processId,
   signedCommitments: commitments5,
 });
+const clearSending = clearedToSend({
+  processId,
+});
 // ---------
 // Scenarios
 // ---------
@@ -320,5 +324,25 @@ export const existingChannelAsHub = {
     sharedData: hubSentPreFundCommitment,
     action: receivePostFundSetupFromB,
     commitments: commitments5,
+  },
+};
+
+export const notClearedToSend = {
+  ...propsA,
+  commitmentType: CommitmentType.PostFundSetup,
+  initialize: {
+    args: { ...existingArgsA, clearedToSend: false },
+    sharedData: aReceivedPrefundSetup,
+    commitments: commitments2,
+  },
+  clearedToSend: {
+    state: {
+      ...commitmentSentA,
+      commitmentType: CommitmentType.PostFundSetup,
+      clearedToSend: false,
+    },
+    sharedData: aReceivedPrefundSetup,
+    action: clearSending,
+    commitments: commitments3,
   },
 };
