@@ -5,7 +5,6 @@ import { APPLICATION_PROCESS_ID } from '../protocols/application/reducer';
 
 export function* messageSender(message) {
   window.parent.postMessage(message, '*');
-  console.log(message);
   if (
     message.messagePayload &&
     message.messagePayload.type === 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED'
