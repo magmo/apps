@@ -31,7 +31,7 @@ export function initialize(
   proposedDestination: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.LedgerTopUpState> {
-  const lastCommitment = getLatestCommitment(sharedData, ledgerId);
+  const lastCommitment = helpers.getLatestCommitment(ledgerId, sharedData);
 
   const newProtocolState = states.waitForPreTopUpLedgerUpdate({
     processId,
@@ -55,7 +55,7 @@ export function initialize(
     sharedData = signResult.store;
 
     const messageRelay = sendCommitmentReceived(
-      getOpponentAddress(sharedData, ledgerId),
+      helpers.getOpponentAddress(ledgerId, sharedData),
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
@@ -119,7 +119,7 @@ const waitForPreTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpStat
     sharedData = signResult.store;
 
     const messageRelay = sendCommitmentReceived(
-      getOpponentAddress(sharedData, protocolState.ledgerId),
+      helpers.getOpponentAddress(protocolState.ledgerId, sharedData),
       protocolState.processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
@@ -129,7 +129,7 @@ const waitForPreTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpStat
   }
 
   // Create direct funding state
-  const lastCommitment = getLatestCommitment(sharedData, protocolState.ledgerId);
+  const lastCommitment = helpers.getLatestCommitment(protocolState.ledgerId, sharedData);
   const directFundingAction = directFundingRequested({
     processId: protocolState.processId,
     channelId: protocolState.ledgerId,
@@ -236,7 +236,7 @@ const waitForPostTopUpLedgerUpdateReducer: ProtocolReducer<states.LedgerTopUpSta
     sharedData = signResult.store;
 
     const messageRelay = sendCommitmentReceived(
-      getOpponentAddress(sharedData, protocolState.ledgerId),
+      helpers.getOpponentAddress(protocolState.ledgerId, sharedData),
       protocolState.processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
@@ -253,16 +253,7 @@ function calculateTotalTopUp(allocation: string[]): string {
     .add(allocation[3])
     .toHexString();
 }
-function getOpponentAddress(sharedData: SharedData, channelId: string) {
-  const channel = getExistingChannel(sharedData, channelId);
 
-  return theirAddress(channel);
-}
-function getLatestCommitment(sharedData: SharedData, channelId: string) {
-  const channel = getExistingChannel(sharedData, channelId);
-
-  return getLastCommitment(channel);
-}
 function calculateTopUpAllocation(
   proposedAllocation: string[],
   currentAllocation: string[],
