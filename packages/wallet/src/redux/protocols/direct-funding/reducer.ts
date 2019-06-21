@@ -69,7 +69,7 @@ export function initialize(
       action.requiredDeposit,
       action.safeToDepositLevel,
     );
-    const { storage: newSharedData, state: transactionSubmissionState } = initTransactionState(
+    const { storage: newStorage, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
       action.processId,
       action.channelId,
@@ -87,7 +87,7 @@ export function initialize(
         transactionSubmissionState,
         postFundSetupState,
       }),
-      sharedData: newSharedData,
+      sharedData: newStorage,
     };
   }
 
