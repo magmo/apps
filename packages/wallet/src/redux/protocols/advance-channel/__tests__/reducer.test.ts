@@ -281,6 +281,14 @@ describe('when not cleared to send', () => {
     itSendsNoMessage(result);
     itIsClearedToSend(protocolState);
   });
+
+  describe('when cleared to send, but the commitment was already sent', () => {
+    const { state, sharedData, action } = scenario.clearedToSendAndAlreadySent;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'AdvanceChannel.CommitmentSent');
+    itSendsNoMessage(result);
+  });
 });
 
 function itIsClearedToSend(protocolState: states.AdvanceChannelState) {

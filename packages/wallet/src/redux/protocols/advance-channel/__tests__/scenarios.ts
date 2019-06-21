@@ -368,4 +368,14 @@ export const notClearedToSend = {
     sharedData: emptySharedData,
     action: clearSending,
   },
+  clearedToSendAndAlreadySent: {
+    state: {
+      ...commitmentSentB,
+      commitmentType: CommitmentType.PreFundSetup,
+      clearedToSend: true,
+    },
+    sharedData: bSentPreFundCommitment,
+    action: clearSending,
+    commitments: commitments1,
+  },
 };
