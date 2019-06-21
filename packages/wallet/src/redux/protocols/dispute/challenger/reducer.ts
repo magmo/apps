@@ -293,7 +293,7 @@ function timeoutAcknowledged(state: NonTerminalCState, sharedData: SharedData) {
   }
   return {
     state: successClosed({}),
-    sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+    sharedData: hideWallet(sharedData),
   };
   // From the point of view of the app, it is as if we have concluded
 }
