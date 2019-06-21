@@ -168,6 +168,7 @@ function initializeNewProtocol(
 ): { protocolState: ProtocolState; sharedData: states.SharedData } {
   const processId = getProcessId(action);
   const incomingSharedData = states.sharedData(state);
+  // TODO do not reinitialise an existing process
   switch (action.type) {
     case 'WALLET.NEW_PROCESS.FUNDING_REQUESTED': {
       const { channelId } = action;
@@ -216,12 +217,7 @@ function initializeNewProtocol(
         state.privateKey,
       );
     case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
-      return defundingProtocol.initialize(
-        processId,
-        action.channelId,
-        incomingSharedData,
-        action.action,
-      );
+      return defundingProtocol.initialize(processId, action.channelId, incomingSharedData);
     default:
       return unreachable(action);
   }
