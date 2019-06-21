@@ -78,7 +78,7 @@ export const aHappyPath = {
       ...defaultsForA,
       channelFunded: true,
     }),
-    sharedData: { ...advanceChannelScenarios.initialStore },
+    sharedData: sharedData(),
     action: advanceChannelScenarios.successTrigger,
   },
 };
