@@ -49,7 +49,7 @@ export const initialize = (
     // send a request for opponent to start new defunding process first, because they may not yet have done so
 
     const actionToRelay = defundRequested({
-      processId: '0xTODO',
+      processId: '0XTODO', // wish to terminate existing process in opponent's wallet (could use currentProcessId but this is not on SharedData)
       channelId,
     });
 
