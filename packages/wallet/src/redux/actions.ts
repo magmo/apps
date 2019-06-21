@@ -3,6 +3,7 @@ import * as directFunding from './protocols/direct-funding/actions';
 import * as indirectFunding from './protocols/indirect-funding/actions';
 import * as application from './protocols/application/actions';
 import * as protocol from './protocols/actions';
+import * as advanceChannel from './protocols/advance-channel';
 import { FundingAction, isFundingAction } from './protocols/funding/actions';
 import { CommitmentReceived, commitmentReceived, RelayableAction } from '../communication';
 import {
@@ -14,6 +15,7 @@ import { ConcludingAction, isConcludingAction } from './protocols/concluding';
 import { ApplicationAction } from './protocols/application/actions';
 import { ActionConstructor } from './utils';
 import { Commitment } from '../domain';
+import { AdvanceChannelAction } from './protocols/advance-channel/actions';
 
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
@@ -204,6 +206,7 @@ export function isProtocolAction(action: WalletAction): action is ProtocolAction
 }
 
 export type WalletAction =
+  | AdvanceChannelAction
   | AdjudicatorKnown
   | AdjudicatorEventAction
   | BlockMined
@@ -223,7 +226,14 @@ export function isCommonAction(action: WalletAction): action is CommonAction {
   );
 }
 
-export { channel, directFunding as funding, indirectFunding, protocol, application };
+export {
+  channel,
+  directFunding as funding,
+  indirectFunding,
+  protocol,
+  application,
+  advanceChannel,
+};
 
 // These are any actions that update shared data directly without any protocol
 export type SharedDataUpdateAction = AdjudicatorEventAction;
