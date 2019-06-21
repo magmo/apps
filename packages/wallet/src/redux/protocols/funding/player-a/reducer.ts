@@ -17,15 +17,13 @@ import * as indirectFundingStates from '../../indirect-funding/states';
 import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
 import {
-  initialize as initializeExistingChannelFunding,
+  initializeExistingChannelFunding,
   existingChannelFundingReducer,
-} from '../../existing-channel-funding/reducer';
-import * as existingChannelFundingStates from '../../existing-channel-funding/states';
-import { addHex } from '../../../../utils/hex-utils';
-import {
   ExistingChannelFundingAction,
   isExistingChannelFundingAction,
-} from '../../existing-channel-funding/actions';
+} from '../../existing-channel-funding';
+import * as existingChannelFundingStates from '../../existing-channel-funding/states';
+import { addHex } from '../../../../utils/hex-utils';
 import { CommitmentType } from 'fmg-core';
 import { getLastCommitment } from '../../../channel-store';
 

@@ -19,12 +19,11 @@ import { Properties } from '../../../utils';
 import {
   isExistingChannelFundingAction,
   ExistingChannelFundingAction,
-} from '../../existing-channel-funding/actions';
-import * as existingChannelFundingStates from '../../existing-channel-funding/states';
-import {
   existingChannelFundingReducer,
-  initialize as initializeExistingChannelFunding,
-} from '../../existing-channel-funding/reducer';
+  initializeExistingChannelFunding,
+} from '../../existing-channel-funding';
+import * as existingChannelFundingStates from '../../existing-channel-funding/states';
+
 import { addHex } from '../../../../utils/hex-utils';
 import { CommitmentType } from 'fmg-core';
 import { getLastCommitment } from '../../../channel-store';
