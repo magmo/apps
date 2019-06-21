@@ -178,9 +178,6 @@ function initializeWithExistingChannel(
 ) {
   const { channelId, ourIndex, clearedToSend } = initializeChannelArgs;
   const channel = getChannel(sharedData.channelStore, channelId);
-  if (!channel) {
-    throw new Error('Channel not stored');
-  }
   if (isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
     const lastCommitment = getLastCommitment(channel);
     const ourCommitment = nextSetupCommitment(lastCommitment);
