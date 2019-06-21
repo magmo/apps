@@ -190,15 +190,21 @@ function acknowledgeTimeoutReducer(
   sharedData: SharedData,
   action: actions.ResponderAction,
 ): ProtocolStateWithSharedData<states.ResponderState> {
-  if (
-    action.type !== 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED' &&
-    action.type !== 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'
-  ) {
-    return { protocolState, sharedData };
+  if (action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED') {
+    return {
+      protocolState: states.failure({ reason: states.FailureReason.TimeOut }),
+      sharedData: hideWallet(sharedData),
+    };
+  }
+  if (action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED') {
+    return {
+      protocolState: states.failure({ reason: states.FailureReason.TimeOut }),
+      sharedData,
+    };
   }
   return {
-    protocolState: states.failure({ reason: states.FailureReason.TimeOut }),
-    sharedData: hideWallet(sharedData),
+    protocolState,
+    sharedData,
   };
 }
 
