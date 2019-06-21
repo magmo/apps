@@ -280,7 +280,7 @@ export const existingChannelAsB = {
   receiveFromHub: {
     state: { ...commitmentSentB, commitmentType: CommitmentType.PostFundSetup },
     sharedData: bSentPostFundSetupCommitment,
-    action: receivePostFundSetupFromA,
+    action: receivePostFundSetupFromHub,
     commitments: commitments5,
   },
 };
