@@ -76,6 +76,10 @@ const commitments5 = [signedCommitment3, signedCommitment4, signedCommitment5];
 // ----
 // States
 // ------
+const notSafeToSendA = states.notSafeToSend({
+  ...propsA,
+  commitmentType: CommitmentType.PostFundSetup,
+});
 const commitmentSentA = states.commitmentSent({
   ...propsA,
   commitmentType: CommitmentType.PreFundSetup,
@@ -337,7 +341,7 @@ export const notClearedToSend = {
   },
   clearedToSend: {
     state: {
-      ...commitmentSentA,
+      ...notSafeToSendA,
       commitmentType: CommitmentType.PostFundSetup,
       clearedToSend: false,
     },
