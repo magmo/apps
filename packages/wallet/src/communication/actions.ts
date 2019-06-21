@@ -4,7 +4,7 @@ import { FundingStrategy } from './index';
 import { WalletProtocol } from '.';
 import { ActionConstructor } from '../redux/utils';
 import { Commitments } from '../redux/channel-store';
-import { DefundRequested } from 'src/redux/protocols/actions';
+import { DefundRequested } from '../redux/protocols/actions';
 
 export interface BaseProcessAction {
   processId: string;
