@@ -29,7 +29,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
-  // Get the desired allocation/destination from the app commitment
+
   const {
     allocation: proposedAllocation,
     destination: proposedDestination,
@@ -130,6 +130,7 @@ const waitForLedgerTopUpReducer = (
     const { ledgerId, processId } = protocolState;
     const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
     const theirCommitment = getLastCommitment(ledgerChannel);
+
     if (helpers.isFirstPlayer(ledgerId, sharedData)) {
       const appFunding = craftAppFunding(sharedData, protocolState.channelId);
       const ourCommitment = proposeNewConsensus(
