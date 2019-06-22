@@ -131,7 +131,6 @@ const waitForLedgerTopUpReducer = (
     const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
     const theirCommitment = getLastCommitment(ledgerChannel);
     if (helpers.isFirstPlayer(ledgerId, sharedData)) {
-      // Get the desired allocation/destination from the app commitment
       const appFunding = craftAppFunding(sharedData, protocolState.channelId);
       const ourCommitment = proposeNewConsensus(
         theirCommitment,
