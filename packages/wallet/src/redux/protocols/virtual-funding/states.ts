@@ -11,10 +11,6 @@ interface Base {
   targetChannelId: string;
 }
 
-export interface WaitForApproval extends Base {
-  type: 'VirtualFunding.WaitForApproval';
-}
-
 export interface WaitForChannelPreparation extends Base {
   type: 'VirtualFunding.WaitForChannelPreparation';
   jointChannelState: AdvanceChannelState;

@@ -73,9 +73,7 @@ In the following diagram, to move from `WaitForChannelPreparation`, the protocol
 ```mermaid
 graph TD
 linkStyle default interpolate basis
-  St((start)) --> F((failure))
-  St((start)) --> WFAp(WaitForApproval)
-  WFAp --> |Approved| WFOC("WaitForChannelPreparation: #60;AdvanceChannel(J), AdvanceChannel(G)#62;")
+  St((start)) --> WFOC("WaitForChannelPreparation: #60;AdvanceChannel(J), AdvanceChannel(G)#62;")
 
   WFOC --> |"Prepared(first)"| WFOC
   WFOC --> |"Prepared(second)"| WFGF("WaitForGuarantorFunding: IndirectFunding(G)")
@@ -83,7 +81,6 @@ linkStyle default interpolate basis
   WFGF --> |GuarantorFunded| WFAF("WaitForApplicationFunding: UpdateConsensus(J)")
   WFAF --> |ApplicationFunded| WFSA(WaitForSuccessAcknowledgement)
   WFSA --> |SuccessAcknowledged| S((success))
-  WFAp --> |Rejected| F((failure))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
@@ -92,9 +89,5 @@ linkStyle default interpolate basis
   class St logic;
   class S Success;
   class F Failure;
-  class Fi WaitForChildProtocol
-  class WFOC WaitForChildProtocol
-  class WFJ WaitForChildProtocol
-  class WFAF WaitForChildProtocol
-  class WFGF WaitForChildProtocol
+  class WFAp,Fi,WFOC,WFJ,WFAF,WFGF WaitForChildProtocol
 ```
