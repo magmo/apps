@@ -27,7 +27,6 @@ const props = {
   channelId,
   ledgerId,
   processId,
-  proposedAmount: fourToApp[0].wei,
 };
 
 const setFundingState = (sharedData: SharedData): SharedData => {
@@ -81,6 +80,7 @@ const playerBFirstPostFundSetupReceived = setFundingState(
 const initialPlayerBLedgerSharedData = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
+    channelFromCommitments([app0, app1], bsAddress, bsPrivateKey),
   ]),
 );
 

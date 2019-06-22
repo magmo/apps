@@ -10,9 +10,9 @@ describe('player A happy path', () => {
   const scenario = scenarios.playerAFullyFundedHappyPath;
 
   describe('when initializing', () => {
-    const { processId, channelId, ledgerId, sharedData, proposedAmount } = scenario.initialize;
+    const { processId, channelId, ledgerId, sharedData } = scenario.initialize;
 
-    const result = initialize(processId, channelId, ledgerId, proposedAmount, sharedData);
+    const result = initialize(processId, channelId, ledgerId, sharedData);
     itTransitionsTo(result, 'ExistingChannelFunding.WaitForLedgerUpdate');
     itSendsMessage(result, scenario.initialize.reply);
   });
@@ -34,9 +34,9 @@ describe('player B happy path', () => {
   const scenario = scenarios.playerBFullyFundedHappyPath;
 
   describe('when initializing', () => {
-    const { processId, channelId, ledgerId, sharedData, proposedAmount } = scenario.initialize;
+    const { processId, channelId, ledgerId, sharedData } = scenario.initialize;
 
-    const result = initialize(processId, channelId, ledgerId, proposedAmount, sharedData);
+    const result = initialize(processId, channelId, ledgerId, sharedData);
     itTransitionsTo(result, 'ExistingChannelFunding.WaitForLedgerUpdate');
   });
 
