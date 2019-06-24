@@ -22,6 +22,11 @@ const oneThree = [
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
 ];
 
+const oneOne = [
+  { address: asAddress, wei: bigNumberify(1).toHexString() },
+  { address: bsAddress, wei: bigNumberify(1).toHexString() },
+];
+
 const fourToApp = [{ address: channelId, wei: bigNumberify(4).toHexString() }];
 const props = {
   channelId,
@@ -43,6 +48,8 @@ const ledger4 = ledgerCommitment({ turnNum: 4, balances: oneThree });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: oneThree });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances: oneThree, proposedBalances: fourToApp });
 const ledger7 = ledgerCommitment({ turnNum: 7, balances: fourToApp });
+const topUpLedger4 = ledgerCommitment({ turnNum: 4, balances: oneOne });
+const topUpLedger5 = ledgerCommitment({ turnNum: 5, balances: oneOne });
 
 const app0 = appCommitment({ turnNum: 0, balances: oneThree });
 const app1 = appCommitment({ turnNum: 1, balances: oneThree });
@@ -57,6 +64,14 @@ const initialPlayerALedgerSharedData = setFundingState(
     channelFromCommitments([app0, app1], asAddress, asPrivateKey),
   ]),
 );
+
+const initialPlayerATopUpNeededSharedData = setFundingState(
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments([topUpLedger4, topUpLedger5], asAddress, asPrivateKey),
+    channelFromCommitments([app0, app1], asAddress, asPrivateKey),
+  ]),
+);
+
 const playerAFirstCommitmentReceived = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
@@ -81,6 +96,13 @@ const playerBFirstPostFundSetupReceived = setFundingState(
 const initialPlayerBLedgerSharedData = setFundingState(
   setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
+    channelFromCommitments([app0, app1], bsAddress, bsPrivateKey),
+  ]),
+);
+
+const initialPlayerBTopUpNeededSharedData = setFundingState(
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments([topUpLedger4, topUpLedger5], bsAddress, bsPrivateKey),
     channelFromCommitments([app0, app1], bsAddress, bsPrivateKey),
   ]),
 );
@@ -196,8 +218,14 @@ export const playerBInvalidPostFundCommitment = {
 
 export const playerATopUpNeeded = {
   initialize: {
-    sharedData: initialPlayerALedgerSharedData,
+    sharedData: initialPlayerATopUpNeededSharedData,
     ...props,
-    reply: ledger6,
+  },
+};
+
+export const playerBTopUpNeeded = {
+  initialize: {
+    sharedData: initialPlayerBTopUpNeededSharedData,
+    ...props,
   },
 };

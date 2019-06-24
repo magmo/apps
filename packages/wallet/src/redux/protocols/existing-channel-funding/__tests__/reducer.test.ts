@@ -73,6 +73,16 @@ describe('player A invalid post fund commitment', () => {
   });
 });
 
+describe('player A top up needed', () => {
+  const scenario = scenarios.playerATopUpNeeded;
+  describe('when initializing', () => {
+    const { processId, channelId, ledgerId, sharedData } = scenario.initialize;
+
+    const result = initialize(processId, channelId, ledgerId, sharedData);
+    itTransitionsTo(result, 'ExistingChannelFunding.WaitForLedgerTopUp');
+  });
+});
+
 describe('player B invalid ledger update commitment', () => {
   const scenario = scenarios.playerBInvalidUpdateCommitment;
   describe('when in WaitForLedgerUpdate', () => {
@@ -88,6 +98,16 @@ describe('player B invalid post fund commitment', () => {
     const { state, action, sharedData } = scenario.waitForPostFundSetup;
     const updatedState = existingChannelFundingReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'ExistingChannelFunding.Failure');
+  });
+});
+
+describe('player B top up needed', () => {
+  const scenario = scenarios.playerATopUpNeeded;
+  describe('when initializing', () => {
+    const { processId, channelId, ledgerId, sharedData } = scenario.initialize;
+
+    const result = initialize(processId, channelId, ledgerId, sharedData);
+    itTransitionsTo(result, 'ExistingChannelFunding.WaitForLedgerTopUp');
   });
 });
 
