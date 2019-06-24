@@ -67,8 +67,9 @@ export const keepLedgerChannelApproved: ActionConstructor<KeepLedgerChannelAppro
 // -------
 
 export interface CommitmentsReceived extends BaseProcessAction {
-  type: 'WALLET.ADVANCE_CHANNEL.COMMITMENTS_RECEIVED';
+  type: 'WALLET.COMMON.COMMITMENTS_RECEIVED';
   signedCommitments: Commitments;
+  protocolLocator?: string;
 }
 
 // -------
@@ -77,7 +78,7 @@ export interface CommitmentsReceived extends BaseProcessAction {
 
 export const commitmentsReceived: ActionConstructor<CommitmentsReceived> = p => ({
   ...p,
-  type: 'WALLET.ADVANCE_CHANNEL.COMMITMENTS_RECEIVED',
+  type: 'WALLET.COMMON.COMMITMENTS_RECEIVED',
 });
 
 // COMMON
@@ -122,6 +123,6 @@ export function isRelayableAction(action: WalletAction): action is RelayableActi
     action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED' ||
     action.type === 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED' ||
-    action.type === 'WALLET.ADVANCE_CHANNEL.COMMITMENTS_RECEIVED'
+    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED'
   );
 }

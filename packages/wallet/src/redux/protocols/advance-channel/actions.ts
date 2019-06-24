@@ -18,7 +18,7 @@ export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
 
 export function isAdvanceChannelAction(action: WalletAction): action is AdvanceChannelAction {
   return (
-    action.type === 'WALLET.ADVANCE_CHANNEL.COMMITMENTS_RECEIVED' ||
+    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
     action.type === 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND'
   );
 }

@@ -10,8 +10,8 @@ import { bigNumberify } from 'ethers/utils';
 import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as states from '../states';
-import { commitmentReceived } from '../../../actions';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../reducer';
+import { commitmentsReceived } from '../../../../communication';
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
@@ -23,7 +23,7 @@ const twoThreeOneTwo = [
   { address: asAddress, wei: bigNumberify(1).toHexString() },
   { address: bsAddress, wei: bigNumberify(2).toHexString() },
 ];
-const ledger0 = ledgerCommitment({ turnNum: 0, balances: twoThree });
+const ledger20 = ledgerCommitment({ turnNum: 20, balances: twoThree });
 const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoThree });
 const ledger6 = ledgerCommitment({
@@ -43,7 +43,7 @@ const aInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
 ]);
 const aUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
+  channelFromCommitments([ledger4, ledger5, ledger6], asAddress, asPrivateKey),
 ]);
 const bInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
@@ -65,19 +65,19 @@ const waitForUpdate = states.waitForUpdate({
 // ------
 // Actions
 // ------
-const update0Received = commitmentReceived({
+const update0Received = commitmentsReceived({
   processId,
-  signedCommitment: ledger6,
+  signedCommitments: [ledger6],
   protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
 });
-const update1Received = commitmentReceived({
+const update1Received = commitmentsReceived({
   processId,
-  signedCommitment: ledger7,
+  signedCommitments: [ledger6, ledger7],
   protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
 });
-const invalidUpdateReceived = commitmentReceived({
+const invalidUpdateReceived = commitmentsReceived({
   processId,
-  signedCommitment: ledger0,
+  signedCommitments: [ledger20],
   protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
 });
 export const aHappyPath = {
