@@ -14,7 +14,7 @@ export const JOINT_CHANNEL_DESCRIPTOR = 'jointChannel';
 export const GUARANTOR_CHANNEL_DESCRIPTOR = 'guarantorChannel';
 export const INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR = 'indirectGuarantorFunding';
 export const INDIRECT_APPLICATION_FUNDING_DESCRIPTOR = 'indirectApplicationFunding';
-export type SUBSTATE_DESCRIPTORS =
+export type SubstateDescriptor =
   | typeof JOINT_CHANNEL_DESCRIPTOR
   | typeof GUARANTOR_CHANNEL_DESCRIPTOR
   | typeof INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR
