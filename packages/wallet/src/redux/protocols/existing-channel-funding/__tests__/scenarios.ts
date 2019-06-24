@@ -17,9 +17,9 @@ import { EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
 
 const processId = 'processId';
 
-const twoTwo = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(2).toHexString() },
+const oneThree = [
+  { address: asAddress, wei: bigNumberify(1).toHexString() },
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
 ];
 
 const fourToApp = [{ address: channelId, wei: bigNumberify(4).toHexString() }];
@@ -39,14 +39,15 @@ const setFundingState = (sharedData: SharedData): SharedData => {
 // -----------
 // Commitments
 // -----------
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoTwo });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoTwo });
-const ledger6 = ledgerCommitment({ turnNum: 6, balances: twoTwo, proposedBalances: fourToApp });
+const ledger4 = ledgerCommitment({ turnNum: 4, balances: oneThree });
+const ledger5 = ledgerCommitment({ turnNum: 5, balances: oneThree });
+const ledger6 = ledgerCommitment({ turnNum: 6, balances: oneThree, proposedBalances: fourToApp });
 const ledger7 = ledgerCommitment({ turnNum: 7, balances: fourToApp });
-const app0 = appCommitment({ turnNum: 0, balances: twoTwo });
-const app1 = appCommitment({ turnNum: 1, balances: twoTwo });
-const app2 = appCommitment({ turnNum: 2, balances: twoTwo });
-const app3 = appCommitment({ turnNum: 3, balances: twoTwo });
+
+const app0 = appCommitment({ turnNum: 0, balances: oneThree });
+const app1 = appCommitment({ turnNum: 1, balances: oneThree });
+const app2 = appCommitment({ turnNum: 2, balances: oneThree });
+const app3 = appCommitment({ turnNum: 3, balances: oneThree });
 // -----------
 // Shared Data
 // -----------
@@ -190,5 +191,13 @@ export const playerBInvalidPostFundCommitment = {
     state: waitForLedgerUpdate,
     sharedData: playerBFirstPostFundSetupReceived,
     action: invalidPostFundReceived,
+  },
+};
+
+export const playerATopUpNeeded = {
+  initialize: {
+    sharedData: initialPlayerALedgerSharedData,
+    ...props,
+    reply: ledger6,
   },
 };
