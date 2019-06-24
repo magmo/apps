@@ -46,22 +46,28 @@ export const initialize = (
       };
     }
     newSharedData = signResult.store;
-    // send a request for opponent to start new defunding process first, because they may not yet have done so
 
+    // send a request for opponent to start new defunding process first, because they may not yet have done so
     const actionToRelay = defundRequested({
-      processId: '0XTODO', // wish to terminate existing process in opponent's wallet (could use currentProcessId but this is not on SharedData)
+      processId: sharedData.currentProcessId || '', // wish to terminate existing process in opponent's wallet
       channelId,
     });
 
-    const messageRelay0 = messageRelayRequested(theirAddress(ledgerChannel), actionToRelay);
+    const defundRequestedMessageRelay = messageRelayRequested(
+      theirAddress(ledgerChannel),
+      actionToRelay,
+    );
 
-    const messageRelay = sendCommitmentReceived(
+    const commitmentReceivedMessageRelay = sendCommitmentReceived(
       theirAddress(ledgerChannel),
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
     );
-    newSharedData = queueMessage(queueMessage(newSharedData, messageRelay0), messageRelay);
+    newSharedData = queueMessage(
+      queueMessage(newSharedData, defundRequestedMessageRelay),
+      commitmentReceivedMessageRelay,
+    );
   }
 
   const protocolState = states.waitForLedgerUpdate({
