@@ -68,6 +68,6 @@ export function isResponderAction(action: WalletAction): action is ResponderActi
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.DISPUTE.RESPONDER.ACKNOWLEDGED' ||
-    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'
+    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED' // TODO in future this should be a new and distinct action that is not a new process Action
   );
 }

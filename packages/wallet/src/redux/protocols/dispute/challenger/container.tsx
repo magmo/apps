@@ -94,7 +94,7 @@ const mapDispatchToProps = {
   approve: actions.challengeApproved,
   deny: actions.challengeDenied,
   acknowledged: actions.acknowledged,
-  defund: defundRequested,
+  defund: defundRequested, // TODO in future we should split this action into two distinct actions, so that protocol action and new process action unions remain disjoint.
 };
 
 export const Challenger = connect(

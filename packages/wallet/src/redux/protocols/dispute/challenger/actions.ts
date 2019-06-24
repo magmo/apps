@@ -72,6 +72,6 @@ export function isChallengerAction(action: WalletAction): action is ChallengerAc
     action.type === 'WALLET.ADJUDICATOR.REFUTED_EVENT' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
     action.type === 'WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED' ||
-    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED'
+    action.type === 'WALLET.NEW_PROCESS.DEFUND_REQUESTED' // TODO in future this should be a new and distinct action that is not a new process Action
   );
 }

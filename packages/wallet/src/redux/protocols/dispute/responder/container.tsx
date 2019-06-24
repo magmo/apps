@@ -67,7 +67,7 @@ const mapDispatchToProps = {
   respondApproved: actions.respondApproved,
   responseProvided: actions.responseProvided,
   acknowledged: actions.acknowledged,
-  defund: defundRequested,
+  defund: defundRequested, // TODO in future we should split this action into two distinct actions, so that protocol action and new process action unions remain disjoint.
 };
 
 export const Responder = connect(
