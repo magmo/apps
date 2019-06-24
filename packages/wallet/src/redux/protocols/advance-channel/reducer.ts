@@ -55,7 +55,7 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
   action: WalletAction,
 ) => {
   if (!isAdvanceChannelAction(action)) {
-    console.error('Invalid action: expected WALLET.ADVANCE_CHANNEL.COMMITMENTS_RECEIVED');
+    console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
     return { protocolState, sharedData };
   }
 
