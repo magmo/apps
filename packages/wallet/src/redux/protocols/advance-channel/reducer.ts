@@ -25,6 +25,7 @@ import { Channel } from 'fmg-core';
 import { isAdvanceChannelAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { Properties } from '../../utils';
+import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '.';
 
 type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
@@ -154,6 +155,7 @@ function initializeWithNewChannel(
       nextParticipant(participants, ourIndex),
       processId,
       [signResult.signedCommitment],
+      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
 
@@ -202,6 +204,7 @@ function initializeWithExistingChannel(
       nextParticipant(channel.participants, ourIndex),
       processId,
       getCommitments(sharedData, channelId),
+      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
 
@@ -248,6 +251,7 @@ function attemptToAdvanceChannel(
       nextParticipant(participants, ourIndex),
       protocolState.processId,
       channel.commitments,
+      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
     );
 
     sharedData = queueMessage(sharedData, messageRelay);

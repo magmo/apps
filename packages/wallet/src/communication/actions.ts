@@ -78,6 +78,7 @@ export interface CommitmentReceived extends BaseProcessAction {
 
 export interface CommitmentsReceived extends BaseProcessAction {
   type: 'WALLET.COMMON.COMMITMENTS_RECEIVED';
+  protocolLocator: string;
   signedCommitments: Commitments;
 }
 

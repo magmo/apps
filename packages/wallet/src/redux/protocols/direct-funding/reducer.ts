@@ -2,7 +2,7 @@ import { bigNumberify } from 'ethers/utils';
 import { unreachable } from '../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 import * as actions from '../../actions';
-import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
+import { ProtocolReducer, ProtocolStateWithSharedData, makeLocator } from '../../protocols';
 import { SharedData } from '../../state';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
@@ -46,6 +46,10 @@ export function initialize(
     processId,
     commitmentType,
     clearedToSend: alreadyFunded && exchangePostFundSetups,
+    protocolLocator: makeLocator(
+      DIRECT_FUNDING_PROTOCOL_LOCATOR,
+      advanceChannel.ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+    ),
   });
   sharedData = newSharedData;
 
