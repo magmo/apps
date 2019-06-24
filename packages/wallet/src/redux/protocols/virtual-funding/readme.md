@@ -79,8 +79,7 @@ linkStyle default interpolate basis
   WFOC --> |"Prepared(second)"| WFGF("WaitForGuarantorFunding: IndirectFunding(G)")
 
   WFGF --> |GuarantorFunded| WFAF("WaitForApplicationFunding: UpdateConsensus(J)")
-  WFAF --> |ApplicationFunded| WFSA(WaitForSuccessAcknowledgement)
-  WFSA --> |SuccessAcknowledged| S((success))
+  WFAF --> |ApplicationFunded| S((success))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;

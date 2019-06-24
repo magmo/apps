@@ -1,5 +1,5 @@
 import { ProtocolState } from '..';
-import { StateConstructor, Properties } from '../../utils';
+import { StateConstructor } from '../../utils';
 import { AdvanceChannelState } from '../advance-channel';
 
 // -------
@@ -24,9 +24,6 @@ export interface WaitForApplicationFunding extends Base {
   type: 'VirtualFunding.WaitForApplicationFunding';
   indirectFundingState: 'UpdateConsensusState<J>';
 }
-export interface WaitForSuccessAcknowledgement extends Base {
-  type: 'VirtualFunding.WaitForSuccessAcknowledgement';
-}
 export interface Success {
   type: 'VirtualFunding.Success';
 }
@@ -48,9 +45,6 @@ export const waitForGuarantorFunding: StateConstructor<WaitForGuarantorFunding> 
 export const waitForApplicationFunding: StateConstructor<WaitForApplicationFunding> = p => {
   return { type: 'VirtualFunding.WaitForApplicationFunding', ...p };
 };
-export const waitForSuccessAcknowledgement: StateConstructor<WaitForSuccessAcknowledgement> = p => {
-  return { type: 'VirtualFunding.WaitForSuccessAcknowledgement', ...p };
-};
 
 export const success: StateConstructor<Success> = _ => {
   return { type: 'VirtualFunding.Success' };
@@ -67,8 +61,7 @@ export const failure: StateConstructor<Failure> = _ => {
 export type NonTerminalVirtualFundingState =
   | WaitForChannelPreparation
   | WaitForGuarantorFunding
-  | WaitForApplicationFunding
-  | WaitForSuccessAcknowledgement;
+  | WaitForApplicationFunding;
 
 export type VirtualFundingState = NonTerminalVirtualFundingState | Success | Failure;
 export type VirtualFundingStateType = VirtualFundingState['type'];
@@ -78,7 +71,6 @@ export function isVirtualFundingState(state: ProtocolState): state is VirtualFun
     state.type === 'VirtualFunding.WaitForChannelPreparation' ||
     state.type === 'VirtualFunding.WaitForGuarantorFunding' ||
     state.type === 'VirtualFunding.WaitForApplicationFunding' ||
-    state.type === 'VirtualFunding.WaitForSuccessAcknowledgement' ||
     state.type === 'VirtualFunding.Failure' ||
     state.type === 'VirtualFunding.Success'
   );
