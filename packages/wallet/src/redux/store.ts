@@ -1,7 +1,6 @@
 import { applyMiddleware, compose, createStore } from 'redux';
 import { fork } from 'redux-saga/effects';
 import createSagaMiddleware from 'redux-saga';
-import thunk from 'redux-thunk';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -9,7 +8,7 @@ import { walletReducer } from './reducer';
 import { sagaManager } from './sagas/saga-manager';
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const enhancers = composeEnhancers(applyMiddleware(thunk, sagaMiddleware));
+const enhancers = composeEnhancers(applyMiddleware(sagaMiddleware));
 
 const store = createStore(walletReducer, enhancers);
 
