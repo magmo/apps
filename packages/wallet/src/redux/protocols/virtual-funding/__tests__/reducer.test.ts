@@ -25,11 +25,10 @@ const itTransitionsSubstateTo = (
 
 describe('happyPath', () => {
   const scenario = scenarios.happyPath;
-  const { processId } = scenario;
 
   describeScenarioStep(scenario.initialize, () => {
     const { sharedData, args } = scenario.initialize;
-    const { protocolState } = initialize(processId, sharedData, args);
+    const { protocolState } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForChannelPreparation');
   });

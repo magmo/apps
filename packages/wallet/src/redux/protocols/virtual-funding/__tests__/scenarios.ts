@@ -32,6 +32,7 @@ const initializeArgs = {
   privateKey: asPrivateKey,
   ourIndex: 0,
   commitmentType: CommitmentType.PreFundSetup,
+  targetChannelId,
 };
 
 const props = {
