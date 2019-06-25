@@ -118,7 +118,10 @@ export const consensusUpdateReducer = (
   }
 
   latestCommitment = helpers.getLatestCommitment(channelId, sharedData);
-
+  // If we are the last player we would be the one reaching consensus so we check again
+  if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
+    return { protocolState: states.success({}), sharedData };
+  }
   return { protocolState: states.waitForUpdate(protocolState), sharedData };
 };
 
