@@ -178,6 +178,7 @@ const receivePostFundSetupFromHub = commitmentsReceived({
 });
 const clearSending = clearedToSend({
   processId,
+  protocolLocator: 'locator',
 });
 // ---------
 // Scenarios

@@ -16,8 +16,14 @@ import { DirectFundingRequested } from './actions';
 import { CommitmentType } from '../../../domain';
 import { clearedToSend } from '../advance-channel/actions';
 
-type DFReducer = ProtocolReducer<states.DirectFundingState>;
 export const DIRECT_FUNDING_PROTOCOL_LOCATOR = 'DirectFunding';
+
+type DFReducer = ProtocolReducer<states.DirectFundingState>;
+const ADVANCE_CHANNEL_PROTOCOL_LOCATOR = makeLocator(
+  DIRECT_FUNDING_PROTOCOL_LOCATOR,
+  advanceChannel.ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+);
+
 export function initialize(
   action: DirectFundingRequested,
   sharedData: SharedData,
@@ -46,10 +52,7 @@ export function initialize(
     processId,
     commitmentType,
     clearedToSend: alreadyFunded && exchangePostFundSetups,
-    protocolLocator: makeLocator(
-      DIRECT_FUNDING_PROTOCOL_LOCATOR,
-      advanceChannel.ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-    ),
+    protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
   });
   sharedData = newSharedData;
 
@@ -223,7 +226,10 @@ const fundingConfirmedReducer: DFReducer = (
   } = advanceChannel.advanceChannelReducer(
     protocolState.postFundSetupState,
     sharedData,
-    clearedToSend({ processId: action.processId }),
+    clearedToSend({
+      processId: action.processId,
+      protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+    }),
   );
 
   if (postFundSetupState.type === 'AdvanceChannel.Success') {

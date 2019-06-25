@@ -4,15 +4,17 @@ import { ActionConstructor } from '../../utils';
 
 export interface ClearedToSend extends BaseProcessAction {
   type: 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND';
+  protocolLocator: string;
 }
 
 export type AdvanceChannelAction = CommitmentsReceived | ClearedToSend;
 
 export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
-  const { processId } = p;
+  const { processId, protocolLocator } = p;
   return {
     type: 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND',
     processId,
+    protocolLocator,
   };
 };
 
