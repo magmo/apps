@@ -60,37 +60,26 @@ export const keepLedgerChannelApproved: ActionConstructor<KeepLedgerChannelAppro
   type: 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED',
 });
 
-// ADVANCE CHANNEL
-
-// -------
-// Actions
-// -------
-
-export interface CommitmentsReceived extends BaseProcessAction {
-  type: 'WALLET.COMMON.COMMITMENTS_RECEIVED';
-  signedCommitments: Commitments;
-  protocolLocator?: string;
-}
-
-// -------
-// Constructors
-// -------
-
-export const commitmentsReceived: ActionConstructor<CommitmentsReceived> = p => ({
-  ...p,
-  type: 'WALLET.COMMON.COMMITMENTS_RECEIVED',
-});
-
 // COMMON
 
 // -------
 // Actions
 // -------
 
+// Protocols should switch to CommitmentsReceived, as we will in general
+// need to support n-party channels, and that is easiest to manage by
+// sending a full round of commitments when possible ie. when not in PreFundSetup
+
 export interface CommitmentReceived extends BaseProcessAction {
   type: 'WALLET.COMMON.COMMITMENT_RECEIVED';
   signedCommitment: SignedCommitment;
   protocolLocator?: string;
+}
+
+export interface CommitmentsReceived extends BaseProcessAction {
+  type: 'WALLET.COMMON.COMMITMENTS_RECEIVED';
+  protocolLocator: string;
+  signedCommitments: Commitments;
 }
 
 // -------
@@ -100,6 +89,11 @@ export interface CommitmentReceived extends BaseProcessAction {
 export const commitmentReceived: ActionConstructor<CommitmentReceived> = p => ({
   ...p,
   type: 'WALLET.COMMON.COMMITMENT_RECEIVED',
+});
+
+export const commitmentsReceived: ActionConstructor<CommitmentsReceived> = p => ({
+  ...p,
+  type: 'WALLET.COMMON.COMMITMENTS_RECEIVED',
 });
 
 // -------

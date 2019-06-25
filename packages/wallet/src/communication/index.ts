@@ -61,7 +61,7 @@ export const sendCommitmentsReceived = (
   to: string,
   processId: string,
   signedCommitments: SignedCommitment[],
-  protocolLocator?: string,
+  protocolLocator: string,
 ) => {
   const payload = commitmentsReceived({ processId, signedCommitments, protocolLocator });
   return messageRelayRequested(to, payload);

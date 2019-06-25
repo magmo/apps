@@ -113,6 +113,7 @@ function initializeWithNewChannel(
     allocation,
     ourIndex,
     clearedToSend,
+    protocolLocator,
   } = initializeChannelArgs;
 
   if (isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
@@ -145,12 +146,7 @@ function initializeWithNewChannel(
     sharedData = registerChannelToMonitor(sharedData, processId, channelId);
 
     // Send commitments to next participant
-    sharedData = helpers.sendCommitments(
-      sharedData,
-      processId,
-      channelId,
-      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-    );
+    sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
     const protocolState = states.commitmentSent({
       ...initializeChannelArgs,
       processId,
@@ -175,7 +171,7 @@ function initializeWithExistingChannel(
   sharedData: Storage,
   initializeChannelArgs: OngoingChannelArgs,
 ) {
-  const { channelId, ourIndex, clearedToSend } = initializeChannelArgs;
+  const { channelId, ourIndex, clearedToSend, protocolLocator } = initializeChannelArgs;
   const channel = getChannel(sharedData.channelStore, channelId);
   if (isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
     const lastCommitment = getLastCommitment(channel);
@@ -191,12 +187,7 @@ function initializeWithExistingChannel(
     }
     sharedData = signResult.store;
 
-    sharedData = helpers.sendCommitments(
-      sharedData,
-      processId,
-      channelId,
-      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-    );
+    sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
 
     const protocolState = states.commitmentSent({
       ...initializeChannelArgs,
@@ -217,7 +208,7 @@ function attemptToAdvanceChannel(
   protocolState: states.ChannelUnknown | states.NotSafeToSend,
   channelId: string,
 ): { sharedData: SharedData; protocolState: states.AdvanceChannelState } {
-  const { ourIndex, commitmentType, clearedToSend, processId } = protocolState;
+  const { ourIndex, commitmentType, clearedToSend, protocolLocator, processId } = protocolState;
 
   let channel = getChannel(sharedData.channelStore, channelId);
   if (isSafeToSend({ sharedData, ourIndex, channelId, clearedToSend })) {
@@ -235,13 +226,9 @@ function attemptToAdvanceChannel(
     sharedData = signResult.store;
 
     // Finally, send the commitments to the next participant
+    channel = getChannel(sharedData.channelStore, channelId);
 
-    sharedData = helpers.sendCommitments(
-      sharedData,
-      processId,
-      channelId,
-      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-    );
+    sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
     channel = getExistingChannel(sharedData, channelId);
     if (channelAdvanced(channel, commitmentType)) {
       return { protocolState: states.success(protocolState), sharedData };
