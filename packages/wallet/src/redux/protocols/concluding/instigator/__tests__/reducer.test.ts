@@ -27,6 +27,7 @@ describe('[ Happy path ]', () => {
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itSendsConcludeInstigated(result.sharedData, reply);
+    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS, 1);
     itTransitionsTo(result, 'ConcludingInstigator.WaitForOpponentConclude');
   });
 
@@ -41,7 +42,6 @@ describe('[ Happy path ]', () => {
     const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
-    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
@@ -95,7 +95,6 @@ describe('[ No Defunding Happy path ]', () => {
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Concluding.Success');
-    itSendsThisMessage(result.sharedData, CONCLUDE_SUCCESS);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });

@@ -20,6 +20,7 @@ describe('[ Happy path ]', () => {
     const result = initialize(commitment, processId, sharedData);
 
     itTransitionsTo(result, 'ConcludingResponder.ApproveConcluding');
+    itSendsThisMessage(result.sharedData, OPPONENT_CONCLUDED);
   });
   describeScenarioStep(scenario.approveConcluding, () => {
     const { state, sharedData, action, reply } = scenario.approveConcluding;
@@ -34,8 +35,6 @@ describe('[ Happy path ]', () => {
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Concluding.Success');
-    itSendsThisMessage(result.sharedData, OPPONENT_CONCLUDED);
-    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -84,7 +83,6 @@ describe('[ Happy path No Defunding]', () => {
     const result = responderConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Concluding.Success');
-    itSendsThisMessage(result.sharedData, OPPONENT_CONCLUDED);
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });

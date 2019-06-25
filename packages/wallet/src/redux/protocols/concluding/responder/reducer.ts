@@ -93,7 +93,7 @@ export function initialize(
     // if it's our turn now, we may resign
     return {
       protocolState: approveConcluding({ channelId, processId }),
-      sharedData: showWallet(updatedStorage),
+      sharedData: showWallet(sendOpponentConcluded(updatedStorage)),
     };
   } else {
     return {
@@ -216,7 +216,7 @@ function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
     case 'ConcludingResponder.AcknowledgeSuccess':
       return {
         protocolState: success({}),
-        sharedData: sendOpponentConcluded(hideWallet(sharedData)),
+        sharedData: hideWallet(sharedData),
       };
     case 'ConcludingResponder.AcknowledgeFailure':
       return {

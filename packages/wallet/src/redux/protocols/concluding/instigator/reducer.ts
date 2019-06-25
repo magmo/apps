@@ -205,7 +205,7 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
 
     return {
       protocolState: instigatorWaitForOpponentConclude({ ...protocolState }),
-      sharedData: sharedDataWithOwnCommitment,
+      sharedData: sendConcludeSuccess(sharedDataWithOwnCommitment),
     };
   } else {
     return { protocolState, sharedData };
@@ -286,7 +286,7 @@ function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): Re
   }
   return {
     protocolState: success({}),
-    sharedData,
+    sharedData: hideWallet(sharedData),
   };
 }
 
@@ -295,7 +295,7 @@ function acknowledged(protocolState: CState, sharedData: Storage): ReturnVal {
     case 'ConcludingInstigator.AcknowledgeSuccess':
       return {
         protocolState: success({}),
-        sharedData: sendConcludeSuccess(hideWallet(sharedData)),
+        sharedData: hideWallet(sharedData),
       };
     case 'ConcludingInstigator.AcknowledgeFailure':
       return {
