@@ -79,7 +79,7 @@ export const consensusUpdateReducer = (
     const { turnNum } = getExistingChannel(sharedData, channelId);
     sharedData = helpers.checkCommitments(sharedData, turnNum, action.signedCommitments);
   } catch (err) {
-    return { protocolState: states.failure({ reason: 'UnableToValidate' }), sharedData };
+    return { protocolState: states.failure({ reason: `UnableToValidate: ${err.message}` }), sharedData };
   }
 
   const { proposedAllocation, proposedDestination } = protocolState;
