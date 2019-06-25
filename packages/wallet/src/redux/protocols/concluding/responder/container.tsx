@@ -5,7 +5,6 @@ import { ResponderNonTerminalState as NonTerminalConcludingState } from './state
 import { unreachable } from '../../../../utils/reducer-utils';
 import ApproveConcluding from './components/approve-concluding';
 import ApproveDefunding from './components/approve-defunding';
-import { Defunding } from '../../defunding/container';
 import * as actions from './actions';
 import Acknowledge from '../../shared-components/acknowledge';
 import { ConsensusUpdate } from '../../consensus-update/container';
@@ -47,8 +46,6 @@ class ConcludingContainer extends PureComponent<Props> {
             keepOpen={() => keepOpen({ processId })}
           />
         );
-      case 'ConcludingResponder.WaitForDefund':
-        return <Defunding state={state.defundingState} />;
       case 'ConcludingResponder.ApproveConcluding':
         return <ApproveConcluding approve={() => approve({ processId })} />;
       case 'ConcludingResponder.WaitForLedgerUpdate':

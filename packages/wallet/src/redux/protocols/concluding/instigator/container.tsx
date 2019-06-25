@@ -6,7 +6,6 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import ApproveConcluding from './components/approve-concluding';
 import ApproveDefunding from './components/approve-defunding';
 import WaitForOpponentConclude from './components/wait-for-opponent-conclude';
-import { Defunding } from '../../defunding/container';
 import * as actions from './actions';
 import Acknowledge from '../../shared-components/acknowledge';
 import { ConsensusUpdate } from '../../consensus-update/container';
@@ -51,8 +50,6 @@ class ConcludingContainer extends PureComponent<Props> {
             keepOpen={() => keepOpen({ processId })}
           />
         );
-      case 'ConcludingInstigator.WaitForDefund':
-        return <Defunding state={state.defundingState} />;
       case 'ConcludingInstigator.ApproveConcluding':
         return (
           <ApproveConcluding
