@@ -286,7 +286,7 @@ function defundChosen(protocolState: NonTerminalCState, sharedData: Storage): Re
   }
   return {
     protocolState: success({}),
-    sharedData: hideWallet(sharedData),
+    sharedData,
   };
 }
 

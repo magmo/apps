@@ -42,7 +42,7 @@ describe('[ Happy path ]', () => {
     const { state, action, sharedData } = scenario.acknowledgeConcludeReceived;
     const result = instigatorConcludingReducer(state, sharedData, action);
 
-    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+    itTransitionsTo(result, 'Concluding.Success');
   });
 });
 
