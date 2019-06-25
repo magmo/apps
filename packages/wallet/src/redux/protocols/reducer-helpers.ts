@@ -93,7 +93,7 @@ export function sendCommitments(
   sharedData: SharedData,
   processId: string,
   channelId: string,
-  protocolLocator?: string,
+  protocolLocator: string,
 ): SharedData {
   const channel = getExistingChannel(sharedData, channelId);
   const { participants, ourIndex } = channel;
