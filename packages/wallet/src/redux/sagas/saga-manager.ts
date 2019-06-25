@@ -13,6 +13,7 @@ import { displaySender } from './display-sender';
 import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
+import { multipleActionDispatcher } from './multiple-action-dispatcher';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -20,6 +21,7 @@ export function* sagaManager(): IterableIterator<any> {
   let ganacheMinerProcess;
   let challengeResponseInitiatorProcess;
 
+  yield fork(multipleActionDispatcher);
   // always want the message listenter to be running
   yield fork(messageListener);
 
