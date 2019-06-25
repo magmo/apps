@@ -71,7 +71,7 @@ class ConcludingContainer extends PureComponent<Props> {
 function dispatchDefundRequestedAndDefundChosen(processId, channelId) {
   return dispatch => {
     Promise.resolve(dispatch(actions.defundChosen({ processId }))).then(() =>
-      dispatch(defundRequested({ processId: 'toBeDeleted', channelId })),
+      dispatch(defundRequested({ channelId })),
     );
   };
 }
