@@ -17,7 +17,7 @@ Player A is identified by being the first participant in the `participants` arra
 the application channel X that is to be funded.
 
 We therefore split the overall indirect-funding protocol into two sub-protocols: the
-[player-a-indirect-funding protocol](./player-a) and the [player-b-indirect-funding protocol](./player-b).
+[player-a-indirect-funding protocol](./player-a/readme.md) and the [player-b-indirect-funding protocol](./player-b/readme.md).
 
 The two protocols interact through the following messages:
 
