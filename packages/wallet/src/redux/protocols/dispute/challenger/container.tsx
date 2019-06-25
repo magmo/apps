@@ -11,13 +11,14 @@ import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout'
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from './components/defund-or-not';
 import { defundRequested } from '../../actions';
+import { MultipleWalletActions } from '../../../../redux/actions';
 
 interface Props {
   state: NonTerminalChallengerState;
   approve: ActionDispatcher<actions.ChallengeApproved>;
   deny: ActionDispatcher<actions.ChallengeDenied>;
   acknowledged: ActionDispatcher<actions.Acknowledged>;
-  defund: typeof dispatchDefundRequestedAndExitChallenge;
+  defund: typeof defundRequestedAndExitChallenge;
 }
 
 class ChallengerContainer extends PureComponent<Props> {
@@ -90,19 +91,17 @@ function describeFailure(reason: FailureReason): string {
   }
 }
 
-function dispatchDefundRequestedAndExitChallenge(processId, channelId) {
-  return dispatch => {
-    Promise.resolve(dispatch(actions.exitChallenge({ processId }))).then(() =>
-      dispatch(defundRequested({ channelId })),
-    );
-  };
+function defundRequestedAndExitChallenge(processId, channelId) {
+  return MultipleWalletActions({
+    actions: [defundRequested({ channelId }), actions.exitChallenge({ processId })],
+  });
 }
 
 const mapDispatchToProps = {
   approve: actions.challengeApproved,
   deny: actions.challengeDenied,
   acknowledged: actions.acknowledged,
-  defund: dispatchDefundRequestedAndExitChallenge,
+  defund: defundRequestedAndExitChallenge,
 };
 
 export const Challenger = connect(
