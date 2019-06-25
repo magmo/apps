@@ -9,11 +9,12 @@ import * as actions from './actions';
 import Acknowledge from '../../shared-components/acknowledge';
 import { ConsensusUpdate } from '../../consensus-update/container';
 import WaitForOpponentDecision from './components/wait-for-opponent-decision';
+import { defundRequested } from '../../actions';
 
 interface Props {
   state: NonTerminalConcludingState;
   approve: typeof actions.concludeApproved;
-  defund: typeof actions.defundChosen;
+  defund: typeof dispatchDefundRequestedAndDefundChosen;
   keepOpen: typeof actions.keepOpenChosen;
   acknowledge: typeof actions.acknowledged;
 }
@@ -42,7 +43,7 @@ class ConcludingContainer extends PureComponent<Props> {
       case 'ConcludingResponder.DecideDefund':
         return (
           <ApproveDefunding
-            approve={() => defund({ processId })}
+            approve={() => defund(processId, state.channelId)}
             keepOpen={() => keepOpen({ processId })}
           />
         );
@@ -58,9 +59,17 @@ class ConcludingContainer extends PureComponent<Props> {
   }
 }
 
+function dispatchDefundRequestedAndDefundChosen(processId, channelId) {
+  return dispatch => {
+    Promise.resolve(dispatch(actions.defundChosen({ processId }))).then(() =>
+      dispatch(defundRequested({ processId: 'toBeDeleted', channelId })),
+    );
+  };
+}
+
 const mapDispatchToProps = {
   approve: actions.concludeApproved,
-  defund: actions.defundChosen,
+  defund: dispatchDefundRequestedAndDefundChosen,
   acknowledge: actions.acknowledged,
   keepOpen: actions.keepOpenChosen,
 };
