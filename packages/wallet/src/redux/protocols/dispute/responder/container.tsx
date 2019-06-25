@@ -10,14 +10,14 @@ import { TransactionSubmission } from '../../transaction-submission/container';
 import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from '../challenger/components/defund-or-not';
-import { DefundRequested, defundRequested } from '../../actions';
+import { defundRequested } from '../../actions';
 
 interface Props {
   state: states.NonTerminalResponderState;
   respondApproved: ActionDispatcher<actions.RespondApproved>;
   responseProvided: ActionDispatcher<actions.ResponseProvided>;
   acknowledged: ActionDispatcher<actions.Acknowledged>;
-  defund: ActionDispatcher<DefundRequested>;
+  defund: typeof dispatchDefundRequestedAndExitChallenge;
 }
 class ResponderContainer extends PureComponent<Props> {
   render() {
@@ -52,7 +52,7 @@ class ResponderContainer extends PureComponent<Props> {
       case 'Responding.AcknowledgeTimeout':
         return (
           <DefundOrNot
-            approve={() => defund({ channelId: state.channelId, processId })}
+            approve={() => defund(processId, state.channelId)}
             deny={() => acknowledged({ processId })}
             channelId={state.channelId}
           />
@@ -63,11 +63,19 @@ class ResponderContainer extends PureComponent<Props> {
   }
 }
 
+function dispatchDefundRequestedAndExitChallenge(processId, channelId) {
+  return dispatch => {
+    Promise.resolve(dispatch(actions.exitChallenge({ processId }))).then(() =>
+      dispatch(defundRequested({ processId: 'toBeDeleted', channelId })),
+    );
+  };
+}
+
 const mapDispatchToProps = {
   respondApproved: actions.respondApproved,
   responseProvided: actions.responseProvided,
   acknowledged: actions.acknowledged,
-  defund: defundRequested, // TODO in future we should split this action into two distinct actions, so that protocol action and new process action unions remain disjoint.
+  defund: dispatchDefundRequestedAndExitChallenge,
 };
 
 export const Responder = connect(
