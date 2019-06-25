@@ -2,9 +2,11 @@ import * as scenarios from './scenarios';
 import { initialize, consensusUpdateReducer } from '../reducer';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { describeScenarioStep } from '../../../__tests__/helpers';
-import { getLastMessage } from '../../../state';
-import { SignedCommitment } from '../../../../domain';
+import {
+  describeScenarioStep,
+  expectTheseCommitmentsSent,
+  itSendsNoMessage,
+} from '../../../__tests__/helpers';
 
 describe('Two Players', () => {
   describe('Player A Happy Path', () => {
@@ -24,18 +26,19 @@ describe('Two Players', () => {
         proposedDestination,
         sharedData,
       );
-      itSendsMessage(result, scenario.initialize.reply);
+      expectTheseCommitmentsSent(result, scenario.initialize.reply);
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
     });
     describeScenarioStep(scenario.waitForUpdate, () => {
       const { sharedData, action, state } = scenario.waitForUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.Success');
+      itSendsNoMessage(result);
     });
   });
 
   describe('Player B Happy Path', () => {
-    const scenario = scenarios.twoPlayerAHappyPath;
+    const scenario = scenarios.twoPlayerBHappyPath;
     describe('when initializing', () => {
       const {
         processId,
@@ -53,11 +56,13 @@ describe('Two Players', () => {
       );
 
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
+      itSendsNoMessage(result);
     });
     describeScenarioStep(scenario.waitForUpdate, () => {
-      const { sharedData, action, state } = scenario.waitForUpdate;
+      const { sharedData, action, state, reply } = scenario.waitForUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.Success');
+      expectTheseCommitmentsSent(result, reply);
     });
   });
 
@@ -68,6 +73,7 @@ describe('Two Players', () => {
       const { sharedData, action, state } = scenario.waitForUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.Failure');
+      itSendsNoMessage(result);
     });
   });
 
@@ -78,6 +84,7 @@ describe('Two Players', () => {
       const { sharedData, action, state } = scenario.waitForUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.Failure');
+      itSendsNoMessage(result);
     });
   });
 });
@@ -102,19 +109,21 @@ describe('Three Players', () => {
       );
 
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
-      itSendsMessage(result, scenario.initialize.reply);
+      expectTheseCommitmentsSent(result, scenario.initialize.reply);
     });
 
     describe("when receiving Player B's update", () => {
       const { sharedData, action, state } = scenario.waitForPlayerBUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
+      itSendsNoMessage(result);
     });
 
     describe("when receiving hub's update", () => {
       const { sharedData, action, state } = scenario.waitForHubUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.Success');
+      itSendsNoMessage(result);
     });
   });
 
@@ -137,19 +146,21 @@ describe('Three Players', () => {
       );
 
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
+      itSendsNoMessage(result);
     });
 
     describe("when receiving Player A's update", () => {
       const { sharedData, action, state, reply } = scenario.waitForPlayerAUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
-      itSendsMessage(result, reply);
+      expectTheseCommitmentsSent(result, reply);
     });
 
     describe("when receiving hub's update", () => {
       const { sharedData, action, state } = scenario.waitForHubUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.Success');
+      itSendsNoMessage(result);
     });
   });
 
@@ -178,12 +189,13 @@ describe('Three Players', () => {
       const { sharedData, action, state } = scenario.waitForPlayerAUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
+      itSendsNoMessage(result);
     });
 
     describe("when receiving Player B's update", () => {
       const { sharedData, action, state, reply } = scenario.waitForPlayerBUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itSendsMessage(result, reply);
+      expectTheseCommitmentsSent(result, reply);
       itTransitionsTo(result, 'ConsensusUpdate.Success');
     });
   });
@@ -195,25 +207,5 @@ function itTransitionsTo(
 ) {
   it(`transitions to ${type}`, () => {
     expect(result.protocolState.type).toEqual(type);
-  });
-}
-
-function itSendsMessage(
-  state: ProtocolStateWithSharedData<states.ConsensusUpdateState>,
-  message: SignedCommitment,
-) {
-  it('sends a message', () => {
-    const lastMessage = getLastMessage(state.sharedData);
-    if (lastMessage && 'messagePayload' in lastMessage) {
-      const dataPayload = lastMessage.messagePayload;
-      // This is yuk. The data in a message is currently of 'any' type..
-      if (!('signedCommitments' in dataPayload)) {
-        fail('No signedCommitments in the last message.');
-      }
-
-      expect(dataPayload.signedCommitments).toContainEqual(message);
-    } else {
-      fail('No messages in the outbox.');
-    }
   });
 }

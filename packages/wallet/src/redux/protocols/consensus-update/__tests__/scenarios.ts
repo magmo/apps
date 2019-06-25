@@ -72,70 +72,40 @@ const threePlayerLedger11 = threeWayLedgerCommitment({
   balances: oneOneFour,
 });
 
+const addressAndPrivateKeyLookup = {
+  [ThreePartyPlayerIndex.A]: { address: asAddress, privateKey: asPrivateKey },
+  [ThreePartyPlayerIndex.B]: { address: bsAddress, privateKey: bsPrivateKey },
+  [ThreePartyPlayerIndex.Hub]: { address: hubAddress, privateKey: hubPrivateKey },
+};
+
 // ------
 // SharedData
 // ------
 
 const threePlayerInitialSharedData = (ourIndex: ThreePartyPlayerIndex) => {
-  const address =
-    ourIndex === ThreePartyPlayerIndex.A
-      ? asAddress
-      : ourIndex === ThreePartyPlayerIndex.B
-      ? bsAddress
-      : hubAddress;
-  const privateKey =
-    ourIndex === ThreePartyPlayerIndex.A
-      ? asPrivateKey
-      : ourIndex === ThreePartyPlayerIndex.B
-      ? bsPrivateKey
-      : hubPrivateKey;
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(
       [threePlayerLedger6, threePlayerLedger7, threePlayerLedger8],
-      address,
-      privateKey,
+      addressAndPrivateKeyLookup[ourIndex].address,
+      addressAndPrivateKeyLookup[ourIndex].privateKey,
     ),
   ]);
 };
 const threePlayerFirstUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
-  const address =
-    ourIndex === ThreePartyPlayerIndex.A
-      ? asAddress
-      : ourIndex === ThreePartyPlayerIndex.B
-      ? bsAddress
-      : hubAddress;
-  const privateKey =
-    ourIndex === ThreePartyPlayerIndex.A
-      ? asPrivateKey
-      : ourIndex === ThreePartyPlayerIndex.B
-      ? bsPrivateKey
-      : hubPrivateKey;
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(
       [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
-      address,
-      privateKey,
+      addressAndPrivateKeyLookup[ourIndex].address,
+      addressAndPrivateKeyLookup[ourIndex].privateKey,
     ),
   ]);
 };
 const threePlayerSecondUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
-  const address =
-    ourIndex === ThreePartyPlayerIndex.A
-      ? asAddress
-      : ourIndex === ThreePartyPlayerIndex.B
-      ? bsAddress
-      : hubAddress;
-  const privateKey =
-    ourIndex === ThreePartyPlayerIndex.A
-      ? asPrivateKey
-      : ourIndex === ThreePartyPlayerIndex.B
-      ? bsPrivateKey
-      : hubPrivateKey;
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(
       [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
-      address,
-      privateKey,
+      addressAndPrivateKeyLookup[ourIndex].address,
+      addressAndPrivateKeyLookup[ourIndex].privateKey,
     ),
   ]);
 };
@@ -216,7 +186,7 @@ export const twoPlayerAHappyPath = {
     proposedDestination,
     processId,
     sharedData: twoPlayerAInitialSharedData,
-    reply: ledger6,
+    reply: [ledger5, ledger6],
   },
   waitForUpdate: {
     state: twoPlayerWaitForUpdate,
@@ -227,6 +197,8 @@ export const twoPlayerAHappyPath = {
 
 export const twoPlayerBHappyPath = {
   initialize: {
+    processId,
+    channelId: ledgerId,
     proposedAllocation,
     proposedDestination,
     sharedData: twoPlayerBInitialSharedData,
@@ -235,7 +207,7 @@ export const twoPlayerBHappyPath = {
     state: twoPlayerWaitForUpdate,
     sharedData: twoPlayerBInitialSharedData,
     action: twoPlayerUpdate0Received,
-    reply: ledger7,
+    reply: [ledger6, ledger7],
   },
 };
 
@@ -262,7 +234,7 @@ export const threePlayerAHappyPath = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
-    reply: threePlayerLedger9,
+    reply: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
   },
   waitForPlayerBUpdate: {
     state: threePlayerWaitForUpdate,
@@ -288,7 +260,7 @@ export const threePlayerBHappyPath = {
     state: threePlayerWaitForUpdate,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate0Received,
-    reply: threePlayerLedger10,
+    reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
   },
   waitForHubUpdate: {
     state: threePlayerWaitForUpdate,
@@ -314,6 +286,6 @@ export const threePlayerHubHappyPath = {
     state: threePlayerWaitForUpdate,
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate1Received,
-    reply: threePlayerLedger11,
+    reply: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
   },
 };
