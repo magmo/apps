@@ -11,6 +11,7 @@ import {
 } from '../../../domain/consensus-app';
 import { Commitment } from '../../../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator';
+import { eqHexArray } from '../../../utils/hex-utils';
 
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = 'ConsensusUpdate';
 
@@ -125,27 +126,6 @@ export const consensusUpdateReducer = (
   return { protocolState: states.waitForUpdate(protocolState), sharedData };
 };
 
-function allocationAndDestinationMatch(
-  allocation: string[],
-  destination: string[],
-  expectedAllocation: string[],
-  expectedDestination: string[],
-): boolean {
-  if (
-    allocation.length !== expectedAllocation.length ||
-    destination.length !== expectedDestination.length
-  ) {
-    return false;
-  }
-
-  for (let i = 0; i < expectedAllocation.length; i++) {
-    if (allocation[i] !== expectedAllocation[i] || destination[i] !== expectedDestination[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
 function consensusReached(
   commitment: Commitment,
   expectedAllocation: string[],
@@ -153,12 +133,8 @@ function consensusReached(
 ) {
   return (
     consensusHasBeenReached(commitment) &&
-    allocationAndDestinationMatch(
-      commitment.allocation,
-      commitment.destination,
-      expectedAllocation,
-      expectedDestination,
-    )
+    eqHexArray(commitment.allocation, expectedAllocation) &&
+    eqHexArray(commitment.destination, expectedDestination)
   );
 }
 
@@ -170,10 +146,8 @@ function proposalCommitmentHasExpectedValues(
   const { proposedAllocation, proposedDestination } = appAttributesFromBytes(
     commitment.appAttributes,
   );
-  return allocationAndDestinationMatch(
-    proposedAllocation,
-    proposedDestination,
-    expectedAllocation,
-    expectedDestination,
+  return (
+    eqHexArray(proposedAllocation, expectedAllocation) &&
+    eqHexArray(proposedDestination, expectedDestination)
   );
 }
