@@ -19,6 +19,12 @@ sequenceDiagram
   Note  over I, R: Exchange Concludes
   I->>R: Conclude
   R->>I: Conclude
-  Note  over I, R: Defund L (sub-protocol)
-
 ```
+
+# Terminology
+
+Use "Conclude" / "Concluding" everywhere, here. In an application, you might choose to Resign, or you (or an opponent) might run out of funds. In these cases, according to the wallet you are concluding the channel.
+
+For now we will avoid "Resigning", "Closing" and so on.
+
+We will also include the `Defunding` protocol as an optional subprotocol of `Concluding`. If `Defunding` fails, `Concluding` will still be considered to have also failed.
