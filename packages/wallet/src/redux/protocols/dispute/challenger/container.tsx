@@ -10,14 +10,14 @@ import Acknowledge from '../../shared-components/acknowledge';
 import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout';
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from './components/defund-or-not';
-import { DefundRequested, defundRequested } from '../../actions';
+import { defundRequested } from '../../actions';
 
 interface Props {
   state: NonTerminalChallengerState;
   approve: ActionDispatcher<actions.ChallengeApproved>;
   deny: ActionDispatcher<actions.ChallengeDenied>;
   acknowledged: ActionDispatcher<actions.Acknowledged>;
-  defund: ActionDispatcher<DefundRequested>;
+  defund: typeof dispatchDefundRequestedAndExitChallenge;
 }
 
 class ChallengerContainer extends PureComponent<Props> {
@@ -50,7 +50,7 @@ class ChallengerContainer extends PureComponent<Props> {
       case 'Challenging.AcknowledgeTimeout':
         return (
           <DefundOrNot
-            approve={() => defund({ channelId: state.channelId, processId })}
+            approve={() => defund(processId, state.channelId)}
             deny={() => acknowledged({ processId })}
             channelId={state.channelId}
           />
@@ -90,11 +90,19 @@ function describeFailure(reason: FailureReason): string {
   }
 }
 
+function dispatchDefundRequestedAndExitChallenge(processId, channelId) {
+  return dispatch => {
+    Promise.resolve(dispatch(actions.exitChallenge({ processId }))).then(() =>
+      dispatch(defundRequested({ processId: 'toBeDeleted', channelId })),
+    );
+  };
+}
+
 const mapDispatchToProps = {
   approve: actions.challengeApproved,
   deny: actions.challengeDenied,
   acknowledged: actions.acknowledged,
-  defund: defundRequested, // TODO in future we should split this action into two distinct actions, so that protocol action and new process action unions remain disjoint.
+  defund: dispatchDefundRequestedAndExitChallenge,
 };
 
 export const Challenger = connect(
