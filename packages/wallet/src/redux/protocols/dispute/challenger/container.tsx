@@ -93,7 +93,7 @@ function describeFailure(reason: FailureReason): string {
 function dispatchDefundRequestedAndExitChallenge(processId, channelId) {
   return dispatch => {
     Promise.resolve(dispatch(actions.exitChallenge({ processId }))).then(() =>
-      dispatch(defundRequested({ processId: 'toBeDeleted', channelId })),
+      dispatch(defundRequested({ channelId })),
     );
   };
 }
