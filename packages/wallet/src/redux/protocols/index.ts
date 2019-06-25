@@ -14,11 +14,7 @@ import { TransactionSubmissionState } from './transaction-submission';
 import { ExistingChannelFundingState } from './existing-channel-funding/states';
 import { LedgerTopUpState } from './ledger-top-up/states';
 import { ConsensusUpdateState } from './consensus-update/states';
-import { AdvanceChannelState, ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from './advance-channel';
-import { EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR } from './existing-channel-funding/reducer';
-import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from './consensus-update/reducer';
-import { DIRECT_FUNDING_PROTOCOL_LOCATOR } from './direct-funding/reducer';
-import { LEDGER_TOP_UP_PROTOCOL_LOCATOR } from './ledger-top-up/reducer';
+import { AdvanceChannelState } from './advance-channel';
 
 export type ProtocolState =
   | ApplicationState
@@ -49,13 +45,6 @@ export interface ProtocolStateWithSharedData<T extends ProtocolState> {
   sharedData: SharedData;
 }
 
-export function makeLocator(...args: Locator[]) {
+export function makeLocator(...args: string[]) {
   return args.join('-');
 }
-
-export type Locator =
-  | typeof ADVANCE_CHANNEL_PROTOCOL_LOCATOR
-  | typeof CONSENSUS_UPDATE_PROTOCOL_LOCATOR
-  | typeof DIRECT_FUNDING_PROTOCOL_LOCATOR
-  | typeof EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR
-  | typeof LEDGER_TOP_UP_PROTOCOL_LOCATOR;
