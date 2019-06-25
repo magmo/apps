@@ -62,7 +62,11 @@ storiesOf('Landing Page', module).add('Landing Page', walletStateRender({}));
 
 export const fakeStore = state => ({
   dispatch: action => {
-    alert(`Action ${action.type} triggered`);
+    if (typeof action === 'function') {
+      alert(`Thunk triggered`);
+    } else {
+      alert(`Action ${action.type} triggered`);
+    }
     return action;
   },
   getState: () => state,
