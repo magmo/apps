@@ -25,7 +25,6 @@ import { Channel } from 'fmg-core';
 import { isAdvanceChannelAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { Properties } from '../../utils';
-import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '.';
 
 type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
@@ -119,6 +118,7 @@ function initializeWithNewChannel(
     allocation,
     ourIndex,
     clearedToSend,
+    protocolLocator,
   } = initializeChannelArgs;
 
   if (isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
@@ -155,7 +155,7 @@ function initializeWithNewChannel(
       nextParticipant(participants, ourIndex),
       processId,
       [signResult.signedCommitment],
-      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+      protocolLocator,
     );
     sharedData = queueMessage(sharedData, messageRelay);
 
@@ -183,7 +183,7 @@ function initializeWithExistingChannel(
   sharedData: Storage,
   initializeChannelArgs: OngoingChannelArgs,
 ) {
-  const { channelId, ourIndex, clearedToSend } = initializeChannelArgs;
+  const { channelId, ourIndex, clearedToSend, protocolLocator } = initializeChannelArgs;
   const channel = getChannel(sharedData.channelStore, channelId);
   if (isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
     const lastCommitment = getLastCommitment(channel);
@@ -204,7 +204,7 @@ function initializeWithExistingChannel(
       nextParticipant(channel.participants, ourIndex),
       processId,
       getCommitments(sharedData, channelId),
-      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+      protocolLocator,
     );
     sharedData = queueMessage(sharedData, messageRelay);
 
@@ -227,7 +227,7 @@ function attemptToAdvanceChannel(
   protocolState: states.ChannelUnknown | states.NotSafeToSend,
   channelId: string,
 ): { sharedData: SharedData; protocolState: states.AdvanceChannelState } {
-  const { ourIndex, commitmentType, clearedToSend } = protocolState;
+  const { ourIndex, commitmentType, clearedToSend, protocolLocator } = protocolState;
 
   let channel = getChannel(sharedData.channelStore, channelId);
   if (isSafeToSend({ sharedData, ourIndex, channelId, clearedToSend })) {
@@ -251,7 +251,7 @@ function attemptToAdvanceChannel(
       nextParticipant(participants, ourIndex),
       protocolState.processId,
       channel.commitments,
-      ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+      protocolLocator,
     );
 
     sharedData = queueMessage(sharedData, messageRelay);
