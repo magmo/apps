@@ -1,9 +1,11 @@
 import * as states from '../states';
 
-import { EMPTY_SHARED_DATA } from '../../../state';
+import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { CommitmentType } from '../../../../domain';
 import { preSuccess, success } from '../../advance-channel/__tests__';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 
 // ---------
 // Test data
@@ -16,10 +18,14 @@ const {
   threeParticipants: destination,
   oneTwoThree: allocation,
   ledgerLibraryAddress: channelType,
-  jointLedgerId: targetChannelId,
 } = scenarios;
 const { signedCommitment0 } = signedJointLedgerCommitments;
 const appAttributes = signedCommitment0.commitment.appAttributes;
+
+const app0 = appCommitment({ turnNum: 0, balances: twoThree });
+const app1 = appCommitment({ turnNum: 1, balances: twoThree });
+const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
+const targetChannelId = appChannel.channelId;
 
 const initializeArgs = {
   allocation,
@@ -80,7 +86,7 @@ export const happyPath = {
   ...props,
   initialize: {
     args: initializeArgs,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: setChannel(EMPTY_SHARED_DATA, appChannel),
   },
   openJFirst: {
     state: scenarioStates.waitForChannelPreparation,
