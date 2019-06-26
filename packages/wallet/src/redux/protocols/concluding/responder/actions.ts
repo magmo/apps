@@ -1,4 +1,4 @@
-import { CommitmentReceived, WalletAction, isCommonAction } from '../../../actions';
+import { WalletAction, isCommonAction } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
 import { KeepLedgerChannelApproved } from '../../../../communication';
 
@@ -53,7 +53,6 @@ export const acknowledged: ActionConstructor<Acknowledged> = p => ({
 // -------
 
 export type ConcludingResponderAction =
-  | CommitmentReceived
   | ConcludeApproved
   | DefundChosen
   | KeepOpenChosen

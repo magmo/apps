@@ -33,7 +33,6 @@ import {
   sendKeepLedgerChannelApproved,
 } from '../../../../communication';
 import { failure, success } from '../states';
-import { getChannelId } from '../../../../domain';
 import { ProtocolStateWithSharedData } from '../..';
 import { isConcludingInstigatorAction } from './actions';
 import {
@@ -50,14 +49,8 @@ export function instigatorConcludingReducer(
   sharedData: SharedData,
   action: ProtocolAction,
 ): ReturnVal {
-  // TODO: Since a commitment received could be a defundingAction OR
-  // a concludingAction we need to check if its the action we're interested in
-  // This is a bit awkward, probably a better way of handling this?
   if (action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') {
-    const channelId = getChannelId(action.signedCommitment.commitment);
-    if (channelId === protocolState.channelId) {
-      return concludeReceived(action, protocolState, sharedData);
-    }
+    return concludeReceived(action, protocolState, sharedData);
   }
   if (isConsensusUpdateAction(action)) {
     return handleLedgerUpdateAction(protocolState, sharedData, action);
