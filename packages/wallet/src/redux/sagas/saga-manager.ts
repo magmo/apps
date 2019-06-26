@@ -22,6 +22,7 @@ export function* sagaManager(): IterableIterator<any> {
   let challengeResponseInitiatorProcess;
 
   yield fork(multipleActionDispatcher);
+
   // always want the message listenter to be running
   yield fork(messageListener);
 

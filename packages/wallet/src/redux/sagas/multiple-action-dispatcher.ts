@@ -1,10 +1,9 @@
-import { take, fork } from 'redux-saga/effects';
 import { MultipleWalletActions } from '../actions';
+import { take, all, put } from 'redux-saga/effects';
 
 export function* multipleActionDispatcher() {
-  const multipleWalletActions = yield take(MultipleWalletActions);
-  const actions = multipleWalletActions.actions;
-  yield actions.forEach(action => {
-    return fork(action);
-  });
+  while (true) {
+    const multipleWalletActions: MultipleWalletActions = yield take('MULTIPLE_ACTIONS');
+    yield all(multipleWalletActions.actions.map(action => put(action)));
+  }
 }
