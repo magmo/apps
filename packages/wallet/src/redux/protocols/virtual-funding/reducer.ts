@@ -100,6 +100,7 @@ function waitForChannelPreparationReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
+  // Unimplemented
   return { protocolState, sharedData };
 }
 
@@ -108,6 +109,7 @@ function waitForGuarantorFundingReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
+  // Unimplemented
   return { protocolState, sharedData };
 }
 
@@ -116,5 +118,6 @@ function waitForApplicationFundingReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
+  // Unimplemented
   return { protocolState, sharedData };
 }
