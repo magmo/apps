@@ -27,6 +27,8 @@ const app1 = appCommitment({ turnNum: 1, balances: twoThree });
 const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
 const targetChannelId = appChannel.channelId;
 
+// To properly test the embedded advanceChannel protocols, it's useful to be playerA
+// to make sure that the commitments get sent.
 const initializeArgs = {
   allocation,
   destination,

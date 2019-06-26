@@ -1,8 +1,13 @@
 import * as states from '../states';
 import { initialize, reducer } from '../reducer';
 import * as scenarios from './scenarios';
-import { describeScenarioStep } from '../../../__tests__/helpers';
+import {
+  scenarioStepDescription,
+  expectTheseCommitmentsSent,
+  itSendsNoMessage,
+} from '../../../__tests__/helpers';
 import { success, preSuccess } from '../../advance-channel/__tests__';
+import { oneTwoThree } from '../../../__tests__/test-scenarios';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -26,23 +31,27 @@ const itTransitionsSubstateTo = (
 describe('happyPath', () => {
   const scenario = scenarios.happyPath;
 
-  describeScenarioStep(scenario.initialize, () => {
+  describe.only('Initialization', () => {
     const { sharedData, args } = scenario.initialize;
-    const { protocolState } = initialize(sharedData, args);
+    const { protocolState, sharedData: result } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForChannelPreparation');
+
+    expectTheseCommitmentsSent(result, [{ commitment: { turnNum: 0, allocation: oneTwoThree } }]);
+    expectTheseCommitmentsSent(result, [{ commitment: { turnNum: 0, allocation: [] } }]);
   });
 
-  describeScenarioStep(scenario.openGFirst, () => {
+  describe(scenarioStepDescription(scenario.openGFirst), () => {
     const { state, sharedData, action } = scenario.openGFirst;
-    const { protocolState } = reducer(state, sharedData, action);
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForChannelPreparation');
     itTransitionsSubstateTo(protocolState, 'guarantorChannel', success.state.type);
     itTransitionsSubstateTo(protocolState, 'jointChannel', preSuccess.state.type);
+    itSendsNoMessage(result);
   });
 
-  describeScenarioStep(scenario.openJFirst, () => {
+  describe(scenarioStepDescription(scenario.openJFirst), () => {
     const { state, sharedData, action } = scenario.openJFirst;
     const { protocolState } = reducer(state, sharedData, action);
 
@@ -51,7 +60,7 @@ describe('happyPath', () => {
     itTransitionsSubstateTo(protocolState, 'guarantorChannel', preSuccess.state.type);
   });
 
-  describeScenarioStep(scenario.openGSecond, () => {
+  describe(scenarioStepDescription(scenario.openGSecond), () => {
     const { state, sharedData, action } = scenario.openGSecond;
     const { protocolState } = reducer(state, sharedData, action);
 
@@ -59,7 +68,7 @@ describe('happyPath', () => {
     itTransitionsSubstateTo(protocolState, 'indirectGuarantorFunding', 'NotImplemented');
   });
 
-  describeScenarioStep(scenario.openJSecond, () => {
+  describe(scenarioStepDescription(scenario.openJSecond), () => {
     const { state, sharedData, action } = scenario.openJSecond;
     const { protocolState } = reducer(state, sharedData, action);
 

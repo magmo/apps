@@ -30,7 +30,7 @@ export function initialize(sharedData: Storage, args: InitializationArgs): Retur
   });
   const channelType = CONSENSUS_LIBRARY_ADDRESS;
 
-  const { protocolState: guarantorChannel } = advanceChannel.initializeAdvanceChannel(
+  const guarantorChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
     sharedData,
     CommitmentType.PreFundSetup,
@@ -41,15 +41,16 @@ export function initialize(sharedData: Storage, args: InitializationArgs): Retur
       clearedToSend: true,
       processId,
       protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
-      allocation,
+      allocation: [],
       destination,
       channelType,
       appAttributes,
     },
   );
-  const { protocolState: jointChannel } = advanceChannel.initializeAdvanceChannel(
+
+  const jointChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
-    sharedData,
+    guarantorChannelInitialized.sharedData,
     CommitmentType.PreFundSetup,
     {
       privateKey,
@@ -64,14 +65,15 @@ export function initialize(sharedData: Storage, args: InitializationArgs): Retur
       appAttributes,
     },
   );
+
   return {
     protocolState: states.waitForChannelPreparation({
       processId,
-      [states.GUARANTOR_CHANNEL_DESCRIPTOR]: guarantorChannel,
-      [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannel,
+      [states.GUARANTOR_CHANNEL_DESCRIPTOR]: guarantorChannelInitialized.protocolState,
+      [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannelInitialized.protocolState,
       targetChannelId,
     }),
-    sharedData,
+    sharedData: jointChannelInitialized.sharedData,
   };
 }
 
