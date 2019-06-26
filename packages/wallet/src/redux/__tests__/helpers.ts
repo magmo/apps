@@ -126,6 +126,7 @@ export const expectThisCommitmentSent = (
       // To help with debugging, you can change the idx variable when running tests to 'search'
       // for the correct commitment
 
+      console.warn(`Message not found: inspecting mismatched message in position ${idx}`);
       expect(messageOutbox[idx]).toMatchObject({
         messagePayload: {
           type,
@@ -170,6 +171,7 @@ export const expectTheseCommitmentsSent = (
 
       // To help with debugging, you can change the idx variable when running tests to 'search'
       // for the correct commitment
+      console.warn(`Message not found: inspecting mismatched message in position ${idx}`);
       expect(messageOutbox[idx]).toMatchObject({
         messagePayload: {
           type,
