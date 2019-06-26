@@ -15,55 +15,49 @@ interface InitializationArgs {
   ourIndex: number;
   targetChannelId: string;
   processId: string;
-  allocation: string[];
-  destination: string[];
+  startingAllocation: string[];
+  startingDestination: string[];
 }
 
 export function initialize(sharedData: Storage, args: InitializationArgs): ReturnVal {
-  const { ourIndex, processId, targetChannelId, allocation, destination } = args;
+  const { ourIndex, processId, targetChannelId, startingAllocation, startingDestination } = args;
   const privateKey = getPrivatekey(sharedData, targetChannelId);
-  const appAttributes = bytesFromAppAttributes({
-    proposedAllocation: allocation,
-    proposedDestination: destination,
-    furtherVotesRequired: 0,
-    updateType: UpdateType.Consensus,
-  });
   const channelType = CONSENSUS_LIBRARY_ADDRESS;
 
+  function channelSpecificArgs(allocation, destination) {
+    return {
+      allocation,
+      destination,
+      appAttributes: bytesFromAppAttributes({
+        proposedAllocation: allocation,
+        proposedDestination: destination,
+        furtherVotesRequired: 0,
+        updateType: UpdateType.Consensus,
+      }),
+    };
+  }
+
+  const initializationArgs = {
+    privateKey,
+    channelType,
+    ourIndex,
+    commitmentType: CommitmentType.PreFundSetup,
+    clearedToSend: true,
+    processId,
+    protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
+  };
   const guarantorChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
     sharedData,
     CommitmentType.PreFundSetup,
-    {
-      privateKey,
-      ourIndex,
-      commitmentType: CommitmentType.PreFundSetup,
-      clearedToSend: true,
-      processId,
-      protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
-      allocation: [],
-      destination,
-      channelType,
-      appAttributes,
-    },
+    { ...initializationArgs, ...channelSpecificArgs([], startingDestination) },
   );
 
   const jointChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
     guarantorChannelInitialized.sharedData,
     CommitmentType.PreFundSetup,
-    {
-      privateKey,
-      ourIndex,
-      commitmentType: CommitmentType.PreFundSetup,
-      clearedToSend: true,
-      processId,
-      protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR,
-      allocation,
-      destination,
-      channelType,
-      appAttributes,
-    },
+    { ...initializationArgs, ...channelSpecificArgs(startingAllocation, startingDestination) },
   );
 
   return {
