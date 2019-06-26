@@ -122,7 +122,7 @@ export interface ChallengeExpiredEvent {
 // Constructors
 // -------
 
-export const MultipleWalletActions: ActionConstructor<MultipleWalletActions> = p => ({
+export const multipleWalletActions: ActionConstructor<MultipleWalletActions> = p => ({
   ...p,
   type: 'WALLET.MULTIPLE_ACTIONS',
 });

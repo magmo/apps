@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from '../challenger/components/defund-or-not';
 import { defundRequested } from '../../actions';
-import { MultipleWalletActions } from '../../../../redux/actions';
+import { multipleWalletActions } from '../../../../redux/actions';
 
 interface Props {
   state: states.NonTerminalResponderState;
@@ -65,7 +65,7 @@ class ResponderContainer extends PureComponent<Props> {
 }
 
 function defundRequestedAndExitChallenge(processId, channelId) {
-  return MultipleWalletActions({
+  return multipleWalletActions({
     actions: [defundRequested({ channelId }), actions.exitChallenge({ processId })],
   });
 }

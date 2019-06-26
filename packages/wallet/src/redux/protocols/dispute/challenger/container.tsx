@@ -11,7 +11,7 @@ import WaitForResponseOrTimeout from './components/wait-for-response-or-timeout'
 import { ActionDispatcher } from '../../../utils';
 import DefundOrNot from './components/defund-or-not';
 import { defundRequested } from '../../actions';
-import { MultipleWalletActions } from '../../../../redux/actions';
+import { multipleWalletActions } from '../../../../redux/actions';
 
 interface Props {
   state: NonTerminalChallengerState;
@@ -92,7 +92,7 @@ function describeFailure(reason: FailureReason): string {
 }
 
 function defundRequestedAndExitChallenge(processId, channelId) {
-  return MultipleWalletActions({
+  return multipleWalletActions({
     actions: [defundRequested({ channelId }), actions.exitChallenge({ processId })],
   });
 }
