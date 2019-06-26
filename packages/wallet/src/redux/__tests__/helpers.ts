@@ -82,12 +82,12 @@ export const expectThisMessage = (state: SideEffectState, messageType: string) =
 
 type PartialCommitments = Array<{ commitment: Partial<Commitment>; signature?: string }>;
 
-export function transformPartialCommitmentToObjectContainint(sc: {
-  commitment: Partial<Commitment>;
-  signature?: string;
-}) {
+function transformCommitmentToMatcher(sc: { commitment: Partial<Commitment>; signature?: string }) {
   if (sc.signature) {
-    return expect.objectContaining({ signature: sc.signature });
+    return expect.objectContaining({
+      commitment: expect.objectContaining(sc.commitment),
+      signature: sc.signature,
+    });
   } else {
     return expect.objectContaining({ commitment: expect.objectContaining(sc.commitment) });
   }
@@ -111,7 +111,7 @@ export const expectThisCommitmentSent = (
       expect.arrayContaining([
         expect.objectContaining({
           messagePayload: expect.objectContaining({
-            signedCommitment: transformPartialCommitmentToObjectContainint({ commitment }),
+            signedCommitment: transformCommitmentToMatcher({ commitment }),
           }),
         }),
       ]),
@@ -126,6 +126,7 @@ export const expectThisCommitmentSent = (
       // To help with debugging, you can change the idx variable when running tests to 'search'
       // for the correct commitment
 
+      console.warn(`Message not found: inspecting mismatched message in position ${idx}`);
       expect(messageOutbox[idx]).toMatchObject({
         messagePayload: {
           type,
@@ -156,7 +157,7 @@ export const expectTheseCommitmentsSent = (
       expect.arrayContaining([
         expect.objectContaining({
           messagePayload: expect.objectContaining({
-            signedCommitments: commitments.map(transformPartialCommitmentToObjectContainint),
+            signedCommitments: commitments.map(transformCommitmentToMatcher),
           }),
         }),
       ]),
@@ -170,6 +171,7 @@ export const expectTheseCommitmentsSent = (
 
       // To help with debugging, you can change the idx variable when running tests to 'search'
       // for the correct commitment
+      console.warn(`Message not found: inspecting mismatched message in position ${idx}`);
       expect(messageOutbox[idx]).toMatchObject({
         messagePayload: {
           type,
