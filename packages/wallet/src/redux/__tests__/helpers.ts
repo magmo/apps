@@ -97,6 +97,7 @@ export const expectThisCommitmentSent = (
   state: SideEffectState,
   commitment: Partial<Commitment>,
   type = 'WALLET.COMMON.COMMITMENT_RECEIVED',
+  idx = 0,
 ) => {
   const messageOutbox = getOutboxState(state, 'messageOutbox');
 
@@ -122,7 +123,10 @@ export const expectThisCommitmentSent = (
       // The errors are much more useful in this case, but will be deceiving in the case when
       // multiple messages are queued.
 
-      expect(messageOutbox[0]).toMatchObject({
+      // To help with debugging, you can change the idx variable when running tests to 'search'
+      // for the correct commitment
+
+      expect(messageOutbox[idx]).toMatchObject({
         messagePayload: {
           type,
           signedCommitment: { commitment },
@@ -138,6 +142,7 @@ export const expectTheseCommitmentsSent = (
   state: SideEffectState,
   commitments: PartialCommitments,
   type = 'WALLET.COMMON.COMMITMENTS_RECEIVED',
+  idx = 0,
 ) => {
   const messageOutbox = getOutboxState(state, 'messageOutbox');
 
@@ -163,7 +168,9 @@ export const expectTheseCommitmentsSent = (
       // The errors are much more useful in this case, but will be deceiving in the case when
       // multiple messages are queued.
 
-      expect(messageOutbox[0]).toMatchObject({
+      // To help with debugging, you can change the idx variable when running tests to 'search'
+      // for the correct commitment
+      expect(messageOutbox[idx]).toMatchObject({
         messagePayload: {
           type,
           signedCommitments: commitments,
