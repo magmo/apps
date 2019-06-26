@@ -26,6 +26,7 @@ export interface ExitChallenge {
   type: 'WALLET.DISPUTE.CHALLENGER.EXIT_CHALLENGE';
   processId: string;
 }
+
 export interface Acknowledged {
   type: 'WALLET.DISPUTE.CHALLENGER.ACKNOWLEDGED';
   processId: string;
