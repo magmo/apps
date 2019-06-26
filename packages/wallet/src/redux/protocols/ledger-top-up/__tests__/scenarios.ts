@@ -1,40 +1,33 @@
 import { bigNumberify } from 'ethers/utils';
 import * as states from '../states';
-import * as globalActions from '../../../actions';
 import {
   noPostFundSetupsPreSuccessA,
   noPostFundSetupsPreSuccessB,
 } from '../../direct-funding/__tests__';
 import {
-  ledgerCommitment,
-  asPrivateKey,
   channelId,
   ledgerId,
   asAddress,
   bsAddress,
+  ledgerCommitment,
+  addressAndPrivateKeyLookup,
 } from '../../../../domain/commitments/__tests__';
-import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
+import { TwoPartyPlayerIndex } from '../../../types';
+import { twoPlayerPreSuccessA, twoPlayerPreSuccessB } from '../../consensus-update/__tests__';
+import { setChannels } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
-import { LEDGER_TOP_UP_PROTOCOL_LOCATOR } from '../reducer';
+
 // ---------
 // Test data
 // ---------
 
-const twoThree = [
+const twoFive = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+  { address: bsAddress, wei: bigNumberify(5).toHexString() },
 ];
-const twoThreeAndOneOne = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+const oneThree = [
   { address: asAddress, wei: bigNumberify(1).toHexString() },
-  { address: bsAddress, wei: bigNumberify(1).toHexString() },
-];
-
-const threeFour = [
-  { address: asAddress, wei: bigNumberify(3).toHexString() },
-  { address: bsAddress, wei: bigNumberify(4).toHexString() },
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
 ];
 
 const processId = 'process-id.123';
@@ -42,137 +35,121 @@ const props = {
   processId,
   channelId,
   ledgerId,
-  proposedAllocation: threeFour.map(a => a.wei),
-  proposedDestination: threeFour.map(a => a.address),
+  proposedAllocation: twoFive.map(a => a.wei),
+  originalAllocation: oneThree.map(a => a.wei),
+  proposedDestination: twoFive.map(a => a.address),
 };
 
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoThree });
-const ledger6 = ledgerCommitment({
-  turnNum: 6,
-  balances: twoThree,
-  proposedBalances: twoThreeAndOneOne,
-});
-const ledger7 = ledgerCommitment({ turnNum: 7, balances: twoThreeAndOneOne });
-const ledger8 = ledgerCommitment({
-  turnNum: 8,
-  balances: twoThreeAndOneOne,
-  proposedBalances: threeFour,
-});
-const ledger9 = ledgerCommitment({ turnNum: 9, balances: threeFour });
+const ledger4 = ledgerCommitment({ turnNum: 4, balances: oneThree });
+const ledger5 = ledgerCommitment({ turnNum: 5, balances: oneThree });
+
 // ------
 // States
 // ------
-const waitForPreTopUpUpdate = states.waitForPreTopUpLedgerUpdate(props);
-const waitForPostTopUpUpdate = states.waitForPostTopUpLedgerUpdate(props);
-const waitForDirectFundingForPlayerA = states.waitForDirectFunding({
+const switchOrderAndAddATopUpUpdate = states.switchOrderAndAddATopUpUpdate({
+  ...props,
+  consensusUpdateState: twoPlayerPreSuccessA.state,
+});
+const waitForDirectFundingForA = states.waitForDirectFundingForA({
   ...props,
   directFundingState: noPostFundSetupsPreSuccessA.state,
 });
-const waitForDirectFundingForPlayerB = states.waitForDirectFunding({
+const restoreOrderAndAddBTopUpUpdate = states.restoreOrderAndAddBTopUpUpdate({
   ...props,
-  directFundingState: noPostFundSetupsPreSuccessB.state,
+  consensusUpdateState: twoPlayerPreSuccessA.state,
 });
-// ------
-// Shared Data
-// ------
-const aInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
-]);
+const waitForDirectFundingForB = states.waitForDirectFundingForB({
+  ...props,
+  directFundingState: noPostFundSetupsPreSuccessA.state,
+});
 
-const aPreTopUpUpdate0ReceivedSharedData = {
-  ...setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
-  ]),
-};
-
-const aPreTopUpUpdate1ReceivedSharedData = {
-  ...setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments([ledger6, ledger7], asAddress, asPrivateKey),
-  ]),
-};
-
-const aPostTopUpUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger7, ledger8], asAddress, asPrivateKey),
-]);
-
-const bInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
-]);
-const bPreTopUpUpdate1ReceivedSharedData = {
-  ...setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments([ledger6, ledger7], asAddress, asPrivateKey),
-  ]),
-};
 // ------
 // Actions
 // ------
-const preTopUpUpdate0 = globalActions.commitmentReceived({
-  processId,
-  signedCommitment: ledger6,
-  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
-});
-const preTopUpUpdate1 = globalActions.commitmentReceived({
-  processId,
-  signedCommitment: ledger7,
-  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
-});
-const postTopUpUpdate0 = globalActions.commitmentReceived({
-  processId,
-  signedCommitment: ledger8,
-  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
-});
-const postTopUpUpdate1 = globalActions.commitmentReceived({
-  processId,
-  signedCommitment: ledger9,
-  protocolLocator: LEDGER_TOP_UP_PROTOCOL_LOCATOR,
-});
+
+const playerAConsensusUpdateSuccess = twoPlayerPreSuccessA.action;
+const playerBConsensusUpdateSuccess = twoPlayerPreSuccessB.action;
 const playerAFundingSuccess = noPostFundSetupsPreSuccessA.action;
 const playerBFundingSuccess = noPostFundSetupsPreSuccessB.action;
-export const playerABothPlayersTopUp = {
+
+// ------
+// Shared Data
+// ------
+const consensusSharedData = (ourIndex: TwoPartyPlayerIndex) => {
+  return ourIndex === TwoPartyPlayerIndex.A
+    ? twoPlayerPreSuccessA.sharedData
+    : twoPlayerPreSuccessB.sharedData;
+};
+const fundingSharedData = (ourIndex: TwoPartyPlayerIndex) => {
+  return setChannels(
+    ourIndex === TwoPartyPlayerIndex.A
+      ? noPostFundSetupsPreSuccessA.sharedData
+      : noPostFundSetupsPreSuccessB.sharedData,
+    [
+      channelFromCommitments(
+        [ledger4, ledger5],
+        addressAndPrivateKeyLookup[ourIndex].address,
+        addressAndPrivateKeyLookup[ourIndex].privateKey,
+      ),
+    ],
+  );
+};
+
+// ------
+// Scenarios
+// ------
+export const playerAHappyPath = {
   initialize: {
     ...props,
-    reply: ledger6,
-    sharedData: aInitialSharedData,
+    sharedData: fundingSharedData(TwoPartyPlayerIndex.A),
   },
-  waitForPreTopUpLedgerUpdate: {
-    state: waitForPreTopUpUpdate,
-    action: preTopUpUpdate1,
-    sharedData: aPreTopUpUpdate0ReceivedSharedData,
+
+  switchOrderAndAddATopUpUpdate: {
+    state: switchOrderAndAddATopUpUpdate,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.A),
+    action: playerAConsensusUpdateSuccess,
   },
-  waitForDirectFunding: {
-    state: waitForDirectFundingForPlayerA,
+  waitForDirectFundingForA: {
+    state: waitForDirectFundingForA,
+    sharedData: fundingSharedData(TwoPartyPlayerIndex.A),
     action: playerAFundingSuccess,
-    sharedData: aPreTopUpUpdate1ReceivedSharedData,
-    reply: postTopUpUpdate0,
   },
-  waitForPostTopUpLedgerUpdate: {
-    state: waitForPostTopUpUpdate,
-    sharedData: aPostTopUpUpdate0ReceivedSharedData,
-    action: postTopUpUpdate1,
+  restoreOrderAndAddBTopUpUpdate: {
+    state: restoreOrderAndAddBTopUpUpdate,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.A),
+    action: playerAConsensusUpdateSuccess,
+  },
+  waitForDirectFundingForB: {
+    state: waitForDirectFundingForB,
+    sharedData: fundingSharedData(TwoPartyPlayerIndex.A),
+    action: playerAFundingSuccess,
   },
 };
 
-export const playerBBothPlayersTopUp = {
+export const playerBHappyPath = {
   initialize: {
     ...props,
-    sharedData: bInitialSharedData,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.B),
   },
-  waitForPreTopUpLedgerUpdate: {
-    state: waitForPreTopUpUpdate,
-    action: preTopUpUpdate0,
-    sharedData: bInitialSharedData,
-    reply: preTopUpUpdate1,
+
+  switchOrderAndAddATopUpUpdate: {
+    state: switchOrderAndAddATopUpUpdate,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.B),
+    action: playerBConsensusUpdateSuccess,
   },
-  waitForDirectFunding: {
-    state: waitForDirectFundingForPlayerB,
+  waitForDirectFundingForA: {
+    state: waitForDirectFundingForA,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.B),
     action: playerBFundingSuccess,
-    sharedData: bPreTopUpUpdate1ReceivedSharedData,
   },
-  waitForPostTopUpLedgerUpdate: {
-    state: waitForPostTopUpUpdate,
-    action: postTopUpUpdate0,
-    sharedData: bPreTopUpUpdate1ReceivedSharedData,
-    reply: postTopUpUpdate1,
+  restoreOrderAndAddBTopUpUpdate: {
+    state: restoreOrderAndAddBTopUpUpdate,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.B),
+    action: playerBConsensusUpdateSuccess,
+  },
+  waitForDirectFundingForB: {
+    state: waitForDirectFundingForB,
+    sharedData: consensusSharedData(TwoPartyPlayerIndex.B),
+    action: playerBFundingSuccess,
   },
 };

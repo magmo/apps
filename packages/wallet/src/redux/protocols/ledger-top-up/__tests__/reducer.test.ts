@@ -1,10 +1,11 @@
 import * as scenarios from './scenarios';
 import { initialize, ledgerTopUpReducer } from '../reducer';
-import { LedgerTopUpState, LedgerTopUpStateType } from '../states';
+import { LedgerTopUpState, LedgerTopUpStateType, WaitForDirectFundingForA } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
+import { describeScenarioStep } from '../../../__tests__/helpers';
 
-describe('player A both players need a top up', () => {
-  const scenario = scenarios.playerABothPlayersTopUp;
+describe('player A happy path', () => {
+  const scenario = scenarios.playerAHappyPath;
   describe('when initializing', () => {
     const {
       channelId,
@@ -23,27 +24,42 @@ describe('player A both players need a top up', () => {
       sharedData,
     );
 
-    itTransitionsTo(initialState, 'LedgerTopUp.WaitForPreTopUpLedgerUpdate');
+    itTransitionsTo(initialState, 'LedgerTopUp.SwitchOrderAndAddATopUpUpdate');
   });
-  describe('when in WaitForPreTopUpLedgerUpdate', () => {
-    const { action, sharedData, state } = scenario.waitForPreTopUpLedgerUpdate;
+  describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
+    const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFunding');
+    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
+    it('requests the correct deposit amount', () => {
+      expect(
+        (updatedState.protocolState as WaitForDirectFundingForA).directFundingState.requiredDeposit,
+      ).toEqual('0x01');
+    });
   });
-  describe('when in WaitForDirectFunding', () => {
-    const { action, sharedData, state } = scenario.waitForDirectFunding;
+  describeScenarioStep(scenario.waitForDirectFundingForA, () => {
+    const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForPostTopUpLedgerUpdate');
+    itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
   });
-  describe('when in WaitForPostTopUpLedgerUpdate', () => {
-    const { action, sharedData, state } = scenario.waitForPostTopUpLedgerUpdate;
+  describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
+    const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
+    const updatedState = ledgerTopUpReducer(state, sharedData, action);
+    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
+    it('requests the correct deposit amount', () => {
+      expect(
+        (updatedState.protocolState as WaitForDirectFundingForA).directFundingState.requiredDeposit,
+      ).toEqual('0x0');
+    });
+  });
+  describeScenarioStep(scenario.waitForDirectFundingForB, () => {
+    const { action, sharedData, state } = scenario.waitForDirectFundingForB;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
 });
 
-describe('player B both players need a top up', () => {
-  const scenario = scenarios.playerBBothPlayersTopUp;
+describe('player B happy path', () => {
+  const scenario = scenarios.playerBHappyPath;
   describe('when initializing', () => {
     const {
       channelId,
@@ -62,20 +78,35 @@ describe('player B both players need a top up', () => {
       sharedData,
     );
 
-    itTransitionsTo(initialState, 'LedgerTopUp.WaitForPreTopUpLedgerUpdate');
+    itTransitionsTo(initialState, 'LedgerTopUp.SwitchOrderAndAddATopUpUpdate');
   });
-  describe('when in WaitForPreTopUpLedgerUpdate', () => {
-    const { action, sharedData, state } = scenario.waitForPreTopUpLedgerUpdate;
+  describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
+    const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFunding');
+    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
+    it('requests the correct deposit amount', () => {
+      expect(
+        (updatedState.protocolState as WaitForDirectFundingForA).directFundingState.requiredDeposit,
+      ).toEqual('0x0');
+    });
   });
-  describe('when in WaitForDirectFunding', () => {
-    const { action, sharedData, state } = scenario.waitForDirectFunding;
+  describeScenarioStep(scenario.waitForDirectFundingForA, () => {
+    const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForPostTopUpLedgerUpdate');
+    itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
   });
-  describe('when in WaitForPostTopUpLedgerUpdate', () => {
-    const { action, sharedData, state } = scenario.waitForPostTopUpLedgerUpdate;
+  describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
+    const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
+    const updatedState = ledgerTopUpReducer(state, sharedData, action);
+    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
+    it('requests the correct deposit amount', () => {
+      expect(
+        (updatedState.protocolState as WaitForDirectFundingForA).directFundingState.requiredDeposit,
+      ).toEqual('0x02');
+    });
+  });
+  describeScenarioStep(scenario.waitForDirectFundingForB, () => {
+    const { action, sharedData, state } = scenario.waitForDirectFundingForB;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });

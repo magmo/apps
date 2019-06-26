@@ -9,24 +9,21 @@ The protocol only handles performing a top up with two players. It works by:
 3. Adding the top-up value to player B's allocation and moving it to the end via the consensus update protocol. This restores the order and also protects player A.
 4. Running the direct funding protocol for player B's deposit. The channel is now funded.
 
-We always perform step 3 even if player B does not need a top up. In the case of player B not needing a top-up we just restore the allocation order without modifying player B's allocation.
+We always run through all four steps. If only one player requires a top up then their directFunding protocol will complete immediately and allow us to move onto the next step.
+While this may result in extra communication it makes the control flow simpler.
 
 ## State machine
 
 ```mermaid
 graph TD
   linkStyle default interpolate basis
-  St((Start))-->NT1{"First player needs top-up?"}
-  NT1-->|Yes|WFLU1(SwitchOrderAndAddATopUpUpdate)
-  NT1-->|No|WFLU2(RestoreOrderAndAddBTopUpUpdate)
+  St((Start))-->WFLU1(SwitchOrderAndAddATopUpUpdate)
   WFLU1-->|Consensus Update Action|WFLU1
   WFLU1-->|Consensus Update Success|WFDF1(WaitForDirectFundingForPlayerA)
   WFDF1-->|Direct Funding Action|WFDF1(WaitForDirectFundingForPlayerA)
   WFDF1-->|Direct Funding Success|WFLU2
   WFLU2-->|Consensus Update Action|WFLU2
-  WFLU2-->|Consensus Update Success|NT2{"Second player needs top-up?"}
-  NT2-->|Yes|WFDF2(WaitForDirectFundingForPlayerB)
-  NT2-->|No|Su((success))
+  WFLU2-->|Consensus Update Success|WFDF2
   WFDF2-->|Direct Funding Action|WFDF2(WaitForDirectFundingForPlayerB)
   WFDF2-->|Direct Funding Success|Su((success))
 
