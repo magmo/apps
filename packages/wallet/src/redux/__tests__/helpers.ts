@@ -84,7 +84,10 @@ type PartialCommitments = Array<{ commitment: Partial<Commitment>; signature?: s
 
 function transformCommitmentToMatcher(sc: { commitment: Partial<Commitment>; signature?: string }) {
   if (sc.signature) {
-    return expect.objectContaining({ signature: sc.signature });
+    return expect.objectContaining({
+      commitment: expect.objectContaining(sc.commitment),
+      signature: sc.signature,
+    });
   } else {
     return expect.objectContaining({ commitment: expect.objectContaining(sc.commitment) });
   }
