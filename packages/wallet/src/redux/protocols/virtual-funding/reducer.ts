@@ -9,7 +9,6 @@ import { bytesFromAppAttributes, UpdateType } from 'fmg-nitro-adjudicator';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
-type Storage = SharedData;
 
 interface InitializationArgs {
   ourIndex: number;
@@ -19,7 +18,7 @@ interface InitializationArgs {
   startingDestination: string[];
 }
 
-export function initialize(sharedData: Storage, args: InitializationArgs): ReturnVal {
+export function initialize(sharedData: SharedData, args: InitializationArgs): ReturnVal {
   const { ourIndex, processId, targetChannelId, startingAllocation, startingDestination } = args;
   const privateKey = getPrivatekey(sharedData, targetChannelId);
   const channelType = CONSENSUS_LIBRARY_ADDRESS;
