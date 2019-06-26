@@ -250,7 +250,7 @@ function initializeDirectFundingState(
 ) {
   const isFirstPlayer = helpers.isFirstPlayer(ledgerId, sharedData);
 
-  let requiredDeposit;
+  let requiredDeposit = '0x0';
   if (playerFor === TwoPartyPlayerIndex.A && isFirstPlayer) {
     requiredDeposit = bigNumberify(proposedAllocation[TwoPartyPlayerIndex.A])
       .sub(originalAllocation[TwoPartyPlayerIndex.A])
@@ -259,7 +259,9 @@ function initializeDirectFundingState(
     requiredDeposit = bigNumberify(proposedAllocation[TwoPartyPlayerIndex.B])
       .sub(originalAllocation[TwoPartyPlayerIndex.B])
       .toHexString();
-  } else {
+  }
+  // If a player has an allocation greater than the proposedAllocation then they do not have to deposit
+  if (bigNumberify(requiredDeposit).lt('0x0')) {
     requiredDeposit = '0x0';
   }
 
@@ -294,20 +296,29 @@ function initializeConsensusState(
   let newDestination;
   // For player A we want to move their top-upped deposit to the end and leave player B's as is
   if (playerFor === TwoPartyPlayerIndex.A) {
-    newAllocation = [
-      currentAllocation[TwoPartyPlayerIndex.B],
-      proposedAllocation[TwoPartyPlayerIndex.A],
-    ];
+    const currentAllocationForA = currentAllocation[TwoPartyPlayerIndex.A];
+    const proposedAllocationForA = proposedAllocation[TwoPartyPlayerIndex.A];
+
+    const newAllocationForA = bigNumberify(currentAllocationForA).gte(proposedAllocationForA)
+      ? currentAllocationForA
+      : proposedAllocationForA;
+
+    newAllocation = [currentAllocation[TwoPartyPlayerIndex.B], newAllocationForA];
     newDestination = [
       proposedDestination[TwoPartyPlayerIndex.B],
       proposedDestination[TwoPartyPlayerIndex.A],
     ];
   } else {
-    // For Player B we want to restore the order and use both updated deposits (since player A is already done with their top-up)
-    newAllocation = [
-      proposedAllocation[TwoPartyPlayerIndex.A],
-      proposedAllocation[TwoPartyPlayerIndex.B],
-    ];
+    // When we're handling this for player B the allocation has already been flipped, so our current value is first in the allocation
+    const currentAllocationForB = currentAllocation[0];
+    const currentAllocationForA = currentAllocation[1];
+    const proposedAllocationForB = proposedAllocation[TwoPartyPlayerIndex.B];
+
+    const newAllocationForB = bigNumberify(currentAllocationForB).gte(proposedAllocationForB)
+      ? currentAllocationForB
+      : proposedAllocationForB;
+    // For Player B we're restoring the original order of [A,B]
+    newAllocation = [currentAllocationForA, newAllocationForB];
     newDestination = proposedDestination;
   }
   const {
