@@ -82,10 +82,7 @@ export const expectThisMessage = (state: SideEffectState, messageType: string) =
 
 type PartialCommitments = Array<{ commitment: Partial<Commitment>; signature?: string }>;
 
-export function transformPartialCommitmentToObjectContainint(sc: {
-  commitment: Partial<Commitment>;
-  signature?: string;
-}) {
+function transformCommitmentToMatcher(sc: { commitment: Partial<Commitment>; signature?: string }) {
   if (sc.signature) {
     return expect.objectContaining({ signature: sc.signature });
   } else {
@@ -111,7 +108,7 @@ export const expectThisCommitmentSent = (
       expect.arrayContaining([
         expect.objectContaining({
           messagePayload: expect.objectContaining({
-            signedCommitment: transformPartialCommitmentToObjectContainint({ commitment }),
+            signedCommitment: transformCommitmentToMatcher({ commitment }),
           }),
         }),
       ]),
@@ -156,7 +153,7 @@ export const expectTheseCommitmentsSent = (
       expect.arrayContaining([
         expect.objectContaining({
           messagePayload: expect.objectContaining({
-            signedCommitments: commitments.map(transformPartialCommitmentToObjectContainint),
+            signedCommitments: commitments.map(transformCommitmentToMatcher),
           }),
         }),
       ]),
