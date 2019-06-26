@@ -11,12 +11,13 @@ import Acknowledge from '../../shared-components/acknowledge';
 import { ConsensusUpdate } from '../../consensus-update/container';
 import WaitForOpponentDecision from './components/wait-for-opponent-decision';
 import { defundRequested } from '../../actions';
+import { multipleWalletActions } from '../../../../redux/actions';
 
 interface Props {
   state: NonTerminalConcludingState;
   approve: typeof actions.concludeApproved;
   deny: typeof actions.cancelled;
-  defund: typeof dispatchDefundRequestedAndDefundChosen;
+  defund: typeof defundRequestedAndDefundChosen;
   keepOpen: typeof actions.keepOpenChosen;
   acknowledge: typeof actions.acknowledged;
 }
@@ -68,18 +69,16 @@ class ConcludingContainer extends PureComponent<Props> {
   }
 }
 
-function dispatchDefundRequestedAndDefundChosen(processId, channelId) {
-  return dispatch => {
-    Promise.resolve(dispatch(actions.defundChosen({ processId }))).then(() =>
-      dispatch(defundRequested({ channelId })),
-    );
-  };
+function defundRequestedAndDefundChosen(processId, channelId) {
+  return multipleWalletActions({
+    actions: [actions.defundChosen({ processId }), defundRequested({ channelId })],
+  });
 }
 
 const mapDispatchToProps = {
   approve: actions.concludeApproved,
   deny: actions.cancelled,
-  defund: dispatchDefundRequestedAndDefundChosen,
+  defund: defundRequestedAndDefundChosen,
   acknowledge: actions.acknowledged,
   keepOpen: actions.keepOpenChosen,
 };
