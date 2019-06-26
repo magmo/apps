@@ -7,8 +7,6 @@ import { exitChallenge } from '../../protocols/dispute/challenger/actions';
 
 describe('multiple action dispatcher', () => {
   const saga = multipleActionDispatcher();
-
-  // having to do this next part is a bit nasty
   const mockMultipleActions = actions.multipleWalletActions({
     actions: [
       defundRequested({ channelId: '0xchannelId' }),
