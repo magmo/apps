@@ -30,7 +30,7 @@ export const isTransactionAction = isTA;
 // -------
 
 export interface MultipleWalletActions {
-  type: 'MULTIPLE_ACTIONS';
+  type: 'WALLET.MULTIPLE_ACTIONS';
   actions: WalletAction[];
 }
 export interface LoggedIn {
@@ -124,7 +124,7 @@ export interface ChallengeExpiredEvent {
 
 export const MultipleWalletActions: ActionConstructor<MultipleWalletActions> = p => ({
   ...p,
-  type: 'MULTIPLE_ACTIONS',
+  type: 'WALLET.MULTIPLE_ACTIONS',
 });
 
 export const loggedIn: ActionConstructor<LoggedIn> = p => ({ ...p, type: 'WALLET.LOGGED_IN' });
