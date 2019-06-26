@@ -40,7 +40,7 @@ export function initialize(
 
   const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
   const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
-
+  const depositNotRequired = bigNumberify(requiredDeposit).eq('0x');
   const commitmentType = CommitmentType.PostFundSetup;
 
   const {
@@ -51,7 +51,7 @@ export function initialize(
     ourIndex,
     processId,
     commitmentType,
-    clearedToSend: alreadyFunded && exchangePostFundSetups,
+    clearedToSend: (alreadyFunded || depositNotRequired) && exchangePostFundSetups,
     protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
   });
   sharedData = newSharedData;
@@ -67,6 +67,23 @@ export function initialize(
         safeToDepositLevel,
         exchangePostFundSetups,
         postFundSetupState,
+      }),
+      sharedData,
+    };
+  }
+  if (depositNotRequired) {
+    return {
+      protocolState: states.waitForFundingAndPostFundSetup({
+        processId,
+        totalFundingRequired,
+        requiredDeposit,
+        channelId,
+        ourIndex,
+        safeToDepositLevel,
+        exchangePostFundSetups,
+        postFundSetupState,
+        channelFunded: false,
+        postFundSetupReceived: false,
       }),
       sharedData,
     };

@@ -39,6 +39,11 @@ const defaultsForB: states.DirectFundingState = {
 
 // actions
 const aInitializeAction = directFundingRequested({ ...defaultsForA });
+const aInitializeWithNoDeposit = directFundingRequested({
+  ...defaultsForA,
+  exchangePostFundSetups: false,
+  requiredDeposit: '0x0',
+});
 const bInitializeAction = directFundingRequested({ ...defaultsForB });
 const aFundingReceivedEvent = globalActions.fundingReceivedEvent({
   processId,
@@ -167,6 +172,10 @@ export const bNoPostFundSetupsHappyPath = {
     sharedData: sharedData(),
     action: bFundingReceivedEvent,
   },
+};
+
+export const depositNotRequired = {
+  initialize: { action: aInitializeWithNoDeposit, sharedData: sharedData() },
 };
 
 export const transactionFails = {
