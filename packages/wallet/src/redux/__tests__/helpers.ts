@@ -11,8 +11,13 @@ type SideEffectState =
   | { sharedData: SharedData };
 
 export function describeScenarioStep(scenarioStep, fn) {
-  return describe(`${scenarioStep.state.type} + \n    ${scenarioStep.action.type} =>`, fn);
+  return describe(scenarioStepDescription(scenarioStep), fn);
 }
+
+export function scenarioStepDescription(scenarioStep) {
+  return `${scenarioStep.state.type} + \n    ${scenarioStep.action.type} =>`;
+}
+
 export const itSendsAMessage = (state: SideEffectState) => {
   it(`sends a message`, () => {
     expectSideEffect('messageOutbox', state, item => expect(item).toEqual(expect.anything()));
