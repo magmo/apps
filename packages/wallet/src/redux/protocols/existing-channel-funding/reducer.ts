@@ -42,6 +42,7 @@ export const initialize = (
       ledgerId,
       proposedAllocation,
       proposedDestination,
+      theirCommitment.allocation,
       sharedData,
     );
     return {

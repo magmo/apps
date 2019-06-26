@@ -23,16 +23,16 @@ export function initialize(
   ledgerId: string,
   proposedAllocation: string[],
   proposedDestination: string[],
+  originalAllocation: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.LedgerTopUpState> {
-  const lastCommitment = helpers.getLatestCommitment(ledgerId, sharedData);
   const { consensusUpdateState, sharedData: newSharedData } = initializeConsensusState(
     TwoPartyPlayerIndex.A,
     processId,
     ledgerId,
     proposedAllocation,
     proposedDestination,
-    lastCommitment.allocation,
+    originalAllocation,
 
     sharedData,
   );
@@ -43,7 +43,7 @@ export function initialize(
     proposedAllocation,
     proposedDestination,
     consensusUpdateState,
-    originalAllocation: lastCommitment.allocation,
+    originalAllocation,
   });
   return { protocolState: newProtocolState, sharedData: newSharedData };
 }
@@ -298,11 +298,14 @@ function initializeConsensusState(
       currentAllocation[TwoPartyPlayerIndex.B],
       proposedAllocation[TwoPartyPlayerIndex.A],
     ];
-    newDestination = proposedDestination.reverse();
+    newDestination = [
+      proposedDestination[TwoPartyPlayerIndex.B],
+      proposedDestination[TwoPartyPlayerIndex.A],
+    ];
   } else {
     // For Player B we want to restore the order and use both updated deposits (since player A is already done with their top-up)
     newAllocation = [
-      currentAllocation[TwoPartyPlayerIndex.A],
+      proposedAllocation[TwoPartyPlayerIndex.A],
       proposedAllocation[TwoPartyPlayerIndex.B],
     ];
     newDestination = proposedDestination;

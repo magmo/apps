@@ -21,12 +21,18 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 // Test data
 // ---------
 
-const twoFive = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
+export const fourFive = [
+  { address: asAddress, wei: bigNumberify(4).toHexString() },
   { address: bsAddress, wei: bigNumberify(5).toHexString() },
 ];
-const oneThree = [
-  { address: asAddress, wei: bigNumberify(1).toHexString() },
+
+export const threeTwo = [
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+  { address: asAddress, wei: bigNumberify(2).toHexString() },
+];
+
+export const twoThree = [
+  { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
 ];
 
@@ -35,13 +41,13 @@ const props = {
   processId,
   channelId,
   ledgerId,
-  proposedAllocation: twoFive.map(a => a.wei),
-  originalAllocation: oneThree.map(a => a.wei),
-  proposedDestination: twoFive.map(a => a.address),
+  proposedAllocation: fourFive.map(a => a.wei),
+  originalAllocation: twoThree.map(a => a.wei),
+  proposedDestination: fourFive.map(a => a.address),
 };
 
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: oneThree });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: oneThree });
+const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree });
+const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoThree });
 
 // ------
 // States
