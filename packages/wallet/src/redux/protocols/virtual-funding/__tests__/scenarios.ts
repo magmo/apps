@@ -30,8 +30,8 @@ const targetChannelId = appChannel.channelId;
 // To properly test the embedded advanceChannel protocols, it's useful to be playerA
 // to make sure that the commitments get sent.
 const initializeArgs = {
-  allocation,
-  destination,
+  startingAllocation: allocation,
+  startingDestination: destination,
   channelType,
   appAttributes,
   processId,
