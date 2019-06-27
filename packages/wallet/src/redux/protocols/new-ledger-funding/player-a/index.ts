@@ -1,1 +1,1 @@
-export {  NewLedgerFunding } from './container';
+export { NewLedgerFunding } from './container';
