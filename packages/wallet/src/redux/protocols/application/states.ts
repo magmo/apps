@@ -1,5 +1,6 @@
 import { StateConstructor } from '../../utils';
 import { DisputeState } from '../dispute/state';
+import { ProtocolState } from '..';
 
 // -------
 // States
@@ -59,4 +60,12 @@ export type ApplicationStateType = ApplicationState['type'];
 
 export function isTerminal(state: ApplicationState): state is Success {
   return state.type === 'Application.Success';
+}
+
+export function isApplicationState(state: ProtocolState): state is ApplicationState {
+  return (
+    state.type === 'Application.WaitForDispute' ||
+    state.type === 'Application.Ongoing' ||
+    state.type === 'Application.WaitForFirstCommitment'
+  );
 }
