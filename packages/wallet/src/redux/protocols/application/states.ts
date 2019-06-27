@@ -1,4 +1,5 @@
 import { StateConstructor } from '../../utils';
+import { DisputeState } from '../dispute/state';
 
 // -------
 // States
@@ -22,6 +23,7 @@ export interface WaitForDispute {
   channelId: string;
   address: string;
   privateKey: string;
+  disputeState: DisputeState;
 }
 
 export interface Success {
@@ -43,7 +45,7 @@ export const success: StateConstructor<Success> = p => {
   return { ...p, type: 'Application.Success' };
 };
 
-export const WaitForDispute: StateConstructor<WaitForDispute> = p => {
+export const waitForDispute: StateConstructor<WaitForDispute> = p => {
   return { ...p, type: 'Application.WaitForDispute' };
 };
 

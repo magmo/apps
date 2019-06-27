@@ -17,6 +17,7 @@ import {
 } from '../../channel-store/reducer';
 import { Commitment } from '../../../domain';
 import { ProtocolAction } from '../../actions';
+import * as dispute from '../dispute';
 
 // TODO: Right now we're using a fixed application ID
 // since we're not too concerned with handling multiple running app channels.
@@ -53,6 +54,10 @@ export function applicationReducer(
       return ownCommitmentReceivedReducer(protocolState, sharedData, action);
     case 'WALLET.APPLICATION.CONCLUDED':
       return { sharedData, protocolState: states.success({}) };
+    case 'WALLET.APPLICATION.CHALLENGE_CREATED':
+      return challengeCreatedReducer(protocolState, sharedData, action);
+    case 'WALLET.APPLICATION.CHALLENGE_REQUESTED':
+      return challengeRequestedReducer(protocolState, sharedData, action);
     default:
       return unreachable(action);
   }
@@ -102,6 +107,46 @@ function opponentCommitmentReceivedReducer(
       protocolState: states.ongoing(protocolState),
     };
   }
+}
+
+function challengeCreatedReducer(
+  protocolState: states.NonTerminalApplicationState,
+  sharedData: SharedData,
+  action: actions.ChallengeCreated,
+): ProtocolStateWithSharedData<states.ApplicationState> {
+  const { channelId, processId } = action;
+  const disputeState = dispute.initializeChallenger(channelId, processId, sharedData);
+  const newProtocolState = states.waitForDispute({
+    ...protocolState,
+    disputeState: disputeState.state,
+  });
+  return {
+    protocolState: newProtocolState,
+    sharedData: disputeState.sharedData,
+  };
+}
+
+function challengeRequestedReducer(
+  protocolState: states.NonTerminalApplicationState,
+  sharedData: SharedData,
+  action: actions.ChallengeRequested,
+): ProtocolStateWithSharedData<states.ApplicationState> {
+  const { channelId, processId, expiryTime, commitment } = action;
+  const disputeState = dispute.initializeResponder(
+    processId,
+    channelId,
+    expiryTime,
+    sharedData,
+    commitment,
+  );
+  const newProtocolState = states.waitForDispute({
+    ...protocolState,
+    disputeState: disputeState.protocolState,
+  });
+  return {
+    protocolState: newProtocolState,
+    sharedData: disputeState.sharedData,
+  };
 }
 
 const validateAndUpdate = (
