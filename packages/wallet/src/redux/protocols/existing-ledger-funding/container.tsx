@@ -15,4 +15,4 @@ class ExistingLedgerFundingContainer extends PureComponent<Props> {
   }
 }
 
-export const ExistingChannelFunding = connect(() => ({}))(ExistingLedgerFundingContainer);
+export const ExistingLedgerFunding = connect(() => ({}))(ExistingLedgerFundingContainer);

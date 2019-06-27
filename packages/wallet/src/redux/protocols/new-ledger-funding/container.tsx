@@ -1,8 +1,8 @@
 import * as states from './states';
 import { PureComponent } from 'react';
 import React from 'react';
-import { NewLedgerFunding as PlayerAIndirectFunding } from './player-a';
-import { NewLedgerFunding as PlayerBIndirectFunding } from './player-b';
+import { NewLedgerFunding as PlayerANewLedgerFunding } from './player-a';
+import { NewLedgerFunding as PlayerBNewLedgerFunding } from './player-b';
 import { connect } from 'react-redux';
 
 interface Props {
@@ -13,11 +13,11 @@ class NewLedgerFundingContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
     if (states.isPlayerAState(state)) {
-      return <PlayerAIndirectFunding state={state} />;
+      return <PlayerANewLedgerFunding state={state} />;
     } else {
-      return <PlayerBIndirectFunding state={state} />;
+      return <PlayerBNewLedgerFunding state={state} />;
     }
   }
 }
 
-export const IndirectFunding = connect(() => ({}))(NewLedgerFundingContainer);
+export const NewLedgerFunding = connect(() => ({}))(NewLedgerFundingContainer);

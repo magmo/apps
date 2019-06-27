@@ -17,7 +17,7 @@ class NewLedgerFundingContainer extends PureComponent<Props> {
       case 'NewLedgerFunding.BWaitForDirectFunding':
       case 'NewLedgerFunding.BWaitForPostFundSetup0':
       case 'NewLedgerFunding.BWaitForLedgerUpdate0':
-        return <FundingStep indirectFundingStateB={state} />;
+        return <FundingStep newLedgerFundingStateB={state} />;
       default:
         return unreachable(state);
     }

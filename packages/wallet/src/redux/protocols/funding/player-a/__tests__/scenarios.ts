@@ -34,8 +34,8 @@ import { bigNumberify } from 'ethers/utils';
 // Test data
 // ---------
 const processId = 'process-id.123';
-const strategy: FundingStrategy = 'IndirectFundingStrategy';
-const existingChannelStrategy: FundingStrategy = 'ExistingChannelStrategy';
+const strategy: FundingStrategy = 'NewLedgerFundingStrategy';
+const existingChannelStrategy: FundingStrategy = 'ExistingLedgerFundingStrategy';
 const targetChannelId = channelId;
 const opponentAddress = bsAddress;
 const ourAddress = asAddress;

@@ -4,7 +4,7 @@ import { unreachable } from '../../../../../utils/reducer-utils';
 import { PlayerBState } from '../states';
 
 interface Props {
-  indirectFundingStateB: PlayerBState;
+  newLedgerFundingStateB: PlayerBState;
 }
 
 export enum Step {
@@ -54,7 +54,7 @@ const messagesForStepList: MessagesForStep[] = [
 
 export class FundingStep extends React.PureComponent<Props> {
   render() {
-    const fundingState = this.props.indirectFundingStateB;
+    const fundingState = this.props.newLedgerFundingStateB;
     const currentStep = fundingStepByState(fundingState);
 
     return (
