@@ -162,6 +162,25 @@ function handleDisputeAction(
     return { protocolState, sharedData };
   }
   const newDisputeState = disputeReducer(protocolState.disputeState, sharedData, action);
+  if (
+    newDisputeState.protocolState.type === 'Challenging.SuccessOpen' ||
+    newDisputeState.protocolState.type === 'Challenging.Failure' ||
+    newDisputeState.protocolState.type === 'Responding.Success'
+  ) {
+    return {
+      protocolState: states.ongoing({ ...protocolState }),
+      sharedData: newDisputeState.sharedData,
+    };
+  }
+  if (
+    newDisputeState.protocolState.type === 'Challenging.SuccessClosed' ||
+    newDisputeState.protocolState.type === 'Responding.Failure'
+  ) {
+    return {
+      protocolState: states.success({ ...protocolState }),
+      sharedData: newDisputeState.sharedData,
+    };
+  }
   const newApplicationState = { ...protocolState, disputeState: newDisputeState.protocolState };
   return { protocolState: newApplicationState, sharedData: newDisputeState.sharedData };
 }
