@@ -4,7 +4,7 @@ import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
 import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
 import * as application from '../protocols/application/reducer';
-import { isRelayableAction, WalletProtocol } from '../../communication';
+import { isRelayableAction } from '../../communication';
 import { responseProvided } from '../protocols/dispute/responder/actions';
 import { getChannelId, Commitment, SignedCommitment } from '../../domain';
 import * as selectors from '../selectors';
@@ -87,8 +87,7 @@ export function* messageListener() {
         break;
       case incoming.RESPOND_TO_CHALLENGE:
         // TODO: This probably should be in a function
-        const channelId = getChannelId(action.commitment);
-        const processId = `${WalletProtocol.Dispute}-${channelId}`;
+        const processId = application.APPLICATION_PROCESS_ID;
         yield put(responseProvided({ processId, commitment: action.commitment }));
         break;
       case incoming.RECEIVE_MESSAGE:
