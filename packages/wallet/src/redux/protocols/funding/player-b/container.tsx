@@ -14,7 +14,7 @@ import { FundingStrategy } from '..';
 import { IndirectFunding } from '../../indirect-funding/container';
 import { ActionDispatcher } from '../../../utils';
 import { isIndirectFundingState } from '../../indirect-funding/states';
-import { ExistingChannelFunding } from '../../existing-channel-funding/container';
+import { ExistingChannelFunding } from '../../existing-ledger-funding/container';
 interface Props {
   state: states.OngoingFundingState;
   strategyApproved: ActionDispatcher<actions.StrategyApproved>;

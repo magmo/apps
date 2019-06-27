@@ -13,7 +13,7 @@ import { SharedData, EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as states from '../states';
 import * as globalActions from '../../../actions';
-import { EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
+import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
 
 const processId = 'processId';
 
@@ -118,32 +118,32 @@ const waitForPostFundSetup = states.waitForPostFundSetup(props);
 const ledgerUpdate0Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger6,
-  protocolLocator: EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+  protocolLocator: EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
 });
 const ledgerUpdate1Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger7,
-  protocolLocator: EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+  protocolLocator: EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
 });
 const appPostFundSetup0Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: app2,
-  protocolLocator: EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+  protocolLocator: EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
 });
 const appPostFundSetup1Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: app3,
-  protocolLocator: EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+  protocolLocator: EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
 });
 const invalidLedgerUpdateReceived = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger5,
-  protocolLocator: EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+  protocolLocator: EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
 });
 const invalidPostFundReceived = globalActions.commitmentReceived({
   processId,
   signedCommitment: app0,
-  protocolLocator: EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+  protocolLocator: EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
 });
 
 export const playerAFullyFundedHappyPath = {

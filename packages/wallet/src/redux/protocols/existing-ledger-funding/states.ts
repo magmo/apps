@@ -8,7 +8,7 @@ export type FailureReason =
   | 'PostFundSetupFailure';
 
 export interface WaitForLedgerTopUp {
-  type: 'ExistingChannelFunding.WaitForLedgerTopUp';
+  type: 'ExistingLedgerFunding.WaitForLedgerTopUp';
   processId: string;
   ledgerTopUpState: any;
   channelId: string;
@@ -16,73 +16,72 @@ export interface WaitForLedgerTopUp {
 }
 
 export interface WaitForPostFundSetup {
-  type: 'ExistingChannelFunding.WaitForPostFundSetup';
+  type: 'ExistingLedgerFunding.WaitForPostFundSetup';
   processId: string;
   channelId: string;
   ledgerId: string;
 }
 
 export interface WaitForLedgerUpdate {
-  type: 'ExistingChannelFunding.WaitForLedgerUpdate';
+  type: 'ExistingLedgerFunding.WaitForLedgerUpdate';
   processId: string;
   channelId: string;
   ledgerId: string;
 }
 
 export interface Failure {
-  type: 'ExistingChannelFunding.Failure';
+  type: 'ExistingLedgerFunding.Failure';
   reason: FailureReason;
 }
 
 export interface Success {
-  type: 'ExistingChannelFunding.Success';
+  type: 'ExistingLedgerFunding.Success';
 }
 
 export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
   return {
     ...p,
-    type: 'ExistingChannelFunding.WaitForLedgerUpdate',
+    type: 'ExistingLedgerFunding.WaitForLedgerUpdate',
   };
 };
 
 export const waitForLedgerTopUp: StateConstructor<WaitForLedgerTopUp> = p => {
   return {
     ...p,
-    type: 'ExistingChannelFunding.WaitForLedgerTopUp',
+    type: 'ExistingLedgerFunding.WaitForLedgerTopUp',
   };
 };
 
 export const waitForPostFundSetup: StateConstructor<WaitForPostFundSetup> = p => {
   return {
     ...p,
-    type: 'ExistingChannelFunding.WaitForPostFundSetup',
+    type: 'ExistingLedgerFunding.WaitForPostFundSetup',
   };
 };
 
 export const success: StateConstructor<Success> = p => {
-  return { ...p, type: 'ExistingChannelFunding.Success' };
+  return { ...p, type: 'ExistingLedgerFunding.Success' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  return { ...p, type: 'ExistingChannelFunding.Failure' };
+  return { ...p, type: 'ExistingLedgerFunding.Failure' };
 };
 
-export type ExistingChannelFundingState =
+export type ExistingLedgerFundingState =
   | WaitForLedgerTopUp
   | WaitForLedgerUpdate
   | WaitForPostFundSetup
   | Success
   | Failure;
 
-export function isExistingChannelFundingState(
+export function isExistingLedgerFundingState(
   state: ProtocolState,
-): state is ExistingChannelFundingState {
-  return state.type.indexOf('ExistingChannelFunding') === 0;
+): state is ExistingLedgerFundingState {
+  return state.type.indexOf('ExistingLedgerFunding') === 0;
 }
 
-export function isTerminal(state: ExistingChannelFundingState): state is Success | Failure {
+export function isTerminal(state: ExistingLedgerFundingState): state is Success | Failure {
   return (
-    state.type === 'ExistingChannelFunding.Failure' ||
-    state.type === 'ExistingChannelFunding.Success'
+    state.type === 'ExistingLedgerFunding.Failure' || state.type === 'ExistingLedgerFunding.Success'
   );
 }

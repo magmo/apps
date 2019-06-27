@@ -1,10 +1,10 @@
-# Existing Channel Funding Protocol
+# Existing Ledger Funding Protocol
 
 The purpose of this protocol is to fund a channel using an existing ledger channel. The protocol should
 
 - Check if a ledger channel has enough funds to fund the requested channel.
   - If not it should initiate a ledger top-up protocol.
-- Craft ledger updates to fund the channel. (Perhaps we should extract this into a protocol that can be shared by indirect-funding and existing channel funding.)
+- Craft ledger updates to fund the channel. (Perhaps we should extract this into a protocol that can be shared by indirect-funding and Existing Ledgerfunding.)
 
 Currently we assume a Ledger Top-up protocol handles both the cases where a current player needs to top-up funds and the case where their opponent needs to top-up.
 
@@ -17,7 +17,7 @@ Currently we assume a Ledger Top-up protocol handles both the cases where a curr
   linkStyle default interpolate basis
   St((Start))-->L
   L{Does Player channel have enough funds?}-->|No|LT(WaitForLedgerTopup)
-  L{Does existing channel have enough funds?}-->|Yes|SC0[SendLedgerUpdate0]
+  L{Does Existing channel has enough funds?}-->|Yes|SC0[SendLedgerUpdate0]
   LT-->|LedgerChannelToppedUp|SC0[SendLedgerUpdate0]
   SC0-->WC(WaitForLedgerUpdate)
   WC-->|"CommitmentReceived(Reject)"|F((failure))
@@ -41,8 +41,8 @@ Currently we assume a Ledger Top-up protocol handles both the cases where a curr
   graph TD
   linkStyle default interpolate basis
   St((Start))-->L
-  L{Does existing channel have enough funds?}-->|No|LT(WaitForLedgerTopup)
-  L{Does existing channel have enough funds?}-->|Yes|WC(WaitForLedgerUpdate)
+  L{Does Existing Ledgerhave enough funds?}-->|No|LT(WaitForLedgerTopup)
+  L{Does Existing Ledgerhave enough funds?}-->|Yes|WC(WaitForLedgerUpdate)
   LT-->|LedgerChannelToppedUp|WC(WaitForLedgerUpdate)
   WC-->|"CommitmentReceived(Accept)"|SC1[SendLedgerUpdate1]
   SC1-->WP(WaitForPostFundSetup)

@@ -5,14 +5,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 interface Props {
-  state: states.ExistingChannelFundingState;
+  state: states.ExistingLedgerFundingState;
 }
 
-class ExistingChannelFundingContainer extends PureComponent<Props> {
+class ExistingLedgerFundingContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
     return <div>{state.type}</div>;
   }
 }
 
-export const ExistingChannelFunding = connect(() => ({}))(ExistingChannelFundingContainer);
+export const ExistingChannelFunding = connect(() => ({}))(ExistingLedgerFundingContainer);

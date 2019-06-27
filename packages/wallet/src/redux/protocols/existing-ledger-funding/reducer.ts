@@ -7,7 +7,7 @@ import {
 } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
-import { ExistingChannelFundingAction } from './actions';
+import { ExistingLedgerFundingAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import * as selectors from '../../selectors';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-app';
@@ -19,14 +19,14 @@ import { CommitmentType } from 'fmg-core';
 import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
 import { addHex } from '../../../utils/hex-utils';
-export const EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR = 'ExistingChannelFunding';
+export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'ExistingLedgerFunding';
 
 export const initialize = (
   processId: string,
   channelId: string,
   ledgerId: string,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
+): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 
@@ -76,7 +76,7 @@ export const initialize = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
-      EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+      EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
     );
     sharedData = queueMessage(sharedData, messageRelay);
   }
@@ -90,17 +90,17 @@ export const initialize = (
   return { protocolState, sharedData };
 };
 
-export const existingChannelFundingReducer = (
-  protocolState: states.ExistingChannelFundingState,
+export const existingLedgerFundingReducer = (
+  protocolState: states.ExistingLedgerFundingState,
   sharedData: SharedData,
-  action: ExistingChannelFundingAction,
-): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
+  action: ExistingLedgerFundingAction,
+): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
   switch (protocolState.type) {
-    case 'ExistingChannelFunding.WaitForLedgerUpdate':
+    case 'ExistingLedgerFunding.WaitForLedgerUpdate':
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
-    case 'ExistingChannelFunding.WaitForPostFundSetup':
+    case 'ExistingLedgerFunding.WaitForPostFundSetup':
       return waitForPostFundSetupReducer(protocolState, sharedData, action);
-    case 'ExistingChannelFunding.WaitForLedgerTopUp':
+    case 'ExistingLedgerFunding.WaitForLedgerTopUp':
       return waitForLedgerTopUpReducer(protocolState, sharedData, action);
   }
   return { protocolState, sharedData };
@@ -109,8 +109,8 @@ export const existingChannelFundingReducer = (
 const waitForLedgerTopUpReducer = (
   protocolState: states.WaitForLedgerTopUp,
   sharedData: SharedData,
-  action: ExistingChannelFundingAction,
-): ProtocolStateWithSharedData<states.ExistingChannelFundingState> => {
+  action: ExistingLedgerFundingAction,
+): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
   if (!isLedgerTopUpAction(action)) {
     console.warn(`Expected a ledger top up action.`);
   }
@@ -154,7 +154,7 @@ const waitForLedgerTopUpReducer = (
         processId,
         signResult.signedCommitment.commitment,
         signResult.signedCommitment.signature,
-        EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+        EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
       );
       sharedData = queueMessage(sharedData, messageRelay);
     }
@@ -174,7 +174,7 @@ const waitForLedgerTopUpReducer = (
 const waitForPostFundSetupReducer = (
   protocolState: states.WaitForPostFundSetup,
   sharedData: SharedData,
-  action: ExistingChannelFundingAction,
+  action: ExistingLedgerFundingAction,
 ) => {
   if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     throw new Error(`Invalid action ${action.type}`);
@@ -212,7 +212,7 @@ const waitForPostFundSetupReducer = (
 const waitForLedgerUpdateReducer = (
   protocolState: states.WaitForLedgerUpdate,
   sharedData: SharedData,
-  action: ExistingChannelFundingAction,
+  action: ExistingLedgerFundingAction,
 ) => {
   if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
     return { protocolState, sharedData };
@@ -259,7 +259,7 @@ const waitForLedgerUpdateReducer = (
       processId,
       signResult.signedCommitment.commitment,
       signResult.signedCommitment.signature,
-      EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+      EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
     );
     newSharedData = queueMessage(newSharedData, messageRelay);
   }
@@ -323,7 +323,7 @@ function craftAndSendAppPostFundCommitment(
     processId,
     signResult.signedCommitment.commitment,
     signResult.signedCommitment.signature,
-    EXISTING_CHANNEL_FUNDING_PROTOCOL_LOCATOR,
+    EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
   );
   newSharedData = queueMessage(newSharedData, messageRelay);
   return newSharedData;

@@ -13,7 +13,7 @@ import {
 } from '../../../../../domain/commitments/__tests__';
 import { bsAddress, bsPrivateKey } from '../../../../../communication/__tests__/commitments';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
-import * as existingChannelFundingTests from '../../../existing-channel-funding/__tests__';
+import * as existingChannelFundingTests from '../../../existing-ledger-funding/__tests__';
 import { bigNumberify } from 'ethers/utils';
 
 // To test all paths through the state machine we will use 4 different scenarios:

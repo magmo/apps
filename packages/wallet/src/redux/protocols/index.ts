@@ -11,7 +11,7 @@ import { IndirectDefundingState } from './indirect-defunding/states';
 import { DefundingState } from './defunding/states';
 import { ConcludingState } from './concluding/states';
 import { TransactionSubmissionState } from './transaction-submission';
-import { ExistingChannelFundingState } from './existing-channel-funding/states';
+import { ExistingLedgerFundingState } from './existing-ledger-funding/states';
 import { LedgerTopUpState } from './ledger-top-up/states';
 import { ConsensusUpdateState } from './consensus-update/states';
 import { AdvanceChannelState } from './advance-channel';
@@ -30,7 +30,7 @@ export type ProtocolState =
   | ConcludingState
   | IndirectDefundingState
   | TransactionSubmissionState
-  | ExistingChannelFundingState
+  | ExistingLedgerFundingState
   | LedgerTopUpState
   | ConsensusUpdateState
   | TransactionSubmissionState

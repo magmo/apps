@@ -5,7 +5,7 @@ import { TwoPartyPlayerIndex } from '../../../../types';
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 import { FundingStrategy } from '../..';
 import * as indirectFundingTests from '../../../indirect-funding/player-a/__tests__';
-import * as existingChannelTests from '../../../existing-channel-funding/__tests__';
+import * as existingChannelTests from '../../../existing-ledger-funding/__tests__';
 import {
   channelId,
   bsAddress,

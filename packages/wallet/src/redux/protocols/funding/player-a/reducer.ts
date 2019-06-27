@@ -17,12 +17,12 @@ import * as indirectFundingStates from '../../indirect-funding/states';
 import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
 import {
-  initializeExistingChannelFunding,
-  existingChannelFundingReducer,
-  ExistingChannelFundingAction,
-  isExistingChannelFundingAction,
-} from '../../existing-channel-funding';
-import * as existingChannelFundingStates from '../../existing-channel-funding/states';
+  initializeExistingLedgerFunding,
+  existingLedgerFundingReducer,
+  ExistingLedgerFundingAction,
+  isExistingLedgerFundingAction,
+} from '../../existing-ledger-funding';
+import * as existingLedgerFundingStates from '../../existing-ledger-funding/states';
 import { CommitmentType } from 'fmg-core';
 import { getLastCommitment } from '../../../channel-store';
 
@@ -51,7 +51,7 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (isIndirectFundingAction(action) || isExistingChannelFundingAction(action)) {
+  if (isIndirectFundingAction(action) || isExistingLedgerFundingAction(action)) {
     return handleFundingAction(state, sharedData, action);
   }
 
@@ -86,8 +86,8 @@ function handleFundingAction(
   }
 
   if (
-    isExistingChannelFundingAction(action) &&
-    existingChannelFundingStates.isExistingChannelFundingState(protocolState.fundingState)
+    isExistingLedgerFundingAction(action) &&
+    existingLedgerFundingStates.isExistingLedgerFundingState(protocolState.fundingState)
   ) {
     return handleExistingChannelFundingAction(protocolState, sharedData, action);
   } else {
@@ -98,9 +98,9 @@ function handleFundingAction(
 function handleExistingChannelFundingAction(
   protocolState: states.WaitForFunding,
   sharedData: SharedData,
-  action: ExistingChannelFundingAction,
+  action: ExistingLedgerFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (!existingChannelFundingStates.isExistingChannelFundingState(protocolState.fundingState)) {
+  if (!existingLedgerFundingStates.isExistingLedgerFundingState(protocolState.fundingState)) {
     console.error(
       `Funding reducer received indirect funding action ${
         action.type
@@ -111,9 +111,9 @@ function handleExistingChannelFundingAction(
   const {
     protocolState: updatedFundingState,
     sharedData: updatedSharedData,
-  } = existingChannelFundingReducer(protocolState.fundingState, sharedData, action);
+  } = existingLedgerFundingReducer(protocolState.fundingState, sharedData, action);
 
-  if (!existingChannelFundingStates.isTerminal(updatedFundingState)) {
+  if (!existingLedgerFundingStates.isTerminal(updatedFundingState)) {
     return {
       protocolState: states.waitForFunding({ ...protocolState, fundingState: updatedFundingState }),
       sharedData: updatedSharedData,
@@ -210,14 +210,14 @@ function strategyApproved(
     const {
       protocolState: fundingState,
       sharedData: newSharedData,
-    } = initializeExistingChannelFunding(
+    } = initializeExistingLedgerFunding(
       state.processId,
       channelState.channelId,
       existingLedgerChannel.channelId,
       sharedData,
     );
 
-    if (existingChannelFundingStates.isTerminal(fundingState)) {
+    if (existingLedgerFundingStates.isTerminal(fundingState)) {
       console.error('Indirect funding strate initialized to terminal state.');
       return handleFundingComplete(state, fundingState, newSharedData);
     }
@@ -298,12 +298,12 @@ function handleFundingComplete(
   protocolState: Properties<states.WaitForSuccessConfirmation>,
   fundingState:
     | indirectFundingStates.IndirectFundingState
-    | existingChannelFundingStates.ExistingChannelFundingState,
+    | existingLedgerFundingStates.ExistingLedgerFundingState,
   sharedData: SharedData,
 ) {
   if (
     fundingState.type === 'IndirectFunding.Success' ||
-    fundingState.type === 'ExistingChannelFunding.Success'
+    fundingState.type === 'ExistingLedgerFunding.Success'
   ) {
     return {
       protocolState: states.waitForSuccessConfirmation(protocolState),
