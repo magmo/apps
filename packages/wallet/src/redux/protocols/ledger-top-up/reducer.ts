@@ -1,4 +1,4 @@
-import { SharedData } from '../../state';
+import { SharedData, registerChannelToMonitor } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
 import * as helpers from '../reducer-helpers';
@@ -27,6 +27,7 @@ export function initialize(
   originalAllocation: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.LedgerTopUpState> {
+  sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
   const { consensusUpdateState, sharedData: newSharedData } = initializeConsensusState(
     TwoPartyPlayerIndex.A,
     processId,
@@ -299,28 +300,16 @@ function initializeDirectFundingState(
       originalAllocation[TwoPartyPlayerIndex.B],
     );
   }
-  // This would be much simpler if we just used the allocation from the latest commitment
-  // However that makes testing more difficult
-  // We calculate the difference between the amount on chain (previousTotal) and the total for the new allocation
+
   let totalFundingRequired = '0x0';
-  let previousTotal = '0x0';
-  let proposedTotal = '0x0';
   if (playerFor === TwoPartyPlayerIndex.A) {
-    proposedTotal = addHex(
+    totalFundingRequired = addHex(
       proposedAllocation[TwoPartyPlayerIndex.A],
       originalAllocation[TwoPartyPlayerIndex.B],
     );
-
-    previousTotal = originalAllocation.reduce(addHex);
   } else if (playerFor === TwoPartyPlayerIndex.B) {
-    previousTotal = addHex(
-      proposedAllocation[TwoPartyPlayerIndex.A],
-      originalAllocation[TwoPartyPlayerIndex.B],
-    );
-    proposedTotal = proposedAllocation.reduce(addHex);
+    totalFundingRequired = proposedAllocation.reduce(addHex);
   }
-
-  totalFundingRequired = subHex(proposedTotal, previousTotal);
 
   const directFundingAction = directFundingRequested({
     processId,

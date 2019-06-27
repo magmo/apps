@@ -40,6 +40,7 @@ describe('player A happy path', () => {
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x02');
+      expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
@@ -58,6 +59,7 @@ describe('player A happy path', () => {
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
+      expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x09');
     });
   });
   describeScenarioStep(scenario.waitForDirectFundingForB, () => {
@@ -102,6 +104,7 @@ describe('player B happy path', () => {
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
+      expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
@@ -120,6 +123,7 @@ describe('player B happy path', () => {
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x02');
+      expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x09');
     });
   });
   describeScenarioStep(scenario.waitForDirectFundingForB, () => {
@@ -164,6 +168,7 @@ describe('player A one use needs top up', () => {
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x02');
+      expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
@@ -218,6 +223,7 @@ describe('player B one use needs top up', () => {
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
+      expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
@@ -248,6 +254,13 @@ function itTransitionsTo(state: ReturnVal, type: LedgerTopUpStateType) {
 function getRequiredDeposit(protocolState: LedgerTopUpState): string {
   if ('directFundingState' in protocolState) {
     return protocolState.directFundingState.requiredDeposit;
+  }
+  return '0x0';
+}
+
+function getTotalFundingRequired(protocolState: LedgerTopUpState): string {
+  if ('directFundingState' in protocolState) {
+    return protocolState.directFundingState.totalFundingRequired;
   }
   return '0x0';
 }
