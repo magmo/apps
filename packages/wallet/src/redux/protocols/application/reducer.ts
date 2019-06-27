@@ -54,8 +54,8 @@ export function applicationReducer(
       return ownCommitmentReceivedReducer(protocolState, sharedData, action);
     case 'WALLET.APPLICATION.CONCLUDED':
       return { sharedData, protocolState: states.success({}) };
-    case 'WALLET.APPLICATION.CHALLENGE_CREATED':
-      return challengeCreatedReducer(protocolState, sharedData, action);
+    case 'WALLET.APPLICATION.CHALLENGE_DETECTED':
+      return challengeDetectedReducer(protocolState, sharedData, action);
     case 'WALLET.APPLICATION.CHALLENGE_REQUESTED':
       return challengeRequestedReducer(protocolState, sharedData, action);
     default:
@@ -109,10 +109,10 @@ function opponentCommitmentReceivedReducer(
   }
 }
 
-function challengeCreatedReducer(
+function challengeRequestedReducer(
   protocolState: states.NonTerminalApplicationState,
   sharedData: SharedData,
-  action: actions.ChallengeCreated,
+  action: actions.ChallengeRequested,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
   const { channelId, processId } = action;
   const disputeState = dispute.initializeChallenger(channelId, processId, sharedData);
@@ -126,12 +126,12 @@ function challengeCreatedReducer(
   };
 }
 
-function challengeRequestedReducer(
+function challengeDetectedReducer(
   protocolState: states.NonTerminalApplicationState,
   sharedData: SharedData,
-  action: actions.ChallengeRequested,
+  action: actions.ChallengeDetected,
 ): ProtocolStateWithSharedData<states.ApplicationState> {
-  const { channelId, processId, expiryTime, commitment } = action;
+  const { channelId, processId, expiresAt: expiryTime, commitment } = action;
   const disputeState = dispute.initializeResponder(
     processId,
     channelId,

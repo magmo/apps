@@ -22,11 +22,13 @@ export interface ChallengeRequested {
   type: 'WALLET.APPLICATION.CHALLENGE_REQUESTED';
   commitment: Commitment;
   processId: string;
+  channelId: string;
 }
 
-export interface ChallengeCreated {
-  type: 'WALLET.APPLICATION.CHALLENGE_CREATED';
+export interface ChallengeDetected {
+  type: 'WALLET.APPLICATION.CHALLENGE_DETECTED';
   processId: string;
+  channelId: string;
   expiresAt: number;
   commitment: Commitment;
 }
@@ -63,9 +65,9 @@ export const challengeRequested: ActionConstructor<ChallengeRequested> = p => ({
   type: 'WALLET.APPLICATION.CHALLENGE_REQUESTED',
 });
 
-export const challengeCreated: ActionConstructor<ChallengeCreated> = p => ({
+export const challengeDetected: ActionConstructor<ChallengeDetected> = p => ({
   ...p,
-  type: 'WALLET.APPLICATION.CHALLENGE_CREATED',
+  type: 'WALLET.APPLICATION.CHALLENGE_Detected',
 });
 
 export const concluded: ActionConstructor<Concluded> = p => {
@@ -83,7 +85,7 @@ export const concluded: ActionConstructor<Concluded> = p => {
 export type ApplicationAction =
   | OpponentCommitmentReceived
   | OwnCommitmentReceived
-  | ChallengeCreated
+  | ChallengeDetected
   | ChallengeRequested
   | Concluded;
 
@@ -91,7 +93,7 @@ export function isApplicationAction(action: WalletAction): action is Application
   return (
     action.type === 'WALLET.APPLICATION.OPPONENT_COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.APPLICATION.OWN_COMMITMENT_RECEIVED' ||
-    action.type === 'WALLET.APPLICATION.CHALLENGE_CREATED' ||
+    action.type === 'WALLET.APPLICATION.CHALLENGE_DETECTED' ||
     action.type === 'WALLET.APPLICATION.CHALLENGE_REQUESTED' ||
     action.type === 'WALLET.APPLICATION.CONCLUDED'
   );
