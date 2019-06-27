@@ -37,6 +37,7 @@ export function* messageListener() {
           challengeRequested({
             processId: application.APPLICATION_PROCESS_ID, // TODO allow for multiple application Ids
             commitment: action.commitment,
+            channelId: action.channelId,
           }),
         );
         break;

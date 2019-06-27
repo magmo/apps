@@ -1,7 +1,7 @@
 import { ChallengeCreatedEvent } from '../actions';
 import { take, select, put } from 'redux-saga/effects';
 import * as selectors from '../selectors';
-import { challengeCreated } from '../protocols/application/actions';
+import { challengeDetected } from '../protocols/application/actions';
 import { APPLICATION_PROCESS_ID } from '../protocols/application/reducer';
 
 /**
@@ -10,7 +10,7 @@ import { APPLICATION_PROCESS_ID } from '../protocols/application/reducer';
 export function* challengeResponseInitiator() {
   while (true) {
     const action: ChallengeCreatedEvent = yield take('WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT');
-    const { commitment, channelId, finalizedAt } = action;
+    const { commitment, channelId, finalizedAt: expiresAt } = action;
 
     const channelState = yield select(selectors.getOpenedChannelState, channelId);
 
@@ -19,7 +19,12 @@ export function* challengeResponseInitiator() {
 
     if (ourCommitment) {
       yield put(
-        challengeCreated({ commitment, expiresAt: finalizedAt, processId: APPLICATION_PROCESS_ID }),
+        challengeDetected({
+          commitment,
+          channelId,
+          processId: APPLICATION_PROCESS_ID,
+          expiresAt,
+        }),
       );
     }
   }
