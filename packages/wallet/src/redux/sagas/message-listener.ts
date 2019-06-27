@@ -110,8 +110,9 @@ export function* messageListener() {
 
 function* validateTransitionForCommitments(signedCommitments: SignedCommitment[]) {
   const channelId = getChannelId(signedCommitments[0].commitment);
-  // If we're receiving the first commitment there's nothing stored to validate against
-  if (signedCommitments[0].commitment.turnNum > 0) {
+
+  const storedCommitmentExists = yield select(selectors.doesACommitmentExistForChannel, channelId);
+  if (storedCommitmentExists) {
     const latestStoredCommitment: Commitment = yield select(
       selectors.getLastCommitmentForChannel,
       channelId,

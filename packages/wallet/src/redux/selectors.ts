@@ -13,6 +13,13 @@ export const getOpenedChannelState = (state: SharedData, channelId: string): Ope
   return channelStatus;
 };
 
+export const doesACommitmentExistForChannel = (state: SharedData, channelId: string): boolean => {
+  return (
+    state.channelStore[channelId] !== undefined &&
+    state.channelStore[channelId].commitments.length > 0
+  );
+};
+
 export const getChannelState = (state: SharedData, channelId: string): ChannelState => {
   const channelStatus = state.channelStore[channelId];
   if (!channelStatus) {
