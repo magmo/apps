@@ -21,7 +21,7 @@ linkStyle default interpolate basis
   O-->|COMMITMENT_RECEIVED|O(Ongoing)
   AK-->|CONCLUDED|Su((success))
   O-->|CONCLUDED|Su((success))
-  O-->|CHALLENGE_CREATED/DETECTED|WFD(WaitForDispute)
+  O-->|CHALLENGE_REQUESTED/DETECTED|WFD(WaitForDispute)
   WFD-->|Response|O
   WFD-->|Expiry|Su
   classDef logic fill:#efdd20;
