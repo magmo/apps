@@ -4,7 +4,7 @@ import { TwoPartyPlayerIndex } from '../../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 import { FundingStrategy } from '../../../../../communication';
-import * as indirectFundingTests from '../../../indirect-funding/player-b/__tests__';
+import * as indirectFundingTests from '../../../new-ledger-funding/player-b/__tests__';
 import {
   channelId,
   asAddress,

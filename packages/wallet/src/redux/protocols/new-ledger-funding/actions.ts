@@ -17,12 +17,12 @@ import { isDirectFundingAction } from '../direct-funding/actions';
 
 export { playerA, playerB };
 export type ProcessAction = playerA.Action | playerB.Action;
-export type IndirectFundingAction = ProcessAction | CommonAction;
+export type NewLedgerFundingAction = ProcessAction | CommonAction;
 
-export function isIndirectFundingAction(action: WalletAction): action is IndirectFundingAction {
+export function isNewLedgerFundingAction(action: WalletAction): action is NewLedgerFundingAction {
   return (
     isCommonAction(action) ||
     isDirectFundingAction(action) ||
-    action.type.indexOf('WALLET.INDIRECT_FUNDING') === 0
+    action.type.indexOf('WALLET.NEW_LEDGER_FUNDING') === 0
   );
 }

@@ -1,6 +1,6 @@
 import * as channel from './channel-store/actions';
 import * as directFunding from './protocols/direct-funding/actions';
-import * as indirectFunding from './protocols/indirect-funding/actions';
+import * as indirectFunding from './protocols/new-ledger-funding/actions';
 import * as application from './protocols/application/actions';
 import * as protocol from './protocols/actions';
 import * as advanceChannel from './protocols/advance-channel';

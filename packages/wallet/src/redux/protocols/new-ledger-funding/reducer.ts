@@ -5,11 +5,11 @@ import { playerBReducer, initialize as initializeB } from './player-b/reducer';
 import { SharedData } from '../../state';
 import { ChannelState } from '../../channel-store';
 import { isPlayerAState } from './player-a/states';
-import { NonTerminalIndirectFundingState, IndirectFundingState } from './states';
-import { IndirectFundingAction } from './actions';
-import { ProtocolStateWithSharedData } from '../../../redux/protocols';
+import { NonTerminalNewLedgerFundingState, NewLedgerFundingState } from './states';
+import { NewLedgerFundingAction } from './actions';
+import { ProtocolStateWithSharedData } from '..';
 
-type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
+type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 
 export function initialize(
   processId: string,
@@ -29,10 +29,10 @@ export function initialize(
   }
 }
 
-export const indirectFundingReducer = (
-  protocolState: NonTerminalIndirectFundingState,
+export const newLedgerFundingReducer = (
+  protocolState: NonTerminalNewLedgerFundingState,
   sharedData: SharedData,
-  action: IndirectFundingAction,
+  action: NewLedgerFundingAction,
 ): ReturnVal => {
   if (isPlayerAState(protocolState)) {
     return playerAReducer(protocolState, sharedData, action);

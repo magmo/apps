@@ -8,7 +8,7 @@ import {
   signAndStore,
   registerChannelToMonitor,
 } from '../../../state';
-import { IndirectFundingState, failure, success } from '../states';
+import { NewLedgerFundingState, failure, success } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
 import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../../domain';
@@ -29,11 +29,11 @@ import { proposeNewConsensus } from '../../../../domain/consensus-app';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { isTransactionAction } from '../../../actions';
 import { ChannelFundingState } from '../../../state';
-import { IndirectFundingAction } from '../actions';
+import { NewLedgerFundingAction } from '../actions';
 import * as selectors from '../../../selectors';
 
-type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
-type IDFAction = IndirectFundingAction;
+type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
+type IDFAction = NewLedgerFundingAction;
 
 export function initialize(
   processId: string,
@@ -81,16 +81,16 @@ export function initialize(
 export function playerAReducer(
   protocolState: states.PlayerAState,
   sharedData: SharedData,
-  action: IndirectFundingAction,
+  action: NewLedgerFundingAction,
 ): ReturnVal {
   switch (protocolState.type) {
-    case 'IndirectFunding.AWaitForPreFundSetup1':
+    case 'NewLedgerFunding.AWaitForPreFundSetup1':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
-    case 'IndirectFunding.AWaitForDirectFunding':
+    case 'NewLedgerFunding.AWaitForDirectFunding':
       return handleWaitForDirectFunding(protocolState, sharedData, action);
-    case 'IndirectFunding.AWaitForLedgerUpdate1':
+    case 'NewLedgerFunding.AWaitForLedgerUpdate1':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
-    case 'IndirectFunding.AWaitForPostFundSetup1':
+    case 'NewLedgerFunding.AWaitForPostFundSetup1':
       return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);

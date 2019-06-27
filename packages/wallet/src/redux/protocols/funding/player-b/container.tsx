@@ -11,9 +11,9 @@ import ApproveStrategy from '../../../../components/funding/approve-strategy';
 import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
 import AcknowledgeX from '../../../../components/acknowledge-x';
 import { FundingStrategy } from '..';
-import { IndirectFunding } from '../../indirect-funding/container';
+import { IndirectFunding } from '../../new-ledger-funding/container';
 import { ActionDispatcher } from '../../../utils';
-import { isIndirectFundingState } from '../../indirect-funding/states';
+import { isNewLedgerFundingState } from '../../new-ledger-funding/states';
 import { ExistingChannelFunding } from '../../existing-ledger-funding/container';
 interface Props {
   state: states.OngoingFundingState;
@@ -41,7 +41,7 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case 'Funding.PlayerB.WaitForFunding':
-        if (isIndirectFundingState(state.fundingState)) {
+        if (isNewLedgerFundingState(state.fundingState)) {
           return <IndirectFunding state={state.fundingState} />;
         } else {
           return <ExistingChannelFunding state={state.fundingState} />;

@@ -16,13 +16,13 @@ export enum Step {
 
 const fundingStepByState = (state: PlayerAState): Step => {
   switch (state.type) {
-    case 'IndirectFunding.AWaitForPreFundSetup1':
+    case 'NewLedgerFunding.AWaitForPreFundSetup1':
       return Step.AWaitForPreFundSetup1;
-    case 'IndirectFunding.AWaitForDirectFunding':
+    case 'NewLedgerFunding.AWaitForDirectFunding':
       return Step.AWaitForDirectFunding;
-    case 'IndirectFunding.AWaitForLedgerUpdate1':
+    case 'NewLedgerFunding.AWaitForLedgerUpdate1':
       return Step.AWaitForLedgerUpdate1;
-    case 'IndirectFunding.AWaitForPostFundSetup1':
+    case 'NewLedgerFunding.AWaitForPostFundSetup1':
       return Step.AWaitForPostFundSetup1;
     default:
       return unreachable(state);

@@ -3,7 +3,7 @@ import { ChallengerState } from './dispute/challenger/states';
 
 import { DirectFundingState } from './direct-funding/states';
 import { FundingState } from './funding/states';
-import { IndirectFundingState } from './indirect-funding/states';
+import { NewLedgerFundingState } from './new-ledger-funding/states';
 import { ResponderState } from './dispute/responder/states';
 import { WithdrawalState } from './withdrawing/states';
 import { ApplicationState } from './application/states';
@@ -19,7 +19,7 @@ import { VirtualFundingState } from './virtual-funding/states';
 
 export type ProtocolState =
   | ApplicationState
-  | IndirectFundingState
+  | NewLedgerFundingState
   | VirtualFundingState
   | DirectFundingState
   | WithdrawalState

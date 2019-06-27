@@ -1,4 +1,4 @@
-# Indirect Funding Protocol for Player A
+# New Ledger Funding Protocol for Player A
 
 ### State Machine
 

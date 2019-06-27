@@ -16,13 +16,13 @@ export enum Step {
 
 const fundingStepByState = (state: PlayerBState): Step => {
   switch (state.type) {
-    case 'IndirectFunding.BWaitForPreFundSetup0':
+    case 'NewLedgerFunding.BWaitForPreFundSetup0':
       return Step.BWaitForPreFundSetup1;
-    case 'IndirectFunding.BWaitForDirectFunding':
+    case 'NewLedgerFunding.BWaitForDirectFunding':
       return Step.BWaitForDirectFunding;
-    case 'IndirectFunding.BWaitForLedgerUpdate0':
+    case 'NewLedgerFunding.BWaitForLedgerUpdate0':
       return Step.BWaitForLedgerUpdate1;
-    case 'IndirectFunding.BWaitForPostFundSetup0':
+    case 'NewLedgerFunding.BWaitForPostFundSetup0':
       return Step.BWaitForPostFundSetup1;
     default:
       return unreachable(state);

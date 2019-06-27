@@ -5,14 +5,14 @@ import { ActionConstructor } from '../../../utils';
 // Actions
 // -------
 export interface StrategyApproved {
-  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.STRATEGY_APPROVED';
+  type: 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.STRATEGY_APPROVED';
   processId: string;
   channelId: string;
   consensusLibrary: string;
 }
 
 export interface AllocationChanged {
-  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.ALLOCATION_CHANGED';
+  type: 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.ALLOCATION_CHANGED';
   processId: string;
   channelId: string;
   consensusLibrary: string;
@@ -24,12 +24,12 @@ export interface AllocationChanged {
 
 export const strategyApproved: ActionConstructor<StrategyApproved> = p => ({
   ...p,
-  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.STRATEGY_APPROVED',
+  type: 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.STRATEGY_APPROVED',
 });
 
 export const allocationChanged: ActionConstructor<AllocationChanged> = p => ({
   ...p,
-  type: 'WALLET.INDIRECT_FUNDING.PLAYER_A.ALLOCATION_CHANGED',
+  type: 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.ALLOCATION_CHANGED',
 });
 
 // --------

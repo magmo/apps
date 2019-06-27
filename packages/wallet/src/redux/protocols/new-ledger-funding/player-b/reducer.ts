@@ -11,7 +11,7 @@ import {
   getPrivatekey,
   registerChannelToMonitor,
 } from '../../../state';
-import { IndirectFundingState, failure, success } from '../states';
+import { NewLedgerFundingState, failure, success } from '../states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import {
   BWaitForPreFundSetup0,
@@ -24,7 +24,7 @@ import {
 } from './states';
 import { getChannelId, nextSetupCommitment } from '../../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { theirAddress } from '../../../../redux/channel-store';
+import { theirAddress } from '../../../channel-store';
 
 import { directFundingRequested } from '../../direct-funding/actions';
 import { DirectFundingAction } from '../../direct-funding';
@@ -38,11 +38,11 @@ import { sendCommitmentReceived } from '../../../../communication';
 import { addHex } from '../../../../utils/hex-utils';
 import { isTransactionAction } from '../../../actions';
 import { ChannelFundingState } from '../../../state';
-import { IndirectFundingAction } from '../actions';
-import { ProtocolStateWithSharedData } from '../../../../redux/protocols';
+import { NewLedgerFundingAction } from '../actions';
+import { ProtocolStateWithSharedData } from '../..';
 
-type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
-type IDFAction = IndirectFundingAction;
+type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
+type IDFAction = NewLedgerFundingAction;
 
 export function initialize(
   processId: string,
@@ -59,13 +59,13 @@ export function playerBReducer(
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   switch (protocolState.type) {
-    case 'IndirectFunding.BWaitForPreFundSetup0':
+    case 'NewLedgerFunding.BWaitForPreFundSetup0':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
-    case 'IndirectFunding.BWaitForDirectFunding': // defer to child reducer
+    case 'NewLedgerFunding.BWaitForDirectFunding': // defer to child reducer
       return handleWaitForDirectFunding(protocolState, sharedData, action);
-    case 'IndirectFunding.BWaitForLedgerUpdate0':
+    case 'NewLedgerFunding.BWaitForLedgerUpdate0':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
-    case 'IndirectFunding.BWaitForPostFundSetup0':
+    case 'NewLedgerFunding.BWaitForPostFundSetup0':
       return handleWaitForPostFundSetup(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);
@@ -157,7 +157,7 @@ function handleWaitForDirectFunding(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  if (protocolState.type !== 'IndirectFunding.BWaitForDirectFunding') {
+  if (protocolState.type !== 'NewLedgerFunding.BWaitForDirectFunding') {
     return { protocolState, sharedData };
   }
 

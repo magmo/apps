@@ -9,14 +9,14 @@ interface Props {
   state: PlayerAState;
 }
 
-class IndirectFundingContainer extends PureComponent<Props> {
+class NewLedgerFundingContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
     switch (state.type) {
-      case 'IndirectFunding.AWaitForPreFundSetup1':
-      case 'IndirectFunding.AWaitForDirectFunding':
-      case 'IndirectFunding.AWaitForPostFundSetup1':
-      case 'IndirectFunding.AWaitForLedgerUpdate1':
+      case 'NewLedgerFunding.AWaitForPreFundSetup1':
+      case 'NewLedgerFunding.AWaitForDirectFunding':
+      case 'NewLedgerFunding.AWaitForPostFundSetup1':
+      case 'NewLedgerFunding.AWaitForLedgerUpdate1':
         return <FundingStep indirectFundingStateA={state} />;
       default:
         return unreachable(state);
@@ -26,7 +26,7 @@ class IndirectFundingContainer extends PureComponent<Props> {
 
 const mapDispatchToProps = {};
 
-export const IndirectFunding = connect(
+export const NewLedgerFunding = connect(
   () => ({}),
   mapDispatchToProps,
-)(IndirectFundingContainer);
+)(NewLedgerFundingContainer);

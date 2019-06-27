@@ -1,6 +1,6 @@
 import { ProtocolState } from '../..';
 import { FundingStrategy } from '..';
-import { NonTerminalIndirectFundingState } from '../../indirect-funding/states';
+import { NonTerminalNewLedgerFundingState } from '../../new-ledger-funding/states';
 import { StateConstructor } from '../../../utils';
 import { ExistingLedgerFundingState } from '../../existing-ledger-funding/states';
 
@@ -29,7 +29,7 @@ export interface WaitForFunding extends BaseState {
   targetChannelId: string;
   // TODO: Currently we are limited to indirect funding
   // In the future this could support other funding states
-  fundingState: NonTerminalIndirectFundingState | ExistingLedgerFundingState;
+  fundingState: NonTerminalNewLedgerFundingState | ExistingLedgerFundingState;
 }
 
 export interface WaitForSuccessConfirmation extends BaseState {

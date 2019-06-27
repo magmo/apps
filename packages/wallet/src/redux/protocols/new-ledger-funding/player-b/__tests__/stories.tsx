@@ -10,8 +10,8 @@ function flattenScenario(scenario) {
   return scenario;
 }
 
-addStories(flattenScenario(scenarios.happyPath), 'Indirect Funding / Player B / Happy Path');
+addStories(flattenScenario(scenarios.happyPath), 'New Ledger Funding/ Player B / Happy Path');
 addStories(
   flattenScenario(scenarios.ledgerFundingFails),
-  'Indirect Funding / Player B / Ledger funding fails',
+  'New Ledger Funding/ Player B / Ledger funding fails',
 );

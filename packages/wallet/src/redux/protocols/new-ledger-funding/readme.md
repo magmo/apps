@@ -1,6 +1,6 @@
-# Indirect Funding
+# New Ledger Funding
 
-The indirect funding protocol coordinates the process of funding an application channel, X, via a ledger channel, L.
+The new ledger funding protocol coordinates the process of funding an application channel, X, via a ledger channel, L.
 
 - Opening + funding the ledger channel
 - Updating the ledger channel to fund the the application channel
@@ -16,7 +16,7 @@ The indirect funding protocol involves two parties: player A and player B.
 Player A is identified by being the first participant in the `participants` array in
 the application channel X that is to be funded.
 
-We therefore split the overall indirect-funding protocol into two sub-protocols: the
+We therefore split the overall new-ledger-funding protocol into two sub-protocols: the
 [player-a-indirect-funding protocol](./player-a) and the [player-b-indirect-funding protocol](./player-b).
 
 The two protocols interact through the following messages:

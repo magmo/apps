@@ -1,7 +1,7 @@
 import * as states from './states';
 import * as actions from './actions';
 
-import { IndirectFundingAction, isIndirectFundingAction } from '../../indirect-funding/actions';
+import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../../new-ledger-funding/actions';
 import { SharedData, queueMessage } from '../../../state';
 import { ProtocolStateWithSharedData } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
@@ -10,10 +10,10 @@ import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpe
 import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyProposed } from '../../../../communication';
 import {
-  indirectFundingReducer,
-  initialize as initializeIndirectFunding,
-} from '../../indirect-funding/reducer';
-import * as indirectFundingStates from '../../indirect-funding/states';
+  newLedgerFundingReducer,
+  initialize as initializeNewLedgerFunding,
+} from '../../new-ledger-funding/reducer';
+import * as indirectFundingStates from '../../new-ledger-funding/states';
 import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
 import {
@@ -26,7 +26,7 @@ import * as existingLedgerFundingStates from '../../existing-ledger-funding/stat
 import { CommitmentType } from 'fmg-core';
 import { getLastCommitment } from '../../../channel-store';
 
-type EmbeddedAction = IndirectFundingAction;
+type EmbeddedAction = NewLedgerFundingAction;
 
 export function initialize(
   sharedData: SharedData,
@@ -51,7 +51,7 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (isIndirectFundingAction(action) || isExistingLedgerFundingAction(action)) {
+  if (isNewLedgerFundingAction(action) || isExistingLedgerFundingAction(action)) {
     return handleFundingAction(state, sharedData, action);
   }
 
@@ -74,7 +74,7 @@ export function fundingReducer(
 function handleFundingAction(
   protocolState: states.FundingState,
   sharedData: SharedData,
-  action: IndirectFundingAction,
+  action: NewLedgerFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (protocolState.type !== 'Funding.PlayerA.WaitForFunding') {
     console.warn(
@@ -126,9 +126,9 @@ function handleExistingChannelFundingAction(
 function handleIndirectFundingAction(
   protocolState: states.WaitForFunding,
   sharedData: SharedData,
-  action: IndirectFundingAction,
+  action: NewLedgerFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (!indirectFundingStates.isIndirectFundingState(protocolState.fundingState)) {
+  if (!indirectFundingStates.isNewLedgerFundingState(protocolState.fundingState)) {
     console.error(
       `Funding reducer received indirect funding action ${
         action.type
@@ -139,7 +139,7 @@ function handleIndirectFundingAction(
   const {
     protocolState: updatedFundingState,
     sharedData: updatedSharedData,
-  } = indirectFundingReducer(protocolState.fundingState, sharedData, action);
+  } = newLedgerFundingReducer(protocolState.fundingState, sharedData, action);
 
   if (!indirectFundingStates.isTerminal(updatedFundingState)) {
     return {
@@ -226,7 +226,7 @@ function strategyApproved(
       sharedData: newSharedData,
     };
   } else {
-    const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
+    const { protocolState: fundingState, sharedData: newSharedData } = initializeNewLedgerFunding(
       state.processId,
       channelState,
       sharedData,
@@ -297,12 +297,12 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 function handleFundingComplete(
   protocolState: Properties<states.WaitForSuccessConfirmation>,
   fundingState:
-    | indirectFundingStates.IndirectFundingState
+    | indirectFundingStates.NewLedgerFundingState
     | existingLedgerFundingStates.ExistingLedgerFundingState,
   sharedData: SharedData,
 ) {
   if (
-    fundingState.type === 'IndirectFunding.Success' ||
+    fundingState.type === 'NewLedgerFunding.Success' ||
     fundingState.type === 'ExistingLedgerFunding.Success'
   ) {
     return {

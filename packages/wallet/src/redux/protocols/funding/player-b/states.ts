@@ -1,6 +1,6 @@
 import { ProtocolState } from '../..';
 import { FundingStrategy } from '..';
-import { NonTerminalIndirectFundingState } from '../../indirect-funding/states';
+import { NonTerminalNewLedgerFundingState } from '../../new-ledger-funding/states';
 import { StateConstructor } from '../../../utils';
 import { ExistingLedgerFundingState } from '../../existing-ledger-funding/states';
 
@@ -26,7 +26,7 @@ export interface WaitForStrategyApproval extends BaseState {
 
 export interface WaitForFunding extends BaseState {
   type: 'Funding.PlayerB.WaitForFunding';
-  fundingState: NonTerminalIndirectFundingState | ExistingLedgerFundingState;
+  fundingState: NonTerminalNewLedgerFundingState | ExistingLedgerFundingState;
   targetChannelId: string;
 }
 

@@ -7,27 +7,27 @@ import { ProtocolState } from '../..';
 // -------
 
 export interface AWaitForPreFundSetup1 {
-  type: 'IndirectFunding.AWaitForPreFundSetup1';
+  type: 'NewLedgerFunding.AWaitForPreFundSetup1';
   channelId: string;
   ledgerId: string;
   processId: string;
 }
 
 export interface AWaitForDirectFunding {
-  type: 'IndirectFunding.AWaitForDirectFunding';
+  type: 'NewLedgerFunding.AWaitForDirectFunding';
   channelId: string;
   ledgerId: string;
   processId: string;
   directFundingState: DirectFundingState;
 }
 export interface AWaitForPostFundSetup1 {
-  type: 'IndirectFunding.AWaitForPostFundSetup1';
+  type: 'NewLedgerFunding.AWaitForPostFundSetup1';
   channelId: string;
   ledgerId: string;
   processId: string;
 }
 export interface AWaitForLedgerUpdate1 {
-  type: 'IndirectFunding.AWaitForLedgerUpdate1';
+  type: 'NewLedgerFunding.AWaitForLedgerUpdate1';
   channelId: string;
   ledgerId: string;
   processId: string;
@@ -38,22 +38,22 @@ export interface AWaitForLedgerUpdate1 {
 // ------------
 
 export const aWaitForPreFundSetup1: StateConstructor<AWaitForPreFundSetup1> = p => {
-  return { ...p, type: 'IndirectFunding.AWaitForPreFundSetup1' };
+  return { ...p, type: 'NewLedgerFunding.AWaitForPreFundSetup1' };
 };
 
 export const aWaitForDirectFunding: StateConstructor<AWaitForDirectFunding> = p => {
   return {
     ...p,
-    type: 'IndirectFunding.AWaitForDirectFunding',
+    type: 'NewLedgerFunding.AWaitForDirectFunding',
   };
 };
 
 export const aWaitForPostFundSetup1: StateConstructor<AWaitForPostFundSetup1> = p => {
-  return { ...p, type: 'IndirectFunding.AWaitForPostFundSetup1' };
+  return { ...p, type: 'NewLedgerFunding.AWaitForPostFundSetup1' };
 };
 
 export const aWaitForLedgerUpdate1: StateConstructor<AWaitForLedgerUpdate1> = p => {
-  return { ...p, type: 'IndirectFunding.AWaitForLedgerUpdate1' };
+  return { ...p, type: 'NewLedgerFunding.AWaitForLedgerUpdate1' };
 };
 
 // -------
@@ -68,9 +68,9 @@ export type PlayerAState =
 
 export function isPlayerAState(state: ProtocolState): state is PlayerAState {
   return (
-    state.type === 'IndirectFunding.AWaitForPreFundSetup1' ||
-    state.type === 'IndirectFunding.AWaitForDirectFunding' ||
-    state.type === 'IndirectFunding.AWaitForPostFundSetup1' ||
-    state.type === 'IndirectFunding.AWaitForLedgerUpdate1'
+    state.type === 'NewLedgerFunding.AWaitForPreFundSetup1' ||
+    state.type === 'NewLedgerFunding.AWaitForDirectFunding' ||
+    state.type === 'NewLedgerFunding.AWaitForPostFundSetup1' ||
+    state.type === 'NewLedgerFunding.AWaitForLedgerUpdate1'
   );
 }

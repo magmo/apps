@@ -1,69 +1,81 @@
 import * as scenarios from './scenarios';
-import { playerBReducer, initialize } from '../reducer';
-import { ProtocolStateWithSharedData } from '../../../../protocols';
-import { IndirectFundingState, IndirectFundingStateType } from '../../states';
+import { playerAReducer, initialize } from '../reducer';
+import { ProtocolStateWithSharedData } from '../../..';
+import { NewLedgerFundingState } from '../../states';
 import { SignedCommitment } from '../../../../../domain';
 import { getLastMessage } from '../../../../state';
 import { describeScenarioStep } from '../../../../__tests__/helpers';
+import * as selectors from '../../../../selectors';
+
+// Mocks
+const getNextNonceMock = jest.fn().mockReturnValue(0);
+Object.defineProperty(selectors, 'getNextNonce', {
+  value: getNextNonceMock,
+});
 
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('when initializing', () => {
-    const { channelId, store, processId } = scenario.initialParams;
+    const { channelId, store, reply, processId } = scenario.initialParams;
     const initialState = initialize(processId, channelId, store);
 
-    itTransitionsTo(initialState, 'IndirectFunding.BWaitForPreFundSetup0');
+    itTransitionsTo(initialState, 'NewLedgerFunding.AWaitForPreFundSetup1');
+    itSendsMessage(initialState, reply);
   });
 
-  describeScenarioStep(scenario.waitForPreFundSetup0, () => {
-    const { state, action, reply } = scenario.waitForPreFundSetup0;
-    const updatedState = playerBReducer(state.state, state.store, action);
+  describeScenarioStep(scenario.waitForPreFundL1, () => {
+    const { state, action } = scenario.waitForPreFundL1;
+    const updatedState = playerAReducer(state.state, state.store, action);
 
-    itSendsMessage(updatedState, reply);
-    itTransitionsTo(updatedState, 'IndirectFunding.BWaitForDirectFunding');
+    itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForDirectFunding');
   });
+
   describeScenarioStep(scenario.waitForDirectFunding, () => {
-    const { state, action } = scenario.waitForDirectFunding;
-    const updatedState = playerBReducer(state.state, state.store, action);
+    const { state, action, reply } = scenario.waitForDirectFunding;
+    const updatedState = playerAReducer(state.state, state.store, action);
 
-    itTransitionsTo(updatedState, 'IndirectFunding.BWaitForLedgerUpdate0');
-  });
-  describeScenarioStep(scenario.waitForLedgerUpdate0, () => {
-    const { state, action, reply } = scenario.waitForLedgerUpdate0;
-    const updatedState = playerBReducer(state.state, state.store, action);
-
-    itTransitionsTo(updatedState, 'IndirectFunding.BWaitForPostFundSetup0');
+    itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForLedgerUpdate1');
     itSendsMessage(updatedState, reply);
   });
-  describeScenarioStep(scenario.waitForPostFund0, () => {
-    const { state, action, reply } = scenario.waitForPostFund0;
-    const updatedState = playerBReducer(state.state, state.store, action);
+
+  describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
+    const { state, action, reply } = scenario.waitForLedgerUpdate1;
+    const updatedState = playerAReducer(state.state, state.store, action);
+
+    itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForPostFundSetup1');
+    itSendsMessage(updatedState, reply);
+  });
+
+  describeScenarioStep(scenario.waitForPostFund1, () => {
+    const { state, action } = scenario.waitForPostFund1;
+    const updatedState = playerAReducer(state.state, state.store, action);
+
     itUpdatesFundingState(
       updatedState,
       scenario.initialParams.channelId,
       scenario.initialParams.ledgerId,
     );
-    itTransitionsTo(updatedState, 'IndirectFunding.Success');
-    itSendsMessage(updatedState, reply);
+    itTransitionsTo(updatedState, 'NewLedgerFunding.Success');
   });
 });
 
 describe('ledger-funding-fails scenario', () => {
   const scenario = scenarios.ledgerFundingFails;
+
   describeScenarioStep(scenario.waitForDirectFunding, () => {
     const { state, action } = scenario.waitForDirectFunding;
-    const updatedState = playerBReducer(state.state, state.store, action);
+    const updatedState = playerAReducer(state.state, state.store, action);
 
-    itTransitionsTo(updatedState, 'IndirectFunding.Failure');
+    itTransitionsTo(updatedState, 'NewLedgerFunding.Failure');
   });
 });
 
 // -------
 // Helpers
 // -------
-type ReturnVal = ProtocolStateWithSharedData<IndirectFundingState>;
+type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 
-function itTransitionsTo(state: ReturnVal, type: IndirectFundingStateType) {
+function itTransitionsTo(state: ReturnVal, type: NewLedgerFundingState['type']) {
   it(`transitions protocol state to ${type}`, () => {
     expect(state.protocolState.type).toEqual(type);
   });
