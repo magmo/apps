@@ -67,7 +67,7 @@ export const challengeRequested: ActionConstructor<ChallengeRequested> = p => ({
 
 export const challengeDetected: ActionConstructor<ChallengeDetected> = p => ({
   ...p,
-  type: 'WALLET.APPLICATION.CHALLENGE_Detected',
+  type: 'WALLET.APPLICATION.CHALLENGE_DETECTED',
 });
 
 export const concluded: ActionConstructor<Concluded> = p => {
