@@ -7,10 +7,11 @@ import * as application from '../protocols/application/reducer';
 import { isRelayableAction, WalletProtocol } from '../../communication';
 import { responseProvided } from '../protocols/dispute/responder/actions';
 import { getChannelId, Commitment, SignedCommitment } from '../../domain';
-import { concluded } from '../protocols/application/actions';
 import * as selectors from '../selectors';
 import * as contractUtils from '../../utils/contract-utils';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator';
+import { concluded, challengeRequested } from '../protocols/application/actions';
+
 export function* messageListener() {
   const postMessageEventChannel = eventChannel(emitter => {
     window.addEventListener('message', (event: MessageEvent) => {
@@ -33,8 +34,8 @@ export function* messageListener() {
         break;
       case incoming.CREATE_CHALLENGE_REQUEST:
         yield put(
-          actions.protocol.createChallengeRequested({
-            channelId: action.channelId,
+          challengeRequested({
+            processId: application.APPLICATION_PROCESS_ID, // TODO allow for multiple application Ids
             commitment: action.commitment,
           }),
         );

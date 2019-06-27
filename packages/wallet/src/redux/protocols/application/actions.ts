@@ -20,12 +20,15 @@ export interface OpponentCommitmentReceived {
 
 export interface ChallengeRequested {
   type: 'WALLET.APPLICATION.CHALLENGE_REQUESTED';
+  commitment: Commitment;
   processId: string;
 }
 
 export interface ChallengeCreated {
   type: 'WALLET.APPLICATION.CHALLENGE_CREATED';
   processId: string;
+  expiresAt: number;
+  commitment: Commitment;
 }
 export interface Concluded {
   type: 'WALLET.APPLICATION.CONCLUDED';
@@ -55,7 +58,7 @@ export const opponentCommitmentReceived: ActionConstructor<OpponentCommitmentRec
   };
 };
 
-export const createChallengeRequested: ActionConstructor<ChallengeRequested> = p => ({
+export const challengeRequested: ActionConstructor<ChallengeRequested> = p => ({
   ...p,
   type: 'WALLET.APPLICATION.CHALLENGE_REQUESTED',
 });
