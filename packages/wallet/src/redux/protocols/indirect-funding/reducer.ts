@@ -38,6 +38,17 @@ export function initialize(
       sharedData: newSharedData,
     } = initializeExistingLedgerFunding(processId, channelId, ledgerId, sharedData);
 
+    if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Success') {
+      return { protocolState: states.success({}), sharedData: newSharedData };
+    } else if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
+      return {
+        protocolState: states.failure({
+          reason: 'ExistingLedgerFunding Failure',
+        }),
+        sharedData: newSharedData,
+      };
+    }
+
     return {
       protocolState: states.waitForExistingLedgerFunding({
         processId,
@@ -53,6 +64,15 @@ export function initialize(
       protocolState: newLedgerFundingState,
       sharedData: newSharedData,
     } = initializeNewLedgerFunding(processId, channel, sharedData);
+
+    if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
+      return { protocolState: states.success({}), sharedData: newSharedData };
+    } else if (newLedgerFundingState.type === 'NewLedgerFunding.Failure') {
+      return {
+        protocolState: states.failure({ reason: 'NewLedgerFunding Failure' }),
+        sharedData: newSharedData,
+      };
+    }
 
     return {
       protocolState: states.waitForNewLedgerFunding({
@@ -75,15 +95,7 @@ export function indirectFundingReducer(
       console.warn(`Received ${action} but currently in ${protocolState.type}`);
       return { protocolState, sharedData };
     }
-    if (
-      protocolState.newLedgerFundingState.type === 'NewLedgerFunding.Success' ||
-      protocolState.newLedgerFundingState.type === 'NewLedgerFunding.Failure'
-    ) {
-      console.warn(
-        `Received ${action.type} but in terminal state ${protocolState.newLedgerFundingState.type}`,
-      );
-      return { protocolState, sharedData };
-    }
+
     const {
       protocolState: newLedgerFundingState,
       sharedData: newSharedData,
@@ -109,17 +121,7 @@ export function indirectFundingReducer(
       console.warn(`Received ${action} but currently in ${protocolState.type}`);
       return { protocolState, sharedData };
     }
-    if (
-      protocolState.existingLedgerFundingState.type === 'ExistingLedgerFunding.Success' ||
-      protocolState.existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure'
-    ) {
-      console.warn(
-        `Received ${action.type} but in terminal state ${
-          protocolState.existingLedgerFundingState.type
-        }`,
-      );
-      return { protocolState, sharedData };
-    }
+
     const {
       protocolState: existingLedgerFundingState,
       sharedData: newSharedData,
