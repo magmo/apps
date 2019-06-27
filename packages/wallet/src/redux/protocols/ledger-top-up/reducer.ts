@@ -9,13 +9,14 @@ import {
 } from '../direct-funding/reducer';
 import { LedgerTopUpAction } from './actions';
 import { directFundingRequested, isDirectFundingAction } from '../direct-funding/actions';
-import { addHex } from '../../../utils/hex-utils';
+import { addHex, subHex } from '../../../utils/hex-utils';
 import {
   initializeConsensusUpdate,
   isConsensusUpdateAction,
   consensusUpdateReducer,
 } from '../consensus-update';
 import { bigNumberify } from 'ethers/utils';
+import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 export const LEDGER_TOP_UP_PROTOCOL_LOCATOR = 'LedgerTopUp';
 export function initialize(
   processId: string,
@@ -62,15 +63,18 @@ const restoreOrderAndAddBTopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpS
     sharedData: consensusUpdateSharedData,
   } = consensusUpdateReducer(protocolState.consensusUpdateState, sharedData, action);
   sharedData = consensusUpdateSharedData;
-  const { proposedAllocation, processId, ledgerId, originalAllocation } = protocolState;
-  const lastCommitment = helpers.getLatestCommitment(protocolState.ledgerId, sharedData);
+  const { processId, proposedAllocation, ledgerId, originalAllocation } = protocolState;
+
   if (consensusUpdateState.type === 'ConsensusUpdate.Failure') {
     return {
       protocolState: states.failure({ reason: 'ConsensusUpdateFailure' }),
       sharedData: consensusUpdateSharedData,
     };
   } else if (consensusUpdateState.type === 'ConsensusUpdate.Success') {
-    const total = lastCommitment.allocation.reduce(addHex);
+    // If player B already has enough funds then skip to success
+    if (bigNumberify(originalAllocation[PlayerIndex.B]).gte(proposedAllocation[PlayerIndex.B])) {
+      return { protocolState: states.success({}), sharedData: consensusUpdateSharedData };
+    }
     const {
       directFundingState,
       sharedData: directFundingSharedData,
@@ -78,11 +82,11 @@ const restoreOrderAndAddBTopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpS
       TwoPartyPlayerIndex.B,
       processId,
       ledgerId,
-      total,
       proposedAllocation,
       originalAllocation,
       sharedData,
     );
+
     return {
       protocolState: states.waitForDirectFundingForB({ ...protocolState, directFundingState }),
       sharedData: directFundingSharedData,
@@ -112,7 +116,13 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
   } = consensusUpdateReducer(protocolState.consensusUpdateState, sharedData, action);
   sharedData = consensusUpdateSharedData;
 
-  const { proposedAllocation, processId, ledgerId, originalAllocation } = protocolState;
+  const {
+    processId,
+    ledgerId,
+    originalAllocation,
+    proposedAllocation,
+    proposedDestination,
+  } = protocolState;
   const lastCommitment = helpers.getLatestCommitment(protocolState.ledgerId, sharedData);
 
   if (consensusUpdateState.type === 'ConsensusUpdate.Failure') {
@@ -121,7 +131,34 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
       sharedData: consensusUpdateSharedData,
     };
   } else if (consensusUpdateState.type === 'ConsensusUpdate.Success') {
-    const total = lastCommitment.allocation.reduce(addHex);
+    // If player A already has enough funds we skip straight to the next ledger update step
+    if (
+      bigNumberify(originalAllocation[TwoPartyPlayerIndex.A]).gte(
+        proposedAllocation[TwoPartyPlayerIndex.A],
+      )
+    ) {
+      const {
+        consensusUpdateState: consensusUpdateStateForB,
+        sharedData: newSharedData,
+      } = initializeConsensusState(
+        TwoPartyPlayerIndex.B,
+        processId,
+        ledgerId,
+        proposedAllocation,
+        proposedDestination,
+        lastCommitment.allocation,
+        consensusUpdateSharedData,
+      );
+
+      return {
+        protocolState: states.restoreOrderAndAddBTopUpUpdate({
+          ...protocolState,
+          consensusUpdateState: consensusUpdateStateForB,
+        }),
+        sharedData: newSharedData,
+      };
+    }
+
     const {
       directFundingState,
       sharedData: directFundingSharedData,
@@ -129,11 +166,11 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
       TwoPartyPlayerIndex.A,
       processId,
       ledgerId,
-      total,
       proposedAllocation,
       originalAllocation,
       sharedData,
     );
+
     return {
       protocolState: states.waitForDirectFundingForA({ ...protocolState, directFundingState }),
       sharedData: directFundingSharedData,
@@ -243,7 +280,6 @@ function initializeDirectFundingState(
   playerFor: TwoPartyPlayerIndex,
   processId: string,
   ledgerId: string,
-  total: string,
   proposedAllocation: string[],
   originalAllocation: string[],
   sharedData: SharedData,
@@ -251,26 +287,47 @@ function initializeDirectFundingState(
   const isFirstPlayer = helpers.isFirstPlayer(ledgerId, sharedData);
 
   let requiredDeposit = '0x0';
+
   if (playerFor === TwoPartyPlayerIndex.A && isFirstPlayer) {
-    requiredDeposit = bigNumberify(proposedAllocation[TwoPartyPlayerIndex.A])
-      .sub(originalAllocation[TwoPartyPlayerIndex.A])
-      .toHexString();
+    requiredDeposit = subHex(
+      proposedAllocation[TwoPartyPlayerIndex.A],
+      originalAllocation[TwoPartyPlayerIndex.A],
+    );
   } else if (playerFor === TwoPartyPlayerIndex.B && !isFirstPlayer) {
-    requiredDeposit = bigNumberify(proposedAllocation[TwoPartyPlayerIndex.B])
-      .sub(originalAllocation[TwoPartyPlayerIndex.B])
-      .toHexString();
+    requiredDeposit = subHex(
+      proposedAllocation[TwoPartyPlayerIndex.B],
+      originalAllocation[TwoPartyPlayerIndex.B],
+    );
   }
-  // If a player has an allocation greater than the proposedAllocation then they do not have to deposit
-  if (bigNumberify(requiredDeposit).lt('0x0')) {
-    requiredDeposit = '0x0';
+  // This would be much simpler if we just used the allocation from the latest commitment
+  // However that makes testing more difficult
+  // We calculate the difference between the amount on chain (previousTotal) and the total for the new allocation
+  let totalFundingRequired = '0x0';
+  let previousTotal = '0x0';
+  let proposedTotal = '0x0';
+  if (playerFor === TwoPartyPlayerIndex.A) {
+    proposedTotal = addHex(
+      proposedAllocation[TwoPartyPlayerIndex.A],
+      originalAllocation[TwoPartyPlayerIndex.B],
+    );
+
+    previousTotal = originalAllocation.reduce(addHex);
+  } else if (playerFor === TwoPartyPlayerIndex.B) {
+    previousTotal = addHex(
+      proposedAllocation[TwoPartyPlayerIndex.A],
+      originalAllocation[TwoPartyPlayerIndex.B],
+    );
+    proposedTotal = proposedAllocation.reduce(addHex);
   }
+
+  totalFundingRequired = subHex(proposedTotal, previousTotal);
 
   const directFundingAction = directFundingRequested({
     processId,
     channelId: ledgerId,
-    safeToDepositLevel: '0x0',
+    safeToDepositLevel: '0x0', // Since there is only ever one player depositing at a time we can set this to 0
     requiredDeposit,
-    totalFundingRequired: total,
+    totalFundingRequired,
     ourIndex: isFirstPlayer ? TwoPartyPlayerIndex.A : TwoPartyPlayerIndex.B,
     exchangePostFundSetups: false,
   });

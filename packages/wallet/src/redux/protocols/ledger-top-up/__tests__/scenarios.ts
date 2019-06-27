@@ -198,11 +198,6 @@ export const playerAOneUserNeedsTopUp = {
     sharedData: consensusSharedData(TwoPartyPlayerIndex.A),
     action: playerAConsensusUpdateSuccess,
   },
-  waitForDirectFundingForB: {
-    state: waitForDirectFundingForB(oneOverFundedOneUnderFundedProps),
-    sharedData: fundingSharedData(TwoPartyPlayerIndex.A, ledgerThreeFourFlipped),
-    action: playerAFundingSuccess,
-  },
 };
 
 export const playerBOneUserNeedsTopUp = {
@@ -225,10 +220,5 @@ export const playerBOneUserNeedsTopUp = {
     state: restoreOrderAndAddBTopUpUpdate(oneOverFundedOneUnderFundedProps),
     sharedData: consensusSharedData(TwoPartyPlayerIndex.B),
     action: playerAConsensusUpdateSuccess,
-  },
-  waitForDirectFundingForB: {
-    state: waitForDirectFundingForB(oneOverFundedOneUnderFundedProps),
-    sharedData: fundingSharedData(TwoPartyPlayerIndex.B, ledgerThreeFourFlipped),
-    action: playerAFundingSuccess,
   },
 };

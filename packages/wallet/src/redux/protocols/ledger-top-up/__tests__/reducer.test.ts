@@ -179,14 +179,6 @@ describe('player A one use needs top up', () => {
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
-    it('requests the correct deposit amount', () => {
-      expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
-    });
-  });
-  describeScenarioStep(scenario.waitForDirectFundingForB, () => {
-    const { action, sharedData, state } = scenario.waitForDirectFundingForB;
-    const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
 });
@@ -240,14 +232,6 @@ describe('player B one use needs top up', () => {
   });
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
-    const updatedState = ledgerTopUpReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
-    it('requests the correct deposit amount', () => {
-      expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
-    });
-  });
-  describeScenarioStep(scenario.waitForDirectFundingForB, () => {
-    const { action, sharedData, state } = scenario.waitForDirectFundingForB;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
