@@ -128,6 +128,15 @@ describe('Player A No Deposit Required', () => {
   });
 });
 
+describe('Player A channel already has some funds', () => {
+  const scenario = scenarios.existingOnChainDeposit;
+  describe('when initializing', () => {
+    const { action, sharedData } = scenario.initialize;
+    const updatedState = initialize(action, sharedData);
+    itTransitionsTo(updatedState, 'DirectFunding.WaitForDepositTransaction');
+  });
+});
+
 describe('transaction-fails scenario', () => {
   const scenario = scenarios.transactionFails;
   describeScenarioStep(scenario.waitForDepositTransaction, () => {

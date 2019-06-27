@@ -15,7 +15,7 @@ import * as advanceChannel from '../advance-channel';
 import { DirectFundingRequested } from './actions';
 import { CommitmentType } from '../../../domain';
 import { clearedToSend } from '../advance-channel/actions';
-
+import * as selectors from '../../selectors';
 export const DIRECT_FUNDING_PROTOCOL_LOCATOR = 'DirectFunding';
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
@@ -38,7 +38,8 @@ export function initialize(
     exchangePostFundSetups,
   } = action;
 
-  const alreadySafeToDeposit = bigNumberify(safeToDepositLevel).eq('0x');
+  const existingChannelFunding = selectors.getAdjudicatorChannelBalance(sharedData, channelId);
+  const alreadySafeToDeposit = bigNumberify(existingChannelFunding).gte(safeToDepositLevel);
   const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
   const depositNotRequired = bigNumberify(requiredDeposit).eq('0x');
   const commitmentType = CommitmentType.PostFundSetup;
@@ -93,7 +94,7 @@ export function initialize(
     const depositTransaction = createDepositTransaction(
       action.channelId,
       action.requiredDeposit,
-      action.safeToDepositLevel,
+      existingChannelFunding,
     );
     const { storage: newStorage, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
@@ -278,10 +279,14 @@ const notSafeToDepositReducer: DFReducer = (
         action.channelId === state.channelId &&
         bigNumberify(action.totalForDestination).gte(state.safeToDepositLevel)
       ) {
+        const existingChannelFunding = selectors.getAdjudicatorChannelBalance(
+          sharedData,
+          state.channelId,
+        );
         const depositTransaction = createDepositTransaction(
           state.channelId,
           state.requiredDeposit,
-          state.safeToDepositLevel,
+          existingChannelFunding,
         );
 
         const {
