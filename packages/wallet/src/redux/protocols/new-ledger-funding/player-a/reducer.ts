@@ -10,7 +10,7 @@ import {
 } from '../../../state';
 import { NewLedgerFundingState, failure, success } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator';
+import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../../domain';
 import { Channel } from 'fmg-core/lib/channel';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
@@ -24,7 +24,6 @@ import {
   initialize as initializeDirectFunding,
 } from '../../direct-funding/reducer';
 import { addHex } from '../../../../utils/hex-utils';
-import { UpdateType } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { proposeNewConsensus } from '../../../../domain/consensus-app';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { isTransactionAction } from '../../../actions';
@@ -277,7 +276,6 @@ function createInitialSetupCommitment(
     proposedAllocation: [],
     proposedDestination: [],
     furtherVotesRequired: 0,
-    updateType: UpdateType.Consensus,
   };
 
   const nonce = selectors.getNextNonce(sharedData, CONSENSUS_LIBRARY_ADDRESS);
