@@ -300,21 +300,31 @@ function initializeDirectFundingState(
       originalAllocation[TwoPartyPlayerIndex.B],
     );
   }
-
+  // TODO: Currently safeToDepositLevel is used for expectedHeld when calling deposit
+  // So if it isn't set correctly the deposit transaction may just refund our deposit
+  // Ideally this should be handled in direct funding itself
+  let safeToDepositLevel = '0x0';
   let totalFundingRequired = '0x0';
   if (playerFor === TwoPartyPlayerIndex.A) {
     totalFundingRequired = addHex(
       proposedAllocation[TwoPartyPlayerIndex.A],
       originalAllocation[TwoPartyPlayerIndex.B],
     );
+    safeToDepositLevel = originalAllocation.reduce(addHex);
   } else if (playerFor === TwoPartyPlayerIndex.B) {
     totalFundingRequired = proposedAllocation.reduce(addHex);
+    // We need to figure out how much player A deposited before and add that to the original total
+    const asDeposit = subHex(
+      proposedAllocation[TwoPartyPlayerIndex.A],
+      originalAllocation[TwoPartyPlayerIndex.A],
+    );
+    safeToDepositLevel = addHex(originalAllocation.reduce(addHex), asDeposit);
   }
 
   const directFundingAction = directFundingRequested({
     processId,
     channelId: ledgerId,
-    safeToDepositLevel: '0x0', // Since there is only ever one player depositing at a time we can set this to 0
+    safeToDepositLevel,
     requiredDeposit,
     totalFundingRequired,
     ourIndex: isFirstPlayer ? TwoPartyPlayerIndex.A : TwoPartyPlayerIndex.B,
