@@ -17,6 +17,13 @@ export interface Ongoing {
   privateKey: string;
 }
 
+export interface WaitForDispute {
+  type: 'Application.WaitForDispute';
+  channelId: string;
+  address: string;
+  privateKey: string;
+}
+
 export interface Success {
   type: 'Application.Success';
 }
@@ -36,12 +43,16 @@ export const success: StateConstructor<Success> = p => {
   return { ...p, type: 'Application.Success' };
 };
 
+export const WaitForDispute: StateConstructor<WaitForDispute> = p => {
+  return { ...p, type: 'Application.WaitForDispute' };
+};
+
 // -------
 // Unions and Guards
 // -------
 
-export type ApplicationState = WaitForFirstCommitment | Ongoing | Success;
-export type NonTerminalApplicationState = WaitForFirstCommitment | Ongoing;
+export type ApplicationState = WaitForFirstCommitment | Ongoing | WaitForDispute | Success;
+export type NonTerminalApplicationState = WaitForFirstCommitment | WaitForDispute | Ongoing;
 export type ApplicationStateType = ApplicationState['type'];
 
 export function isTerminal(state: ApplicationState): state is Success {
