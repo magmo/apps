@@ -1,6 +1,7 @@
 import { Commitment } from '../../../domain';
 import { WalletAction } from '../../actions';
 import { ActionConstructor } from '../../utils';
+import { DisputeAction, isDisputeAction } from '../dispute';
 
 // -------
 // Actions
@@ -87,10 +88,12 @@ export type ApplicationAction =
   | OwnCommitmentReceived
   | ChallengeDetected
   | ChallengeRequested
-  | Concluded;
+  | Concluded
+  | DisputeAction;
 
 export function isApplicationAction(action: WalletAction): action is ApplicationAction {
   return (
+    isDisputeAction(action) ||
     action.type === 'WALLET.APPLICATION.OPPONENT_COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.APPLICATION.OWN_COMMITMENT_RECEIVED' ||
     action.type === 'WALLET.APPLICATION.CHALLENGE_DETECTED' ||

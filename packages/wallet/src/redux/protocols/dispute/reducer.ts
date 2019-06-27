@@ -6,7 +6,6 @@ import { initialize as responderInitialize, responderReducer } from './responder
 import { initialize as challengerInitialize, challengerReducer } from './challenger/reducer';
 import { isNonTerminalResponderState } from './responder/states';
 import { isResponderAction } from './responder/actions';
-import { ChallengerState } from './challenger/states';
 import { ProtocolAction } from '../../actions';
 import { isChallengerAction } from './challenger/actions';
 
@@ -34,7 +33,7 @@ export const initializeChallengerState = (
 };
 
 export const disputeReducer = (
-  protocolState: ChallengerState,
+  protocolState: DisputeState,
   sharedData: SharedData,
   action: ProtocolAction,
 ): ProtocolStateWithSharedData<DisputeState> => {

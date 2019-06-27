@@ -18,6 +18,7 @@ import {
 import { Commitment } from '../../../domain';
 import { ProtocolAction } from '../../actions';
 import * as dispute from '../dispute';
+import { disputeReducer } from '../dispute/reducer';
 
 // TODO: Right now we're using a fixed application ID
 // since we're not too concerned with handling multiple running app channels.
@@ -46,6 +47,9 @@ export function applicationReducer(
   }
   if (!actions.isApplicationAction(action)) {
     return { protocolState, sharedData };
+  }
+  if (dispute.isDisputeAction(action)) {
+    return handleDisputeAction(protocolState, sharedData, action);
   }
   switch (action.type) {
     case 'WALLET.APPLICATION.OPPONENT_COMMITMENT_RECEIVED':
@@ -147,6 +151,19 @@ function challengeDetectedReducer(
     protocolState: newProtocolState,
     sharedData: { ...disputeState.sharedData, currentProcessId: APPLICATION_PROCESS_ID },
   };
+}
+
+function handleDisputeAction(
+  protocolState: states.NonTerminalApplicationState,
+  sharedData: SharedData,
+  action: dispute.DisputeAction,
+): ProtocolStateWithSharedData<states.ApplicationState> {
+  if (protocolState.type !== 'Application.WaitForDispute') {
+    return { protocolState, sharedData };
+  }
+  const newDisputeState = disputeReducer(protocolState.disputeState, sharedData, action);
+  const newApplicationState = { ...protocolState, disputeState: newDisputeState.protocolState };
+  return { protocolState: newApplicationState, sharedData: newDisputeState.sharedData };
 }
 
 const validateAndUpdate = (
