@@ -20,7 +20,7 @@ import {
   Commitments,
 } from './channel-store';
 import { Properties } from './utils';
-import * as indirectFunding from './protocols/indirect-funding/states';
+import * as newLedgerFunding from './protocols/new-ledger-funding/states';
 import { accumulateSideEffects } from './outbox';
 import { WalletEvent } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
@@ -206,10 +206,10 @@ export function getLastMessage(state: SharedData): WalletEvent | undefined {
   return getLastMessageFromOutbox(state.outboxState);
 }
 
-export function getPrivatekey(state: SharedData, channelId: string): string | undefined {
+export function getPrivatekey(state: SharedData, channelId: string): string {
   const channel = getChannel(state, channelId);
   if (!channel) {
-    return undefined;
+    throw new Error(`Channel ${channelId} missing`);
   } else {
     return channel.privateKey;
   }
@@ -296,4 +296,4 @@ export function getCommitments(store: SharedData, channelId: string): Commitment
   return channel.commitments;
 }
 
-export { indirectFunding };
+export { newLedgerFunding };
