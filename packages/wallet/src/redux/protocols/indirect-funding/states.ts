@@ -43,4 +43,9 @@ export const failure: StateConstructor<Failure> = p => {
 export type NonTerminalIndirectFundingState =
   | WaitForExistingLedgerFunding
   | WaitForNewLedgerFunding;
-export type IndirectFundingState = NonTerminalIndirectFundingState | Success | Failure;
+export type TerminalIndirectFundingState = Success | Failure;
+export type IndirectFundingState = NonTerminalIndirectFundingState | TerminalIndirectFundingState;
+
+export function isTerminal(state: IndirectFundingState): state is TerminalIndirectFundingState {
+  return state.type === 'IndirectFunding.Failure' || state.type === 'IndirectFunding.Success';
+}

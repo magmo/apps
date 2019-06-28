@@ -21,4 +21,4 @@ class IndirectFundingContainer extends PureComponent<Props> {
   }
 }
 
-export const Funding = connect(() => ({}))(IndirectFundingContainer);
+export const IndirectFunding = connect(() => ({}))(IndirectFundingContainer);

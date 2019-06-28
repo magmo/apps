@@ -7,6 +7,6 @@ import { WalletAction } from '../../actions';
 
 export type IndirectFundingAction = NewLedgerFundingAction | ExistingLedgerFundingAction;
 
-export const isIndirectFundingAction = (action: WalletAction): boolean => {
+export const isIndirectFundingAction = (action: WalletAction): action is IndirectFundingAction => {
   return isNewLedgerFundingAction(action) || isExistingLedgerFundingAction(action);
 };
