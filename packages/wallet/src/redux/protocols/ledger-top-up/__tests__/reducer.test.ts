@@ -133,7 +133,7 @@ describe('player B happy path', () => {
   });
 });
 
-describe('player A one use needs top up', () => {
+describe('player A one user needs top up', () => {
   const scenario = scenarios.playerAOneUserNeedsTopUp;
   describe('when initializing', () => {
     const {
