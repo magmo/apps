@@ -15,7 +15,7 @@ import {
   challengerPreSuccessOpenState,
   terminatingAction,
   challengerPreSuccessClosedState,
-} from '../../dispute';
+} from '../../dispute/challenger';
 
 const {
   signedCommitment19,
@@ -101,7 +101,7 @@ const challengeDetected = actions.challengeDetected({
   expiresAt: 999,
 });
 
-const disputeTerminated = terminatingAction;
+const disputeTerminated = { ...terminatingAction };
 
 // -------
 // SharedData
