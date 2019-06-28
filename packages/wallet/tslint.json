@@ -19,7 +19,7 @@
     "no-console": [true, "warning"],
     "object-literal-sort-keys": false,
     "member-access": false,
-    "ordered-imports": false,
+    "ordered-imports": true,
     "jsx-no-lambda": false,
     "interface-name": false,
     "trailing-comma": [
