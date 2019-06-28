@@ -4,6 +4,8 @@ import {
   queueMessage,
   checkAndStore,
   getExistingChannel,
+  ChannelFundingState,
+  setFundingState,
 } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
@@ -206,6 +208,14 @@ const waitForPostFundSetupReducer = (
       };
     }
   }
+
+  // update fundingState
+  const fundingState: ChannelFundingState = {
+    directlyFunded: false,
+    fundingChannel: protocolState.ledgerId,
+  };
+
+  newSharedData = setFundingState(newSharedData, protocolState.channelId, fundingState);
 
   return { protocolState: states.success({}), sharedData: newSharedData };
 };
