@@ -4,15 +4,6 @@ import * as scenarios from './scenarios';
 import { describeScenarioStep, itSendsThisDisplayEventType } from '../../../__tests__/helpers';
 import { HIDE_WALLET } from 'magmo-wallet-client';
 
-const itTransitionsTo = (
-  result: { protocolState: states.DefundingState },
-  type: states.DefundingStateType,
-) => {
-  it(`transitions to ${type}`, () => {
-    expect(result.protocolState.type).toEqual(type);
-  });
-};
-
 const itTransitionsToFailure = (
   result: { protocolState: states.DefundingState },
   failure: states.Failure,
