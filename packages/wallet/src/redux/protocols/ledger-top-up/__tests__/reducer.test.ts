@@ -188,7 +188,7 @@ describe('player A one use needs top up', () => {
   });
 });
 
-describe('player B one use needs top up', () => {
+describe('player B one user needs top up', () => {
   const scenario = scenarios.playerBOneUserNeedsTopUp;
   describe('when initializing', () => {
     const {
