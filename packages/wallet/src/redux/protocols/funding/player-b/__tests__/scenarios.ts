@@ -4,7 +4,6 @@ import { TwoPartyPlayerIndex } from '../../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 import { FundingStrategy } from '../../../../../communication';
-import * as newLedgerFundingTests from '../../../new-ledger-funding/player-b/__tests__';
 import { channelId, asAddress, appCommitment } from '../../../../../domain/commitments/__tests__';
 import { bsAddress, bsPrivateKey } from '../../../../../communication/__tests__/commitments';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
@@ -75,7 +74,7 @@ const indirectStrategyProposed = actions.strategyProposed({ processId, strategy 
 const indirectStrategyApproved = actions.strategyApproved({ processId, strategy });
 
 const successConfirmed = actions.fundingSuccessAcknowledged({ processId });
-const fundingSuccess = newLedgerFundingTests.successTrigger;
+const fundingSuccess = indirectFundingPreSuccess.action;
 const strategyRejected = actions.strategyRejected({ processId });
 const cancelledByB = actions.cancelled({ processId, by: TwoPartyPlayerIndex.B });
 const cancelledByA = actions.cancelled({ processId, by: TwoPartyPlayerIndex.A });
