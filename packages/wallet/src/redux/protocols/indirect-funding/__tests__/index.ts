@@ -1,2 +1,2 @@
 import * as scenarios from './scenarios';
-export const preSuccess = scenarios.newLedgerFundingHappyPath.waitForNewLedgerFunding;
+export const preSuccess = scenarios.existingLedgerFundingHappyPath.waitForExistingLedgerFunding;
