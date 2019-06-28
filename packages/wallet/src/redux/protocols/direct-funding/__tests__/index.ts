@@ -1,9 +1,9 @@
 import {
   aHappyPath,
-  bHappyPath,
-  transactionFails,
   aNoPostFundSetupHappyPath,
+  bHappyPath,
   bNoPostFundSetupsHappyPath,
+  transactionFails,
 } from './scenarios';
 
 export const preSuccessA = aHappyPath.waitForPostFundSetup;

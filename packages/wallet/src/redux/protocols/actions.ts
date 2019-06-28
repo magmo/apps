@@ -1,7 +1,7 @@
-import { TwoPartyPlayerIndex } from '../types';
-import { ActionConstructor } from '../utils';
 import { ConcludeInstigated, WalletProtocol } from '../../communication';
 import { WalletAction } from '../actions';
+import { TwoPartyPlayerIndex } from '../types';
+import { ActionConstructor } from '../utils';
 export { BaseProcessAction } from '../../communication';
 
 // -------

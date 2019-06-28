@@ -1,19 +1,19 @@
-import {
-  ledgerCommitment,
-  asAddress,
-  bsAddress,
-  asPrivateKey,
-  ledgerId,
-  channelId,
-  bsPrivateKey,
-  appCommitment,
-} from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils/bignumber';
-import { SharedData, EMPTY_SHARED_DATA, setChannels } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import * as states from '../states';
+import {
+  appCommitment,
+  asAddress,
+  asPrivateKey,
+  bsAddress,
+  bsPrivateKey,
+  channelId,
+  ledgerCommitment,
+  ledgerId,
+} from '../../../../domain/commitments/__tests__';
 import * as globalActions from '../../../actions';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels, SharedData } from '../../../state';
 import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
+import * as states from '../states';
 
 const processId = 'processId';
 

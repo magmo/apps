@@ -1,7 +1,7 @@
-import * as walletStates from '../state';
-import * as selectors from '../selectors';
-import { ChannelState } from '../channel-store';
 import { Commitment } from '../../domain';
+import { ChannelState } from '../channel-store';
+import * as selectors from '../selectors';
+import * as walletStates from '../state';
 
 describe('getAdjudicatorWatcherProcessesForChannel', () => {
   const createWatcherState = (

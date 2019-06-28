@@ -1,5 +1,5 @@
-import * as scenarios from './scenarios';
 import { addStoriesFromScenario as addStories } from '../../../../../__stories__';
+import * as scenarios from './scenarios';
 
 function flattenScenario(scenario) {
   Object.keys(scenario).forEach(key => {

@@ -1,11 +1,11 @@
-import * as scenarios from '../../redux/__tests__/test-scenarios';
 import {
   signCommitment,
   signData,
-  validSignature,
-  validCommitmentSignature,
   signVerificationData,
+  validCommitmentSignature,
+  validSignature,
 } from '../../domain';
+import * as scenarios from '../../redux/__tests__/test-scenarios';
 
 describe('signing and validating commitments', () => {
   let commitmentSignature;

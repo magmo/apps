@@ -1,8 +1,8 @@
-import { ProtocolState } from '../..';
 import { FundingStrategy } from '..';
-import { NonTerminalNewLedgerFundingState } from '../../new-ledger-funding/states';
+import { ProtocolState } from '../..';
 import { StateConstructor } from '../../../utils';
 import { ExistingLedgerFundingState } from '../../existing-ledger-funding/states';
+import { NonTerminalNewLedgerFundingState } from '../../new-ledger-funding/states';
 
 // -------
 // States

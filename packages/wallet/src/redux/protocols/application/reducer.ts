@@ -1,24 +1,24 @@
-import { SharedData, queueMessage, registerChannelToMonitor } from '../../state';
-import * as states from './states';
-import * as actions from './actions';
-import { ProtocolStateWithSharedData } from '..';
-import { unreachable } from '../../../utils/reducer-utils';
 import {
-  validationSuccess,
-  signatureSuccess,
   signatureFailure,
+  signatureSuccess,
   validationFailure,
+  validationSuccess,
 } from 'magmo-wallet-client';
+import { ProtocolStateWithSharedData } from '..';
+import { Commitment } from '../../../domain';
+import { unreachable } from '../../../utils/reducer-utils';
+import { ProtocolAction } from '../../actions';
 import {
-  checkAndStore,
   checkAndInitialize,
+  checkAndStore,
   signAndInitialize,
   signAndStore,
 } from '../../channel-store/reducer';
-import { Commitment } from '../../../domain';
-import { ProtocolAction } from '../../actions';
+import { queueMessage, registerChannelToMonitor, SharedData } from '../../state';
 import * as dispute from '../dispute';
 import { disputeReducer } from '../dispute/reducer';
+import * as actions from './actions';
+import * as states from './states';
 
 // TODO: Right now we're using a fixed application ID
 // since we're not too concerned with handling multiple running app channels.

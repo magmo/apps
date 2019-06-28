@@ -1,21 +1,21 @@
-import { ProtocolStateWithSharedData } from '..';
-import { SharedData, signAndStore, queueMessage, checkAndStore } from '../../state';
-import * as states from './states';
-import { IndirectDefundingAction } from './actions';
-import * as helpers from '../reducer-helpers';
-import { unreachable } from '../../../utils/reducer-utils';
-import * as selectors from '../../selectors';
-import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-app';
-import {
-  sendCommitmentReceived,
-  multipleRelayableActions,
-  commitmentReceived,
-} from '../../../communication';
-import { theirAddress, getLastCommitment } from '../../channel-store';
-import { composeConcludeCommitment } from '../../../utils/commitment-utils';
-import { CommitmentReceived } from '../../actions';
 import { messageRelayRequested } from 'magmo-wallet-client';
+import { ProtocolStateWithSharedData } from '..';
+import {
+  commitmentReceived,
+  multipleRelayableActions,
+  sendCommitmentReceived,
+} from '../../../communication';
+import { acceptConsensus, proposeNewConsensus } from '../../../domain/consensus-app';
+import { composeConcludeCommitment } from '../../../utils/commitment-utils';
+import { unreachable } from '../../../utils/reducer-utils';
+import { CommitmentReceived } from '../../actions';
+import { getLastCommitment, theirAddress } from '../../channel-store';
+import * as selectors from '../../selectors';
+import { checkAndStore, queueMessage, SharedData, signAndStore } from '../../state';
 import { defundRequested } from '../actions';
+import * as helpers from '../reducer-helpers';
+import { IndirectDefundingAction } from './actions';
+import * as states from './states';
 
 export const initialize = (
   processId: string,

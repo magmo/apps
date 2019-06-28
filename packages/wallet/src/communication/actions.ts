@@ -1,10 +1,10 @@
+import { WalletProtocol } from '.';
 import { SignedCommitment } from '../domain';
 import { WalletAction } from '../redux/actions';
-import { FundingStrategy } from './index';
-import { WalletProtocol } from '.';
-import { ActionConstructor } from '../redux/utils';
 import { Commitments } from '../redux/channel-store';
 import { DefundRequested } from '../redux/protocols/actions';
+import { ActionConstructor } from '../redux/utils';
+import { FundingStrategy } from './index';
 
 export interface MultipleRelayableActions {
   type: 'WALLET.MULTIPLE_RELAYABLE_ACTIONS';

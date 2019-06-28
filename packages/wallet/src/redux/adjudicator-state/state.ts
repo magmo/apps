@@ -1,5 +1,5 @@
-import { Commitment } from '../../domain';
 import { bigNumberify } from 'ethers/utils';
+import { Commitment } from '../../domain';
 
 export interface AdjudicatorState {
   [channelId: string]: AdjudicatorChannelState;

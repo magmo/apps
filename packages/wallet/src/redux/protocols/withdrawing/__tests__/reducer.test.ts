@@ -1,9 +1,9 @@
-import * as scenarios from './scenarios';
-import { withdrawalReducer as reducer, initialize } from '../reducer';
-import * as states from '../states';
 import * as TransactionGenerator from '../../../../utils/transaction-generator';
-import { SharedData } from '../../../state';
 import { describeScenarioStep } from '../../../__tests__/helpers';
+import { SharedData } from '../../../state';
+import { initialize, withdrawalReducer as reducer } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };

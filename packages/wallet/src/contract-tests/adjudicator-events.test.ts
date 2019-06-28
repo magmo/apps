@@ -1,18 +1,18 @@
-import { adjudicatorWatcher } from '../redux/sagas/adjudicator-watcher';
 import { ethers } from 'ethers';
+import { getGanacheProvider } from 'magmo-devtools';
 import SagaTester from 'redux-saga-tester';
 import * as actions from '../redux/actions';
+import { adjudicatorWatcher } from '../redux/sagas/adjudicator-watcher';
+import * as walletStates from '../redux/state';
 import {
-  depositContract,
-  createChallenge,
   concludeGame,
+  createChallenge,
+  defaultDepositAmount,
+  depositContract,
+  getChannelId,
   refuteChallenge,
   respondWithMove,
-  getChannelId,
-  defaultDepositAmount,
 } from './test-utils';
-import * as walletStates from '../redux/state';
-import { getGanacheProvider } from 'magmo-devtools';
 jest.setTimeout(60000);
 
 const createWatcherState = (

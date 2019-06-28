@@ -1,7 +1,7 @@
-import { InstigatorConcludingState, isConcludingInstigatorState } from './instigator/states';
-import { ResponderConcludingState, isConcludingResponderState } from './responder/states';
-import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { StateConstructor } from '../../utils';
+import { InstigatorConcludingState, isConcludingInstigatorState } from './instigator/states';
+import { isConcludingResponderState, ResponderConcludingState } from './responder/states';
 
 export * from './instigator/states';
 export * from './responder/states';

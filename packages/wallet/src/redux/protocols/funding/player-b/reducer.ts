@@ -1,30 +1,30 @@
-import * as states from './states';
 import * as actions from './actions';
+import * as states from './states';
 
-import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../../new-ledger-funding/actions';
-import { SharedData, queueMessage } from '../../../state';
-import { ProtocolStateWithSharedData } from '../..';
-import { unreachable } from '../../../../utils/reducer-utils';
-import { TwoPartyPlayerIndex } from '../../../types';
-import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpers';
+import { CommitmentType } from 'fmg-core';
 import { fundingFailure } from 'magmo-wallet-client';
+import { ProtocolStateWithSharedData } from '../..';
 import { sendStrategyApproved } from '../../../../communication';
-import {
-  newLedgerFundingReducer,
-  initialize as initializeNewLedgerFunding,
-} from '../../new-ledger-funding/reducer';
-import * as newLedgerFundingStates from '../../new-ledger-funding/states';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { getLastCommitment } from '../../../channel-store';
 import * as selectors from '../../../selectors';
+import { queueMessage, SharedData } from '../../../state';
+import { TwoPartyPlayerIndex } from '../../../types';
 import { Properties } from '../../../utils';
 import {
-  isExistingLedgerFundingAction,
   ExistingLedgerFundingAction,
   existingLedgerFundingReducer,
   initializeExistingLedgerFunding,
+  isExistingLedgerFundingAction,
 } from '../../existing-ledger-funding';
 import * as existingLedgerFundingStates from '../../existing-ledger-funding/states';
-import { CommitmentType } from 'fmg-core';
-import { getLastCommitment } from '../../../channel-store';
+import { isNewLedgerFundingAction, NewLedgerFundingAction } from '../../new-ledger-funding/actions';
+import {
+  initialize as initializeNewLedgerFunding,
+  newLedgerFundingReducer,
+} from '../../new-ledger-funding/reducer';
+import * as newLedgerFundingStates from '../../new-ledger-funding/states';
+import { hideWallet, sendFundingComplete, showWallet } from '../../reducer-helpers';
 type EmbeddedAction = NewLedgerFundingAction;
 
 export function initialize(

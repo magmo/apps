@@ -1,12 +1,12 @@
+import { unreachable } from '../../utils/reducer-utils';
+import * as actions from '../actions';
 import {
+  addToBalance,
   AdjudicatorState,
   clearChallenge,
   markAsFinalized,
-  addToBalance,
   setChallenge,
 } from './state';
-import * as actions from '../actions';
-import { unreachable } from '../../utils/reducer-utils';
 
 export const adjudicatorStateReducer = (
   state: AdjudicatorState,

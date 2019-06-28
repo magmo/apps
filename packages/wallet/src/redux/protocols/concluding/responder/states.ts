@@ -5,8 +5,8 @@ export type ResponderConcludingState =
   | TerminalState;
 export type ResponderConcludingStateType = ResponderConcludingState['type'];
 import { ProtocolState } from '../..';
-import { TerminalState, FailureReason } from '../states';
 import { ConsensusUpdateState } from '../../consensus-update/states';
+import { FailureReason, TerminalState } from '../states';
 
 // -------
 // States

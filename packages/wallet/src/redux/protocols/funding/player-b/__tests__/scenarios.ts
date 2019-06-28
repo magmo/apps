@@ -1,20 +1,20 @@
-import * as states from '../states';
-import * as actions from '../actions';
 import { TwoPartyPlayerIndex } from '../../../../types';
+import * as actions from '../actions';
+import * as states from '../states';
 
-import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
+import { bigNumberify } from 'ethers/utils';
 import { FundingStrategy } from '../../../../../communication';
-import * as newLedgerFundingTests from '../../../new-ledger-funding/player-b/__tests__';
+import { bsAddress, bsPrivateKey } from '../../../../../communication/__tests__/commitments';
 import {
-  channelId,
-  asAddress,
   appCommitment,
+  asAddress,
+  channelId,
   ledgerCommitment,
 } from '../../../../../domain/commitments/__tests__';
-import { bsAddress, bsPrivateKey } from '../../../../../communication/__tests__/commitments';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 import * as existingChannelFundingTests from '../../../existing-ledger-funding/__tests__';
-import { bigNumberify } from 'ethers/utils';
+import * as newLedgerFundingTests from '../../../new-ledger-funding/player-b/__tests__';
 
 // To test all paths through the state machine we will use 4 different scenarios:
 //

@@ -1,13 +1,13 @@
-import { BaseProcessAction } from '../../actions';
 import { Commitment } from '../../../../domain';
-import { TransactionAction } from '../../transaction-submission/actions';
 import {
-  isTransactionAction,
   ChallengeExpiredEvent,
   ChallengeExpirySetEvent,
+  isTransactionAction,
   WalletAction,
 } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
+import { BaseProcessAction } from '../../actions';
+import { TransactionAction } from '../../transaction-submission/actions';
 
 // -------
 // Actions

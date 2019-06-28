@@ -1,7 +1,7 @@
-import { WithdrawalState } from '../withdrawing/states';
+import { ProtocolState } from '..';
 import { StateConstructor } from '../../utils';
 import { IndirectDefundingState } from '../indirect-defunding/states';
-import { ProtocolState } from '..';
+import { WithdrawalState } from '../withdrawing/states';
 
 // -------
 // States

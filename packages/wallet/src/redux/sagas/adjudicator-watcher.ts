@@ -1,9 +1,9 @@
-import { getAdjudicatorContract } from '../../utils/contract-utils';
-import { call, take, put, select } from 'redux-saga/effects';
-import { eventChannel } from 'redux-saga';
-import * as actions from '../actions';
 import { ethers } from 'ethers';
 import { fromParameters } from 'fmg-core/lib/commitment';
+import { eventChannel } from 'redux-saga';
+import { call, put, select, take } from 'redux-saga/effects';
+import { getAdjudicatorContract } from '../../utils/contract-utils';
+import * as actions from '../actions';
 import { getAdjudicatorWatcherProcessesForChannel } from '../selectors';
 
 enum AdjudicatorEventType {

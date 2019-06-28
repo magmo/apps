@@ -1,12 +1,12 @@
-import * as states from '../states';
-import * as actions from '../actions';
-import * as transactionActions from '../../transaction-submission/actions';
-import * as transactionScenarios from '../../transaction-submission/__tests__';
-import { ChannelState, ChannelStore } from '../../../channel-store';
-import * as testScenarios from '../../../__tests__/test-scenarios';
 import { Wallet } from 'ethers';
-import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import * as web3Utils from 'web3-utils';
+import * as testScenarios from '../../../__tests__/test-scenarios';
+import { ChannelState, ChannelStore } from '../../../channel-store';
+import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
+import * as transactionScenarios from '../../transaction-submission/__tests__';
+import * as transactionActions from '../../transaction-submission/actions';
+import * as actions from '../actions';
+import * as states from '../states';
 
 // ---------
 // Test data

@@ -1,5 +1,5 @@
-import * as walletStates from '../redux/state';
 import * as scenarios from '../redux/__tests__/test-scenarios';
+import * as walletStates from '../redux/state';
 import * as states from '../redux/state';
 
 const {

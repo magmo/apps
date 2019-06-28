@@ -1,21 +1,21 @@
+import { ethers } from 'ethers';
 import { initializationSuccess } from 'magmo-wallet-client/lib/wallet-events';
+import * as communication from '../communication';
+import { isStartProcessAction, WalletProtocol } from '../communication';
 import { unreachable } from '../utils/reducer-utils';
 import * as actions from './actions';
+import { adjudicatorStateReducer } from './adjudicator-state/reducer';
 import { accumulateSideEffects } from './outbox';
 import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
 import { isNewProcessAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
+import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
+import * as concludingProtocol from './protocols/concluding';
 import * as defundingProtocol from './protocols/defunding';
 import { disputeReducer } from './protocols/dispute/reducer';
-import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
 import * as states from './state';
-import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
-import { adjudicatorStateReducer } from './adjudicator-state/reducer';
-import { isStartProcessAction, WalletProtocol } from '../communication';
-import * as communication from '../communication';
-import { ethers } from 'ethers';
 
 const initialState = states.waitForLogin();
 

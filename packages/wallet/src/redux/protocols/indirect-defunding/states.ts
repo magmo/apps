@@ -1,5 +1,5 @@
-import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { StateConstructor } from '../../utils';
 // -------
 // States
 // -------

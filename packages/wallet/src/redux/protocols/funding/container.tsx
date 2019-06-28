@@ -1,9 +1,9 @@
-import * as states from './states';
 import { PureComponent } from 'react';
 import React from 'react';
+import { connect } from 'react-redux';
 import { Funding as PlayerAFunding } from './player-a';
 import { Funding as PlayerBFunding } from './player-b';
-import { connect } from 'react-redux';
+import * as states from './states';
 
 interface Props {
   state: states.playerA.OngoingFundingState | states.playerB.OngoingFundingState;

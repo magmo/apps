@@ -1,8 +1,8 @@
+import { put, select, take } from 'redux-saga/effects';
 import { ChallengeCreatedEvent } from '../actions';
-import { take, select, put } from 'redux-saga/effects';
-import * as selectors from '../selectors';
 import { challengeDetected } from '../protocols/application/actions';
 import { APPLICATION_PROCESS_ID } from '../protocols/application/reducer';
+import * as selectors from '../selectors';
 
 /**
  * A simple saga that determines if a challenge created event requires the wallet to initialize a respond protocol

@@ -5,16 +5,16 @@ import { connect } from 'react-redux';
 import * as actions from './actions';
 import * as states from './states';
 
-import { unreachable } from '../../../../utils/reducer-utils';
-import { TwoPartyPlayerIndex } from '../../../types';
+import { FundingStrategy } from '..';
+import AcknowledgeX from '../../../../components/acknowledge-x';
 import ApproveStrategy from '../../../../components/funding/approve-strategy';
 import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
-import AcknowledgeX from '../../../../components/acknowledge-x';
-import { FundingStrategy } from '..';
-import { NewLedgerFunding } from '../../new-ledger-funding/container';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { TwoPartyPlayerIndex } from '../../../types';
 import { ActionDispatcher } from '../../../utils';
-import { isNewLedgerFundingState } from '../../new-ledger-funding/states';
 import { ExistingLedgerFunding } from '../../existing-ledger-funding/container';
+import { NewLedgerFunding } from '../../new-ledger-funding/container';
+import { isNewLedgerFundingState } from '../../new-ledger-funding/states';
 interface Props {
   state: states.OngoingFundingState;
   strategyApproved: ActionDispatcher<actions.StrategyApproved>;

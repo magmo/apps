@@ -1,7 +1,7 @@
-import { Commitment, CommitmentType } from '../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { TwoPartyPlayerIndex } from '../redux/types';
+import { Commitment, CommitmentType } from '../domain';
 import { ChannelState, getLastCommitment } from '../redux/channel-store';
+import { TwoPartyPlayerIndex } from '../redux/types';
 
 export const hasConsensusBeenReached = (
   lastCommitment: Commitment,

@@ -1,9 +1,9 @@
-import * as states from '../states';
-import * as withdrawalScenarios from '../../withdrawing/__tests__/scenarios';
 import * as testScenarios from '../../../__tests__/test-scenarios';
 import { ChannelState, ChannelStore } from '../../../channel-store';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
 import * as indirectDefunding from '../../indirect-defunding/__tests__';
+import * as withdrawalScenarios from '../../withdrawing/__tests__/scenarios';
+import * as states from '../states';
 const processId = 'process-id.123';
 
 const {

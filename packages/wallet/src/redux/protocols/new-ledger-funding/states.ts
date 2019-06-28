@@ -1,5 +1,5 @@
-import { PlayerAState, isPlayerAState } from './player-a/states';
-import { PlayerBState, isPlayerBState } from './player-b/states';
+import { isPlayerAState, PlayerAState } from './player-a/states';
+import { isPlayerBState, PlayerBState } from './player-b/states';
 
 export * from './player-a/states';
 export * from './player-b/states';

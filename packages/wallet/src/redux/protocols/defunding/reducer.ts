@@ -1,21 +1,21 @@
-import { SharedData, getChannel } from '../../state';
 import { ProtocolStateWithSharedData } from '..';
-import * as states from './states';
-import * as helpers from '../reducer-helpers';
-import { withdrawalReducer, initialize as withdrawalInitialize } from './../withdrawing/reducer';
-import * as selectors from '../../selectors';
-import * as actions from './actions';
-import { isWithdrawalAction } from '../withdrawing/actions';
+import { CommitmentReceived } from '../../../communication';
+import { ProtocolAction } from '../../../redux/actions';
 import { unreachable } from '../../../utils/reducer-utils';
+import { getLastCommitment } from '../../channel-store';
+import * as selectors from '../../selectors';
+import { getChannel, SharedData } from '../../state';
+import { isIndirectDefundingAction } from '../indirect-defunding/actions';
 import {
   indirectDefundingReducer,
   initialize as indirectDefundingInitialize,
 } from '../indirect-defunding/reducer';
-import { isIndirectDefundingAction } from '../indirect-defunding/actions';
 import * as indirectDefundingStates from '../indirect-defunding/states';
-import { CommitmentReceived } from '../../../communication';
-import { getLastCommitment } from '../../channel-store';
-import { ProtocolAction } from '../../../redux/actions';
+import * as helpers from '../reducer-helpers';
+import { isWithdrawalAction } from '../withdrawing/actions';
+import { initialize as withdrawalInitialize, withdrawalReducer } from './../withdrawing/reducer';
+import * as actions from './actions';
+import * as states from './states';
 
 export const initialize = (
   processId: string,

@@ -1,9 +1,9 @@
-import * as states from '../redux/state';
 import React, { PureComponent } from 'react';
-import LandingPage from '../components/landing-page';
 import { connect } from 'react-redux';
-import * as selectors from '../redux/selectors';
+import LandingPage from '../components/landing-page';
 import { Protocol } from '../redux/protocols/container';
+import * as selectors from '../redux/selectors';
+import * as states from '../redux/state';
 
 interface Props {
   state: states.Initialized;

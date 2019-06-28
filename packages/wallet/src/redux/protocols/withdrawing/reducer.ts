@@ -1,26 +1,26 @@
-import { ProtocolStateWithSharedData } from '..';
-import * as states from './states';
-import { WithdrawalAction } from './actions';
-import * as selectors from '../../selectors';
-import { CommitmentType } from '../../../domain';
-import {
-  createConcludeAndWithdrawTransaction,
-  ConcludeAndWithdrawArgs,
-} from '../../../utils/transaction-generator';
-import { signVerificationData } from '../../../domain';
 import { TransactionRequest } from 'ethers/providers';
+import { ProtocolStateWithSharedData } from '..';
+import { signVerificationData } from '../../../domain';
+import { CommitmentType } from '../../../domain';
+import { unreachable } from '../../../utils/reducer-utils';
+import {
+  ConcludeAndWithdrawArgs,
+  createConcludeAndWithdrawTransaction,
+} from '../../../utils/transaction-generator';
+import * as selectors from '../../selectors';
+import { SharedData } from '../../state';
+import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../transaction-submission/reducer';
-import { isTransactionAction } from '../transaction-submission/actions';
 import {
+  isSuccess,
   isTerminal,
   TransactionSubmissionState,
-  isSuccess,
 } from '../transaction-submission/states';
-import { unreachable } from '../../../utils/reducer-utils';
-import { SharedData } from '../../state';
+import { WithdrawalAction } from './actions';
+import * as states from './states';
 
 export const initialize = (
   withdrawalAmount: string,

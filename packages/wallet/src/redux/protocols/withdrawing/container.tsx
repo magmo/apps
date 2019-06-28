@@ -1,15 +1,15 @@
-import * as states from './states';
-import { PureComponent } from 'react';
-import { TransactionSubmission } from '../transaction-submission/container';
 import React from 'react';
-import { unreachable } from '../../../utils/reducer-utils';
+import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import * as actions from './actions';
-import WaitForApproval from './components/wait-for-approval';
+import { unreachable } from '../../../utils/reducer-utils';
+import { ActionConstructor } from '../../utils';
+import Acknowledge from '../shared-components/acknowledge';
 import Failure from '../shared-components/failure';
 import Success from '../shared-components/success';
-import Acknowledge from '../shared-components/acknowledge';
-import { ActionConstructor } from '../../utils';
+import { TransactionSubmission } from '../transaction-submission/container';
+import * as actions from './actions';
+import WaitForApproval from './components/wait-for-approval';
+import * as states from './states';
 
 interface Props {
   state: states.WithdrawalState;

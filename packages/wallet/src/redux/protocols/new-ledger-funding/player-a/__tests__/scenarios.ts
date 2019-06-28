@@ -1,24 +1,24 @@
 import { bigNumberify } from 'ethers/utils';
 import * as globalActions from '../../../../actions';
+import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 import {
-  aWaitForPreFundSetup1,
   aWaitForDirectFunding,
   aWaitForLedgerUpdate1,
   aWaitForPostFundSetup1,
+  aWaitForPreFundSetup1,
 } from '../states';
-import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
-import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 
-import { preSuccessB, preFailure, preSuccessA } from '../../../direct-funding/__tests__';
 import {
   appCommitment,
-  ledgerCommitment,
   asAddress,
-  bsAddress,
   asPrivateKey,
-  ledgerId,
+  bsAddress,
   channelId,
+  ledgerCommitment,
+  ledgerId,
 } from '../../../../../domain/commitments/__tests__';
+import { preFailure, preSuccessA, preSuccessB } from '../../../direct-funding/__tests__';
 import { success } from '../../../indirect-defunding/states';
 
 // -----------

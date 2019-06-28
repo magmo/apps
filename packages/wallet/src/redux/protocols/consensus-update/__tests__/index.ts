@@ -1,9 +1,9 @@
 import {
-  twoPlayerAHappyPath,
-  twoPlayerBHappyPath,
   threePlayerAHappyPath,
   threePlayerBHappyPath,
   threePlayerHubHappyPath,
+  twoPlayerAHappyPath,
+  twoPlayerBHappyPath,
 } from './scenarios';
 
 export const twoPlayerPreSuccessA = twoPlayerAHappyPath.waitForUpdate;

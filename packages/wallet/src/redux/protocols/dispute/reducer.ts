@@ -1,13 +1,13 @@
-import { SharedData } from '../../state';
-import { Commitment } from '../../../domain';
 import { ProtocolStateWithSharedData } from '..';
-import { DisputeState, isTerminal } from './state';
-import { initialize as responderInitialize, responderReducer } from './responder/reducer';
-import { initialize as challengerInitialize, challengerReducer } from './challenger/reducer';
-import { isNonTerminalResponderState } from './responder/states';
-import { isResponderAction } from './responder/actions';
+import { Commitment } from '../../../domain';
 import { ProtocolAction } from '../../actions';
+import { SharedData } from '../../state';
 import { isChallengerAction } from './challenger/actions';
+import { challengerReducer, initialize as challengerInitialize } from './challenger/reducer';
+import { isResponderAction } from './responder/actions';
+import { initialize as responderInitialize, responderReducer } from './responder/reducer';
+import { isNonTerminalResponderState } from './responder/states';
+import { DisputeState, isTerminal } from './state';
 
 export const initializeResponderState = (
   processId: string,

@@ -1,7 +1,7 @@
 import { walletReducer } from '../reducer';
 
-import * as states from '../state';
 import * as actions from '../actions';
+import * as states from '../state';
 
 describe('when in WaitForLogin', () => {
   const state = states.waitForLogin();

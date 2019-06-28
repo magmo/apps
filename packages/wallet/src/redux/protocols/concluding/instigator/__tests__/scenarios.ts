@@ -1,19 +1,19 @@
 import * as states from '../../states';
 
-import * as actions from '../actions';
-import * as channelScenarios from '../../../../__tests__/test-scenarios';
-import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
-import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
+import { bigNumberify } from 'ethers/utils';
+import { keepLedgerChannelApproved } from '../../../../../communication';
 import {
   appCommitment,
   asPrivateKey,
-  ledgerId,
   ledgerCommitment,
+  ledgerId,
 } from '../../../../../domain/commitments/__tests__';
-import { bigNumberify } from 'ethers/utils';
+import * as channelScenarios from '../../../../__tests__/test-scenarios';
 import { commitmentReceived } from '../../../../actions';
+import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
 import { twoPlayerPreSuccessA } from '../../../consensus-update/__tests__';
-import { keepLedgerChannelApproved } from '../../../../../communication';
+import * as actions from '../actions';
 
 // -----------------
 // Channel Scenarios

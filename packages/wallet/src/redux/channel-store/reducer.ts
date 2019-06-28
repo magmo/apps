@@ -1,17 +1,17 @@
 import { ChannelStore, getChannel, setChannel } from './state';
 
-import { ReducerWithSideEffects } from '../../utils/reducer-utils';
-import { StateWithSideEffects } from '../utils';
 import {
-  SignedCommitment,
   Commitment,
-  signCommitment2,
   getChannelId,
   hasValidSignature,
+  signCommitment2,
+  SignedCommitment,
 } from '../../domain';
-import { pushCommitment, ChannelState, initializeChannel } from './channel-state/states';
-import { validTransition } from './channel-state';
+import { ReducerWithSideEffects } from '../../utils/reducer-utils';
+import { StateWithSideEffects } from '../utils';
 import * as channelActions from './actions';
+import { validTransition } from './channel-state';
+import { ChannelState, initializeChannel, pushCommitment } from './channel-state/states';
 
 export const channelStoreReducer: ReducerWithSideEffects<ChannelStore> = (
   state: ChannelStore,

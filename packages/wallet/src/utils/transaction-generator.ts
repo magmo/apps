@@ -1,8 +1,8 @@
 import { TransactionRequest } from 'ethers/providers';
-import { getAdjudicatorInterface } from './contract-utils';
 import { splitSignature } from 'ethers/utils';
-import { Commitment } from '../domain';
 import { asEthersObject } from 'fmg-core';
+import { Commitment } from '../domain';
+import { getAdjudicatorInterface } from './contract-utils';
 
 export function createForceMoveTransaction(
   fromState: Commitment,

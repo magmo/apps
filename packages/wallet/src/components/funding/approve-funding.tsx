@@ -1,6 +1,6 @@
 import React from 'react';
-import ApproveX from '../approve-x';
 import * as web3Utils from 'web3-utils';
+import ApproveX from '../approve-x';
 
 interface Props {
   fundingApproved: () => void;

@@ -1,7 +1,7 @@
+import { isTransactionAction, WalletAction } from '../../actions';
+import { ActionConstructor } from '../../utils';
 import { BaseProcessAction } from '../actions';
 import { TransactionAction } from '../transaction-submission/actions';
-import { WalletAction, isTransactionAction } from '../../actions';
-import { ActionConstructor } from '../../utils';
 
 // -------
 // Actions

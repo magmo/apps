@@ -1,13 +1,13 @@
-import { unreachable } from '../../../utils/reducer-utils';
-import { TwoPartyPlayerIndex } from '../../types';
-import { playerAReducer, initialize as initializeA } from './player-a/reducer';
-import { playerBReducer, initialize as initializeB } from './player-b/reducer';
-import { SharedData } from '../../state';
-import { ChannelState } from '../../channel-store';
-import { isPlayerAState } from './player-a/states';
-import { NonTerminalNewLedgerFundingState, NewLedgerFundingState } from './states';
-import { NewLedgerFundingAction } from './actions';
 import { ProtocolStateWithSharedData } from '..';
+import { unreachable } from '../../../utils/reducer-utils';
+import { ChannelState } from '../../channel-store';
+import { SharedData } from '../../state';
+import { TwoPartyPlayerIndex } from '../../types';
+import { NewLedgerFundingAction } from './actions';
+import { initialize as initializeA, playerAReducer } from './player-a/reducer';
+import { isPlayerAState } from './player-a/states';
+import { initialize as initializeB, playerBReducer } from './player-b/reducer';
+import { NewLedgerFundingState, NonTerminalNewLedgerFundingState } from './states';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 

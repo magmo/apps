@@ -1,28 +1,28 @@
 import { ethers } from 'ethers';
 
-import { put } from 'redux-saga/effects';
 import { getGanacheProvider } from 'magmo-devtools';
+import { put } from 'redux-saga/effects';
 
+import { signCommitment, signVerificationData } from '../domain';
 import { transactionConfirmed, transactionSent, transactionSubmitted } from '../redux/actions';
 import { transactionSender } from '../redux/sagas/transaction-sender';
-import { signCommitment, signVerificationData } from '../domain';
-import { getLibraryAddress, createChallenge, concludeGame } from './test-utils';
 import {
-  createForceMoveTransaction,
-  createDepositTransaction,
-  createRespondWithMoveTransaction,
-  createRefuteTransaction,
-  createConcludeTransaction,
-  createWithdrawTransaction,
   ConcludeAndWithdrawArgs,
   createConcludeAndWithdrawTransaction,
+  createConcludeTransaction,
+  createDepositTransaction,
+  createForceMoveTransaction,
+  createRefuteTransaction,
+  createRespondWithMoveTransaction,
   createTransferAndWithdrawTransaction,
+  createWithdrawTransaction,
 } from '../utils/transaction-generator';
+import { concludeGame, createChallenge, getLibraryAddress } from './test-utils';
 
-import { depositContract } from './test-utils';
 import { Channel, Commitment, CommitmentType } from 'fmg-core';
 import { channelID } from 'fmg-core/lib/channel';
 import { ADJUDICATOR_ADDRESS } from '../constants';
+import { depositContract } from './test-utils';
 
 jest.setTimeout(90000);
 

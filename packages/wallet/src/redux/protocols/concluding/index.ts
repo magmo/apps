@@ -5,10 +5,10 @@ export {
   concludingReducer as reducer,
 } from './reducer';
 
-import { ConcludingInstigatorAction, isConcludingInstigatorAction } from './instigator/actions';
-import { ConcludingResponderAction, isConcludingResponderAction } from './responder/actions';
 import { WalletAction } from '../../../redux/actions';
 import { ConsensusUpdateAction } from '../consensus-update/actions';
+import { ConcludingInstigatorAction, isConcludingInstigatorAction } from './instigator/actions';
+import { ConcludingResponderAction, isConcludingResponderAction } from './responder/actions';
 
 export type ConcludingAction =
   | ConcludingInstigatorAction

@@ -1,23 +1,23 @@
-import * as scenarios from './scenarios';
-import { challengerReducer, initialize, ReturnVal } from '../reducer';
 import {
-  FailureReason,
-  ChallengerStateType,
-  WaitForTransaction,
-  WaitForResponseOrTimeout,
-} from '../states';
-import {
-  itSendsThisMessage,
-  itSendsThisDisplayEventType,
-  itStoresThisCommitment,
-  describeScenarioStep,
-} from '../../../../__tests__/helpers';
-import {
-  HIDE_WALLET,
-  CHALLENGE_COMPLETE,
   CHALLENGE_COMMITMENT_RECEIVED,
+  CHALLENGE_COMPLETE,
+  HIDE_WALLET,
   SHOW_WALLET,
 } from 'magmo-wallet-client';
+import {
+  describeScenarioStep,
+  itSendsThisDisplayEventType,
+  itSendsThisMessage,
+  itStoresThisCommitment,
+} from '../../../../__tests__/helpers';
+import { challengerReducer, initialize, ReturnVal } from '../reducer';
+import {
+  ChallengerStateType,
+  FailureReason,
+  WaitForResponseOrTimeout,
+  WaitForTransaction,
+} from '../states';
+import * as scenarios from './scenarios';
 
 describe('OPPONENT RESPONDS', () => {
   const scenario = scenarios.opponentResponds;

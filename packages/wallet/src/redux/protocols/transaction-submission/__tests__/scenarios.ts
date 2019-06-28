@@ -1,6 +1,6 @@
-import * as states from '../states';
-import * as actions from '../actions';
 import { EMPTY_SHARED_DATA } from '../../../state';
+import * as actions from '../actions';
+import * as states from '../states';
 
 // ---------
 // Test data

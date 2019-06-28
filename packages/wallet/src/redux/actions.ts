@@ -1,22 +1,22 @@
+import { CommitmentReceived, commitmentReceived, RelayableAction } from '../communication';
 import * as channel from './channel-store/actions';
-import * as directFunding from './protocols/direct-funding/actions';
-import * as newLedgerFunding from './protocols/new-ledger-funding/actions';
-import * as application from './protocols/application/actions';
 import * as protocol from './protocols/actions';
 import * as advanceChannel from './protocols/advance-channel';
+import * as application from './protocols/application/actions';
+import * as directFunding from './protocols/direct-funding/actions';
 import { FundingAction, isFundingAction } from './protocols/funding/actions';
-import { CommitmentReceived, commitmentReceived, RelayableAction } from '../communication';
+import * as newLedgerFunding from './protocols/new-ledger-funding/actions';
 import {
-  TransactionAction as TA,
   isTransactionAction as isTA,
+  TransactionAction as TA,
 } from './protocols/transaction-submission/actions';
 
-import { ConcludingAction, isConcludingAction } from './protocols/concluding';
-import { ApplicationAction } from './protocols/application/actions';
-import { ActionConstructor } from './utils';
 import { Commitment } from '../domain';
-import { isDefundingAction, DefundingAction } from './protocols/defunding/actions';
 import { AdvanceChannelAction } from './protocols/advance-channel/actions';
+import { ApplicationAction } from './protocols/application/actions';
+import { ConcludingAction, isConcludingAction } from './protocols/concluding';
+import { DefundingAction, isDefundingAction } from './protocols/defunding/actions';
+import { ActionConstructor } from './utils';
 
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };

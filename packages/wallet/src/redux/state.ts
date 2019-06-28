@@ -1,32 +1,32 @@
+import { TransactionRequest } from 'ethers/providers';
+import { WalletEvent } from 'magmo-wallet-client';
+import { WalletProtocol } from '../communication';
+import { Commitment, SignedCommitment } from '../domain';
+import { AdjudicatorState } from './adjudicator-state/state';
 import {
-  OutboxState,
-  emptyDisplayOutboxState,
-  SideEffects,
-  queueMessage as queueMessageOutbox,
-  queueTransaction as queueTransactionOutbox,
-  getLastMessage as getLastMessageFromOutbox,
-} from './outbox/state';
-import {
-  ChannelStore,
   ChannelState,
+  ChannelStore,
+  checkAndInitialize as checkAndInitializeChannelStore,
+  checkAndStore as checkAndStoreChannelStore,
+  Commitments,
+  emptyChannelStore,
   setChannel as setChannelInStore,
   setChannels as setChannelsInStore,
-  checkAndStore as checkAndStoreChannelStore,
-  checkAndInitialize as checkAndInitializeChannelStore,
-  signAndStore as signAndStoreChannelStore,
   signAndInitialize as signAndInitializeChannelStore,
-  emptyChannelStore,
+  signAndStore as signAndStoreChannelStore,
   SignFailureReason,
-  Commitments,
 } from './channel-store';
-import { Properties } from './utils';
-import * as newLedgerFunding from './protocols/new-ledger-funding/states';
 import { accumulateSideEffects } from './outbox';
-import { WalletEvent } from 'magmo-wallet-client';
-import { TransactionRequest } from 'ethers/providers';
-import { AdjudicatorState } from './adjudicator-state/state';
-import { SignedCommitment, Commitment } from '../domain';
-import { WalletProtocol } from '../communication';
+import {
+  emptyDisplayOutboxState,
+  getLastMessage as getLastMessageFromOutbox,
+  OutboxState,
+  queueMessage as queueMessageOutbox,
+  queueTransaction as queueTransactionOutbox,
+  SideEffects,
+} from './outbox/state';
+import * as newLedgerFunding from './protocols/new-ledger-funding/states';
+import { Properties } from './utils';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 

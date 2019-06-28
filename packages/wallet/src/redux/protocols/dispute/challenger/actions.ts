@@ -1,12 +1,12 @@
 import {
   ChallengeExpiredEvent,
+  ChallengeExpirySetEvent,
   RefutedEvent,
   RespondWithMoveEvent,
-  ChallengeExpirySetEvent,
   WalletAction,
 } from '../../../actions';
-import { isTransactionAction, TransactionAction } from '../../transaction-submission/actions';
 import { ActionConstructor } from '../../../utils';
+import { isTransactionAction, TransactionAction } from '../../transaction-submission/actions';
 
 // -------
 // Actions

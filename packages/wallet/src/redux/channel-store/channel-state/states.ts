@@ -1,5 +1,5 @@
-import { SignedCommitment, getChannelId, Commitment } from '../../../domain';
 import { ethers } from 'ethers';
+import { Commitment, getChannelId, SignedCommitment } from '../../../domain';
 
 export type Commitments = SignedCommitment[];
 

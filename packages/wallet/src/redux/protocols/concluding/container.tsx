@@ -1,13 +1,13 @@
-import * as states from './states';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PureComponent } from 'react';
 import React from 'react';
-import * as concludingInstigatorStates from './instigator/states';
-import * as concludingResponderStates from './responder/states';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Concluding as ConcludingInstigator } from './instigator/container';
+import * as concludingInstigatorStates from './instigator/states';
 import { Concluding as ConcludingResponder } from './responder/container';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import * as concludingResponderStates from './responder/states';
+import * as states from './states';
 
 interface Props {
   state: states.ConcludingState;

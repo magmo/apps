@@ -1,10 +1,10 @@
 import { clearOutbox } from '../reducer';
 
-import * as actions from '../../actions';
 import * as outgoing from 'magmo-wallet-client/lib/wallet-events';
-import * as scenarios from '../../__tests__/test-scenarios';
-import { OutboxState } from '../state';
 import { sendStrategyApproved, sendStrategyProposed } from '../../../communication';
+import * as scenarios from '../../__tests__/test-scenarios';
+import * as actions from '../../actions';
+import { OutboxState } from '../state';
 
 const { mockTransactionOutboxItem } = scenarios;
 

@@ -1,14 +1,14 @@
-import * as scenarios from './scenarios';
-import * as states from '../states';
-import { ProtocolStateWithSharedData } from '../..';
-import { itSendsThisMessage, describeScenarioStep } from '../../../__tests__/helpers';
-import { initialize, applicationReducer } from '../reducer';
 import {
-  VALIDATION_SUCCESS,
+  SIGNATURE_FAILURE,
   SIGNATURE_SUCCESS,
   VALIDATION_FAILURE,
-  SIGNATURE_FAILURE,
+  VALIDATION_SUCCESS,
 } from 'magmo-wallet-client';
+import { ProtocolStateWithSharedData } from '../..';
+import { describeScenarioStep, itSendsThisMessage } from '../../../__tests__/helpers';
+import { applicationReducer, initialize } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 function whenIn(state) {
   return `when in ${state}`;

@@ -1,14 +1,14 @@
-import { walletReducer, getProcessId } from '../reducer';
+import { getProcessId, walletReducer } from '../reducer';
 
-import * as states from './../state';
-import * as actions from './../actions';
-import * as NewLedgerFundingActions from '../protocols/new-ledger-funding/actions';
-import * as scenarios from './test-scenarios';
-import { TwoPartyPlayerIndex } from '../types';
-import * as fundProtocol from '../protocols/funding';
-import { fundingRequested } from '../protocols/actions';
-import * as adjudicatorState from '../adjudicator-state/reducer';
 import { WalletProtocol } from '../../communication';
+import * as adjudicatorState from '../adjudicator-state/reducer';
+import { fundingRequested } from '../protocols/actions';
+import * as fundProtocol from '../protocols/funding';
+import * as NewLedgerFundingActions from '../protocols/new-ledger-funding/actions';
+import { TwoPartyPlayerIndex } from '../types';
+import * as actions from './../actions';
+import * as states from './../state';
+import * as scenarios from './test-scenarios';
 const { channelId } = scenarios;
 
 const defaults = {

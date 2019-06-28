@@ -1,6 +1,6 @@
-import { StateConstructor } from '../../utils';
 import { TransactionRequest } from 'ethers/providers';
 import { ProtocolState } from '..';
+import { StateConstructor } from '../../utils';
 
 // -------
 // States

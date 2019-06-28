@@ -1,12 +1,12 @@
-import * as scenarios from './scenarios';
 import { initialize, responderReducer } from '../reducer';
+import * as scenarios from './scenarios';
 
-import * as states from '../states';
+import { CHALLENGE_COMPLETE, HIDE_WALLET, SHOW_WALLET } from 'magmo-wallet-client';
 import { Commitment } from '../../../../../domain';
 import * as TransactionGenerator from '../../../../../utils/transaction-generator';
-import { SHOW_WALLET, HIDE_WALLET, CHALLENGE_COMPLETE } from 'magmo-wallet-client';
 import { itSendsThisDisplayEventType, itSendsThisMessage } from '../../../../__tests__/helpers';
 import { describeScenarioStep } from '../../../../__tests__/helpers';
+import * as states from '../states';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };

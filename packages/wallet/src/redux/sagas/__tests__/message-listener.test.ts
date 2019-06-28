@@ -1,11 +1,11 @@
-import { put } from 'redux-saga/effects';
 import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
+import { put } from 'redux-saga/effects';
 
-import { messageListener } from '../message-listener';
-import * as actions from '../../actions';
 import { channel } from 'redux-saga';
-import * as scenarios from '../../__tests__/test-scenarios';
 import { APPLICATION_PROCESS_ID } from '../../../redux/protocols/application/reducer';
+import * as scenarios from '../../__tests__/test-scenarios';
+import * as actions from '../../actions';
+import { messageListener } from '../message-listener';
 
 describe('message listener', () => {
   const saga = messageListener();

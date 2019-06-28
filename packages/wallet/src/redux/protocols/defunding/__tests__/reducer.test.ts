@@ -1,8 +1,8 @@
-import * as states from '../states';
-import { initialize, defundingReducer } from '../reducer';
-import * as scenarios from './scenarios';
-import { describeScenarioStep, itSendsThisDisplayEventType } from '../../../__tests__/helpers';
 import { HIDE_WALLET } from 'magmo-wallet-client';
+import { describeScenarioStep, itSendsThisDisplayEventType } from '../../../__tests__/helpers';
+import { defundingReducer, initialize } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 const itTransitionsTo = (
   result: { protocolState: states.DefundingState },

@@ -1,4 +1,4 @@
-import { SignedCommitment, getChannelId } from '../../../../domain';
+import { getChannelId, SignedCommitment } from '../../../../domain';
 import { ChannelState } from '../states';
 
 export function channelFromCommitments(

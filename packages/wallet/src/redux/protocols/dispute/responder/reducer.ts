@@ -1,33 +1,33 @@
-import { Commitment } from '../../../../domain';
-import { ProtocolStateWithSharedData } from '../..';
-import * as states from './states';
-import * as actions from './actions';
-import { unreachable } from '../../../../utils/reducer-utils';
-import * as selectors from '../../../selectors';
-import * as TransactionGenerator from '../../../../utils/transaction-generator';
-import { TwoPartyPlayerIndex } from '../../../types';
 import { TransactionRequest } from 'ethers/providers';
+import { channelID } from 'fmg-core/lib/channel';
+import * as _ from 'lodash';
+import { ProtocolStateWithSharedData } from '../..';
+import { Commitment } from '../../../../domain';
+import { unreachable } from '../../../../utils/reducer-utils';
+import * as TransactionGenerator from '../../../../utils/transaction-generator';
+import { ProtocolAction } from '../../../actions';
+import * as selectors from '../../../selectors';
+import { registerChannelToMonitor, SharedData, signAndStore } from '../../../state';
+import { TwoPartyPlayerIndex } from '../../../types';
+import {
+  hideWallet,
+  sendChallengeComplete,
+  sendChallengeResponseRequested,
+  sendOpponentConcluded,
+  showWallet,
+} from '../../reducer-helpers';
+import { isTransactionAction } from '../../transaction-submission/actions';
 import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../../transaction-submission/reducer';
-import { SharedData, signAndStore, registerChannelToMonitor } from '../../../state';
-import { isTransactionAction } from '../../transaction-submission/actions';
 import {
+  isSuccess,
   isTerminal,
   TransactionSubmissionState,
-  isSuccess,
 } from '../../transaction-submission/states';
-import { channelID } from 'fmg-core/lib/channel';
-import {
-  showWallet,
-  hideWallet,
-  sendChallengeResponseRequested,
-  sendChallengeComplete,
-  sendOpponentConcluded,
-} from '../../reducer-helpers';
-import { ProtocolAction } from '../../../actions';
-import * as _ from 'lodash';
+import * as actions from './actions';
+import * as states from './states';
 export const initialize = (
   processId: string,
   channelId: string,

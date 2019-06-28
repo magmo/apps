@@ -1,17 +1,17 @@
-import { SharedData, signAndStore, getExistingChannel } from '../../state';
-import * as states from './states';
-import { ProtocolStateWithSharedData } from '..';
-import { ConsensusUpdateAction, isConsensusUpdateAction } from './actions';
-import * as helpers from '../reducer-helpers';
-import {
-  proposeNewConsensus,
-  acceptConsensus,
-  voteForConsensus,
-  consensusHasBeenReached,
-} from '../../../domain/consensus-app';
-import { Commitment } from '../../../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { ProtocolStateWithSharedData } from '..';
+import { Commitment } from '../../../domain';
+import {
+  acceptConsensus,
+  consensusHasBeenReached,
+  proposeNewConsensus,
+  voteForConsensus,
+} from '../../../domain/consensus-app';
 import { eqHexArray } from '../../../utils/hex-utils';
+import { getExistingChannel, SharedData, signAndStore } from '../../state';
+import * as helpers from '../reducer-helpers';
+import { ConsensusUpdateAction, isConsensusUpdateAction } from './actions';
+import * as states from './states';
 
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = 'ConsensusUpdate';
 

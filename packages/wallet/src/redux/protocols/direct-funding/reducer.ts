@@ -1,20 +1,20 @@
 import { bigNumberify } from 'ethers/utils';
+import { CommitmentType } from '../../../domain';
 import { unreachable } from '../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 import * as actions from '../../actions';
-import { ProtocolReducer, ProtocolStateWithSharedData, makeLocator } from '../../protocols';
+import { makeLocator, ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import { SharedData } from '../../state';
+import * as advanceChannel from '../advance-channel';
+import { clearedToSend } from '../advance-channel/actions';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../transaction-submission/reducer';
-import { isTerminal, isSuccess } from '../transaction-submission/states';
-import * as states from './states';
-import * as advanceChannel from '../advance-channel';
+import { isSuccess, isTerminal } from '../transaction-submission/states';
 import { DirectFundingRequested } from './actions';
-import { CommitmentType } from '../../../domain';
-import { clearedToSend } from '../advance-channel/actions';
+import * as states from './states';
 
 export const DIRECT_FUNDING_PROTOCOL_LOCATOR = 'DirectFunding';
 

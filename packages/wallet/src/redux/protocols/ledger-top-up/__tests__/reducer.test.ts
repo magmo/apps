@@ -1,7 +1,7 @@
-import * as scenarios from './scenarios';
+import { ProtocolStateWithSharedData } from '../..';
 import { initialize, ledgerTopUpReducer } from '../reducer';
 import { LedgerTopUpState, LedgerTopUpStateType } from '../states';
-import { ProtocolStateWithSharedData } from '../..';
+import * as scenarios from './scenarios';
 
 describe('player A both players need a top up', () => {
   const scenario = scenarios.playerABothPlayersTopUp;

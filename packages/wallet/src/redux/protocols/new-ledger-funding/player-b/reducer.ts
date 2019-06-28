@@ -1,45 +1,45 @@
 import * as states from '../states';
 import { PlayerBState } from '../states';
 
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
+import { getChannelId, nextSetupCommitment } from '../../../../domain';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { theirAddress } from '../../../channel-store';
 import {
-  SharedData,
+  checkAndInitialize,
   checkAndStore,
   getChannel,
-  signAndStore,
-  queueMessage,
-  checkAndInitialize,
   getPrivatekey,
+  queueMessage,
   registerChannelToMonitor,
+  SharedData,
+  signAndStore,
 } from '../../../state';
-import { NewLedgerFundingState, failure, success } from '../states';
-import { unreachable } from '../../../../utils/reducer-utils';
+import { failure, NewLedgerFundingState, success } from '../states';
 import {
-  BWaitForPreFundSetup0,
   BWaitForDirectFunding,
-  BWaitForLedgerUpdate0,
-  BWaitForPostFundSetup0,
   bWaitForDirectFunding,
+  BWaitForLedgerUpdate0,
   bWaitForLedgerUpdate0,
+  BWaitForPostFundSetup0,
   bWaitForPostFundSetup0,
+  BWaitForPreFundSetup0,
 } from './states';
-import { getChannelId, nextSetupCommitment } from '../../../../domain';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { theirAddress } from '../../../channel-store';
 
-import { directFundingRequested } from '../../direct-funding/actions';
+import { ProtocolStateWithSharedData } from '../..';
+import { sendCommitmentReceived } from '../../../../communication';
+import { acceptConsensus } from '../../../../domain/consensus-app';
+import { addHex } from '../../../../utils/hex-utils';
+import { isTransactionAction } from '../../../actions';
+import { ChannelFundingState } from '../../../state';
 import { DirectFundingAction } from '../../direct-funding';
+import { directFundingRequested } from '../../direct-funding/actions';
 import {
   directFundingStateReducer,
   initialize as initializeDirectFunding,
 } from '../../direct-funding/reducer';
-import { isSuccess, isFailure } from '../../direct-funding/states';
-import { acceptConsensus } from '../../../../domain/consensus-app';
-import { sendCommitmentReceived } from '../../../../communication';
-import { addHex } from '../../../../utils/hex-utils';
-import { isTransactionAction } from '../../../actions';
-import { ChannelFundingState } from '../../../state';
+import { isFailure, isSuccess } from '../../direct-funding/states';
 import { NewLedgerFundingAction } from '../actions';
-import { ProtocolStateWithSharedData } from '../..';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 type IDFAction = NewLedgerFundingAction;

@@ -1,9 +1,9 @@
-import * as actions from '../actions';
-import * as selectors from '../selectors';
-import { take, select, put } from 'redux-saga/effects';
-import { AdjudicatorState, getAdjudicatorChannelState } from '../adjudicator-state/state';
-import { getProvider } from '../../utils/contract-utils';
 import { eventChannel } from 'redux-saga';
+import { put, select, take } from 'redux-saga/effects';
+import { getProvider } from '../../utils/contract-utils';
+import * as actions from '../actions';
+import { AdjudicatorState, getAdjudicatorChannelState } from '../adjudicator-state/state';
+import * as selectors from '../selectors';
 
 export function* challengeWatcher() {
   const provider = yield getProvider();

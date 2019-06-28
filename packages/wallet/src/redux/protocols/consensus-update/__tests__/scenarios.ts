@@ -1,22 +1,22 @@
+import { bigNumberify } from 'ethers/utils';
+import { commitmentsReceived } from '../../../../communication';
 import {
-  ledgerCommitment,
   asAddress,
   asPrivateKey,
   bsAddress,
   bsPrivateKey,
+  hubAddress,
+  hubPrivateKey,
+  ledgerCommitment,
   ledgerId,
   threeWayLedgerCommitment,
   threeWayLedgerId,
-  hubAddress,
-  hubPrivateKey,
 } from '../../../../domain/commitments/__tests__';
-import { bigNumberify } from 'ethers/utils';
-import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import * as states from '../states';
-import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../reducer';
-import { commitmentsReceived } from '../../../../communication';
+import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { ThreePartyPlayerIndex } from '../../../types';
+import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../reducer';
+import * as states from '../states';
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },

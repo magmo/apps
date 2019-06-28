@@ -1,11 +1,11 @@
 import { storiesOf } from '@storybook/react';
 import React from 'react';
 import { Provider } from 'react-redux';
-import '../index.scss';
-import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
-import { initializedState } from './dummy-wallet-states';
+import '../index.scss';
 import { ProtocolState } from '../redux/protocols';
+import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
+import { initializedState } from './dummy-wallet-states';
 import { nestProtocolState } from './nesters';
 const walletStateRender = state => () => {
   console.log(state);

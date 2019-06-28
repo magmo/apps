@@ -1,22 +1,22 @@
-import * as states from '../../states';
-import * as actions from '../actions';
-import * as channelScenarios from '../../../../__tests__/test-scenarios';
-import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
-import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
-import { appCommitment, ledgerId } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
+import { keepLedgerChannelApproved } from '../../../../../communication';
 import { bsPrivateKey } from '../../../../../communication/__tests__/commitments';
+import { appCommitment, ledgerId } from '../../../../../domain/commitments/__tests__';
+import * as channelScenarios from '../../../../__tests__/test-scenarios';
+import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../../state';
+import { twoPlayerPreSuccessA, twoPlayerPreSuccessB } from '../../../consensus-update/__tests__';
 import {
-  ledgerUpdate0Received,
+  app10,
+  app11,
   ledger4,
   ledger5,
   ledger7,
-  app10,
-  app11,
+  ledgerUpdate0Received,
   setFundingState as setFundingStateAlt,
 } from '../../../indirect-defunding/__tests__/scenarios';
-import { twoPlayerPreSuccessA, twoPlayerPreSuccessB } from '../../../consensus-update/__tests__';
-import { keepLedgerChannelApproved } from '../../../../../communication';
+import * as states from '../../states';
+import * as actions from '../actions';
 
 // -----------------
 // Channel Scenarios

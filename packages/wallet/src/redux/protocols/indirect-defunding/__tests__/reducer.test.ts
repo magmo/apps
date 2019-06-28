@@ -1,10 +1,10 @@
-import * as scenarios from './scenarios';
-import { IndirectDefundingState, IndirectDefundingStateType } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { getLastMessage } from '../../../state';
 import { SignedCommitment } from '../../../../domain';
-import { initialize, indirectDefundingReducer } from '../reducer';
 import { itRelaysTheseActions } from '../../../__tests__/helpers';
+import { getLastMessage } from '../../../state';
+import { indirectDefundingReducer, initialize } from '../reducer';
+import { IndirectDefundingState, IndirectDefundingStateType } from '../states';
+import * as scenarios from './scenarios';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAHappyPath;

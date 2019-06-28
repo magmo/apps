@@ -1,6 +1,6 @@
+import { WalletAction } from '../redux/actions';
 import { accumulateSideEffects } from '../redux/outbox';
 import { SideEffects } from '../redux/outbox/state';
-import { WalletAction } from '../redux/actions';
 import { StateWithSideEffects } from '../redux/utils';
 
 export function unreachable(x: never) {

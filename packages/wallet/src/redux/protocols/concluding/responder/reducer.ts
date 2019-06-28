@@ -1,39 +1,39 @@
-import * as states from './states';
-import {
-  ResponderConcludingState as CState,
-  ResponderNonTerminalState as NonTerminalCState,
-  approveConcluding,
-  acknowledgeFailure,
-  decideDefund,
-} from './states';
-import { unreachable } from '../../../../utils/reducer-utils';
-import {
-  SharedData,
-  getChannel,
-  setChannelStore,
-  queueMessage,
-  checkAndStore,
-} from '../../../state';
-import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
-import { ourTurn, getLastCommitment } from '../../../channel-store';
-import * as selectors from '../../../selectors';
-import * as channelStoreReducer from '../../../channel-store/reducer';
-import { theirAddress } from '../../../channel-store';
+import { ProtocolStateWithSharedData } from '../..';
 import { sendCommitmentReceived, sendKeepLedgerChannelApproved } from '../../../../communication';
+import { getChannelId, SignedCommitment } from '../../../../domain';
+import { ProtocolAction } from '../../../../redux/actions';
+import { composeConcludeCommitment } from '../../../../utils/commitment-utils';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { getLastCommitment, ourTurn } from '../../../channel-store';
+import { theirAddress } from '../../../channel-store';
+import * as channelStoreReducer from '../../../channel-store/reducer';
+import * as selectors from '../../../selectors';
 import {
-  showWallet,
+  checkAndStore,
+  getChannel,
+  queueMessage,
+  setChannelStore,
+  SharedData,
+} from '../../../state';
+import { consensusUpdateReducer, initializeConsensusUpdate } from '../../consensus-update/';
+import { ConsensusUpdateAction, isConsensusUpdateAction } from '../../consensus-update/actions';
+import {
   hideWallet,
   sendConcludeFailure,
   sendOpponentConcluded,
+  showWallet,
 } from '../../reducer-helpers';
-import { ProtocolAction } from '../../../../redux/actions';
-import { isConcludingResponderAction } from './actions';
-import { getChannelId, SignedCommitment } from '../../../../domain';
-import { failure, success } from '../states';
-import { ProtocolStateWithSharedData } from '../..';
 import * as helpers from '../../reducer-helpers';
-import { initializeConsensusUpdate, consensusUpdateReducer } from '../../consensus-update/';
-import { ConsensusUpdateAction, isConsensusUpdateAction } from '../../consensus-update/actions';
+import { failure, success } from '../states';
+import { isConcludingResponderAction } from './actions';
+import {
+  acknowledgeFailure,
+  approveConcluding,
+  decideDefund,
+  ResponderConcludingState as CState,
+  ResponderNonTerminalState as NonTerminalCState,
+} from './states';
+import * as states from './states';
 export type ReturnVal = ProtocolStateWithSharedData<states.ResponderConcludingState>;
 export type Storage = SharedData;
 

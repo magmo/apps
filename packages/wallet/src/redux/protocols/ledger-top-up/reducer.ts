@@ -1,27 +1,27 @@
+import { bigNumberify } from 'ethers/utils';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '..';
+import { sendCommitmentReceived } from '../../../communication';
+import { acceptConsensus, proposeNewConsensus } from '../../../domain';
+import { addHex } from '../../../utils/hex-utils';
+import { getLastCommitment, theirAddress } from '../../channel-store';
 import {
+  checkAndStore,
+  getExistingChannel,
+  queueMessage,
+  registerChannelToMonitor,
   SharedData,
   signAndStore,
-  queueMessage,
-  checkAndStore,
-  registerChannelToMonitor,
-  getExistingChannel,
 } from '../../state';
-import * as states from './states';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
-import * as helpers from '../reducer-helpers';
-import { proposeNewConsensus, acceptConsensus } from '../../../domain';
 import { TwoPartyPlayerIndex } from '../../types';
-import { bigNumberify } from 'ethers/utils';
-import { theirAddress, getLastCommitment } from '../../channel-store';
-import { sendCommitmentReceived } from '../../../communication';
-import {
-  initialize as initializeDirectFunding,
-  directFundingStateReducer,
-} from '../direct-funding/reducer';
-import { LedgerTopUpAction } from './actions';
 import { directFundingRequested } from '../direct-funding/actions';
-import { isTerminal, isFailure, isSuccess } from '../direct-funding/states';
-import { addHex } from '../../../utils/hex-utils';
+import {
+  directFundingStateReducer,
+  initialize as initializeDirectFunding,
+} from '../direct-funding/reducer';
+import { isFailure, isSuccess, isTerminal } from '../direct-funding/states';
+import * as helpers from '../reducer-helpers';
+import { LedgerTopUpAction } from './actions';
+import * as states from './states';
 export const LEDGER_TOP_UP_PROTOCOL_LOCATOR = 'LedgerTopUp';
 export function initialize(
   processId: string,

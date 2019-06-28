@@ -1,15 +1,15 @@
-import { take, put, select } from 'redux-saga/effects';
 import * as incoming from 'magmo-wallet-client/lib/wallet-instructions';
+import { put, select, take } from 'redux-saga/effects';
 
-import * as actions from '../actions';
 import { eventChannel } from 'redux-saga';
-import * as application from '../protocols/application/reducer';
 import { isRelayableAction } from '../../communication';
-import { responseProvided } from '../protocols/dispute/responder/actions';
-import { getChannelId, Commitment, SignedCommitment } from '../../domain';
-import * as selectors from '../selectors';
+import { Commitment, getChannelId, SignedCommitment } from '../../domain';
 import * as contractUtils from '../../utils/contract-utils';
-import { concluded, challengeRequested } from '../protocols/application/actions';
+import * as actions from '../actions';
+import { challengeRequested, concluded } from '../protocols/application/actions';
+import * as application from '../protocols/application/reducer';
+import { responseProvided } from '../protocols/dispute/responder/actions';
+import * as selectors from '../selectors';
 
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 export function* messageListener() {

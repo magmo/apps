@@ -1,4 +1,4 @@
-import { CommitmentsReceived, BaseProcessAction } from '../../../communication';
+import { BaseProcessAction, CommitmentsReceived } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { ActionConstructor } from '../../utils';
 

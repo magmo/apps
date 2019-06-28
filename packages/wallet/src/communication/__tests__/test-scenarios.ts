@@ -1,7 +1,8 @@
 import { messageRelayRequested } from 'magmo-wallet-client';
-import { strategyProposed, strategyApproved, sendConcludeInstigated } from '..';
+import { sendConcludeInstigated, strategyApproved, strategyProposed } from '..';
 import { commitmentReceived } from '../../redux/actions';
 import {
+  channelId as appChannelId,
   signedCommitment0,
   signedCommitment1,
   signedCommitment2,
@@ -9,7 +10,6 @@ import {
   signedCommitment51,
   signedCommitment52,
   signedLedgerCommitments,
-  channelId as appChannelId,
 } from './commitments';
 const {
   signedLedgerCommitment0,

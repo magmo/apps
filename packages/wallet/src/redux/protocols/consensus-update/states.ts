@@ -1,5 +1,5 @@
-import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { StateConstructor } from '../../utils';
 
 export type ConsensusUpdateState = WaitForUpdate | Failure | Success;
 export type ConsensusUpdateStateType = ConsensusUpdateState['type'];

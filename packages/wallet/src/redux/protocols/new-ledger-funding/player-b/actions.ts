@@ -1,5 +1,5 @@
-import { DirectFundingAction } from '../../direct-funding';
 import { CommitmentReceived } from '../../../actions';
+import { DirectFundingAction } from '../../direct-funding';
 // -------
 // Actions
 // -------

@@ -1,6 +1,6 @@
-import { Channel, CommitmentType, Commitment } from 'fmg-core';
-import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
+import { Channel, Commitment, CommitmentType } from 'fmg-core';
+import { channelID } from 'fmg-core/lib/channel';
 
 import { signCommitment2 } from '../../domain';
 import { ledgerCommitment } from '../../domain/commitments/__tests__';

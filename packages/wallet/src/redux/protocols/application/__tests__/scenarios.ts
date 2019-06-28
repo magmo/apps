@@ -1,5 +1,5 @@
-import * as states from '../states';
 import * as channelScenarios from '../../../__tests__/test-scenarios';
+import * as states from '../states';
 
 import * as actions from '../actions';
 
@@ -8,14 +8,14 @@ import * as actions from '../actions';
 // -----------------
 const { channelId, asAddress: address, asPrivateKey: privateKey } = channelScenarios;
 import { ChannelState } from '../../../channel-store';
-import { setChannel, EMPTY_SHARED_DATA } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import { APPLICATION_PROCESS_ID } from '../reducer';
+import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
 import {
+  challengerPreSuccessClosedState,
   challengerPreSuccessOpenState,
   terminatingAction,
-  challengerPreSuccessClosedState,
 } from '../../dispute/challenger';
+import { APPLICATION_PROCESS_ID } from '../reducer';
 
 const {
   signedCommitment19,

@@ -1,5 +1,5 @@
+import { put, take } from 'redux-saga/effects';
 import { MultipleWalletActions } from '../actions';
-import { take, put } from 'redux-saga/effects';
 
 export function* multipleActionDispatcher() {
   while (true) {

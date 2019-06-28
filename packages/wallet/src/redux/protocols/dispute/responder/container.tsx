@@ -1,17 +1,17 @@
-import * as states from './states';
-import * as actions from './actions';
 import { PureComponent } from 'react';
 import React from 'react';
 import { unreachable } from '../../../../utils/reducer-utils';
 import Acknowledge from '../../shared-components/acknowledge';
-import WaitForApproval from './components/wait-for-approval';
 import { TransactionSubmission } from '../../transaction-submission/container';
+import * as actions from './actions';
+import WaitForApproval from './components/wait-for-approval';
+import * as states from './states';
 
 import { connect } from 'react-redux';
-import { ActionDispatcher } from '../../../utils';
-import DefundOrNot from '../challenger/components/defund-or-not';
-import { defundRequested } from '../../actions';
 import { multipleWalletActions } from '../../../../redux/actions';
+import { ActionDispatcher } from '../../../utils';
+import { defundRequested } from '../../actions';
+import DefundOrNot from '../challenger/components/defund-or-not';
 
 interface Props {
   state: states.NonTerminalResponderState;

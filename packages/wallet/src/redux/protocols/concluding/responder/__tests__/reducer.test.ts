@@ -1,15 +1,15 @@
-import * as scenarios from './scenarios';
-import { responderConcludingReducer, initialize, ReturnVal } from '../reducer';
-import { ResponderConcludingStateType } from '../states';
+import { CONCLUDE_FAILURE, HIDE_WALLET, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
 import {
-  expectThisCommitmentSent,
-  itSendsThisMessage,
-  itSendsThisDisplayEventType,
   describeScenarioStep,
+  expectThisCommitmentSent,
   expectThisMessage,
+  itSendsThisDisplayEventType,
+  itSendsThisMessage,
 } from '../../../../__tests__/helpers';
 import { FailureReason } from '../../states';
-import { HIDE_WALLET, CONCLUDE_FAILURE, OPPONENT_CONCLUDED } from 'magmo-wallet-client';
+import { initialize, responderConcludingReducer, ReturnVal } from '../reducer';
+import { ResponderConcludingStateType } from '../states';
+import * as scenarios from './scenarios';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;

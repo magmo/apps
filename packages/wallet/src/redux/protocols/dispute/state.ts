@@ -1,18 +1,18 @@
-import {
-  ResponderState,
-  TerminalResponderState,
-  isTerminal as isResponderTerminal,
-  isResponderState,
-  NonTerminalResponderState,
-} from './responder/states';
+import { ProtocolState } from '..';
 import {
   ChallengerState,
-  TerminalChallengerState,
-  isTerminal as isChallengerTerminal,
   isChallengerState,
+  isTerminal as isChallengerTerminal,
   NonTerminalChallengerState,
+  TerminalChallengerState,
 } from './challenger/states';
-import { ProtocolState } from '..';
+import {
+  isResponderState,
+  isTerminal as isResponderTerminal,
+  NonTerminalResponderState,
+  ResponderState,
+  TerminalResponderState,
+} from './responder/states';
 
 export type DisputeState = ResponderState | ChallengerState;
 

@@ -1,15 +1,15 @@
-import { ResponderNonTerminalState } from './responder/states';
-import { InstigatorNonTerminalState, isConcludingInstigatorState } from './instigator/states';
-import { SharedData } from '../../state';
-import { ProtocolAction } from '../../actions';
-import { ConcludingState } from './states';
-import {
-  instigatorConcludingReducer,
-  initialize as initializeInstigator,
-} from './instigator/reducer';
-import { responderConcludingReducer, initialize as initializeResponder } from './responder/reducer';
 import { ProtocolStateWithSharedData } from '..';
 import { SignedCommitment } from '../../../domain';
+import { ProtocolAction } from '../../actions';
+import { SharedData } from '../../state';
+import {
+  initialize as initializeInstigator,
+  instigatorConcludingReducer,
+} from './instigator/reducer';
+import { InstigatorNonTerminalState, isConcludingInstigatorState } from './instigator/states';
+import { initialize as initializeResponder, responderConcludingReducer } from './responder/reducer';
+import { ResponderNonTerminalState } from './responder/states';
+import { ConcludingState } from './states';
 
 export function concludingReducer(
   protocolState: ResponderNonTerminalState | InstigatorNonTerminalState,

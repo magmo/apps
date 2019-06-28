@@ -1,6 +1,6 @@
-import { WalletAction, CommitmentReceived, isCommonAction } from '../../../actions';
-import { ActionConstructor } from '../../../utils';
 import { KeepLedgerChannelApproved } from '../../../../communication';
+import { CommitmentReceived, isCommonAction, WalletAction } from '../../../actions';
+import { ActionConstructor } from '../../../utils';
 
 // -------
 // Actions

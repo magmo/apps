@@ -1,8 +1,8 @@
-import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
-import { Properties, StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 import { TwoPartyPlayerIndex } from '../../types';
+import { Properties, StateConstructor } from '../../utils';
 import { AdvanceChannelState } from '../advance-channel';
+import { NonTerminalTransactionSubmissionState } from '../transaction-submission/states';
 
 // -------
 // States

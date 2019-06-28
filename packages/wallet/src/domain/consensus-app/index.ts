@@ -1,17 +1,17 @@
-import {
-  ConsensusBaseCommitment,
-  bytesFromAppAttributes,
-  appAttributesFromBytes,
-  finalVote,
-  propose,
-  isProposal,
-  isConsensusReached,
-  vote,
-  ConsensusCommitment,
-  AppAttributes,
-  AppCommitment,
-} from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { Commitment } from 'fmg-core';
+import {
+  AppAttributes,
+  appAttributesFromBytes,
+  AppCommitment,
+  bytesFromAppAttributes,
+  ConsensusBaseCommitment,
+  ConsensusCommitment,
+  finalVote,
+  isConsensusReached,
+  isProposal,
+  propose,
+  vote,
+} from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CommitmentType } from '../commitments';
 /////////////
 // Helpers //

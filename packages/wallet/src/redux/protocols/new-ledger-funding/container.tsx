@@ -1,9 +1,9 @@
-import * as states from './states';
 import { PureComponent } from 'react';
 import React from 'react';
+import { connect } from 'react-redux';
 import { NewLedgerFunding as PlayerANewLedgerFunding } from './player-a';
 import { NewLedgerFunding as PlayerBNewLedgerFunding } from './player-b';
-import { connect } from 'react-redux';
+import * as states from './states';
 
 interface Props {
   state: states.PlayerAState | states.PlayerBState;

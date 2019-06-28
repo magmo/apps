@@ -1,14 +1,14 @@
-import * as actions from './actions';
-import { SharedData } from '../../state';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
-import * as states from './states';
-import { initialize as initializeA, fundingReducer as playerAReducer } from './player-a/reducer';
-import { initialize as initializeB, fundingReducer as playerBReducer } from './player-b/reducer';
-import { TwoPartyPlayerIndex } from '../../types';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '..';
 import { unreachable } from '../../../utils/reducer-utils';
+import { SharedData } from '../../state';
+import { TwoPartyPlayerIndex } from '../../types';
 import { NewLedgerFundingAction } from '../new-ledger-funding/actions';
-import * as playerAStates from './player-a/states';
 import { getOpponentAddress, getOurAddress } from '../reducer-helpers';
+import * as actions from './actions';
+import { fundingReducer as playerAReducer, initialize as initializeA } from './player-a/reducer';
+import * as playerAStates from './player-a/states';
+import { fundingReducer as playerBReducer, initialize as initializeB } from './player-b/reducer';
+import * as states from './states';
 
 export function initialize(
   sharedData: SharedData,

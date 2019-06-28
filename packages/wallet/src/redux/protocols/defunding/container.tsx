@@ -1,11 +1,11 @@
-import * as states from './states';
 import { PureComponent } from 'react';
-import { Withdrawal } from '../withdrawing/container';
 import React from 'react';
-import Failure from '../shared-components/failure';
-import Success from '../shared-components/success';
 import { connect } from 'react-redux';
 import { IndirectDefunding } from '../indirect-defunding/container';
+import Failure from '../shared-components/failure';
+import Success from '../shared-components/success';
+import { Withdrawal } from '../withdrawing/container';
+import * as states from './states';
 
 interface Props {
   state: states.DefundingState;

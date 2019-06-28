@@ -1,9 +1,9 @@
-import { OpenChannelState, ChannelState, isFullyOpen, getLastCommitment } from './channel-store';
-import * as walletStates from './state';
-import { SharedData, FundingState } from './state';
 import { WalletProtocol } from '../communication';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../constants';
 import { Commitment } from '../domain';
+import { ChannelState, getLastCommitment, isFullyOpen, OpenChannelState } from './channel-store';
+import * as walletStates from './state';
+import { FundingState, SharedData } from './state';
 
 export const getOpenedChannelState = (state: SharedData, channelId: string): OpenChannelState => {
   const channelStatus = getChannelState(state, channelId);

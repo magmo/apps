@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 
-import NitroAdjudicatorArtifact from '../../build/contracts/NitroAdjudicator.json';
-import ConsensusAppArtifact from '../../build/contracts/ConsensusApp.json';
 import { asEthersObject, Commitment } from 'fmg-core';
+import ConsensusAppArtifact from '../../build/contracts/ConsensusApp.json';
+import NitroAdjudicatorArtifact from '../../build/contracts/NitroAdjudicator.json';
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);

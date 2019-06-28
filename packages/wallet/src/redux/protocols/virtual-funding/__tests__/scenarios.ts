@@ -1,11 +1,11 @@
 import * as states from '../states';
 
-import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
-import * as scenarios from '../../../__tests__/test-scenarios';
 import { CommitmentType } from '../../../../domain';
-import { preSuccess, success } from '../../advance-channel/__tests__';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
+import * as scenarios from '../../../__tests__/test-scenarios';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
+import { preSuccess, success } from '../../advance-channel/__tests__';
 
 // ---------
 // Test data

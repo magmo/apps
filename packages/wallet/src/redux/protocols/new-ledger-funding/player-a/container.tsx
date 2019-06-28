@@ -1,9 +1,9 @@
 import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { PlayerAState } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { FundingStep } from './components/funding-step';
+import { PlayerAState } from './states';
 
 interface Props {
   state: PlayerAState;

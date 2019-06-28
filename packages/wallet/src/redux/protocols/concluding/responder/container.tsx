@@ -1,16 +1,16 @@
 import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { ResponderNonTerminalState as NonTerminalConcludingState } from './states';
+import { multipleWalletActions } from '../../../../redux/actions';
 import { unreachable } from '../../../../utils/reducer-utils';
+import { defundRequested } from '../../actions';
+import { ConsensusUpdate } from '../../consensus-update/container';
+import Acknowledge from '../../shared-components/acknowledge';
+import * as actions from './actions';
 import ApproveConcluding from './components/approve-concluding';
 import ApproveDefunding from './components/approve-defunding';
-import * as actions from './actions';
-import Acknowledge from '../../shared-components/acknowledge';
-import { ConsensusUpdate } from '../../consensus-update/container';
 import WaitForOpponentDecision from './components/wait-for-opponent-decision';
-import { defundRequested } from '../../actions';
-import { multipleWalletActions } from '../../../../redux/actions';
+import { ResponderNonTerminalState as NonTerminalConcludingState } from './states';
 
 interface Props {
   state: NonTerminalConcludingState;

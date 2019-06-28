@@ -1,9 +1,9 @@
 import { FundingState as PlayerAFundingState } from './player-a/states';
 import { FundingState as PlayerBFundingState } from './player-b/states';
 
+import { ProtocolState } from '..';
 import * as playerA from './player-a/states';
 import * as playerB from './player-b/states';
-import { ProtocolState } from '..';
 
 // -------
 // Unions and Guards

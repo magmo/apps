@@ -1,9 +1,9 @@
 import { put, take } from 'redux-saga/effects';
 
 import * as actions from '../../actions';
-import { multipleActionDispatcher } from '../multiple-action-dispatcher';
 import { defundRequested } from '../../protocols/actions';
 import { exitChallenge } from '../../protocols/dispute/challenger/actions';
+import { multipleActionDispatcher } from '../multiple-action-dispatcher';
 
 describe('multiple action dispatcher', () => {
   const saga = multipleActionDispatcher();

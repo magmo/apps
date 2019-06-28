@@ -1,19 +1,19 @@
+import { bigNumberify } from 'ethers/utils/bignumber';
+import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
 import {
   appCommitment,
-  ledgerCommitment,
   asAddress,
-  bsAddress,
   asPrivateKey,
-  ledgerId,
+  bsAddress,
   channelId,
+  ledgerCommitment,
+  ledgerId,
 } from '../../../../domain/commitments/__tests__';
-import { bigNumberify } from 'ethers/utils/bignumber';
-import { waitForLedgerUpdate, waitForConclude } from '../states';
-import { setChannels, EMPTY_SHARED_DATA, SharedData } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
 import * as globalActions from '../../../actions';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels, SharedData } from '../../../state';
 import { defundRequested } from '../../actions';
+import { waitForConclude, waitForLedgerUpdate } from '../states';
 
 const processId = 'processId';
 

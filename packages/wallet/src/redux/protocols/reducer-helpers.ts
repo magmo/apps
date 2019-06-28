@@ -1,17 +1,17 @@
-import { SIGNATURE_SUCCESS, VALIDATION_SUCCESS, fundingSuccess } from 'magmo-wallet-client';
+import { CommitmentType } from 'fmg-core/lib/commitment';
+import { fundingSuccess, SIGNATURE_SUCCESS, VALIDATION_SUCCESS } from 'magmo-wallet-client';
+import * as magmoWalletClient from 'magmo-wallet-client';
+import { sendCommitmentsReceived } from '../../communication';
+import { Commitment } from '../../domain';
 import * as actions from '../actions';
+import { Commitments, getLastCommitment, nextParticipant } from '../channel-store';
+import { ourTurn as ourTurnOnChannel } from '../channel-store';
 import { channelStoreReducer } from '../channel-store/reducer';
 import { accumulateSideEffects } from '../outbox';
 import { SideEffects } from '../outbox/state';
-import { SharedData, queueMessage, getExistingChannel, checkAndStore } from '../state';
 import * as selectors from '../selectors';
+import { checkAndStore, getExistingChannel, queueMessage, SharedData } from '../state';
 import { TwoPartyPlayerIndex } from '../types';
-import { CommitmentType } from 'fmg-core/lib/commitment';
-import * as magmoWalletClient from 'magmo-wallet-client';
-import { getLastCommitment, nextParticipant, Commitments } from '../channel-store';
-import { Commitment } from '../../domain';
-import { sendCommitmentsReceived } from '../../communication';
-import { ourTurn as ourTurnOnChannel } from '../channel-store';
 export const updateChannelState = (
   sharedData: SharedData,
   channelAction: actions.channel.ChannelAction,

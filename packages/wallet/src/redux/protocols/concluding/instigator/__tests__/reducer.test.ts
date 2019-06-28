@@ -1,17 +1,17 @@
-import * as scenarios from './scenarios';
-import { instigatorConcludingReducer, initialize, ReturnVal } from '../reducer';
-import { InstigatorConcludingStateType } from '../states';
-import { FailureReason } from '../../states';
-import { SharedData } from '../../../../state';
+import { CONCLUDE_FAILURE, CONCLUDE_SUCCESS, HIDE_WALLET } from 'magmo-wallet-client';
 import { Commitment } from '../../../../../domain';
 import {
-  expectThisCommitmentSent,
-  itSendsThisMessage,
-  itSendsThisDisplayEventType,
   describeScenarioStep,
+  expectThisCommitmentSent,
   expectThisMessage,
+  itSendsThisDisplayEventType,
+  itSendsThisMessage,
 } from '../../../../__tests__/helpers';
-import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
+import { SharedData } from '../../../../state';
+import { FailureReason } from '../../states';
+import { initialize, instigatorConcludingReducer, ReturnVal } from '../reducer';
+import { InstigatorConcludingStateType } from '../states';
+import * as scenarios from './scenarios';
 
 describe('[ Happy path ]', () => {
   const scenario = scenarios.happyPath;

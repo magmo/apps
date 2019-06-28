@@ -1,10 +1,10 @@
-import { call, put } from 'redux-saga/effects';
-import * as actions from '../actions';
 import { ethers } from 'ethers';
-import { getProvider } from '../../utils/contract-utils';
 import { TransactionResponse } from 'ethers/providers';
-import { QueuedTransaction } from '../outbox';
+import { call, put } from 'redux-saga/effects';
 import { ADJUDICATOR_ADDRESS } from '../../constants';
+import { getProvider } from '../../utils/contract-utils';
+import * as actions from '../actions';
+import { QueuedTransaction } from '../outbox';
 
 export function* transactionSender(transaction: QueuedTransaction) {
   const provider: ethers.providers.JsonRpcProvider = yield call(getProvider);

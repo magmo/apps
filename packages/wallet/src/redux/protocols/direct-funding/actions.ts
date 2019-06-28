@@ -1,6 +1,6 @@
 import * as actions from '../../actions';
-import { ActionConstructor } from '../../utils';
 import { TwoPartyPlayerIndex } from '../../types';
+import { ActionConstructor } from '../../utils';
 import { DIRECT_FUNDING_PROTOCOL_LOCATOR } from './reducer';
 
 // -------

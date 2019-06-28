@@ -1,12 +1,12 @@
-import { Channel, CommitmentType, Commitment } from 'fmg-core';
-import { channelID } from 'fmg-core/lib/channel';
 import { bigNumberify } from 'ethers/utils';
-import * as states from '../state';
+import { Channel, Commitment, CommitmentType } from 'fmg-core';
+import { channelID } from 'fmg-core/lib/channel';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { addHex } from '../../utils/hex-utils';
+import { finalVote, initialConsensus, propose } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { signCommitment, signCommitment2 } from '../../domain';
+import { addHex } from '../../utils/hex-utils';
 import { ChannelState } from '../channel-store';
-import { initialConsensus, propose, finalVote } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import * as states from '../state';
 
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const ledgerLibraryAddress = '0x' + '2'.repeat(40);

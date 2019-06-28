@@ -5,8 +5,8 @@ export type InstigatorConcludingState =
   | TerminalState;
 export type InstigatorConcludingStateType = InstigatorConcludingState['type'];
 import { ProtocolState } from '../..';
-import { FailureReason, TerminalState } from '../states';
 import { ConsensusUpdateState } from '../../consensus-update/states';
+import { FailureReason, TerminalState } from '../states';
 
 // -------
 // States

@@ -1,6 +1,6 @@
+import { css, StyleSheet } from 'aphrodite';
 import React, { Fragment } from 'react';
 import { Button } from 'reactstrap';
-import { StyleSheet, css } from 'aphrodite';
 
 export interface Props {
   yesMessage: string;

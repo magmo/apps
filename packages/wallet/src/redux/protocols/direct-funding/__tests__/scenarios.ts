@@ -2,10 +2,10 @@ import { addHex } from '../../../../utils/hex-utils';
 import * as globalActions from '../../../actions';
 
 import * as scenarios from '../../../__tests__/test-scenarios';
-import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
-import * as states from '../states';
+import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__';
 import { directFundingRequested } from '../actions';
+import * as states from '../states';
 
 const { jointLedgerId: channelId, twoThree } = scenarios;
 

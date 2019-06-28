@@ -1,8 +1,17 @@
-import { waitForWithdrawal, waitForLedgerDefunding } from '../redux/protocols/defunding/states';
+import { waitForLedgerDefunding, waitForWithdrawal } from '../redux/protocols/defunding/states';
+import {
+  isTerminal as DFIsTerminal,
+  NonTerminalDirectFundingState,
+} from '../redux/protocols/direct-funding/states';
 import {
   isTerminal as iddfIsTerminal,
   NonTerminalIndirectDefundingState,
 } from '../redux/protocols/indirect-defunding/states';
+import {
+  aWaitForDirectFunding,
+  isTerminal as idFIsTerminal,
+  NonTerminalNewLedgerFundingState,
+} from '../redux/protocols/new-ledger-funding/states';
 import {
   isTerminal as tsIsTerminal,
   NonTerminalTransactionSubmissionState,
@@ -11,25 +20,16 @@ import {
   isTerminal as wIsTerminal,
   NonTerminalWithdrawalState,
 } from '../redux/protocols/withdrawing/states';
-import {
-  isTerminal as DFIsTerminal,
-  NonTerminalDirectFundingState,
-} from '../redux/protocols/direct-funding/states';
-import {
-  isTerminal as idFIsTerminal,
-  aWaitForDirectFunding,
-  NonTerminalNewLedgerFundingState,
-} from '../redux/protocols/new-ledger-funding/states';
 
 import { isIndirectDefundingState } from '../redux/protocols/indirect-defunding/states';
+import { isNewLedgerFundingState } from '../redux/protocols/new-ledger-funding/states';
 import { isTransactionSubmissionState } from '../redux/protocols/transaction-submission/states';
 import { isWithdrawalState } from '../redux/protocols/withdrawing/states';
-import { isNewLedgerFundingState } from '../redux/protocols/new-ledger-funding/states';
 
+import { ProtocolState } from '../redux/protocols';
 import { isDirectFundingState } from '../redux/protocols/direct-funding/states';
 import { waitForTransaction } from '../redux/protocols/dispute/challenger/states';
 import { waitForFunding } from '../redux/protocols/funding/player-b/states';
-import { ProtocolState } from '../redux/protocols';
 
 // -------
 // Nester

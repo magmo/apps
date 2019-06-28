@@ -1,7 +1,7 @@
+import { CommonAction, isCommonAction, WalletAction } from '../../actions';
+import { isDirectFundingAction } from '../direct-funding/actions';
 import * as playerA from './player-a/actions';
 import * as playerB from './player-b/actions';
-import { CommonAction, WalletAction, isCommonAction } from '../../actions';
-import { isDirectFundingAction } from '../direct-funding/actions';
 
 // -------
 // Actions

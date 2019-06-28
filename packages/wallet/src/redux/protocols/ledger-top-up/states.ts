@@ -1,5 +1,5 @@
-import { DirectFundingState } from '../direct-funding/states';
 import { StateConstructor } from '../../utils';
+import { DirectFundingState } from '../direct-funding/states';
 
 export interface WaitForDirectFunding {
   type: 'LedgerTopUp.WaitForDirectFunding';

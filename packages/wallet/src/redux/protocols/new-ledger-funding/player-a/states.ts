@@ -1,6 +1,6 @@
-import { DirectFundingState } from '../../direct-funding/states';
-import { StateConstructor } from '../../../utils';
 import { ProtocolState } from '../..';
+import { StateConstructor } from '../../../utils';
+import { DirectFundingState } from '../../direct-funding/states';
 
 // -------
 // States

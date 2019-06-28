@@ -1,17 +1,17 @@
+import { TransactionRequest } from 'ethers/providers';
+import { unreachable } from '../../../utils/reducer-utils';
+import { queueTransaction, SharedData } from '../../state';
 import { TransactionAction } from './actions';
 import {
-  TransactionSubmissionState as TSState,
-  NonTerminalTransactionSubmissionState as NonTerminalTSState,
-  waitForSubmission,
   approveRetry,
-  waitForConfirmation,
-  success,
-  waitForSend,
   failure,
+  NonTerminalTransactionSubmissionState as NonTerminalTSState,
+  success,
+  TransactionSubmissionState as TSState,
+  waitForConfirmation,
+  waitForSend,
+  waitForSubmission,
 } from './states';
-import { unreachable } from '../../../utils/reducer-utils';
-import { TransactionRequest } from 'ethers/providers';
-import { queueTransaction, SharedData } from '../../state';
 
 type Storage = SharedData;
 

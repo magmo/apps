@@ -1,15 +1,15 @@
-import * as scenarios from './scenarios';
-import * as states from '../states';
-import { fundingReducer as reducer } from '../reducer';
-import { ProtocolStateWithSharedData } from '../../..';
-import {
-  itSendsThisMessage,
-  itSendsThisDisplayEventType,
-  describeScenarioStep,
-} from '../../../../__tests__/helpers';
-import { sendStrategyProposed } from '../../../../../communication';
 import { FUNDING_SUCCESS, HIDE_WALLET } from 'magmo-wallet-client';
+import { ProtocolStateWithSharedData } from '../../..';
+import { sendStrategyProposed } from '../../../../../communication';
+import {
+  describeScenarioStep,
+  itSendsThisDisplayEventType,
+  itSendsThisMessage,
+} from '../../../../__tests__/helpers';
 import { FundingStateType } from '../../states';
+import { fundingReducer as reducer } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 describe('new ledger channel happy path', () => {
   const scenario = scenarios.newChannelHappyPath;

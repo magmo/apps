@@ -1,6 +1,6 @@
-import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 import { CommitmentType } from '../../../domain';
+import { StateConstructor } from '../../utils';
 
 // -------
 // States

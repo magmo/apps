@@ -1,23 +1,23 @@
-import * as states from './states';
-import {
-  SharedData,
-  registerChannelToMonitor,
-  signAndInitialize,
-  checkAndInitialize,
-  signAndStore,
-  getExistingChannel,
-} from '../../state';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
-import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../domain';
-import { getChannel, getLastCommitment, ChannelState } from '../../channel-store';
-import { WalletAction } from '../../actions';
-import * as selectors from '../../selectors';
-import { CommitmentsReceived } from '../../../communication';
 import { Channel } from 'fmg-core';
-import { isAdvanceChannelAction } from './actions';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '..';
+import { CommitmentsReceived } from '../../../communication';
+import { Commitment, CommitmentType, getChannelId, nextSetupCommitment } from '../../../domain';
 import { unreachable } from '../../../utils/reducer-utils';
+import { WalletAction } from '../../actions';
+import { ChannelState, getChannel, getLastCommitment } from '../../channel-store';
+import * as selectors from '../../selectors';
+import {
+  checkAndInitialize,
+  getExistingChannel,
+  registerChannelToMonitor,
+  SharedData,
+  signAndInitialize,
+  signAndStore,
+} from '../../state';
 import { Properties } from '../../utils';
 import * as helpers from '../reducer-helpers';
+import { isAdvanceChannelAction } from './actions';
+import * as states from './states';
 
 export const ADVANCE_CHANNEL_PROTOCOL_LOCATOR = 'AdvanceChannel';
 

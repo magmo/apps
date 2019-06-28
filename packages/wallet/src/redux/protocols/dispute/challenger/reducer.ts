@@ -1,38 +1,38 @@
-import {
-  ChallengerState as CState,
-  NonTerminalChallengerState as NonTerminalCState,
-  approveChallenge,
-  waitForResponseOrTimeout,
-  acknowledgeFailure as acknowledgeFailureState,
-  FailureReason,
-  waitForTransaction,
-  acknowledgeResponse,
-  acknowledgeTimeout,
-  successOpen,
-  failure,
-  successClosed,
-} from './states';
+import { Commitment, SignedCommitment } from '../../../../domain';
 import { unreachable } from '../../../../utils/reducer-utils';
-import { SharedData, registerChannelToMonitor, checkAndStore } from '../../../state';
-import * as actions from './actions';
-import { TransactionAction } from '../../transaction-submission/actions';
-import { isTransactionAction, ProtocolAction } from '../../../actions';
-import {
-  transactionReducer,
-  initialize as initializeTransaction,
-} from '../../transaction-submission';
-import { isSuccess, isFailure } from '../../transaction-submission/states';
-import { getChannel } from '../../../state';
 import { createForceMoveTransaction } from '../../../../utils/transaction-generator';
+import { isTransactionAction, ProtocolAction } from '../../../actions';
 import { isFullyOpen, ourTurn } from '../../../channel-store';
+import { checkAndStore, registerChannelToMonitor, SharedData } from '../../../state';
+import { getChannel } from '../../../state';
 import {
-  showWallet,
   hideWallet,
   sendChallengeCommitmentReceived,
   sendChallengeComplete,
   sendConcludeSuccess,
+  showWallet,
 } from '../../reducer-helpers';
-import { Commitment, SignedCommitment } from '../../../../domain';
+import {
+  initialize as initializeTransaction,
+  transactionReducer,
+} from '../../transaction-submission';
+import { TransactionAction } from '../../transaction-submission/actions';
+import { isFailure, isSuccess } from '../../transaction-submission/states';
+import * as actions from './actions';
+import {
+  acknowledgeFailure as acknowledgeFailureState,
+  acknowledgeResponse,
+  acknowledgeTimeout,
+  approveChallenge,
+  ChallengerState as CState,
+  failure,
+  FailureReason,
+  NonTerminalChallengerState as NonTerminalCState,
+  successClosed,
+  successOpen,
+  waitForResponseOrTimeout,
+  waitForTransaction,
+} from './states';
 
 const CHALLENGE_TIMEOUT = 5 * 60000;
 

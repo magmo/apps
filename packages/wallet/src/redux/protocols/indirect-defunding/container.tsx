@@ -1,12 +1,12 @@
-import * as states from './states';
 import { PureComponent } from 'react';
 import React from 'react';
+import { connect } from 'react-redux';
+import { unreachable } from '../../../utils/reducer-utils';
 import Failure from '../shared-components/failure';
 import Success from '../shared-components/success';
-import { connect } from 'react-redux';
-import WaitForLedgerUpdate from './components/wait-for-ledger-update';
-import { unreachable } from '../../../utils/reducer-utils';
 import WaitForLedgerConclude from './components/wait-for-ledger-conclude';
+import WaitForLedgerUpdate from './components/wait-for-ledger-update';
+import * as states from './states';
 
 interface Props {
   state: states.IndirectDefundingState;

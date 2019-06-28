@@ -1,12 +1,12 @@
-import * as states from '../states';
-import * as actions from '../actions';
 import * as testScenarios from '../../../../__tests__/test-scenarios';
-import * as transactionScenarios from '../../../transaction-submission/__tests__';
 import { EMPTY_SHARED_DATA, SharedData } from '../../../../state';
+import * as transactionScenarios from '../../../transaction-submission/__tests__';
+import * as actions from '../actions';
+import * as states from '../states';
 
+import { challengeExpiredEvent } from '../../../../actions';
 import { ChannelState, ChannelStore } from '../../../../channel-store';
 import * as transactionActions from '../../../transaction-submission/actions';
-import { challengeExpiredEvent } from '../../../../actions';
 
 // ---------
 // Test data

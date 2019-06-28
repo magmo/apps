@@ -1,13 +1,13 @@
-import * as states from '../states';
 import { ThreePartyPlayerIndex } from '../../../types';
+import * as states from '../states';
 
-import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import * as scenarios from '../../../__tests__/test-scenarios';
+import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '..';
 import { commitmentsReceived } from '../../../../communication';
 import { CommitmentType } from '../../../../domain';
+import * as scenarios from '../../../__tests__/test-scenarios';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { clearedToSend } from '../actions';
-import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '..';
 
 // ---------
 // Test data

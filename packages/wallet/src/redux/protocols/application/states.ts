@@ -1,6 +1,6 @@
+import { ProtocolState } from '..';
 import { StateConstructor } from '../../utils';
 import { DisputeState } from '../dispute/state';
-import { ProtocolState } from '..';
 
 // -------
 // States

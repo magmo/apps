@@ -1,13 +1,13 @@
-import * as states from '../states';
-import { initialize, reducer } from '../reducer';
-import * as scenarios from './scenarios';
 import { CommitmentType } from '../../../../domain';
 import {
   expectTheseCommitmentsSent,
-  itStoresThisCommitment,
   itRegistersThisChannel,
   itSendsNoMessage,
+  itStoresThisCommitment,
 } from '../../../__tests__/helpers';
+import { initialize, reducer } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 const itTransitionsTo = (
   result: states.AdvanceChannelState,

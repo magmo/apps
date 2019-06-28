@@ -1,7 +1,7 @@
-import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../../transaction-submission/states';
-import { Commitment } from '../../../../domain';
 import { ProtocolState } from '../..';
+import { Commitment } from '../../../../domain';
 import { StateConstructor } from '../../../utils';
+import { NonTerminalTransactionSubmissionState as NonTerminalTSState } from '../../transaction-submission/states';
 
 // -------
 // States

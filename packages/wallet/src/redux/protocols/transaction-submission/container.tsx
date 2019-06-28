@@ -1,14 +1,14 @@
 import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { NonTerminalTransactionSubmissionState } from './states';
+import { NETWORK_ID } from '../../../constants';
 import { unreachable } from '../../../utils/reducer-utils';
+import { ActionConstructor } from '../../utils';
+import * as actions from './actions';
+import ApproveRetry from './components/approve-retry';
 import WaitForConfirmation from './components/wait-for-confirmation';
 import WaitForSubmission from './components/wait-for-submission';
-import { NETWORK_ID } from '../../../constants';
-import ApproveRetry from './components/approve-retry';
-import * as actions from './actions';
-import { ActionConstructor } from '../../utils';
+import { NonTerminalTransactionSubmissionState } from './states';
 
 interface Props {
   state: NonTerminalTransactionSubmissionState;

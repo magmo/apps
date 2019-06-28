@@ -1,22 +1,22 @@
 import { bigNumberify } from 'ethers/utils';
-import * as states from '../states';
+import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
+import {
+  asAddress,
+  asPrivateKey,
+  bsAddress,
+  channelId,
+  ledgerCommitment,
+  ledgerId,
+} from '../../../../domain/commitments/__tests__';
 import * as globalActions from '../../../actions';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import {
   noPostFundSetupsPreSuccessA,
   noPostFundSetupsPreSuccessB,
 } from '../../direct-funding/__tests__';
-import {
-  ledgerCommitment,
-  asPrivateKey,
-  channelId,
-  ledgerId,
-  asAddress,
-  bsAddress,
-} from '../../../../domain/commitments/__tests__';
-import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import { bsPrivateKey } from '../../../../communication/__tests__/commitments';
 import { LEDGER_TOP_UP_PROTOCOL_LOCATOR } from '../reducer';
+import * as states from '../states';
 // ---------
 // Test data
 // ---------

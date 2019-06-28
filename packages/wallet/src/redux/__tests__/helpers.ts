@@ -1,10 +1,10 @@
-import { ChannelState, ChannelStore } from '../channel-store';
-import { StateWithSideEffects } from '../utils';
-import { Commitment, SignedCommitment, getChannelId } from '../../domain';
-import { QueuedTransaction, OutboxState, MessageOutbox } from '../outbox/state';
-import { SharedData } from '../state';
-import { ProtocolStateWithSharedData } from '../protocols';
 import { RelayableAction } from 'src/communication';
+import { Commitment, getChannelId, SignedCommitment } from '../../domain';
+import { ChannelState, ChannelStore } from '../channel-store';
+import { MessageOutbox, OutboxState, QueuedTransaction } from '../outbox/state';
+import { ProtocolStateWithSharedData } from '../protocols';
+import { SharedData } from '../state';
+import { StateWithSideEffects } from '../utils';
 
 type SideEffectState =
   | StateWithSideEffects<any>

@@ -1,10 +1,10 @@
-import * as scenarios from './scenarios';
-import { initialize, existingLedgerFundingReducer } from '../reducer';
-import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { getLastMessage } from '../../../state';
 import { SignedCommitment } from '../../../../domain';
 import { describeScenarioStep } from '../../../__tests__/helpers';
+import { getLastMessage } from '../../../state';
+import { existingLedgerFundingReducer, initialize } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAFullyFundedHappyPath;

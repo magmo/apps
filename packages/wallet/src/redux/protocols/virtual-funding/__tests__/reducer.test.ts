@@ -1,13 +1,13 @@
-import * as states from '../states';
-import { initialize, reducer } from '../reducer';
-import * as scenarios from './scenarios';
 import {
-  scenarioStepDescription,
   expectTheseCommitmentsSent,
   itSendsNoMessage,
+  scenarioStepDescription,
 } from '../../../__tests__/helpers';
-import { success, preSuccess } from '../../advance-channel/__tests__';
 import { oneTwoThree } from '../../../__tests__/test-scenarios';
+import { preSuccess, success } from '../../advance-channel/__tests__';
+import { initialize, reducer } from '../reducer';
+import * as states from '../states';
+import * as scenarios from './scenarios';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,

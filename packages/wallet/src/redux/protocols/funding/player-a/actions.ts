@@ -1,7 +1,7 @@
-import { BaseProcessAction } from '../../actions';
-import { TwoPartyPlayerIndex } from '../../../types';
 import { FundingStrategy } from '../../../../communication';
 import { strategyApproved, StrategyApproved } from '../../../../communication';
+import { TwoPartyPlayerIndex } from '../../../types';
+import { BaseProcessAction } from '../../actions';
 export { strategyApproved, StrategyApproved };
 import { ActionConstructor } from '../../../utils';
 

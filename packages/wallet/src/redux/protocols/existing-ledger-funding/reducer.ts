@@ -1,24 +1,24 @@
+import { bigNumberify } from 'ethers/utils';
+import { CommitmentType } from 'fmg-core';
+import { ProtocolStateWithSharedData } from '..';
+import { sendCommitmentReceived } from '../../../communication';
+import { Commitment, nextSetupCommitment } from '../../../domain';
+import { acceptConsensus, proposeNewConsensus } from '../../../domain/consensus-app';
+import { addHex } from '../../../utils/hex-utils';
+import { getLastCommitment, theirAddress } from '../../channel-store';
+import * as selectors from '../../selectors';
 import {
-  SharedData,
-  signAndStore,
-  queueMessage,
   checkAndStore,
   getExistingChannel,
+  queueMessage,
+  SharedData,
+  signAndStore,
 } from '../../state';
-import * as states from './states';
-import { ProtocolStateWithSharedData } from '..';
-import { ExistingLedgerFundingAction } from './actions';
-import * as helpers from '../reducer-helpers';
-import * as selectors from '../../selectors';
-import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-app';
-import { theirAddress, getLastCommitment } from '../../channel-store';
-import { Commitment, nextSetupCommitment } from '../../../domain';
-import { bigNumberify } from 'ethers/utils';
-import { sendCommitmentReceived } from '../../../communication';
-import { CommitmentType } from 'fmg-core';
-import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
-import { addHex } from '../../../utils/hex-utils';
+import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
+import * as helpers from '../reducer-helpers';
+import { ExistingLedgerFundingAction } from './actions';
+import * as states from './states';
 export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'ExistingLedgerFunding';
 
 export const initialize = (

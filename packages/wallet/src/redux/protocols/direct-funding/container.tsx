@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../../redux/actions';
 import { unreachable } from '../../../utils/reducer-utils';
-import { FundingStep } from './components/funding-step';
-import * as directFundingStates from './states';
 import { TransactionSubmission } from '../../protocols/transaction-submission/container';
 import { ActionDispatcher } from '../../utils';
+import { FundingStep } from './components/funding-step';
+import * as directFundingStates from './states';
 
 interface Props {
   state: directFundingStates.DirectFundingState;

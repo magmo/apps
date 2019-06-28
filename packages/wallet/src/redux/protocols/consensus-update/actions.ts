@@ -1,6 +1,6 @@
+import { CommitmentsReceived } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from './reducer';
-import { CommitmentsReceived } from '../../../communication';
 
 export type ConsensusUpdateAction = CommitmentsReceived;
 

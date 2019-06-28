@@ -1,35 +1,35 @@
-import * as states from './states';
+import { Channel } from 'fmg-core/lib/channel';
+import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { ProtocolStateWithSharedData } from '../..';
+import { sendCommitmentReceived } from '../../../../communication';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
+import { Commitment, CommitmentType, getChannelId, nextSetupCommitment } from '../../../../domain';
+import { proposeNewConsensus } from '../../../../domain/consensus-app';
+import { addHex } from '../../../../utils/hex-utils';
+import { unreachable } from '../../../../utils/reducer-utils';
+import { isTransactionAction } from '../../../actions';
+import { getChannel, getLastCommitment, theirAddress } from '../../../channel-store';
+import * as selectors from '../../../selectors';
 import {
-  SharedData,
-  signAndInitialize,
+  checkAndStore,
   getPrivatekey,
   queueMessage,
-  checkAndStore,
-  signAndStore,
   registerChannelToMonitor,
+  SharedData,
+  signAndInitialize,
+  signAndStore,
 } from '../../../state';
-import { NewLedgerFundingState, failure, success } from '../states';
-import { ProtocolStateWithSharedData } from '../..';
-import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../../domain';
-import { Channel } from 'fmg-core/lib/channel';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { getChannel, theirAddress, getLastCommitment } from '../../../channel-store';
-import { sendCommitmentReceived } from '../../../../communication';
+import { ChannelFundingState } from '../../../state';
 import { DirectFundingAction } from '../../direct-funding';
 import { directFundingRequested } from '../../direct-funding/actions';
-import { isSuccess, isFailure, isTerminal } from '../../direct-funding/states';
 import {
   directFundingStateReducer,
   initialize as initializeDirectFunding,
 } from '../../direct-funding/reducer';
-import { addHex } from '../../../../utils/hex-utils';
-import { proposeNewConsensus } from '../../../../domain/consensus-app';
-import { unreachable } from '../../../../utils/reducer-utils';
-import { isTransactionAction } from '../../../actions';
-import { ChannelFundingState } from '../../../state';
+import { isFailure, isSuccess, isTerminal } from '../../direct-funding/states';
 import { NewLedgerFundingAction } from '../actions';
-import * as selectors from '../../../selectors';
+import { failure, NewLedgerFundingState, success } from '../states';
+import * as states from './states';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 type IDFAction = NewLedgerFundingAction;

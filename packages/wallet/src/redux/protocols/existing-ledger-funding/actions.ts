@@ -1,5 +1,5 @@
 import { CommitmentReceived, WalletAction } from '../../actions';
-import { LedgerTopUpAction, isLedgerTopUpAction } from '../ledger-top-up/actions';
+import { isLedgerTopUpAction, LedgerTopUpAction } from '../ledger-top-up/actions';
 import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from './reducer';
 
 export type ExistingLedgerFundingAction = CommitmentReceived | LedgerTopUpAction;

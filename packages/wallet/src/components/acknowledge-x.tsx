@@ -1,6 +1,6 @@
+import { css, StyleSheet } from 'aphrodite';
 import React from 'react';
 import { Button } from 'reactstrap';
-import { StyleSheet, css } from 'aphrodite';
 
 interface Props {
   title: string;

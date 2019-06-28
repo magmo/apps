@@ -1,6 +1,6 @@
 import React from 'react';
-import ApproveX from '../approve-x';
 import { FundingStrategy } from '../../redux/protocols/funding';
+import ApproveX from '../approve-x';
 
 interface Props {
   strategyChosen: (strategy: FundingStrategy) => void;

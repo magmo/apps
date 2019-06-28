@@ -1,6 +1,6 @@
 import { WalletAction } from '../../actions';
-import { WithdrawalAction, isWithdrawalAction } from '../withdrawing/actions';
 import { IndirectDefundingAction, isIndirectDefundingAction } from '../indirect-defunding/actions';
+import { isWithdrawalAction, WithdrawalAction } from '../withdrawing/actions';
 
 // -------
 // Actions

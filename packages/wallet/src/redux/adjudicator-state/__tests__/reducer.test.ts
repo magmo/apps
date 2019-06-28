@@ -1,5 +1,5 @@
-import * as actions from '../../actions';
 import * as testScenarios from '../../__tests__/test-scenarios';
+import * as actions from '../../actions';
 const { gameCommitment1, channelId } = testScenarios;
 import { adjudicatorStateReducer } from '../reducer';
 // tslint:disable: no-shadowed-variable

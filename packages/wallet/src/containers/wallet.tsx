@@ -2,12 +2,12 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import * as states from '../redux/state';
-import MetamaskErrorContainer from './metamask-error';
-import WalletInitializedContainer from './initialized';
-import LandingPage from '../components/landing-page';
 import Modal from 'react-modal';
+import LandingPage from '../components/landing-page';
 import StatusBarLayout from '../components/status-bar-layout';
+import * as states from '../redux/state';
+import WalletInitializedContainer from './initialized';
+import MetamaskErrorContainer from './metamask-error';
 
 interface WalletProps {
   state: states.WalletState;

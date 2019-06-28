@@ -1,18 +1,18 @@
 import { ethers } from 'ethers';
-import { CommitmentType, Commitment } from '../domain';
+import { bigNumberify } from 'ethers/utils';
+import { ADDRESS_ZERO } from 'fmg-core';
+import { Channel, channelID } from 'fmg-core/lib/channel';
+import testGameArtifact from '../../build/contracts/TestGame.json';
+import { ADJUDICATOR_ADDRESS } from '../constants';
+import { Commitment, CommitmentType } from '../domain';
+import { signCommitment } from '../domain';
 import {
+  createConcludeTransaction,
   createDepositTransaction,
   createForceMoveTransaction,
-  createConcludeTransaction,
   createRefuteTransaction,
   createRespondWithMoveTransaction,
 } from '../utils/transaction-generator';
-import { signCommitment } from '../domain';
-import testGameArtifact from '../../build/contracts/TestGame.json';
-import { bigNumberify } from 'ethers/utils';
-import { channelID, Channel } from 'fmg-core/lib/channel';
-import { ADJUDICATOR_ADDRESS } from '../constants';
-import { ADDRESS_ZERO } from 'fmg-core';
 export function getLibraryAddress(networkId) {
   return testGameArtifact.networks[networkId].address;
 }

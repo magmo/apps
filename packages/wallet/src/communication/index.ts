@@ -1,14 +1,14 @@
-import { Commitment, SignedCommitment } from '../domain';
 import { messageRelayRequested } from 'magmo-wallet-client';
+import { Commitment, SignedCommitment } from '../domain';
 import {
-  RelayableAction,
-  strategyProposed,
-  strategyApproved,
   commitmentReceived,
+  commitmentsReceived,
   concludeInstigated,
   ConcludeInstigated,
   keepLedgerChannelApproved,
-  commitmentsReceived,
+  RelayableAction,
+  strategyApproved,
+  strategyProposed,
 } from './actions';
 export * from './actions';
 

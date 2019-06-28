@@ -1,4 +1,4 @@
-import { SideEffects, OutboxState } from './state';
+import { OutboxState, SideEffects } from './state';
 export { QueuedTransaction } from './state';
 
 /**

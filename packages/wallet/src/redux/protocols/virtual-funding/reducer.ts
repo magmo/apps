@@ -1,12 +1,12 @@
-import * as states from './states';
-import { SharedData, getPrivatekey } from '../../state';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
-import { WalletAction, advanceChannel } from '../../actions';
-import { isVirtualFundingAction } from './actions';
-import { unreachable } from '../../../utils/reducer-utils';
-import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { ProtocolReducer, ProtocolStateWithSharedData } from '..';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
+import { CommitmentType } from '../../../domain';
+import { unreachable } from '../../../utils/reducer-utils';
+import { advanceChannel, WalletAction } from '../../actions';
+import { getPrivatekey, SharedData } from '../../state';
+import { isVirtualFundingAction } from './actions';
+import * as states from './states';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 

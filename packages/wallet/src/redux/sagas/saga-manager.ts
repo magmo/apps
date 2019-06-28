@@ -1,18 +1,18 @@
-import { select, take, fork, actionChannel, cancel } from 'redux-saga/effects';
+import { actionChannel, cancel, fork, select, take } from 'redux-saga/effects';
 
+import { adjudicatorWatcher } from './adjudicator-watcher';
+import { challengeWatcher } from './challenge-watcher';
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
 import { transactionSender } from './transaction-sender';
-import { adjudicatorWatcher } from './adjudicator-watcher';
-import { challengeWatcher } from './challenge-watcher';
 
-import { WalletState } from '../state';
 import { getProvider, isDevelopmentNetwork } from '../../utils/contract-utils';
+import { WalletState } from '../state';
 
-import { displaySender } from './display-sender';
-import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
+import { displaySender } from './display-sender';
+import { ganacheMiner } from './ganache-miner';
 import { multipleActionDispatcher } from './multiple-action-dispatcher';
 
 export function* sagaManager(): IterableIterator<any> {

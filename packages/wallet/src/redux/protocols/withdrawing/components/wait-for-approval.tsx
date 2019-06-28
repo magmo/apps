@@ -1,6 +1,6 @@
+import { ethers } from 'ethers';
 import React, { Fragment } from 'react';
 import { Button } from 'reactstrap';
-import { ethers } from 'ethers';
 
 interface Props {
   approve: (address: string) => void;
