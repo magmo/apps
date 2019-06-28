@@ -32,7 +32,7 @@ import { channelFromCommitments } from '../../../../channel-store/channel-state/
 // Test data
 // ---------
 const processId = 'process-id.123';
-const strategy: FundingStrategy = 'NewLedgerFundingStrategy';
+const strategy: FundingStrategy = 'IndirectFundingStrategy';
 const targetChannelId = channelId;
 const opponentAddress = bsAddress;
 const ourAddress = asAddress;

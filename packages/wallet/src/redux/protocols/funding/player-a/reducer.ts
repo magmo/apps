@@ -10,10 +10,7 @@ import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyProposed } from '../../../../communication';
 
 import * as indirectFundingStates from '../../indirect-funding/states';
-import * as selectors from '../../../selectors';
 import { Properties } from '../../../utils';
-import { CommitmentType } from 'fmg-core';
-import { getLastCommitment } from '../../../channel-store';
 import {
   indirectFundingReducer,
   initializeIndirectFunding,
@@ -106,19 +103,8 @@ function strategyChosen(
     return { protocolState: state, sharedData };
   }
   const { processId, opponentAddress } = state;
-  let { strategy } = action;
-  const existingLedgerChannel = selectors.getExistingLedgerChannelForParticipants(
-    sharedData,
-    state.ourAddress,
-    state.opponentAddress,
-  );
-  // TODO: We probably want to let the user select this
-  if (
-    existingLedgerChannel &&
-    getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.App
-  ) {
-    strategy = 'ExistingLedgerFundingStrategy';
-  }
+  const { strategy } = action;
+
   const message = sendStrategyProposed(opponentAddress, processId, strategy);
   return {
     protocolState: states.waitForStrategyResponse({ ...state, strategy }),

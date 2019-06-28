@@ -30,7 +30,7 @@ const processId = 'process-id.123';
 const targetChannelId = channelId;
 const opponentAddress = asAddress;
 const ourAddress = bsAddress;
-const strategy: FundingStrategy = 'NewLedgerFundingStrategy';
+const strategy: FundingStrategy = 'IndirectFundingStrategy';
 const props = {
   targetChannelId,
   processId,
