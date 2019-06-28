@@ -35,7 +35,7 @@ graph TD
     A{Application}--> D
     F{Funding}--> idF(IndirectFunding)
 
-    D{Dispute}--> TS
+    D(Dispute)--> TS
 
 
     C{Concluding}-->CU(ConsensusUpdate)
@@ -60,7 +60,7 @@ graph TD
 
     classDef OrphanProtocol stroke:#333,stroke-width:4px,fill:#0000;
 
-    class A,F,D,C,Df TopLevelProtocol
+    class A,F,C,Df TopLevelProtocol
     class AC,ECF,LTU,NLC,PC,VF OrphanProtocol
 
 
