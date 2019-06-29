@@ -30,7 +30,8 @@ export function initialize(
 
   if (
     existingLedgerChannel &&
-    getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.App
+    (getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.App ||
+      getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.PostFundSetup)
   ) {
     const ledgerId = existingLedgerChannel.channelId;
     const {
