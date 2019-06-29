@@ -31,7 +31,6 @@ describe('new ledger funding happy path', () => {
     const { state, sharedData, action } = scenario.waitForNewLedgerFunding;
 
     const result = indirectFundingReducer(state, sharedData, action);
-
     itTransitionsTo(result.protocolState, 'IndirectFunding.Success');
   });
 });
