@@ -13,7 +13,6 @@ describe('existing ledger funding happy path', () => {
   });
   describeScenarioStep(scenario.waitForExistingLedgerFunding, () => {
     const { state, sharedData, action } = scenario.waitForExistingLedgerFunding;
-
     const result = indirectFundingReducer(state, sharedData, action);
 
     itTransitionsTo(result.protocolState, 'IndirectFunding.Success');
