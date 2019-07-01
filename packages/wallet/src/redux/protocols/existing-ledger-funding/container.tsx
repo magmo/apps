@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { unreachable } from '../../../utils/reducer-utils';
 import WaitForPostFundSetup from './components/wait-for-post-fund-setup';
 import WaitForLedgerUpdate from './components/wait-for-ledger-update';
+import { LedgerTopUp } from '../ledger-top-up/container';
 
 interface Props {
   state: states.ExistingLedgerFundingState;
@@ -16,7 +17,7 @@ class ExistingLedgerFundingContainer extends PureComponent<Props> {
     const { state } = this.props;
     switch (state.type) {
       case 'ExistingLedgerFunding.WaitForLedgerTopUp':
-      // TODO display child container
+        return <LedgerTopUp state={state.ledgerTopUpState} />;
       case 'ExistingLedgerFunding.WaitForLedgerUpdate':
         return <WaitForLedgerUpdate channelId={state.channelId} ledgerId={state.ledgerId} />;
       case 'ExistingLedgerFunding.WaitForPostFundSetup':
