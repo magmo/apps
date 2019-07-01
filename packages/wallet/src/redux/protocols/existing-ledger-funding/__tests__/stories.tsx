@@ -5,3 +5,4 @@ addStories(
   scenarios.playerAFullyFundedHappyPath,
   'Existing Ledger Funding / Player A Fully Funded Happy Path',
 );
+addStories(scenarios.playerATopUpNeeded, 'Existing Ledger Funding / Player A Top-up needed');
