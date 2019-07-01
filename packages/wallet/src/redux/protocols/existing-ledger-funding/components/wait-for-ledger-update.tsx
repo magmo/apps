@@ -10,12 +10,9 @@ export default class WaitForLedgerUpdate extends React.PureComponent<Props> {
     return (
       <Fragment>
         <h1>Waiting...</h1>
-
-        <p>
-          For your opponent to confirm indirect funding for channel:
-          <div className="channel-address">{this.props.channelId}</div> via ledger channel:
-          <div className="channel-address">{this.props.ledgerId}</div>
-        </p>
+        For your opponent to confirm indirect funding for channel:
+        <div className="channel-address">{this.props.channelId}</div> via ledger channel:
+        <div className="channel-address">{this.props.ledgerId}</div>
       </Fragment>
     );
   }

@@ -9,11 +9,8 @@ export default class WaitForPostFundSetup extends React.PureComponent<Props> {
     return (
       <Fragment>
         <h1>Waiting...</h1>
-
-        <p>
-          For your opponent to send a PostFundSetup for channel
-          <div className="channel-address">{this.props.channelId}</div>
-        </p>
+        For your opponent to send a PostFundSetup for channel
+        <div className="channel-address">{this.props.channelId}</div>
       </Fragment>
     );
   }
