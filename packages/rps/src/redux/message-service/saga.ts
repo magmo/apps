@@ -48,8 +48,8 @@ interface WalletMessage {
 type Message = AppMessage | WalletMessage;
 
 export function* sendWalletMessageSaga() {
-  const sendMessageChannel = yield call(createWalletEventChannel, [Wallet.MESSAGE_RELAY_REQUESTED]);
-  while (true) {
+  const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_RELAY_REQUESTED]);
+    while (true) {
     const messageRelayRequest: MessageRelayRequested = yield take(sendMessageChannel);
 
     const { messagePayload, to } = messageRelayRequest;
@@ -210,7 +210,7 @@ function createWalletEventChannel(walletEventTypes: Wallet.WalletEventType[]) {
     return () => {
       listener.unSubscribeAll();
     };
-  }, buffers.expanding(10));
+  }, buffers.fixed(10));
 }
 
 function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.PlayingState) {
