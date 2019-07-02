@@ -1,4 +1,4 @@
-import { addStoriesFromScenario as addStories } from '../../../../../__stories__';
+import { addStoriesFromScenarioAsWallet as addStories } from '../../../../../__stories__';
 import * as scenarios from './scenarios';
 
 addStories(scenarios.happyPath, 'Concluding / Instigator / Happy Path');

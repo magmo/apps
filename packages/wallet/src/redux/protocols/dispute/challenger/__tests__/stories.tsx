@@ -1,5 +1,5 @@
 import * as scenarios from './scenarios';
-import { addStoriesFromScenario as addStories } from '../../../../../__stories__';
+import { addStoriesFromScenarioAsWallet as addStories } from '../../../../../__stories__';
 
 addStories(scenarios.opponentResponds, 'Challenging / Opponent responds');
 addStories(scenarios.challengeTimesOutAndIsDefunded, 'Challenging / Challenge times out');
