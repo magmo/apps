@@ -1,5 +1,5 @@
 import React from 'react';
-import ApproveX from '../../redux/protocols/shared-components/approve-x';
+import ApproveX from '../../shared-components/approve-x';
 import * as web3Utils from 'web3-utils';
 
 interface Props {

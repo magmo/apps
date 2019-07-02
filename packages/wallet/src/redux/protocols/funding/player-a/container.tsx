@@ -8,7 +8,7 @@ import * as states from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import { FundingStrategy } from '..';
-import ChooseStrategy from '../../../../components/funding/choose-strategy';
+import ChooseStrategy from '../components/choose-strategy';
 import WaitForOtherPlayer from '../../shared-components/wait-for-other-player';
 import AcknowledgeX from '../../shared-components/acknowledge-x';
 import { ActionDispatcher } from '../../../utils';

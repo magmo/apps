@@ -7,7 +7,7 @@ import * as states from './states';
 
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
-import ApproveStrategy from '../../../../components/funding/approve-strategy';
+import ApproveStrategy from '../components/approve-strategy';
 import WaitForOtherPlayer from '../../shared-components/wait-for-other-player';
 import AcknowledgeX from '../../shared-components/acknowledge-x';
 import { FundingStrategy } from '..';

@@ -1,13 +1,13 @@
 import React from 'react';
-import ApproveX from '../../redux/protocols/shared-components/approve-x';
-import { FundingStrategy } from '../../redux/protocols/funding';
+import ApproveX from '../../shared-components/approve-x';
+import { FundingStrategy } from '..';
 
 interface Props {
   strategyChosen: (strategy: FundingStrategy) => void;
   cancelled: () => void;
 }
 
-export default class ChooseStrategy extends React.PureComponent<Props> {
+export default class ApproveStrategy extends React.PureComponent<Props> {
   render() {
     const { strategyChosen, cancelled } = this.props;
     return (
