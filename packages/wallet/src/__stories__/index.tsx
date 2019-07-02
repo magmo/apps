@@ -7,6 +7,9 @@ import WalletContainer from '../containers/wallet';
 import { initializedState } from './dummy-wallet-states';
 import { ProtocolState } from '../redux/protocols';
 import { nestProtocolState } from './nesters';
+import Modal from 'react-modal';
+import StatusBarLayout from '../components/status-bar-layout';
+
 const walletStateRender = state => () => {
   console.log(state);
   return (
@@ -16,7 +19,7 @@ const walletStateRender = state => () => {
   );
 };
 
-export const protocolStateRender = (protocolState: ProtocolState) => {
+export const nestProtocolStateAndRenderWallet = (protocolState: ProtocolState) => {
   const walletState = {
     ...initializedState,
     processStore: {
@@ -33,10 +36,36 @@ export const protocolStateRender = (protocolState: ProtocolState) => {
   return walletStateRender(walletState);
 };
 
-export function addStoriesFromScenario(scenario, chapter) {
+export function addStoriesFromScenarioAsWallet(scenario, chapter) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {
-      storiesOf(chapter, module).add(key, protocolStateRender(scenario[key].state));
+      storiesOf(chapter, module).add(key, nestProtocolStateAndRenderWallet(scenario[key].state));
+    }
+  });
+}
+
+const renderProtocolState = (protocolState: ProtocolState, Container) => () => {
+  // TODO type Container
+  return (
+    <Provider store={fakeStore(protocolState)}>
+      <Modal
+        isOpen={true}
+        className={'wallet-content-center'}
+        overlayClassName={'wallet-overlay-center'}
+        ariaHideApp={false}
+      >
+        <StatusBarLayout>
+          <Container state={protocolState} />
+        </StatusBarLayout>
+      </Modal>
+    </Provider>
+  );
+};
+
+export function addStoriesFromScenario(scenario, chapter, container) {
+  Object.keys(scenario).forEach(key => {
+    if (scenario[key].state) {
+      storiesOf(chapter, module).add(key, renderProtocolState(scenario[key].state, container));
     }
   });
 }
