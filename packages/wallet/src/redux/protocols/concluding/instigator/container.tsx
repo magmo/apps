@@ -42,7 +42,7 @@ class ConcludingContainer extends PureComponent<Props> {
           />
         );
       case 'ConcludingInstigator.WaitForOpponentConclude':
-        return <WaitForOtherPlayer name={'conclude'} />;
+        return <WaitForOtherPlayer name={'conclude'} channelId={state.channelId} />;
       case 'ConcludingInstigator.AcknowledgeConcludeReceived':
         return (
           <ApproveX
@@ -68,7 +68,12 @@ class ConcludingContainer extends PureComponent<Props> {
       case 'ConcludingInstigator.WaitForLedgerUpdate':
         return <ConsensusUpdate state={state.consensusUpdateState} />;
       case 'ConcludingInstigator.WaitForOpponentSelection':
-        return <WaitForOtherPlayer name={'decision about defunding the ledger channel'} />;
+        return (
+          <WaitForOtherPlayer
+            name={'decision about defunding the ledger channel'}
+            channelId={state.channelId}
+          />
+        );
       default:
         return unreachable(state);
     }

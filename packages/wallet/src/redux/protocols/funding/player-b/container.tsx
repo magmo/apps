@@ -28,7 +28,7 @@ class FundingContainer extends PureComponent<Props> {
 
     switch (state.type) {
       case 'Funding.PlayerB.WaitForStrategyProposal':
-        return <WaitForOtherPlayer name={'strategy choice'} />;
+        return <WaitForOtherPlayer name={'strategy choice'} channelId={state.targetChannelId} />;
       case 'Funding.PlayerB.WaitForStrategyApproval':
         return (
           <ApproveStrategy
