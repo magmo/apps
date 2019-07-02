@@ -1,4 +1,4 @@
-import * as states from '../redux/state';
+import * as states from '../../state';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 

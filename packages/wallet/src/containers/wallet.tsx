@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import * as states from '../redux/state';
 import MetamaskErrorContainer from './metamask-error';
 import WalletInitializedContainer from './initialized';
-import LandingPage from '../components/landing-page';
+import LandingPage from '../redux/protocols/shared-components/landing-page';
 import Modal from 'react-modal';
-import StatusBarLayout from '../components/status-bar-layout';
+import StatusBarLayout from '../redux/protocols/shared-components/status-bar-layout';
 
 interface WalletProps {
   state: states.WalletState;

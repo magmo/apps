@@ -1,6 +1,6 @@
 import * as states from '../redux/state';
 import React, { PureComponent } from 'react';
-import LandingPage from '../components/landing-page';
+import LandingPage from '../redux/protocols/shared-components/landing-page';
 import { connect } from 'react-redux';
 import * as selectors from '../redux/selectors';
 import { Protocol } from '../redux/protocols/container';

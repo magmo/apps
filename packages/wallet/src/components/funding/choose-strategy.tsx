@@ -1,5 +1,5 @@
 import React from 'react';
-import ApproveX from '../approve-x';
+import ApproveX from '../../redux/protocols/shared-components/approve-x';
 import { FundingStrategy } from '../../redux/protocols/funding';
 
 interface Props {

@@ -9,7 +9,7 @@ import { TransactionSubmission } from '../../transaction-submission/container';
 
 import { connect } from 'react-redux';
 import { ActionDispatcher } from '../../../utils';
-import DefundOrNot from '../challenger/components/defund-or-not';
+import DefundOrNot from './components/defund-or-not';
 import { defundRequested } from '../../actions';
 import { multipleWalletActions } from '../../../../redux/actions';
 

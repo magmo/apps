@@ -9,7 +9,8 @@ export default class WaitForLedgerConclude extends React.PureComponent<Props> {
     return (
       <Fragment>
         <h1>Waiting for your opponent to respond!</h1>
-        <p>...with a conclude to ledger channel ${this.props.ledgerId}</p>
+        ...with a conclude to ledger channel{' '}
+        <div className="channel-address">{this.props.ledgerId}</div>
       </Fragment>
     );
   }

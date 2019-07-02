@@ -9,8 +9,8 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import { FundingStrategy } from '..';
 import ChooseStrategy from '../../../../components/funding/choose-strategy';
-import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
-import AcknowledgeX from '../../../../components/acknowledge-x';
+import WaitForOtherPlayer from '../../shared-components/wait-for-other-player';
+import AcknowledgeX from '../../shared-components/acknowledge-x';
 import { ActionDispatcher } from '../../../utils';
 import { IndirectFunding } from '../../indirect-funding/container';
 
