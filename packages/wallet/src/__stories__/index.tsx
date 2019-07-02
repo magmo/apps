@@ -6,7 +6,7 @@ import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
 import { ProtocolState } from '../redux/protocols';
 import Modal from 'react-modal';
-import StatusBarLayout from '../redux/protocols/shared-components/status-bar-layout';
+import StatusBarLayout from '../components/status-bar-layout';
 
 const walletStateRender = state => () => {
   console.log(state);
