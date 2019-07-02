@@ -49,7 +49,7 @@ type Message = AppMessage | WalletMessage;
 
 export function* sendWalletMessageSaga() {
   const sendMessageChannel = createWalletEventChannel([Wallet.MESSAGE_RELAY_REQUESTED]);
-    while (true) {
+  while (true) {
     const messageRelayRequest: MessageRelayRequested = yield take(sendMessageChannel);
 
     const { messagePayload, to } = messageRelayRequest;
