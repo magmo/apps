@@ -4,9 +4,7 @@ import { Provider } from 'react-redux';
 import '../index.scss';
 import { dummyWaitForLogin, dummyWaitForMetaMask } from './dummy-wallet-states';
 import WalletContainer from '../containers/wallet';
-import { initializedState } from './dummy-wallet-states';
 import { ProtocolState } from '../redux/protocols';
-import { nestProtocolState } from './nesters';
 import Modal from 'react-modal';
 import StatusBarLayout from '../components/status-bar-layout';
 
@@ -19,32 +17,7 @@ const walletStateRender = state => () => {
   );
 };
 
-export const nestProtocolStateAndRenderWallet = (protocolState: ProtocolState) => {
-  const walletState = {
-    ...initializedState,
-    processStore: {
-      dummyProcessId: {
-        processId: 'dummyProcessId',
-        protocol: 0, // at the moment this is not used by containers
-        protocolState: nestProtocolState(protocolState),
-        channelsToMonitor: [],
-      },
-    },
-    currentProcessId: 'dummyProcessId',
-  };
-
-  return walletStateRender(walletState);
-};
-
-export function addStoriesFromScenarioAsWallet(scenario, chapter) {
-  Object.keys(scenario).forEach(key => {
-    if (scenario[key].state) {
-      storiesOf(chapter, module).add(key, nestProtocolStateAndRenderWallet(scenario[key].state));
-    }
-  });
-}
-
-const renderProtocolState = (protocolState: ProtocolState, Container) => () => {
+const protocolStateRender = (protocolState: ProtocolState, Container) => () => {
   // TODO type Container
   return (
     <Provider store={fakeStore(protocolState)}>
@@ -65,7 +38,7 @@ const renderProtocolState = (protocolState: ProtocolState, Container) => () => {
 export function addStoriesFromScenario(scenario, chapter, container) {
   Object.keys(scenario).forEach(key => {
     if (scenario[key].state) {
-      storiesOf(chapter, module).add(key, renderProtocolState(scenario[key].state, container));
+      storiesOf(chapter, module).add(key, protocolStateRender(scenario[key].state, container));
     }
   });
 }
@@ -78,6 +51,7 @@ const WalletScreensNotInitialized = {
 addStoriesFromCollection(WalletScreensNotInitialized, 'Not Initialized ');
 
 const NetworkStatuses = {
+  // TODO the UI currently inspects an environment variable (not the redux state) to infer networkId
   Mainnet: { ...dummyWaitForLogin, networkId: 1 },
   Kovan: { ...dummyWaitForLogin, networkId: 42 },
   Ropsten: { ...dummyWaitForLogin, networkId: 3 },
