@@ -4,17 +4,13 @@ import { connect } from 'react-redux';
 
 import * as actions from './actions';
 import * as states from './states';
-
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
-import ApproveStrategy from '../../../../components/funding/approve-strategy';
-import WaitForOtherPlayer from '../../../../components/wait-for-other-player';
-import AcknowledgeX from '../../../../components/acknowledge-x';
-import { FundingStrategy } from '..';
-import { NewLedgerFunding } from '../../new-ledger-funding/container';
+import WaitForOtherPlayer from '../../shared-components/wait-for-other-player';
+import AcknowledgeX from '../../shared-components/acknowledge-x';
 import { ActionDispatcher } from '../../../utils';
-import { isNewLedgerFundingState } from '../../new-ledger-funding/states';
-import { ExistingLedgerFunding } from '../../existing-ledger-funding/container';
+import { IndirectFunding } from '../../indirect-funding/container';
+import ApproveX from '../../shared-components/approve-x';
 interface Props {
   state: states.OngoingFundingState;
   strategyApproved: ActionDispatcher<actions.StrategyApproved>;
@@ -30,22 +26,44 @@ class FundingContainer extends PureComponent<Props> {
 
     switch (state.type) {
       case 'Funding.PlayerB.WaitForStrategyProposal':
-        return <WaitForOtherPlayer name={'strategy choice'} />;
-      case 'Funding.PlayerB.WaitForStrategyApproval':
         return (
-          <ApproveStrategy
-            strategyChosen={(strategy: FundingStrategy) =>
-              strategyApproved({ processId, strategy })
-            }
-            cancelled={() => cancelled({ processId, by: TwoPartyPlayerIndex.B })}
+          <WaitForOtherPlayer
+            actionDescriptor={'strategy choice'}
+            channelId={state.targetChannelId}
           />
         );
+      case 'Funding.PlayerB.WaitForStrategyApproval':
+        return (
+          <ApproveX
+            title="Funding channel"
+            description="Do you want to fund this state channel with a re-usable ledger channel?"
+            yesMessage="Fund Channel"
+            noMessage="Cancel"
+            approvalAction={() =>
+              strategyApproved({ processId, strategy: 'IndirectFundingStrategy' })
+            }
+            rejectionAction={() => cancelled({ processId, by: TwoPartyPlayerIndex.B })}
+          >
+            <React.Fragment>
+              This site wants you to open a new state channel.
+              {/* <br /> // TODO: modify funding protocol state to store the data necessary to render this
+              <br />
+              <div className="row">
+                <div className="col-sm-6">
+                  <h3>{web3Utils.fromWei(requestedTotalFunds, 'ether')} ETH</h3>
+                  <div>Total</div>
+                </div>
+                <div className="col-sm-6">
+                  <h3>{web3Utils.fromWei(requestedYourContribution, 'ether')} ETH</h3>
+                  <div>Your deposit</div>
+                </div>
+              </div>
+              <br /> */}
+            </React.Fragment>
+          </ApproveX>
+        );
       case 'Funding.PlayerB.WaitForFunding':
-        if (isNewLedgerFundingState(state.fundingState)) {
-          return <NewLedgerFunding state={state.fundingState} />;
-        } else {
-          return <ExistingLedgerFunding state={state.fundingState} />;
-        }
+        return <IndirectFunding state={state.fundingState} />;
       case 'Funding.PlayerB.WaitForSuccessConfirmation':
         return (
           <AcknowledgeX
