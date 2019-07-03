@@ -16,9 +16,14 @@ class IndirectDefundingContainer extends PureComponent<Props> {
     const { state } = this.props;
     switch (state.type) {
       case 'IndirectDefunding.WaitForLedgerUpdate':
-        return <WaitForOtherPlayer name={'ledger channel update'} channelId={state.ledgerId} />;
+        return (
+          <WaitForOtherPlayer
+            actionDescriptor={'ledger channel update'}
+            channelId={state.ledgerId}
+          />
+        );
       case 'IndirectDefunding.WaitForConclude':
-        return <WaitForOtherPlayer name={'conclude'} channelId={state.ledgerId} />;
+        return <WaitForOtherPlayer actionDescriptor={'conclude'} channelId={state.ledgerId} />;
       case 'IndirectDefunding.Failure':
         return <Failure name="indirect-de-funding" reason={state.reason} />;
       case 'IndirectDefunding.Success':

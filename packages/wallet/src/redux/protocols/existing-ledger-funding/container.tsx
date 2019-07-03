@@ -18,10 +18,13 @@ class ExistingLedgerFundingContainer extends PureComponent<Props> {
       case 'ExistingLedgerFunding.WaitForLedgerTopUp':
         return <LedgerTopUp state={state.ledgerTopUpState} />;
       case 'ExistingLedgerFunding.WaitForLedgerUpdate':
-        return <WaitForOtherPlayer name={'ledger update'} channelId={state.ledgerId} />;
+        return <WaitForOtherPlayer actionDescriptor={'ledger update'} channelId={state.ledgerId} />;
       case 'ExistingLedgerFunding.WaitForPostFundSetup':
         return (
-          <WaitForOtherPlayer name={'post funding confirmation'} channelId={state.channelId} />
+          <WaitForOtherPlayer
+            actionDescriptor={'post funding confirmation'}
+            channelId={state.channelId}
+          />
         );
       case 'ExistingLedgerFunding.Success':
       case 'ExistingLedgerFunding.Failure':
