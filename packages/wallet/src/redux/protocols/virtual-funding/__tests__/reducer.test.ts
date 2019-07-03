@@ -3,7 +3,7 @@ import { initialize, reducer } from '../reducer';
 import * as scenarios from './scenarios';
 import {
   scenarioStepDescription,
-  expectTheseCommitmentsSent,
+  itSendsTheseCommitments,
   itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import { success, preSuccess } from '../../advance-channel/__tests__';
@@ -36,9 +36,8 @@ describe('happyPath', () => {
     const { protocolState, sharedData: result } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForJointChannel');
-
-    expectTheseCommitmentsSent(result, [{ commitment: { turnNum: 0, allocation: oneTwoThree } }]);
-    expectTheseCommitmentsSent(result, [{ commitment: { turnNum: 0, allocation: [] } }]);
+    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation: oneTwoThree } }]);
+    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation: [] } }]);
   });
 
   describe(scenarioStepDescription(scenario.openG), () => {
