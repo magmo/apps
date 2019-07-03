@@ -3,6 +3,9 @@ import { PureComponent } from 'react';
 import React from 'react';
 
 import { connect } from 'react-redux';
+import { unreachable } from '../../../utils/reducer-utils';
+import { LedgerTopUp } from '../ledger-top-up/container';
+import WaitForOtherPlayer from '../shared-components/wait-for-other-player';
 
 interface Props {
   state: states.ExistingLedgerFundingState;
@@ -11,7 +14,24 @@ interface Props {
 class ExistingLedgerFundingContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
-    return <div>{state.type}</div>;
+    switch (state.type) {
+      case 'ExistingLedgerFunding.WaitForLedgerTopUp':
+        return <LedgerTopUp state={state.ledgerTopUpState} />;
+      case 'ExistingLedgerFunding.WaitForLedgerUpdate':
+        return <WaitForOtherPlayer actionDescriptor={'ledger update'} channelId={state.ledgerId} />;
+      case 'ExistingLedgerFunding.WaitForPostFundSetup':
+        return (
+          <WaitForOtherPlayer
+            actionDescriptor={'post funding confirmation'}
+            channelId={state.channelId}
+          />
+        );
+      case 'ExistingLedgerFunding.Success':
+      case 'ExistingLedgerFunding.Failure':
+        return <div>{state.type}</div>;
+      default:
+        return unreachable(state);
+    }
   }
 }
 

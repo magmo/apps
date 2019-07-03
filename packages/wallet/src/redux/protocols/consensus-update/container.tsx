@@ -4,6 +4,7 @@ import Failure from '../shared-components/failure';
 import Success from '../shared-components/success';
 import React from 'react';
 import { connect } from 'react-redux';
+import WaitForOtherPlayer from '../shared-components/wait-for-other-player';
 
 interface Props {
   state: states.ConsensusUpdateState;
@@ -14,7 +15,9 @@ class ConsensusUpdateContainer extends PureComponent<Props> {
     const { state } = this.props;
     switch (state.type) {
       case 'ConsensusUpdate.WaitForUpdate':
-        return <div>Waiting for ledger updates to be exchanged</div>;
+        return (
+          <WaitForOtherPlayer actionDescriptor={'consensus update'} channelId={state.channelId} />
+        );
       case 'ConsensusUpdate.Failure':
         return <Failure name="consensus update" reason={state.reason} />;
       case 'ConsensusUpdate.Success':
