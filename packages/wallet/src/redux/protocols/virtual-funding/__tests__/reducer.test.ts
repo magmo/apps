@@ -37,7 +37,6 @@ describe('happyPath', () => {
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForJointChannel');
     itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation: oneTwoThree } }]);
-    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation: [] } }]);
   });
 
   describe(scenarioStepDescription(scenario.openG), () => {

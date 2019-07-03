@@ -44,16 +44,10 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
     processId,
     protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
   };
-  const guarantorChannelInitialized = advanceChannel.initializeAdvanceChannel(
-    processId,
-    sharedData,
-    CommitmentType.PreFundSetup,
-    { ...initializationArgs, ...channelSpecificArgs([], startingDestination) },
-  );
 
   const jointChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
-    guarantorChannelInitialized.sharedData,
+    sharedData,
     CommitmentType.PreFundSetup,
     { ...initializationArgs, ...channelSpecificArgs(startingAllocation, startingDestination) },
   );
