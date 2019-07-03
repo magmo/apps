@@ -2,25 +2,54 @@ import * as koaBody from 'koa-body';
 import * as Router from 'koa-router';
 
 import { RelayableAction } from 'magmo-wallet/lib/src/communication';
+import { sendToFirebase } from '../../../message/firebase-relay';
 import { getProcess } from '../../../wallet/db/queries/walletProcess';
 import { handleGameRequest } from '../../handlers/handle-game-request';
 import { handleNewProcessAction } from '../../handlers/handle-new-process-action';
 import { handleOngoingProcessAction } from '../../handlers/handle-ongoing-process-action';
-export const BASE_URL = `/api/v2/channels`;
+export const BASE_URL = `/api/v1/channels`;
 
 const router = new Router();
+
+export function sendViaFirebaseToApplication(ctx) {
+  const status = ctx.status;
+  if (status === 200 || status === 201) {
+    const to = ctx.body.commitment.channel.participants[0];
+    const messagePayload = ctx.body;
+    if (to && messagePayload) {
+      sendToFirebase(to, { ...messagePayload, queue: 'GAME_ENGINE' });
+    }
+  }
+}
+
+export function sendViaFirebaseToWallet(ctx) {
+  const status = ctx.status;
+  if (status === 200 || status === 201) {
+    const to = ctx.body.to;
+    const payload = ctx.body.messagePayload;
+    if (to && payload) {
+      sendToFirebase(to, { payload, queue: 'WALLET' });
+    }
+  }
+}
 
 router.post(`${BASE_URL}`, koaBody(), async ctx => {
   const { queue } = ctx.request.body;
   if (queue === 'GAME_ENGINE') {
-    return await handleGameRequest(ctx);
+    const response = await handleGameRequest(ctx);
+    sendViaFirebaseToApplication(response);
+    return response;
   } else {
     const action = ctx.request.body;
 
     if (await isNewProcessAction(action)) {
-      return await handleNewProcessAction(ctx);
+      const response = await handleNewProcessAction(ctx);
+      sendViaFirebaseToWallet(response);
+      return response;
     } else if (await isProtocolAction(action)) {
-      return await handleOngoingProcessAction(ctx);
+      const response = await handleOngoingProcessAction(ctx);
+      sendViaFirebaseToWallet(response);
+      return response;
     }
   }
 });

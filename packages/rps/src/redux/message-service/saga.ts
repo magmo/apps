@@ -55,23 +55,11 @@ export function* sendWalletMessageSaga() {
     const { messagePayload, to } = messageRelayRequest;
     const messageToSend: WalletMessage = { payload: messagePayload, queue: Queue.WALLET };
 
-    if (process.env.NODE_ENV === 'development' && to === process.env.SERVER_WALLET_ADDRESS) {
-      try {
-        const response = yield call(postData, { ...messagePayload });
-
-        // Since the response is returned straight away, we have to relay the commitment
-        // immediately
-        Wallet.relayMessage(WALLET_IFRAME_ID, response.messagePayload);
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      yield call(
-        reduxSagaFirebase.database.create,
-        `/messages/${to.toLowerCase()}`,
-        sanitizeMessageForFirebase(messageToSend),
-      );
-    }
+    yield fork(
+      reduxSagaFirebase.database.create,
+      `/messages/${to.toLowerCase()}`,
+      sanitizeMessageForFirebase(messageToSend),
+    );
   }
 }
 
@@ -111,30 +99,12 @@ export function* sendMessagesSaga() {
       const toSend: AppMessage = { commitment, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
 
-      if (
-        process.env.NODE_ENV === 'development' &&
-        commitment.channel.participants[1] === process.env.SERVER_WALLET_ADDRESS
-      ) {
-        // To ease local development, we bypass firebase and make http requests directly against the local server
-        const response = yield call(postData, { ...toSend, commitment: toSend.commitment });
-        yield put(gameActions.messageSent());
-
-        // Since the response is returned straight away, we have to receive the commitment immediately
-        const { commitment: theirCommitment, signature: theirSignature } = response;
-        yield receiveCommitmentSaga({
-          commitment: theirCommitment,
-          signature: theirSignature,
-          queue: Queue.GAME_ENGINE,
-          userName: 'Neo Bot',
-        });
-      } else {
-        yield call(
-          reduxSagaFirebase.database.create,
-          `/messages/${opponentAddress.toLowerCase()}`,
-          sanitizeMessageForFirebase(toSend),
-        );
-        yield put(gameActions.messageSent());
-      }
+      yield call(
+        reduxSagaFirebase.database.create,
+        `/messages/${opponentAddress.toLowerCase()}`,
+        sanitizeMessageForFirebase(toSend),
+      );
+      yield put(gameActions.messageSent());
     }
     if (messageState.walletOutbox) {
       if (
@@ -354,17 +324,6 @@ function* receiveCommitmentSaga(message: AppMessage) {
   } else {
     yield put(gameActions.commitmentReceived(fromCoreCommitment(data)));
   }
-}
-
-async function postData(data = {}) {
-  const response = await fetch(`${process.env.BOT_URL}/api/v2/channels`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  return await response.json(); // parses response to JSON
 }
 
 function* validateMessage(commitment: Commitment, signature) {
