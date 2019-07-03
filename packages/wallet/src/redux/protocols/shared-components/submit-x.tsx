@@ -9,7 +9,7 @@ export default class SubmitX extends React.PureComponent<Props> {
     const { name } = this.props;
     return (
       <div>
-        <h1>Sending your {name}</h1>
+        <h2>Sending your {name}</h2>
         <p>Please confirm the transaction in MetaMask.</p>
       </div>
     );

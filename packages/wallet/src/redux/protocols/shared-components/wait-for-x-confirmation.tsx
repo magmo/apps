@@ -26,7 +26,7 @@ export default class WaitForXConfirmation extends React.PureComponent<Props> {
     const { name } = this.props;
     return (
       <div>
-        <h1>Waiting for your {name} to be mined!</h1>
+        <h2>Waiting for your {name} to be mined!</h2>
         <p>
           Hold tight! Visit{' '}
           <a target="_blank" href={this.buildEtherscanLink()}>
