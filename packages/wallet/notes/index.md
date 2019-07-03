@@ -40,7 +40,7 @@ graph TD
 
     C{Concluding}-->CU(ConsensusUpdate)
 
-    idF -->  ECF(ExistingLedgerFunding)
+    idF -->  ELF(ExistingLedgerFunding)
     idF --> NLC(NewLedgerChannel)
 
     NLC --> CU(ConsensusUpdate)
