@@ -59,7 +59,12 @@ class FundingContainer extends PureComponent<Props> {
           </ApproveX>
         );
       case 'Funding.PlayerA.WaitForStrategyResponse':
-        return <WaitForOtherPlayer actionDescriptor={'strategy response'} channelId={state.targetChannelId} />;
+        return (
+          <WaitForOtherPlayer
+            actionDescriptor={'strategy response'}
+            channelId={state.targetChannelId}
+          />
+        );
       case 'Funding.PlayerA.WaitForFunding':
         return <IndirectFunding state={state.fundingState} />;
       case 'Funding.PlayerA.WaitForSuccessConfirmation':
