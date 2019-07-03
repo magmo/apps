@@ -59,9 +59,8 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
   );
 
   return {
-    protocolState: states.waitForChannelPreparation({
+    protocolState: states.waitForJointChannel({
       processId,
-      [states.GUARANTOR_CHANNEL_DESCRIPTOR]: guarantorChannelInitialized.protocolState,
       [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannelInitialized.protocolState,
       targetChannelId,
     }),
@@ -80,8 +79,11 @@ export const reducer: ProtocolReducer<states.VirtualFundingState> = (
   }
 
   switch (protocolState.type) {
-    case 'VirtualFunding.WaitForChannelPreparation': {
-      return waitForChannelPreparationReducer(protocolState, sharedData, action);
+    case 'VirtualFunding.WaitForJointChannel': {
+      return waitForJointChannelReducer(protocolState, sharedData, action);
+    }
+    case 'VirtualFunding.WaitForGuarantorChannel': {
+      return waitForGuarantorChannelReducer(protocolState, sharedData, action);
     }
     case 'VirtualFunding.WaitForGuarantorFunding': {
       return waitForGuarantorFundingReducer(protocolState, sharedData, action);
@@ -94,7 +96,16 @@ export const reducer: ProtocolReducer<states.VirtualFundingState> = (
   }
 };
 
-function waitForChannelPreparationReducer(
+function waitForJointChannelReducer(
+  protocolState: states.VirtualFundingState,
+  sharedData: SharedData,
+  action: WalletAction,
+) {
+  // Unimplemented
+  return { protocolState, sharedData };
+}
+
+function waitForGuarantorChannelReducer(
   protocolState: states.VirtualFundingState,
   sharedData: SharedData,
   action: WalletAction,
