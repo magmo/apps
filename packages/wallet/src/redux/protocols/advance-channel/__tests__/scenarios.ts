@@ -87,6 +87,10 @@ const commitmentSentA = states.commitmentSent({
   ...propsA,
   commitmentType: CommitmentType.PreFundSetup,
 });
+const postFundCommitmentSentA = states.commitmentSent({
+  ...propsA,
+  commitmentType: CommitmentType.PostFundSetup,
+});
 
 const channelUnknownB = states.channelUnknown({
   ...propsB,
@@ -226,20 +230,40 @@ export const initialized = {
   sharedData: aSentPreFundCommitment,
   trigger: receivePreFundSetupFromHub,
 };
-export const preSuccess = {
-  ...propsA,
-  state: commitmentSentA,
-  sharedData: aSentPreFundCommitment,
-  trigger: receivePreFundSetupFromHub,
+
+export const preFund = {
+  preSuccess: {
+    ...propsA,
+    state: commitmentSentA,
+    sharedData: aSentPreFundCommitment,
+    trigger: receivePreFundSetupFromHub,
+  },
+  success: {
+    ...propsA,
+    state: states.success({
+      commitmentType: CommitmentType.PreFundSetup,
+      channelId,
+      ourIndex: PlayerIndex.A,
+    }),
+    sharedData: aReceivedPrefundSetup,
+  },
 };
-export const success = {
-  ...propsA,
-  state: states.success({
-    commitmentType: CommitmentType.PreFundSetup,
-    channelId,
-    ourIndex: PlayerIndex.A,
-  }),
-  sharedData: aReceivedPrefundSetup,
+export const postFund = {
+  preSuccess: {
+    ...propsA,
+    state: postFundCommitmentSentA,
+    sharedData: aSentPostFundCommitment,
+    trigger: receivePostFundSetupFromHub,
+  },
+  success: {
+    ...propsA,
+    state: states.success({
+      commitmentType: CommitmentType.PreFundSetup,
+      channelId,
+      ourIndex: PlayerIndex.A,
+    }),
+    sharedData: aReceivedPrefundSetup,
+  },
 };
 
 export const newChannelAsA = {
