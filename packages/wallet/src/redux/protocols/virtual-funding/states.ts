@@ -10,6 +10,8 @@ import { ConsensusUpdateState } from '../consensus-update';
 interface Base {
   processId: string;
   targetChannelId: string;
+  startingAllocation: string[];
+  startingDestination: string[];
 }
 export const JOINT_CHANNEL_DESCRIPTOR = 'jointChannel';
 export const GUARANTOR_CHANNEL_DESCRIPTOR = 'guarantorChannel';

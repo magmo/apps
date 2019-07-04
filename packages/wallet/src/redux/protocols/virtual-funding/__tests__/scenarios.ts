@@ -46,6 +46,8 @@ const initializeArgs = {
 const props = {
   targetChannelId,
   processId,
+  startingAllocation: allocation,
+  startingDestination: destination,
 };
 
 // ----

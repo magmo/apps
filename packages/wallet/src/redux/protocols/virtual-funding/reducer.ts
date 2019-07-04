@@ -46,6 +46,8 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
       processId,
       [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannelInitialized.protocolState,
       targetChannelId,
+      startingAllocation,
+      startingDestination,
     }),
     sharedData: jointChannelInitialized.sharedData,
   };
