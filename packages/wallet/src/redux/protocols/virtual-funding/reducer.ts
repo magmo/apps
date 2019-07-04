@@ -57,7 +57,7 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
   return {
     protocolState: states.waitForJointChannel({
       processId,
-      [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannelInitialized.protocolState,
+      jointChannel: jointChannelInitialized.protocolState,
       targetChannelId,
       startingAllocation,
       startingDestination,
@@ -104,11 +104,7 @@ function waitForJointChannelReducer(
     action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
     action.protocolLocator === states.JOINT_CHANNEL_DESCRIPTOR
   ) {
-    const result = advanceChannelReducer(
-      protocolState[states.JOINT_CHANNEL_DESCRIPTOR],
-      sharedData,
-      action,
-    );
+    const result = advanceChannelReducer(protocolState.jointChannel, sharedData, action);
 
     if (advanceChannel.isSuccess(result.protocolState)) {
       const { ourIndex, channelId: jointChannelId } = result.protocolState;
@@ -131,7 +127,7 @@ function waitForJointChannelReducer(
           return {
             protocolState: {
               ...protocolState,
-              [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannelResult.protocolState,
+              jointChannel: jointChannelResult.protocolState,
             },
             sharedData: jointChannelResult.sharedData,
           };
@@ -161,7 +157,7 @@ function waitForJointChannelReducer(
           return {
             protocolState: states.waitForGuarantorChannel({
               ...protocolState,
-              [states.GUARANTOR_CHANNEL_DESCRIPTOR]: guarantorChannelResult.protocolState,
+              guarantorChannel: guarantorChannelResult.protocolState,
             }),
             sharedData: guarantorChannelResult.sharedData,
           };

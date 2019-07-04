@@ -64,11 +64,11 @@ const props = {
 const scenarioStates = {
   waitForJointChannel1: states.waitForJointChannel({
     ...props,
-    [states.JOINT_CHANNEL_DESCRIPTOR]: preFund.preSuccess.state,
+    jointChannel: preFund.preSuccess.state,
   }),
   waitForJointChannel2: states.waitForJointChannel({
     ...props,
-    [states.JOINT_CHANNEL_DESCRIPTOR]: {
+    jointChannel: {
       ...preFund.preSuccess.state,
       commitmentType: CommitmentType.PostFundSetup,
     },
@@ -76,7 +76,7 @@ const scenarioStates = {
 
   waitForGuarantorChannel: states.waitForGuarantorChannel({
     ...props,
-    [states.GUARANTOR_CHANNEL_DESCRIPTOR]: preFund.success.state,
+    guarantorChannel: preFund.success.state,
   }),
 };
 
