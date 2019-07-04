@@ -56,16 +56,16 @@ export interface Failure {
 // ------------
 
 export const waitForJointChannel: StateConstructor<WaitForJointChannel> = p => {
-  return { type: 'VirtualFunding.WaitForJointChannel', ...p };
+  return { ...p, type: 'VirtualFunding.WaitForJointChannel' };
 };
 export const waitForGuarantorChannel: StateConstructor<WaitForGuarantorChannel> = p => {
-  return { type: 'VirtualFunding.WaitForGuarantorChannel', ...p };
+  return { ...p, type: 'VirtualFunding.WaitForGuarantorChannel' };
 };
 export const waitForGuarantorFunding: StateConstructor<WaitForGuarantorFunding> = p => {
-  return { type: 'VirtualFunding.WaitForGuarantorFunding', ...p };
+  return { ...p, type: 'VirtualFunding.WaitForGuarantorFunding' };
 };
 export const waitForApplicationFunding: StateConstructor<WaitForApplicationFunding> = p => {
-  return { type: 'VirtualFunding.WaitForApplicationFunding', ...p };
+  return { ...p, type: 'VirtualFunding.WaitForApplicationFunding' };
 };
 
 export const success: StateConstructor<Success> = _ => {
