@@ -24,7 +24,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   const lastCommitment = helpers.getLatestCommitment(channelId, sharedData);
 
-  if (helpers.isFirstPlayer(channelId, sharedData)) {
+  if (helpers.ourTurn(sharedData, channelId)) {
     const ourCommitment = proposeNewConsensus(
       lastCommitment,
       proposedAllocation,

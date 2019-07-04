@@ -14,12 +14,15 @@ import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
 import { multipleActionDispatcher } from './multiple-action-dispatcher';
+import { LOAD } from 'redux-storage';
+import { channelUpdater } from './channel-updater';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
   let challengeWatcherProcess;
   let ganacheMinerProcess;
   let challengeResponseInitiatorProcess;
+  let channelUpdaterProcess;
 
   yield fork(multipleActionDispatcher);
 
@@ -30,7 +33,10 @@ export function* sagaManager(): IterableIterator<any> {
   const channel = yield actionChannel('*');
 
   while (true) {
-    yield take(channel);
+    const action = yield take(channel);
+    if (action.type === LOAD && !channelUpdaterProcess) {
+      channelUpdaterProcess = yield fork(channelUpdater);
+    }
 
     const state: WalletState = yield select((walletState: WalletState) => walletState);
 

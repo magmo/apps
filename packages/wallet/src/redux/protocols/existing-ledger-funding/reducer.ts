@@ -6,6 +6,7 @@ import {
   getExistingChannel,
   ChannelFundingState,
   setFundingState,
+  registerChannelToMonitor,
 } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
@@ -29,6 +30,7 @@ export const initialize = (
   ledgerId: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
+  sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 
@@ -57,8 +59,9 @@ export const initialize = (
       sharedData: newSharedData,
     };
   }
+  console.log('OUR TURN', helpers.ourTurn(sharedData, ledgerId));
 
-  if (helpers.isFirstPlayer(ledgerId, sharedData)) {
+  if (helpers.ourTurn(sharedData, ledgerId)) {
     const appFunding = craftAppFunding(sharedData, channelId);
     const ourCommitment = proposeNewConsensus(
       theirCommitment,
@@ -134,7 +137,7 @@ const waitForLedgerTopUpReducer = (
     const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
     const theirCommitment = getLastCommitment(ledgerChannel);
 
-    if (helpers.isFirstPlayer(ledgerId, sharedData)) {
+    if (helpers.ourTurn(sharedData, ledgerId)) {
       const appFunding = craftAppFunding(sharedData, protocolState.channelId);
       const ourCommitment = proposeNewConsensus(
         theirCommitment,
@@ -194,7 +197,7 @@ const waitForPostFundSetupReducer = (
   }
   newSharedData = checkResult.store;
 
-  if (!helpers.isFirstPlayer(protocolState.channelId, newSharedData)) {
+  if (helpers.ourTurn(newSharedData, protocolState.channelId)) {
     try {
       newSharedData = craftAndSendAppPostFundCommitment(
         newSharedData,
@@ -241,7 +244,7 @@ const waitForLedgerUpdateReducer = (
     };
   }
   newSharedData = checkResult.store;
-  if (helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
+  if (helpers.ourTurn(newSharedData, protocolState.ledgerId)) {
     try {
       newSharedData = craftAndSendAppPostFundCommitment(
         newSharedData,

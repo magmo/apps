@@ -117,7 +117,7 @@ function strategyApproved(state: states.FundingState, sharedData: SharedData) {
     sharedData,
   );
   if (indirectFundingStates.isTerminal(fundingState)) {
-    console.error('Indirect funding strate initialized to terminal state.');
+    console.error('Indirect funding state initialized to terminal state.');
     return handleFundingComplete(state, fundingState, newSharedData);
   }
   return {

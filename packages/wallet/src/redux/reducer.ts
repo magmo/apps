@@ -43,6 +43,7 @@ export function initializedReducer(
   action: actions.WalletAction,
 ): states.WalletState {
   let newState = { ...state };
+
   if (actions.isSharedDataUpdateAction(action)) {
     newState = updateSharedData(newState, action);
   }
@@ -204,7 +205,13 @@ const waitForLoginReducer = (
 ): states.WalletState => {
   switch (action.type) {
     case 'WALLET.LOGGED_IN':
-      const { privateKey, address } = ethers.Wallet.createRandom();
+      let address = state.address;
+      let privateKey = state.privateKey;
+      if (!address || !privateKey) {
+        const { privateKey: newPrivateKey, address: newAddress } = ethers.Wallet.createRandom();
+        address = newAddress;
+        privateKey = newPrivateKey;
+      }
       return states.initialized({
         ...state,
         uid: action.uid,

@@ -3,8 +3,6 @@ import { ProtocolStateWithSharedData } from '..';
 import { IndirectFundingState } from './states';
 import * as selectors from '../../selectors';
 import * as helpers from '../reducer-helpers';
-import { getLastCommitment } from '../../channel-store/channel-state';
-import { CommitmentType } from 'fmg-core';
 import {
   initializeExistingLedgerFunding,
   isExistingLedgerFundingAction,
@@ -23,17 +21,13 @@ export function initialize(
   channelId: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<IndirectFundingState> {
-  const existingLedgerChannel = selectors.getExistingLedgerChannelForParticipants(
+  const existingLedgerChannel = selectors.getExistingOpenLedgerChannelForParticipants(
     sharedData,
     helpers.getOurAddress(channelId, sharedData),
     helpers.getOpponentAddress(channelId, sharedData),
   );
 
-  if (
-    existingLedgerChannel &&
-    (getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.App ||
-      getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.PostFundSetup)
-  ) {
+  if (existingLedgerChannel) {
     const ledgerId = existingLedgerChannel.channelId;
     const {
       protocolState: existingLedgerFundingState,

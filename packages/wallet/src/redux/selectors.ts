@@ -3,7 +3,7 @@ import * as walletStates from './state';
 import { SharedData, FundingState } from './state';
 import { WalletProtocol } from '../communication';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../constants';
-import { Commitment } from '../domain';
+import { Commitment, CommitmentType } from '../domain';
 
 export const getOpenedChannelState = (state: SharedData, channelId: string): OpenChannelState => {
   const channelStatus = getChannelState(state, channelId);
@@ -33,7 +33,7 @@ export const getLastCommitmentForChannel = (state: SharedData, channelId: string
   return getLastCommitment(channelState);
 };
 
-export const getExistingLedgerChannelForParticipants = (
+export const getExistingOpenLedgerChannelForParticipants = (
   state: SharedData,
   playerA: string,
   playerB: string,
@@ -43,7 +43,9 @@ export const getExistingLedgerChannelForParticipants = (
     if (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
       channel.participants.indexOf(playerA) > -1 &&
-      channel.participants.indexOf(playerB) > -1
+      channel.participants.indexOf(playerB) > -1 &&
+      getLastCommitment(channel).commitmentType !== CommitmentType.Conclude &&
+      getLastCommitment(channel).commitmentType !== CommitmentType.PreFundSetup
     ) {
       return channel;
     }
@@ -121,4 +123,8 @@ export const getNextNonce = (
     }
   }
   return highestNonce + 1;
+};
+
+export const getChannelIds = (state: SharedData): string[] => {
+  return Object.keys(state.channelStore);
 };
