@@ -19,6 +19,7 @@ import { VirtualFundingState } from './virtual-funding/states';
 import { IndirectFundingState } from './indirect-funding/states';
 import { ProtocolLocator, EmbeddedProtocol } from '../../communication';
 import { WalletAction } from '../actions';
+import { ChannelSyncState } from './channel-sync/states';
 
 export type ProtocolState =
   | ApplicationState
@@ -38,7 +39,8 @@ export type ProtocolState =
   | ConsensusUpdateState
   | TransactionSubmissionState
   | AdvanceChannelState
-  | IndirectFundingState;
+  | IndirectFundingState
+  | ChannelSyncState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
   protocolState: T,
