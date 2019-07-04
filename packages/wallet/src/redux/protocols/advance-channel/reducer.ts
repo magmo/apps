@@ -231,7 +231,7 @@ function attemptToAdvanceChannel(
     sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
     channel = getExistingChannel(sharedData, channelId);
     if (channelAdvanced(channel, commitmentType)) {
-      return { protocolState: states.success(protocolState), sharedData };
+      return { protocolState: states.success({ ...protocolState, channelId }), sharedData };
     } else {
       return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
     }

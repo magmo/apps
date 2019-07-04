@@ -1,5 +1,5 @@
 import * as states from '../states';
-import { ThreePartyPlayerIndex } from '../../../types';
+import { ThreePartyPlayerIndex as PlayerIndex } from '../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
@@ -12,6 +12,7 @@ import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '..';
 // ---------
 // Test data
 // ---------
+
 const processId = 'Process.123';
 const {
   asAddress,
@@ -53,18 +54,18 @@ const props = {
 
 const propsA = {
   ...props,
-  ourIndex: ThreePartyPlayerIndex.A,
+  ourIndex: PlayerIndex.A,
 };
 
 const propsB = {
   ...props,
-  ourIndex: ThreePartyPlayerIndex.B,
+  ourIndex: PlayerIndex.B,
   privateKey: bsPrivateKey,
 };
 
 const propsHub = {
   ...props,
-  ourIndex: ThreePartyPlayerIndex.Hub,
+  ourIndex: PlayerIndex.Hub,
   privateKey: hubPrivateKey,
 };
 
@@ -187,7 +188,7 @@ const initializeArgsA = {
   ...initializeArgs,
   address: asAddress,
   privateKey: asPrivateKey,
-  ourIndex: 0,
+  ourIndex: PlayerIndex.A,
   commitmentType: CommitmentType.PreFundSetup,
 };
 
@@ -195,7 +196,7 @@ const initializeArgsB = {
   ...initializeArgs,
   address: bsAddress,
   privateKey: bsPrivateKey,
-  ourIndex: 1,
+  ourIndex: PlayerIndex.B,
   commitmentType: CommitmentType.PreFundSetup,
 };
 
@@ -203,7 +204,7 @@ const initializeArgsHub = {
   ...initializeArgs,
   address: hubAddress,
   privateKey: hubPrivateKey,
-  ourIndex: 2,
+  ourIndex: PlayerIndex.Hub,
   commitmentType: CommitmentType.PreFundSetup,
 };
 
@@ -215,9 +216,9 @@ const existingArgs = {
   protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
 };
 
-const existingArgsA = { ...existingArgs, ourIndex: 0 };
-const existingArgsB = { ...existingArgs, ourIndex: 1 };
-const existingArgsHub = { ...existingArgs, ourIndex: 2 };
+const existingArgsA = { ...existingArgs, ourIndex: PlayerIndex.A };
+const existingArgsB = { ...existingArgs, ourIndex: PlayerIndex.B };
+const existingArgsHub = { ...existingArgs, ourIndex: PlayerIndex.Hub };
 
 export const initialized = {
   ...propsA,
@@ -233,7 +234,11 @@ export const preSuccess = {
 };
 export const success = {
   ...propsA,
-  state: states.success({ commitmentType: CommitmentType.PreFundSetup }),
+  state: states.success({
+    commitmentType: CommitmentType.PreFundSetup,
+    channelId,
+    ourIndex: PlayerIndex.A,
+  }),
   sharedData: aReceivedPrefundSetup,
 };
 
