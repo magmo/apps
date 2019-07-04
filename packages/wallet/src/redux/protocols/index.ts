@@ -17,6 +17,7 @@ import { ConsensusUpdateState } from './consensus-update/states';
 import { AdvanceChannelState } from './advance-channel';
 import { VirtualFundingState } from './virtual-funding/states';
 import { IndirectFundingState } from './indirect-funding/states';
+import { ChannelSyncState } from './channel-sync/states';
 
 export type ProtocolState =
   | ApplicationState
@@ -36,7 +37,8 @@ export type ProtocolState =
   | ConsensusUpdateState
   | TransactionSubmissionState
   | AdvanceChannelState
-  | IndirectFundingState;
+  | IndirectFundingState
+  | ChannelSyncState;
 
 export type ProtocolReducer<T extends ProtocolState> = (
   protocolState: T,
