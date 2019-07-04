@@ -161,9 +161,8 @@ function waitForJointChannelReducer(
             }),
             sharedData: guarantorChannelResult.sharedData,
           };
-        case CommitmentType.App:
-        case CommitmentType.Conclude:
-          throw new Error('Unimplemented');
+        default:
+          return { protocolState, sharedData };
       }
     }
   }
