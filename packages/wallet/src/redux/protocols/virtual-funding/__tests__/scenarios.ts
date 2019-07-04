@@ -16,7 +16,6 @@ const {
   asPrivateKey,
   signedJointLedgerCommitments,
   threeParticipants: destination,
-  oneTwoThree: allocation,
   ledgerLibraryAddress: channelType,
 } = scenarios;
 const { signedCommitment0 } = signedJointLedgerCommitments;
@@ -26,12 +25,17 @@ const app0 = appCommitment({ turnNum: 0, balances: twoThree });
 const app1 = appCommitment({ turnNum: 1, balances: twoThree });
 const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
 const targetChannelId = appChannel.channelId;
+const hubAddress = destination[2];
 
 // To properly test the embedded advanceChannel protocols, it's useful to be playerA
 // to make sure that the commitments get sent.
+
+const startingAllocation = app0.commitment.allocation;
+const startingDestination = app0.commitment.destination;
+
 const initializeArgs = {
-  startingAllocation: allocation,
-  startingDestination: destination,
+  startingAllocation,
+  startingDestination,
   participants: destination,
   channelType,
   appAttributes,
@@ -42,14 +46,15 @@ const initializeArgs = {
   ourIndex: 0,
   commitmentType: CommitmentType.PreFundSetup,
   targetChannelId,
-  hubAddress: destination[2],
+  hubAddress,
 };
 
 const props = {
   targetChannelId,
   processId,
-  startingAllocation: allocation,
-  startingDestination: destination,
+  startingAllocation,
+  startingDestination,
+  hubAddress,
 };
 
 // ----

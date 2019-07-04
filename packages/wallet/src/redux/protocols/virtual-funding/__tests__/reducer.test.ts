@@ -7,7 +7,7 @@ import {
   itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import { success, preSuccess } from '../../advance-channel/__tests__';
-import { oneTwoThree } from '../../../__tests__/test-scenarios';
+import { twoThreeFive } from '../../../__tests__/test-scenarios';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -32,11 +32,20 @@ describe('happyPath', () => {
   const scenario = scenarios.happyPath;
 
   describe.only('Initialization', () => {
+    const { startingDestination, hubAddress } = scenario;
     const { sharedData, args } = scenario.initialize;
     const { protocolState, sharedData: result } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForJointChannel');
-    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation: oneTwoThree } }]);
+    itSendsTheseCommitments(result, [
+      {
+        commitment: {
+          turnNum: 0,
+          allocation: twoThreeFive,
+          destination: [...startingDestination, hubAddress],
+        },
+      },
+    ]);
   });
 
   describe.only(scenarioStepDescription(scenario.openJ), () => {

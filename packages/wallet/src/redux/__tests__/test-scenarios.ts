@@ -35,6 +35,7 @@ export const fundingState = {
 };
 
 export const twoThree = [bigNumberify(2).toHexString(), bigNumberify(3).toHexString()];
+export const twoThreeFive = [...twoThree, twoThree.reduce(addHex)];
 export const oneTwoThree = [
   bigNumberify(1).toHexString(),
   bigNumberify(2).toHexString(),

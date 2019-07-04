@@ -9,6 +9,7 @@ import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app'
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
 import { advanceChannelReducer } from '../advance-channel';
 import { ethers } from 'ethers';
+import { addHex } from '../../../..';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
@@ -44,14 +45,13 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
     participants: [...startingDestination, hubAddress],
   };
 
-  // TODO: Create proper allocations
-  // const jointAllocation = ['0x0'];
-  // const jointDestination = [channelType];
+  const jointAllocation = [...startingAllocation, startingAllocation.reduce(addHex)];
+  const jointDestination = [...startingDestination, hubAddress];
   const jointChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
     sharedData,
     CommitmentType.PreFundSetup,
-    { ...initializationArgs, ...channelSpecificArgs(startingAllocation, startingDestination) },
+    { ...initializationArgs, ...channelSpecificArgs(jointAllocation, jointDestination) },
   );
 
   return {
