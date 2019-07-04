@@ -3,7 +3,7 @@ import * as states from '../states';
 import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { CommitmentType } from '../../../../domain';
-import { preSuccess, success } from '../../advance-channel/__tests__';
+import { preFund, postFund } from '../../advance-channel/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 
@@ -53,14 +53,21 @@ const props = {
 // ------
 
 const scenarioStates = {
-  waitForJointChannel: states.waitForJointChannel({
+  waitForJointChannel1: states.waitForJointChannel({
     ...props,
-    [states.JOINT_CHANNEL_DESCRIPTOR]: preSuccess.state,
+    [states.JOINT_CHANNEL_DESCRIPTOR]: preFund.preSuccess.state,
+  }),
+  waitForJointChannel2: states.waitForJointChannel({
+    ...props,
+    [states.JOINT_CHANNEL_DESCRIPTOR]: {
+      ...preFund.preSuccess.state,
+      commitmentType: CommitmentType.PostFundSetup,
+    },
   }),
 
   waitForGuarantorChannel: states.waitForGuarantorChannel({
     ...props,
-    [states.GUARANTOR_CHANNEL_DESCRIPTOR]: success.state,
+    [states.GUARANTOR_CHANNEL_DESCRIPTOR]: preFund.success.state,
   }),
 };
 
@@ -83,13 +90,26 @@ export const happyPath = {
     sharedData: setChannel(EMPTY_SHARED_DATA, appChannel),
   },
   openJ: {
-    state: scenarioStates.waitForJointChannel,
-    action: { ...preSuccess.trigger, protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR },
-    sharedData: preSuccess.sharedData,
+    state: scenarioStates.waitForJointChannel1,
+    action: { ...preFund.preSuccess.trigger, protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR },
+    sharedData: preFund.preSuccess.sharedData,
+  },
+  prepareJ: {
+    state: scenarioStates.waitForJointChannel2,
+    action: { ...postFund.preSuccess.trigger, protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR },
+    sharedData: postFund.preSuccess.sharedData,
   },
   openG: {
     state: scenarioStates.waitForGuarantorChannel,
-    action: { ...preSuccess.trigger, protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR },
-    sharedData: preSuccess.sharedData,
+    action: { ...preFund.preSuccess.trigger, protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR },
+    sharedData: preFund.preSuccess.sharedData,
+  },
+  prepareG: {
+    state: scenarioStates.waitForGuarantorChannel,
+    action: {
+      ...postFund.preSuccess.trigger,
+      protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
+    },
+    sharedData: postFund.preSuccess.sharedData,
   },
 };
