@@ -92,17 +92,17 @@ export const happyPath = {
   openJ: {
     state: scenarioStates.waitForJointChannel1,
     action: { ...preFund.preSuccess.trigger, protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR },
-    sharedData: preFund.preSuccess.sharedData,
+    sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareJ: {
     state: scenarioStates.waitForJointChannel2,
     action: { ...postFund.preSuccess.trigger, protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR },
-    sharedData: postFund.preSuccess.sharedData,
+    sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
   openG: {
     state: scenarioStates.waitForGuarantorChannel,
     action: { ...preFund.preSuccess.trigger, protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR },
-    sharedData: preFund.preSuccess.sharedData,
+    sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareG: {
     state: scenarioStates.waitForGuarantorChannel,
@@ -110,6 +110,6 @@ export const happyPath = {
       ...postFund.preSuccess.trigger,
       protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
     },
-    sharedData: postFund.preSuccess.sharedData,
+    sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
 };
