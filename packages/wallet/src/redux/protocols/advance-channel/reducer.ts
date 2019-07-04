@@ -114,12 +114,12 @@ function initializeWithNewChannel(
     ourIndex,
     clearedToSend,
     protocolLocator,
+    participants,
   } = initializeChannelArgs;
 
   if (isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
     // Initialize the channel in the store
     const nonce = selectors.getNextNonce(sharedData, channelType);
-    const participants = destination;
     const channel: Channel = {
       nonce,
       participants,

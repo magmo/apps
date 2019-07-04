@@ -27,6 +27,7 @@ const {
   ledgerLibraryAddress: channelType,
   jointLedgerId: channelId,
 } = scenarios;
+const participants = destination;
 const {
   signedCommitment0,
   signedCommitment1,
@@ -40,6 +41,7 @@ const appAttributes = signedCommitment0.commitment.appAttributes;
 const initializeArgs = {
   allocation,
   destination,
+  participants,
   channelType,
   appAttributes,
   processId,

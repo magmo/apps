@@ -20,6 +20,7 @@ export interface ChannelUnknown extends BaseState {
   ourIndex: number;
   allocation: string[];
   destination: string[];
+  participants: string[];
   channelType: string;
   appAttributes: string;
   privateKey: string;
@@ -64,13 +65,22 @@ const base: StateConstructor<BaseState> = params => {
 };
 
 export const channelUnknown: StateConstructor<ChannelUnknown> = params => {
-  const { privateKey, allocation, destination, channelType, appAttributes, clearedToSend } = params;
+  const {
+    privateKey,
+    allocation,
+    destination,
+    participants,
+    channelType,
+    appAttributes,
+    clearedToSend,
+  } = params;
   return {
     ...base(params),
     type: 'AdvanceChannel.ChannelUnknown',
     privateKey,
     allocation,
     destination,
+    participants,
     channelType,
     appAttributes,
     clearedToSend,

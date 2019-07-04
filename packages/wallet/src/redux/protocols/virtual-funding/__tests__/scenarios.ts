@@ -32,6 +32,7 @@ const targetChannelId = appChannel.channelId;
 const initializeArgs = {
   startingAllocation: allocation,
   startingDestination: destination,
+  participants: destination,
   channelType,
   appAttributes,
   processId,
