@@ -14,6 +14,8 @@ import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
 import { multipleActionDispatcher } from './multiple-action-dispatcher';
+import { channelUpdater } from './channel-updater';
+import { isStorageLoadAction } from '../actions';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -30,7 +32,10 @@ export function* sagaManager(): IterableIterator<any> {
   const channel = yield actionChannel('*');
 
   while (true) {
-    yield take(channel);
+    const action = yield take(channel);
+    if (isStorageLoadAction(action)) {
+      yield fork(channelUpdater);
+    }
 
     const state: WalletState = yield select((walletState: WalletState) => walletState);
 

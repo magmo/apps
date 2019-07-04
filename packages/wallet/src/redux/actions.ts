@@ -17,7 +17,7 @@ import { ActionConstructor } from './utils';
 import { Commitment } from '../domain';
 import { isDefundingAction, DefundingAction } from './protocols/defunding/actions';
 import { AdvanceChannelAction } from './protocols/advance-channel/actions';
-
+import { LOAD } from 'redux-storage';
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
 
@@ -111,6 +111,12 @@ export interface ChallengeExpiredEvent {
   timestamp: number;
 }
 
+export interface ChannelUpdate {
+  type: 'WALLET.ADJUDICATOR.CHANNEL_UPDATE';
+  channelId: string;
+  isFinalized: boolean;
+  balance: string;
+}
 // -------
 // Constructors
 // -------
@@ -176,6 +182,10 @@ export const challengeExpiredEvent: ActionConstructor<ChallengeExpiredEvent> = p
   ...p,
   type: 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED',
 });
+export const channelUpdate: ActionConstructor<ChannelUpdate> = p => ({
+  ...p,
+  type: 'WALLET.ADJUDICATOR.CHANNEL_UPDATE',
+});
 
 // -------
 // Unions and Guards
@@ -188,7 +198,8 @@ export type AdjudicatorEventAction =
   | FundingReceivedEvent
   | ChallengeExpiredEvent
   | ChallengeCreatedEvent
-  | ChallengeExpirySetEvent;
+  | ChallengeExpirySetEvent
+  | ChannelUpdate;
 
 export type ProtocolAction =
   // only list top level protocol actions
@@ -201,6 +212,15 @@ export function isProtocolAction(action: WalletAction): action is ProtocolAction
     isConcludingAction(action) ||
     isDefundingAction(action)
   );
+}
+
+export interface StorageLoadAction {
+  type: typeof LOAD;
+  payload: any;
+}
+
+export function isStorageLoadAction(action: any): action is StorageLoadAction {
+  return action.type && action.type === LOAD;
 }
 
 export type WalletAction =
@@ -241,6 +261,7 @@ export function isAdjudicatorEventAction(action: WalletAction): action is Adjudi
     action.type === 'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT' ||
-    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET'
+    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
+    action.type === 'WALLET.ADJUDICATOR.CHANNEL_UPDATE'
   );
 }
