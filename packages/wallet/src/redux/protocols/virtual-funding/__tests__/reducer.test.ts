@@ -47,6 +47,14 @@ describe('happyPath', () => {
     itTransitionsSubstateTo(protocolState, 'jointChannel', preSuccess.state.type);
   });
 
+  describe.only(scenarioStepDescription(scenario.prepareJ), () => {
+    const { state, sharedData, action } = scenario.prepareJ;
+    const { protocolState } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'VirtualFunding.WaitForGuarantorChannel');
+    itTransitionsSubstateTo(protocolState, 'guarantorChannel', preSuccess.state.type);
+  });
+
   describe(scenarioStepDescription(scenario.openG), () => {
     const { state, sharedData, action } = scenario.openG;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
