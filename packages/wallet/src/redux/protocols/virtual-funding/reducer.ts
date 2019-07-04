@@ -7,6 +7,7 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
+import { advanceChannelReducer } from '../advance-channel';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
@@ -22,18 +23,6 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
   const { ourIndex, processId, targetChannelId, startingAllocation, startingDestination } = args;
   const privateKey = getPrivatekey(sharedData, targetChannelId);
   const channelType = CONSENSUS_LIBRARY_ADDRESS;
-
-  function channelSpecificArgs(allocation, destination) {
-    return {
-      allocation,
-      destination,
-      appAttributes: bytesFromAppAttributes({
-        proposedAllocation: allocation,
-        proposedDestination: destination,
-        furtherVotesRequired: 0,
-      }),
-    };
-  }
 
   const initializationArgs = {
     privateKey,
@@ -91,11 +80,79 @@ export const reducer: ProtocolReducer<states.VirtualFundingState> = (
 };
 
 function waitForJointChannelReducer(
-  protocolState: states.VirtualFundingState,
+  protocolState: states.WaitForJointChannel,
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  // Unimplemented
+  const { processId } = protocolState;
+  if (
+    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
+    action.protocolLocator === states.JOINT_CHANNEL_DESCRIPTOR
+  ) {
+    const result = advanceChannelReducer(
+      protocolState[states.JOINT_CHANNEL_DESCRIPTOR],
+      sharedData,
+      action,
+    );
+
+    if (advanceChannel.isSuccess(result.protocolState)) {
+      const { ourIndex, channelId } = result.protocolState;
+      switch (result.protocolState.commitmentType) {
+        case CommitmentType.PreFundSetup:
+          const jointChannelResult = advanceChannel.initializeAdvanceChannel(
+            processId,
+            result.sharedData,
+            CommitmentType.PostFundSetup,
+            {
+              clearedToSend: true,
+              commitmentType: CommitmentType.PostFundSetup,
+              processId,
+              protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR,
+              channelId,
+              ourIndex,
+            },
+          );
+
+          return {
+            protocolState: {
+              ...protocolState,
+              [states.JOINT_CHANNEL_DESCRIPTOR]: jointChannelResult.protocolState,
+            },
+            sharedData: jointChannelResult.sharedData,
+          };
+        case CommitmentType.PostFundSetup:
+          const { targetChannelId } = protocolState;
+          const privateKey = getPrivatekey(sharedData, targetChannelId);
+          const channelType = CONSENSUS_LIBRARY_ADDRESS;
+          const allocation = [channelId, 'HUB_ADDRESS']; // TODO: Replace with proper address
+          const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
+            processId,
+            result.sharedData,
+            CommitmentType.PostFundSetup,
+            {
+              clearedToSend: true,
+              commitmentType: CommitmentType.PreFundSetup,
+              processId,
+              protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
+              ourIndex,
+              privateKey,
+              channelType,
+              ...channelSpecificArgs(allocation, []),
+            },
+          );
+          return {
+            protocolState: {
+              ...protocolState,
+              [states.GUARANTOR_CHANNEL_DESCRIPTOR]: guarantorChannelResult.protocolState,
+            },
+            sharedData: guarantorChannelResult.sharedData,
+          };
+        case CommitmentType.App:
+        case CommitmentType.Conclude:
+          throw new Error('Unimplemented');
+      }
+    }
+  }
   return { protocolState, sharedData };
 }
 
@@ -124,4 +181,19 @@ function waitForApplicationFundingReducer(
 ) {
   // Unimplemented
   return { protocolState, sharedData };
+}
+
+function channelSpecificArgs(
+  allocation: string[],
+  destination: string[],
+): { allocation: string[]; destination: string[]; appAttributes: string } {
+  return {
+    allocation,
+    destination,
+    appAttributes: bytesFromAppAttributes({
+      proposedAllocation: allocation,
+      proposedDestination: destination,
+      furtherVotesRequired: 0,
+    }),
+  };
 }
