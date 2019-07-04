@@ -9,7 +9,7 @@ import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app'
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
 import { advanceChannelReducer } from '../advance-channel';
 import { ethers } from 'ethers';
-import { addHex } from '../../../..';
+import { addHex } from '../../../utils/hex-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
