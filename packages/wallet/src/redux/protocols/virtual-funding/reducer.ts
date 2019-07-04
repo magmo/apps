@@ -8,6 +8,7 @@ import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
 import { advanceChannelReducer } from '../advance-channel';
+import { ethers } from 'ethers';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
@@ -15,12 +16,20 @@ interface InitializationArgs {
   ourIndex: number;
   targetChannelId: string;
   processId: string;
+  hubAddress: string;
   startingAllocation: string[];
   startingDestination: string[];
 }
 
 export function initialize(sharedData: SharedData, args: InitializationArgs): ReturnVal {
-  const { ourIndex, processId, targetChannelId, startingAllocation, startingDestination } = args;
+  const {
+    ourIndex,
+    processId,
+    targetChannelId,
+    startingAllocation,
+    startingDestination,
+    hubAddress,
+  } = args;
   const privateKey = getPrivatekey(sharedData, targetChannelId);
   const channelType = CONSENSUS_LIBRARY_ADDRESS;
 
@@ -32,8 +41,12 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
     clearedToSend: true,
     processId,
     protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
+    participants: [...startingDestination, hubAddress],
   };
 
+  // TODO: Create proper allocations
+  // const jointAllocation = ['0x0'];
+  // const jointDestination = [channelType];
   const jointChannelInitialized = advanceChannel.initializeAdvanceChannel(
     processId,
     sharedData,
@@ -98,7 +111,7 @@ function waitForJointChannelReducer(
     );
 
     if (advanceChannel.isSuccess(result.protocolState)) {
-      const { ourIndex, channelId } = result.protocolState;
+      const { ourIndex, channelId: jointChannelId } = result.protocolState;
       switch (result.protocolState.commitmentType) {
         case CommitmentType.PreFundSetup:
           const jointChannelResult = advanceChannel.initializeAdvanceChannel(
@@ -110,7 +123,7 @@ function waitForJointChannelReducer(
               commitmentType: CommitmentType.PostFundSetup,
               processId,
               protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR,
-              channelId,
+              channelId: jointChannelId,
               ourIndex,
             },
           );
@@ -125,12 +138,14 @@ function waitForJointChannelReducer(
         case CommitmentType.PostFundSetup:
           const { targetChannelId } = protocolState;
           const privateKey = getPrivatekey(sharedData, targetChannelId);
+          const ourAddress = new ethers.Wallet(privateKey).address;
           const channelType = CONSENSUS_LIBRARY_ADDRESS;
-          const allocation = [channelId, 'HUB_ADDRESS']; // TODO: Replace with proper address
+          const hubAddress = channelType; // TODO: Replace with proper address
+          const allocation = [jointChannelId, hubAddress];
           const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
             processId,
             result.sharedData,
-            CommitmentType.PostFundSetup,
+            CommitmentType.PreFundSetup,
             {
               clearedToSend: true,
               commitmentType: CommitmentType.PreFundSetup,
@@ -139,14 +154,15 @@ function waitForJointChannelReducer(
               ourIndex,
               privateKey,
               channelType,
+              participants: [ourAddress, hubAddress],
               ...channelSpecificArgs(allocation, []),
             },
           );
           return {
-            protocolState: {
+            protocolState: states.waitForGuarantorChannel({
               ...protocolState,
               [states.GUARANTOR_CHANNEL_DESCRIPTOR]: guarantorChannelResult.protocolState,
-            },
+            }),
             sharedData: guarantorChannelResult.sharedData,
           };
         case CommitmentType.App:

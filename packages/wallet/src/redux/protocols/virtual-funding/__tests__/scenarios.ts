@@ -42,6 +42,7 @@ const initializeArgs = {
   ourIndex: 0,
   commitmentType: CommitmentType.PreFundSetup,
   targetChannelId,
+  hubAddress: destination[2],
 };
 
 const props = {
