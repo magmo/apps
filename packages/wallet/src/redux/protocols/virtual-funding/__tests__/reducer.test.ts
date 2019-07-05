@@ -4,7 +4,7 @@ import * as scenarios from './scenarios';
 import {
   scenarioStepDescription,
   itSendsTheseCommitments,
-  expectThisCommitmentSent,
+  itSendsThisCommitment,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { twoThreeFive } from '../../../__tests__/test-scenarios';
@@ -116,7 +116,7 @@ describe('happyPath', () => {
     // Since we ask the indirect-funding protocol to fund that channel, the resulting
     // ledger channel has three participants as well.
     // TODO: Fix this by constructing appropriate test data
-    expectThisCommitmentSent(result, {
+    itSendsThisCommitment(result, {
       turnNum: 0,
       channel: {
         participants: [expect.any(String), expect.any(String), expect.any(String)],
