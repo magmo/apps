@@ -74,9 +74,13 @@ const scenarioStates = {
     },
   }),
 
-  waitForGuarantorChannel: states.waitForGuarantorChannel({
+  waitForGuarantorChannel1: states.waitForGuarantorChannel({
     ...props,
-    guarantorChannel: preFund.success.state,
+    guarantorChannel: preFund.preSuccess.state,
+  }),
+  waitForGuarantorChannel2: states.waitForGuarantorChannel({
+    ...props,
+    guarantorChannel: postFund.preSuccess.state,
   }),
 };
 
@@ -109,12 +113,12 @@ export const happyPath = {
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
   openG: {
-    state: scenarioStates.waitForGuarantorChannel,
+    state: scenarioStates.waitForGuarantorChannel1,
     action: { ...preFund.preSuccess.trigger, protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR },
     sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareG: {
-    state: scenarioStates.waitForGuarantorChannel,
+    state: scenarioStates.waitForGuarantorChannel2,
     action: {
       ...postFund.preSuccess.trigger,
       protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
