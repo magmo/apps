@@ -8,6 +8,7 @@ import { preSuccess } from '../../indirect-funding/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
+import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../existing-ledger-funding/reducer';
 
 // ---------
 // Test data
@@ -28,10 +29,7 @@ const app1 = appCommitment({ turnNum: 1, balances: twoThree });
 const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
 const targetChannelId = appChannel.channelId;
 const hubAddress = destination[2];
-const jointChannelId = getChannelId(signedCommitment0.commitment);
-
-// To properly test the embedded advanceChannel protocols, it's useful to be playerA
-// to make sure that the commitments get sent.
+const jointChannelId = preSuccess.state.existingLedgerFundingState.ledgerId;
 
 const startingAllocation = app0.commitment.allocation;
 const startingDestination = app0.commitment.destination;
@@ -44,6 +42,8 @@ const initializeArgs = {
   appAttributes,
   processId,
   clearedToSend: true,
+  // To properly test the embedded advanceChannel protocols, it's useful to be playerA
+  // to make sure that the commitments get sent.
   address: asAddress,
   privateKey: asPrivateKey,
   ourIndex: 0,
@@ -59,6 +59,7 @@ const props = {
   startingDestination,
   hubAddress,
   ourIndex: PlayerIndex.A,
+  jointChannelId,
 };
 
 // ----
@@ -135,8 +136,14 @@ export const happyPath = {
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
   fundG: {
+    appChannelId: getChannelId(appChannel.commitments[0].commitment),
     state: scenarioStates.waitForGuarantorFunding,
-    action: { ...preSuccess.action, protocolLocator: states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR },
-    sharedData: setChannel(preSuccess.sharedData, appChannel),
+    action: {
+      ...preSuccess.action,
+      protocolLocator: `${
+        states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR
+      }/${EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR}`,
+    },
+    sharedData: preSuccess.sharedData,
   },
 };

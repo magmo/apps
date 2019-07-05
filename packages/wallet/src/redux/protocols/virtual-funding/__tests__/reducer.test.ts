@@ -7,8 +7,11 @@ import {
   itSendsThisCommitment,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
-import { twoThreeFive } from '../../../__tests__/test-scenarios';
+import { twoThreeFive, twoThree } from '../../../__tests__/test-scenarios';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
+import { addHex } from '../../../../utils/hex-utils';
+import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { bigNumberify } from 'ethers/utils';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -124,5 +127,32 @@ describe('happyPath', () => {
         channelType: CONSENSUS_LIBRARY_ADDRESS,
       },
     });
+  });
+
+  describe(scenarioStepDescription(scenario.fundG), () => {
+    const { state, sharedData, action, appChannelId } = scenario.fundG;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'VirtualFunding.WaitForApplicationFunding');
+    itTransitionsSubstateTo(
+      protocolState,
+      'indirectApplicationFunding',
+      'ConsensusUpdate.WaitForUpdate',
+    );
+    itSendsTheseCommitments(result, [
+      { commitment: { turnNum: 7 } },
+      {
+        commitment: {
+          turnNum: 8,
+          destination: [appChannelId],
+          allocation: [bigNumberify(4).toHexString()],
+          appAttributes: bytesFromAppAttributes({
+            proposedAllocation: [twoThree.reduce(addHex)],
+            proposedDestination: [appChannelId],
+            furtherVotesRequired: 1,
+          }),
+        },
+      },
+    ]);
   });
 });
