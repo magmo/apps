@@ -2,7 +2,7 @@ import * as states from '../states';
 
 import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
 import * as scenarios from '../../../__tests__/test-scenarios';
-import { CommitmentType } from '../../../../domain';
+import { CommitmentType, getChannelId } from '../../../../domain';
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
@@ -27,6 +27,7 @@ const app1 = appCommitment({ turnNum: 1, balances: twoThree });
 const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
 const targetChannelId = appChannel.channelId;
 const hubAddress = destination[2];
+const jointChannelId = getChannelId(signedCommitment0.commitment);
 
 // To properly test the embedded advanceChannel protocols, it's useful to be playerA
 // to make sure that the commitments get sent.
@@ -113,6 +114,7 @@ export const happyPath = {
     state: scenarioStates.waitForJointChannel2,
     action: { ...postFund.preSuccess.trigger, protocolLocator: states.JOINT_CHANNEL_DESCRIPTOR },
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
+    jointChannelId,
   },
   openG: {
     state: scenarioStates.waitForGuarantorChannel1,
