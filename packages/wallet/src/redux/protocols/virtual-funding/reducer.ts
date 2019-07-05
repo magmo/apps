@@ -8,6 +8,7 @@ import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
 import { advanceChannelReducer } from '../advance-channel';
+import { initializeIndirectFunding } from '../indirect-funding';
 import { ethers } from 'ethers';
 import { addHex } from '../../../utils/hex-utils';
 
@@ -179,11 +180,68 @@ function waitForJointChannelReducer(
 }
 
 function waitForGuarantorChannelReducer(
-  protocolState: states.VirtualFundingState,
+  protocolState: states.WaitForGuarantorChannel,
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  // Unimplemented
+  const { processId } = protocolState;
+  if (
+    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
+    action.protocolLocator === states.GUARANTOR_CHANNEL_DESCRIPTOR
+  ) {
+    const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
+    if (advanceChannel.isSuccess(result.protocolState)) {
+      const { ourIndex, channelId: guarantorChannelId } = result.protocolState;
+      switch (result.protocolState.commitmentType) {
+        case CommitmentType.PreFundSetup:
+          const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
+            processId,
+            result.sharedData,
+            CommitmentType.PostFundSetup,
+            {
+              clearedToSend: true,
+              commitmentType: CommitmentType.PostFundSetup,
+              processId,
+              protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
+              channelId: guarantorChannelId,
+              ourIndex,
+            },
+          );
+          return {
+            protocolState: {
+              ...protocolState,
+              jointChannel: guarantorChannelResult.protocolState,
+            },
+            sharedData: guarantorChannelResult.sharedData,
+          };
+
+        case CommitmentType.PostFundSetup:
+          const indirectFundingResult = initializeIndirectFunding(
+            processId,
+            result.protocolState.channelId,
+            result.sharedData,
+          );
+          return {
+            protocolState: states.waitForGuarantorFunding({
+              ...protocolState,
+              indirectGuarantorFunding: indirectFundingResult.protocolState,
+            }),
+            sharedData: indirectFundingResult.sharedData,
+          };
+
+        default:
+          return {
+            protocolState: { ...protocolState, guarantorChannel: result.protocolState },
+            sharedData: result.sharedData,
+          };
+      }
+    } else {
+      return {
+        protocolState: { ...protocolState, guarantorChannel: result.protocolState },
+        sharedData: result.sharedData,
+      };
+    }
+  }
   return { protocolState, sharedData };
 }
 
