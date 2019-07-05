@@ -4,6 +4,7 @@ import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
 import * as scenarios from '../../../__tests__/test-scenarios';
 import { CommitmentType, getChannelId } from '../../../../domain';
 import { preFund, postFund } from '../../advance-channel/__tests__';
+import { preSuccess } from '../../indirect-funding/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
@@ -85,6 +86,10 @@ const scenarioStates = {
     ...props,
     guarantorChannel: postFund.preSuccess.state,
   }),
+  waitForGuarantorFunding: states.waitForGuarantorFunding({
+    ...props,
+    indirectGuarantorFunding: preSuccess.state,
+  }),
 };
 
 // -------
@@ -128,5 +133,10 @@ export const happyPath = {
       protocolLocator: states.GUARANTOR_CHANNEL_DESCRIPTOR,
     },
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
+  },
+  fundG: {
+    state: scenarioStates.waitForGuarantorFunding,
+    action: { ...preSuccess.action, protocolLocator: states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR },
+    sharedData: setChannel(preSuccess.sharedData, appChannel),
   },
 };
