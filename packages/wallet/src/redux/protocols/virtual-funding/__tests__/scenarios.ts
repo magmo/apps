@@ -2,13 +2,15 @@ import * as states from '../states';
 
 import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
 import * as scenarios from '../../../__tests__/test-scenarios';
-import { CommitmentType, getChannelId } from '../../../../domain';
+import { CommitmentType } from '../../../../domain';
 import { preFund, postFund } from '../../advance-channel/__tests__';
-import { preSuccess } from '../../indirect-funding/__tests__';
+import { preSuccess as indirectFundingPreSuccess } from '../../indirect-funding/__tests__';
+import { threePlayerPreSuccessA as consensusUpdatePreSuccess } from '../../consensus-update/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../existing-ledger-funding/reducer';
+import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../consensus-update/reducer';
 
 // ---------
 // Test data
@@ -29,7 +31,7 @@ const app1 = appCommitment({ turnNum: 1, balances: twoThree });
 const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
 const targetChannelId = appChannel.channelId;
 const hubAddress = destination[2];
-const jointChannelId = preSuccess.state.existingLedgerFundingState.ledgerId;
+const jointChannelId = indirectFundingPreSuccess.state.existingLedgerFundingState.ledgerId;
 
 const startingAllocation = app0.commitment.allocation;
 const startingDestination = app0.commitment.destination;
@@ -89,7 +91,11 @@ const scenarioStates = {
   }),
   waitForGuarantorFunding: states.waitForGuarantorFunding({
     ...props,
-    indirectGuarantorFunding: preSuccess.state,
+    indirectGuarantorFunding: indirectFundingPreSuccess.state,
+  }),
+  waitForApplicationFunding: states.waitForApplicationFunding({
+    ...props,
+    indirectApplicationFunding: consensusUpdatePreSuccess.state,
   }),
 };
 
@@ -136,14 +142,24 @@ export const happyPath = {
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
   fundG: {
-    appChannelId: getChannelId(appChannel.commitments[0].commitment),
+    appChannelId: appChannel.channelId,
     state: scenarioStates.waitForGuarantorFunding,
     action: {
-      ...preSuccess.action,
+      ...indirectFundingPreSuccess.action,
       protocolLocator: `${
         states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR
       }/${EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR}`,
     },
-    sharedData: preSuccess.sharedData,
+    sharedData: indirectFundingPreSuccess.sharedData,
+  },
+  fundApp: {
+    state: scenarioStates.waitForApplicationFunding,
+    action: {
+      ...consensusUpdatePreSuccess.action,
+      protocolLocator: `${
+        states.INDIRECT_APPLICATION_FUNDING_DESCRIPTOR
+      }/${CONSENSUS_UPDATE_PROTOCOL_LOCATOR}`,
+    },
+    sharedData: consensusUpdatePreSuccess.sharedData,
   },
 };

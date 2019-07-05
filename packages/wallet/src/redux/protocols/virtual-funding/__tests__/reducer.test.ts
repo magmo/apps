@@ -5,6 +5,7 @@ import {
   scenarioStepDescription,
   itSendsTheseCommitments,
   itSendsThisCommitment,
+  itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { twoThreeFive, twoThree } from '../../../__tests__/test-scenarios';
@@ -156,5 +157,13 @@ describe('happyPath', () => {
         },
       },
     ]);
+  });
+
+  describe(scenarioStepDescription(scenario.fundApp), () => {
+    const { state, sharedData, action } = scenario.fundApp;
+    const { protocolState, sharedData: result } = reducer(state, sharedData, action);
+
+    itTransitionsTo(protocolState, 'VirtualFunding.Success');
+    itSendsNoMessage(result);
   });
 });
