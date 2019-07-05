@@ -8,7 +8,8 @@ import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
 import { advanceChannelReducer } from '../advance-channel';
-import { initializeIndirectFunding } from '../indirect-funding';
+import * as consensusUpdate from '../consensus-update';
+import * as indirectFunding from '../indirect-funding';
 import { ethers } from 'ethers';
 import { addHex } from '../../../utils/hex-utils';
 
@@ -184,7 +185,7 @@ function waitForGuarantorChannelReducer(
   const { processId } = protocolState;
   if (
     action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
-    action.protocolLocator === states.GUARANTOR_CHANNEL_DESCRIPTOR
+    action.protocolLocator.indexOf(states.GUARANTOR_CHANNEL_DESCRIPTOR) === 0
   ) {
     const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
     if (advanceChannel.isSuccess(result.protocolState)) {
@@ -213,7 +214,7 @@ function waitForGuarantorChannelReducer(
           };
 
         case CommitmentType.PostFundSetup:
-          const indirectFundingResult = initializeIndirectFunding(
+          const indirectFundingResult = indirectFunding.initializeIndirectFunding(
             processId,
             result.protocolState.channelId,
             result.sharedData,
@@ -243,11 +244,54 @@ function waitForGuarantorChannelReducer(
 }
 
 function waitForGuarantorFundingReducer(
-  protocolState: states.VirtualFundingState,
+  protocolState: states.WaitForGuarantorFunding,
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  // Unimplemented
+  const { processId, jointChannelId, startingAllocation, targetChannelId } = protocolState;
+  if (
+    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' &&
+    action.protocolLocator &&
+    action.protocolLocator.indexOf(states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR) === 0
+  ) {
+    const result = indirectFunding.indirectFundingReducer(
+      protocolState.indirectGuarantorFunding,
+      sharedData,
+      action,
+    );
+    if (indirectFunding.isTerminal(result.protocolState)) {
+      switch (result.protocolState.type) {
+        case 'IndirectFunding.Success':
+          const proposedAllocation = [startingAllocation.reduce(addHex)];
+          const proposedDestination = [targetChannelId];
+
+          const applicationFundingResult = consensusUpdate.initializeConsensusUpdate(
+            processId,
+            jointChannelId,
+            proposedAllocation,
+            proposedDestination,
+            result.sharedData,
+          );
+          return {
+            protocolState: states.waitForApplicationFunding({
+              ...protocolState,
+              indirectApplicationFunding: applicationFundingResult.protocolState,
+            }),
+            sharedData: applicationFundingResult.sharedData,
+          };
+        case 'IndirectFunding.Failure':
+          throw new Error(`Indirect funding failed: ${result.protocolState.reason}`);
+
+        default:
+          return unreachable(result.protocolState);
+      }
+    } else {
+      return {
+        protocolState: { ...protocolState, guarantorChannel: result.protocolState },
+        sharedData: result.sharedData,
+      };
+    }
+  }
   return { protocolState, sharedData };
 }
 
