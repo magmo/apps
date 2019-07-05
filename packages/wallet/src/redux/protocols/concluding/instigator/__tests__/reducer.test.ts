@@ -158,9 +158,7 @@ describe('[ Concluding Cancelled ]', () => {
 /////////////
 
 function itSendsConcludeInstigated(sharedData: SharedData, commitment: Commitment) {
-  it('sends a conclude instigated message with the correct commitment', () => {
-    itSendsThisCommitment(sharedData, commitment, 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED');
-  });
+  itSendsThisCommitment(sharedData, commitment, 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED');
 }
 
 function itTransitionsTo(result: ReturnVal, type: InstigatorConcludingStateType) {
