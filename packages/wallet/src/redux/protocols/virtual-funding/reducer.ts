@@ -99,7 +99,7 @@ function waitForJointChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId, hubAddress } = protocolState;
+  const { processId, hubAddress, ourIndex } = protocolState;
   if (
     action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
     action.protocolLocator === states.JOINT_CHANNEL_DESCRIPTOR
@@ -107,7 +107,7 @@ function waitForJointChannelReducer(
     const result = advanceChannelReducer(protocolState.jointChannel, sharedData, action);
 
     if (advanceChannel.isSuccess(result.protocolState)) {
-      const { ourIndex, channelId: jointChannelId } = result.protocolState;
+      const { channelId: jointChannelId } = result.protocolState;
       switch (result.protocolState.commitmentType) {
         case CommitmentType.PreFundSetup:
           const jointChannelResult = advanceChannel.initializeAdvanceChannel(
@@ -188,14 +188,14 @@ function waitForGuarantorChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId } = protocolState;
+  const { processId, ourIndex } = protocolState;
   if (
     action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
     action.protocolLocator.indexOf(states.GUARANTOR_CHANNEL_DESCRIPTOR) === 0
   ) {
     const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
     if (advanceChannel.isSuccess(result.protocolState)) {
-      const { ourIndex, channelId: guarantorChannelId } = result.protocolState;
+      const { channelId: guarantorChannelId } = result.protocolState;
       switch (result.protocolState.commitmentType) {
         case CommitmentType.PreFundSetup:
           const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
