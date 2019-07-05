@@ -32,12 +32,14 @@ export const GUARANTOR_CHANNEL_DESCRIPTOR = 'guarantorChannel';
 export interface WaitForGuarantorChannel extends Base {
   type: 'VirtualFunding.WaitForGuarantorChannel';
   guarantorChannel: AdvanceChannelState;
+  jointChannelId: string;
 }
 
 export const INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR = 'indirectGuarantorFunding';
 export interface WaitForGuarantorFunding extends Base {
   type: 'VirtualFunding.WaitForGuarantorFunding';
   indirectGuarantorFunding: IndirectFundingState;
+  jointChannelId: string;
 }
 
 export const INDIRECT_APPLICATION_FUNDING_DESCRIPTOR = 'indirectApplicationFunding';
