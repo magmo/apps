@@ -163,13 +163,19 @@ function waitForJointChannelReducer(
           };
         default:
           return {
-            protocolState: { ...protocolState, jointChannel: result.protocolState },
+            protocolState: states.waitForJointChannel({
+              ...protocolState,
+              jointChannel: result.protocolState,
+            }),
             sharedData: result.sharedData,
           };
       }
     } else {
       return {
-        protocolState: { ...protocolState, jointChannel: result.protocolState },
+        protocolState: states.waitForJointChannel({
+          ...protocolState,
+          jointChannel: result.protocolState,
+        }),
         sharedData: result.sharedData,
       };
     }
@@ -229,13 +235,19 @@ function waitForGuarantorChannelReducer(
 
         default:
           return {
-            protocolState: { ...protocolState, guarantorChannel: result.protocolState },
+            protocolState: states.waitForGuarantorChannel({
+              ...protocolState,
+              guarantorChannel: result.protocolState,
+            }),
             sharedData: result.sharedData,
           };
       }
     } else {
       return {
-        protocolState: { ...protocolState, guarantorChannel: result.protocolState },
+        protocolState: states.waitForGuarantorChannel({
+          ...protocolState,
+          guarantorChannel: result.protocolState,
+        }),
         sharedData: result.sharedData,
       };
     }
@@ -287,7 +299,10 @@ function waitForGuarantorFundingReducer(
       }
     } else {
       return {
-        protocolState: { ...protocolState, guarantorChannel: result.protocolState },
+        protocolState: states.waitForGuarantorFunding({
+          ...protocolState,
+          indirectGuarantorFunding: result.protocolState,
+        }),
         sharedData: result.sharedData,
       };
     }
