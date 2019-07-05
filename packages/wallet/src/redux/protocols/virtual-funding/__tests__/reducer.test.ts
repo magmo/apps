@@ -4,10 +4,11 @@ import * as scenarios from './scenarios';
 import {
   scenarioStepDescription,
   itSendsTheseCommitments,
-  itSendsNoMessage,
+  expectThisCommitmentSent,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { twoThreeFive } from '../../../__tests__/test-scenarios';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -58,6 +59,7 @@ describe('happyPath', () => {
     // Even though there should only be two commitments in the guarantor channel round,
     // since we're using the preSuccess scenarios from advance-channel, which sets up a joint
     // 3-party channel, three get sent out.
+    // TODO: Fix this by constructing appropriate test data
     itSendsTheseCommitments(result, [
       { commitment: { turnNum: 1 } },
       { commitment: { turnNum: 2 } },
@@ -91,6 +93,7 @@ describe('happyPath', () => {
     // Even though there should only be two commitments in the guarantor channel round,
     // since we're using the preSuccess scenarios from advance-channel, which sets up a joint
     // 3-party channel, three get sent out.
+    // TODO: Fix this by constructing appropriate test data
     itSendsTheseCommitments(result, [
       { commitment: { turnNum: 1 } },
       { commitment: { turnNum: 2 } },
@@ -98,12 +101,28 @@ describe('happyPath', () => {
     ]);
   });
 
-  describe.skip(scenarioStepDescription(scenario.prepareG), () => {
+  describe(scenarioStepDescription(scenario.prepareG), () => {
     const { state, sharedData, action } = scenario.prepareG;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForGuarantorFunding');
-    itTransitionsSubstateTo(protocolState, 'indirectGuarantorFunding', postFund.success.state.type);
-    itSendsNoMessage(result);
+    itTransitionsSubstateTo(
+      protocolState,
+      'indirectGuarantorFunding',
+      'IndirectFunding.WaitForNewLedgerFunding',
+    );
+    // While this channel should have two participants, the test scenarios currently
+    // create a guarantor channel that has three participants.
+    // Since we ask the indirect-funding protocol to fund that channel, the resulting
+    // ledger channel has three participants as well.
+    // TODO: Fix this by constructing appropriate test data
+    expectThisCommitmentSent(result, {
+      turnNum: 0,
+      channel: {
+        participants: [expect.any(String), expect.any(String), expect.any(String)],
+        nonce: expect.any(Number),
+        channelType: CONSENSUS_LIBRARY_ADDRESS,
+      },
+    });
   });
 });
