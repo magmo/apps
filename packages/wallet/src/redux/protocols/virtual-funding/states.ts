@@ -13,6 +13,8 @@ interface Base {
   targetChannelId: string;
   startingAllocation: string[];
   startingDestination: string[];
+  ourIndex: number;
+  hubAddress: string;
 }
 export type SubstateDescriptor =
   | typeof JOINT_CHANNEL_DESCRIPTOR

@@ -6,6 +6,7 @@ import { CommitmentType } from '../../../../domain';
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
+import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 
 // ---------
 // Test data
@@ -55,6 +56,7 @@ const props = {
   startingAllocation,
   startingDestination,
   hubAddress,
+  ourIndex: PlayerIndex.A,
 };
 
 // ----

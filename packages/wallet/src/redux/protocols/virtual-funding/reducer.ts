@@ -14,14 +14,10 @@ import { addHex } from '../../../utils/hex-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
-interface InitializationArgs {
-  ourIndex: number;
-  targetChannelId: string;
-  processId: string;
-  hubAddress: string;
-  startingAllocation: string[];
-  startingDestination: string[];
-}
+type InitializationArgs = Pick<
+  states.WaitForJointChannel,
+  Exclude<keyof states.WaitForJointChannel, 'type' | 'jointChannel'>
+>;
 
 export function initialize(sharedData: SharedData, args: InitializationArgs): ReturnVal {
   const {
@@ -62,6 +58,8 @@ export function initialize(sharedData: SharedData, args: InitializationArgs): Re
       targetChannelId,
       startingAllocation,
       startingDestination,
+      ourIndex,
+      hubAddress,
     }),
     sharedData: jointChannelInitialized.sharedData,
   };
@@ -100,7 +98,7 @@ function waitForJointChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId } = protocolState;
+  const { processId, hubAddress } = protocolState;
   if (
     action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
     action.protocolLocator === states.JOINT_CHANNEL_DESCRIPTOR
@@ -137,7 +135,6 @@ function waitForJointChannelReducer(
           const privateKey = getPrivatekey(sharedData, targetChannelId);
           const ourAddress = new ethers.Wallet(privateKey).address;
           const channelType = CONSENSUS_LIBRARY_ADDRESS;
-          const hubAddress = channelType; // TODO: Replace with proper address
           const destination = [jointChannelId, hubAddress];
           const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
             processId,
