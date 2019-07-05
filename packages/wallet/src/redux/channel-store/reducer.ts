@@ -142,6 +142,7 @@ export function checkAndStore(
 
   if (!isSafeTransition(store, channel, commitment)) {
     console.log('Failed to verify a safe transition');
+    throw new Error('Failed to verify a safe transition');
     return { isSuccess: false };
   }
 

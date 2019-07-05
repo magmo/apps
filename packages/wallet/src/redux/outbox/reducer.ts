@@ -12,6 +12,12 @@ export function clearOutbox(state: OutboxState, action: actions.WalletAction): O
   if (action.type === 'WALLET.TRANSACTION_SUBMISSION.TRANSACTION_SENT') {
     nextOutbox.transactionOutbox = nextOutbox.transactionOutbox.slice(1);
   }
+  if (
+    action.type === 'WALLET.LOCKING.LOCK_CHANNEL_REQUEST' ||
+    action.type === 'WALLET.LOCKING.UNLOCK_CHANNEL_REQUEST'
+  ) {
+    nextOutbox.lockOutbox = nextOutbox.lockOutbox.slice(1);
+  }
 
   return nextOutbox;
 }

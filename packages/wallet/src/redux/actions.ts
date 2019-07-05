@@ -123,10 +123,46 @@ export interface ChannelUpdate {
   isFinalized: boolean;
   balance: string;
 }
+
+export interface LockChannelRequest {
+  type: 'WALLET.LOCKING.LOCK_CHANNEL_REQUEST';
+  processId: string;
+  channelId: string;
+}
+export interface UnlockChannelRequest {
+  type: 'WALLET.LOCKING.UNLOCK_CHANNEL_REQUEST';
+  processId: string;
+  channelId: string;
+}
+export interface ChannelLocked {
+  type: 'WALLET.LOCKING.CHANNEL_LOCKED';
+  processId: string;
+  channelId: string;
+}
+export interface ChannelUnlocked {
+  type: 'WALLET.LOCKING.CHANNEL_UNLOCKED';
+  processId: string;
+  channelId: string;
+}
 // -------
 // Constructors
 // -------
-
+export const channelLocked: ActionConstructor<ChannelLocked> = p => ({
+  ...p,
+  type: 'WALLET.LOCKING.CHANNEL_LOCKED',
+});
+export const channelUnlocked: ActionConstructor<ChannelUnlocked> = p => ({
+  ...p,
+  type: 'WALLET.LOCKING.CHANNEL_UNLOCKED',
+});
+export const lockChannelRequest: ActionConstructor<LockChannelRequest> = p => ({
+  ...p,
+  type: 'WALLET.LOCKING.LOCK_CHANNEL_REQUEST',
+});
+export const unlockChannelRequest: ActionConstructor<UnlockChannelRequest> = p => ({
+  ...p,
+  type: 'WALLET.LOCKING.UNLOCK_CHANNEL_REQUEST',
+});
 export const multipleWalletActions: ActionConstructor<MultipleWalletActions> = p => ({
   ...p,
   type: 'WALLET.MULTIPLE_ACTIONS',
@@ -236,6 +272,14 @@ export function isLoadAction(action: any): action is LoadAction {
   return action.type && action.type === LOAD;
 }
 
+export type LockRequest = LockChannelRequest | UnlockChannelRequest;
+export type LockAction = ChannelLocked | ChannelUnlocked;
+export function isLockAction(action: WalletAction): action is LockAction {
+  return (
+    action.type === 'WALLET.LOCKING.CHANNEL_LOCKED' ||
+    action.type === 'WALLET.LOCKING.CHANNEL_UNLOCKED'
+  );
+}
 export type WalletAction =
   | AdvanceChannelAction
   | AdjudicatorKnown
@@ -248,8 +292,9 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | RelayableAction;
-
+  | RelayableAction
+  | LockAction
+  | LockRequest;
 export function isCommonAction(action: WalletAction): action is CommonAction {
   return (
     ['WALLET.COMMON.MESSAGE_RECEIVED', 'WALLET.COMMON.COMMITMENT_RECEIVED'].indexOf(action.type) >=

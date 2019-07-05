@@ -1,4 +1,4 @@
-import { select, take, fork, actionChannel, cancel } from 'redux-saga/effects';
+import { select, take, fork, actionChannel, cancel, put } from 'redux-saga/effects';
 
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
@@ -14,8 +14,9 @@ import { ganacheMiner } from './ganache-miner';
 import { WALLET_INITIALIZED } from '../state';
 import { challengeResponseInitiator } from './challenge-response-initiator';
 import { multipleActionDispatcher } from './multiple-action-dispatcher';
-import { LOAD } from 'redux-storage';
+
 import { channelUpdater } from './channel-updater';
+import { channelLocker } from './channel-locker';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -28,13 +29,14 @@ export function* sagaManager(): IterableIterator<any> {
 
   // always want the message listenter to be running
   yield fork(messageListener);
+  yield fork(channelLocker);
 
   // todo: restrict just to wallet actions
   const channel = yield actionChannel('*');
 
   while (true) {
     const action = yield take(channel);
-    if (action.type === LOAD && !channelUpdaterProcess) {
+    if (action.type === 'REDUX_STORAGE_LOAD' && !channelUpdaterProcess) {
       channelUpdaterProcess = yield fork(channelUpdater);
     }
 
@@ -86,6 +88,10 @@ export function* sagaManager(): IterableIterator<any> {
     if (outboxState.transactionOutbox.length) {
       const queuedTransaction = outboxState.transactionOutbox[0];
       yield transactionSender(queuedTransaction);
+    }
+    if (outboxState.lockOutbox.length) {
+      const lockRequest = outboxState.lockOutbox[0];
+      yield put(lockRequest);
     }
   }
 }

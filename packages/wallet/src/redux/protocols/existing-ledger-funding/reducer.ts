@@ -7,6 +7,7 @@ import {
   ChannelFundingState,
   setFundingState,
   registerChannelToMonitor,
+  queueLockRequest,
 } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
@@ -27,6 +28,8 @@ import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledg
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
 import { addHex } from '../../../utils/hex-utils';
 import { initializeChannelSync, isChannelSyncAction, channelSyncReducer } from '../channel-sync';
+
+import { lockChannelRequest } from '../../actions';
 export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'ExistingLedgerFunding';
 
 export const initialize = (
@@ -36,6 +39,21 @@ export const initialize = (
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
   sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
+  sharedData = queueLockRequest(sharedData, lockChannelRequest({ channelId: ledgerId, processId }));
+  return {
+    protocolState: states.waitForChannelLock({ processId, ledgerId, channelId }),
+    sharedData,
+  };
+};
+const waitForChannelLockReducer = (
+  protocolState: states.WaitForChannelLock,
+  sharedData: SharedData,
+  action: ExistingLedgerFundingAction,
+): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
+  if (action.type !== 'WALLET.LOCKING.CHANNEL_LOCKED') {
+    return { protocolState, sharedData };
+  }
+  const { processId, ledgerId, channelId } = protocolState;
   const { protocolState: channelSyncState, sharedData: newSharedData } = initializeChannelSync(
     processId,
     ledgerId,
@@ -47,7 +65,6 @@ export const initialize = (
     sharedData: newSharedData,
   };
 };
-
 export const existingLedgerFundingReducer = (
   protocolState: states.ExistingLedgerFundingState,
   sharedData: SharedData,
@@ -62,6 +79,8 @@ export const existingLedgerFundingReducer = (
       return waitForLedgerTopUpReducer(protocolState, sharedData, action);
     case 'ExistingLedgerFunding.WaitForChannelSync':
       return waitForChannelSyncReducer(protocolState, sharedData, action);
+    case 'ExistingLedgerFunding.WaitForChannelLock':
+      return waitForChannelLockReducer(protocolState, sharedData, action);
   }
   return { protocolState, sharedData };
 };
@@ -119,7 +138,6 @@ const waitForChannelSyncReducer = (
         sharedData,
       };
     }
-    console.log('OUR TURN', helpers.ourTurn(sharedData, ledgerId));
     if (helpers.ourTurn(sharedData, ledgerId)) {
       const appFunding = craftAppFunding(sharedData, channelId);
       const ourCommitment = proposeNewConsensus(
@@ -145,7 +163,7 @@ const waitForChannelSyncReducer = (
       );
       sharedData = queueMessage(sharedData, messageRelay);
     }
-    console.log('OUR TURN after', helpers.ourTurn(sharedData, ledgerId));
+
     const newProtocolState = states.waitForLedgerUpdate({
       processId,
       ledgerId,
@@ -283,7 +301,6 @@ const waitForLedgerUpdateReducer = (
   let newSharedData = { ...sharedData };
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
 
-  console.log('ourturn2 b4', helpers.ourTurn(newSharedData, protocolState.ledgerId));
   const checkResult = checkAndStore(newSharedData, action.signedCommitment);
   if (!checkResult.isSuccess) {
     return {

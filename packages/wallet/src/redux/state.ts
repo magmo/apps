@@ -5,6 +5,7 @@ import {
   queueMessage as queueMessageOutbox,
   queueTransaction as queueTransactionOutbox,
   getLastMessage as getLastMessageFromOutbox,
+  queueLockRequest as queueLockRequestOutbox,
 } from './outbox/state';
 import {
   ChannelStore,
@@ -27,6 +28,7 @@ import { TransactionRequest } from 'ethers/providers';
 import { AdjudicatorState } from './adjudicator-state/state';
 import { SignedCommitment, Commitment } from '../domain';
 import { WalletProtocol } from '../communication';
+import { LockRequest } from './actions';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -191,7 +193,9 @@ export function getExistingChannel(state: SharedData, channelId: string) {
 export function queueMessage(state: SharedData, message: WalletEvent): SharedData {
   return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
 }
-
+export function queueLockRequest(state: SharedData, lockRequest: LockRequest): SharedData {
+  return { ...state, outboxState: queueLockRequestOutbox(state.outboxState, lockRequest) };
+}
 export function setChannelStore(state: SharedData, channelStore: ChannelStore): SharedData {
   return { ...state, channelStore };
 }

@@ -9,6 +9,12 @@ export type FailureReason =
   | 'PostFundSetupFailure'
   | 'ChannelSyncFailure';
 
+export interface WaitForChannelLock {
+  type: 'ExistingLedgerFunding.WaitForChannelLock';
+  processId: string;
+  channelId: string;
+  ledgerId: string;
+}
 export interface WaitForLedgerTopUp {
   type: 'ExistingLedgerFunding.WaitForLedgerTopUp';
   processId: string;
@@ -74,6 +80,10 @@ export const waitForPostFundSetup: StateConstructor<WaitForPostFundSetup> = p =>
   };
 };
 
+export const waitForChannelLock: StateConstructor<WaitForChannelLock> = p => {
+  return { ...p, type: 'ExistingLedgerFunding.WaitForChannelLock' };
+};
+
 export const success: StateConstructor<Success> = p => {
   return { ...p, type: 'ExistingLedgerFunding.Success' };
 };
@@ -85,7 +95,8 @@ export type NonTerminalExistingLedgerFundingState =
   | WaitForLedgerTopUp
   | WaitForLedgerUpdate
   | WaitForPostFundSetup
-  | WaitForChannelSync;
+  | WaitForChannelSync
+  | WaitForChannelLock;
 export type ExistingLedgerFundingState = NonTerminalExistingLedgerFundingState | Success | Failure;
 
 export function isExistingLedgerFundingState(
