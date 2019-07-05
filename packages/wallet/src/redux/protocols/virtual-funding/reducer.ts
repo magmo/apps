@@ -296,11 +296,43 @@ function waitForGuarantorFundingReducer(
 }
 
 function waitForApplicationFundingReducer(
-  protocolState: states.VirtualFundingState,
+  protocolState: states.WaitForApplicationFunding,
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  // Unimplemented
+  if (
+    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
+    action.protocolLocator &&
+    action.protocolLocator.indexOf(states.INDIRECT_APPLICATION_FUNDING_DESCRIPTOR) === 0
+  ) {
+    const result = consensusUpdate.consensusUpdateReducer(
+      protocolState.indirectApplicationFunding,
+      sharedData,
+      action,
+    );
+    if (consensusUpdate.isTerminal(result.protocolState)) {
+      switch (result.protocolState.type) {
+        case 'ConsensusUpdate.Success':
+          return {
+            protocolState: states.success(protocolState),
+            sharedData: result.sharedData,
+          };
+        case 'ConsensusUpdate.Failure':
+          throw new Error(`Indirect funding failed: ${result.protocolState.reason}`);
+
+        default:
+          return unreachable(result.protocolState);
+      }
+    } else {
+      return {
+        protocolState: states.waitForApplicationFunding({
+          ...protocolState,
+          indirectApplicationFunding: result.protocolState,
+        }),
+        sharedData: result.sharedData,
+      };
+    }
+  }
   return { protocolState, sharedData };
 }
 
