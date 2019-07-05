@@ -1,11 +1,13 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { ChannelSyncState } from '../channel-sync/states';
 
 export type FailureReason =
   | 'ReceivedInvalidCommitment'
   | 'SignatureFailure'
   | 'LedgerTopUpFailure'
-  | 'PostFundSetupFailure';
+  | 'PostFundSetupFailure'
+  | 'ChannelSyncFailure';
 
 export interface WaitForLedgerTopUp {
   type: 'ExistingLedgerFunding.WaitForLedgerTopUp';
@@ -25,7 +27,15 @@ export interface WaitForLedgerUpdate {
   targetAllocation: string[];
   targetDestination: string[];
 }
-
+export interface WaitForChannelSync {
+  type: 'ExistingLedgerFunding.WaitForChannelSync';
+  processId: string;
+  channelSyncState: ChannelSyncState;
+  channelId: string;
+  ledgerId: string;
+  targetAllocation: string[];
+  targetDestination: string[];
+}
 export interface Failure {
   type: 'ExistingLedgerFunding.Failure';
   reason: FailureReason;
@@ -39,6 +49,13 @@ export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
   return {
     ...p,
     type: 'ExistingLedgerFunding.WaitForLedgerUpdate',
+  };
+};
+
+export const waitForChannelSync: StateConstructor<WaitForChannelSync> = p => {
+  return {
+    ...p,
+    type: 'ExistingLedgerFunding.WaitForChannelSync',
   };
 };
 
@@ -56,7 +73,10 @@ export const success: StateConstructor<Success> = p => {
 export const failure: StateConstructor<Failure> = p => {
   return { ...p, type: 'ExistingLedgerFunding.Failure' };
 };
-export type NonTerminalExistingLedgerFundingState = WaitForLedgerTopUp | WaitForLedgerUpdate;
+export type NonTerminalExistingLedgerFundingState =
+  | WaitForLedgerTopUp
+  | WaitForLedgerUpdate
+  | WaitForChannelSync;
 
 export type ExistingLedgerFundingState = NonTerminalExistingLedgerFundingState | Success | Failure;
 

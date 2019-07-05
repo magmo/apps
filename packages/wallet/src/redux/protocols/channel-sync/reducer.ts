@@ -1,10 +1,11 @@
 import { SharedData, getExistingChannel } from '../../state';
-import { ProtocolStateWithSharedData } from '..';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { ChannelSyncState } from './states';
 import { sendCommitments, checkCommitments } from '../reducer-helpers';
 import * as states from './states';
 import { ChannelSyncAction, isChannelSyncAction } from './actions';
-export const CHANNEL_SYNC_PROTOCOL_LOCATOR = 'ChannelSync';
+import { EmbeddedProtocol } from '../../../communication';
+export const CHANNEL_SYNC_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.ChannelSync);
 
 export function initialize(
   processId: string,

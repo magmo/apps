@@ -5,6 +5,7 @@ import {
   checkAndStore,
   ChannelFundingState,
   setFundingState,
+  registerChannelToMonitor,
 } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
@@ -20,6 +21,7 @@ import { CommitmentType } from 'fmg-core';
 import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
 import { addHex } from '../../../utils/hex-utils';
+import { isChannelSyncAction, channelSyncReducer, initializeChannelSync } from '../channel-sync';
 export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(
   EmbeddedProtocol.ExistingLedgerFunding,
 );
@@ -32,67 +34,23 @@ export const initialize = (
   targetDestination: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.NonTerminalExistingLedgerFundingState | states.Failure> => {
-  const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
-  const theirCommitment = getLastCommitment(ledgerChannel);
-
-  if (ledgerChannelNeedsTopUp(theirCommitment, targetAllocation, targetDestination)) {
-    const { protocolState: ledgerTopUpState, sharedData: newSharedData } = initializeLedgerTopUp(
+  sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
+  const { protocolState: channelSyncState, sharedData: newSharedData } = initializeChannelSync(
+    processId,
+    ledgerId,
+    sharedData,
+  );
+  return {
+    protocolState: states.waitForChannelSync({
       processId,
       channelId,
       ledgerId,
+      channelSyncState,
       targetAllocation,
       targetDestination,
-      theirCommitment.allocation,
-      sharedData,
-    );
-    return {
-      protocolState: states.waitForLedgerTopUp({
-        ledgerTopUpState,
-        processId,
-        channelId,
-        ledgerId,
-        targetAllocation,
-        targetDestination,
-      }),
-      sharedData: newSharedData,
-    };
-  }
-
-  if (helpers.isFirstPlayer(ledgerId, sharedData)) {
-    const appFunding = craftAppFunding(sharedData, channelId);
-    const ourCommitment = proposeNewConsensus(
-      theirCommitment,
-      appFunding.proposedAllocation,
-      appFunding.proposedDestination,
-    );
-    const signResult = signAndStore(sharedData, ourCommitment);
-    if (!signResult.isSuccess) {
-      return {
-        protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
-        sharedData,
-      };
-    }
-    sharedData = signResult.store;
-
-    const messageRelay = sendCommitmentReceived(
-      theirAddress(ledgerChannel),
-      processId,
-      signResult.signedCommitment.commitment,
-      signResult.signedCommitment.signature,
-      EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
-    );
-    sharedData = queueMessage(sharedData, messageRelay);
-  }
-
-  const protocolState = states.waitForLedgerUpdate({
-    processId,
-    ledgerId,
-    channelId,
-    targetAllocation,
-    targetDestination,
-  });
-
-  return { protocolState, sharedData };
+    }),
+    sharedData: newSharedData,
+  };
 };
 
 export const existingLedgerFundingReducer = (
@@ -105,10 +63,110 @@ export const existingLedgerFundingReducer = (
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
     case 'ExistingLedgerFunding.WaitForLedgerTopUp':
       return waitForLedgerTopUpReducer(protocolState, sharedData, action);
+    case 'ExistingLedgerFunding.WaitForChannelSync':
+      return waitForChannelSyncReducer(protocolState, sharedData, action);
   }
   return { protocolState, sharedData };
 };
+const waitForChannelSyncReducer = (
+  protocolState: states.WaitForChannelSync,
+  sharedData: SharedData,
+  action: ExistingLedgerFundingAction,
+): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
+  if (!isChannelSyncAction(action)) {
+    return { protocolState, sharedData };
+  }
 
+  const { protocolState: channelSyncState, sharedData: newSharedData } = channelSyncReducer(
+    protocolState.channelSyncState,
+    sharedData,
+    action,
+  );
+  sharedData = newSharedData;
+  if (channelSyncState.type === 'ChannelSync.Failure') {
+    return {
+      protocolState: states.failure({ reason: 'ChannelSyncFailure' }),
+      sharedData,
+    };
+  } else if (channelSyncState.type === 'ChannelSync.Success') {
+    const { processId, channelId, ledgerId, targetAllocation, targetDestination } = protocolState;
+    const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
+    const theirCommitment = getLastCommitment(ledgerChannel);
+
+    const {
+      allocation: proposedAllocation,
+      destination: proposedDestination,
+    } = helpers.getLatestCommitment(channelId, sharedData);
+
+    if (ledgerChannelNeedsTopUp(theirCommitment, proposedAllocation, proposedDestination)) {
+      const {
+        protocolState: ledgerTopUpState,
+        sharedData: ledgerTopUpSharedData,
+      } = initializeLedgerTopUp(
+        processId,
+        channelId,
+        ledgerId,
+        proposedAllocation,
+        proposedDestination,
+        theirCommitment.allocation,
+        sharedData,
+      );
+      sharedData = ledgerTopUpSharedData;
+      return {
+        protocolState: states.waitForLedgerTopUp({
+          ledgerTopUpState,
+          processId,
+          channelId,
+          ledgerId,
+          targetAllocation,
+          targetDestination,
+        }),
+        sharedData,
+      };
+    }
+
+    if (helpers.ourTurn(sharedData, ledgerId)) {
+      const appFunding = craftAppFunding(sharedData, channelId);
+      const ourCommitment = proposeNewConsensus(
+        theirCommitment,
+        appFunding.proposedAllocation,
+        appFunding.proposedDestination,
+      );
+      const signResult = signAndStore(sharedData, ourCommitment);
+      if (!signResult.isSuccess) {
+        return {
+          protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
+          sharedData,
+        };
+      }
+      sharedData = signResult.store;
+
+      const messageRelay = sendCommitmentReceived(
+        theirAddress(ledgerChannel),
+        processId,
+        signResult.signedCommitment.commitment,
+        signResult.signedCommitment.signature,
+        EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
+      );
+      sharedData = queueMessage(sharedData, messageRelay);
+    }
+
+    const newProtocolState = states.waitForLedgerUpdate({
+      processId,
+      ledgerId,
+      channelId,
+      targetAllocation,
+      targetDestination,
+    });
+
+    return { protocolState: newProtocolState, sharedData };
+  } else {
+    return {
+      protocolState: states.waitForChannelSync({ ...protocolState, channelSyncState }),
+      sharedData,
+    };
+  }
+};
 const waitForLedgerTopUpReducer = (
   protocolState: states.WaitForLedgerTopUp,
   sharedData: SharedData,
