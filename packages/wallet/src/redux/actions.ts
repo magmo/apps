@@ -118,7 +118,7 @@ export interface ChallengeExpiredEvent {
 }
 
 export interface ChannelUpdate {
-  type: 'WALLET.ADJUDICATOR.BALANCE_UPDATE';
+  type: 'WALLET.ADJUDICATOR.CHANNEL_UPDATE';
   channelId: string;
   isFinalized: boolean;
   balance: string;
@@ -231,7 +231,7 @@ export const challengeExpiredEvent: ActionConstructor<ChallengeExpiredEvent> = p
 });
 export const channelUpdate: ActionConstructor<ChannelUpdate> = p => ({
   ...p,
-  type: 'WALLET.ADJUDICATOR.BALANCE_UPDATE',
+  type: 'WALLET.ADJUDICATOR.CHANNEL_UPDATE',
 });
 
 // -------
@@ -327,6 +327,6 @@ export function isAdjudicatorEventAction(action: WalletAction): action is Adjudi
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
-    action.type === 'WALLET.ADJUDICATOR.BALANCE_UPDATE'
+    action.type === 'WALLET.ADJUDICATOR.CHANNEL_UPDATE'
   );
 }

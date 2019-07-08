@@ -16,7 +16,7 @@ const storageEngine = filter(createEngine('magmo-wallet'), [
   ['channelStore'],
 ]);
 const storageMiddleware = storage.createMiddleware(storageEngine, [
-  'WALLET.ADJUDICATOR.BALANCE_UPDATE',
+  'WALLET.ADJUDICATOR.CHANNEL_UPDATE',
 ]);
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancers = composeEnhancers(applyMiddleware(sagaMiddleware, storageMiddleware));
