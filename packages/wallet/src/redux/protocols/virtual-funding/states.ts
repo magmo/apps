@@ -8,7 +8,7 @@ import { IndirectFundingState } from '../indirect-funding';
 // States
 // -------
 
-interface Base {
+export interface InitializationArgs {
   processId: string;
   targetChannelId: string;
   startingAllocation: string[];
@@ -16,6 +16,8 @@ interface Base {
   ourIndex: number;
   hubAddress: string;
 }
+type Base = InitializationArgs;
+
 export type SubstateDescriptor =
   | typeof JOINT_CHANNEL_DESCRIPTOR
   | typeof GUARANTOR_CHANNEL_DESCRIPTOR

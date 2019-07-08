@@ -14,12 +14,7 @@ import { addHex } from '../../../utils/hex-utils';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
-type InitializationArgs = Pick<
-  states.WaitForJointChannel,
-  Exclude<keyof states.WaitForJointChannel, 'type' | 'jointChannel'>
->;
-
-export function initialize(sharedData: SharedData, args: InitializationArgs): ReturnVal {
+export function initialize(sharedData: SharedData, args: states.InitializationArgs): ReturnVal {
   const {
     ourIndex,
     processId,
