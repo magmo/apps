@@ -7,7 +7,7 @@ import {
   itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import { success, preSuccess } from '../../advance-channel/__tests__';
-import { twoThreeFive } from '../../../__tests__/test-scenarios';
+import { bigNumberify } from 'ethers/utils/bignumber';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -27,25 +27,20 @@ const itTransitionsSubstateTo = (
     expect(result[substate].type).toEqual(type);
   });
 };
-
+const allocation = [
+  bigNumberify(2).toHexString(),
+  bigNumberify(3).toHexString(),
+  bigNumberify(5).toHexString(),
+];
 describe('happyPath', () => {
   const scenario = scenarios.happyPath;
 
   describe.only('Initialization', () => {
-    const { startingDestination, hubAddress } = scenario;
     const { sharedData, args } = scenario.initialize;
     const { protocolState, sharedData: result } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForJointChannel');
-    itSendsTheseCommitments(result, [
-      {
-        commitment: {
-          turnNum: 0,
-          allocation: twoThreeFive,
-          destination: [...startingDestination, hubAddress],
-        },
-      },
-    ]);
+    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation } }]);
   });
 
   describe.only(scenarioStepDescription(scenario.openJ), () => {
