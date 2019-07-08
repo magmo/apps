@@ -7,9 +7,7 @@ import {
   itSendsThisCommitment,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
-import { twoThree } from '../../../__tests__/test-scenarios';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { addHex } from '../../../../utils/hex-utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { bigNumberify } from 'ethers/utils';
 
@@ -143,7 +141,7 @@ describe('happyPath', () => {
           destination: [appChannelId],
           allocation: [bigNumberify(4).toHexString()],
           appAttributes: bytesFromAppAttributes({
-            proposedAllocation: [twoThree.reduce(addHex)],
+            proposedAllocation: [bigNumberify(5).toHexString()],
             proposedDestination: [appChannelId],
             furtherVotesRequired: 1,
           }),
