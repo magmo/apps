@@ -33,16 +33,20 @@ export const getLastCommitmentForChannel = (state: SharedData, channelId: string
   return getLastCommitment(channelState);
 };
 
-export const getExistingLedgerChannelForParticipants = (
+export const getFundedLedgerChannelForParticipants = (
   state: SharedData,
   playerA: string,
   playerB: string,
 ): ChannelState | undefined => {
+  // Finds a directly funded, two-party channel between players A and B
   return Object.values(state.channelStore).find(channel => {
+    const fundingState = getChannelFundingState(state, channel.channelId);
+    const directlyFunded: boolean = fundingState ? fundingState.directlyFunded : false;
     return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
-      channel.participants.indexOf(playerA) > -1 &&
-      channel.participants.indexOf(playerB) > -1
+      // We call concat() on participants in order to not sort it in place
+      channel.participants.concat().sort() === [playerA, playerB].sort() &&
+      directlyFunded
     );
   });
 };
@@ -85,8 +89,8 @@ export const getFundingState = (state: SharedData): FundingState => {
 export const getChannelFundingState = (
   state: SharedData,
   channelId: string,
-): walletStates.ChannelFundingState => {
-  return state.fundingState[channelId];
+): walletStates.ChannelFundingState | undefined => {
+  return getFundingState(state)[channelId];
 };
 
 export const getProtocolForProcessId = (
