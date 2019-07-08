@@ -63,7 +63,8 @@ describe('happyPath', () => {
   });
 
   describe(scenarioStepDescription(scenario.prepareJ), () => {
-    const { state, sharedData, action, jointChannelId } = scenario.prepareJ;
+    const { targetChannelId, ourAddress } = scenario;
+    const { state, sharedData, action } = scenario.prepareJ;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForGuarantorChannel');
@@ -73,7 +74,7 @@ describe('happyPath', () => {
         commitment: {
           turnNum: 0,
           allocation: [],
-          destination: [jointChannelId, hubAddress],
+          destination: [targetChannelId, ourAddress, hubAddress],
         },
       },
     ]);

@@ -135,7 +135,7 @@ function waitForJointChannelReducer(
           const privateKey = getPrivatekey(sharedData, targetChannelId);
           const ourAddress = new ethers.Wallet(privateKey).address;
           const channelType = CONSENSUS_LIBRARY_ADDRESS;
-          const destination = [jointChannelId, hubAddress];
+          const destination = [targetChannelId, ourAddress, hubAddress];
           const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
             processId,
             result.sharedData,

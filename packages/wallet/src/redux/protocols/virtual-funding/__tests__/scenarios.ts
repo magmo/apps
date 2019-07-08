@@ -54,6 +54,7 @@ const props = {
   startingDestination,
   hubAddress,
   ourIndex: PlayerIndex.A,
+  ourAddress: asAddress,
 };
 
 // ----
