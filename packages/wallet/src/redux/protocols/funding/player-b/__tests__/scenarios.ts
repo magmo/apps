@@ -8,6 +8,7 @@ import { channelId, asAddress, appCommitment } from '../../../../../domain/commi
 import { bsAddress, bsPrivateKey } from '../../../../../communication/__tests__/commitments';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 import { preSuccess as indirectFundingPreSuccess } from '../../../indirect-funding/__tests__';
+import { preSuccess as advanceChannelPreSuccess } from '../../../advance-channel/__tests__';
 import { bigNumberify } from 'ethers/utils';
 
 // To test all paths through the state machine we will use 4 different scenarios:
@@ -49,10 +50,14 @@ const waitForIndirectStrategyApproval = states.waitForStrategyApproval(props);
 const waitForIndirectFunding = states.waitForFunding({
   ...props,
   fundingState: indirectFundingPreSuccess.state,
+  postFundSetupState: advanceChannelPreSuccess.state,
 });
 
 const waitForSuccessConfirmation = states.waitForSuccessConfirmation(props);
-
+const waitForPostFundSetup = states.waitForPostFundSetup({
+  ...props,
+  postFundSetupState: advanceChannelPreSuccess.state,
+});
 const twoTwo = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(2).toHexString() },
@@ -98,6 +103,11 @@ export const happyPath = {
     state: waitForIndirectFunding,
     sharedData: indirectFundingPreSuccess.sharedData,
     action: fundingSuccess,
+  },
+  waitForPostFundSetup: {
+    state: waitForPostFundSetup,
+    sharedData: advanceChannelPreSuccess.sharedData,
+    action: advanceChannelPreSuccess.trigger,
   },
   waitForSuccessConfirmation: {
     state: waitForSuccessConfirmation,

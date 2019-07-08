@@ -12,6 +12,7 @@ import {
   asPrivateKey,
 } from '../../../../../domain/commitments/__tests__';
 import { preSuccess as indirectFundingPreSuccess } from '../../../indirect-funding/__tests__';
+import { preSuccess as advanceChannelPreSuccess } from '../../../advance-channel/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 
@@ -62,8 +63,12 @@ const waitForStrategyResponse = states.waitForStrategyResponse(props);
 const waitForIndirectFunding = states.waitForFunding({
   ...props,
   fundingState: indirectFundingPreSuccess.state,
+  postFundSetupState: advanceChannelPreSuccess.state,
 });
-
+const waitForPostFundSetup = states.waitForPostFundSetup({
+  ...props,
+  postFundSetupState: advanceChannelPreSuccess.state,
+});
 const waitForSuccessConfirmation = states.waitForSuccessConfirmation(props);
 
 // -------
@@ -96,6 +101,11 @@ export const happyPath = {
     state: waitForIndirectFunding,
     sharedData: indirectFundingPreSuccess.sharedData,
     action: fundingSuccess,
+  },
+  waitForPostFundSetup: {
+    state: waitForPostFundSetup,
+    sharedData: advanceChannelPreSuccess.sharedData,
+    action: advanceChannelPreSuccess.trigger,
   },
   waitForSuccessConfirmation: {
     state: waitForSuccessConfirmation,

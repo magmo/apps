@@ -37,9 +37,14 @@ describe('happy path', () => {
     const { state, sharedData, action } = scenario.waitForFunding;
 
     const result = reducer(state, sharedData, action);
+    itTransitionsTo(result, 'Funding.PlayerB.WaitForPostFundSetup');
+  });
+  describeScenarioStep(scenario.waitForPostFundSetup, () => {
+    const { state, sharedData, action } = scenario.waitForPostFundSetup;
+
+    const result = reducer(state, sharedData, action);
     itTransitionsTo(result, 'Funding.PlayerB.WaitForSuccessConfirmation');
   });
-
   describeScenarioStep(scenario.waitForSuccessConfirmation, () => {
     const { state, sharedData, action } = scenario.waitForSuccessConfirmation;
 
