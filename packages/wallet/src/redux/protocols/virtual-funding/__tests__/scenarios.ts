@@ -1,13 +1,14 @@
 import * as states from '../states';
 
 import { EMPTY_SHARED_DATA, setChannel } from '../../../state';
-import * as scenarios from '../../../__tests__/test-scenarios';
+import * as scenarios from '../../../../domain/commitments/__tests__';
 import { CommitmentType } from '../../../../domain';
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { preSuccess as indirectFundingPreSuccess } from '../../indirect-funding/__tests__';
 import { threePlayerPreSuccessA as consensusUpdatePreSuccess } from '../../consensus-update/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../existing-ledger-funding/reducer';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../consensus-update/reducer';
@@ -16,14 +17,9 @@ import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../consensus-update/reduce
 // Test data
 // ---------
 const processId = 'Process.123';
-const {
-  asAddress,
-  asPrivateKey,
-  signedJointLedgerCommitments,
-  threeParticipants: destination,
-  ledgerLibraryAddress: channelType,
-} = scenarios;
-const { signedCommitment0 } = signedJointLedgerCommitments;
+const { asAddress, asPrivateKey, threeParticipants: destination } = scenarios;
+const channelType = CONSENSUS_LIBRARY_ADDRESS;
+const signedCommitment0 = scenarios.threeWayLedgerCommitment({ turnNum: 0 });
 const appAttributes = signedCommitment0.commitment.appAttributes;
 
 const app0 = appCommitment({ turnNum: 0, balances: twoThree });
@@ -62,6 +58,7 @@ const props = {
   hubAddress,
   ourIndex: PlayerIndex.A,
   jointChannelId,
+  ourAddress: asAddress,
 };
 
 // ----

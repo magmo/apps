@@ -8,9 +8,7 @@ import {
   itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
-import { twoThreeFive, twoThree } from '../../../__tests__/test-scenarios';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { addHex } from '../../../../utils/hex-utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { bigNumberify } from 'ethers/utils';
 
@@ -32,26 +30,21 @@ const itTransitionsSubstateTo = (
     expect(result[substate].type).toEqual(type);
   });
 };
-
+const allocation = [
+  bigNumberify(2).toHexString(),
+  bigNumberify(3).toHexString(),
+  bigNumberify(5).toHexString(),
+];
 describe('happyPath', () => {
   const scenario = scenarios.happyPath;
   const { hubAddress } = scenario;
 
   describe('Initialization', () => {
-    const { startingDestination } = scenario;
     const { sharedData, args } = scenario.initialize;
     const { protocolState, sharedData: result } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForJointChannel');
-    itSendsTheseCommitments(result, [
-      {
-        commitment: {
-          turnNum: 0,
-          allocation: twoThreeFive,
-          destination: [...startingDestination, hubAddress],
-        },
-      },
-    ]);
+    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation } }]);
   });
 
   describe(scenarioStepDescription(scenario.openJ), () => {
@@ -72,6 +65,7 @@ describe('happyPath', () => {
   });
 
   describe(scenarioStepDescription(scenario.prepareJ), () => {
+    const { targetChannelId, ourAddress } = scenario;
     const { state, sharedData, action } = scenario.prepareJ;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
@@ -82,9 +76,7 @@ describe('happyPath', () => {
         commitment: {
           turnNum: 0,
           allocation: [],
-          // By rights, we should check that the first destination is the jointChannelId.
-          // However, the way test data is constructed makes that hard.
-          destination: [expect.any(String), hubAddress],
+          destination: [targetChannelId, ourAddress, hubAddress],
         },
       },
     ]);
@@ -150,7 +142,7 @@ describe('happyPath', () => {
           destination: [appChannelId],
           allocation: [bigNumberify(4).toHexString()],
           appAttributes: bytesFromAppAttributes({
-            proposedAllocation: [twoThree.reduce(addHex)],
+            proposedAllocation: [bigNumberify(5).toHexString()],
             proposedDestination: [appChannelId],
             furtherVotesRequired: 1,
           }),

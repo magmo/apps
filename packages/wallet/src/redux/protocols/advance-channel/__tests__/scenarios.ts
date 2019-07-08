@@ -3,17 +3,26 @@ import { ThreePartyPlayerIndex as PlayerIndex } from '../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import * as scenarios from '../../../__tests__/test-scenarios';
+import * as scenarios from '../../../../domain/commitments/__tests__';
 import { commitmentsReceived } from '../../../../communication';
 import { CommitmentType } from '../../../../domain';
 import { clearedToSend } from '../actions';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '..';
+import { bigNumberify } from 'ethers/utils';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 
 // ---------
 // Test data
 // ---------
 
 const processId = 'Process.123';
+const allocation = [
+  bigNumberify(2).toHexString(),
+  bigNumberify(3).toHexString(),
+  bigNumberify(2).toHexString(),
+];
+const channelType = CONSENSUS_LIBRARY_ADDRESS;
+const channelId = scenarios.threeWayLedgerId;
 const {
   asAddress,
   asPrivateKey,
@@ -21,22 +30,17 @@ const {
   bsPrivateKey,
   hubAddress,
   hubPrivateKey,
-  signedJointLedgerCommitments,
   threeParticipants: destination,
-  oneTwoThree: allocation,
-  ledgerLibraryAddress: channelType,
-  jointLedgerId: channelId,
 } = scenarios;
-const participants = destination;
-const {
-  signedCommitment0,
-  signedCommitment1,
-  signedCommitment2,
-  signedCommitment3,
-  signedCommitment4,
-  signedCommitment5,
-} = signedJointLedgerCommitments;
+
+const signedCommitment0 = scenarios.threeWayLedgerCommitment({ turnNum: 0 });
+const signedCommitment1 = scenarios.threeWayLedgerCommitment({ turnNum: 1 });
+const signedCommitment2 = scenarios.threeWayLedgerCommitment({ turnNum: 2 });
+const signedCommitment3 = scenarios.threeWayLedgerCommitment({ turnNum: 3 });
+const signedCommitment4 = scenarios.threeWayLedgerCommitment({ turnNum: 4 });
+const signedCommitment5 = scenarios.threeWayLedgerCommitment({ turnNum: 5 });
 const appAttributes = signedCommitment0.commitment.appAttributes;
+const participants = signedCommitment0.commitment.channel.participants;
 
 const initializeArgs = {
   allocation,
