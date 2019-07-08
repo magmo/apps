@@ -172,7 +172,6 @@ function createWalletEventChannel(walletEventTypes: Wallet.WalletEventType[]) {
     walletEventTypes.forEach(eventType => {
       listener.subscribe(eventType, event => {
         emit(event);
-        console.log(event);
       });
     });
 
