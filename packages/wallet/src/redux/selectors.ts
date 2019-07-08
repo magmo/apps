@@ -38,17 +38,13 @@ export const getExistingLedgerChannelForParticipants = (
   playerA: string,
   playerB: string,
 ): ChannelState | undefined => {
-  for (const existingChannelId of Object.keys(state.channelStore)) {
-    const channel = state.channelStore[existingChannelId];
-    if (
+  return Object.values(state.channelStore).find(channel => {
+    return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
       channel.participants.indexOf(playerA) > -1 &&
       channel.participants.indexOf(playerB) > -1
-    ) {
-      return channel;
-    }
-  }
-  return undefined;
+    );
+  });
 };
 export const getAdjudicatorWatcherProcessesForChannel = (
   state: walletStates.Initialized,
