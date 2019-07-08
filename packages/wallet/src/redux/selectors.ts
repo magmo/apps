@@ -45,7 +45,8 @@ export const getFundedLedgerChannelForParticipants = (
     return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
       // We call concat() on participants in order to not sort it in place
-      channel.participants.concat().sort() === [playerA, playerB].sort() &&
+      JSON.stringify(channel.participants.concat().sort()) ===
+        JSON.stringify([playerA, playerB].sort()) &&
       directlyFunded
     );
   });
