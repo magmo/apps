@@ -58,6 +58,6 @@ export const newLedgerFundingHappyPath = {
   waitForNewLedgerFunding: {
     state: waitForNewLedgerFunding,
     action: newLedgerFundingSuccessTrigger,
-    sharedData: newLedgerPreSuccess.store,
+    sharedData: newLedgerPreSuccess.sharedData,
   },
 };

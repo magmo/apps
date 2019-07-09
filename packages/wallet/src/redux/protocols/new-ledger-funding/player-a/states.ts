@@ -1,6 +1,8 @@
 import { DirectFundingState } from '../../direct-funding/states';
 import { StateConstructor } from '../../../utils';
 import { ProtocolState } from '../..';
+import { ConsensusUpdateState } from '../../consensus-update';
+import { AdvanceChannelState } from '../../advance-channel';
 
 // -------
 // States
@@ -19,18 +21,22 @@ export interface AWaitForDirectFunding {
   ledgerId: string;
   processId: string;
   directFundingState: DirectFundingState;
+  postFundSetupState: AdvanceChannelState;
 }
 export interface AWaitForPostFundSetup1 {
   type: 'NewLedgerFunding.AWaitForPostFundSetup1';
   channelId: string;
   ledgerId: string;
   processId: string;
+  postFundSetupState: AdvanceChannelState;
+  consensusUpdateState: ConsensusUpdateState;
 }
 export interface AWaitForLedgerUpdate1 {
   type: 'NewLedgerFunding.AWaitForLedgerUpdate1';
   channelId: string;
   ledgerId: string;
   processId: string;
+  consensusUpdateState: ConsensusUpdateState;
 }
 
 // ------------

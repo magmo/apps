@@ -9,7 +9,13 @@ import {
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
 import { EMPTY_SHARED_DATA, setChannels } from '../../../../state';
 
-import { preSuccessB, preFailure, preSuccessA } from '../../../direct-funding/__tests__';
+import {
+  preSuccessB as DFPreSuccessB,
+  preFailure as DFPreFailure,
+  preSuccessA as DFPreSuccessA,
+} from '../../../direct-funding/__tests__';
+import { twoPlayerPreSuccessA as CUPreSuccessA } from '../../../consensus-update/__tests__/index';
+import { preSuccess as ACPreSuccess } from '../../../advance-channel/__tests__/index';
 import {
   appCommitment,
   ledgerCommitment,
@@ -20,7 +26,7 @@ import {
   channelId,
 } from '../../../../../domain/commitments/__tests__';
 import { success } from '../../../indirect-defunding/states';
-
+import * as _ from 'lodash';
 // -----------
 // Commitments
 // -----------
@@ -60,25 +66,30 @@ const waitForPreFundL1 = {
   ]),
 };
 const waitForDirectFunding = {
-  state: aWaitForDirectFunding({ ...props, directFundingState: preSuccessA.state }), //
-  store: setChannels(preSuccessB.sharedData, [
+  state: aWaitForDirectFunding({
+    ...props,
+    directFundingState: DFPreSuccessA.state,
+    postFundSetupState: ACPreSuccess.state,
+  }), //
+  store: setChannels(DFPreSuccessB.sharedData, [
     channelFromCommitments([app1, app2], asAddress, asPrivateKey),
     channelFromCommitments([ledger2, ledger3], asAddress, asPrivateKey),
   ]),
 };
 const waitForLedgerUpdate1 = {
-  state: aWaitForLedgerUpdate1(props),
+  state: aWaitForLedgerUpdate1({ ...props, consensusUpdateState: CUPreSuccessA.state }),
   store: setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments([app0, app1], asAddress, asPrivateKey),
     channelFromCommitments([ledger3, ledger4], asAddress, asPrivateKey),
   ]),
 };
 const waitForPostFund1 = {
-  state: aWaitForPostFundSetup1(props),
-  store: setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments([app1, app2], asAddress, asPrivateKey),
-    channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
-  ]),
+  state: aWaitForPostFundSetup1({
+    ...props,
+    consensusUpdateState: CUPreSuccessA.state,
+    postFundSetupState: ACPreSuccess.state,
+  }),
+  store: { ..._.merge(ACPreSuccess.sharedData, CUPreSuccessA.sharedData) },
 };
 
 export const successState = {
@@ -90,8 +101,12 @@ export const successState = {
 };
 
 const waitForDirectFundingFailure = {
-  state: aWaitForDirectFunding({ ...props, directFundingState: preFailure.state }), //
-  store: setChannels(preFailure.sharedData, [
+  state: aWaitForDirectFunding({
+    ...props,
+    directFundingState: DFPreFailure.state,
+    postFundSetupState: ACPreSuccess.state,
+  }), //
+  store: setChannels(DFPreFailure.sharedData, [
     channelFromCommitments([app0, app1], asAddress, asPrivateKey),
     channelFromCommitments([ledger0, ledger1], asAddress, asPrivateKey),
   ]),
@@ -104,11 +119,6 @@ const preFundL1Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger1,
 });
-const ledgerUpdate1Received = globalActions.commitmentReceived({
-  processId,
-  signedCommitment: ledger5,
-});
-const postFund1Received = globalActions.commitmentReceived({ processId, signedCommitment: app3 });
 
 export const happyPath = {
   initialParams: {
@@ -118,16 +128,33 @@ export const happyPath = {
     processId: 'processId',
     ledgerId,
   },
-  waitForPreFundL1: { state: waitForPreFundL1, action: preFundL1Received },
-  waitForDirectFunding: { state: waitForDirectFunding, action: preSuccessA.action, reply: ledger4 },
-  waitForLedgerUpdate1: {
-    state: waitForLedgerUpdate1,
-    action: ledgerUpdate1Received,
-    reply: app2,
+  waitForPreFundL1: {
+    state: waitForPreFundL1.state,
+    sharedData: waitForPreFundL1.store,
+    action: preFundL1Received,
   },
-  waitForPostFund1: { state: waitForPostFund1, action: postFund1Received },
+  waitForDirectFunding: {
+    state: waitForDirectFunding.state,
+    sharedData: waitForDirectFunding.store,
+    action: DFPreSuccessA.action,
+  },
+
+  waitForPostFund1: {
+    state: waitForPostFund1.state,
+    sharedData: waitForPostFund1.store,
+    action: ACPreSuccess.trigger,
+  },
+  waitForLedgerUpdate1: {
+    state: waitForLedgerUpdate1.state,
+    sharedData: CUPreSuccessA.sharedData,
+    action: CUPreSuccessA.action,
+  },
 };
 
 export const ledgerFundingFails = {
-  waitForDirectFunding: { state: waitForDirectFundingFailure, action: preFailure.action },
+  waitForDirectFunding: {
+    state: waitForDirectFundingFailure.state,
+    sharedData: waitForDirectFundingFailure.store,
+    action: DFPreFailure.action,
+  },
 };

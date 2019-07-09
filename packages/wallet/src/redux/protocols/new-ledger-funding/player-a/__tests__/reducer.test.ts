@@ -24,32 +24,29 @@ describe('happy-path scenario', () => {
   });
 
   describeScenarioStep(scenario.waitForPreFundL1, () => {
-    const { state, action } = scenario.waitForPreFundL1;
-    const updatedState = playerAReducer(state.state, state.store, action);
+    const { state, action, sharedData } = scenario.waitForPreFundL1;
+    const updatedState = playerAReducer(state, sharedData, action);
 
     itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForDirectFunding');
   });
 
   describeScenarioStep(scenario.waitForDirectFunding, () => {
-    const { state, action, reply } = scenario.waitForDirectFunding;
-    const updatedState = playerAReducer(state.state, state.store, action);
-
-    itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForLedgerUpdate1');
-    itSendsMessage(updatedState, reply);
-  });
-
-  describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
-    const { state, action, reply } = scenario.waitForLedgerUpdate1;
-    const updatedState = playerAReducer(state.state, state.store, action);
+    const { state, action, sharedData } = scenario.waitForDirectFunding;
+    const updatedState = playerAReducer(state, sharedData, action);
 
     itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForPostFundSetup1');
-    itSendsMessage(updatedState, reply);
   });
 
   describeScenarioStep(scenario.waitForPostFund1, () => {
-    const { state, action } = scenario.waitForPostFund1;
-    const updatedState = playerAReducer(state.state, state.store, action);
+    const { state, action, sharedData } = scenario.waitForPostFund1;
+    const updatedState = playerAReducer(state, sharedData, action);
 
+    itTransitionsTo(updatedState, 'NewLedgerFunding.AWaitForLedgerUpdate1');
+  });
+
+  describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
+    const { state, action, sharedData } = scenario.waitForLedgerUpdate1;
+    const updatedState = playerAReducer(state, sharedData, action);
     itUpdatesFundingState(
       updatedState,
       scenario.initialParams.channelId,
@@ -63,8 +60,8 @@ describe('ledger-funding-fails scenario', () => {
   const scenario = scenarios.ledgerFundingFails;
 
   describeScenarioStep(scenario.waitForDirectFunding, () => {
-    const { state, action } = scenario.waitForDirectFunding;
-    const updatedState = playerAReducer(state.state, state.store, action);
+    const { state, action, sharedData } = scenario.waitForDirectFunding;
+    const updatedState = playerAReducer(state, sharedData, action);
 
     itTransitionsTo(updatedState, 'NewLedgerFunding.Failure');
   });

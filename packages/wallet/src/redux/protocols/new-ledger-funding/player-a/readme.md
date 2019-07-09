@@ -8,10 +8,12 @@
     St((start)) --> WFPrF1(WaitForPreFundL1)
     WFPrF1 -->|ReceiveCommitment| WFDF(WaitForDirectFunding)
     WFDF -->|FundingAction| WFDF
-    WFDF -->|Success| WFLU1(WaitForLedgerUpdate1)
+    WFDF -->|Success| WFPoF1(WaitForPostFundSetup1)
     WFDF -->|Failure| F((Failure))
-    WFLU1 --> |ReceiveCommitment| WFPoF1(WaitForPostFundSetup1)
-    WFPoF1 --> |ReceiveCommitment| S((Success))
+    WFPoF1 --> |AdvanceChannelAction| WFPoF1(WaitForPostFundSetup1)
+    WFPoF1 --> |AdvanceChannelSuccess|WFL1(WaitForLedgerUpdate1)
+    WFL1 --> |ConsensusUpdateAction|WFL1
+    WFL1 --> |ConsensusUpdateSuccess| S((sucess))
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
@@ -19,7 +21,7 @@
   class St logic;
   class S Success;
   class F Failure;
-  class WFDF WaitForChildProtocol;
+  class WFDF,WFPoF1,WFL1 WaitForChildProtocol;
 
 ```
 
