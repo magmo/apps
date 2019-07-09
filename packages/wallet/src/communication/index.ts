@@ -32,7 +32,7 @@ export const enum EmbeddedProtocol {
 }
 
 export type ProtocolLocator = EmbeddedProtocol[];
-export type FundingStrategy = 'IndirectFundingStrategy';
+export type FundingStrategy = 'IndirectFundingStrategy' | 'VirtualFundingStrategy';
 
 function sendMessage(to: string, message: RelayableAction) {
   return messageRelayRequested(to, message);
