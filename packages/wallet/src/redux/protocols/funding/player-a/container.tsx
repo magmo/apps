@@ -63,7 +63,7 @@ class FundingContainer extends PureComponent<Props> {
             channelId={state.targetChannelId}
           />
         );
-      case 'Funding.PlayerA.WaitForFunding':
+      case 'Funding.PlayerA.WaitForIndirectFunding':
         return <IndirectFunding state={state.fundingState} />;
       case 'Funding.PlayerA.WaitForSuccessConfirmation':
         return (

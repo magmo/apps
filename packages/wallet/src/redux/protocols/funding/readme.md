@@ -25,10 +25,10 @@ graph TD
 linkStyle default interpolate basis
   S((start)) --> WFSC(WaitForStrategyChoice)
 
-  WFSC --> |WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN| WFSR(WaitForStrategyResponse)
-  WFSR --> |WALLET.FUNDING.STRATEGY_APPROVED| WFF(WaitForFunding)
-  WFF --> |FundingStrategyAction| WFF
-  WFF --> |FundingStrategyAction| WFAC(WaitForPostFundSetup)
+  WFSC --> |WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN| WFSR("WaitForStrategyResponse(Strategy)")
+  WFSR --> |"WALLET.FUNDING.STRATEGY_APPROVED(IndirectFunding)"| WFIF(WaitForIndirectFunding)
+  WFIF --> |FundingStrategyAction| WFIF
+  WFIF --> |FundingStrategyAction| WFAC(WaitForPostFundSetup)
 
   WFAC-->|AdvanceChannelAction|WFAC
   WFAC-->|AdvanceChannelSuccess|WFSConf(WaitForSuccessConfirmation)
@@ -48,7 +48,7 @@ linkStyle default interpolate basis
   class S logic;
   class SS Success;
   class F Failure;
-  class WFF,WFAC WaitForChildProtocol;
+  class WFIF,WFAC WaitForChildProtocol;
 ```
 
 ### Player B

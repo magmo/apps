@@ -24,8 +24,8 @@ export interface WaitForStrategyResponse extends BaseState {
   strategy: FundingStrategy;
 }
 
-export interface WaitForFunding extends BaseState {
-  type: 'Funding.PlayerA.WaitForFunding';
+export interface WaitForIndirectFunding extends BaseState {
+  type: 'Funding.PlayerA.WaitForIndirectFunding';
   targetChannelId: string;
   // TODO: Currently we are limited to indirect funding
   // In the future this could support other funding states
@@ -72,10 +72,10 @@ export const waitForStrategyResponse: StateConstructor<WaitForStrategyResponse> 
   };
 };
 
-export const waitForFunding: StateConstructor<WaitForFunding> = p => {
+export const waitForIndirectFunding: StateConstructor<WaitForIndirectFunding> = p => {
   return {
     ...p,
-    type: 'Funding.PlayerA.WaitForFunding',
+    type: 'Funding.PlayerA.WaitForIndirectFunding',
   };
 };
 
@@ -105,7 +105,7 @@ export const failure: StateConstructor<Failure> = p => {
 export type OngoingFundingState =
   | WaitForStrategyChoice
   | WaitForStrategyResponse
-  | WaitForFunding
+  | WaitForIndirectFunding
   | WaitForSuccessConfirmation
   | WaitForPostFundSetup;
 
@@ -114,7 +114,7 @@ export type FundingState = OngoingFundingState | TerminalFundingState;
 
 export function isFundingState(state: ProtocolState): state is FundingState {
   return (
-    state.type === 'Funding.PlayerA.WaitForFunding' ||
+    state.type === 'Funding.PlayerA.WaitForIndirectFunding' ||
     state.type === 'Funding.PlayerA.WaitForStrategyChoice' ||
     state.type === 'Funding.PlayerA.WaitForStrategyResponse' ||
     state.type === 'Funding.PlayerA.WaitForSuccessConfirmation' ||

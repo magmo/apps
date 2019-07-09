@@ -85,7 +85,7 @@ function handleAdvanceChannelAction(
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (
     protocolState.type !== 'Funding.PlayerA.WaitForPostFundSetup' &&
-    protocolState.type !== 'Funding.PlayerA.WaitForFunding'
+    protocolState.type !== 'Funding.PlayerA.WaitForIndirectFunding'
   ) {
     console.warn(
       `Funding reducer received advance channel action ${action.type} but is currently in state ${
@@ -118,7 +118,7 @@ function handleFundingAction(
   sharedData: SharedData,
   action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (protocolState.type !== 'Funding.PlayerA.WaitForFunding') {
+  if (protocolState.type !== 'Funding.PlayerA.WaitForIndirectFunding') {
     console.warn(
       `Funding reducer received indirect funding action ${action.type} but is currently in state ${
         protocolState.type
@@ -134,7 +134,7 @@ function handleFundingAction(
 
   if (!indirectFundingStates.isTerminal(updatedFundingState)) {
     return {
-      protocolState: states.waitForFunding({
+      protocolState: states.waitForIndirectFunding({
         ...protocolState,
         fundingState: updatedFundingState,
       }),
@@ -199,7 +199,7 @@ function strategyApproved(
     },
   );
   return {
-    protocolState: states.waitForFunding({
+    protocolState: states.waitForIndirectFunding({
       ...state,
       fundingState,
       postFundSetupState: advanceChannelResult.protocolState,
@@ -253,7 +253,7 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 }
 
 function handleFundingComplete(
-  protocolState: states.WaitForFunding,
+  protocolState: states.WaitForIndirectFunding,
   fundingState: indirectFundingStates.IndirectFundingState,
   sharedData: SharedData,
 ) {

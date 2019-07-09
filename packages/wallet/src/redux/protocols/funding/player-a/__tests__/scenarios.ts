@@ -35,7 +35,7 @@ import { EmbeddedProtocol } from '../../../../../communication';
 // Test data
 // ---------
 const processId = 'process-id.123';
-const strategy: FundingStrategy = 'IndirectFundingStrategy';
+const indirectStrategy: FundingStrategy = 'IndirectFundingStrategy';
 const targetChannelId = channelId;
 const opponentAddress = bsAddress;
 const ourAddress = asAddress;
@@ -44,7 +44,7 @@ const props = {
   processId,
   targetChannelId,
   opponentAddress,
-  strategy,
+  strategy: indirectStrategy,
   ourAddress,
 };
 const oneThree = [
@@ -65,9 +65,8 @@ const preFundSharedData = setChannels(EMPTY_SHARED_DATA, [
 // States
 // ------
 const waitForStrategyChoice = states.waitForStrategyChoice(props);
-
 const waitForStrategyResponse = states.waitForStrategyResponse(props);
-const waitForIndirectFunding = states.waitForFunding({
+const waitForIndirectFunding = states.waitForIndirectFunding({
   ...props,
   fundingState: indirectFundingPreSuccess.state,
   postFundSetupState: advanceChannelPreSuccess.state,
@@ -81,7 +80,7 @@ const waitForSuccessConfirmation = states.waitForSuccessConfirmation(props);
 // -------
 // Actions
 // -------
-const strategyChosen = actions.strategyChosen({ processId, strategy });
+const chooseIndirectStrategy = actions.strategyChosen({ processId, strategy: indirectStrategy });
 const strategyApproved = actions.strategyApproved({ processId });
 const successConfirmed = actions.fundingSuccessAcknowledged({ processId });
 const fundingSuccess = prependToLocator(
@@ -100,7 +99,7 @@ export const indirectStrategyChosen = {
   waitForStrategyChoice: {
     state: waitForStrategyChoice,
     sharedData: EMPTY_SHARED_DATA,
-    action: strategyChosen,
+    action: chooseIndirectStrategy,
   },
   waitForStrategyResponse: {
     state: waitForStrategyResponse,

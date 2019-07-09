@@ -27,7 +27,7 @@ describe('indirect strastegy chosen', () => {
     const { state, sharedData, action } = scenario.waitForStrategyResponse;
     const result = reducer(state, sharedData, action);
 
-    itTransitionsTo(result, 'Funding.PlayerA.WaitForFunding');
+    itTransitionsTo(result, 'Funding.PlayerA.WaitForIndirectFunding');
   });
 
   describeScenarioStep(scenario.waitForFunding, () => {
