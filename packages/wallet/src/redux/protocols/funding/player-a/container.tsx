@@ -65,6 +65,8 @@ class FundingContainer extends PureComponent<Props> {
         );
       case 'Funding.PlayerA.WaitForIndirectFunding':
         return <IndirectFunding state={state.fundingState} />;
+      case 'Funding.PlayerA.WaitForVirtualFunding':
+        throw new Error('Unimplemented');
       case 'Funding.PlayerA.WaitForSuccessConfirmation':
         return (
           <AcknowledgeX

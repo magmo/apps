@@ -3,6 +3,7 @@ import { FundingStrategy } from '..';
 import { StateConstructor } from '../../../utils';
 import { NonTerminalIndirectFundingState } from '../../indirect-funding';
 import { AdvanceChannelState } from '../../advance-channel';
+import { NonTerminalVirtualFundingState } from '../../virtual-funding/states';
 
 // -------
 // States
@@ -27,10 +28,15 @@ export interface WaitForStrategyResponse extends BaseState {
 export interface WaitForIndirectFunding extends BaseState {
   type: 'Funding.PlayerA.WaitForIndirectFunding';
   targetChannelId: string;
-  // TODO: Currently we are limited to indirect funding
-  // In the future this could support other funding states
   fundingState: NonTerminalIndirectFundingState;
   // PostFundSetup state is initialized early to handle post fund setups that arrive before funding is done
+  postFundSetupState: AdvanceChannelState;
+}
+
+export interface WaitForVirtualFunding extends BaseState {
+  type: 'Funding.PlayerA.WaitForVirtualFunding';
+  targetChannelId: string;
+  fundingState: NonTerminalVirtualFundingState;
   postFundSetupState: AdvanceChannelState;
 }
 
@@ -79,6 +85,13 @@ export const waitForIndirectFunding: StateConstructor<WaitForIndirectFunding> = 
   };
 };
 
+export const waitForVirtualFunding: StateConstructor<WaitForVirtualFunding> = p => {
+  return {
+    ...p,
+    type: 'Funding.PlayerA.WaitForVirtualFunding',
+  };
+};
+
 export const waitForSuccessConfirmation: StateConstructor<WaitForSuccessConfirmation> = p => {
   return {
     ...p,
@@ -106,6 +119,7 @@ export type OngoingFundingState =
   | WaitForStrategyChoice
   | WaitForStrategyResponse
   | WaitForIndirectFunding
+  | WaitForVirtualFunding
   | WaitForSuccessConfirmation
   | WaitForPostFundSetup;
 
@@ -115,6 +129,7 @@ export type FundingState = OngoingFundingState | TerminalFundingState;
 export function isFundingState(state: ProtocolState): state is FundingState {
   return (
     state.type === 'Funding.PlayerA.WaitForIndirectFunding' ||
+    state.type === 'Funding.PlayerA.WaitForVirtualFunding' ||
     state.type === 'Funding.PlayerA.WaitForStrategyChoice' ||
     state.type === 'Funding.PlayerA.WaitForStrategyResponse' ||
     state.type === 'Funding.PlayerA.WaitForSuccessConfirmation' ||

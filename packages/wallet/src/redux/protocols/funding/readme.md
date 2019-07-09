@@ -27,8 +27,11 @@ linkStyle default interpolate basis
 
   WFSC --> |WALLET.FUNDING.PLAYER_A.STRATEGY_CHOSEN| WFSR("WaitForStrategyResponse(Strategy)")
   WFSR --> |"WALLET.FUNDING.STRATEGY_APPROVED(IndirectFunding)"| WFIF(WaitForIndirectFunding)
+  WFSR --> |"WALLET.FUNDING.STRATEGY_APPROVED(VirtualFunding)"| WFVF(WaitForVirtualFunding)
   WFIF --> |FundingStrategyAction| WFIF
   WFIF --> |FundingStrategyAction| WFAC(WaitForPostFundSetup)
+  WFVF --> |FundingStrategyAction| WFVF
+  WFVF --> |FundingStrategyAction| WFAC(WaitForPostFundSetup)
 
   WFAC-->|AdvanceChannelAction|WFAC
   WFAC-->|AdvanceChannelSuccess|WFSConf(WaitForSuccessConfirmation)
@@ -48,7 +51,7 @@ linkStyle default interpolate basis
   class S logic;
   class SS Success;
   class F Failure;
-  class WFIF,WFAC WaitForChildProtocol;
+  class WFVF,WFIF,WFAC WaitForChildProtocol;
 ```
 
 ### Player B
