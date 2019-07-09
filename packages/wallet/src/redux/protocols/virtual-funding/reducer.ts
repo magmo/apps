@@ -22,9 +22,10 @@ export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
 import { getLatestCommitment } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
-type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
-
-export function initialize(sharedData: SharedData, args: states.InitializationArgs): ReturnVal {
+export function initialize(
+  sharedData: SharedData,
+  args: states.InitializationArgs,
+): ProtocolStateWithSharedData<states.NonTerminalVirtualFundingState> {
   const {
     ourIndex,
     processId,
