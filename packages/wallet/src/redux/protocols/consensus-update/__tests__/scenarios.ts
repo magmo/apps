@@ -123,7 +123,8 @@ const processId = 'process-id.123';
 // ------
 // States
 // ------
-const twoPlayerWaitForUpdate = (clearedToSend, updateSent) => {
+// tslint:disable-next-line: no-shadowed-variable
+const twoPlayerWaitForUpdate = (clearedToSend: boolean, updateSent: boolean) => {
   return states.waitForUpdate({
     channelId: ledgerId,
     processId,
@@ -134,6 +135,7 @@ const twoPlayerWaitForUpdate = (clearedToSend, updateSent) => {
   });
 };
 
+// tslint:disable-next-line: no-shadowed-variable
 const threePlayerWaitForUpdate = (clearedToSend, updateSent) => {
   return states.waitForUpdate({
     channelId: threeWayLedgerId,
