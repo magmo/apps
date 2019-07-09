@@ -1,6 +1,6 @@
 import { SharedData, signAndStore, getExistingChannel } from '../../state';
 import * as states from './states';
-import { ProtocolStateWithSharedData, makeLocator } from '..';
+import { ProtocolStateWithSharedData } from '..';
 import { isConsensusUpdateAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import {
@@ -12,12 +12,12 @@ import {
 import { Commitment } from '../../../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { eqHexArray } from '../../../utils/hex-utils';
-import { CommitmentsReceived, EmbeddedProtocol, ProtocolLocator } from '../../../communication';
+import { CommitmentsReceived, ProtocolLocator } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { ChannelState } from '../../channel-store';
 
-export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.ConsensusUpdate);
+export { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../../communication/protocol-locator';
 
 export const initialize = ({
   processId,
