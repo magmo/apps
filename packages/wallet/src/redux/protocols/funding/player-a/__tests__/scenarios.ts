@@ -95,7 +95,7 @@ const cancelledByB = actions.cancelled({ processId, by: TwoPartyPlayerIndex.B })
 // ---------
 // Scenarios
 // ---------
-export const happyPath = {
+export const indirectStrategyChosen = {
   ...props,
   waitForStrategyChoice: {
     state: waitForStrategyChoice,

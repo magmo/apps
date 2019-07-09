@@ -32,12 +32,10 @@ class FundingContainer extends PureComponent<Props> {
         return (
           <ApproveX
             title="Funding channel"
-            description="Do you want to fund this state channel with a re-usable ledger channel?"
+            description="Do you want to fund this state channel with a virtual channel?"
             yesMessage="Fund Channel"
             noMessage="Cancel"
-            approvalAction={() =>
-              strategyChosen({ processId, strategy: 'IndirectFundingStrategy' })
-            }
+            approvalAction={() => strategyChosen({ processId, strategy: 'VirtualFundingStrategy' })}
             rejectionAction={() => cancelled({ processId, by: TwoPartyPlayerIndex.B })}
           >
             <React.Fragment>

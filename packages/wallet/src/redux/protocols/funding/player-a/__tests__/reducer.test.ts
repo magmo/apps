@@ -11,8 +11,8 @@ import { sendStrategyProposed } from '../../../../../communication';
 import { FUNDING_SUCCESS, HIDE_WALLET } from 'magmo-wallet-client';
 import { FundingStateType } from '../../states';
 
-describe('happy path', () => {
-  const scenario = scenarios.happyPath;
+describe('indirect strastegy chosen', () => {
+  const scenario = scenarios.indirectStrategyChosen;
 
   describeScenarioStep(scenario.waitForStrategyChoice, () => {
     const { state, sharedData, action } = scenario.waitForStrategyChoice;
