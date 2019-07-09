@@ -21,7 +21,7 @@ import {
   initializeIndirectFunding,
   IndirectFundingAction,
 } from '../../indirect-funding';
-import { initializeVirtualFunding, VirtualFundingState } from '../../virtual-funding';
+import * as virtualFunding from '../../virtual-funding';
 import {
   AdvanceChannelAction,
   advanceChannelReducer,
@@ -32,6 +32,7 @@ import { clearedToSend, routesToAdvanceChannel } from '../../advance-channel/act
 import { CommitmentType } from '../../../../domain';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../../advance-channel/reducer';
 import { routesToIndirectFunding } from '../../indirect-funding/actions';
+import { routesToVirtualFunding } from '../../virtual-funding/actions';
 
 type EmbeddedAction = IndirectFundingAction | AdvanceChannelAction;
 
@@ -61,7 +62,9 @@ export function fundingReducer(
   if (routesToAdvanceChannel(action, EMPTY_LOCATOR)) {
     return handleAdvanceChannelAction(state, sharedData, action);
   } else if (routesToIndirectFunding(action, EMPTY_LOCATOR)) {
-    return handleFundingAction(state, sharedData, action);
+    return handleIndirectFundingAction(state, sharedData, action);
+  } else if (routesToVirtualFunding(action, EMPTY_LOCATOR)) {
+    return handleVirtualFundingAction(state, sharedData, action);
   }
 
   switch (action.type) {
@@ -115,7 +118,7 @@ function handleAdvanceChannelAction(
   }
 }
 
-function handleFundingAction(
+function handleIndirectFundingAction(
   protocolState: states.FundingState,
   sharedData: SharedData,
   action: IndirectFundingAction,
@@ -146,6 +149,39 @@ function handleFundingAction(
     return handleFundingComplete(protocolState, updatedFundingState, updatedSharedData);
   }
 }
+
+function handleVirtualFundingAction(
+  protocolState: states.FundingState,
+  sharedData: SharedData,
+  action: virtualFunding.VirtualFundingAction,
+): ProtocolStateWithSharedData<states.FundingState> {
+  if (protocolState.type !== 'Funding.PlayerA.WaitForVirtualFunding') {
+    console.warn(
+      `Funding reducer received indirect funding action ${action.type} but is currently in state ${
+        protocolState.type
+      }`,
+    );
+    return { protocolState, sharedData };
+  }
+
+  const {
+    protocolState: updatedFundingState,
+    sharedData: updatedSharedData,
+  } = virtualFunding.virtualFundingReducer(protocolState.fundingState, sharedData, action);
+
+  if (!virtualFunding.isTerminal(updatedFundingState)) {
+    return {
+      protocolState: states.waitForVirtualFunding({
+        ...protocolState,
+        fundingState: updatedFundingState,
+      }),
+      sharedData: updatedSharedData,
+    };
+  } else {
+    return handleFundingComplete(protocolState, updatedFundingState, updatedSharedData);
+  }
+}
+
 function strategyChosen(
   state: states.FundingState,
   sharedData: SharedData,
@@ -224,19 +260,19 @@ function strategyApproved(
 
       const ourIndex = channel.participants.indexOf(ourAddress);
 
-      const { protocolState: fundingState, sharedData: newSharedData } = initializeVirtualFunding(
-        sharedData,
-        {
-          processId,
-          targetChannelId,
-          ourIndex,
-          // TODO: This should be an env variable
-          hubAddress: '0x100063c326b27f78b2cBb7cd036B8ddE4d4FCa7C',
-          startingAllocation,
-          startingDestination,
-          protocolLocator: makeLocator(EmbeddedProtocol.VirtualFunding),
-        },
-      );
+      const {
+        protocolState: fundingState,
+        sharedData: newSharedData,
+      } = virtualFunding.initializeVirtualFunding(sharedData, {
+        processId,
+        targetChannelId,
+        ourIndex,
+        // TODO: This should be an env variable
+        hubAddress: '0x100063c326b27f78b2cBb7cd036B8ddE4d4FCa7C',
+        startingAllocation,
+        startingDestination,
+        protocolLocator: makeLocator(EmbeddedProtocol.VirtualFunding),
+      });
 
       const advanceChannelResult = initializeAdvanceChannel(
         processId,
@@ -311,7 +347,7 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 
 function handleFundingComplete(
   protocolState: states.WaitForIndirectFunding | states.WaitForVirtualFunding,
-  fundingState: indirectFundingStates.IndirectFundingState | VirtualFundingState,
+  fundingState: indirectFundingStates.IndirectFundingState | virtualFunding.VirtualFundingState,
   sharedData: SharedData,
 ) {
   switch (fundingState.type) {
