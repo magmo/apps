@@ -12,6 +12,7 @@ import {
   asPrivateKey,
 } from '../../../../../domain/commitments/__tests__';
 import { preSuccess as indirectFundingPreSuccess } from '../../../indirect-funding/__tests__';
+import { preSuccess as virtualFundingPreSuccess } from '../../../virtual-funding/__tests__';
 import { preSuccess as advanceChannelPreSuccess } from '../../../advance-channel/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import { channelFromCommitments } from '../../../../channel-store/channel-state/__tests__';
@@ -22,7 +23,7 @@ import { EmbeddedProtocol } from '../../../../../communication';
 //
 // 1. Happy path: WaitForStrategyChoice
 //             -> WaitForStrategyResponse
-//             -> WaitForFunding
+//             -> WaitForIndirectFunding
 //             -> WaitForSuccessConfirmation
 //             -> Success
 //
@@ -36,6 +37,7 @@ import { EmbeddedProtocol } from '../../../../../communication';
 // ---------
 const processId = 'process-id.123';
 const indirectStrategy: FundingStrategy = 'IndirectFundingStrategy';
+const virtualStrategy: FundingStrategy = 'VirtualFundingStrategy';
 const targetChannelId = channelId;
 const opponentAddress = bsAddress;
 const ourAddress = asAddress;
@@ -44,7 +46,6 @@ const props = {
   processId,
   targetChannelId,
   opponentAddress,
-  strategy: indirectStrategy,
   ourAddress,
 };
 const oneThree = [
@@ -60,10 +61,22 @@ const successSharedData = setChannels(EMPTY_SHARED_DATA, [
 // States
 // ------
 const waitForStrategyChoice = states.waitForStrategyChoice(props);
-const waitForStrategyResponse = states.waitForStrategyResponse(props);
+const waitForIndirectStrategyResponse = states.waitForStrategyResponse({
+  ...props,
+  strategy: indirectStrategy,
+});
+const waitForVirtualStrategyResponse = states.waitForStrategyResponse({
+  ...props,
+  strategy: virtualStrategy,
+});
 const waitForIndirectFunding = states.waitForIndirectFunding({
   ...props,
   fundingState: indirectFundingPreSuccess.state,
+  postFundSetupState: advanceChannelPreSuccess.state,
+});
+const waitForVirtualFunding = states.waitForVirtualFunding({
+  ...props,
+  fundingState: virtualFundingPreSuccess.state,
   postFundSetupState: advanceChannelPreSuccess.state,
 });
 const waitForPostFundSetup = states.waitForPostFundSetup({
@@ -76,11 +89,17 @@ const waitForSuccessConfirmation = states.waitForSuccessConfirmation(props);
 // Actions
 // -------
 const chooseIndirectStrategy = actions.strategyChosen({ processId, strategy: indirectStrategy });
+const chooseVirtualStrategy = actions.strategyChosen({ processId, strategy: virtualStrategy });
 const approveIndirectStrategy = actions.strategyApproved({ processId, strategy: indirectStrategy });
+const approveVirtualStrategy = actions.strategyApproved({ processId, strategy: virtualStrategy });
 const successConfirmed = actions.fundingSuccessAcknowledged({ processId });
-const fundingSuccess = prependToLocator(
+const indirectFundingSuccess = prependToLocator(
   indirectFundingPreSuccess.action,
   EmbeddedProtocol.IndirectFunding,
+);
+const virtualFundingSuccess = prependToLocator(
+  virtualFundingPreSuccess.action,
+  EmbeddedProtocol.VirtualFunding,
 );
 const strategyRejected = actions.strategyRejected({ processId });
 const cancelledByA = actions.cancelled({ processId, by: TwoPartyPlayerIndex.A });
@@ -97,14 +116,14 @@ export const indirectStrategyChosen = {
     action: chooseIndirectStrategy,
   },
   waitForStrategyResponse: {
-    state: waitForStrategyResponse,
+    state: waitForIndirectStrategyResponse,
     sharedData: indirectFundingPreSuccess.sharedData,
     action: approveIndirectStrategy,
   },
-  waitForFunding: {
+  waitForIndirectFunding: {
     state: waitForIndirectFunding,
     sharedData: indirectFundingPreSuccess.sharedData,
-    action: fundingSuccess,
+    action: indirectFundingSuccess,
   },
   waitForPostFundSetup: {
     state: waitForPostFundSetup,
@@ -118,11 +137,34 @@ export const indirectStrategyChosen = {
   },
 };
 
+export const virtualStrategyChosen = {
+  ...props,
+  waitForStrategyChoice: {
+    state: waitForStrategyChoice,
+    sharedData: EMPTY_SHARED_DATA,
+    action: chooseVirtualStrategy,
+  },
+  waitForStrategyResponse: {
+    state: waitForVirtualStrategyResponse,
+    sharedData: setChannels(virtualFundingPreSuccess.sharedData, [
+      channelFromCommitments([app2, app3], asAddress, asPrivateKey),
+    ]),
+    action: approveVirtualStrategy,
+  },
+  waitForVirtualFunding: {
+    state: waitForVirtualFunding,
+    sharedData: setChannels(virtualFundingPreSuccess.sharedData, [
+      channelFromCommitments([app2, app3], asAddress, asPrivateKey),
+    ]),
+    action: virtualFundingSuccess,
+  },
+};
+
 export const rejectedStrategy = {
   ...props,
 
   waitForStrategyResponse: {
-    state: waitForStrategyResponse,
+    state: waitForIndirectStrategyResponse,
     sharedData: indirectFundingPreSuccess.sharedData,
     action: strategyRejected,
   },
@@ -136,7 +178,7 @@ export const cancelledByUser = {
     action: cancelledByA,
   },
   waitForStrategyResponse: {
-    state: waitForStrategyResponse,
+    state: waitForIndirectStrategyResponse,
     sharedData: indirectFundingPreSuccess.sharedData,
     action: cancelledByA,
   },
@@ -150,7 +192,7 @@ export const cancelledByOpponent = {
     action: cancelledByB,
   },
   waitForStrategyResponse: {
-    state: waitForStrategyResponse,
+    state: waitForIndirectStrategyResponse,
     sharedData: indirectFundingPreSuccess.sharedData,
     action: cancelledByB,
   },

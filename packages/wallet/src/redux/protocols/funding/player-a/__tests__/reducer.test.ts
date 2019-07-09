@@ -19,8 +19,11 @@ describe('indirect strastegy chosen', () => {
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Funding.PlayerA.WaitForStrategyResponse');
-    const { processId, strategy, opponentAddress } = scenario;
-    itSendsThisMessage(result, sendStrategyProposed(opponentAddress, processId, strategy));
+    const { processId, opponentAddress } = scenario;
+    itSendsThisMessage(
+      result,
+      sendStrategyProposed(opponentAddress, processId, 'IndirectFundingStrategy'),
+    );
   });
 
   describeScenarioStep(scenario.waitForStrategyResponse, () => {
@@ -30,8 +33,9 @@ describe('indirect strastegy chosen', () => {
     itTransitionsTo(result, 'Funding.PlayerA.WaitForIndirectFunding');
   });
 
-  describeScenarioStep(scenario.waitForFunding, () => {
-    const { state, sharedData, action } = scenario.waitForFunding;
+  describeScenarioStep(scenario.waitForIndirectFunding, () => {
+    const { state, sharedData, action } = scenario.waitForIndirectFunding;
+
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Funding.PlayerA.WaitForPostFundSetup');
