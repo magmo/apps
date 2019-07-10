@@ -5,7 +5,7 @@ import { accumulateSideEffects } from '../outbox';
 import { SideEffects } from '../outbox/state';
 import { SharedData, queueMessage, getExistingChannel, checkAndStore } from '../state';
 import * as selectors from '../selectors';
-import { TwoPartyPlayerIndex } from '../types';
+import { TwoPartyPlayerIndex, ThreePartyPlayerIndex } from '../types';
 import { CommitmentType } from 'fmg-core/lib/commitment';
 import * as magmoWalletClient from 'magmo-wallet-client';
 import { getLastCommitment, nextParticipant, Commitments } from '../channel-store';
@@ -207,7 +207,13 @@ export const getFundingChannelId = (channelId: string, sharedData: SharedData): 
   }
   return channelFundingState.fundingChannel;
 };
-
+export const getTwoPlayerIndex = (
+  channelId: string,
+  sharedData: SharedData,
+): TwoPartyPlayerIndex => {
+  const channelState = selectors.getChannelState(sharedData, channelId);
+  return channelState.participants.indexOf(channelState.address);
+};
 export const isFirstPlayer = (channelId: string, sharedData: SharedData) => {
   const channelState = selectors.getChannelState(sharedData, channelId);
   return channelState.ourIndex === TwoPartyPlayerIndex.A;

@@ -33,8 +33,7 @@ import {
   isAdvanceChannelAction,
   advanceChannelReducer,
 } from '../advance-channel';
-import { TwoPartyPlayerIndex } from '../../types';
-import { getLatestCommitment, isFirstPlayer } from '../reducer-helpers';
+import { getLatestCommitment, isFirstPlayer, getTwoPlayerIndex } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
@@ -46,9 +45,7 @@ export function initialize(
   sharedData: SharedData,
 ): ReturnVal {
   const privateKey = getPrivatekey(sharedData, channelId);
-  const ourIndex = isFirstPlayer(channelId, sharedData)
-    ? TwoPartyPlayerIndex.A
-    : TwoPartyPlayerIndex.B;
+  const ourIndex = getTwoPlayerIndex(channelId, sharedData);
   const { allocation, destination, channel } = getLatestCommitment(channelId, sharedData);
   const initializationArgs = {
     privateKey,
@@ -248,9 +245,7 @@ function handleWaitForPreFundSetup(
       const safeToDepositLevel = isFirstPlayer(protocolState.channelId, sharedData)
         ? '0x0'
         : latestCommitment.allocation[1];
-      const ourIndex = isFirstPlayer(protocolState.channelId, sharedData)
-        ? TwoPartyPlayerIndex.A
-        : TwoPartyPlayerIndex.B;
+      const ourIndex = getTwoPlayerIndex(protocolState.channelId, sharedData);
       // update the state
       const directFundingAction = directFundingRequested({
         processId: protocolState.processId,
