@@ -62,7 +62,8 @@ const twoTwo = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(2).toHexString() },
 ];
-
+const app0 = appCommitment({ turnNum: 0, balances: twoTwo });
+const app1 = appCommitment({ turnNum: 1, balances: twoTwo });
 const app2 = appCommitment({ turnNum: 2, balances: twoTwo });
 const app3 = appCommitment({ turnNum: 3, balances: twoTwo });
 // ------
@@ -71,6 +72,9 @@ const app3 = appCommitment({ turnNum: 3, balances: twoTwo });
 
 const successSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([app2, app3], bsAddress, bsPrivateKey),
+]);
+const preFundSharedData = setChannels(EMPTY_SHARED_DATA, [
+  channelFromCommitments([app0, app1], bsAddress, bsPrivateKey),
 ]);
 // -------
 // Actions
@@ -96,7 +100,7 @@ export const happyPath = {
   },
   waitForStrategyApproval: {
     state: waitForIndirectStrategyApproval,
-    sharedData: indirectFundingPreSuccess.sharedData,
+    sharedData: preFundSharedData,
     action: indirectStrategyApproved,
   },
   waitForFunding: {
