@@ -83,7 +83,10 @@ function handleAdvanceChannelAction(
   sharedData: SharedData,
   action: AdvanceChannelAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (protocolState.type !== 'Funding.PlayerA.WaitForPostFundSetup' && protocolState.type!=='Funding.PlayerA.WaitForFunding') {
+  if (
+    protocolState.type !== 'Funding.PlayerA.WaitForPostFundSetup' &&
+    protocolState.type !== 'Funding.PlayerA.WaitForFunding'
+  ) {
     console.warn(
       `Funding reducer received advance channel action ${action.type} but is currently in state ${
         protocolState.type
