@@ -8,7 +8,7 @@ import {
   setFundingState,
 } from '../../state';
 import * as states from './states';
-import { ProtocolStateWithSharedData } from '..';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { ExistingLedgerFundingAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import * as selectors from '../../selectors';
@@ -16,12 +16,14 @@ import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-
 import { theirAddress, getLastCommitment } from '../../channel-store';
 import { Commitment, nextSetupCommitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
-import { sendCommitmentReceived } from '../../../communication';
+import { sendCommitmentReceived, EmbeddedProtocol } from '../../../communication';
 import { CommitmentType } from 'fmg-core';
 import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
 import { addHex } from '../../../utils/hex-utils';
-export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'ExistingLedgerFunding';
+export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(
+  EmbeddedProtocol.ExistingLedgerFunding,
+);
 
 export const initialize = (
   processId: string,

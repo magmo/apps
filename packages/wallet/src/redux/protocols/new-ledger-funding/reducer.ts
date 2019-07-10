@@ -7,8 +7,9 @@ import { ChannelState } from '../../channel-store';
 import { isPlayerAState } from './player-a/states';
 import { NonTerminalNewLedgerFundingState, NewLedgerFundingState } from './states';
 import { NewLedgerFundingAction } from './actions';
-import { ProtocolStateWithSharedData } from '..';
-export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'NewLedgerFunding';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
+import { EmbeddedProtocol } from '../../../communication';
+export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.NewLedgerFunding);
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 

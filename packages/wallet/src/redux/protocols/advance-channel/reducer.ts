@@ -7,19 +7,19 @@ import {
   signAndStore,
   getExistingChannel,
 } from '../../state';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
+import { ProtocolStateWithSharedData, ProtocolReducer, makeLocator } from '..';
 import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../domain';
 import { getChannel, getLastCommitment, ChannelState } from '../../channel-store';
 import { WalletAction } from '../../actions';
 import * as selectors from '../../selectors';
-import { CommitmentsReceived } from '../../../communication';
+import { CommitmentsReceived, EmbeddedProtocol } from '../../../communication';
 import { Channel } from 'fmg-core';
 import { isAdvanceChannelAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { Properties } from '../../utils';
 import * as helpers from '../reducer-helpers';
 
-export const ADVANCE_CHANNEL_PROTOCOL_LOCATOR = 'AdvanceChannel';
+export const ADVANCE_CHANNEL_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.AdvanceChannel);
 
 type ReturnVal = ProtocolStateWithSharedData<states.AdvanceChannelState>;
 type Storage = SharedData;
@@ -49,13 +49,14 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
   sharedData: SharedData,
   action: WalletAction,
 ) => {
-  if (!isAdvanceChannelAction(action, '', '')) {
+  if (!isAdvanceChannelAction(action, [], EmbeddedProtocol.AdvanceChannel)) {
     console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
     return { protocolState, sharedData };
   }
-
-  if (action.type === 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND') {
-    return clearedToSendReducer(protocolState, sharedData);
+  {
+    if (action.type === 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND') {
+      return clearedToSendReducer(protocolState, sharedData);
+    }
   }
 
   switch (protocolState.type) {

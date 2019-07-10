@@ -21,11 +21,7 @@ const itTransitionsTo = (
   });
 };
 
-const itTransitionsSubstateTo = (
-  result: any,
-  substate: states.SubstateDescriptor,
-  type: string,
-) => {
+const itTransitionsSubstateTo = (result: any, substate: string, type: string) => {
   it(`transitions ${substate} to ${type}`, () => {
     expect(result[substate].type).toEqual(type);
   });

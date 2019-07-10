@@ -31,6 +31,8 @@ export const enum EmbeddedProtocol {
   NewLedgerFunding = 'NewLedgerFunding',
   VirtualFunding = 'VirtualFunding',
 }
+
+export type ProtocolLocator = EmbeddedProtocol[];
 export type FundingStrategy = 'IndirectFundingStrategy';
 
 function sendMessage(to: string, message: RelayableAction) {
@@ -58,7 +60,7 @@ export const sendCommitmentReceived = (
   processId: string,
   commitment: Commitment,
   signature: string,
-  protocolLocator: string = '',
+  protocolLocator: ProtocolLocator = [],
 ) => {
   const payload = commitmentReceived({
     processId,
@@ -72,7 +74,7 @@ export const sendCommitmentsReceived = (
   to: string,
   processId: string,
   signedCommitments: SignedCommitment[],
-  protocolLocator: string,
+  protocolLocator: ProtocolLocator,
 ) => {
   const payload = commitmentsReceived({ processId, signedCommitments, protocolLocator });
   return messageRelayRequested(to, payload);

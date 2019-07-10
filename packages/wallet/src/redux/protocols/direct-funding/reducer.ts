@@ -17,12 +17,13 @@ import { CommitmentType } from '../../../domain';
 import { clearedToSend } from '../advance-channel/actions';
 import * as selectors from '../../selectors';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
-export const DIRECT_FUNDING_PROTOCOL_LOCATOR = 'DirectFunding';
+import { EmbeddedProtocol } from '../../../communication';
+export const DIRECT_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.DirectFunding);
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
 const protocolLocator = makeLocator(
-  DIRECT_FUNDING_PROTOCOL_LOCATOR,
-  ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+  EmbeddedProtocol.DirectFunding,
+  EmbeddedProtocol.AdvanceChannel,
 );
 
 export function initialize(

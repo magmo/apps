@@ -1,11 +1,16 @@
-import { CommitmentsReceived, BaseProcessAction, isCommonAction } from '../../../communication';
+import {
+  CommitmentsReceived,
+  BaseProcessAction,
+  isCommonAction,
+  EmbeddedProtocol,
+  ProtocolLocator,
+} from '../../../communication';
 import { WalletAction } from '../../actions';
 import { ActionConstructor } from '../../utils';
-import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from './reducer';
 
 export interface ClearedToSend extends BaseProcessAction {
   type: 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND';
-  protocolLocator: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export type AdvanceChannelAction = CommitmentsReceived | ClearedToSend;
@@ -21,8 +26,8 @@ export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
 
 export function isAdvanceChannelAction(
   action: WalletAction,
-  path = '',
-  descriptor = ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+  path = [],
+  descriptor = EmbeddedProtocol.AdvanceChannel,
 ): action is AdvanceChannelAction {
   return (
     isCommonAction(action, path, descriptor) ||

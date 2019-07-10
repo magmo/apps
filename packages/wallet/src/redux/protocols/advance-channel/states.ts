@@ -1,6 +1,7 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 import { CommitmentType } from '../../../domain';
+import { ProtocolLocator } from '../../../communication';
 
 // -------
 // States
@@ -12,7 +13,7 @@ interface BaseState {
   processId: string;
   ourIndex: number;
   commitmentType: CommitmentType;
-  protocolLocator: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface ChannelUnknown extends BaseState {

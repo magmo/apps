@@ -63,7 +63,7 @@ export const isConcludingResponderAction = (
   action: WalletAction,
 ): action is ConcludingResponderAction => {
   return (
-    isCommonAction(action, '', '') ||
+    isCommonAction(action) ||
     action.type === 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN' ||

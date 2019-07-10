@@ -75,7 +75,7 @@ export const isConcludingInstigatorAction = (
   action: WalletAction,
 ): action is ConcludingInstigatorAction => {
   return (
-    isCommonAction(action, '', '') ||
+    isCommonAction(action) ||
     action.type === 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDING_CANCELLED' ||
     action.type === 'WALLET.CONCLUDING.INSTIGATOR.CONCLUDE_APPROVED' ||

@@ -63,7 +63,7 @@ export const initialize = (
             commitment: signResult.signedCommitment.commitment,
             signature: signResult.signedCommitment.signature,
           },
-          protocolLocator: '',
+          protocolLocator: [],
         }),
       ],
     });

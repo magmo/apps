@@ -94,7 +94,7 @@ const acknowledged = actions.acknowledged({ processId });
 const commitmentReceivedAction = commitmentReceived({
   processId,
   signedCommitment: app53,
-  protocolLocator: '',
+  protocolLocator: [],
 });
 const defundChosen = actions.defundChosen({ processId });
 const keepOpenChosen = actions.keepOpenChosen({ processId });

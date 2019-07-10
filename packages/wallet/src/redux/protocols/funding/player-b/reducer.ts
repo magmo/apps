@@ -7,7 +7,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
-import { sendStrategyApproved } from '../../../../communication';
+import { sendStrategyApproved, EmbeddedProtocol } from '../../../../communication';
 import { Properties } from '../../../utils';
 import {
   IndirectFundingAction,
@@ -41,7 +41,7 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (isIndirectFundingAction(action)) {
+  if (isIndirectFundingAction(action, [], EmbeddedProtocol.IndirectFunding)) {
     return handleFundingAction(state, sharedData, action);
   }
 

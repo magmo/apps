@@ -2,7 +2,12 @@ import * as playerA from './player-a/actions';
 import * as playerB from './player-b/actions';
 import { WalletAction } from '../../actions';
 import { isDirectFundingAction } from '../direct-funding/actions';
-import { isCommonAction, CommonAction } from '../../../communication';
+import {
+  isCommonAction,
+  CommonAction,
+  EmbeddedProtocol,
+  ProtocolLocator,
+} from '../../../communication';
 
 // -------
 // Actions
@@ -22,8 +27,8 @@ export type NewLedgerFundingAction = ProcessAction | CommonAction;
 
 export function isNewLedgerFundingAction(
   action: WalletAction,
-  path = '',
-  descriptor?,
+  path: ProtocolLocator = [],
+  descriptor?: EmbeddedProtocol,
 ): action is NewLedgerFundingAction {
   return (
     isCommonAction(action, path, descriptor) ||

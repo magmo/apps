@@ -16,7 +16,7 @@ import * as globalActions from '../../../actions';
 import { defundRequested } from '../../actions';
 
 const processId = 'processId';
-const protocolLocator = '';
+const protocolLocator = [];
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },

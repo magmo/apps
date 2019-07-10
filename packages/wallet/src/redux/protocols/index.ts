@@ -17,6 +17,7 @@ import { ConsensusUpdateState } from './consensus-update/states';
 import { AdvanceChannelState } from './advance-channel';
 import { VirtualFundingState } from './virtual-funding/states';
 import { IndirectFundingState } from './indirect-funding/states';
+import { ProtocolLocator, EmbeddedProtocol } from '../../communication';
 
 export type ProtocolState =
   | ApplicationState
@@ -49,6 +50,6 @@ export interface ProtocolStateWithSharedData<T extends ProtocolState> {
   sharedData: SharedData;
 }
 
-export function makeLocator(...args: string[]) {
-  return args.filter(s => s.length > 0).join('/');
+export function makeLocator(...args: Array<ProtocolLocator | EmbeddedProtocol>): ProtocolLocator {
+  return ([] as ProtocolLocator).concat(...args).filter(s => s.length > 0);
 }

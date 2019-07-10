@@ -1,6 +1,6 @@
 import { SignedCommitment } from '../domain';
 import { WalletAction } from '../redux/actions';
-import { FundingStrategy } from './index';
+import { FundingStrategy, ProtocolLocator, EmbeddedProtocol } from './index';
 import { ProcessProtocol } from '.';
 import { ActionConstructor } from '../redux/utils';
 import { Commitments } from '../redux/channel-store';
@@ -84,12 +84,12 @@ export const keepLedgerChannelApproved: ActionConstructor<KeepLedgerChannelAppro
 export interface CommitmentReceived extends BaseProcessAction {
   type: 'WALLET.COMMON.COMMITMENT_RECEIVED';
   signedCommitment: SignedCommitment;
-  protocolLocator: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface CommitmentsReceived extends BaseProcessAction {
   type: 'WALLET.COMMON.COMMITMENTS_RECEIVED';
-  protocolLocator: string;
+  protocolLocator: ProtocolLocator;
   signedCommitments: Commitments;
 }
 
@@ -137,15 +137,12 @@ export function isRelayableAction(action: WalletAction): action is RelayableActi
 export type CommonAction = CommitmentReceived | CommitmentsReceived;
 export function isCommonAction(
   action: WalletAction,
-  path: string,
-  descriptor: string,
+  path?: ProtocolLocator,
+  descriptor?: EmbeddedProtocol,
 ): action is CommonAction {
   return (
     (action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
       action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') &&
-    action.protocolLocator
-      .replace(path, '')
-      .replace(/^(\/)/, '') // strip the leading /, if exists
-      .startsWith(descriptor)
+    (!path || !descriptor || action.protocolLocator.indexOf(descriptor) === path.length)
   );
 }

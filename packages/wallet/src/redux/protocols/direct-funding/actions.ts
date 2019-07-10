@@ -38,8 +38,8 @@ export type DirectFundingAction =
 
 export function isDirectFundingAction(
   action: actions.WalletAction,
-  path = '',
-  descriptor = DIRECT_FUNDING_PROTOCOL_LOCATOR,
+  path = [],
+  descriptor = DIRECT_FUNDING_PROTOCOL_LOCATOR[0],
 ): action is DirectFundingAction {
   return (
     action.type === 'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT' ||

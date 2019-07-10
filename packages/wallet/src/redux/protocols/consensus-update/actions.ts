@@ -1,11 +1,16 @@
 import { WalletAction } from '../../actions';
-import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from './reducer';
-import { CommitmentsReceived, BaseProcessAction, isCommonAction } from '../../../communication';
+import {
+  CommitmentsReceived,
+  BaseProcessAction,
+  isCommonAction,
+  ProtocolLocator,
+  EmbeddedProtocol,
+} from '../../../communication';
 import { ActionConstructor } from '../../utils';
 
 export interface ClearedToSend extends BaseProcessAction {
   type: 'WALLET.CONSENSUS_UPDATE.CLEARED_TO_SEND';
-  protocolLocator: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
@@ -19,8 +24,8 @@ export type ConsensusUpdateAction = CommitmentsReceived | ClearedToSend;
 
 export const isConsensusUpdateAction = (
   action: WalletAction,
-  path = '',
-  descriptor = CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+  path = [],
+  descriptor = EmbeddedProtocol.ConsensusUpdate,
 ): action is ConsensusUpdateAction => {
   return (
     isCommonAction(action, path, descriptor) ||
