@@ -20,5 +20,5 @@ export function isExistingLedgerFundingAction(
 
 export const routestoExistingLedgerFunding = routerFactory(
   isExistingLedgerFundingAction,
-  EmbeddedProtocol.NewLedgerFunding,
+  EmbeddedProtocol.ExistingLedgerFunding,
 );
