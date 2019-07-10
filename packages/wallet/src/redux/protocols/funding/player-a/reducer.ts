@@ -55,6 +55,7 @@ export function fundingReducer(
 ): ProtocolStateWithSharedData<states.FundingState> {
   if (
     isAdvanceChannelAction(action) &&
+    // TODO: Remove this check once protocol-locator updates have been made
     action.protocolLocator === ADVANCE_CHANNEL_PROTOCOL_LOCATOR
   ) {
     return handleAdvanceChannelAction(state, sharedData, action);
