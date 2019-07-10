@@ -47,7 +47,7 @@ export const sendCommitmentReceived = (
   processId: string,
   commitment: Commitment,
   signature: string,
-  protocolLocator?: string,
+  protocolLocator: string = '',
 ) => {
   const payload = commitmentReceived({
     processId,

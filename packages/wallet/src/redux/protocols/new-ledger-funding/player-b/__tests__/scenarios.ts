@@ -25,6 +25,7 @@ import { success } from '../../../indirect-defunding/states';
 // Commitments
 // -----------
 const processId = 'processId';
+const protocolLocator = '';
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
@@ -108,12 +109,18 @@ export const successState = {
 const preFundSetup0Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger0,
+  protocolLocator,
 });
 const ledgerUpdate0Received = globalActions.commitmentReceived({
   processId,
   signedCommitment: ledger4,
+  protocolLocator,
 });
-const postFund0Received = globalActions.commitmentReceived({ processId, signedCommitment: app2 });
+const postFund0Received = globalActions.commitmentReceived({
+  processId,
+  signedCommitment: app2,
+  protocolLocator,
+});
 
 export const happyPath = {
   initialParams: {
