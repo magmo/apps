@@ -72,7 +72,7 @@ export const reducer: ProtocolReducer<states.VirtualFundingState> = (
   sharedData: SharedData,
   action: WalletAction,
 ) => {
-  if (!isVirtualFundingAction(action)) {
+  if (!isVirtualFundingAction(action, protocolState.protocolLocator)) {
     console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
     return { protocolState, sharedData };
   }

@@ -26,7 +26,7 @@ export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
 
 export function isAdvanceChannelAction(
   action: WalletAction,
-  path = [],
+  path: ProtocolLocator = [],
   descriptor = EmbeddedProtocol.AdvanceChannel,
 ): action is AdvanceChannelAction {
   return (

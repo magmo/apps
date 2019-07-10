@@ -49,7 +49,7 @@ const initializeArgs = {
   commitmentType: CommitmentType.PreFundSetup,
   targetChannelId,
   hubAddress,
-  protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+  protocolLocator: makeLocator(EmbeddedProtocol.VirtualFunding, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
 };
 
 const props = {
