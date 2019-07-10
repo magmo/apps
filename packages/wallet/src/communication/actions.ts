@@ -143,6 +143,9 @@ export function isCommonAction(
   return (
     (action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
       action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') &&
-    action.protocolLocator.replace(path, '').startsWith(descriptor)
+    action.protocolLocator
+      .replace(path, '')
+      .replace(/^(\/)/, '') // strip the leading /, if exists
+      .startsWith(descriptor)
   );
 }
