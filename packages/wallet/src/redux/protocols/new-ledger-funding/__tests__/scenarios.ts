@@ -36,7 +36,6 @@ const fiveToApp = [{ address: channelId, wei: bigNumberify(5).toHexString() }];
 const app2 = appCommitment({ turnNum: 2, balances: twoThree });
 const app3 = appCommitment({ turnNum: 3, balances: twoThree });
 
-const ledger0 = ledgerCommitment({ turnNum: 0, balances: twoThree });
 const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
 
