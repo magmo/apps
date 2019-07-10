@@ -20,12 +20,13 @@ import {
   channelId,
 } from '../../../../../domain/commitments/__tests__';
 import { success } from '../../../indirect-defunding/states';
+import { NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../reducer';
 
 // -----------
 // Commitments
 // -----------
 const processId = 'processId';
-const protocolLocator = '';
+const protocolLocator = NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR;
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },

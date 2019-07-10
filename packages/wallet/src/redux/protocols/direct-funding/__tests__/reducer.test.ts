@@ -32,6 +32,7 @@ describe('Player A Happy path', () => {
     itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
   });
 });
+
 describe('Player A Happy Path With No Post Fund Setup Exchange', () => {
   const scenario = scenarios.aNoPostFundSetupHappyPath;
   describe('when initializing', () => {

@@ -7,9 +7,9 @@ import * as scenarios from '../../../../domain/commitments/__tests__';
 import { commitmentsReceived } from '../../../../communication';
 import { CommitmentType } from '../../../../domain';
 import { clearedToSend } from '../actions';
-import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '..';
 import { bigNumberify } from 'ethers/utils';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
+import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../reducer';
 
 // ---------
 // Test data
@@ -159,7 +159,7 @@ const bSentPostFundSetupCommitment = setChannels(EMPTY_SHARED_DATA, [
 
 const args = {
   processId,
-  protocolLocator: 'AdvancedChannel',
+  protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
 };
 
 const receivePreFundSetupFromA = commitmentsReceived({
