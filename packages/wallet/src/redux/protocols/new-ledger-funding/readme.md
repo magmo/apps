@@ -11,7 +11,7 @@ Out of scope (for now):
 
 ## The Protocol
 
-The two protocols interact through the following messages:
+The protocol interacts between client wallets through the following messages:
 
 ```mermaid
 sequenceDiagram
