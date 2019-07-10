@@ -113,6 +113,13 @@ const scenarioStates = {
 // Scenarios
 // ---------
 
+function fixLocator(action, protocol = EmbeddedProtocol.VirtualFunding) {
+  return {
+    ...action,
+    protocolLocator: makeLocator(protocol, action.protocolLocator),
+  };
+}
+
 export const happyPath = {
   ...props,
   initialize: {
@@ -121,40 +128,36 @@ export const happyPath = {
   },
   openJ: {
     state: scenarioStates.waitForJointChannel1,
-    action: preFund.preSuccess.trigger,
+    action: fixLocator(preFund.preSuccess.trigger),
     sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareJ: {
     state: scenarioStates.waitForJointChannel2,
-    action: postFund.preSuccess.trigger,
+    action: fixLocator(postFund.preSuccess.trigger),
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
     jointChannelId,
   },
   openG: {
     state: scenarioStates.waitForGuarantorChannel1,
-    action: preFund.preSuccess.trigger,
+    action: fixLocator(preFund.preSuccess.trigger),
     sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareG: {
     state: scenarioStates.waitForGuarantorChannel2,
-    action: postFund.preSuccess.trigger,
+    action: fixLocator(postFund.preSuccess.trigger),
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
   fundG: {
     appChannelId: appChannel.channelId,
     state: scenarioStates.waitForGuarantorFunding,
-    action: {
-      ...indirectFundingPreSuccess.action,
-      protocolLocator: makeLocator(
-        EmbeddedProtocol.IndirectFunding,
-        indirectFundingPreSuccess.action.protocolLocator,
-      ),
-    },
+    action: fixLocator(
+      fixLocator(indirectFundingPreSuccess.action, EmbeddedProtocol.IndirectFunding),
+    ),
     sharedData: indirectFundingPreSuccess.sharedData,
   },
   fundApp: {
     state: scenarioStates.waitForApplicationFunding,
-    action: consensusUpdatePreSuccess.action,
+    action: fixLocator(consensusUpdatePreSuccess.action),
     sharedData: consensusUpdatePreSuccess.sharedData,
   },
 };
