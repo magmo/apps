@@ -10,7 +10,6 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../consensus-update/reducer';
 import { makeLocator } from '../..';
 
 // ---------
@@ -154,9 +153,7 @@ export const happyPath = {
     state: scenarioStates.waitForApplicationFunding,
     action: {
       ...consensusUpdatePreSuccess.action,
-      protocolLocator: `${
-        states.INDIRECT_APPLICATION_FUNDING_DESCRIPTOR
-      }/${CONSENSUS_UPDATE_PROTOCOL_LOCATOR}`,
+      protocolLocator: states.INDIRECT_APPLICATION_FUNDING_DESCRIPTOR,
     },
     sharedData: consensusUpdatePreSuccess.sharedData,
   },
