@@ -172,7 +172,7 @@ function strategyApproved(state: states.FundingState, sharedData: SharedData) {
     CommitmentType.PostFundSetup,
     {
       channelId: targetChannelId,
-      ourIndex: TwoPartyPlayerIndex.A,
+      ourIndex: TwoPartyPlayerIndex.B,
       processId,
       commitmentType: CommitmentType.PostFundSetup,
       clearedToSend: false,
