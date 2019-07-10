@@ -111,10 +111,7 @@ function routeToProtocolReducer(
         );
         return updatedState(state, concludingSharedData, processState, concludingProtocolState);
       default:
-        // TODO: This should return unreachable(state), but right now, only some protocols are
-        // "whitelisted" to run as a top-level process, which means we can't
-        // exhaust all options
-        return state;
+        return unreachable(processState.protocol);
     }
   }
 }
