@@ -3,7 +3,6 @@ import {
   signAndStore,
   queueMessage,
   checkAndStore,
-  getExistingChannel,
   ChannelFundingState,
   setFundingState,
 } from '../../state';
@@ -14,7 +13,7 @@ import * as helpers from '../reducer-helpers';
 import * as selectors from '../../selectors';
 import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-app';
 import { theirAddress, getLastCommitment } from '../../channel-store';
-import { Commitment, nextSetupCommitment } from '../../../domain';
+import { Commitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
 import { sendCommitmentReceived } from '../../../communication';
 import { CommitmentType } from 'fmg-core';
@@ -193,20 +192,7 @@ const waitForLedgerUpdateReducer = (
     };
   }
   newSharedData = checkResult.store;
-  if (helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
-    try {
-      newSharedData = craftAndSendAppPostFundCommitment(
-        newSharedData,
-        protocolState.channelId,
-        protocolState.processId,
-      );
-    } catch (error) {
-      return {
-        protocolState: states.failure({ reason: 'PostFundSetupFailure' }),
-        sharedData,
-      };
-    }
-  } else {
+  if (!helpers.isFirstPlayer(protocolState.ledgerId, newSharedData)) {
     const ourCommitment = acceptConsensus(theirCommitment);
     const signResult = signAndStore(newSharedData, ourCommitment);
     if (!signResult.isSuccess) {
@@ -268,35 +254,4 @@ function craftAppFunding(
     proposedAllocation: [total],
     proposedDestination: [appChannelId],
   };
-}
-function craftAndSendAppPostFundCommitment(
-  sharedData: SharedData,
-  appChannelId: string,
-  processId: string,
-): SharedData {
-  let newSharedData = { ...sharedData };
-  const appChannel = getExistingChannel(sharedData, appChannelId);
-
-  const theirAppCommitment = getLastCommitment(appChannel);
-
-  const ourAppCommitment = nextSetupCommitment(theirAppCommitment);
-  if (ourAppCommitment === 'NotASetupCommitment') {
-    throw new Error('NotASetupCommitment');
-  }
-  const signResult = signAndStore(newSharedData, ourAppCommitment);
-  if (!signResult.isSuccess) {
-    throw new Error('CouldNotSign');
-  }
-  newSharedData = signResult.store;
-
-  // just need to put our message in the outbox
-  const messageRelay = sendCommitmentReceived(
-    theirAddress(appChannel),
-    processId,
-    signResult.signedCommitment.commitment,
-    signResult.signedCommitment.signature,
-    EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
-  );
-  newSharedData = queueMessage(newSharedData, messageRelay);
-  return newSharedData;
 }

@@ -196,11 +196,15 @@ function handleWaitForLedgerUpdate(
       return { protocolState: failure({}), sharedData };
     } else {
       // update fundingState
-      const fundingState: ChannelFundingState = {
+      const channelFundingState: ChannelFundingState = {
         directlyFunded: false,
         fundingChannel: protocolState.ledgerId,
       };
-      sharedData = setFundingState(sharedData, protocolState.channelId, fundingState);
+      const ledgerFundingState: ChannelFundingState = {
+        directlyFunded: true,
+      };
+      sharedData = setFundingState(sharedData, protocolState.channelId, channelFundingState);
+      sharedData = setFundingState(sharedData, protocolState.ledgerId, ledgerFundingState);
       return { protocolState: success({}), sharedData };
     }
   } else {

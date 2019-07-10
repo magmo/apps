@@ -51,7 +51,7 @@ describe('happy-path scenario', () => {
       scenario.initialParams.channelId,
       scenario.initialParams.ledgerId,
     );
-
+    itUpdatesFundingState(updatedState, scenario.initialParams.ledgerId);
     itTransitionsTo(updatedState, 'NewLedgerFunding.Success');
   });
 });
