@@ -158,7 +158,7 @@ export const consensusUpdateReducer = (
   sharedData: SharedData,
   action: ConsensusUpdateAction,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (!isConsensusUpdateAction(action)) {
+  if (!isConsensusUpdateAction(action, '', '')) {
     console.warn(`Consensus Update received non Consensus Update action ${action}`);
     return { protocolState, sharedData };
   }

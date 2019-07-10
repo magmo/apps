@@ -252,7 +252,13 @@ function waitForGuarantorFundingReducer(
   action: WalletAction,
 ) {
   const { processId, jointChannelId, startingAllocation, targetChannelId } = protocolState;
-  if (indirectFunding.isIndirectFundingAction(action, '', 'indirectGuarantorFunding')) {
+  if (
+    indirectFunding.isIndirectFundingAction(
+      action,
+      '',
+      states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR,
+    )
+  ) {
     const result = indirectFunding.indirectFundingReducer(
       protocolState.indirectGuarantorFunding,
       sharedData,

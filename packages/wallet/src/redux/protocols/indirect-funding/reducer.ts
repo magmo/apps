@@ -95,7 +95,7 @@ export function indirectFundingReducer(
   action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.IndirectFundingState> {
   if (protocolState.type === 'IndirectFunding.WaitForNewLedgerFunding') {
-    if (!isNewLedgerFundingAction(action)) {
+    if (!isNewLedgerFundingAction(action, '', '')) {
       console.warn(`Received ${action} but currently in ${protocolState.type}`);
       return { protocolState, sharedData };
     }
@@ -121,7 +121,7 @@ export function indirectFundingReducer(
       };
     }
   } else if (protocolState.type === 'IndirectFunding.WaitForExistingLedgerFunding') {
-    if (!isExistingLedgerFundingAction(action)) {
+    if (!isExistingLedgerFundingAction(action, '', '')) {
       console.warn(`Received ${action} but currently in ${protocolState.type}`);
       return { protocolState, sharedData };
     }
