@@ -7,14 +7,15 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
-import { advanceChannelReducer, isAdvanceChannelAction } from '../advance-channel';
+import { advanceChannelReducer } from '../advance-channel';
 import * as consensusUpdate from '../consensus-update';
 import * as indirectFunding from '../indirect-funding';
 import { ethers } from 'ethers';
 import { addHex } from '../../../utils/hex-utils';
-import { EmbeddedProtocol } from '../../../communication';
-import { INDIRECT_FUNDING_PROTOCOL_LOCATOR } from '../indirect-funding/reducer';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
+import { routesToAdvanceChannel } from '../advance-channel/actions';
+import { routesToIndirectFunding } from '../indirect-funding/actions';
+import { routesToConsensusUpdate } from '../consensus-update/actions';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
 
@@ -72,7 +73,7 @@ export const reducer: ProtocolReducer<states.VirtualFundingState> = (
   sharedData: SharedData,
   action: WalletAction,
 ) => {
-  if (!isVirtualFundingAction(action, protocolState.protocolLocator)) {
+  if (!isVirtualFundingAction(action)) {
     console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
     return { protocolState, sharedData };
   }
@@ -101,7 +102,7 @@ function waitForJointChannelReducer(
   action: WalletAction,
 ) {
   const { processId, hubAddress, ourIndex } = protocolState;
-  if (isAdvanceChannelAction(action, [], EmbeddedProtocol.AdvanceChannel)) {
+  if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const result = advanceChannelReducer(protocolState.jointChannel, sharedData, action);
 
     if (advanceChannel.isSuccess(result.protocolState)) {
@@ -187,7 +188,7 @@ function waitForGuarantorChannelReducer(
   action: WalletAction,
 ) {
   const { processId, ourIndex } = protocolState;
-  if (isAdvanceChannelAction(action, [], EmbeddedProtocol.AdvanceChannel)) {
+  if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
     if (advanceChannel.isSuccess(result.protocolState)) {
       const { channelId: guarantorChannelId } = result.protocolState;
@@ -255,8 +256,14 @@ function waitForGuarantorFundingReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId, jointChannelId, startingAllocation, targetChannelId } = protocolState;
-  if (indirectFunding.isIndirectFundingAction(action, [], INDIRECT_FUNDING_PROTOCOL_LOCATOR)) {
+  const {
+    processId,
+    jointChannelId,
+    startingAllocation,
+    targetChannelId,
+    protocolLocator,
+  } = protocolState;
+  if (routesToIndirectFunding(action, protocolLocator)) {
     const result = indirectFunding.indirectFundingReducer(
       protocolState.indirectGuarantorFunding,
       sharedData,
@@ -307,7 +314,7 @@ function waitForApplicationFundingReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  if (consensusUpdate.isConsensusUpdateAction(action, [], EmbeddedProtocol.ConsensusUpdate)) {
+  if (routesToConsensusUpdate(action, protocolState.protocolLocator)) {
     const result = consensusUpdate.consensusUpdateReducer(
       protocolState.indirectApplicationFunding,
       sharedData,

@@ -1,8 +1,12 @@
 import * as actions from '../../actions';
 import { ActionConstructor } from '../../utils';
 import { TwoPartyPlayerIndex } from '../../types';
-import { DIRECT_FUNDING_PROTOCOL_LOCATOR } from './reducer';
-import { isCommonAction } from '../../../communication';
+import {
+  isCommonAction,
+  routesToProtocol,
+  ProtocolLocator,
+  EmbeddedProtocol,
+} from '../../../communication';
 
 // -------
 // Actions
@@ -29,23 +33,33 @@ export const directFundingRequested: ActionConstructor<DirectFundingRequested> =
 // Unions and Guards
 // -------
 
+type EmbeddedAction = actions.advanceChannel.AdvanceChannelAction | actions.TransactionAction;
+
 export type DirectFundingAction =
   | DirectFundingRequested
   | actions.CommitmentReceived
   | actions.FundingReceivedEvent
-  | actions.advanceChannel.AdvanceChannelAction
-  | actions.TransactionAction;
+  | EmbeddedAction;
 
-export function isDirectFundingAction(
-  action: actions.WalletAction,
-  path = [],
-  descriptor = DIRECT_FUNDING_PROTOCOL_LOCATOR[0],
-): action is DirectFundingAction {
+function isEmbeddedAction(action: actions.WalletAction): action is EmbeddedAction {
+  return (
+    actions.advanceChannel.isAdvanceChannelAction(action) || actions.isTransactionAction(action)
+  );
+}
+
+export function isDirectFundingAction(action: actions.WalletAction): action is DirectFundingAction {
   return (
     action.type === 'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT' ||
     action.type === 'WALLET.DIRECT_FUNDING.DIRECT_FUNDING_REQUESTED' ||
-    isCommonAction(action, path, descriptor) ||
-    actions.advanceChannel.isAdvanceChannelAction(action) ||
-    actions.isTransactionAction(action)
+    isCommonAction(action, EmbeddedProtocol.DirectFunding) ||
+    isEmbeddedAction(action)
   );
+}
+
+export function routesToDirectFunding(
+  action: actions.WalletAction,
+  path: ProtocolLocator = [],
+  descriptor = EmbeddedProtocol.DirectFunding,
+): action is DirectFundingAction {
+  return isDirectFundingAction(action) && routesToProtocol(action, path, descriptor);
 }

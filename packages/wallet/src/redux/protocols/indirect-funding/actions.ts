@@ -1,4 +1,8 @@
-import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../new-ledger-funding/actions';
+import {
+  NewLedgerFundingAction,
+  isNewLedgerFundingAction,
+  routesToNewLedgerFunding,
+} from '../new-ledger-funding/actions';
 import {
   ExistingLedgerFundingAction,
   isExistingLedgerFundingAction,
@@ -6,24 +10,20 @@ import {
 import { WalletAction } from '../../actions';
 import { makeLocator } from '..';
 import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
+import { routestoExistingLedgerFunding } from '../existing-ledger-funding/actions';
 
 export type IndirectFundingAction = NewLedgerFundingAction | ExistingLedgerFundingAction;
 
-export const isIndirectFundingAction = (
+export const isIndirectFundingAction = (action: WalletAction): action is IndirectFundingAction => {
+  return isNewLedgerFundingAction(action) || isExistingLedgerFundingAction(action);
+};
+
+export const routesToIndirectFunding = (
   action: WalletAction,
   path: ProtocolLocator = [],
-  descriptor,
 ): action is IndirectFundingAction => {
   return (
-    isNewLedgerFundingAction(
-      action,
-      makeLocator(path, descriptor),
-      EmbeddedProtocol.NewLedgerFunding,
-    ) ||
-    isExistingLedgerFundingAction(
-      action,
-      makeLocator(path, descriptor),
-      EmbeddedProtocol.ExistingLedgerFunding,
-    )
+    routesToNewLedgerFunding(action, makeLocator(path, EmbeddedProtocol.IndirectFunding)) ||
+    routestoExistingLedgerFunding(action, makeLocator(path, EmbeddedProtocol.IndirectFunding))
   );
 };

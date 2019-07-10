@@ -5,6 +5,7 @@ import {
   isCommonAction,
   ProtocolLocator,
   EmbeddedProtocol,
+  routerFactory,
 } from '../../../communication';
 import { ActionConstructor } from '../../utils';
 
@@ -22,13 +23,14 @@ export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
 
 export type ConsensusUpdateAction = CommitmentsReceived | ClearedToSend;
 
-export const isConsensusUpdateAction = (
-  action: WalletAction,
-  path = [],
-  descriptor = EmbeddedProtocol.ConsensusUpdate,
-): action is ConsensusUpdateAction => {
+export const isConsensusUpdateAction = (action: WalletAction): action is ConsensusUpdateAction => {
   return (
-    isCommonAction(action, path, descriptor) ||
+    isCommonAction(action, EmbeddedProtocol.ConsensusUpdate) ||
     action.type === 'WALLET.CONSENSUS_UPDATE.CLEARED_TO_SEND'
   );
 };
+
+export const routesToConsensusUpdate = routerFactory(
+  isConsensusUpdateAction,
+  EmbeddedProtocol.ConsensusUpdate,
+);

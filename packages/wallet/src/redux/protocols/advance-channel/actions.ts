@@ -2,8 +2,9 @@ import {
   CommitmentsReceived,
   BaseProcessAction,
   isCommonAction,
-  EmbeddedProtocol,
   ProtocolLocator,
+  EmbeddedProtocol,
+  routerFactory,
 } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { ActionConstructor } from '../../utils';
@@ -24,13 +25,14 @@ export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
   };
 };
 
-export function isAdvanceChannelAction(
-  action: WalletAction,
-  path: ProtocolLocator = [],
-  descriptor = EmbeddedProtocol.AdvanceChannel,
-): action is AdvanceChannelAction {
+export function isAdvanceChannelAction(action: WalletAction): action is AdvanceChannelAction {
   return (
-    isCommonAction(action, path, descriptor) ||
+    isCommonAction(action, EmbeddedProtocol.AdvanceChannel) ||
     action.type === 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND'
   );
 }
+
+export const routesToAdvanceChannel = routerFactory(
+  isAdvanceChannelAction,
+  EmbeddedProtocol.AdvanceChannel,
+);

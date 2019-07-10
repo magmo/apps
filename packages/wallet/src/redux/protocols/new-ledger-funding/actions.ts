@@ -6,7 +6,7 @@ import {
   isCommonAction,
   CommonAction,
   EmbeddedProtocol,
-  ProtocolLocator,
+  routerFactory,
 } from '../../../communication';
 
 // -------
@@ -25,15 +25,16 @@ export { playerA, playerB };
 export type ProcessAction = playerA.Action | playerB.Action;
 export type NewLedgerFundingAction = ProcessAction | CommonAction;
 
-export function isNewLedgerFundingAction(
-  action: WalletAction,
-  path: ProtocolLocator = [],
-  descriptor?: EmbeddedProtocol,
-): action is NewLedgerFundingAction {
+export function isNewLedgerFundingAction(action: WalletAction): action is NewLedgerFundingAction {
   return (
-    isCommonAction(action, path, descriptor) ||
+    isCommonAction(action, EmbeddedProtocol.NewLedgerFunding) ||
     isDirectFundingAction(action) ||
     playerA.isNewLedgerFundingAction(action) ||
-    playerB.isNewLedgerFundingAction(action, path, descriptor)
+    playerB.isNewLedgerFundingAction(action)
   );
 }
+
+export const routesToNewLedgerFunding = routerFactory(
+  isNewLedgerFundingAction,
+  EmbeddedProtocol.NewLedgerFunding,
+);

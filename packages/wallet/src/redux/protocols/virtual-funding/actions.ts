@@ -1,17 +1,23 @@
 import { WalletAction } from '../../actions';
-import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../new-ledger-funding/actions';
 import { AdvanceChannelAction, isAdvanceChannelAction } from '../advance-channel';
-import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
+import { EmbeddedProtocol, routerFactory } from '../../../communication';
+import { IndirectFundingAction, isIndirectFundingAction } from '../indirect-funding';
+import { ConsensusUpdateAction, isConsensusUpdateAction } from '../consensus-update';
 
-export type VirtualFundingAction = NewLedgerFundingAction | AdvanceChannelAction; // | ConsensusReachedAction
+export type VirtualFundingAction =
+  | AdvanceChannelAction
+  | IndirectFundingAction
+  | ConsensusUpdateAction;
 
-export function isVirtualFundingAction(
-  action: WalletAction,
-  path: ProtocolLocator = [],
-  descriptor = EmbeddedProtocol.VirtualFunding,
-): action is VirtualFundingAction {
+export function isVirtualFundingAction(action: WalletAction): action is VirtualFundingAction {
   return (
-    isNewLedgerFundingAction(action, path, descriptor) ||
-    isAdvanceChannelAction(action, path, descriptor)
+    isAdvanceChannelAction(action) ||
+    isIndirectFundingAction(action) ||
+    isConsensusUpdateAction(action)
   );
 }
+
+export const routesToVirtualFunding = routerFactory(
+  isVirtualFundingAction,
+  EmbeddedProtocol.VirtualFunding,
+);

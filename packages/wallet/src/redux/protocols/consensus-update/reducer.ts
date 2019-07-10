@@ -1,7 +1,7 @@
 import { SharedData, signAndStore, getExistingChannel } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
-import { ConsensusUpdateAction, isConsensusUpdateAction, ClearedToSend } from './actions';
+import { isConsensusUpdateAction, ClearedToSend } from './actions';
 import * as helpers from '../reducer-helpers';
 import {
   proposeNewConsensus,
@@ -13,6 +13,7 @@ import { Commitment } from '../../../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { eqHexArray } from '../../../utils/hex-utils';
 import { CommitmentsReceived, EmbeddedProtocol } from '../../../communication';
+import { WalletAction } from '../../actions';
 
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.ConsensusUpdate);
 
@@ -156,7 +157,7 @@ const handleCommitmentReceived = (
 export const consensusUpdateReducer = (
   protocolState: states.ConsensusUpdateState,
   sharedData: SharedData,
-  action: ConsensusUpdateAction,
+  action: WalletAction,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   if (!isConsensusUpdateAction(action)) {
     console.warn(`Consensus Update received non Consensus Update action ${action}`);

@@ -1,7 +1,7 @@
 import { DirectFundingAction } from '../../direct-funding';
 import { CommitmentReceived, WalletAction } from '../../../actions';
 import { isDirectFundingAction } from '../../direct-funding/actions';
-import { isCommonAction, EmbeddedProtocol, ProtocolLocator } from '../../../../communication';
+import { isCommonAction, EmbeddedProtocol } from '../../../../communication';
 // -------
 // Actions
 // -------
@@ -16,13 +16,9 @@ import { isCommonAction, EmbeddedProtocol, ProtocolLocator } from '../../../../c
 
 export type Action = DirectFundingAction | CommitmentReceived;
 
-export function isNewLedgerFundingAction(
-  action: WalletAction,
-  path: ProtocolLocator = [],
-  descriptor = EmbeddedProtocol.NewLedgerFunding,
-): action is Action {
+export function isNewLedgerFundingAction(action: WalletAction): action is Action {
   return (
-    isCommonAction(action, path, descriptor) ||
+    isCommonAction(action, EmbeddedProtocol.NewLedgerFunding) ||
     isDirectFundingAction(action) ||
     action.type === 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.STRATEGY_APPROVED'
   );

@@ -137,12 +137,32 @@ export function isRelayableAction(action: WalletAction): action is RelayableActi
 export type CommonAction = CommitmentReceived | CommitmentsReceived;
 export function isCommonAction(
   action: WalletAction,
-  path?: ProtocolLocator,
-  descriptor?: EmbeddedProtocol,
+  protocol?: EmbeddedProtocol,
 ): action is CommonAction {
   return (
     (action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
       action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') &&
-    (!path || !descriptor || action.protocolLocator.indexOf(descriptor) === path.length)
+    // When passed a protocol, check that it's got the protocol in the protocol locator
+    (!protocol || action.protocolLocator.indexOf(protocol) >= 0)
   );
+}
+
+export function routesToProtocol(
+  action: WalletAction,
+  path: ProtocolLocator,
+  descriptor: EmbeddedProtocol,
+): boolean {
+  if ('protocolLocator' in action) {
+    return action.protocolLocator.indexOf(descriptor) === path.length;
+  } else {
+    return true;
+  }
+}
+
+export function routerFactory(
+  typeGuard: (action: WalletAction) => boolean,
+  protocol: EmbeddedProtocol,
+): (action: WalletAction, path: ProtocolLocator) => boolean {
+  return (action: WalletAction, path: ProtocolLocator) =>
+    typeGuard(action) && routesToProtocol(action, path, protocol);
 }
