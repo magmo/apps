@@ -1,7 +1,7 @@
 import React from 'react';
 import { Checklist, MessagesForStep, messagesForStep } from '../../shared-components/checklist';
-import { unreachable } from '../../../../..';
 import { NonTerminalNewLedgerFundingState } from '../states';
+import { unreachable } from '../../../../utils/reducer-utils';
 
 interface Props {
   newLedgerFundingState: NonTerminalNewLedgerFundingState;

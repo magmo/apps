@@ -4,7 +4,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 import { FundingStep } from './components/funding-step';
-import { unreachable } from '../../../..';
+import { unreachable } from '../../../utils/reducer-utils';
 
 interface Props {
   state: states.NonTerminalNewLedgerFundingState;
