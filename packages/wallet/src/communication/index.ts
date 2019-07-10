@@ -12,7 +12,8 @@ import {
 } from './actions';
 export * from './actions';
 
-export const enum WalletProtocol {
+// These protocols are precisely those that run at the top-level
+export const enum ProcessProtocol {
   Application = 'Application',
   Funding = 'Funding',
   Defunding = 'Defunding',

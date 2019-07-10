@@ -12,7 +12,7 @@ import * as fundProtocol from './protocols/funding';
 import * as states from './state';
 import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
-import { isStartProcessAction, WalletProtocol } from '../communication';
+import { isStartProcessAction, ProcessProtocol } from '../communication';
 import * as communication from '../communication';
 import { ethers } from 'ethers';
 
@@ -77,20 +77,20 @@ function routeToProtocolReducer(
     return state;
   } else {
     switch (processState.protocol) {
-      case WalletProtocol.Funding:
+      case ProcessProtocol.Funding:
         const { protocolState, sharedData } = fundProtocol.reducer(
           processState.protocolState,
           states.sharedData(state),
           action,
         );
         return updatedState(state, sharedData, processState, protocolState);
-      case WalletProtocol.Defunding:
+      case ProcessProtocol.Defunding:
         const {
           protocolState: defundingProtocolState,
           sharedData: defundingSharedData,
         } = defundingProtocol.reducer(processState.protocolState, states.sharedData(state), action);
         return updatedState(state, defundingSharedData, processState, defundingProtocolState);
-      case WalletProtocol.Application:
+      case ProcessProtocol.Application:
         const {
           protocolState: appProtocolState,
           sharedData: appSharedData,
@@ -100,7 +100,7 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, appSharedData, processState, appProtocolState);
-      case WalletProtocol.Concluding:
+      case ProcessProtocol.Concluding:
         const {
           protocolState: concludingProtocolState,
           sharedData: concludingSharedData,

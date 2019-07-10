@@ -1,7 +1,7 @@
 import { SignedCommitment } from '../domain';
 import { WalletAction } from '../redux/actions';
 import { FundingStrategy } from './index';
-import { WalletProtocol } from '.';
+import { ProcessProtocol } from '.';
 import { ActionConstructor } from '../redux/utils';
 import { Commitments } from '../redux/channel-store';
 import { DefundRequested } from '../redux/protocols/actions';
@@ -42,7 +42,7 @@ export interface KeepLedgerChannelApproved extends BaseProcessAction {
 export interface ConcludeInstigated {
   type: 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
   signedCommitment: SignedCommitment;
-  protocol: WalletProtocol.Concluding;
+  protocol: ProcessProtocol.Concluding;
   channelId: string;
 }
 
@@ -63,7 +63,7 @@ export const strategyApproved: ActionConstructor<StrategyApproved> = p => ({
 export const concludeInstigated: ActionConstructor<ConcludeInstigated> = p => ({
   ...p,
   type: 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED',
-  protocol: WalletProtocol.Concluding,
+  protocol: ProcessProtocol.Concluding,
 });
 
 export const keepLedgerChannelApproved: ActionConstructor<KeepLedgerChannelApproved> = p => ({
