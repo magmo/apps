@@ -25,21 +25,21 @@ describe('happy-path scenario', () => {
   describeScenarioStep(scenario.waitForPreFundL1, () => {
     const { state, action, sharedData } = scenario.waitForPreFundL1;
     const updatedState = newLedgerFundingReducer(state, sharedData, action);
-
+    itSendsAMessage(updatedState);
     itTransitionsTo(updatedState, 'NewLedgerFunding.WaitForDirectFunding');
   });
 
   describeScenarioStep(scenario.waitForDirectFunding, () => {
     const { state, action, sharedData } = scenario.waitForDirectFunding;
     const updatedState = newLedgerFundingReducer(state, sharedData, action);
-
+    itSendsAMessage(updatedState);
     itTransitionsTo(updatedState, 'NewLedgerFunding.WaitForPostFundSetup');
   });
 
   describeScenarioStep(scenario.waitForPostFund1, () => {
     const { state, action, sharedData } = scenario.waitForPostFund1;
     const updatedState = newLedgerFundingReducer(state, sharedData, action);
-
+    itSendsAMessage(updatedState);
     itTransitionsTo(updatedState, 'NewLedgerFunding.WaitForLedgerUpdate');
   });
 
@@ -51,6 +51,7 @@ describe('happy-path scenario', () => {
       scenario.initialParams.channelId,
       scenario.initialParams.ledgerId,
     );
+    itSendsAMessage(updatedState);
     itTransitionsTo(updatedState, 'NewLedgerFunding.Success');
   });
 });

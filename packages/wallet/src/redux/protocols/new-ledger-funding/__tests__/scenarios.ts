@@ -89,12 +89,13 @@ const waitForDirectFundingFailure = states.waitForDirectFunding({
   directFundingState: DFPreFailure.state,
   postFundSetupState: ACPreSuccess.state,
 });
-
+// Since we rely extensively on sub-protocols
+// it is not feasible to do player a / player b scenarios
+// so we just have the one
 export const happyPath = {
   initialParams: {
     store: ACPreSuccess.sharedData,
     channelId,
-    reply: ledger0,
     processId: 'processId',
     ledgerId,
   },
