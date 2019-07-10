@@ -1,6 +1,6 @@
-import { WalletAction, isCommonAction } from '../../../actions';
+import { WalletAction } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
-import { KeepLedgerChannelApproved } from '../../../../communication';
+import { KeepLedgerChannelApproved, isCommonAction } from '../../../../communication';
 
 // -------
 // Actions
@@ -63,7 +63,7 @@ export const isConcludingResponderAction = (
   action: WalletAction,
 ): action is ConcludingResponderAction => {
   return (
-    isCommonAction(action) ||
+    isCommonAction(action, '', '') ||
     action.type === 'WALLET.CONCLUDING.KEEP_LEDGER_CHANNEL_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.RESPONDER.CONCLUDE_APPROVED' ||
     action.type === 'WALLET.CONCLUDING.RESPONDER.DEFUND_CHOSEN' ||

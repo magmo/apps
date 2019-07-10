@@ -133,3 +133,16 @@ export function isRelayableAction(action: WalletAction): action is RelayableActi
     action.type === 'WALLET.MULTIPLE_RELAYABLE_ACTIONS'
   );
 }
+
+export type CommonAction = CommitmentReceived | CommitmentsReceived;
+export function isCommonAction(
+  action: WalletAction,
+  path: string,
+  descriptor: string,
+): action is CommonAction {
+  return (
+    (action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
+      action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') &&
+    action.protocolLocator.replace(path, '').startsWith(descriptor)
+  );
+}

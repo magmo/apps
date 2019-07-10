@@ -7,7 +7,7 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { CommitmentType } from '../../../domain';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
-import { advanceChannelReducer } from '../advance-channel';
+import { advanceChannelReducer, isAdvanceChannelAction } from '../advance-channel';
 import * as consensusUpdate from '../consensus-update';
 import * as indirectFunding from '../indirect-funding';
 import { ethers } from 'ethers';
@@ -95,10 +95,7 @@ function waitForJointChannelReducer(
   action: WalletAction,
 ) {
   const { processId, hubAddress, ourIndex } = protocolState;
-  if (
-    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
-    action.protocolLocator === states.JOINT_CHANNEL_DESCRIPTOR
-  ) {
+  if (isAdvanceChannelAction(action, '', states.JOINT_CHANNEL_DESCRIPTOR)) {
     const result = advanceChannelReducer(protocolState.jointChannel, sharedData, action);
 
     if (advanceChannel.isSuccess(result.protocolState)) {
@@ -184,10 +181,7 @@ function waitForGuarantorChannelReducer(
   action: WalletAction,
 ) {
   const { processId, ourIndex } = protocolState;
-  if (
-    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
-    action.protocolLocator.indexOf(states.GUARANTOR_CHANNEL_DESCRIPTOR) === 0
-  ) {
+  if (isAdvanceChannelAction(action, '', states.GUARANTOR_CHANNEL_DESCRIPTOR)) {
     const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
     if (advanceChannel.isSuccess(result.protocolState)) {
       const { channelId: guarantorChannelId } = result.protocolState;
@@ -257,9 +251,11 @@ function waitForGuarantorFundingReducer(
 ) {
   const { processId, jointChannelId, startingAllocation, targetChannelId } = protocolState;
   if (
-    action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED' &&
-    action.protocolLocator &&
-    action.protocolLocator.indexOf(states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR) === 0
+    indirectFunding.isIndirectFundingAction(
+      action,
+      '',
+      states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR,
+    )
   ) {
     const result = indirectFunding.indirectFundingReducer(
       protocolState.indirectGuarantorFunding,
@@ -312,9 +308,11 @@ function waitForApplicationFundingReducer(
   action: WalletAction,
 ) {
   if (
-    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' &&
-    action.protocolLocator &&
-    action.protocolLocator.indexOf(states.INDIRECT_APPLICATION_FUNDING_DESCRIPTOR) === 0
+    consensusUpdate.isConsensusUpdateAction(
+      action,
+      '',
+      states.INDIRECT_APPLICATION_FUNDING_DESCRIPTOR,
+    )
   ) {
     const result = consensusUpdate.consensusUpdateReducer(
       protocolState.indirectApplicationFunding,

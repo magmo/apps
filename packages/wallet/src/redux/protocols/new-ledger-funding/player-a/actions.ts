@@ -1,5 +1,6 @@
 import { Commitment } from '../../../../domain';
 import { ActionConstructor } from '../../../utils';
+import { WalletAction } from '../../../actions';
 
 // -------
 // Actions
@@ -37,3 +38,10 @@ export const allocationChanged: ActionConstructor<AllocationChanged> = p => ({
 // --------
 
 export type Action = StrategyApproved | AllocationChanged;
+
+export function isNewLedgerFundingAction(action: WalletAction): action is Action {
+  return (
+    action.type === 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.ALLOCATION_CHANGED' ||
+    action.type === 'WALLET.NEW_LEDGER_FUNDING.PLAYER_A.STRATEGY_APPROVED'
+  );
+}

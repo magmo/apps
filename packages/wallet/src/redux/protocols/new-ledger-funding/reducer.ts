@@ -8,6 +8,7 @@ import { isPlayerAState } from './player-a/states';
 import { NonTerminalNewLedgerFundingState, NewLedgerFundingState } from './states';
 import { NewLedgerFundingAction } from './actions';
 import { ProtocolStateWithSharedData } from '..';
+export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'NewLedgerFunding';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 

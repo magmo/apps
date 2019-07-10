@@ -1,6 +1,7 @@
-import { CommitmentsReceived, BaseProcessAction } from '../../../communication';
+import { CommitmentsReceived, BaseProcessAction, isCommonAction } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { ActionConstructor } from '../../utils';
+import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from './reducer';
 
 export interface ClearedToSend extends BaseProcessAction {
   type: 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND';
@@ -18,9 +19,13 @@ export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
   };
 };
 
-export function isAdvanceChannelAction(action: WalletAction): action is AdvanceChannelAction {
+export function isAdvanceChannelAction(
+  action: WalletAction,
+  path = '',
+  descriptor = ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+): action is AdvanceChannelAction {
   return (
-    action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
+    isCommonAction(action, path, descriptor) ||
     action.type === 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND'
   );
 }
