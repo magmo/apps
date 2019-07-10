@@ -10,8 +10,8 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../existing-ledger-funding/reducer';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../consensus-update/reducer';
+import { makeLocator } from '../..';
 
 // ---------
 // Test data
@@ -143,9 +143,10 @@ export const happyPath = {
     state: scenarioStates.waitForGuarantorFunding,
     action: {
       ...indirectFundingPreSuccess.action,
-      protocolLocator: `${
-        states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR
-      }/${EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR}`,
+      protocolLocator: makeLocator(
+        states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR,
+        indirectFundingPreSuccess.action.protocolLocator,
+      ),
     },
     sharedData: indirectFundingPreSuccess.sharedData,
   },

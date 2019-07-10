@@ -50,5 +50,5 @@ export interface ProtocolStateWithSharedData<T extends ProtocolState> {
 }
 
 export function makeLocator(...args: string[]) {
-  return args.join('-');
+  return args.filter(s => s.length > 0).join('/');
 }

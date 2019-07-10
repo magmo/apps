@@ -18,6 +18,8 @@ import {
 } from '../new-ledger-funding';
 import { IndirectFundingAction } from './actions';
 
+export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = 'IndirectFunding';
+
 export function initialize(
   processId: string,
   channelId: string,

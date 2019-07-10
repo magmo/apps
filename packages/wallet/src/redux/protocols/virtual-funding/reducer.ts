@@ -13,6 +13,8 @@ import * as indirectFunding from '../indirect-funding';
 import { ethers } from 'ethers';
 import { addHex } from '../../../utils/hex-utils';
 
+export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
+
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
 export function initialize(sharedData: SharedData, args: states.InitializationArgs): ReturnVal {
@@ -66,7 +68,7 @@ export const reducer: ProtocolReducer<states.VirtualFundingState> = (
   sharedData: SharedData,
   action: WalletAction,
 ) => {
-  if (!isVirtualFundingAction(action)) {
+  if (!isVirtualFundingAction(action, '', '')) {
     console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
     return { protocolState, sharedData };
   }
@@ -250,13 +252,7 @@ function waitForGuarantorFundingReducer(
   action: WalletAction,
 ) {
   const { processId, jointChannelId, startingAllocation, targetChannelId } = protocolState;
-  if (
-    indirectFunding.isIndirectFundingAction(
-      action,
-      '',
-      states.INDIRECT_GUARANTOR_FUNDING_DESCRIPTOR,
-    )
-  ) {
+  if (indirectFunding.isIndirectFundingAction(action, '', 'indirectGuarantorFunding')) {
     const result = indirectFunding.indirectFundingReducer(
       protocolState.indirectGuarantorFunding,
       sharedData,
