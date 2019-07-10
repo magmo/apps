@@ -118,6 +118,7 @@ function handleWaitForPostFundSetup(
     };
   } else if (
     isAdvanceChannelAction(action) &&
+    // TODO: Remove this check once the protocol-locator has been properly implemented.
     action.protocolLocator === NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR
   ) {
     const advanceChannelResult = advanceChannelReducer(
