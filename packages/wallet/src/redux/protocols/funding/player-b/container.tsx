@@ -11,7 +11,6 @@ import AcknowledgeX from '../../shared-components/acknowledge-x';
 import { ActionDispatcher } from '../../../utils';
 import { IndirectFunding } from '../../indirect-funding/container';
 import ApproveX from '../../shared-components/approve-x';
-import { WaitForPostFundSetup } from '../components/wait-for-post-fund-setup';
 interface Props {
   state: states.OngoingFundingState;
   strategyApproved: ActionDispatcher<actions.StrategyApproved>;
