@@ -20,6 +20,17 @@ export const enum ProcessProtocol {
   Concluding = 'Concluding',
 }
 
+export const enum EmbeddedProtocol {
+  AdvanceChannel = 'AdvanceChannel',
+  ConsensusUpdate = 'ConsensusUpdate',
+  DirectFunding = 'DirectFunding', // TODO: Post-fund-setup exchange will be removed from direct funding, so this should be removed
+  ExistingLedgerFunding = 'ExistingLedgerFunding',
+  IndirectDefunding = 'IndirectDefunding',
+  IndirectFunding = 'IndirectFunding',
+  LedgerTopUp = 'LedgerTopUp',
+  NewLedgerFunding = 'NewLedgerFunding',
+  VirtualFunding = 'VirtualFunding',
+}
 export type FundingStrategy = 'IndirectFundingStrategy';
 
 function sendMessage(to: string, message: RelayableAction) {
