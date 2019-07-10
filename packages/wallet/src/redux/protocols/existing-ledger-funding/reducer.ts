@@ -101,8 +101,6 @@ export const existingLedgerFundingReducer = (
   switch (protocolState.type) {
     case 'ExistingLedgerFunding.WaitForLedgerUpdate':
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
-    case 'ExistingLedgerFunding.WaitForPostFundSetup':
-      return waitForPostFundSetupReducer(protocolState, sharedData, action);
     case 'ExistingLedgerFunding.WaitForLedgerTopUp':
       return waitForLedgerTopUpReducer(protocolState, sharedData, action);
   }
@@ -174,52 +172,6 @@ const waitForLedgerTopUpReducer = (
   }
 };
 
-const waitForPostFundSetupReducer = (
-  protocolState: states.WaitForPostFundSetup,
-  sharedData: SharedData,
-  action: ExistingLedgerFundingAction,
-) => {
-  if (action.type !== 'WALLET.COMMON.COMMITMENT_RECEIVED') {
-    throw new Error(`Invalid action ${action.type}`);
-  }
-
-  let newSharedData = { ...sharedData };
-
-  const checkResult = checkAndStore(newSharedData, action.signedCommitment);
-  if (!checkResult.isSuccess) {
-    return {
-      protocolState: states.failure({ reason: 'ReceivedInvalidCommitment' }),
-      sharedData,
-    };
-  }
-  newSharedData = checkResult.store;
-
-  if (!helpers.isFirstPlayer(protocolState.channelId, newSharedData)) {
-    try {
-      newSharedData = craftAndSendAppPostFundCommitment(
-        newSharedData,
-        protocolState.channelId,
-        protocolState.processId,
-      );
-    } catch (error) {
-      return {
-        protocolState: states.failure({ reason: 'PostFundSetupFailure' }),
-        sharedData,
-      };
-    }
-  }
-
-  // update fundingState
-  const fundingState: ChannelFundingState = {
-    directlyFunded: false,
-    fundingChannel: protocolState.ledgerId,
-  };
-
-  newSharedData = setFundingState(newSharedData, protocolState.channelId, fundingState);
-
-  return { protocolState: states.success({}), sharedData: newSharedData };
-};
-
 const waitForLedgerUpdateReducer = (
   protocolState: states.WaitForLedgerUpdate,
   sharedData: SharedData,
@@ -274,8 +226,14 @@ const waitForLedgerUpdateReducer = (
     );
     newSharedData = queueMessage(newSharedData, messageRelay);
   }
+  const fundingState: ChannelFundingState = {
+    directlyFunded: false,
+    fundingChannel: protocolState.ledgerId,
+  };
 
-  return { protocolState: states.waitForPostFundSetup(protocolState), sharedData: newSharedData };
+  newSharedData = setFundingState(newSharedData, protocolState.channelId, fundingState);
+
+  return { protocolState: states.success({}), sharedData: newSharedData };
 };
 
 function ledgerChannelNeedsTopUp(
