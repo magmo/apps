@@ -25,8 +25,8 @@ import {
   ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
 } from '../../advance-channel';
 import * as advanceChannelStates from '../../advance-channel/states';
-import { CommitmentType } from 'fmg-core';
 import { clearedToSend } from '../../advance-channel/actions';
+import { CommitmentType } from '../../../../domain';
 
 type EmbeddedAction = IndirectFundingAction | AdvanceChannelAction;
 
