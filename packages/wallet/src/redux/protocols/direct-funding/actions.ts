@@ -1,12 +1,7 @@
 import * as actions from '../../actions';
 import { ActionConstructor } from '../../utils';
 import { TwoPartyPlayerIndex } from '../../types';
-import {
-  isCommonAction,
-  routesToProtocol,
-  ProtocolLocator,
-  EmbeddedProtocol,
-} from '../../../communication';
+import { isCommonAction, EmbeddedProtocol, routerFactory } from '../../../communication';
 
 // -------
 // Actions
@@ -56,10 +51,7 @@ export function isDirectFundingAction(action: actions.WalletAction): action is D
   );
 }
 
-export function routesToDirectFunding(
-  action: actions.WalletAction,
-  path: ProtocolLocator = [],
-  descriptor = EmbeddedProtocol.DirectFunding,
-): action is DirectFundingAction {
-  return isDirectFundingAction(action) && routesToProtocol(action, path, descriptor);
-}
+export const routesToDirectFunding = routerFactory(
+  isDirectFundingAction,
+  EmbeddedProtocol.DirectFunding,
+);

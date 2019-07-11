@@ -16,7 +16,7 @@ import {
   isNewLedgerFundingAction,
   newLedgerFundingReducer,
 } from '../new-ledger-funding';
-import { IndirectFundingAction } from './actions';
+import { WalletAction } from '../../actions';
 
 export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = 'IndirectFunding';
 
@@ -92,7 +92,7 @@ export function initialize(
 export function indirectFundingReducer(
   protocolState: states.IndirectFundingState,
   sharedData: SharedData,
-  action: IndirectFundingAction,
+  action: WalletAction,
 ): ProtocolStateWithSharedData<states.IndirectFundingState> {
   if (protocolState.type === 'IndirectFunding.WaitForNewLedgerFunding') {
     if (!isNewLedgerFundingAction(action)) {
