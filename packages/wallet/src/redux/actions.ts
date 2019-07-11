@@ -294,7 +294,9 @@ export type WalletAction =
   | channel.ChannelAction
   | RelayableAction
   | LockAction
-  | LockRequest;
+  | LockRequest
+  | MessageReceived;
+
 export function isCommonAction(action: WalletAction): action is CommonAction {
   return (
     ['WALLET.COMMON.MESSAGE_RECEIVED', 'WALLET.COMMON.COMMITMENT_RECEIVED'].indexOf(action.type) >=

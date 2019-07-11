@@ -318,7 +318,6 @@ function initializeDirectFundingState(
     requiredDeposit,
     totalFundingRequired,
     ourIndex: isFirstPlayer ? TwoPartyPlayerIndex.A : TwoPartyPlayerIndex.B,
-    exchangePostFundSetups: false,
   });
 
   const { protocolState: directFundingState, sharedData: newSharedData } = initializeDirectFunding(
@@ -370,6 +369,13 @@ function initializeConsensusState(
   const {
     protocolState: consensusUpdateState,
     sharedData: newSharedData,
-  } = initializeConsensusUpdate(processId, ledgerId, newAllocation, newDestination, sharedData);
+  } = initializeConsensusUpdate(
+    processId,
+    ledgerId,
+    true,
+    newAllocation,
+    newDestination,
+    sharedData,
+  );
   return { consensusUpdateState, sharedData: newSharedData };
 }

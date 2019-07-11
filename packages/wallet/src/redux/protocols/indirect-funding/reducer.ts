@@ -1,4 +1,4 @@
-import { SharedData, getExistingChannel } from '../../state';
+import { SharedData } from '../../state';
 import { ProtocolStateWithSharedData } from '..';
 import { IndirectFundingState } from './states';
 import * as selectors from '../../selectors';
@@ -21,7 +21,7 @@ export function initialize(
   channelId: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<IndirectFundingState> {
-  const existingLedgerChannel = selectors.getExistingOpenLedgerChannelForParticipants(
+  const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
     sharedData,
     helpers.getOurAddress(channelId, sharedData),
     helpers.getOpponentAddress(channelId, sharedData),
@@ -55,11 +55,10 @@ export function initialize(
       sharedData: newSharedData,
     };
   } else {
-    const channel = getExistingChannel(sharedData, channelId);
     const {
       protocolState: newLedgerFundingState,
       sharedData: newSharedData,
-    } = initializeNewLedgerFunding(processId, channel, sharedData);
+    } = initializeNewLedgerFunding(processId, channelId, sharedData);
 
     if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
       return { protocolState: states.success({}), sharedData: newSharedData };

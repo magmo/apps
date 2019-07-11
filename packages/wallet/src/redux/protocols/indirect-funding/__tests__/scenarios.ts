@@ -15,7 +15,7 @@ import { preSuccess as existingLedgerPreSuccess } from '../../existing-ledger-fu
 import {
   preSuccessState as newLedgerPreSuccess,
   successTrigger as newLedgerFundingSuccessTrigger,
-} from '../../new-ledger-funding/player-a/__tests__';
+} from '../../new-ledger-funding/__tests__';
 
 const processId = 'processId';
 const props = { ledgerId, channelId, processId };
@@ -28,7 +28,7 @@ const ledger4 = ledgerCommitment({ turnNum: 4, balances: oneThree });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: oneThree });
 const app0 = appCommitment({ turnNum: 0, balances: oneThree });
 const app1 = appCommitment({ turnNum: 1, balances: oneThree });
-const existingLedgerFundingSharedData = setChannels(EMPTY_SHARED_DATA, [
+const existingLedgerFundingSharedData = setChannels(existingLedgerPreSuccess.sharedData, [
   channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
   channelFromCommitments([app0, app1], asAddress, asPrivateKey),
 ]);
@@ -58,6 +58,6 @@ export const newLedgerFundingHappyPath = {
   waitForNewLedgerFunding: {
     state: waitForNewLedgerFunding,
     action: newLedgerFundingSuccessTrigger,
-    sharedData: newLedgerPreSuccess.store,
+    sharedData: newLedgerPreSuccess.sharedData,
   },
 };

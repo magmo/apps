@@ -23,13 +23,6 @@ class ExistingLedgerFundingContainer extends PureComponent<Props> {
         return <WaitForOtherPlayer actionDescriptor={'channel lock'} channelId={state.ledgerId} />;
       case 'ExistingLedgerFunding.WaitForChannelSync':
         return <WaitForOtherPlayer actionDescriptor={'channel sync'} channelId={state.ledgerId} />;
-      case 'ExistingLedgerFunding.WaitForPostFundSetup':
-        return (
-          <WaitForOtherPlayer
-            actionDescriptor={'post funding confirmation'}
-            channelId={state.channelId}
-          />
-        );
       case 'ExistingLedgerFunding.Success':
       case 'ExistingLedgerFunding.Failure':
         return <div>{state.type}</div>;

@@ -3,7 +3,7 @@ import * as walletStates from './state';
 import { SharedData, FundingState } from './state';
 import { WalletProtocol } from '../communication';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../constants';
-import { Commitment, CommitmentType } from '../domain';
+import { Commitment } from '../domain';
 
 export const getOpenedChannelState = (state: SharedData, channelId: string): OpenChannelState => {
   const channelStatus = getChannelState(state, channelId);
@@ -33,24 +33,23 @@ export const getLastCommitmentForChannel = (state: SharedData, channelId: string
   return getLastCommitment(channelState);
 };
 
-export const getExistingOpenLedgerChannelForParticipants = (
+export const getFundedLedgerChannelForParticipants = (
   state: SharedData,
   playerA: string,
   playerB: string,
 ): ChannelState | undefined => {
-  for (const existingChannelId of Object.keys(state.channelStore)) {
-    const channel = state.channelStore[existingChannelId];
-    if (
+  // Finds a directly funded, two-party channel between players A and B
+  return Object.values(state.channelStore).find(channel => {
+    const fundingState = getChannelFundingState(state, channel.channelId);
+    const directlyFunded: boolean = fundingState ? fundingState.directlyFunded : false;
+    return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
-      channel.participants.indexOf(playerA) > -1 &&
-      channel.participants.indexOf(playerB) > -1 &&
-      getLastCommitment(channel).commitmentType !== CommitmentType.Conclude &&
-      getLastCommitment(channel).commitmentType !== CommitmentType.PreFundSetup
-    ) {
-      return channel;
-    }
-  }
-  return undefined;
+      // We call concat() on participants in order to not sort it in place
+      JSON.stringify(channel.participants.concat().sort()) ===
+        JSON.stringify([playerA, playerB].sort()) &&
+      directlyFunded
+    );
+  });
 };
 export const getAdjudicatorWatcherProcessesForChannel = (
   state: walletStates.Initialized,
@@ -91,8 +90,8 @@ export const getFundingState = (state: SharedData): FundingState => {
 export const getChannelFundingState = (
   state: SharedData,
   channelId: string,
-): walletStates.ChannelFundingState => {
-  return state.fundingState[channelId];
+): walletStates.ChannelFundingState | undefined => {
+  return getFundingState(state)[channelId];
 };
 
 export const getProtocolForProcessId = (

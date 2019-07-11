@@ -2,7 +2,10 @@ import * as playerA from './player-a/actions';
 import * as playerB from './player-b/actions';
 import { isNewLedgerFundingAction, NewLedgerFundingAction } from '../new-ledger-funding/actions';
 import { WalletAction } from '../../../redux/actions';
-import { isExistingLedgerFundingAction } from '../existing-ledger-funding';
+import {
+  ExistingLedgerFundingAction,
+  isExistingLedgerFundingAction,
+} from '../existing-ledger-funding';
 // -------
 // Actions
 // -------
@@ -14,9 +17,10 @@ import { isExistingLedgerFundingAction } from '../existing-ledger-funding';
 // --------
 // Unions and Guards
 // --------
-type EmbeddedAction = NewLedgerFundingAction;
-const isEmbeddedAction = action =>
-  isNewLedgerFundingAction(action) || isExistingLedgerFundingAction(action);
+type EmbeddedAction = NewLedgerFundingAction | ExistingLedgerFundingAction;
+const isEmbeddedAction = a => {
+  return isNewLedgerFundingAction(a) || isExistingLedgerFundingAction(a);
+};
 
 export type FundingAction = playerA.FundingAction | playerB.FundingAction | EmbeddedAction;
 

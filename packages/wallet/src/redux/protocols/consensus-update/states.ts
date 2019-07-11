@@ -10,6 +10,8 @@ export interface WaitForUpdate {
   proposedDestination: string[];
   channelId: string;
   processId: string;
+  clearedToSend: boolean;
+  updateSent: boolean;
 }
 
 export interface Failure {
@@ -38,9 +40,9 @@ export const waitForUpdate: StateConstructor<WaitForUpdate> = p => {
 };
 
 export function isConsensusUpdateState(state: ProtocolState): state is ConsensusUpdateState {
-  return (
-    state.type === 'ConsensusUpdate.WaitForUpdate' ||
-    state.type === 'ConsensusUpdate.Failure' ||
-    state.type === 'ConsensusUpdate.Success'
-  );
+  return state.type === 'ConsensusUpdate.WaitForUpdate' || isTerminal(state);
+}
+
+export function isTerminal(state: ProtocolState): state is Failure | Success {
+  return state.type === 'ConsensusUpdate.Failure' || state.type === 'ConsensusUpdate.Success';
 }
