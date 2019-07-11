@@ -149,11 +149,11 @@ export function isCommonAction(
 
 export function routesToProtocol(
   action: WalletAction,
-  path: ProtocolLocator,
+  protocolLocator: ProtocolLocator,
   descriptor: EmbeddedProtocol,
 ): boolean {
   if ('protocolLocator' in action) {
-    return action.protocolLocator.indexOf(descriptor) === path.length;
+    return action.protocolLocator.indexOf(descriptor) === protocolLocator.length;
   } else {
     return true;
   }
@@ -162,7 +162,7 @@ export function routesToProtocol(
 export function routerFactory(
   typeGuard: (action: WalletAction) => boolean,
   protocol: EmbeddedProtocol,
-): (action: WalletAction, path: ProtocolLocator) => boolean {
-  return (action: WalletAction, path: ProtocolLocator) =>
-    typeGuard(action) && routesToProtocol(action, path, protocol);
+): (action: WalletAction, protocolLocator: ProtocolLocator) => boolean {
+  return (action: WalletAction, protocolLocator: ProtocolLocator) =>
+    typeGuard(action) && routesToProtocol(action, protocolLocator, protocol);
 }
