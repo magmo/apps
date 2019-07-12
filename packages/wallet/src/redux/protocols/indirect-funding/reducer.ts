@@ -1,5 +1,5 @@
 import { SharedData } from '../../state';
-import { ProtocolStateWithSharedData } from '..';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { IndirectFundingState } from './states';
 import * as selectors from '../../selectors';
 import * as helpers from '../reducer-helpers';
@@ -17,6 +17,7 @@ import {
   newLedgerFundingReducer,
 } from '../new-ledger-funding';
 import { WalletAction } from '../../actions';
+import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
 
 export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = 'IndirectFunding';
 
@@ -24,6 +25,7 @@ export function initialize(
   processId: string,
   channelId: string,
   sharedData: SharedData,
+  protocolLocator: ProtocolLocator,
 ): ProtocolStateWithSharedData<IndirectFundingState> {
   const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
     sharedData,
@@ -66,7 +68,12 @@ export function initialize(
     const {
       protocolState: newLedgerFundingState,
       sharedData: newSharedData,
-    } = initializeNewLedgerFunding(processId, channelId, sharedData);
+    } = initializeNewLedgerFunding(
+      processId,
+      channelId,
+      sharedData,
+      makeLocator(protocolLocator, EmbeddedProtocol.NewLedgerFunding),
+    );
 
     if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
       return { protocolState: states.success({}), sharedData: newSharedData };

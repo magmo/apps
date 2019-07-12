@@ -1,6 +1,6 @@
 import * as states from './states';
 import { SharedData, getPrivatekey } from '../../state';
-import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
+import { ProtocolStateWithSharedData, ProtocolReducer, makeLocator } from '..';
 import { WalletAction, advanceChannel } from '../../actions';
 import { isVirtualFundingAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -16,6 +16,7 @@ import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
 import { routesToAdvanceChannel } from '../advance-channel/actions';
 import { routesToIndirectFunding } from '../indirect-funding/actions';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
+import { EmbeddedProtocol } from '../../../communication';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
 
@@ -223,6 +224,7 @@ function waitForGuarantorChannelReducer(
             processId,
             result.protocolState.channelId,
             result.sharedData,
+            makeLocator(protocolState.protocolLocator, EmbeddedProtocol.IndirectFunding),
           );
           return {
             protocolState: states.waitForGuarantorFunding({

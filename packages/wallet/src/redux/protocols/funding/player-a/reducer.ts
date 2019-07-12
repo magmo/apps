@@ -2,12 +2,12 @@ import * as states from './states';
 import * as actions from './actions';
 
 import { SharedData, queueMessage } from '../../../state';
-import { ProtocolStateWithSharedData } from '../..';
+import { ProtocolStateWithSharedData, makeLocator } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
-import { sendStrategyProposed } from '../../../../communication';
+import { sendStrategyProposed, EmbeddedProtocol } from '../../../../communication';
 
 import * as indirectFundingStates from '../../indirect-funding/states';
 import { Properties } from '../../../utils';
@@ -53,11 +53,7 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (
-    isAdvanceChannelAction(action) &&
-    // TODO: Remove this check once protocol-locator updates have been made
-    action.protocolLocator === ADVANCE_CHANNEL_PROTOCOL_LOCATOR
-  ) {
+  if (isAdvanceChannelAction(action)) {
     return handleAdvanceChannelAction(state, sharedData, action);
   } else if (isIndirectFundingAction(action)) {
     return handleFundingAction(state, sharedData, action);
@@ -172,6 +168,7 @@ function strategyApproved(state: states.FundingState, sharedData: SharedData) {
     state.processId,
     state.targetChannelId,
     sharedData,
+    makeLocator(EmbeddedProtocol.IndirectFunding),
   );
   if (indirectFundingStates.isTerminal(fundingState)) {
     console.error('Indirect funding strate initialized to terminal state.');

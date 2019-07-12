@@ -18,7 +18,7 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { isTransactionAction } from '../../actions';
 import { ChannelFundingState } from '../../state';
 import { NewLedgerFundingAction } from './actions';
-import { EmbeddedProtocol } from '../../../communication';
+import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
 import {
   initializeConsensusUpdate,
   ConsensusUpdateAction,
@@ -40,10 +40,12 @@ import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
 type IDFAction = NewLedgerFundingAction;
 export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.NewLedgerFunding);
+
 export function initialize(
   processId: string,
   channelId: string,
   sharedData: SharedData,
+  protocolLocator: ProtocolLocator,
 ): ReturnVal {
   const privateKey = getPrivatekey(sharedData, channelId);
   const ourIndex = getTwoPlayerIndex(channelId, sharedData);
@@ -74,6 +76,7 @@ export function initialize(
     channelId,
     processId,
     preFundSetupState: advanceChannelResult.protocolState,
+    protocolLocator,
   });
   return { protocolState, sharedData };
 }
@@ -117,11 +120,7 @@ function handleWaitForPostFundSetup(
       },
       sharedData,
     };
-  } else if (
-    isAdvanceChannelAction(action) &&
-    // TODO: Remove this check once the protocol-locator has been properly implemented.
-    action.protocolLocator === NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR
-  ) {
+  } else if (isAdvanceChannelAction(action)) {
     const advanceChannelResult = advanceChannelReducer(
       protocolState.postFundSetupState,
       sharedData,
@@ -160,10 +159,11 @@ function handleWaitForPostFundSetup(
     }
   } else {
     console.warn(
-      `Expected a Consensus Update action or Advance Channel action received ${
+      `Expected a Consensus Update action or Advance Channel action, but received ${
         action.type
       } instead.`,
     );
+
     return { protocolState, sharedData };
   }
 }

@@ -21,6 +21,7 @@ import {
 import { success } from '../../indirect-defunding/states';
 import * as _ from 'lodash';
 import { NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
+import { makeLocator } from '../..';
 // -----------
 // Commitments
 // -----------
@@ -41,7 +42,8 @@ const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
 
 // Channels
 
-const props = { channelId, ledgerId, processId };
+const protocolLocator = NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR;
+const props = { channelId, ledgerId, processId, protocolLocator };
 
 // ------
 // States
@@ -112,7 +114,10 @@ export const happyPath = {
   waitForPostFund1: {
     state: waitForPostFund1,
     sharedData: waitForPostFundSharedData,
-    action: { ...ACPreSuccess.trigger, protocolLocator: NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR },
+    action: {
+      ...ACPreSuccess.trigger,
+      protocolLocator: makeLocator(protocolLocator, ACPreSuccess.trigger.protocolLocator),
+    },
   },
   waitForLedgerUpdate1: {
     state: waitForLedgerUpdate1,

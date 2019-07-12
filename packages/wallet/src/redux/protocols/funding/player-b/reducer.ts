@@ -7,7 +7,7 @@ import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
-import { sendStrategyApproved } from '../../../../communication';
+import { sendStrategyApproved, EmbeddedProtocol } from '../../../../communication';
 import { Properties } from '../../../utils';
 import {
   IndirectFundingAction,
@@ -51,10 +51,7 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (
-    isAdvanceChannelAction(action) &&
-    action.protocolLocator === ADVANCE_CHANNEL_PROTOCOL_LOCATOR
-  ) {
+  if (isAdvanceChannelAction(action)) {
     return handleAdvanceChannelAction(state, sharedData, action);
   } else if (isIndirectFundingAction(action)) {
     return handleFundingAction(state, sharedData, action);
@@ -164,6 +161,7 @@ function strategyApproved(state: states.FundingState, sharedData: SharedData) {
     processId,
     targetChannelId,
     sharedData,
+    makeLocator(EmbeddedProtocol.IndirectFunding),
   );
 
   const advanceChannelResult = initializeAdvanceChannel(
