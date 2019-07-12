@@ -35,16 +35,21 @@ describe('happy path', () => {
 
   describeScenarioStep(scenario.waitForFunding, () => {
     const { state, sharedData, action } = scenario.waitForFunding;
+    it('works', () => {
+      expect(action.protocolLocator).toMatchObject([]);
+    });
 
     const result = reducer(state, sharedData, action);
     itTransitionsTo(result, 'Funding.PlayerB.WaitForPostFundSetup');
   });
+
   describeScenarioStep(scenario.waitForPostFundSetup, () => {
     const { state, sharedData, action } = scenario.waitForPostFundSetup;
 
     const result = reducer(state, sharedData, action);
     itTransitionsTo(result, 'Funding.PlayerB.WaitForSuccessConfirmation');
   });
+
   describeScenarioStep(scenario.waitForSuccessConfirmation, () => {
     const { state, sharedData, action } = scenario.waitForSuccessConfirmation;
 

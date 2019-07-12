@@ -209,7 +209,6 @@ const waitForLoginReducer = (
           messageOutbox: [initializationSuccess(address)],
         }),
         processStore: {},
-        adjudicatorStore: {},
         privateKey,
         address,
       });

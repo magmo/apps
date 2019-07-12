@@ -56,9 +56,6 @@ export function initialize(
         channelId,
         ourIndex,
         safeToDepositLevel,
-
-        channelFunded: false,
-        postFundSetupReceived: false,
       }),
       sharedData,
     };
@@ -206,11 +203,7 @@ const waitForDepositTransactionReducer: DFReducer = (
   } else {
     if (isSuccess(newTransactionState)) {
       return {
-        protocolState: states.waitForFunding({
-          ...protocolState,
-          channelFunded: false,
-          postFundSetupReceived: false,
-        }),
+        protocolState: states.waitForFunding(protocolState),
         sharedData,
       };
     } else {

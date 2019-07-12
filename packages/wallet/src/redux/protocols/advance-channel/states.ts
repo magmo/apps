@@ -54,10 +54,9 @@ export interface Failure {
 // ------------
 
 const base: StateConstructor<BaseState> = params => {
-  const { processId, channelId, ourIndex, commitmentType, protocolLocator } = params;
+  const { processId, ourIndex, commitmentType, protocolLocator } = params;
   return {
     processId,
-    channelId,
     ourIndex,
     commitmentType,
     protocolLocator,
