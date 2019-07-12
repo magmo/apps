@@ -1,8 +1,8 @@
 import { WalletAction } from '../../actions';
 import { AdvanceChannelAction, isAdvanceChannelAction } from '../advance-channel';
 import { EmbeddedProtocol, routerFactory } from '../../../communication';
-import { IndirectFundingAction, isIndirectFundingAction } from '../indirect-funding';
 import { ConsensusUpdateAction, isConsensusUpdateAction } from '../consensus-update';
+import { isIndirectFundingAction, IndirectFundingAction } from '../indirect-funding';
 
 export type VirtualFundingAction =
   | AdvanceChannelAction

@@ -14,6 +14,7 @@ import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app'
 import { eqHexArray } from '../../../utils/hex-utils';
 import { CommitmentsReceived, EmbeddedProtocol } from '../../../communication';
 import { WalletAction } from '../../actions';
+import { unreachable } from '../../../utils/reducer-utils';
 
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.ConsensusUpdate);
 
@@ -163,10 +164,13 @@ export const consensusUpdateReducer = (
     console.warn(`Consensus Update received non Consensus Update action ${action}`);
     return { protocolState, sharedData };
   }
-  if (action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED') {
-    return handleCommitmentReceived(protocolState, sharedData, action);
-  } else {
-    return handleClearedToSend(protocolState, sharedData, action);
+  switch (action.type) {
+    case 'WALLET.COMMON.COMMITMENTS_RECEIVED':
+      return handleCommitmentReceived(protocolState, sharedData, action);
+    case 'WALLET.CONSENSUS_UPDATE.CLEARED_TO_SEND':
+      return handleClearedToSend(protocolState, sharedData, action);
+    default:
+      return unreachable(action);
   }
 };
 

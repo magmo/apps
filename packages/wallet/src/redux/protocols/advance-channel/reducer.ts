@@ -53,24 +53,26 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
     console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
     return { protocolState, sharedData };
   }
-  {
-    if (action.type === 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND') {
-      return clearedToSendReducer(protocolState, sharedData);
-    }
-  }
 
-  switch (protocolState.type) {
-    case 'AdvanceChannel.ChannelUnknown': {
-      return channelUnknownReducer(protocolState, sharedData, action);
-    }
-    case 'AdvanceChannel.NotSafeToSend': {
-      return notSafeToSendReducer(protocolState, sharedData, action);
-    }
-    case 'AdvanceChannel.CommitmentSent': {
-      return commitmentSentReducer(protocolState, sharedData, action);
-    }
+  switch (action.type) {
+    case 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND':
+      return clearedToSendReducer(protocolState, sharedData);
+    case 'WALLET.COMMON.COMMITMENTS_RECEIVED':
+      switch (protocolState.type) {
+        case 'AdvanceChannel.ChannelUnknown': {
+          return channelUnknownReducer(protocolState, sharedData, action);
+        }
+        case 'AdvanceChannel.NotSafeToSend': {
+          return notSafeToSendReducer(protocolState, sharedData, action);
+        }
+        case 'AdvanceChannel.CommitmentSent': {
+          return commitmentSentReducer(protocolState, sharedData, action);
+        }
+        default:
+          return unreachable(protocolState);
+      }
     default:
-      return unreachable(protocolState);
+      return unreachable(action);
   }
 };
 

@@ -50,7 +50,10 @@ export function initialize(sharedData: SharedData, args: states.InitializationAr
     processId,
     sharedData,
     CommitmentType.PreFundSetup,
-    { ...initializationArgs, ...channelSpecificArgs(jointAllocation, jointDestination) },
+    {
+      ...initializationArgs,
+      ...channelSpecificArgs(jointAllocation, jointDestination),
+    },
   );
 
   return {
