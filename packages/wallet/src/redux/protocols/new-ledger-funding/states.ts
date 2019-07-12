@@ -99,6 +99,14 @@ export function isNewLedgerFundingState(state: ProtocolState): state is NewLedge
   );
 }
 
+export function isSuccess(state: NewLedgerFundingState): state is Success {
+  return state.type === 'NewLedgerFunding.Success';
+}
+
+export function isFailure(state: NewLedgerFundingState): state is Failure {
+  return state.type === 'NewLedgerFunding.Failure';
+}
+
 export function isTerminal(state: NewLedgerFundingState): state is Failure | Success {
-  return state.type === 'NewLedgerFunding.Failure' || state.type === 'NewLedgerFunding.Success';
+  return !![isSuccess, isFailure].find(g => g(state));
 }

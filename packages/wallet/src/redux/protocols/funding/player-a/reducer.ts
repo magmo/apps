@@ -10,7 +10,6 @@ import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyProposed, EmbeddedProtocol } from '../../../../communication';
 
 import * as indirectFundingStates from '../../indirect-funding/states';
-import { Properties } from '../../../utils';
 import {
   indirectFundingReducer,
   initializeIndirectFunding,
@@ -159,7 +158,10 @@ function strategyChosen(
   };
 }
 
-function strategyApproved(state: states.FundingState, sharedData: SharedData) {
+function strategyApproved(
+  state: states.FundingState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.FundingState> {
   if (state.type !== 'Funding.PlayerA.WaitForStrategyResponse') {
     return { protocolState: state, sharedData };
   }
@@ -170,9 +172,11 @@ function strategyApproved(state: states.FundingState, sharedData: SharedData) {
     sharedData,
     makeLocator(EmbeddedProtocol.IndirectFunding),
   );
-  if (indirectFundingStates.isTerminal(fundingState)) {
-    console.error('Indirect funding strate initialized to terminal state.');
-    return handleFundingComplete(state, fundingState, newSharedData);
+  if (fundingState.type === 'IndirectFunding.Failure') {
+    return {
+      protocolState: states.failure(fundingState),
+      sharedData,
+    };
   }
   const { processId, targetChannelId } = state;
   const advanceChannelResult = initializeAdvanceChannel(
@@ -243,7 +247,7 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 }
 
 function handleFundingComplete(
-  protocolState: Properties<states.WaitForSuccessConfirmation>,
+  protocolState: states.WaitForFunding,
   fundingState: indirectFundingStates.IndirectFundingState,
   sharedData: SharedData,
 ) {

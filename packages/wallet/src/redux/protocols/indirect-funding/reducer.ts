@@ -1,6 +1,5 @@
 import { SharedData } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
-import { IndirectFundingState } from './states';
 import * as selectors from '../../selectors';
 import * as helpers from '../reducer-helpers';
 import { getLastCommitment } from '../../channel-store/channel-state';
@@ -11,13 +10,9 @@ import {
   existingLedgerFundingReducer,
 } from '../existing-ledger-funding';
 import * as states from './states';
-import {
-  initializeNewLedgerFunding,
-  isNewLedgerFundingAction,
-  newLedgerFundingReducer,
-} from '../new-ledger-funding';
 import { WalletAction } from '../../actions';
 import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
+import * as newLedgerFunding from '../new-ledger-funding';
 
 export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = 'IndirectFunding';
 
@@ -26,7 +21,7 @@ export function initialize(
   channelId: string,
   sharedData: SharedData,
   protocolLocator: ProtocolLocator,
-): ProtocolStateWithSharedData<IndirectFundingState> {
+): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
   const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
     sharedData,
     helpers.getOurAddress(channelId, sharedData),
@@ -44,9 +39,7 @@ export function initialize(
       sharedData: newSharedData,
     } = initializeExistingLedgerFunding(processId, channelId, ledgerId, sharedData);
 
-    if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Success') {
-      return { protocolState: states.success({}), sharedData: newSharedData };
-    } else if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
+    if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
       return {
         protocolState: states.failure({
           reason: 'ExistingLedgerFunding Failure',
@@ -68,16 +61,14 @@ export function initialize(
     const {
       protocolState: newLedgerFundingState,
       sharedData: newSharedData,
-    } = initializeNewLedgerFunding(
+    } = newLedgerFunding.initializeNewLedgerFunding(
       processId,
       channelId,
       sharedData,
       makeLocator(protocolLocator, EmbeddedProtocol.NewLedgerFunding),
     );
 
-    if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
-      return { protocolState: states.success({}), sharedData: newSharedData };
-    } else if (newLedgerFundingState.type === 'NewLedgerFunding.Failure') {
+    if (newLedgerFundingState.type === 'NewLedgerFunding.Failure') {
       return {
         protocolState: states.failure({ reason: 'NewLedgerFunding Failure' }),
         sharedData: newSharedData,
@@ -101,7 +92,7 @@ export function indirectFundingReducer(
   action: WalletAction,
 ): ProtocolStateWithSharedData<states.IndirectFundingState> {
   if (protocolState.type === 'IndirectFunding.WaitForNewLedgerFunding') {
-    if (!isNewLedgerFundingAction(action)) {
+    if (!newLedgerFunding.isNewLedgerFundingAction(action)) {
       console.warn(`Received ${action} but currently in ${protocolState.type}`);
       return { protocolState, sharedData };
     }
@@ -109,20 +100,19 @@ export function indirectFundingReducer(
     const {
       protocolState: newLedgerFundingState,
       sharedData: newSharedData,
-    } = newLedgerFundingReducer(protocolState.newLedgerFundingState, sharedData, action);
-    if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
-      return { protocolState: states.success({}), sharedData: newSharedData };
-    } else if (newLedgerFundingState.type === 'NewLedgerFunding.Failure') {
+    } = newLedgerFunding.newLedgerFundingReducer(
+      protocolState.newLedgerFundingState,
+      sharedData,
+      action,
+    );
+    if (newLedgerFunding.isSuccess(newLedgerFundingState)) {
       return {
-        protocolState: states.failure({ reason: 'NewLedgerFunding Failure' }),
+        protocolState: states.success({}),
         sharedData: newSharedData,
       };
-    } else {
+    } else if (newLedgerFunding.isFailure(newLedgerFundingState)) {
       return {
-        protocolState: states.waitForNewLedgerFunding({
-          ...protocolState,
-          newLedgerFundingState,
-        }),
+        protocolState: states.failure({ reason: 'NewLedgerFunding failure' }),
         sharedData: newSharedData,
       };
     }

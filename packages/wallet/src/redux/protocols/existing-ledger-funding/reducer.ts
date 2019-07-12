@@ -29,7 +29,7 @@ export const initialize = (
   channelId: string,
   ledgerId: string,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
+): ProtocolStateWithSharedData<states.NonTerminalExistingLedgerFundingState | states.Failure> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 

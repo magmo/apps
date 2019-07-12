@@ -8,7 +8,6 @@ import { TwoPartyPlayerIndex } from '../../../types';
 import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyApproved, EmbeddedProtocol } from '../../../../communication';
-import { Properties } from '../../../utils';
 import {
   IndirectFundingAction,
   isIndirectFundingAction,
@@ -177,9 +176,11 @@ function strategyApproved(state: states.FundingState, sharedData: SharedData) {
       protocolLocator: makeLocator(ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
     },
   );
-  if (indirectFundingStates.isTerminal(fundingState)) {
-    console.error('Indirect funding strate initialized to terminal state.');
-    return handleFundingComplete(state, fundingState, newSharedData);
+  if (fundingState.type === 'IndirectFunding.Failure') {
+    return {
+      protocolState: states.failure(fundingState),
+      sharedData,
+    };
   }
   return {
     protocolState: states.waitForFunding({
@@ -240,7 +241,7 @@ function cancelled(state: states.FundingState, sharedData: SharedData, action: a
 }
 
 function handleFundingComplete(
-  protocolState: Properties<states.WaitForSuccessConfirmation>,
+  protocolState: states.WaitForFunding,
   fundingState: indirectFundingStates.IndirectFundingState,
   sharedData: SharedData,
 ) {

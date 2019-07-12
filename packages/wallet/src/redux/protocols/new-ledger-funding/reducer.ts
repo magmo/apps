@@ -1,6 +1,5 @@
 import * as states from './states';
 import { SharedData, getPrivatekey, setFundingState } from '../../state';
-import { NewLedgerFundingState, failure, success } from './states';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CommitmentType } from '../../../domain';
@@ -37,7 +36,7 @@ import {
 import { getLatestCommitment, isFirstPlayer, getTwoPlayerIndex } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
-type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
+type ReturnVal = ProtocolStateWithSharedData<states.NewLedgerFundingState>;
 type IDFAction = NewLedgerFundingAction;
 export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.NewLedgerFunding);
 
@@ -46,7 +45,7 @@ export function initialize(
   channelId: string,
   sharedData: SharedData,
   protocolLocator: ProtocolLocator,
-): ReturnVal {
+): ProtocolStateWithSharedData<states.NonTerminalNewLedgerFundingState | states.Failure> {
   const privateKey = getPrivatekey(sharedData, channelId);
   const ourIndex = getTwoPlayerIndex(channelId, sharedData);
   const { allocation, destination, channel } = getLatestCommitment(channelId, sharedData);
@@ -129,7 +128,7 @@ function handleWaitForPostFundSetup(
     sharedData = advanceChannelResult.sharedData;
     if (advanceChannelState.isTerminal(advanceChannelResult.protocolState)) {
       if (advanceChannelResult.protocolState.type === 'AdvanceChannel.Failure') {
-        return { protocolState: failure({}), sharedData };
+        return { protocolState: states.failure({}), sharedData };
       } else {
         const consensusUpdateResult = consensusUpdateReducer(
           protocolState.consensusUpdateState,
@@ -192,7 +191,7 @@ function handleWaitForLedgerUpdate(
   sharedData = consensusUpdateResult.sharedData;
   if (consensusUpdateState.isTerminal(consensusUpdateResult.protocolState)) {
     if (consensusUpdateResult.protocolState.type === 'ConsensusUpdate.Failure') {
-      return { protocolState: failure({}), sharedData };
+      return { protocolState: states.failure({}), sharedData };
     } else {
       // update fundingState
       const channelFundingState: ChannelFundingState = {
@@ -204,7 +203,7 @@ function handleWaitForLedgerUpdate(
       };
       sharedData = setFundingState(sharedData, protocolState.channelId, channelFundingState);
       sharedData = setFundingState(sharedData, protocolState.ledgerId, ledgerFundingState);
-      return { protocolState: success({}), sharedData };
+      return { protocolState: states.success({}), sharedData };
     }
   } else {
     return {
@@ -234,7 +233,7 @@ function handleWaitForPreFundSetup(
     };
   } else {
     if (preFundResult.protocolState.type === 'AdvanceChannel.Failure') {
-      return { protocolState: failure({}), sharedData };
+      return { protocolState: states.failure({}), sharedData };
     } else {
       const ledgerId = preFundResult.protocolState.channelId;
       const latestCommitment = getLatestCommitment(ledgerId, sharedData);
@@ -322,7 +321,7 @@ function handleWaitForDirectFunding(
     return { protocolState: newProtocolState, sharedData };
   }
   if (isFailure(newDirectFundingState)) {
-    return { protocolState: failure({}), sharedData };
+    return { protocolState: states.failure({}), sharedData };
   }
   if (isSuccess(newDirectFundingState)) {
     const channel = getChannel(sharedData.channelStore, newProtocolState.ledgerId);
@@ -358,7 +357,6 @@ function handleWaitForDirectFunding(
       return {
         protocolState: states.waitForLedgerUpdate({
           ...protocolState,
-          postFundSetupState: advanceChannelResult.protocolState,
           consensusUpdateState: consensusUpdateResult.protocolState,
         }),
         sharedData,
