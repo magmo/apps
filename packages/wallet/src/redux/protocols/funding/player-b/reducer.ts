@@ -252,10 +252,7 @@ function handleFundingComplete(
       sharedData,
       clearedToSend({
         processId: protocolState.processId,
-        protocolLocator: makeLocator(
-          protocolState.someRandomField,
-          ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-        ),
+        protocolLocator: makeLocator(ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
       }),
     );
     return {
