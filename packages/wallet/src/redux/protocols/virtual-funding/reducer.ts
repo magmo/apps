@@ -30,6 +30,7 @@ export function initialize(sharedData: SharedData, args: states.InitializationAr
     startingAllocation,
     startingDestination,
     hubAddress,
+    protocolLocator,
   } = args;
   const privateKey = getPrivatekey(sharedData, targetChannelId);
   const channelType = CONSENSUS_LIBRARY_ADDRESS;
@@ -41,7 +42,7 @@ export function initialize(sharedData: SharedData, args: states.InitializationAr
     commitmentType: CommitmentType.PreFundSetup,
     clearedToSend: true,
     processId,
-    protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+    protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
     participants: [...startingDestination, hubAddress],
   };
 
@@ -66,7 +67,7 @@ export function initialize(sharedData: SharedData, args: states.InitializationAr
       startingDestination,
       ourIndex,
       hubAddress,
-      protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+      protocolLocator,
     }),
     sharedData: jointChannelInitialized.sharedData,
   };
