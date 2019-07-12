@@ -5,7 +5,12 @@ import { SharedData, queueMessage } from '../../../state';
 import { ProtocolStateWithSharedData, makeLocator } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
-import { showWallet, hideWallet, sendFundingComplete } from '../../reducer-helpers';
+import {
+  showWallet,
+  hideWallet,
+  sendFundingComplete,
+  getLatestCommitment,
+} from '../../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyProposed, EmbeddedProtocol } from '../../../../communication';
 
@@ -165,10 +170,12 @@ function strategyApproved(
   if (state.type !== 'Funding.PlayerA.WaitForStrategyResponse') {
     return { protocolState: state, sharedData };
   }
-
+  const latestCommitment = getLatestCommitment(state.targetChannelId, sharedData);
   const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
     state.processId,
     state.targetChannelId,
+    latestCommitment.allocation,
+    latestCommitment.destination,
     sharedData,
     makeLocator(EmbeddedProtocol.IndirectFunding),
   );

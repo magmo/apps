@@ -11,14 +11,16 @@ import {
 } from '../existing-ledger-funding';
 import * as states from './states';
 import { WalletAction } from '../../actions';
-import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
+import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
 import * as newLedgerFunding from '../new-ledger-funding';
 
-export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = 'IndirectFunding';
+export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.IndirectFunding);
 
 export function initialize(
   processId: string,
   channelId: string,
+  targetAllocation: string[],
+  targetDestination: string[],
   sharedData: SharedData,
   protocolLocator: ProtocolLocator,
 ): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
@@ -37,7 +39,14 @@ export function initialize(
     const {
       protocolState: existingLedgerFundingState,
       sharedData: newSharedData,
-    } = initializeExistingLedgerFunding(processId, channelId, ledgerId, sharedData);
+    } = initializeExistingLedgerFunding(
+      processId,
+      channelId,
+      ledgerId,
+      targetAllocation,
+      targetDestination,
+      sharedData,
+    );
 
     if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
       return {
@@ -54,6 +63,8 @@ export function initialize(
         channelId,
         ledgerId,
         existingLedgerFundingState,
+        targetAllocation,
+        targetDestination,
       }),
       sharedData: newSharedData,
     };
@@ -64,6 +75,8 @@ export function initialize(
     } = newLedgerFunding.initializeNewLedgerFunding(
       processId,
       channelId,
+      targetAllocation,
+      targetDestination,
       sharedData,
       makeLocator(protocolLocator, EmbeddedProtocol.NewLedgerFunding),
     );
@@ -80,6 +93,8 @@ export function initialize(
         processId,
         channelId,
         newLedgerFundingState,
+        targetAllocation,
+        targetDestination,
       }),
       sharedData: newSharedData,
     };

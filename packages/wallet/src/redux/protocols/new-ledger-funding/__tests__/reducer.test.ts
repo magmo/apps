@@ -1,11 +1,10 @@
 import * as scenarios from './scenarios';
 import { newLedgerFundingReducer, initialize } from '../reducer';
-import { ProtocolStateWithSharedData, makeLocator } from '../..';
+import { ProtocolStateWithSharedData } from '../..';
 import { NewLedgerFundingState } from '../states';
 
 import { describeScenarioStep, itSendsAMessage } from '../../../__tests__/helpers';
 import * as selectors from '../../../selectors';
-import { EmbeddedProtocol } from '../../../../communication';
 
 // Mocks
 const getNextNonceMock = jest.fn().mockReturnValue(0);
@@ -16,12 +15,21 @@ Object.defineProperty(selectors, 'getNextNonce', {
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('when initializing', () => {
-    const { channelId, store, processId } = scenario.initialParams;
+    const {
+      channelId,
+      store,
+      processId,
+      targetAllocation,
+      targetDestination,
+      protocolLocator,
+    } = scenario.initialParams;
     const initialState = initialize(
       processId,
       channelId,
+      targetAllocation,
+      targetDestination,
       store,
-      makeLocator(EmbeddedProtocol.NewLedgerFunding),
+      protocolLocator,
     );
 
     itTransitionsTo(initialState, 'NewLedgerFunding.WaitForPreFundSetup');

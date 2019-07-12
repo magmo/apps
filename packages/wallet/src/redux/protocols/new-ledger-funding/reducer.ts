@@ -43,6 +43,8 @@ export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.
 export function initialize(
   processId: string,
   channelId: string,
+  targetAllocation: string[],
+  targetDestination: string[],
   sharedData: SharedData,
   protocolLocator: ProtocolLocator,
 ): ProtocolStateWithSharedData<states.NonTerminalNewLedgerFundingState | states.Failure> {

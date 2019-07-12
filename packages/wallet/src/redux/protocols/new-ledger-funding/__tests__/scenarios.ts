@@ -99,6 +99,9 @@ export const happyPath = {
     channelId,
     processId: 'processId',
     ledgerId,
+    targetAllocation: twoThree.map(t => t.wei),
+    targetDestination: twoThree.map(t => t.address),
+    protocolLocator,
   },
   waitForPreFundL1: {
     state: waitForPreFundL1,
