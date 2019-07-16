@@ -16,34 +16,31 @@ export interface Failure {
   type: 'NewLedgerFunding.Failure';
 }
 
-export interface WaitForPreFundSetup {
-  type: 'NewLedgerFunding.WaitForPreFundSetup';
+interface Base {
   channelId: string;
   processId: string;
+}
+
+export interface WaitForPreFundSetup extends Base {
+  type: 'NewLedgerFunding.WaitForPreFundSetup';
   preFundSetupState: AdvanceChannelState;
 }
 
-export interface WaitForDirectFunding {
+export interface WaitForDirectFunding extends Base {
   type: 'NewLedgerFunding.WaitForDirectFunding';
-  channelId: string;
   ledgerId: string;
-  processId: string;
   directFundingState: DirectFundingState;
   postFundSetupState: AdvanceChannelState;
 }
-export interface WaitForPostFundSetup {
+export interface WaitForPostFundSetup extends Base {
   type: 'NewLedgerFunding.WaitForPostFundSetup';
-  channelId: string;
   ledgerId: string;
-  processId: string;
   postFundSetupState: AdvanceChannelState;
   consensusUpdateState: ConsensusUpdateState;
 }
-export interface WaitForLedgerUpdate {
+export interface WaitForLedgerUpdate extends Base {
   type: 'NewLedgerFunding.WaitForLedgerUpdate';
-  channelId: string;
   ledgerId: string;
-  processId: string;
   consensusUpdateState: ConsensusUpdateState;
 }
 // ------------
