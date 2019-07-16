@@ -75,13 +75,7 @@ export function initialize(
     const {
       protocolState: NewLedgerChannelState,
       sharedData: newSharedData,
-    } = initializeNewLedgerChannel(
-      processId,
-      channelId,
-      targetAllocation,
-      targetDestination,
-      sharedData,
-    );
+    } = initializeNewLedgerChannel(processId, channelId, sharedData);
 
     if (NewLedgerChannelState.type === 'NewLedgerChannel.Success') {
       return { protocolState: states.success({}), sharedData: newSharedData };

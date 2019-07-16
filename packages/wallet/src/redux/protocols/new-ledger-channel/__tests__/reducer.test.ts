@@ -15,20 +15,8 @@ Object.defineProperty(selectors, 'getNextNonce', {
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('when initializing', () => {
-    const {
-      channelId,
-      store,
-      processId,
-      targetAllocation,
-      targetDestination,
-    } = scenario.initialParams;
-    const initialState = initialize(
-      processId,
-      channelId,
-      targetAllocation,
-      targetDestination,
-      store,
-    );
+    const { channelId, store, processId } = scenario.initialParams;
+    const initialState = initialize(processId, channelId, store);
 
     itTransitionsTo(initialState, 'NewLedgerChannel.WaitForPreFundSetup');
     itSendsAMessage(initialState);
@@ -52,18 +40,6 @@ describe('happy-path scenario', () => {
     const { state, action, sharedData } = scenario.waitForPostFund1;
     const updatedState = NewLedgerChannelReducer(state, sharedData, action);
 
-    itTransitionsTo(updatedState, 'NewLedgerChannel.WaitForLedgerUpdate');
-  });
-
-  describeScenarioStep(scenario.waitForLedgerUpdate1, () => {
-    const { state, action, sharedData } = scenario.waitForLedgerUpdate1;
-    const updatedState = NewLedgerChannelReducer(state, sharedData, action);
-    itUpdatesFundingState(
-      updatedState,
-      scenario.initialParams.channelId,
-      scenario.initialParams.ledgerId,
-    );
-    itUpdatesFundingState(updatedState, scenario.initialParams.ledgerId);
     itTransitionsTo(updatedState, 'NewLedgerChannel.Success');
   });
 });
@@ -87,20 +63,5 @@ type ReturnVal = ProtocolStateWithSharedData<NewLedgerChannelState>;
 function itTransitionsTo(state: ReturnVal, type: NewLedgerChannelState['type']) {
   it(`transitions protocol state to ${type}`, () => {
     expect(state.protocolState.type).toEqual(type);
-  });
-}
-
-function itUpdatesFundingState(state: ReturnVal, channelId: string, fundingChannelId?: string) {
-  it(`Updates the funding state to reflect ${channelId} funded by ${fundingChannelId}`, () => {
-    if (!state.sharedData.fundingState[channelId]) {
-      fail(`No entry for ${channelId} in fundingState`);
-    } else {
-      if (!fundingChannelId) {
-        expect(state.sharedData.fundingState[channelId].directlyFunded).toBeTruthy();
-      } else {
-        expect(state.sharedData.fundingState[channelId].directlyFunded).toBeFalsy();
-        expect(state.sharedData.fundingState[channelId].fundingChannel).toEqual(fundingChannelId);
-      }
-    }
   });
 }

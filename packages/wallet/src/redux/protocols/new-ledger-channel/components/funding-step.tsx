@@ -20,8 +20,6 @@ const fundingStepByState = (state: NonTerminalNewLedgerChannelState): Step => {
       return Step.AWaitForPreFundSetup1;
     case 'NewLedgerChannel.WaitForDirectFunding':
       return Step.AWaitForDirectFunding;
-    case 'NewLedgerChannel.WaitForLedgerUpdate':
-      return Step.AWaitForLedgerUpdate1;
     case 'NewLedgerChannel.WaitForPostFundSetup':
       return Step.AWaitForPostFundSetup1;
     default:

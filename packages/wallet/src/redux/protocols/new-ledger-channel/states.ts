@@ -2,7 +2,6 @@ import { ProtocolState } from '..';
 import { StateConstructor } from '../../utils';
 import { DirectFundingState } from '../direct-funding/states';
 import { AdvanceChannelState } from '../advance-channel';
-import { ConsensusUpdateState } from '../consensus-update';
 
 // -------
 // States
@@ -36,13 +35,8 @@ export interface WaitForPostFundSetup extends Base {
   type: 'NewLedgerChannel.WaitForPostFundSetup';
   ledgerId: string;
   postFundSetupState: AdvanceChannelState;
-  consensusUpdateState: ConsensusUpdateState;
 }
-export interface WaitForLedgerUpdate extends Base {
-  type: 'NewLedgerChannel.WaitForLedgerUpdate';
-  ledgerId: string;
-  consensusUpdateState: ConsensusUpdateState;
-}
+
 // ------------
 // Constructors
 // ------------
@@ -69,10 +63,6 @@ export const waitForPostFundSetup: StateConstructor<WaitForPostFundSetup> = p =>
   return { ...p, type: 'NewLedgerChannel.WaitForPostFundSetup' };
 };
 
-export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
-  return { ...p, type: 'NewLedgerChannel.WaitForLedgerUpdate' };
-};
-
 // -------
 // Unions and Guards
 // -------
@@ -80,8 +70,7 @@ export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
 export type NonTerminalNewLedgerChannelState =
   | WaitForPreFundSetup
   | WaitForDirectFunding
-  | WaitForPostFundSetup
-  | WaitForLedgerUpdate;
+  | WaitForPostFundSetup;
 
 export type NewLedgerChannelState = NonTerminalNewLedgerChannelState | Success | Failure;
 export type NewLedgerChannelStateType = NewLedgerChannelState['type'];
@@ -92,7 +81,6 @@ export function isNewLedgerChannelState(state: ProtocolState): state is NewLedge
     state.type === 'NewLedgerChannel.Success' ||
     state.type === 'NewLedgerChannel.WaitForDirectFunding' ||
     state.type === 'NewLedgerChannel.WaitForPostFundSetup' ||
-    state.type === 'NewLedgerChannel.WaitForLedgerUpdate' ||
     state.type === 'NewLedgerChannel.WaitForPreFundSetup'
   );
 }

@@ -17,7 +17,6 @@ class NewLedgerChannelContainer extends PureComponent<Props> {
       case 'NewLedgerChannel.WaitForPreFundSetup':
       case 'NewLedgerChannel.WaitForDirectFunding':
       case 'NewLedgerChannel.WaitForPostFundSetup':
-      case 'NewLedgerChannel.WaitForLedgerUpdate':
         return <FundingStep NewLedgerChannelState={state} />;
       default:
         return unreachable(state);
