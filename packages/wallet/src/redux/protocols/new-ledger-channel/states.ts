@@ -9,6 +9,7 @@ import { AdvanceChannelState } from '../advance-channel';
 
 export interface Success {
   type: 'NewLedgerChannel.Success';
+  ledgerId: string;
 }
 
 export interface Failure {
@@ -42,7 +43,7 @@ export interface WaitForPostFundSetup extends Base {
 // ------------
 
 export const success: StateConstructor<Success> = p => {
-  return { type: 'NewLedgerChannel.Success' };
+  return { type: 'NewLedgerChannel.Success', ledgerId: p.ledgerId };
 };
 
 export const failure: StateConstructor<Failure> = p => {

@@ -107,24 +107,15 @@ function waitForNewLedgerChannelReducer(
         sharedData: newSharedData,
       };
     case 'NewLedgerChannel.Success':
+      const { ledgerId } = newLedgerChannelState;
       const { channelId } = protocolState;
-      const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
+      const existingLedgerChannel = selectors.getChannelState(sharedData, ledgerId);
+      return fundWithExistingLedgerChannel({
+        ...protocolState,
+        channelId,
         sharedData,
-        helpers.getOurAddress(channelId, sharedData),
-        helpers.getOpponentAddress(channelId, sharedData),
-      );
-      if (ledgerChannelIsReady(existingLedgerChannel)) {
-        return fundWithExistingLedgerChannel({
-          ...protocolState,
-          channelId,
-          sharedData,
-          existingLedgerChannel,
-        });
-      } else {
-        throw new Error(
-          `Expected ledger channel ${protocolState.newLedgerChannel.channelId} not found`,
-        );
-      }
+        existingLedgerChannel,
+      });
     default:
       return {
         protocolState: states.waitForNewLedgerChannel({

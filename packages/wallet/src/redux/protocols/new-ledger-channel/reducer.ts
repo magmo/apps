@@ -104,7 +104,12 @@ function handleWaitForPostFundSetup(
         case 'AdvanceChannel.Failure':
           return { protocolState: failure({}), sharedData };
         case 'AdvanceChannel.Success':
-          return { protocolState: states.success({}), sharedData };
+          return {
+            protocolState: states.success({
+              ledgerId: protocolState.ledgerId,
+            }),
+            sharedData,
+          };
         default:
           return unreachable(advanceChannelResult.protocolState);
       }
@@ -250,7 +255,7 @@ function handleWaitForDirectFunding(
 
     if (advanceChannelResult.protocolState.type === 'AdvanceChannel.Success') {
       return {
-        protocolState: states.success({}),
+        protocolState: states.success({ ledgerId: advanceChannelResult.protocolState.channelId }),
         sharedData,
       };
     } else if (advanceChannelResult.protocolState.type === 'AdvanceChannel.Failure') {
