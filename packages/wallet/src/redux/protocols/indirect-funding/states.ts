@@ -2,23 +2,21 @@ import { NonTerminalExistingLedgerFundingState } from '../existing-ledger-fundin
 import { StateConstructor } from '../../utils';
 import { NonTerminalNewLedgerFundingState } from '../new-ledger-funding/states';
 
-export interface WaitForNewLedgerFunding {
-  type: 'IndirectFunding.WaitForNewLedgerFunding';
+interface Base {
   processId: string;
-  newLedgerFundingState: NonTerminalNewLedgerFundingState;
   channelId: string;
   targetAllocation: string[];
   targetDestination: string[];
 }
+export interface WaitForNewLedgerFunding extends Base {
+  type: 'IndirectFunding.WaitForNewLedgerFunding';
+  newLedgerFundingState: NonTerminalNewLedgerFundingState;
+}
 
-export interface WaitForExistingLedgerFunding {
+export interface WaitForExistingLedgerFunding extends Base {
   type: 'IndirectFunding.WaitForExistingLedgerFunding';
-  processId: string;
   existingLedgerFundingState: NonTerminalExistingLedgerFundingState;
-  channelId: string;
   ledgerId: string;
-  targetAllocation: string[];
-  targetDestination: string[];
 }
 
 export interface Failure {
