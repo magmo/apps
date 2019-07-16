@@ -52,11 +52,6 @@ const waitForNewLedgerChannel = states.waitForNewLedgerChannel({
 
 export const existingLedgerFundingHappyPath = {
   initialize: { ...props, sharedData: existingLedgerFundingSharedData },
-  waitForExistingLedgerFunding: {
-    state: waitForExistingLedgerFunding,
-    action: existingLedgerPreSuccess.action,
-    sharedData: existingLedgerPreSuccess.sharedData,
-  },
 };
 
 export const newLedgerChannelHappyPath = {
@@ -65,5 +60,10 @@ export const newLedgerChannelHappyPath = {
     state: waitForNewLedgerChannel,
     action: NewLedgerChannelSuccessTrigger,
     sharedData: newLedgerPreSuccess.sharedData,
+  },
+  waitForExistingLedgerFunding: {
+    state: waitForExistingLedgerFunding,
+    action: existingLedgerPreSuccess.action,
+    sharedData: existingLedgerPreSuccess.sharedData,
   },
 };
