@@ -1,4 +1,4 @@
-import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../new-ledger-funding/actions';
+import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../new-ledger-channel/actions';
 import {
   ExistingLedgerFundingAction,
   isExistingLedgerFundingAction,

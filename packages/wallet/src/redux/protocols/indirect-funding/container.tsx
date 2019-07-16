@@ -4,7 +4,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 import { ExistingLedgerFunding } from '../existing-ledger-funding/container';
-import { NewLedgerFunding } from '../new-ledger-funding/container';
+import { NewLedgerFunding } from '../new-ledger-channel/container';
 
 interface Props {
   state: states.NonTerminalIndirectFundingState;

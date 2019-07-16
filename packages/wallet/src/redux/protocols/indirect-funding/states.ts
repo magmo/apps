@@ -1,6 +1,6 @@
 import { NonTerminalExistingLedgerFundingState } from '../existing-ledger-funding';
 import { StateConstructor } from '../../utils';
-import { NonTerminalNewLedgerFundingState } from '../new-ledger-funding/states';
+import { NonTerminalNewLedgerFundingState } from '../new-ledger-channel/states';
 
 interface Base {
   processId: string;

@@ -6,7 +6,7 @@ import { initialize as initializeA, fundingReducer as playerAReducer } from './p
 import { initialize as initializeB, fundingReducer as playerBReducer } from './player-b/reducer';
 import { TwoPartyPlayerIndex } from '../../types';
 import { unreachable } from '../../../utils/reducer-utils';
-import { NewLedgerFundingAction } from '../new-ledger-funding/actions';
+import { NewLedgerFundingAction } from '../new-ledger-channel/actions';
 import * as playerAStates from './player-a/states';
 import { getOpponentAddress, getOurAddress } from '../reducer-helpers';
 

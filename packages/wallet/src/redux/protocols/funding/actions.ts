@@ -1,6 +1,6 @@
 import * as playerA from './player-a/actions';
 import * as playerB from './player-b/actions';
-import { isNewLedgerFundingAction, NewLedgerFundingAction } from '../new-ledger-funding/actions';
+import { isNewLedgerFundingAction, NewLedgerFundingAction } from '../new-ledger-channel/actions';
 import { WalletAction } from '../../../redux/actions';
 import {
   ExistingLedgerFundingAction,
