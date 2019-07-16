@@ -14,7 +14,7 @@ import * as states from '../states';
 import { preSuccess as existingLedgerPreSuccess } from '../../existing-ledger-funding/__tests__';
 import {
   preSuccessState as newLedgerPreSuccess,
-  successTrigger as newLedgerFundingSuccessTrigger,
+  successTrigger as NewLedgerChannelSuccessTrigger,
 } from '../../new-ledger-channel/__tests__';
 
 const processId = 'processId';
@@ -38,16 +38,16 @@ const existingLedgerFundingSharedData = setChannels(existingLedgerPreSuccess.sha
   channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
   channelFromCommitments([app0, app1], asAddress, asPrivateKey),
 ]);
-const newLedgerFundingSharedData = setChannels(EMPTY_SHARED_DATA, [
+const NewLedgerChannelSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([app0, app1], asAddress, asPrivateKey),
 ]);
 const waitForExistingLedgerFunding = states.waitForExistingLedgerFunding({
   ...props,
   existingLedgerFundingState: existingLedgerPreSuccess.state,
 });
-const waitForNewLedgerFunding = states.waitForNewLedgerFunding({
+const waitForNewLedgerChannel = states.waitForNewLedgerChannel({
   ...props,
-  newLedgerFundingState: newLedgerPreSuccess.state,
+  newLedgerChannel: newLedgerPreSuccess.state,
 });
 
 export const existingLedgerFundingHappyPath = {
@@ -59,11 +59,11 @@ export const existingLedgerFundingHappyPath = {
   },
 };
 
-export const newLedgerFundingHappyPath = {
-  initialize: { ...props, sharedData: newLedgerFundingSharedData },
-  waitForNewLedgerFunding: {
-    state: waitForNewLedgerFunding,
-    action: newLedgerFundingSuccessTrigger,
+export const newLedgerChannelHappyPath = {
+  initialize: { ...props, sharedData: NewLedgerChannelSharedData },
+  waitForNewLedgerChannel: {
+    state: waitForNewLedgerChannel,
+    action: NewLedgerChannelSuccessTrigger,
     sharedData: newLedgerPreSuccess.sharedData,
   },
 };

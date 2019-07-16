@@ -12,9 +12,9 @@ import {
 } from '../existing-ledger-funding';
 import * as states from './states';
 import {
-  initializeNewLedgerFunding,
-  isNewLedgerFundingAction,
-  newLedgerFundingReducer,
+  initializeNewLedgerChannel,
+  isNewLedgerChannelAction,
+  NewLedgerChannelReducer,
 } from '../new-ledger-channel';
 import { IndirectFundingAction } from './actions';
 
@@ -73,9 +73,9 @@ export function initialize(
     };
   } else {
     const {
-      protocolState: newLedgerFundingState,
+      protocolState: NewLedgerChannelState,
       sharedData: newSharedData,
-    } = initializeNewLedgerFunding(
+    } = initializeNewLedgerChannel(
       processId,
       channelId,
       targetAllocation,
@@ -83,20 +83,20 @@ export function initialize(
       sharedData,
     );
 
-    if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
+    if (NewLedgerChannelState.type === 'NewLedgerChannel.Success') {
       return { protocolState: states.success({}), sharedData: newSharedData };
-    } else if (newLedgerFundingState.type === 'NewLedgerFunding.Failure') {
+    } else if (NewLedgerChannelState.type === 'NewLedgerChannel.Failure') {
       return {
-        protocolState: states.failure({ reason: 'NewLedgerFunding Failure' }),
+        protocolState: states.failure({ reason: 'NewLedgerChannel Failure' }),
         sharedData: newSharedData,
       };
     }
 
     return {
-      protocolState: states.waitForNewLedgerFunding({
+      protocolState: states.waitForNewLedgerChannel({
         processId,
         channelId,
-        newLedgerFundingState,
+        newLedgerChannel: NewLedgerChannelState,
         targetAllocation,
         targetDestination,
       }),
@@ -110,28 +110,28 @@ export function indirectFundingReducer(
   sharedData: SharedData,
   action: IndirectFundingAction,
 ): ProtocolStateWithSharedData<states.IndirectFundingState> {
-  if (protocolState.type === 'IndirectFunding.WaitForNewLedgerFunding') {
-    if (!isNewLedgerFundingAction(action)) {
+  if (protocolState.type === 'IndirectFunding.WaitForNewLedgerChannel') {
+    if (!isNewLedgerChannelAction(action)) {
       console.warn(`Received ${action} but currently in ${protocolState.type}`);
       return { protocolState, sharedData };
     }
 
     const {
-      protocolState: newLedgerFundingState,
+      protocolState: NewLedgerChannelState,
       sharedData: newSharedData,
-    } = newLedgerFundingReducer(protocolState.newLedgerFundingState, sharedData, action);
-    if (newLedgerFundingState.type === 'NewLedgerFunding.Success') {
+    } = NewLedgerChannelReducer(protocolState.newLedgerChannel, sharedData, action);
+    if (NewLedgerChannelState.type === 'NewLedgerChannel.Success') {
       return { protocolState: states.success({}), sharedData: newSharedData };
-    } else if (newLedgerFundingState.type === 'NewLedgerFunding.Failure') {
+    } else if (NewLedgerChannelState.type === 'NewLedgerChannel.Failure') {
       return {
-        protocolState: states.failure({ reason: 'NewLedgerFunding Failure' }),
+        protocolState: states.failure({ reason: 'NewLedgerChannel Failure' }),
         sharedData: newSharedData,
       };
     } else {
       return {
-        protocolState: states.waitForNewLedgerFunding({
+        protocolState: states.waitForNewLedgerChannel({
           ...protocolState,
-          newLedgerFundingState,
+          newLedgerChannel: NewLedgerChannelState,
         }),
         sharedData: newSharedData,
       };

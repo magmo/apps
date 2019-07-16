@@ -15,11 +15,11 @@ import { WalletAction } from '../../actions';
 // Unions and Guards
 // --------
 
-export type NewLedgerFundingAction =
+export type NewLedgerChannelAction =
   | ConsensusUpdateAction
   | AdvanceChannelAction
   | DirectFundingAction;
-export function isNewLedgerFundingAction(action: WalletAction): action is NewLedgerFundingAction {
+export function isNewLedgerChannelAction(action: WalletAction): action is NewLedgerChannelAction {
   return (
     isDirectFundingAction(action) ||
     isConsensusUpdateAction(action) ||

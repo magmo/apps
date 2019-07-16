@@ -1,6 +1,6 @@
 import { NonTerminalExistingLedgerFundingState } from '../existing-ledger-funding';
 import { StateConstructor } from '../../utils';
-import { NonTerminalNewLedgerFundingState } from '../new-ledger-channel/states';
+import { NonTerminalNewLedgerChannelState } from '../new-ledger-channel/states';
 
 interface Base {
   processId: string;
@@ -8,9 +8,9 @@ interface Base {
   targetAllocation: string[];
   targetDestination: string[];
 }
-export interface WaitForNewLedgerFunding extends Base {
-  type: 'IndirectFunding.WaitForNewLedgerFunding';
-  newLedgerFundingState: NonTerminalNewLedgerFundingState;
+export interface WaitForNewLedgerChannel extends Base {
+  type: 'IndirectFunding.WaitForNewLedgerChannel';
+  newLedgerChannel: NonTerminalNewLedgerChannelState;
 }
 
 export interface WaitForExistingLedgerFunding extends Base {
@@ -28,8 +28,8 @@ export interface Success {
   type: 'IndirectFunding.Success';
 }
 
-export const waitForNewLedgerFunding: StateConstructor<WaitForNewLedgerFunding> = p => {
-  return { ...p, type: 'IndirectFunding.WaitForNewLedgerFunding' };
+export const waitForNewLedgerChannel: StateConstructor<WaitForNewLedgerChannel> = p => {
+  return { ...p, type: 'IndirectFunding.WaitForNewLedgerChannel' };
 };
 export const waitForExistingLedgerFunding: StateConstructor<WaitForExistingLedgerFunding> = p => {
   return { ...p, type: 'IndirectFunding.WaitForExistingLedgerFunding' };
@@ -44,7 +44,7 @@ export const failure: StateConstructor<Failure> = p => {
 };
 export type NonTerminalIndirectFundingState =
   | WaitForExistingLedgerFunding
-  | WaitForNewLedgerFunding;
+  | WaitForNewLedgerChannel;
 export type TerminalIndirectFundingState = Success | Failure;
 export type IndirectFundingState = NonTerminalIndirectFundingState | TerminalIndirectFundingState;
 export type IndirectFundingStateType = IndirectFundingState['type'];

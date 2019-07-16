@@ -9,11 +9,11 @@ import { ConsensusUpdateState } from '../consensus-update';
 // -------
 
 export interface Success {
-  type: 'NewLedgerFunding.Success';
+  type: 'NewLedgerChannel.Success';
 }
 
 export interface Failure {
-  type: 'NewLedgerFunding.Failure';
+  type: 'NewLedgerChannel.Failure';
 }
 
 interface Base {
@@ -22,24 +22,24 @@ interface Base {
 }
 
 export interface WaitForPreFundSetup extends Base {
-  type: 'NewLedgerFunding.WaitForPreFundSetup';
+  type: 'NewLedgerChannel.WaitForPreFundSetup';
   preFundSetupState: AdvanceChannelState;
 }
 
 export interface WaitForDirectFunding extends Base {
-  type: 'NewLedgerFunding.WaitForDirectFunding';
+  type: 'NewLedgerChannel.WaitForDirectFunding';
   ledgerId: string;
   directFundingState: DirectFundingState;
   postFundSetupState: AdvanceChannelState;
 }
 export interface WaitForPostFundSetup extends Base {
-  type: 'NewLedgerFunding.WaitForPostFundSetup';
+  type: 'NewLedgerChannel.WaitForPostFundSetup';
   ledgerId: string;
   postFundSetupState: AdvanceChannelState;
   consensusUpdateState: ConsensusUpdateState;
 }
 export interface WaitForLedgerUpdate extends Base {
-  type: 'NewLedgerFunding.WaitForLedgerUpdate';
+  type: 'NewLedgerChannel.WaitForLedgerUpdate';
   ledgerId: string;
   consensusUpdateState: ConsensusUpdateState;
 }
@@ -48,55 +48,55 @@ export interface WaitForLedgerUpdate extends Base {
 // ------------
 
 export const success: StateConstructor<Success> = p => {
-  return { type: 'NewLedgerFunding.Success' };
+  return { type: 'NewLedgerChannel.Success' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  return { type: 'NewLedgerFunding.Failure' };
+  return { type: 'NewLedgerChannel.Failure' };
 };
 export const waitForPreFundSetup: StateConstructor<WaitForPreFundSetup> = p => {
-  return { ...p, type: 'NewLedgerFunding.WaitForPreFundSetup' };
+  return { ...p, type: 'NewLedgerChannel.WaitForPreFundSetup' };
 };
 
 export const waitForDirectFunding: StateConstructor<WaitForDirectFunding> = p => {
   return {
     ...p,
-    type: 'NewLedgerFunding.WaitForDirectFunding',
+    type: 'NewLedgerChannel.WaitForDirectFunding',
   };
 };
 
 export const waitForPostFundSetup: StateConstructor<WaitForPostFundSetup> = p => {
-  return { ...p, type: 'NewLedgerFunding.WaitForPostFundSetup' };
+  return { ...p, type: 'NewLedgerChannel.WaitForPostFundSetup' };
 };
 
 export const waitForLedgerUpdate: StateConstructor<WaitForLedgerUpdate> = p => {
-  return { ...p, type: 'NewLedgerFunding.WaitForLedgerUpdate' };
+  return { ...p, type: 'NewLedgerChannel.WaitForLedgerUpdate' };
 };
 
 // -------
 // Unions and Guards
 // -------
 
-export type NonTerminalNewLedgerFundingState =
+export type NonTerminalNewLedgerChannelState =
   | WaitForPreFundSetup
   | WaitForDirectFunding
   | WaitForPostFundSetup
   | WaitForLedgerUpdate;
 
-export type NewLedgerFundingState = NonTerminalNewLedgerFundingState | Success | Failure;
-export type NewLedgerFundingStateType = NewLedgerFundingState['type'];
+export type NewLedgerChannelState = NonTerminalNewLedgerChannelState | Success | Failure;
+export type NewLedgerChannelStateType = NewLedgerChannelState['type'];
 
-export function isNewLedgerFundingState(state: ProtocolState): state is NewLedgerFundingState {
+export function isNewLedgerChannelState(state: ProtocolState): state is NewLedgerChannelState {
   return (
-    state.type === 'NewLedgerFunding.Failure' ||
-    state.type === 'NewLedgerFunding.Success' ||
-    state.type === 'NewLedgerFunding.WaitForDirectFunding' ||
-    state.type === 'NewLedgerFunding.WaitForPostFundSetup' ||
-    state.type === 'NewLedgerFunding.WaitForLedgerUpdate' ||
-    state.type === 'NewLedgerFunding.WaitForPreFundSetup'
+    state.type === 'NewLedgerChannel.Failure' ||
+    state.type === 'NewLedgerChannel.Success' ||
+    state.type === 'NewLedgerChannel.WaitForDirectFunding' ||
+    state.type === 'NewLedgerChannel.WaitForPostFundSetup' ||
+    state.type === 'NewLedgerChannel.WaitForLedgerUpdate' ||
+    state.type === 'NewLedgerChannel.WaitForPreFundSetup'
   );
 }
 
-export function isTerminal(state: NewLedgerFundingState): state is Failure | Success {
-  return state.type === 'NewLedgerFunding.Failure' || state.type === 'NewLedgerFunding.Success';
+export function isTerminal(state: NewLedgerChannelState): state is Failure | Success {
+  return state.type === 'NewLedgerChannel.Failure' || state.type === 'NewLedgerChannel.Success';
 }

@@ -1,6 +1,6 @@
 import * as states from './states';
 import { SharedData, getPrivatekey, setFundingState } from '../../state';
-import { NewLedgerFundingState, failure, success } from './states';
+import { NewLedgerChannelState, failure, success } from './states';
 import { ProtocolStateWithSharedData } from '..';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { CommitmentType } from '../../../domain';
@@ -17,7 +17,7 @@ import { addHex } from '../../../utils/hex-utils';
 import { unreachable } from '../../../utils/reducer-utils';
 import { isTransactionAction } from '../../actions';
 import { ChannelFundingState } from '../../state';
-import { NewLedgerFundingAction } from './actions';
+import { NewLedgerChannelAction } from './actions';
 import {
   initializeConsensusUpdate,
   ConsensusUpdateAction,
@@ -36,9 +36,9 @@ import {
 import { getLatestCommitment, isFirstPlayer, getTwoPlayerIndex } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
-type ReturnVal = ProtocolStateWithSharedData<NewLedgerFundingState>;
-type IDFAction = NewLedgerFundingAction;
-export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'NewLedgerFunding';
+type ReturnVal = ProtocolStateWithSharedData<NewLedgerChannelState>;
+type IDFAction = NewLedgerChannelAction;
+export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'NewLedgerChannel';
 export function initialize(
   processId: string,
   channelId: string,
@@ -79,19 +79,19 @@ export function initialize(
   return { protocolState, sharedData };
 }
 
-export function newLedgerFundingReducer(
-  protocolState: states.NonTerminalNewLedgerFundingState,
+export function NewLedgerChannelReducer(
+  protocolState: states.NonTerminalNewLedgerChannelState,
   sharedData: SharedData,
-  action: NewLedgerFundingAction,
+  action: NewLedgerChannelAction,
 ): ReturnVal {
   switch (protocolState.type) {
-    case 'NewLedgerFunding.WaitForPreFundSetup':
+    case 'NewLedgerChannel.WaitForPreFundSetup':
       return handleWaitForPreFundSetup(protocolState, sharedData, action);
-    case 'NewLedgerFunding.WaitForDirectFunding':
+    case 'NewLedgerChannel.WaitForDirectFunding':
       return handleWaitForDirectFunding(protocolState, sharedData, action);
-    case 'NewLedgerFunding.WaitForPostFundSetup':
+    case 'NewLedgerChannel.WaitForPostFundSetup':
       return handleWaitForPostFundSetup(protocolState, sharedData, action);
-    case 'NewLedgerFunding.WaitForLedgerUpdate':
+    case 'NewLedgerChannel.WaitForLedgerUpdate':
       return handleWaitForLedgerUpdate(protocolState, sharedData, action);
 
     default:

@@ -1,3 +1,3 @@
-export { NewLedgerFundingState } from './states';
-export { NewLedgerFundingAction, isNewLedgerFundingAction } from './actions';
-export { initialize as initializeNewLedgerFunding, newLedgerFundingReducer } from './reducer';
+export { NewLedgerChannelState as NewLedgerChannelState } from './states';
+export { NewLedgerChannelAction as NewLedgerChannelAction, isNewLedgerChannelAction } from './actions';
+export { initialize as initializeNewLedgerChannel, NewLedgerChannelReducer } from './reducer';

@@ -1,12 +1,12 @@
-import { NewLedgerFundingAction, isNewLedgerFundingAction } from '../new-ledger-channel/actions';
+import { NewLedgerChannelAction, isNewLedgerChannelAction } from '../new-ledger-channel/actions';
 import {
   ExistingLedgerFundingAction,
   isExistingLedgerFundingAction,
 } from '../existing-ledger-funding';
 import { WalletAction } from '../../actions';
 
-export type IndirectFundingAction = NewLedgerFundingAction | ExistingLedgerFundingAction;
+export type IndirectFundingAction = NewLedgerChannelAction | ExistingLedgerFundingAction;
 
 export const isIndirectFundingAction = (action: WalletAction): action is IndirectFundingAction => {
-  return isNewLedgerFundingAction(action) || isExistingLedgerFundingAction(action);
+  return isNewLedgerChannelAction(action) || isExistingLedgerFundingAction(action);
 };
