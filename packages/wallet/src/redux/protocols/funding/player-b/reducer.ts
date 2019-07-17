@@ -15,7 +15,6 @@ import { fundingFailure } from 'magmo-wallet-client';
 import { sendStrategyApproved, EmbeddedProtocol } from '../../../../communication';
 import {
   IndirectFundingAction,
-  isIndirectFundingAction,
   indirectFundingReducer,
   initializeIndirectFunding,
 } from '../../indirect-funding';
@@ -23,13 +22,13 @@ import * as indirectFundingStates from '../../indirect-funding/states';
 import {
   AdvanceChannelAction,
   advanceChannelReducer,
-  isAdvanceChannelAction,
   initializeAdvanceChannel,
 } from '../../advance-channel';
 import * as advanceChannelStates from '../../advance-channel/states';
 import { CommitmentType } from '../../../../domain';
-import { clearedToSend } from '../../advance-channel/actions';
+import { clearedToSend, routesToAdvanceChannel } from '../../advance-channel/actions';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../../advance-channel/reducer';
+import { routesToIndirectFunding } from '../../indirect-funding/actions';
 type EmbeddedAction = IndirectFundingAction | AdvanceChannelAction;
 
 export function initialize(
@@ -55,9 +54,9 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (isAdvanceChannelAction(action)) {
+  if (routesToAdvanceChannel(action, [EmbeddedProtocol.AdvanceChannel])) {
     return handleAdvanceChannelAction(state, sharedData, action);
-  } else if (isIndirectFundingAction(action)) {
+  } else if (routesToIndirectFunding(action, [EmbeddedProtocol.IndirectFunding])) {
     return handleFundingAction(state, sharedData, action);
   }
 
@@ -93,6 +92,7 @@ function handleAdvanceChannelAction(
     );
     return { protocolState, sharedData };
   }
+
   const result = advanceChannelReducer(protocolState.postFundSetupState, sharedData, action);
   if (!advanceChannelStates.isTerminal(result.protocolState)) {
     return {
