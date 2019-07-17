@@ -54,6 +54,7 @@ export interface ProtocolStateWithSharedData<T extends ProtocolState> {
 export function makeLocator(...args: Array<ProtocolLocator | EmbeddedProtocol>): ProtocolLocator {
   return ([] as ProtocolLocator).concat(...args).filter(s => s.length > 0);
 }
+export const EMPTY_LOCATOR: ProtocolLocator = makeLocator();
 
 export function prependToLocator<T extends WalletAction & { protocolLocator: ProtocolLocator }>(
   action: T,

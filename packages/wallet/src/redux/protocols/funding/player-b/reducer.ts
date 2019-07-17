@@ -2,7 +2,7 @@ import * as states from './states';
 import * as actions from './actions';
 
 import { SharedData, queueMessage } from '../../../state';
-import { ProtocolStateWithSharedData, makeLocator } from '../..';
+import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import {
@@ -54,9 +54,9 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (routesToAdvanceChannel(action, [EmbeddedProtocol.AdvanceChannel])) {
+  if (routesToAdvanceChannel(action, EMPTY_LOCATOR)) {
     return handleAdvanceChannelAction(state, sharedData, action);
-  } else if (routesToIndirectFunding(action, [EmbeddedProtocol.IndirectFunding])) {
+  } else if (routesToIndirectFunding(action, EMPTY_LOCATOR)) {
     return handleFundingAction(state, sharedData, action);
   }
 
