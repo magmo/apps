@@ -148,10 +148,13 @@ export function routesToProtocol(
   }
 }
 
-export function routerFactory(
-  typeGuard: (action: WalletAction) => boolean,
+export function routerFactory<T extends WalletAction>(
+  typeGuard: (action: WalletAction) => action is T,
   protocol: EmbeddedProtocol,
-): (action: WalletAction, protocolLocator: ProtocolLocator) => boolean {
-  return (action: WalletAction, protocolLocator: ProtocolLocator) =>
-    typeGuard(action) && routesToProtocol(action, protocolLocator, protocol);
+): (action: WalletAction, protocolLocator: ProtocolLocator) => action is T {
+  function router(action: WalletAction, protocolLocator: ProtocolLocator): action is T {
+    return typeGuard(action) && routesToProtocol(action, protocolLocator, protocol);
+  }
+
+  return router;
 }
