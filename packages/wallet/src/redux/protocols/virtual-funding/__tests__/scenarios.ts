@@ -10,7 +10,7 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import { makeLocator } from '../..';
+import { makeLocator, prependToLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../../advance-channel/reducer';
 
@@ -113,13 +113,6 @@ const scenarioStates = {
 // Scenarios
 // ---------
 
-function fixLocator(action, protocol = EmbeddedProtocol.VirtualFunding) {
-  return {
-    ...action,
-    protocolLocator: makeLocator(protocol, action.protocolLocator),
-  };
-}
-
 export const happyPath = {
   ...props,
   initialize: {
@@ -128,36 +121,37 @@ export const happyPath = {
   },
   openJ: {
     state: scenarioStates.waitForJointChannel1,
-    action: fixLocator(preFund.preSuccess.trigger),
+    action: prependToLocator(preFund.preSuccess.trigger, EmbeddedProtocol.VirtualFunding),
     sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareJ: {
     state: scenarioStates.waitForJointChannel2,
-    action: fixLocator(postFund.preSuccess.trigger),
+    action: prependToLocator(postFund.preSuccess.trigger, EmbeddedProtocol.VirtualFunding),
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
     jointChannelId,
   },
   openG: {
     state: scenarioStates.waitForGuarantorChannel1,
-    action: fixLocator(preFund.preSuccess.trigger),
+    action: prependToLocator(preFund.preSuccess.trigger, EmbeddedProtocol.VirtualFunding),
     sharedData: setChannel(preFund.preSuccess.sharedData, appChannel),
   },
   prepareG: {
     state: scenarioStates.waitForGuarantorChannel2,
-    action: fixLocator(postFund.preSuccess.trigger),
+    action: prependToLocator(postFund.preSuccess.trigger, EmbeddedProtocol.VirtualFunding),
     sharedData: setChannel(postFund.preSuccess.sharedData, appChannel),
   },
   fundG: {
     appChannelId: appChannel.channelId,
     state: scenarioStates.waitForGuarantorFunding,
-    action: fixLocator(
-      fixLocator(indirectFundingPreSuccess.action, EmbeddedProtocol.IndirectFunding),
-    ),
+    action: prependToLocator(indirectFundingPreSuccess.action, [
+      EmbeddedProtocol.VirtualFunding,
+      EmbeddedProtocol.IndirectFunding,
+    ]),
     sharedData: indirectFundingPreSuccess.sharedData,
   },
   fundApp: {
     state: scenarioStates.waitForApplicationFunding,
-    action: fixLocator(consensusUpdatePreSuccess.action),
+    action: prependToLocator(consensusUpdatePreSuccess.action, EmbeddedProtocol.VirtualFunding),
     sharedData: consensusUpdatePreSuccess.sharedData,
   },
 };

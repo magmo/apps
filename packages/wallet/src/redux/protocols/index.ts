@@ -18,6 +18,7 @@ import { AdvanceChannelState } from './advance-channel';
 import { VirtualFundingState } from './virtual-funding/states';
 import { IndirectFundingState } from './indirect-funding/states';
 import { ProtocolLocator, EmbeddedProtocol } from '../../communication';
+import { WalletAction } from '../actions';
 
 export type ProtocolState =
   | ApplicationState
@@ -52,4 +53,14 @@ export interface ProtocolStateWithSharedData<T extends ProtocolState> {
 
 export function makeLocator(...args: Array<ProtocolLocator | EmbeddedProtocol>): ProtocolLocator {
   return ([] as ProtocolLocator).concat(...args).filter(s => s.length > 0);
+}
+
+export function prependToLocator<T extends WalletAction & { protocolLocator: ProtocolLocator }>(
+  action: T,
+  protocol: ProtocolLocator | EmbeddedProtocol,
+): T {
+  return {
+    ...action,
+    protocolLocator: makeLocator(protocol, action.protocolLocator),
+  };
 }

@@ -17,6 +17,8 @@ import {
   successTrigger as newLedgerFundingSuccessTrigger,
 } from '../../new-ledger-funding/__tests__';
 import { INDIRECT_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
+import { prependToLocator } from '../..';
+import { EmbeddedProtocol } from '../../../../communication';
 
 const processId = 'processId';
 
@@ -65,7 +67,7 @@ export const newLedgerFundingHappyPath = {
   initialize: { ...props, sharedData: newLedgerFundingSharedData },
   waitForNewLedgerFunding: {
     state: waitForNewLedgerFunding,
-    action: newLedgerFundingSuccessTrigger,
+    action: prependToLocator(newLedgerFundingSuccessTrigger, EmbeddedProtocol.NewLedgerFunding),
     sharedData: newLedgerPreSuccess.sharedData,
   },
 };
