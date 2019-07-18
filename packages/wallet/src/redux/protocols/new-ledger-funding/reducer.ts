@@ -26,8 +26,14 @@ import {
 } from '../consensus-update';
 import * as consensusUpdateState from '../consensus-update/states';
 import * as advanceChannelState from '../advance-channel/states';
-import { clearedToSend as consensusUpdateClearedToSend } from '../consensus-update/actions';
-import { clearedToSend as advanceChannelClearedToSend } from '../advance-channel/actions';
+import {
+  clearedToSend as consensusUpdateClearedToSend,
+  routesToConsensusUpdate,
+} from '../consensus-update/actions';
+import {
+  clearedToSend as advanceChannelClearedToSend,
+  routesToAdvanceChannel,
+} from '../advance-channel/actions';
 import {
   initializeAdvanceChannel,
   isAdvanceChannelAction,
@@ -107,7 +113,7 @@ function handleWaitForPostFundSetup(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
-  if (isConsensusUpdateAction(action)) {
+  if (routesToConsensusUpdate(action, protocolState.protocolLocator)) {
     const consensusUpdateResult = consensusUpdateReducer(
       protocolState.consensusUpdateState,
       sharedData,
@@ -121,7 +127,7 @@ function handleWaitForPostFundSetup(
       },
       sharedData,
     };
-  } else if (isAdvanceChannelAction(action)) {
+  } else if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const advanceChannelResult = advanceChannelReducer(
       protocolState.postFundSetupState,
       sharedData,
@@ -291,10 +297,7 @@ function handleWaitForDirectFunding(
   sharedData: SharedData,
   action: IDFAction | DirectFundingAction | ConsensusUpdateAction,
 ): ReturnVal {
-  if (
-    isAdvanceChannelAction(action) &&
-    action.protocolLocator === NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR
-  ) {
+  if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const advanceChannelResult = advanceChannelReducer(
       protocolState.postFundSetupState,
       sharedData,
