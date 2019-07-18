@@ -98,8 +98,9 @@ const handleClearedToSend = (
     return { protocolState, sharedData };
   }
   const { processId, channelId, proposedAllocation, proposedDestination } = protocolState;
-  const shouldUpdateBeSent = helpers.ourTurn(sharedData, channelId);
-  if (shouldUpdateBeSent) {
+  const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
+  const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend: true });
+  if (safeToSend) {
     try {
       if (helpers.isFirstPlayer(channelId, sharedData)) {
         sharedData = sendProposal(
@@ -119,6 +120,7 @@ const handleClearedToSend = (
       };
     }
   }
+
   const latestCommitment = helpers.getLatestCommitment(channelId, sharedData);
   // If we are the last player we would be the one reaching consensus so we check again
   if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
@@ -129,6 +131,7 @@ const handleClearedToSend = (
     sharedData,
   };
 };
+
 const handleCommitmentReceived = (
   protocolState: states.ConsensusUpdateState,
   sharedData: SharedData,
