@@ -108,5 +108,5 @@ export function isFailure(state: NewLedgerFundingState): state is Failure {
 }
 
 export function isTerminal(state: NewLedgerFundingState): state is Failure | Success {
-  return !![isSuccess, isFailure].find(g => g(state));
+  return isSuccess(state) || isFailure(state);
 }
