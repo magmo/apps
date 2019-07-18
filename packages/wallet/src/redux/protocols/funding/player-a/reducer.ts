@@ -2,7 +2,7 @@ import * as states from './states';
 import * as actions from './actions';
 
 import { SharedData, queueMessage } from '../../../state';
-import { ProtocolStateWithSharedData, makeLocator } from '../..';
+import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '../..';
 import { unreachable } from '../../../../utils/reducer-utils';
 import { TwoPartyPlayerIndex } from '../../../types';
 import {
@@ -18,19 +18,18 @@ import * as indirectFundingStates from '../../indirect-funding/states';
 import {
   indirectFundingReducer,
   initializeIndirectFunding,
-  isIndirectFundingAction,
   IndirectFundingAction,
 } from '../../indirect-funding';
 import {
-  isAdvanceChannelAction,
   AdvanceChannelAction,
   advanceChannelReducer,
   initializeAdvanceChannel,
 } from '../../advance-channel';
 import * as advanceChannelStates from '../../advance-channel/states';
-import { clearedToSend } from '../../advance-channel/actions';
+import { clearedToSend, routesToAdvanceChannel } from '../../advance-channel/actions';
 import { CommitmentType } from '../../../../domain';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../../advance-channel/reducer';
+import { routesToIndirectFunding } from '../../indirect-funding/actions';
 
 type EmbeddedAction = IndirectFundingAction | AdvanceChannelAction;
 
@@ -57,9 +56,9 @@ export function fundingReducer(
   sharedData: SharedData,
   action: actions.FundingAction | EmbeddedAction,
 ): ProtocolStateWithSharedData<states.FundingState> {
-  if (isAdvanceChannelAction(action)) {
+  if (routesToAdvanceChannel(action, EMPTY_LOCATOR)) {
     return handleAdvanceChannelAction(state, sharedData, action);
-  } else if (isIndirectFundingAction(action)) {
+  } else if (routesToIndirectFunding(action, EMPTY_LOCATOR)) {
     return handleFundingAction(state, sharedData, action);
   }
 
