@@ -26,33 +26,48 @@ export const initialize = (
   proposedDestination: string[],
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  const sendUpdate = helpers.isFirstPlayer(channelId, sharedData) && clearedToSend;
-  if (sendUpdate) {
-    try {
-      sharedData = sendProposal(
-        processId,
-        channelId,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
-    } catch (error) {
+  const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
+  const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend });
+  switch (safeToSend) {
+    case true:
+      try {
+        sharedData = sendProposal(
+          processId,
+          channelId,
+          proposedAllocation,
+          proposedDestination,
+          sharedData,
+        );
+      } catch (error) {
+        return {
+          protocolState: states.failure({ reason: error.message }),
+          sharedData,
+        };
+      }
+
       return {
-        protocolState: states.failure({ reason: error.message }),
+        protocolState: states.commitmentSent({
+          processId,
+          channelId,
+          proposedAllocation,
+          proposedDestination,
+        }),
         sharedData,
       };
-    }
+    case false:
+      return {
+        protocolState: states.notSafeToSend({
+          processId,
+          channelId,
+          proposedAllocation,
+          proposedDestination,
+          clearedToSend,
+        }),
+        sharedData,
+      };
+    default:
+      return unreachable(safeToSend);
   }
-
-  return {
-    protocolState: states.commitmentSent({
-      processId,
-      channelId,
-      proposedAllocation,
-      proposedDestination,
-    }),
-    sharedData,
-  };
 };
 
 const handleClearedToSend = (
