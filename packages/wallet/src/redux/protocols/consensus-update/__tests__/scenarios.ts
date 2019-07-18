@@ -166,21 +166,13 @@ const threePlayerCommitmentSent = states.commitmentSent(threeProps);
 // Actions
 // ------
 const protocolLocator = CONSENSUS_UPDATE_PROTOCOL_LOCATOR;
-const twoPlayerUpdate0Received = commitmentsReceived({
-  processId,
-  signedCommitments: [ledger5, ledger6],
-  protocolLocator,
-});
-const twoPlayerUpdate1Received = commitmentsReceived({
-  processId,
-  signedCommitments: [ledger6, ledger7],
-  protocolLocator,
-});
-const twoPlayerWrongTurnReceived = commitmentsReceived({
-  processId,
-  signedCommitments: [ledger19, ledger20],
-  protocolLocator,
-});
+function twoPlayerCommitmentsReceived(turnNum: TurnNum) {
+  return commitmentsReceived({
+    processId,
+    signedCommitments: ledgers[turnNum],
+    protocolLocator,
+  });
+}
 
 const threePlayerUpdate0Received = commitmentsReceived({
   processId,
@@ -216,7 +208,7 @@ export const twoPlayerAHappyPath = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerUpdate1Received,
+    action: twoPlayerCommitmentsReceived(7),
   },
 };
 
@@ -232,8 +224,8 @@ export const twoPlayerANotOurTurn = {
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerUpdate1Received,
-    reply: ledgers[7],
+    action: twoPlayerCommitmentsReceived(7),
+    reply: ledgers[8],
   },
 };
 
@@ -249,14 +241,14 @@ export const twoPlayerBHappyPath = {
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerUpdate0Received,
-    reply: [ledger6, ledger7],
+    action: twoPlayerCommitmentsReceived(6),
+    reply: ledgers[7],
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerUpdate0Received,
-    reply: [ledger6, ledger7],
+    action: twoPlayerCommitmentsReceived(6),
+    reply: ledgers[7],
   },
 };
 
@@ -272,9 +264,8 @@ export const twoPlayerBOurTurn = {
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(7, TwoPartyPlayerIndex.B),
-    action: twoPlayerUpdate1Received,
-    reply: ledgers[7],
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.B),
+    action: twoPlayerCommitmentsReceived(7),
   },
 };
 
@@ -282,12 +273,12 @@ export const twoPlayerACommitmentRejected = {
   wrongTurn: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerWrongTurnReceived,
+    action: twoPlayerCommitmentsReceived(20),
   },
   notConsensus: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerWrongTurnReceived,
+    action: twoPlayerCommitmentsReceived(20),
   },
 };
 
@@ -295,7 +286,7 @@ export const twoPlayerBCommitmentRejected = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerWrongTurnReceived,
+    action: twoPlayerCommitmentsReceived(20),
   },
 };
 
