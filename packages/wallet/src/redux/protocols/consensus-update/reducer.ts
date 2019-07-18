@@ -18,14 +18,21 @@ import { unreachable } from '../../../utils/reducer-utils';
 
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.ConsensusUpdate);
 
-export const initialize = (
-  processId: string,
-  channelId: string,
-  clearedToSend: boolean,
-  proposedAllocation: string[],
-  proposedDestination: string[],
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
+export const initialize = ({
+  processId,
+  channelId,
+  clearedToSend,
+  proposedAllocation,
+  proposedDestination,
+  sharedData,
+}: {
+  processId: string;
+  channelId: string;
+  clearedToSend: boolean;
+  proposedAllocation: string[];
+  proposedDestination: string[];
+  sharedData: SharedData;
+}): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
   const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend });
   switch (safeToSend) {

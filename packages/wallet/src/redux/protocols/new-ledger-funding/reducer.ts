@@ -347,14 +347,14 @@ function handleWaitForDirectFunding(
     const latestCommitment = getLatestCommitment(ledgerId, sharedData);
     const proposedAllocation = [latestCommitment.allocation.reduce(addHex)];
     const proposedDestination = [channelId];
-    const consensusUpdateResult = initializeConsensusUpdate(
+    const consensusUpdateResult = initializeConsensusUpdate({
       processId,
-      ledgerId,
-      false,
+      channelId: ledgerId,
+      clearedToSend: false,
       proposedAllocation,
       proposedDestination,
       sharedData,
-    );
+    });
     sharedData = consensusUpdateResult.sharedData;
     // We can skip directly to the ledger update if the post fund setup exchange is already done
 

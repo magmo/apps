@@ -196,14 +196,14 @@ function concludeReceived(
     const latestCommitment = helpers.getLatestCommitment(protocolState.channelId, sharedData);
     const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
 
-    const consensusUpdateResult = consensusUpdateInitialize(
-      protocolState.processId,
-      ledgerId,
-      false,
-      latestCommitment.allocation,
-      latestCommitment.destination,
+    const consensusUpdateResult = consensusUpdateInitialize({
+      processId: protocolState.processId,
+      channelId: ledgerId,
+      clearedToSend: false,
+      proposedAllocation: latestCommitment.allocation,
+      proposedDestination: latestCommitment.destination,
       sharedData,
-    );
+    });
     sharedData = consensusUpdateResult.sharedData;
     return {
       protocolState: states.instigatorAcknowledgeConcludeReceived({

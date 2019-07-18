@@ -369,13 +369,13 @@ function initializeConsensusState(
   const {
     protocolState: consensusUpdateState,
     sharedData: newSharedData,
-  } = initializeConsensusUpdate(
+  } = initializeConsensusUpdate({
     processId,
-    ledgerId,
-    true,
-    newAllocation,
-    newDestination,
+    channelId: ledgerId,
+    clearedToSend: true,
+    proposedAllocation: newAllocation,
+    proposedDestination: newDestination,
     sharedData,
-  );
+  });
   return { consensusUpdateState, sharedData: newSharedData };
 }

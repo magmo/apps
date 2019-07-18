@@ -164,14 +164,15 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
   if (fundingState && !fundingState.directlyFunded) {
     const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
     const lastestCommitment = helpers.getLatestCommitment(channelId, sharedData);
-    const consensusUpdateResult = initializeConsensusUpdate(
+    const consensusUpdateResult = initializeConsensusUpdate({
       processId,
-      ledgerId,
-      false,
-      lastestCommitment.allocation,
-      lastestCommitment.destination,
+      channelId: ledgerId,
+      clearedToSend: false,
+      proposedAllocation: lastestCommitment.allocation,
+      proposedDestination: lastestCommitment.destination,
       sharedData,
-    );
+    });
+
     sharedData = consensusUpdateResult.sharedData;
     return {
       protocolState: decideDefund({

@@ -12,22 +12,7 @@ describe('Two Players', () => {
   describe('Player A Happy Path', () => {
     const scenario = scenarios.twoPlayerAHappyPath;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
       itSendsTheseCommitments(result, scenario.initialize.reply);
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
     });
@@ -43,22 +28,7 @@ describe('Two Players', () => {
   describe('Player A Not our turn', () => {
     const scenario = scenarios.twoPlayerANotOurTurn;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itSendsNoMessage(result);
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
@@ -76,22 +46,7 @@ describe('Two Players', () => {
   describe('Player B Happy Path', () => {
     const scenario = scenarios.twoPlayerBHappyPath;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSendsNoMessage(result);
@@ -146,22 +101,7 @@ describe('Three Players', () => {
   describe('Player A Happy Path', () => {
     const scenario = scenarios.threePlayerAHappyPath;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
       itSendsTheseCommitments(result, scenario.initialize.reply);
@@ -185,22 +125,7 @@ describe('Three Players', () => {
   describe('Player A waiting for Cleared To Send', () => {
     const scenario = scenarios.threePlayerANotClearedToSend;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
     });
@@ -224,22 +149,7 @@ describe('Three Players', () => {
   describe('Player B Happy Path', () => {
     const scenario = scenarios.threePlayerBHappyPath;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSendsNoMessage(result);
@@ -264,22 +174,7 @@ describe('Three Players', () => {
   describe('Player B waiting for Cleared To send', () => {
     const scenario = scenarios.threePlayerBNotClearedToSend;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSetsClearedToSend(result, false);
@@ -308,22 +203,7 @@ describe('Three Players', () => {
   describe('Hub Happy Path', () => {
     const scenario = scenarios.threePlayerHubHappyPath;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
     });
@@ -346,22 +226,7 @@ describe('Three Players', () => {
   describe('Hub waiting for Cleared To Send', () => {
     const scenario = scenarios.threePlayerHubNotClearedToSend;
     describe('when initializing', () => {
-      const {
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      } = scenario.initialize;
-      const result = initialize(
-        processId,
-        channelId,
-        clearedToSend,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-      );
+      const result = initialize(scenario.initialize);
 
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
       itSetsClearedToSend(result, false);
