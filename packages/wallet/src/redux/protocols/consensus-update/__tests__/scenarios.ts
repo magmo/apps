@@ -39,25 +39,32 @@ const oneOneFour = [
   { address: bsAddress, wei: bigNumberify(1).toHexString() },
   { address: asAddress, wei: bigNumberify(4).toHexString() },
 ];
-const ledger19 = ledgerCommitment({ turnNum: 19, balances: twoThree });
-const ledger20 = ledgerCommitment({ turnNum: 20, balances: twoThree });
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoThree });
-const ledger6 = ledgerCommitment({
-  turnNum: 6,
-  balances: twoThree,
-  proposedBalances: twoThreeOneTwo,
-});
-const ledger7 = ledgerCommitment({
-  turnNum: 7,
-  balances: twoThreeOneTwo,
-});
-type TurnNum = 20 | 5 | 6 | 7;
-const ledgers: { [turnNum in TurnNum]: SignedCommitment[] } = {
-  20: [ledger19, ledger20],
+// Commitments that have reached consensus
+const balances = twoThree;
+const proposedBalances = twoThreeOneTwo;
+const ledger4 = ledgerCommitment({ turnNum: 4, balances });
+const ledger5 = ledgerCommitment({ turnNum: 5, balances });
+const ledger6 = ledgerCommitment({ turnNum: 6, balances: proposedBalances });
+const ledger7 = ledgerCommitment({ turnNum: 7, balances: proposedBalances });
+const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
+
+// Commitments that propose a new consensus
+const ledger5Propose = ledgerCommitment({ turnNum: 5, balances, proposedBalances });
+const ledger6Propose = ledgerCommitment({ turnNum: 6, balances, proposedBalances });
+const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
+
+type AcceptConsensusTurnNum = 5 | 6 | 7 | 20;
+const acceptConsensusLedgers: { [turnNum in AcceptConsensusTurnNum]: SignedCommitment[] } = {
   5: [ledger4, ledger5],
-  6: [ledger5, ledger6],
-  7: [ledger6, ledger7],
+  6: [ledger5Propose, ledger6],
+  7: [ledger6Propose, ledger7],
+  20: [ledger19Propose, ledger20],
+};
+
+type ProposeTurnNum = 5 | 6;
+const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
+  5: [ledger4, ledger5Propose],
+  6: [ledger5, ledger6Propose],
 };
 
 const threePlayerLedger6 = threeWayLedgerCommitment({ turnNum: 6, balances: twoThreeOne });
@@ -111,10 +118,22 @@ const threePlayerSecondUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
   ]);
 };
 
-const twoPlayerSharedData = (turnNum: TurnNum, ourIndex: TwoPartyPlayerIndex) =>
+const twoPlayerConsensusAcceptedSharedData = (
+  turnNum: AcceptConsensusTurnNum,
+  ourIndex: TwoPartyPlayerIndex,
+) =>
   setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(
-      ledgers[turnNum],
+      acceptConsensusLedgers[turnNum],
+      addressAndPrivateKeyLookup[ourIndex].address,
+      addressAndPrivateKeyLookup[ourIndex].privateKey,
+    ),
+  ]);
+
+const twoPlayerNewProposalSharedData = (turnNum: ProposeTurnNum, ourIndex: TwoPartyPlayerIndex) =>
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(
+      proposeLedgers[turnNum],
       addressAndPrivateKeyLookup[ourIndex].address,
       addressAndPrivateKeyLookup[ourIndex].privateKey,
     ),
@@ -166,10 +185,10 @@ const threePlayerCommitmentSent = states.commitmentSent(threeProps);
 // Actions
 // ------
 const protocolLocator = CONSENSUS_UPDATE_PROTOCOL_LOCATOR;
-function twoPlayerCommitmentsReceived(turnNum: TurnNum) {
+function twoPlayerCommitmentsReceived(turnNum: AcceptConsensusTurnNum) {
   return commitmentsReceived({
     processId,
-    signedCommitments: ledgers[turnNum],
+    signedCommitments: acceptConsensusLedgers[turnNum],
     protocolLocator,
   });
 }
@@ -201,13 +220,13 @@ export const twoPlayerAHappyPath = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.A),
-    reply: [ledger5, ledger6],
+    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.A),
+    reply: [ledger5, ledger6Propose],
     clearedToSend: true,
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerCommitmentsReceived(7),
   },
 };
@@ -218,14 +237,14 @@ export const twoPlayerANotOurTurn = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.A),
     clearedToSend: true,
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerCommitmentsReceived(7),
-    reply: ledgers[8],
+    reply: acceptConsensusLedgers[8],
   },
 };
 
@@ -236,19 +255,19 @@ export const twoPlayerBHappyPath = {
     proposedAllocation,
     proposedDestination,
     clearedToSend: true,
-    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
-    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerCommitmentsReceived(6),
-    reply: ledgers[7],
+    reply: acceptConsensusLedgers[7],
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerCommitmentsReceived(6),
-    reply: ledgers[7],
+    reply: acceptConsensusLedgers[7],
   },
 };
 
@@ -258,13 +277,13 @@ export const twoPlayerBOurTurn = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.B),
-    reply: [ledger5, ledger6],
+    sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.B),
+    reply: [ledger5, ledger6Propose],
     clearedToSend: true,
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.B),
     action: twoPlayerCommitmentsReceived(7),
   },
 };
@@ -272,12 +291,12 @@ export const twoPlayerBOurTurn = {
 export const twoPlayerACommitmentRejected = {
   wrongTurn: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerCommitmentsReceived(20),
   },
   notConsensus: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerCommitmentsReceived(20),
   },
 };
@@ -285,7 +304,7 @@ export const twoPlayerACommitmentRejected = {
 export const twoPlayerBCommitmentRejected = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerNewProposalSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerCommitmentsReceived(20),
   },
 };

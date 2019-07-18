@@ -168,6 +168,7 @@ const handleCommitmentReceived = (
       sharedData,
     };
   }
+
   if (helpers.ourTurn(sharedData, channelId)) {
     try {
       sharedData = sendAcceptConsensus(processId, channelId, sharedData);
