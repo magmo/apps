@@ -16,6 +16,7 @@ import { commitmentsReceived } from '../../../../communication';
 import { ThreePartyPlayerIndex, TwoPartyPlayerIndex } from '../../../types';
 import { clearedToSend } from '../actions';
 import { SignedCommitment } from '../../../../domain';
+import { unreachable } from '../../../../utils/reducer-utils';
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
@@ -46,6 +47,7 @@ const ledger4 = ledgerCommitment({ turnNum: 4, balances });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances: proposedBalances });
 const ledger7 = ledgerCommitment({ turnNum: 7, balances: proposedBalances });
+const ledger8 = ledgerCommitment({ turnNum: 8, balances: proposedBalances });
 const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
 
 // Commitments that propose a new consensus
@@ -54,13 +56,23 @@ const ledger6Propose = ledgerCommitment({ turnNum: 6, balances, proposedBalances
 const ledger7Propose = ledgerCommitment({ turnNum: 7, balances, proposedBalances });
 const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
 
-type AcceptConsensusTurnNum = 5 | 6 | 7 | 20;
-const acceptConsensusLedgers: { [turnNum in AcceptConsensusTurnNum]: SignedCommitment[] } = {
-  5: [ledger4, ledger5],
-  6: [ledger5Propose, ledger6],
-  7: [ledger6Propose, ledger7],
-  20: [ledger19Propose, ledger20],
-};
+type AcceptConsensusTurnNum = 5 | 6 | 7 | 8 | 20;
+function acceptConsensusLedgers(turnNum: AcceptConsensusTurnNum) {
+  switch (turnNum) {
+    case 5:
+      return [ledger4, ledger5];
+    case 6:
+      return [ledger5Propose, ledger6];
+    case 7:
+      return [ledger6Propose, ledger7];
+    case 8:
+      return [ledger7Propose, ledger8];
+    case 20:
+      return [ledger19Propose, ledger20];
+    default:
+      return unreachable(turnNum);
+  }
+}
 
 type ProposeTurnNum = 5 | 6 | 7;
 const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
@@ -126,7 +138,7 @@ const twoPlayerConsensusAcceptedSharedData = (
 ) =>
   setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(
-      acceptConsensusLedgers[turnNum],
+      acceptConsensusLedgers(turnNum),
       addressAndPrivateKeyLookup[ourIndex].address,
       addressAndPrivateKeyLookup[ourIndex].privateKey,
     ),
@@ -197,7 +209,7 @@ function twoPlayerNewProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
 function twoPlayerAcceptConsensusCommitmentsReceived(turnNum: AcceptConsensusTurnNum) {
   return commitmentsReceived({
     processId,
-    signedCommitments: acceptConsensusLedgers[turnNum],
+    signedCommitments: acceptConsensusLedgers(turnNum),
     protocolLocator,
   });
 }
@@ -253,7 +265,7 @@ export const twoPlayerANotOurTurn = {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerNewProposalCommitmentsReceived(7),
-    reply: acceptConsensusLedgers[8],
+    reply: acceptConsensusLedgers(8),
   },
 };
 
@@ -270,13 +282,13 @@ export const twoPlayerBHappyPath = {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerNewProposalCommitmentsReceived(6),
-    reply: acceptConsensusLedgers[7],
+    reply: acceptConsensusLedgers(7),
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerNewProposalCommitmentsReceived(6),
-    reply: acceptConsensusLedgers[7],
+    reply: acceptConsensusLedgers(7),
   },
 };
 
