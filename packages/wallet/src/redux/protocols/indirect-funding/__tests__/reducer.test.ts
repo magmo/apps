@@ -49,14 +49,15 @@ describe('new ledger funding happy path', () => {
     );
     itTransitionsTo(result.protocolState, 'IndirectFunding.WaitForNewLedgerChannel');
   });
+
   describeScenarioStep(scenario.waitForNewLedgerChannel, () => {
     const { state, sharedData, action } = scenario.waitForNewLedgerChannel;
     const result = indirectFundingReducer(state, sharedData, action);
     itTransitionsTo(result.protocolState, 'IndirectFunding.WaitForExistingLedgerFunding');
   });
 
-  describeScenarioStep(scenario.waitForNewLedgerChannel, () => {
-    const { state, sharedData, action } = scenario.waitForNewLedgerChannel;
+  describeScenarioStep(scenario.waitForExistingLedgerFunding, () => {
+    const { state, sharedData, action } = scenario.waitForExistingLedgerFunding;
     const result = indirectFundingReducer(state, sharedData, action);
     itTransitionsTo(result.protocolState, 'IndirectFunding.Success');
   });
