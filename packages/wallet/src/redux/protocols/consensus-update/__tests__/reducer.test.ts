@@ -39,6 +39,31 @@ describe('Two Players', () => {
     });
   });
 
+  describe('Player A Not our turn', () => {
+    const scenario = scenarios.twoPlayerANotOurTurn;
+    describe('when initializing', () => {
+      const {
+        processId,
+        channelId,
+        clearedToSend,
+        proposedAllocation,
+        proposedDestination,
+        sharedData,
+      } = scenario.initialize;
+      const result = initialize(
+        processId,
+        channelId,
+        clearedToSend,
+        proposedAllocation,
+        proposedDestination,
+        sharedData,
+      );
+
+      itSendsNoMessage(result);
+      itTransitionsTo(result, 'ConsensusUpdate.WaitForUpdate');
+    });
+  });
+
   describe('Player B Happy Path', () => {
     const scenario = scenarios.twoPlayerBHappyPath;
     describe('when initializing', () => {

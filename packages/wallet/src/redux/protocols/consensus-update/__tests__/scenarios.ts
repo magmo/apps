@@ -187,6 +187,7 @@ const clearedToSendAction = clearedToSend({
   processId,
   protocolLocator,
 });
+
 export const twoPlayerAHappyPath = {
   initialize: {
     channelId: ledgerId,
@@ -201,6 +202,18 @@ export const twoPlayerAHappyPath = {
     state: twoPlayerWaitForUpdate(true, true),
     sharedData: twoPlayerAUpdate0ReceivedSharedData,
     action: twoPlayerUpdate1Received,
+  },
+};
+
+export const twoPlayerANotOurTurn = {
+  initialize: {
+    channelId: ledgerId,
+    proposedAllocation,
+    proposedDestination,
+    processId,
+    sharedData: twoPlayerAUpdate0ReceivedSharedData,
+    reply: [ledger5, ledger6],
+    clearedToSend: true,
   },
 };
 

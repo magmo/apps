@@ -56,6 +56,7 @@ export const initialize = (
     sharedData,
   };
 };
+
 const handleClearedToSend = (
   protocolState: states.ConsensusUpdateState,
   sharedData: SharedData,
