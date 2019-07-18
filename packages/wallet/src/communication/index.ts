@@ -7,19 +7,31 @@ import {
   commitmentReceived,
   concludeInstigated,
   ConcludeInstigated,
-  keepLedgerChannelApproved,
   commitmentsReceived,
 } from './actions';
 export * from './actions';
 
-export const enum WalletProtocol {
+// These protocols are precisely those that run at the top-level
+export const enum ProcessProtocol {
   Application = 'Application',
   Funding = 'Funding',
-  Dispute = 'Dispute',
   Defunding = 'Defunding',
   Concluding = 'Concluding',
 }
 
+export const enum EmbeddedProtocol {
+  AdvanceChannel = 'AdvanceChannel',
+  ConsensusUpdate = 'ConsensusUpdate',
+  DirectFunding = 'DirectFunding', // TODO: Post-fund-setup exchange will be removed from direct funding, so this should be removed
+  ExistingLedgerFunding = 'ExistingLedgerFunding',
+  IndirectDefunding = 'IndirectDefunding',
+  IndirectFunding = 'IndirectFunding',
+  LedgerTopUp = 'LedgerTopUp',
+  NewLedgerFunding = 'NewLedgerFunding',
+  VirtualFunding = 'VirtualFunding',
+}
+
+export type ProtocolLocator = EmbeddedProtocol[];
 export type FundingStrategy = 'IndirectFundingStrategy';
 
 function sendMessage(to: string, message: RelayableAction) {
@@ -38,16 +50,12 @@ export function sendConcludeInstigated(to: string, channelId, signedCommitment: 
   return sendMessage(to, concludeInstigated({ signedCommitment, channelId }));
 }
 
-export function sendKeepLedgerChannelApproved(to: string, processId: string) {
-  return sendMessage(to, keepLedgerChannelApproved({ processId }));
-}
-
 export const sendCommitmentReceived = (
   to: string,
   processId: string,
   commitment: Commitment,
   signature: string,
-  protocolLocator?: string,
+  protocolLocator: ProtocolLocator = [],
 ) => {
   const payload = commitmentReceived({
     processId,
@@ -61,7 +69,7 @@ export const sendCommitmentsReceived = (
   to: string,
   processId: string,
   signedCommitments: SignedCommitment[],
-  protocolLocator: string,
+  protocolLocator: ProtocolLocator,
 ) => {
   const payload = commitmentsReceived({ processId, signedCommitments, protocolLocator });
   return messageRelayRequested(to, payload);

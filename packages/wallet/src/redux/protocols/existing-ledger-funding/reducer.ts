@@ -7,7 +7,7 @@ import {
   setFundingState,
 } from '../../state';
 import * as states from './states';
-import { ProtocolStateWithSharedData } from '..';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { ExistingLedgerFundingAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import * as selectors from '../../selectors';
@@ -15,34 +15,33 @@ import { proposeNewConsensus, acceptConsensus } from '../../../domain/consensus-
 import { theirAddress, getLastCommitment } from '../../channel-store';
 import { Commitment } from '../../../domain';
 import { bigNumberify } from 'ethers/utils';
-import { sendCommitmentReceived } from '../../../communication';
+import { sendCommitmentReceived, EmbeddedProtocol } from '../../../communication';
 import { CommitmentType } from 'fmg-core';
 import { initialize as initializeLedgerTopUp, ledgerTopUpReducer } from '../ledger-top-up/reducer';
 import { isLedgerTopUpAction } from '../ledger-top-up/actions';
 import { addHex } from '../../../utils/hex-utils';
-export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = 'ExistingLedgerFunding';
+export const EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(
+  EmbeddedProtocol.ExistingLedgerFunding,
+);
 
 export const initialize = (
   processId: string,
   channelId: string,
   ledgerId: string,
+  targetAllocation: string[],
+  targetDestination: string[],
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
+): ProtocolStateWithSharedData<states.NonTerminalExistingLedgerFundingState | states.Failure> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 
-  const {
-    allocation: proposedAllocation,
-    destination: proposedDestination,
-  } = helpers.getLatestCommitment(channelId, sharedData);
-
-  if (ledgerChannelNeedsTopUp(theirCommitment, proposedAllocation, proposedDestination)) {
+  if (ledgerChannelNeedsTopUp(theirCommitment, targetAllocation, targetDestination)) {
     const { protocolState: ledgerTopUpState, sharedData: newSharedData } = initializeLedgerTopUp(
       processId,
       channelId,
       ledgerId,
-      proposedAllocation,
-      proposedDestination,
+      targetAllocation,
+      targetDestination,
       theirCommitment.allocation,
       sharedData,
     );
@@ -52,6 +51,8 @@ export const initialize = (
         processId,
         channelId,
         ledgerId,
+        targetAllocation,
+        targetDestination,
       }),
       sharedData: newSharedData,
     };
@@ -87,6 +88,8 @@ export const initialize = (
     processId,
     ledgerId,
     channelId,
+    targetAllocation,
+    targetDestination,
   });
 
   return { protocolState, sharedData };

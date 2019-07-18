@@ -15,8 +15,22 @@ Object.defineProperty(selectors, 'getNextNonce', {
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('when initializing', () => {
-    const { channelId, store, processId } = scenario.initialParams;
-    const initialState = initialize(processId, channelId, store);
+    const {
+      channelId,
+      store,
+      processId,
+      targetAllocation,
+      targetDestination,
+      protocolLocator,
+    } = scenario.initialParams;
+    const initialState = initialize(
+      processId,
+      channelId,
+      targetAllocation,
+      targetDestination,
+      store,
+      protocolLocator,
+    );
 
     itTransitionsTo(initialState, 'NewLedgerFunding.WaitForPreFundSetup');
     itSendsAMessage(initialState);
