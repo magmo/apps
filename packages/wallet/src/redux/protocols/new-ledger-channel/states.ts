@@ -2,6 +2,7 @@ import { ProtocolState } from '..';
 import { StateConstructor } from '../../utils';
 import { DirectFundingState } from '../direct-funding/states';
 import { AdvanceChannelState } from '../advance-channel';
+import { ProtocolLocator } from '../../../communication';
 
 // -------
 // States
@@ -19,6 +20,7 @@ export interface Failure {
 interface Base {
   channelId: string;
   processId: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface WaitForPreFundSetup extends Base {

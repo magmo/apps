@@ -1,7 +1,7 @@
-import { isDirectFundingAction, DirectFundingAction } from '../direct-funding/actions';
-import { ConsensusUpdateAction, isConsensusUpdateAction } from '../consensus-update';
-import { AdvanceChannelAction, isAdvanceChannelAction } from '../advance-channel';
 import { WalletAction } from '../../actions';
+import { isCommonAction, EmbeddedProtocol, routerFactory } from '../../../communication';
+import { isDirectFundingAction, DirectFundingAction } from '../direct-funding/actions';
+import { AdvanceChannelAction, isAdvanceChannelAction } from '../advance-channel';
 
 // -------
 // Actions
@@ -15,14 +15,16 @@ import { WalletAction } from '../../actions';
 // Unions and Guards
 // --------
 
-export type NewLedgerChannelAction =
-  | ConsensusUpdateAction
-  | AdvanceChannelAction
-  | DirectFundingAction;
+export type NewLedgerChannelAction = AdvanceChannelAction | DirectFundingAction;
 export function isNewLedgerChannelAction(action: WalletAction): action is NewLedgerChannelAction {
   return (
+    isCommonAction(action, EmbeddedProtocol.NewLedgerChannel) ||
     isDirectFundingAction(action) ||
-    isConsensusUpdateAction(action) ||
     isAdvanceChannelAction(action)
   );
 }
+
+export const routesToNewLedgerChannel = routerFactory(
+  isNewLedgerChannelAction,
+  EmbeddedProtocol.NewLedgerChannel,
+);

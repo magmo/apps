@@ -1,6 +1,5 @@
 import { SharedData } from '../../state';
-import { ProtocolStateWithSharedData } from '..';
-import { IndirectFundingState } from './states';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
 import * as selectors from '../../selectors';
 import * as helpers from '../reducer-helpers';
 import { getLastCommitment, ChannelState } from '../../channel-store/channel-state';
@@ -11,14 +10,13 @@ import {
   existingLedgerFundingReducer,
 } from '../existing-ledger-funding';
 import * as states from './states';
-import {
-  initializeNewLedgerChannel,
-  isNewLedgerChannelAction,
-  NewLedgerChannelReducer,
-} from '../new-ledger-channel';
-import { IndirectFundingAction } from './actions';
+import { isNewLedgerChannelAction, NewLedgerChannelReducer } from '../new-ledger-channel';
 import { unreachable } from '../../../utils/reducer-utils';
 import { WalletAction } from '../../actions';
+import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
+import * as newLedgerChannel from '../new-ledger-channel';
+
+export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.IndirectFunding);
 
 export function initialize(
   processId: string,
@@ -26,7 +24,8 @@ export function initialize(
   targetAllocation: string[],
   targetDestination: string[],
   sharedData: SharedData,
-): ProtocolStateWithSharedData<IndirectFundingState> {
+  protocolLocator: ProtocolLocator,
+): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
   const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
     sharedData,
     helpers.getOurAddress(channelId, sharedData),
@@ -44,13 +43,16 @@ export function initialize(
     });
   } else {
     const {
-      protocolState: NewLedgerChannelState,
+      protocolState: newLedgerChannelState,
       sharedData: newSharedData,
-    } = initializeNewLedgerChannel(processId, channelId, sharedData);
+    } = newLedgerChannel.initializeNewLedgerChannel(
+      processId,
+      channelId,
+      sharedData,
+      makeLocator(protocolLocator, EmbeddedProtocol.NewLedgerChannel),
+    );
 
-    if (NewLedgerChannelState.type === 'NewLedgerChannel.Success') {
-      return { protocolState: states.success({}), sharedData: newSharedData };
-    } else if (NewLedgerChannelState.type === 'NewLedgerChannel.Failure') {
+    if (newLedgerChannelState.type === 'NewLedgerChannel.Failure') {
       return {
         protocolState: states.failure({ reason: 'NewLedgerChannel Failure' }),
         sharedData: newSharedData,
@@ -61,7 +63,7 @@ export function initialize(
       protocolState: states.waitForNewLedgerChannel({
         processId,
         channelId,
-        newLedgerChannel: NewLedgerChannelState,
+        newLedgerChannel: newLedgerChannelState,
         targetAllocation,
         targetDestination,
       }),
@@ -73,7 +75,7 @@ export function initialize(
 export function indirectFundingReducer(
   protocolState: states.NonTerminalIndirectFundingState,
   sharedData: SharedData,
-  action: IndirectFundingAction,
+  action: WalletAction,
 ): ProtocolStateWithSharedData<states.IndirectFundingState> {
   switch (protocolState.type) {
     case 'IndirectFunding.WaitForNewLedgerChannel':
@@ -175,7 +177,7 @@ function fundWithExistingLedgerChannel({
   targetDestination: string[];
   sharedData: SharedData;
   existingLedgerChannel: ChannelState;
-}): ProtocolStateWithSharedData<IndirectFundingState> {
+}): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
   const ledgerId = existingLedgerChannel.channelId;
   const {
     protocolState: existingLedgerFundingState,
@@ -189,9 +191,7 @@ function fundWithExistingLedgerChannel({
     sharedData,
   );
 
-  if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Success') {
-    return { protocolState: states.success({}), sharedData: newSharedData };
-  } else if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
+  if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
     return {
       protocolState: states.failure({
         reason: 'ExistingLedgerFunding Failure',

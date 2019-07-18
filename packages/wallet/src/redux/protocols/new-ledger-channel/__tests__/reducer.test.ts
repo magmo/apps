@@ -5,6 +5,7 @@ import { NewLedgerChannelState } from '../states';
 
 import { describeScenarioStep, itSendsAMessage } from '../../../__tests__/helpers';
 import * as selectors from '../../../selectors';
+import { EmbeddedProtocol } from '../../../../communication';
 
 // Mocks
 const getNextNonceMock = jest.fn().mockReturnValue(0);
@@ -16,7 +17,9 @@ describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('when initializing', () => {
     const { channelId, store, processId } = scenario.initialParams;
-    const initialState = initialize(processId, channelId, store);
+    const initialState = initialize(processId, channelId, store, [
+      EmbeddedProtocol.NewLedgerChannel,
+    ]);
 
     itTransitionsTo(initialState, 'NewLedgerChannel.WaitForPreFundSetup');
     itSendsAMessage(initialState);
