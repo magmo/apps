@@ -270,7 +270,7 @@ function getProposedConsensus(
 ): { proposedAllocation: string[]; proposedDestination: string[] } {
   if (
     'consensusUpdateState' in protocolState &&
-    protocolState.consensusUpdateState.type === 'ConsensusUpdate.WaitForUpdate'
+    protocolState.consensusUpdateState.type === 'ConsensusUpdate.CommitmentSent'
   ) {
     const { proposedAllocation, proposedDestination } = protocolState.consensusUpdateState;
     return { proposedDestination, proposedAllocation };

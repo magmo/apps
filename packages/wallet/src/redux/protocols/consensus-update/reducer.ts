@@ -45,7 +45,7 @@ export const initialize = (
   }
 
   return {
-    protocolState: states.waitForUpdate({
+    protocolState: states.commitmentSent({
       processId,
       channelId,
       proposedAllocation,
@@ -62,7 +62,7 @@ const handleClearedToSend = (
   sharedData: SharedData,
   action: ClearedToSend,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (protocolState.type !== 'ConsensusUpdate.WaitForUpdate') {
+  if (protocolState.type !== 'ConsensusUpdate.CommitmentSent') {
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
@@ -96,7 +96,7 @@ const handleClearedToSend = (
     return { protocolState: states.success({}), sharedData };
   }
   return {
-    protocolState: states.waitForUpdate({ ...protocolState, updateSent, clearedToSend: true }),
+    protocolState: states.commitmentSent({ ...protocolState, updateSent, clearedToSend: true }),
     sharedData,
   };
 };
@@ -105,7 +105,7 @@ const handleCommitmentReceived = (
   sharedData: SharedData,
   action: CommitmentsReceived,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (protocolState.type !== 'ConsensusUpdate.WaitForUpdate') {
+  if (protocolState.type !== 'ConsensusUpdate.CommitmentSent') {
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
@@ -153,7 +153,7 @@ const handleCommitmentReceived = (
   if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
     return { protocolState: states.success({}), sharedData };
   }
-  return { protocolState: states.waitForUpdate({ ...protocolState, updateSent }), sharedData };
+  return { protocolState: states.commitmentSent({ ...protocolState, updateSent }), sharedData };
 };
 
 export const consensusUpdateReducer = (

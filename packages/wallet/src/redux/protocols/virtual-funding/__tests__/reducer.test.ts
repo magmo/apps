@@ -131,7 +131,7 @@ describe('happyPath', () => {
     itTransitionsSubstateTo(
       protocolState,
       'indirectApplicationFunding',
-      'ConsensusUpdate.WaitForUpdate',
+      'ConsensusUpdate.CommitmentSent',
     );
     itSendsTheseCommitments(result, [
       { commitment: { turnNum: 7 } },

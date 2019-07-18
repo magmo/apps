@@ -124,8 +124,8 @@ const processId = 'process-id.123';
 // States
 // ------
 // tslint:disable-next-line: no-shadowed-variable
-const twoPlayerWaitForUpdate = (clearedToSend: boolean, updateSent: boolean) => {
-  return states.waitForUpdate({
+const twoPlayerCommitmentSent = (clearedToSend: boolean, updateSent: boolean) => {
+  return states.commitmentSent({
     channelId: ledgerId,
     processId,
     proposedAllocation,
@@ -136,8 +136,8 @@ const twoPlayerWaitForUpdate = (clearedToSend: boolean, updateSent: boolean) => 
 };
 
 // tslint:disable-next-line: no-shadowed-variable
-const threePlayerWaitForUpdate = (clearedToSend, updateSent) => {
-  return states.waitForUpdate({
+const threePlayerCommitmentSent = (clearedToSend, updateSent) => {
+  return states.commitmentSent({
     channelId: threeWayLedgerId,
     processId,
     proposedAllocation: threePlayerProposedAllocation,
@@ -198,8 +198,8 @@ export const twoPlayerAHappyPath = {
     reply: [ledger5, ledger6],
     clearedToSend: true,
   },
-  waitForUpdate: {
-    state: twoPlayerWaitForUpdate(true, true),
+  commitmentSent: {
+    state: twoPlayerCommitmentSent(true, true),
     sharedData: twoPlayerAUpdate0ReceivedSharedData,
     action: twoPlayerUpdate1Received,
   },
@@ -226,8 +226,8 @@ export const twoPlayerBHappyPath = {
     clearedToSend: true,
     sharedData: twoPlayerBInitialSharedData,
   },
-  waitForUpdate: {
-    state: twoPlayerWaitForUpdate(true, false),
+  commitmentSent: {
+    state: twoPlayerCommitmentSent(true, false),
     sharedData: twoPlayerBInitialSharedData,
     action: twoPlayerUpdate0Received,
     reply: [ledger6, ledger7],
@@ -235,16 +235,16 @@ export const twoPlayerBHappyPath = {
 };
 
 export const twoPlayerACommitmentRejected = {
-  waitForUpdate: {
-    state: twoPlayerWaitForUpdate(true, true),
+  commitmentSent: {
+    state: twoPlayerCommitmentSent(true, true),
     sharedData: twoPlayerAUpdate0ReceivedSharedData,
     action: twoPlayerInvalidUpdateReceived,
   },
 };
 
 export const twoPlayerBCommitmentRejected = {
-  waitForUpdate: {
-    state: twoPlayerWaitForUpdate(true, false),
+  commitmentSent: {
+    state: twoPlayerCommitmentSent(true, false),
     sharedData: twoPlayerBInitialSharedData,
     action: twoPlayerInvalidUpdateReceived,
   },
@@ -261,12 +261,12 @@ export const threePlayerAHappyPath = {
     reply: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
   },
   waitForPlayerBUpdate: {
-    state: threePlayerWaitForUpdate(true, true),
+    state: threePlayerCommitmentSent(true, true),
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.A),
     action: threePlayerUpdate1Received,
   },
   waitForHubUpdate: {
-    state: threePlayerWaitForUpdate(true, true),
+    state: threePlayerCommitmentSent(true, true),
     sharedData: threePlayerSecondUpdateSharedData(ThreePartyPlayerIndex.A),
     action: threePlayerUpdate2Received,
   },
@@ -282,13 +282,13 @@ export const threePlayerBHappyPath = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerWaitForUpdate(true, false),
+    state: threePlayerCommitmentSent(true, false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate0Received,
     reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
   },
   waitForHubUpdate: {
-    state: threePlayerWaitForUpdate(true, true),
+    state: threePlayerCommitmentSent(true, true),
     sharedData: threePlayerSecondUpdateSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate2Received,
   },
@@ -304,12 +304,12 @@ export const threePlayerHubHappyPath = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerWaitForUpdate(true, false),
+    state: threePlayerCommitmentSent(true, false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate0Received,
   },
   waitForPlayerBUpdate: {
-    state: threePlayerWaitForUpdate(true, false),
+    state: threePlayerCommitmentSent(true, false),
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate1Received,
     reply: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
@@ -325,8 +325,8 @@ export const threePlayerANotClearedToSend = {
     clearedToSend: false,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
   },
-  waitForUpdateAndClearedToSend: {
-    state: threePlayerWaitForUpdate(false, false),
+  commitmentSentAndClearedToSend: {
+    state: threePlayerCommitmentSent(false, false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
     action: clearedToSendAction,
     reply: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
@@ -342,13 +342,13 @@ export const threePlayerBNotClearedToSend = {
     clearedToSend: false,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
-  waitForUpdateAndClearedToSend: {
-    state: threePlayerWaitForUpdate(false, false),
+  commitmentSentAndClearedToSend: {
+    state: threePlayerCommitmentSent(false, false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: clearedToSendAction,
   },
   waitForPlayerAUpdate: {
-    state: threePlayerWaitForUpdate(true, false),
+    state: threePlayerCommitmentSent(true, false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate0Received,
     reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
@@ -365,17 +365,17 @@ export const threePlayerHubNotClearedToSend = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerWaitForUpdate(false, false),
+    state: threePlayerCommitmentSent(false, false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate0Received,
   },
   waitForPlayerBUpdate: {
-    state: threePlayerWaitForUpdate(false, false),
+    state: threePlayerCommitmentSent(false, false),
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate1Received,
   },
   waitForClearedToSend: {
-    state: threePlayerWaitForUpdate(false, false),
+    state: threePlayerCommitmentSent(false, false),
     action: clearedToSendAction,
     sharedData: threePlayerSecondUpdateSharedData(ThreePartyPlayerIndex.Hub),
     reply: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],

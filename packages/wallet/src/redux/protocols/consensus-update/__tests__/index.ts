@@ -6,8 +6,8 @@ import {
   threePlayerHubHappyPath,
 } from './scenarios';
 
-export const twoPlayerPreSuccessA = twoPlayerAHappyPath.waitForUpdate;
-export const twoPlayerPreSuccessB = twoPlayerBHappyPath.waitForUpdate;
+export const twoPlayerPreSuccessA = twoPlayerAHappyPath.commitmentSent;
+export const twoPlayerPreSuccessB = twoPlayerBHappyPath.commitmentSent;
 
 export const threePlayerPreSuccessA = threePlayerAHappyPath.waitForHubUpdate;
 export const threePlayerPreSuccessB = threePlayerBHappyPath.waitForHubUpdate;

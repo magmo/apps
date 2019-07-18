@@ -14,7 +14,7 @@ class ConsensusUpdateContainer extends PureComponent<Props> {
   render() {
     const { state } = this.props;
     switch (state.type) {
-      case 'ConsensusUpdate.WaitForUpdate':
+      case 'ConsensusUpdate.CommitmentSent':
         return (
           <WaitForOtherPlayer actionDescriptor={'consensus update'} channelId={state.channelId} />
         );

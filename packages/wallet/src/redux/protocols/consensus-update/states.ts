@@ -1,11 +1,11 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 
-export type ConsensusUpdateState = WaitForUpdate | Failure | Success;
+export type ConsensusUpdateState = CommitmentSent | Failure | Success;
 export type ConsensusUpdateStateType = ConsensusUpdateState['type'];
 
-export interface WaitForUpdate {
-  type: 'ConsensusUpdate.WaitForUpdate';
+export interface CommitmentSent {
+  type: 'ConsensusUpdate.CommitmentSent';
   proposedAllocation: string[];
   proposedDestination: string[];
   channelId: string;
@@ -35,12 +35,12 @@ export const failure: StateConstructor<Failure> = p => {
   return { ...p, type: 'ConsensusUpdate.Failure' };
 };
 
-export const waitForUpdate: StateConstructor<WaitForUpdate> = p => {
-  return { ...p, type: 'ConsensusUpdate.WaitForUpdate' };
+export const commitmentSent: StateConstructor<CommitmentSent> = p => {
+  return { ...p, type: 'ConsensusUpdate.CommitmentSent' };
 };
 
 export function isConsensusUpdateState(state: ProtocolState): state is ConsensusUpdateState {
-  return state.type === 'ConsensusUpdate.WaitForUpdate' || isTerminal(state);
+  return state.type === 'ConsensusUpdate.CommitmentSent' || isTerminal(state);
 }
 
 export function isTerminal(state: ProtocolState): state is Failure | Success {
