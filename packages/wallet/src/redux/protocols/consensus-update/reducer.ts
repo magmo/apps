@@ -40,7 +40,10 @@ export const initialize = (
         );
       } catch (error) {
         return {
-          protocolState: states.failure({ reason: error.message }),
+          protocolState: states.failure({
+            reason: states.FailureReason.Error,
+            error: error.message,
+          }),
           sharedData,
         };
       }
@@ -121,7 +124,7 @@ const handleClearedToSend = (
       }
     } catch (error) {
       return {
-        protocolState: states.failure({ reason: error.message }),
+        protocolState: states.failure({ reason: states.FailureReason.Error, error: error.message }),
         sharedData,
       };
     }
@@ -150,7 +153,10 @@ const handleCommitmentReceived = (
     sharedData = helpers.checkCommitments(sharedData, turnNum, action.signedCommitments);
   } catch (err) {
     return {
-      protocolState: states.failure({ reason: `UnableToValidate: ${err.message}` }),
+      protocolState: states.failure({
+        reason: states.FailureReason.UnableToValidate,
+        error: err.message,
+      }),
       sharedData,
     };
   }
@@ -165,7 +171,7 @@ const handleCommitmentReceived = (
     !proposalCommitmentHasExpectedValues(latestCommitment, proposedAllocation, proposedDestination)
   ) {
     return {
-      protocolState: states.failure({ reason: 'Proposal does not match expected values.' }),
+      protocolState: states.failure({ reason: states.FailureReason.ProposalDoesNotMatch }),
       sharedData,
     };
   }
@@ -175,7 +181,7 @@ const handleCommitmentReceived = (
       sharedData = sendAcceptConsensus(processId, channelId, sharedData);
     } catch (error) {
       return {
-        protocolState: states.failure({ reason: error.message }),
+        protocolState: states.failure({ reason: states.FailureReason.Error, error: error.message }),
         sharedData,
       };
     }

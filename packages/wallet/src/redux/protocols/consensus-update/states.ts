@@ -21,9 +21,17 @@ export interface CommitmentSent extends Base {
   type: 'ConsensusUpdate.CommitmentSent';
 }
 
+export enum FailureReason {
+  Error = 'Error',
+  UnableToValidate = 'Unable to validate',
+  InvalidTurnNumReceive = 'Invalid turn number received',
+  ConsensusExpected = 'Consensus expected',
+  ProposalDoesNotMatch = 'Proposal does not match expected values.',
+}
 export interface Failure {
   type: 'ConsensusUpdate.Failure';
-  reason: string;
+  reason: FailureReason;
+  error?: string;
 }
 
 export interface Success {
