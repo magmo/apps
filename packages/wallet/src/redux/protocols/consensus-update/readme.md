@@ -7,24 +7,28 @@ The purpose of the protocol is to handle updating the allocation and destination
 ```mermaid
 graph TD
 linkStyle default interpolate basis
-  S(( )) --> WFU(WaitForUpdate)
-  WFU-->|WALLET.COMMON.COMMITMENTS_RECEIVED|AR
-  AR{ }-->|Reject|F(( ))
-  AR-->|Approve|SS(( ))
+  St((start)) --> STSCO{Safe to send?}
+  STSCO --> |Yes| CS
+  STSCO --> |No| NSTS(NotSafeToSend)
+  NSTS -->|CommitmentsReceived| CV2{Commitments valid?}
+  CV2   -->|No| F((Failure))
+  CV2 -->|Yes| STS{Safe to send?}
+  NSTS -->|ClearedToSend| STS
+
+  CS   -->|CommitmentsReceived| CV{Commitments valid?}
+  STS -->|YES| RC
+  STS -->|NO| NSTS
+  CV   -->|No| F2((Failure))
+  CV   -->|Yes| RC{Round complete?}
+
+  RC   -->|No| CS(CommitmentsSent)
+  RC   -->|Yes| S((Success))
 
   classDef logic fill:#efdd20;
   classDef Success fill:#58ef21;
   classDef Failure fill:#f45941;
-  classDef WaitForChildProtocol stroke:#333,stroke-width:4px,color:#ffff,fill:#333;
-  class AR logic;
-  class SS Success;
-  class F Failure;
-  class D WaitForChildProtocol;
+
+  class St,STS,STSCO,FP,RC,CV,CV2 logic;
+  class S Success;
+  class F,F2 Failure;
 ```
-
-## Scenarios
-
-1. **Player A Happy Path** Start->WaitForUpdate->Success
-2. **Player B Happy Path** Start->WaitForUpdate->Success
-3. **Player A Commitment Rejected** WaitForUpdate->Failure
-4. **Player B Commitment Rejected** WaitForUpdate->Failure
