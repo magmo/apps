@@ -1,7 +1,7 @@
 import { SharedData, signAndStore, getExistingChannel } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
-import { isConsensusUpdateAction, ClearedToSend } from './actions';
+import { isConsensusUpdateAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import {
   proposeNewConsensus,
@@ -70,10 +70,28 @@ export const initialize = (
   }
 };
 
+export const consensusUpdateReducer = (
+  protocolState: states.ConsensusUpdateState,
+  sharedData: SharedData,
+  action: WalletAction,
+): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
+  if (!isConsensusUpdateAction(action)) {
+    console.warn(`Consensus Update received non Consensus Update action ${action}`);
+    return { protocolState, sharedData };
+  }
+  switch (action.type) {
+    case 'WALLET.COMMON.COMMITMENTS_RECEIVED':
+      return handleCommitmentReceived(protocolState, sharedData, action);
+    case 'WALLET.CONSENSUS_UPDATE.CLEARED_TO_SEND':
+      return handleClearedToSend(protocolState, sharedData);
+    default:
+      return unreachable(action);
+  }
+};
+
 const handleClearedToSend = (
   protocolState: states.ConsensusUpdateState,
   sharedData: SharedData,
-  action: ClearedToSend,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   if (protocolState.type !== 'ConsensusUpdate.CommitmentSent') {
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
@@ -163,25 +181,6 @@ const handleCommitmentReceived = (
     return { protocolState: states.success({}), sharedData };
   }
   return { protocolState: states.commitmentSent({ ...protocolState }), sharedData };
-};
-
-export const consensusUpdateReducer = (
-  protocolState: states.ConsensusUpdateState,
-  sharedData: SharedData,
-  action: WalletAction,
-): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (!isConsensusUpdateAction(action)) {
-    console.warn(`Consensus Update received non Consensus Update action ${action}`);
-    return { protocolState, sharedData };
-  }
-  switch (action.type) {
-    case 'WALLET.COMMON.COMMITMENTS_RECEIVED':
-      return handleCommitmentReceived(protocolState, sharedData, action);
-    case 'WALLET.CONSENSUS_UPDATE.CLEARED_TO_SEND':
-      return handleClearedToSend(protocolState, sharedData, action);
-    default:
-      return unreachable(action);
-  }
 };
 
 function consensusReached(
