@@ -102,6 +102,7 @@ const handleClearedToSend = (
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
+
   const { processId, channelId, proposedAllocation, proposedDestination } = protocolState;
   const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
   const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend: true });
@@ -219,9 +220,9 @@ function sendAcceptConsensus(
   sharedData: SharedData,
 ): SharedData {
   const lastCommitment = helpers.getLatestCommitment(channelId, sharedData);
-  const ourCommitment = helpers.isLastPlayer(channelId, sharedData)
-    ? acceptConsensus(lastCommitment)
-    : voteForConsensus(lastCommitment);
+  const { furtherVotesRequired } = appAttributesFromBytes(lastCommitment.appAttributes);
+  const ourCommitment =
+    furtherVotesRequired === 1 ? acceptConsensus(lastCommitment) : voteForConsensus(lastCommitment);
 
   const signResult = signAndStore(sharedData, ourCommitment);
   if (!signResult.isSuccess) {
