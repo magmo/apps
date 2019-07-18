@@ -50,8 +50,6 @@ export const initialize = (
       channelId,
       proposedAllocation,
       proposedDestination,
-      clearedToSend,
-      updateSent: sendUpdate,
     }),
     sharedData,
   };
@@ -67,8 +65,7 @@ const handleClearedToSend = (
     return { protocolState, sharedData };
   }
   const { processId, channelId, proposedAllocation, proposedDestination } = protocolState;
-  let updateSent = protocolState.updateSent;
-  const shouldUpdateBeSent = !updateSent && helpers.ourTurn(sharedData, channelId);
+  const shouldUpdateBeSent = helpers.ourTurn(sharedData, channelId);
   if (shouldUpdateBeSent) {
     try {
       if (helpers.isFirstPlayer(channelId, sharedData)) {
@@ -82,7 +79,6 @@ const handleClearedToSend = (
       } else {
         sharedData = sendAcceptConsensus(processId, channelId, sharedData);
       }
-      updateSent = true;
     } catch (error) {
       return {
         protocolState: states.failure({ reason: error.message }),
@@ -96,7 +92,7 @@ const handleClearedToSend = (
     return { protocolState: states.success({}), sharedData };
   }
   return {
-    protocolState: states.commitmentSent({ ...protocolState, updateSent, clearedToSend: true }),
+    protocolState: states.commitmentSent({ ...protocolState }),
     sharedData,
   };
 };
@@ -109,7 +105,7 @@ const handleCommitmentReceived = (
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
-  const { channelId, processId, clearedToSend } = protocolState;
+  const { channelId, processId } = protocolState;
 
   try {
     const { turnNum } = getExistingChannel(sharedData, channelId);
@@ -135,11 +131,9 @@ const handleCommitmentReceived = (
       sharedData,
     };
   }
-  let updateSent = protocolState.updateSent;
-  if (helpers.ourTurn(sharedData, channelId) && clearedToSend) {
+  if (helpers.ourTurn(sharedData, channelId)) {
     try {
       sharedData = sendAcceptConsensus(processId, channelId, sharedData);
-      updateSent = true;
     } catch (error) {
       return {
         protocolState: states.failure({ reason: error.message }),
@@ -153,7 +147,7 @@ const handleCommitmentReceived = (
   if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
     return { protocolState: states.success({}), sharedData };
   }
-  return { protocolState: states.commitmentSent({ ...protocolState, updateSent }), sharedData };
+  return { protocolState: states.commitmentSent({ ...protocolState }), sharedData };
 };
 
 export const consensusUpdateReducer = (

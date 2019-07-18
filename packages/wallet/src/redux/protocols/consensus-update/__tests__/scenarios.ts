@@ -130,8 +130,6 @@ const twoPlayerCommitmentSent = (clearedToSend: boolean, updateSent: boolean) =>
     processId,
     proposedAllocation,
     proposedDestination,
-    clearedToSend,
-    updateSent,
   });
 };
 
@@ -142,8 +140,6 @@ const threePlayerCommitmentSent = (clearedToSend, updateSent) => {
     processId,
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
-    clearedToSend,
-    updateSent,
   });
 };
 
