@@ -168,6 +168,7 @@ const twoProps = {
   processId,
   proposedAllocation,
   proposedDestination,
+  furtherVotesRequired: 1,
 };
 
 const threeProps = {
@@ -175,12 +176,14 @@ const threeProps = {
   processId,
   proposedAllocation: threePlayerProposedAllocation,
   proposedDestination: threePlayerProposedDestination,
+  furtherVotesRequired: 2,
 };
 
 const twoPlayerNotSafeToSend = (cleared: boolean) => {
   return states.notSafeToSend({
     ...twoProps,
     clearedToSend: cleared,
+    furtherVotesRequired: 1,
   });
 };
 
@@ -190,6 +193,7 @@ const threePlayerNotSafeToSend = (cleared: boolean) => {
   return states.notSafeToSend({
     ...threeProps,
     clearedToSend: cleared,
+    furtherVotesRequired: 2,
   });
 };
 

@@ -10,6 +10,7 @@ interface Base {
   proposedDestination: string[];
   channelId: string;
   processId: string;
+  furtherVotesRequired: number;
 }
 
 export interface NotSafeToSend extends Base {

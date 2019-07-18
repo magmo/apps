@@ -35,6 +35,7 @@ export const initialize = ({
 }): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
   const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend });
+  const numParticipants = getExistingChannel(sharedData, channelId).participants.length;
   switch (safeToSend) {
     case true:
       try {
@@ -61,6 +62,7 @@ export const initialize = ({
           channelId,
           proposedAllocation,
           proposedDestination,
+          furtherVotesRequired: numParticipants - 1,
         }),
         sharedData,
       };
@@ -72,6 +74,7 @@ export const initialize = ({
           proposedAllocation,
           proposedDestination,
           clearedToSend,
+          furtherVotesRequired: numParticipants,
         }),
         sharedData,
       };
