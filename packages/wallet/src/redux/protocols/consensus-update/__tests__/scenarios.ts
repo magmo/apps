@@ -51,6 +51,7 @@ const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
 // Commitments that propose a new consensus
 const ledger5Propose = ledgerCommitment({ turnNum: 5, balances, proposedBalances });
 const ledger6Propose = ledgerCommitment({ turnNum: 6, balances, proposedBalances });
+const ledger7Propose = ledgerCommitment({ turnNum: 7, balances, proposedBalances });
 const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
 
 type AcceptConsensusTurnNum = 5 | 6 | 7 | 20;
@@ -61,10 +62,11 @@ const acceptConsensusLedgers: { [turnNum in AcceptConsensusTurnNum]: SignedCommi
   20: [ledger19Propose, ledger20],
 };
 
-type ProposeTurnNum = 5 | 6;
+type ProposeTurnNum = 5 | 6 | 7;
 const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
   5: [ledger4, ledger5Propose],
   6: [ledger5, ledger6Propose],
+  7: [ledger6, ledger7Propose],
 };
 
 const threePlayerLedger6 = threeWayLedgerCommitment({ turnNum: 6, balances: twoThreeOne });
@@ -185,7 +187,14 @@ const threePlayerCommitmentSent = states.commitmentSent(threeProps);
 // Actions
 // ------
 const protocolLocator = CONSENSUS_UPDATE_PROTOCOL_LOCATOR;
-function twoPlayerCommitmentsReceived(turnNum: AcceptConsensusTurnNum) {
+function twoPlayerNewProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
+  return commitmentsReceived({
+    processId,
+    signedCommitments: proposeLedgers[turnNum],
+    protocolLocator,
+  });
+}
+function twoPlayerAcceptConsensusCommitmentsReceived(turnNum: AcceptConsensusTurnNum) {
   return commitmentsReceived({
     processId,
     signedCommitments: acceptConsensusLedgers[turnNum],
@@ -227,7 +236,7 @@ export const twoPlayerAHappyPath = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerCommitmentsReceived(7),
+    action: twoPlayerAcceptConsensusCommitmentsReceived(7),
   },
 };
 
@@ -243,7 +252,7 @@ export const twoPlayerANotOurTurn = {
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerCommitmentsReceived(7),
+    action: twoPlayerNewProposalCommitmentsReceived(7),
     reply: acceptConsensusLedgers[8],
   },
 };
@@ -260,13 +269,13 @@ export const twoPlayerBHappyPath = {
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerCommitmentsReceived(6),
+    action: twoPlayerNewProposalCommitmentsReceived(6),
     reply: acceptConsensusLedgers[7],
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerCommitmentsReceived(6),
+    action: twoPlayerNewProposalCommitmentsReceived(6),
     reply: acceptConsensusLedgers[7],
   },
 };
@@ -284,7 +293,7 @@ export const twoPlayerBOurTurn = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.B),
-    action: twoPlayerCommitmentsReceived(7),
+    action: twoPlayerAcceptConsensusCommitmentsReceived(7),
   },
 };
 
@@ -292,12 +301,12 @@ export const twoPlayerACommitmentRejected = {
   wrongTurn: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerCommitmentsReceived(20),
+    action: twoPlayerAcceptConsensusCommitmentsReceived(20),
   },
   notConsensus: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerCommitmentsReceived(20),
+    action: twoPlayerAcceptConsensusCommitmentsReceived(20),
   },
 };
 
@@ -305,7 +314,7 @@ export const twoPlayerBCommitmentRejected = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerCommitmentsReceived(20),
+    action: twoPlayerAcceptConsensusCommitmentsReceived(20),
   },
 };
 
