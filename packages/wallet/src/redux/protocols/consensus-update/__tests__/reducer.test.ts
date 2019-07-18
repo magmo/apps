@@ -241,8 +241,9 @@ describe('Three Players', () => {
         sharedData,
       );
 
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSendsNoMessage(result);
+      itSetsClearedToSend(result, true);
     });
 
     describe("when receiving Player A's update", () => {
