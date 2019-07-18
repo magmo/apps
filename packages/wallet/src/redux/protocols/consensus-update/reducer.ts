@@ -79,6 +79,11 @@ export const consensusUpdateReducer = (
     console.warn(`Consensus Update received non Consensus Update action ${action}`);
     return { protocolState, sharedData };
   }
+  if (states.isTerminal(protocolState)) {
+    console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
+    return { protocolState, sharedData };
+  }
+
   switch (action.type) {
     case 'WALLET.COMMON.COMMITMENTS_RECEIVED':
       return handleCommitmentReceived(protocolState, sharedData, action);
@@ -133,14 +138,10 @@ const handleClearedToSend = (
 };
 
 const handleCommitmentReceived = (
-  protocolState: states.ConsensusUpdateState,
+  protocolState: states.NonTerminalConsensusUpdateState,
   sharedData: SharedData,
   action: CommitmentsReceived,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (protocolState.type !== 'ConsensusUpdate.CommitmentSent') {
-    console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
-    return { protocolState, sharedData };
-  }
   const { channelId, processId } = protocolState;
 
   try {
