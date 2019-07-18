@@ -31,6 +31,7 @@ describe('Two Players', () => {
       itSendsTheseCommitments(result, scenario.initialize.reply);
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
     });
+
     describeScenarioStep(scenario.commitmentSent, () => {
       const { sharedData, action, state } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
@@ -60,7 +61,7 @@ describe('Two Players', () => {
       );
 
       itSendsNoMessage(result);
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
     });
   });
 
@@ -84,9 +85,17 @@ describe('Two Players', () => {
         sharedData,
       );
 
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSendsNoMessage(result);
     });
+
+    describeScenarioStep(scenario.notSafeToSend, () => {
+      const { sharedData, action, state, reply } = scenario.notSafeToSend;
+      const result = consensusUpdateReducer(state, sharedData, action);
+      itTransitionsTo(result, 'ConsensusUpdate.Success');
+      itSendsTheseCommitments(result, reply);
+    });
+
     describeScenarioStep(scenario.commitmentSent, () => {
       const { sharedData, action, state, reply } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
@@ -178,14 +187,21 @@ describe('Three Players', () => {
         sharedData,
       );
 
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
     });
 
-    describe('when receiving Cleared To Send', () => {
-      const { sharedData, action, state } = scenario.commitmentSentAndClearedToSend;
+    describe('when receiving Cleared To Send on our turn', () => {
+      const { sharedData, action, state, reply } = scenario.notSafeToSendAndOurTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
-      itSendsTheseCommitments(result, scenario.commitmentSentAndClearedToSend.reply);
+      itSendsTheseCommitments(result, reply);
+    });
+
+    describe('when receiving Cleared To Send not on our turn', () => {
+      const { sharedData, action, state } = scenario.notSafeToSendAndNotOurTurn;
+      const result = consensusUpdateReducer(state, sharedData, action);
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
+      itSendsNoMessage(result);
       itSetsClearedToSend(result, true);
     });
   });
@@ -249,25 +265,27 @@ describe('Three Players', () => {
         sharedData,
       );
 
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSetsClearedToSend(result, false);
       itSendsNoMessage(result);
     });
 
     describe('when receiving cleared to Send', () => {
-      const { sharedData, action, state } = scenario.commitmentSentAndClearedToSend;
+      const { sharedData, action, state } = scenario.notClearedToSendAndNotOurTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSendsNoMessage(result);
       itSetsClearedToSend(result, true);
     });
 
     describe("when receiving player A's update", () => {
-      const { sharedData, action, state, reply } = scenario.waitForPlayerAUpdate;
+      const { sharedData, action, state } = scenario.notClearedToSendAndNotOurTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
-      itSendsTheseCommitments(result, reply);
-      itSetsClearedToSend(result, true);
+
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
+      itSendsNoMessage(result);
+      itSetsClearedToSend(result, false);
     });
   });
 

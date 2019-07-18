@@ -1,9 +1,7 @@
 import {
   ledgerCommitment,
   asAddress,
-  asPrivateKey,
   bsAddress,
-  bsPrivateKey,
   ledgerId,
   threeWayLedgerCommitment,
   threeWayLedgerId,
@@ -15,8 +13,9 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import * as states from '../states';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../reducer';
 import { commitmentsReceived } from '../../../../communication';
-import { ThreePartyPlayerIndex } from '../../../types';
+import { ThreePartyPlayerIndex, TwoPartyPlayerIndex } from '../../../types';
 import { clearedToSend } from '../actions';
+import { SignedCommitment } from '../../../../domain';
 
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
@@ -40,6 +39,7 @@ const oneOneFour = [
   { address: bsAddress, wei: bigNumberify(1).toHexString() },
   { address: asAddress, wei: bigNumberify(4).toHexString() },
 ];
+const ledger19 = ledgerCommitment({ turnNum: 19, balances: twoThree });
 const ledger20 = ledgerCommitment({ turnNum: 20, balances: twoThree });
 const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: twoThree });
@@ -52,6 +52,13 @@ const ledger7 = ledgerCommitment({
   turnNum: 7,
   balances: twoThreeOneTwo,
 });
+type TurnNum = 20 | 5 | 6 | 7;
+const ledgers: { [turnNum in TurnNum]: SignedCommitment[] } = {
+  20: [ledger19, ledger20],
+  5: [ledger4, ledger5],
+  6: [ledger5, ledger6],
+  7: [ledger6, ledger7],
+};
 
 const threePlayerLedger6 = threeWayLedgerCommitment({ turnNum: 6, balances: twoThreeOne });
 const threePlayerLedger7 = threeWayLedgerCommitment({ turnNum: 7, balances: twoThreeOne });
@@ -104,44 +111,56 @@ const threePlayerSecondUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
   ]);
 };
 
-const twoPlayerAInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
-]);
-const twoPlayerAUpdate0ReceivedSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger4, ledger5, ledger6], asAddress, asPrivateKey),
-]);
-const twoPlayerBInitialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger4, ledger5], bsAddress, bsPrivateKey),
-]);
+const twoPlayerSharedData = (turnNum: TurnNum, ourIndex: TwoPartyPlayerIndex) =>
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(
+      ledgers[turnNum],
+      addressAndPrivateKeyLookup[ourIndex].address,
+      addressAndPrivateKeyLookup[ourIndex].privateKey,
+    ),
+  ]);
 
+// ------
+// States
+// ------
 const proposedAllocation = twoThreeOneTwo.map(b => b.wei);
 const proposedDestination = twoThreeOneTwo.map(b => b.address);
 
 const threePlayerProposedAllocation = oneOneFour.map(b => b.wei);
 const threePlayerProposedDestination = oneOneFour.map(b => b.address);
 const processId = 'process-id.123';
-// ------
-// States
-// ------
-// tslint:disable-next-line: no-shadowed-variable
-const twoPlayerCommitmentSent = (clearedToSend: boolean, updateSent: boolean) => {
-  return states.commitmentSent({
-    channelId: ledgerId,
-    processId,
-    proposedAllocation,
-    proposedDestination,
+
+const twoProps = {
+  channelId: ledgerId,
+  processId,
+  proposedAllocation,
+  proposedDestination,
+};
+
+const threeProps = {
+  channelId: threeWayLedgerId,
+  processId,
+  proposedAllocation: threePlayerProposedAllocation,
+  proposedDestination: threePlayerProposedDestination,
+};
+
+const twoPlayerNotSafeToSend = (cleared: boolean) => {
+  return states.notSafeToSend({
+    ...twoProps,
+    clearedToSend: cleared,
   });
 };
 
-// tslint:disable-next-line: no-shadowed-variable
-const threePlayerCommitmentSent = (clearedToSend, updateSent) => {
-  return states.commitmentSent({
-    channelId: threeWayLedgerId,
-    processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+const twoPlayerCommitmentSent = states.commitmentSent(twoProps);
+
+const threePlayerNotSafeToSend = (cleared: boolean) => {
+  return states.notSafeToSend({
+    ...threeProps,
+    clearedToSend: cleared,
   });
 };
+
+const threePlayerCommitmentSent = states.commitmentSent(threeProps);
 
 // ------
 // Actions
@@ -149,7 +168,7 @@ const threePlayerCommitmentSent = (clearedToSend, updateSent) => {
 const protocolLocator = CONSENSUS_UPDATE_PROTOCOL_LOCATOR;
 const twoPlayerUpdate0Received = commitmentsReceived({
   processId,
-  signedCommitments: [ledger6],
+  signedCommitments: [ledger5, ledger6],
   protocolLocator,
 });
 const twoPlayerUpdate1Received = commitmentsReceived({
@@ -159,7 +178,7 @@ const twoPlayerUpdate1Received = commitmentsReceived({
 });
 const twoPlayerInvalidUpdateReceived = commitmentsReceived({
   processId,
-  signedCommitments: [ledger20],
+  signedCommitments: [ledger19, ledger20],
   protocolLocator,
 });
 
@@ -190,13 +209,13 @@ export const twoPlayerAHappyPath = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerAInitialSharedData,
+    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.A),
     reply: [ledger5, ledger6],
     clearedToSend: true,
   },
   commitmentSent: {
-    state: twoPlayerCommitmentSent(true, true),
-    sharedData: twoPlayerAUpdate0ReceivedSharedData,
+    state: twoPlayerCommitmentSent,
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerUpdate1Received,
   },
 };
@@ -207,9 +226,13 @@ export const twoPlayerANotOurTurn = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerAUpdate0ReceivedSharedData,
-    reply: [ledger5, ledger6],
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
     clearedToSend: true,
+  },
+  notSafeToSend: {
+    state: twoPlayerNotSafeToSend(true),
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    action: twoPlayerUpdate1Received,
   },
 };
 
@@ -220,28 +243,51 @@ export const twoPlayerBHappyPath = {
     proposedAllocation,
     proposedDestination,
     clearedToSend: true,
-    sharedData: twoPlayerBInitialSharedData,
+    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
+  },
+  notSafeToSend: {
+    state: twoPlayerNotSafeToSend(true),
+    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
+    action: twoPlayerUpdate0Received,
+    reply: [ledger6, ledger7],
   },
   commitmentSent: {
-    state: twoPlayerCommitmentSent(true, false),
-    sharedData: twoPlayerBInitialSharedData,
+    state: twoPlayerCommitmentSent,
+    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerUpdate0Received,
     reply: [ledger6, ledger7],
   },
 };
 
+export const twoPlayerBOurTurn = {
+  initialize: {
+    channelId: ledgerId,
+    proposedAllocation,
+    proposedDestination,
+    processId,
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.B),
+    reply: [ledger5, ledger6],
+    clearedToSend: true,
+  },
+  commitmentSent: {
+    state: twoPlayerCommitmentSent,
+    sharedData: twoPlayerSharedData(7, TwoPartyPlayerIndex.B),
+    action: twoPlayerUpdate1Received,
+  },
+};
+
 export const twoPlayerACommitmentRejected = {
   commitmentSent: {
-    state: twoPlayerCommitmentSent(true, true),
-    sharedData: twoPlayerAUpdate0ReceivedSharedData,
+    state: twoPlayerCommitmentSent,
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerInvalidUpdateReceived,
   },
 };
 
 export const twoPlayerBCommitmentRejected = {
   commitmentSent: {
-    state: twoPlayerCommitmentSent(true, false),
-    sharedData: twoPlayerBInitialSharedData,
+    state: twoPlayerCommitmentSent,
+    sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerInvalidUpdateReceived,
   },
 };
@@ -257,12 +303,12 @@ export const threePlayerAHappyPath = {
     reply: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
   },
   waitForPlayerBUpdate: {
-    state: threePlayerCommitmentSent(true, true),
+    state: threePlayerCommitmentSent,
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.A),
     action: threePlayerUpdate1Received,
   },
   waitForHubUpdate: {
-    state: threePlayerCommitmentSent(true, true),
+    state: threePlayerCommitmentSent,
     sharedData: threePlayerSecondUpdateSharedData(ThreePartyPlayerIndex.A),
     action: threePlayerUpdate2Received,
   },
@@ -278,13 +324,13 @@ export const threePlayerBHappyPath = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerCommitmentSent(true, false),
+    state: threePlayerCommitmentSent,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate0Received,
     reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
   },
   waitForHubUpdate: {
-    state: threePlayerCommitmentSent(true, true),
+    state: threePlayerCommitmentSent,
     sharedData: threePlayerSecondUpdateSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate2Received,
   },
@@ -300,12 +346,12 @@ export const threePlayerHubHappyPath = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerCommitmentSent(true, false),
+    state: threePlayerCommitmentSent,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate0Received,
   },
   waitForPlayerBUpdate: {
-    state: threePlayerCommitmentSent(true, false),
+    state: threePlayerCommitmentSent,
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate1Received,
     reply: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
@@ -321,11 +367,16 @@ export const threePlayerANotClearedToSend = {
     clearedToSend: false,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
   },
-  commitmentSentAndClearedToSend: {
-    state: threePlayerCommitmentSent(false, false),
+  notSafeToSendAndOurTurn: {
+    state: threePlayerNotSafeToSend(false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
     action: clearedToSendAction,
     reply: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
+  },
+  notSafeToSendAndNotOurTurn: {
+    state: threePlayerNotSafeToSend(false),
+    sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.A),
+    action: clearedToSendAction,
   },
 };
 
@@ -338,15 +389,15 @@ export const threePlayerBNotClearedToSend = {
     clearedToSend: false,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
-  commitmentSentAndClearedToSend: {
-    state: threePlayerCommitmentSent(false, false),
+  notClearedToSendAndNotOurTurn: {
+    state: threePlayerNotSafeToSend(false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: clearedToSendAction,
   },
-  waitForPlayerAUpdate: {
-    state: threePlayerCommitmentSent(true, false),
-    sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
-    action: threePlayerUpdate0Received,
+  notClearedToSendAndOurTurn: {
+    state: threePlayerNotSafeToSend(false),
+    sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.B),
+    action: clearedToSendAction,
     reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
   },
 };
@@ -361,19 +412,32 @@ export const threePlayerHubNotClearedToSend = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerCommitmentSent(false, false),
+    state: threePlayerNotSafeToSend(false),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate0Received,
   },
   waitForPlayerBUpdate: {
-    state: threePlayerCommitmentSent(false, false),
+    state: threePlayerNotSafeToSend(false),
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate1Received,
   },
   waitForClearedToSend: {
-    state: threePlayerCommitmentSent(false, false),
+    state: threePlayerNotSafeToSend(false),
     action: clearedToSendAction,
     sharedData: threePlayerSecondUpdateSharedData(ThreePartyPlayerIndex.Hub),
     reply: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
+  },
+};
+
+export const threePlayerNotOurTurn = {
+  playerA: {
+    initialize: {
+      channelId: threeWayLedgerId,
+      processId,
+      proposedAllocation: threePlayerProposedAllocation,
+      proposedDestination: threePlayerProposedDestination,
+      clearedToSend: true,
+      sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.A),
+    },
   },
 };
