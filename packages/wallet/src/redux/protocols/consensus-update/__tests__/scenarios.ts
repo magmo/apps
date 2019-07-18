@@ -176,7 +176,7 @@ const twoPlayerUpdate1Received = commitmentsReceived({
   signedCommitments: [ledger6, ledger7],
   protocolLocator,
 });
-const twoPlayerInvalidUpdateReceived = commitmentsReceived({
+const twoPlayerWrongTurnReceived = commitmentsReceived({
   processId,
   signedCommitments: [ledger19, ledger20],
   protocolLocator,
@@ -233,6 +233,7 @@ export const twoPlayerANotOurTurn = {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerUpdate1Received,
+    reply: ledgers[7],
   },
 };
 
@@ -273,14 +274,20 @@ export const twoPlayerBOurTurn = {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(7, TwoPartyPlayerIndex.B),
     action: twoPlayerUpdate1Received,
+    reply: ledgers[7],
   },
 };
 
 export const twoPlayerACommitmentRejected = {
-  commitmentSent: {
+  wrongTurn: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerInvalidUpdateReceived,
+    action: twoPlayerWrongTurnReceived,
+  },
+  notConsensus: {
+    state: twoPlayerCommitmentSent,
+    sharedData: twoPlayerSharedData(6, TwoPartyPlayerIndex.A),
+    action: twoPlayerWrongTurnReceived,
   },
 };
 
@@ -288,7 +295,7 @@ export const twoPlayerBCommitmentRejected = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerInvalidUpdateReceived,
+    action: twoPlayerWrongTurnReceived,
   },
 };
 

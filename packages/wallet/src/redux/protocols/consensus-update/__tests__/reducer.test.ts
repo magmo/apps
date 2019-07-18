@@ -63,6 +63,14 @@ describe('Two Players', () => {
       itSendsNoMessage(result);
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
     });
+
+    describeScenarioStep(scenario.notSafeToSend, () => {
+      const { sharedData, action, state, reply } = scenario.notSafeToSend;
+      const result = consensusUpdateReducer(state, sharedData, action);
+
+      itTransitionsTo(result, 'ConsensusUpdate.Success');
+      itSendsTheseCommitments(result, reply);
+    });
   });
 
   describe('Player B Happy Path', () => {
@@ -107,10 +115,17 @@ describe('Two Players', () => {
   describe('Player A Invalid Commitment', () => {
     const scenario = scenarios.twoPlayerACommitmentRejected;
 
-    describeScenarioStep(scenario.commitmentSent, () => {
-      const { sharedData, action, state } = scenario.commitmentSent;
+    describeScenarioStep(scenario.wrongTurn, () => {
+      const { sharedData, action, state } = scenario.wrongTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Failure');
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', 'invalid commitment received');
+      itSendsNoMessage(result);
+    });
+
+    describeScenarioStep(scenario.notConsensus, () => {
+      const { sharedData, action, state } = scenario.notConsensus;
+      const result = consensusUpdateReducer(state, sharedData, action);
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', 'not consensus');
       itSendsNoMessage(result);
     });
   });
@@ -121,7 +136,7 @@ describe('Two Players', () => {
     describeScenarioStep(scenario.commitmentSent, () => {
       const { sharedData, action, state } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Failure');
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', 'invalid commitment received');
       itSendsNoMessage(result);
     });
   });
@@ -388,8 +403,13 @@ function itSetsClearedToSend(
 function itTransitionsTo(
   result: ProtocolStateWithSharedData<states.ConsensusUpdateState>,
   type: states.ConsensusUpdateStateType,
+  reason?: string,
 ) {
   it(`transitions to ${type}`, () => {
     expect(result.protocolState.type).toEqual(type);
+
+    if (reason) {
+      expect((result.protocolState as states.Failure).reason).toEqual(reason);
+    }
   });
 }
