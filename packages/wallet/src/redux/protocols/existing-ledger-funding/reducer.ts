@@ -238,7 +238,10 @@ function ledgerChannelNeedsTopUp(
   proposedAllocation: string[],
   proposedDestination: string[],
 ) {
-  if (latestCommitment.commitmentType !== CommitmentType.App) {
+  if (
+    latestCommitment.commitmentType !== CommitmentType.App &&
+    latestCommitment.commitmentType !== CommitmentType.PostFundSetup
+  ) {
     throw new Error('Ledger channel is already closed.');
   }
   // We assume that destination/allocation are the same length and destination contains the same addresses
