@@ -322,7 +322,7 @@ export const twoPlayerACommitmentRejected = {
   notConsensus: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerAcceptConsensusCommitmentsReceived(20),
+    action: twoPlayerNewProposalCommitmentsReceived(7),
   },
 };
 
