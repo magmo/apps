@@ -18,6 +18,7 @@ import {
 import { bigNumberify } from 'ethers/utils';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
+import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 export const LEDGER_TOP_UP_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.LedgerTopUp);
 export function initialize(
   processId: string,
@@ -380,7 +381,7 @@ function initializeConsensusState(
     true,
     newAllocation,
     newDestination,
-    makeLocator(protocolLocator, EmbeddedProtocol.LedgerTopUp),
+    makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
     sharedData,
   );
   return { consensusUpdateState, sharedData: newSharedData };
