@@ -62,7 +62,7 @@ export const initialize = ({
           channelId,
           proposedAllocation,
           proposedDestination,
-          furtherVotesRequired: numParticipants - 1,
+          furtherVotesRequired: numParticipants - 2,
         }),
         sharedData,
       };
@@ -74,7 +74,7 @@ export const initialize = ({
           proposedAllocation,
           proposedDestination,
           clearedToSend,
-          furtherVotesRequired: numParticipants,
+          furtherVotesRequired: numParticipants - 1,
         }),
         sharedData,
       };

@@ -105,6 +105,7 @@ describe('Three Players', () => {
 
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
       itSendsTheseCommitments(result, scenario.initialize.reply);
+      itDecrementsFurtherVotesRequiredTo(result, 1);
     });
 
     describe("when receiving Player B's update", () => {
@@ -277,5 +278,11 @@ function itTransitionsTo(
     if (reason) {
       expect((result.protocolState as states.Failure).reason).toEqual(reason);
     }
+  });
+}
+
+function itDecrementsFurtherVotesRequiredTo(result, votes) {
+  it(`Decrements furtherVotesRequired to ${votes}`, () => {
+    expect(result.protocolState.furtherVotesRequired).toEqual(votes);
   });
 }
