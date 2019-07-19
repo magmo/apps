@@ -73,14 +73,16 @@ describe('Two Players', () => {
     describeScenarioStep(scenario.wrongTurn, () => {
       const { sharedData, action, state } = scenario.wrongTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Failure', 'invalid commitment received');
+
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.UnableToValidate);
       itSendsNoMessage(result);
     });
 
     describeScenarioStep(scenario.notConsensus, () => {
       const { sharedData, action, state } = scenario.notConsensus;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Failure', 'not consensus');
+
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.ConsensusExpected);
       itSendsNoMessage(result);
     });
   });
@@ -91,7 +93,8 @@ describe('Two Players', () => {
     describeScenarioStep(scenario.commitmentSent, () => {
       const { sharedData, action, state } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Failure', 'invalid commitment received');
+
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.UnableToValidate);
       itSendsNoMessage(result);
     });
   });
