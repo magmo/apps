@@ -41,6 +41,7 @@ import {
 } from '../advance-channel';
 import { getLatestCommitment, isFirstPlayer, getTwoPlayerIndex } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
+import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
 
 type ReturnVal = ProtocolStateWithSharedData<states.NewLedgerFundingState>;
 type IDFAction = NewLedgerFundingAction;
@@ -64,7 +65,7 @@ export function initialize(
     commitmentType: CommitmentType.PreFundSetup,
     clearedToSend: true,
     processId,
-    protocolLocator: NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR,
+    protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
     participants: channel.participants,
   };
 
@@ -143,7 +144,10 @@ function handleWaitForPostFundSetup(
           sharedData,
           consensusUpdateClearedToSend({
             processId: protocolState.processId,
-            protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+            protocolLocator: makeLocator(
+              protocolState.protocolLocator,
+              CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+            ),
           }),
         );
         sharedData = consensusUpdateResult.sharedData;
@@ -230,7 +234,8 @@ function handleWaitForPreFundSetup(
   action: IDFAction | DirectFundingAction,
 ): ReturnVal {
   if (!isAdvanceChannelAction(action)) {
-    throw new Error(`Incorrect action ${action.type}`);
+    console.warn(`Expected Advance Channel action but received ${action.type}`);
+    return { protocolState, sharedData };
   }
   const preFundResult = advanceChannelReducer(protocolState.preFundSetupState, sharedData, action);
   sharedData = preFundResult.sharedData;
@@ -266,6 +271,7 @@ function handleWaitForPreFundSetup(
       });
       const directFundingState = initializeDirectFunding(directFundingAction, sharedData);
       sharedData = directFundingState.sharedData;
+
       const advanceChannelResult = initializeAdvanceChannel(
         protocolState.processId,
         directFundingState.sharedData,
@@ -276,7 +282,10 @@ function handleWaitForPreFundSetup(
           processId: protocolState.processId,
           commitmentType: CommitmentType.PostFundSetup,
           clearedToSend: false,
-          protocolLocator: NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR,
+          protocolLocator: makeLocator(
+            protocolState.protocolLocator,
+            ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+          ),
         },
       );
       sharedData = advanceChannelResult.sharedData;
@@ -339,7 +348,10 @@ function handleWaitForDirectFunding(
       sharedData,
       advanceChannelClearedToSend({
         processId,
-        protocolLocator: NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR,
+        protocolLocator: makeLocator(
+          protocolState.protocolLocator,
+          ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+        ),
       }),
     );
 
@@ -353,6 +365,7 @@ function handleWaitForDirectFunding(
       false,
       proposedAllocation,
       proposedDestination,
+      makeLocator(protocolState.protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
       sharedData,
     );
     sharedData = consensusUpdateResult.sharedData;

@@ -128,11 +128,12 @@ export function isCommonAction(
   action: WalletAction,
   protocol?: EmbeddedProtocol,
 ): action is CommonAction {
+  console.log(action);
   return (
     (action.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED' ||
       action.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') &&
     // When passed a protocol, check that it's got the protocol in the protocol locator
-    (!protocol || action.protocolLocator.indexOf(protocol) >= 0)
+    (!protocol || (action.protocolLocator && action.protocolLocator.indexOf(protocol) >= 0))
   );
 }
 

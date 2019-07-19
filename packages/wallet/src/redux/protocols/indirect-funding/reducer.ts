@@ -45,6 +45,7 @@ export function initialize(
       ledgerId,
       targetAllocation,
       targetDestination,
+      makeLocator(protocolLocator, EmbeddedProtocol.ExistingLedgerFunding),
       sharedData,
     );
 
@@ -120,6 +121,7 @@ export function indirectFundingReducer(
       sharedData,
       action,
     );
+    sharedData = newSharedData;
     if (newLedgerFunding.isSuccess(newLedgerFundingState)) {
       return {
         protocolState: states.success({}),
@@ -129,6 +131,11 @@ export function indirectFundingReducer(
       return {
         protocolState: states.failure({ reason: 'NewLedgerFunding failure' }),
         sharedData: newSharedData,
+      };
+    } else {
+      return {
+        protocolState: { ...protocolState, newLedgerFundingState },
+        sharedData,
       };
     }
   } else if (protocolState.type === 'IndirectFunding.WaitForExistingLedgerFunding') {
@@ -141,6 +148,7 @@ export function indirectFundingReducer(
       protocolState: existingLedgerFundingState,
       sharedData: newSharedData,
     } = existingLedgerFundingReducer(protocolState.existingLedgerFundingState, sharedData, action);
+    sharedData = newSharedData;
     if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Success') {
       return { protocolState: states.success({}), sharedData: newSharedData };
     } else if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
