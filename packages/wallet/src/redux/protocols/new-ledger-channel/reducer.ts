@@ -309,7 +309,6 @@ function channelSpecificArgs(
 }
 
 function updateFundingState(sharedData: SharedData, appChannelId: string, ledgerId: string) {
-  // update fundingState
   const channelFundingState: ChannelFundingState = {
     directlyFunded: false,
     fundingChannel: ledgerId,
