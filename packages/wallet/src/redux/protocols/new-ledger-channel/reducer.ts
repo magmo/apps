@@ -28,7 +28,6 @@ import {
   advanceChannelReducer,
 } from '../advance-channel';
 import { getLatestCommitment, isFirstPlayer, getTwoPlayerIndex } from '../reducer-helpers';
-import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerChannelState>;
