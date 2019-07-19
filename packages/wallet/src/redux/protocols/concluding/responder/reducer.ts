@@ -30,7 +30,7 @@ import { ProtocolAction } from '../../../../redux/actions';
 import { isConcludingResponderAction } from './actions';
 import { getChannelId, SignedCommitment } from '../../../../domain';
 import { failure, success } from '../states';
-import { ProtocolStateWithSharedData, makeLocator } from '../..';
+import { ProtocolStateWithSharedData } from '../..';
 import * as helpers from '../../reducer-helpers';
 import { initializeConsensusUpdate, consensusUpdateReducer } from '../../consensus-update/';
 import {
@@ -170,7 +170,7 @@ function concludeApproved(protocolState: NonTerminalCState, sharedData: Storage)
       false,
       lastestCommitment.allocation,
       lastestCommitment.destination,
-      makeLocator(CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
+      CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
       sharedData,
     );
     sharedData = consensusUpdateResult.sharedData;
