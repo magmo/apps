@@ -114,11 +114,11 @@ function waitForNewLedgerChannelReducer(
     case 'NewLedgerChannel.Success':
       const { ledgerId } = newLedgerChannelState;
       const { channelId, protocolLocator } = protocolState;
-      const existingLedgerChannel = selectors.getChannelState(sharedData, ledgerId);
+      const existingLedgerChannel = selectors.getChannelState(newSharedData, ledgerId);
       return fundWithExistingLedgerChannel({
         ...protocolState,
         channelId,
-        sharedData,
+        sharedData: newSharedData,
         existingLedgerChannel,
         protocolLocator,
       });
