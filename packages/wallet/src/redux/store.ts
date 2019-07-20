@@ -9,12 +9,13 @@ import { sagaManager } from './sagas/saga-manager';
 import filter from 'redux-storage-decorator-filter';
 import createEngine from 'redux-storage-engine-indexed-db';
 
-// We only store/recover the channel store, address and privatekey
+// We currently whitelist the values that we store/load.
 const storageEngine = filter(createEngine('magmo-wallet'), [
   'whitelisted-key',
   ['address'],
   ['privateKey'],
   ['channelStore'],
+  ['fundingState'],
 ]);
 
 const storageMiddleware = storage.createMiddleware(storageEngine);
