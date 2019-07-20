@@ -15,6 +15,7 @@ import { eqHexArray } from '../../../utils/hex-utils';
 import { CommitmentsReceived, EmbeddedProtocol } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
+import { ChannelState } from '../../channel-store';
 
 export const CONSENSUS_UPDATE_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.ConsensusUpdate);
 
@@ -108,47 +109,16 @@ export const consensusUpdateReducer = (
 };
 
 const handleClearedToSend = (
-  protocolState: states.ConsensusUpdateState,
+  protocolState: states.NonTerminalConsensusUpdateState,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (protocolState.type !== 'ConsensusUpdate.CommitmentSent') {
+  if (protocolState.type !== 'ConsensusUpdate.NotSafeToSend') {
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
   }
 
-  const { processId, channelId, proposedAllocation, proposedDestination } = protocolState;
-  const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
-  const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend: true });
-  if (safeToSend) {
-    try {
-      if (helpers.isFirstPlayer(channelId, sharedData)) {
-        sharedData = sendProposal(
-          processId,
-          channelId,
-          proposedAllocation,
-          proposedDestination,
-          sharedData,
-        );
-      } else {
-        sharedData = sendAcceptConsensus(processId, channelId, sharedData);
-      }
-    } catch (error) {
-      return {
-        protocolState: states.failure({ reason: states.FailureReason.Error, error: error.message }),
-        sharedData,
-      };
-    }
-  }
-
-  const latestCommitment = helpers.getLatestCommitment(channelId, sharedData);
-  // If we are the last player we would be the one reaching consensus so we check again
-  if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
-    return { protocolState: states.success({}), sharedData };
-  }
-  return {
-    protocolState: states.commitmentSent({ ...protocolState }),
-    sharedData,
-  };
+  protocolState = { ...protocolState, clearedToSend: true };
+  return sendIfSafe(protocolState, sharedData);
 };
 
 const handleCommitmentReceived = (
@@ -156,65 +126,110 @@ const handleCommitmentReceived = (
   sharedData: SharedData,
   action: CommitmentsReceived,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  const { channelId, processId } = protocolState;
+  const { channelId } = protocolState;
 
   try {
     const { turnNum } = getExistingChannel(sharedData, channelId);
     sharedData = helpers.checkCommitments(sharedData, turnNum, action.signedCommitments);
   } catch (err) {
-    return {
-      protocolState: states.failure({
-        reason: states.FailureReason.UnableToValidate,
-        error: err.message,
-      }),
-      sharedData,
-    };
+    console.error(err.message);
   }
 
-  const { proposedAllocation, proposedDestination } = protocolState;
-  let latestCommitment = helpers.getLatestCommitment(channelId, sharedData);
-  if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
-    return { protocolState: states.success({}), sharedData };
-  }
-
-  if (
-    !proposalCommitmentHasExpectedValues(latestCommitment, proposedAllocation, proposedDestination)
-  ) {
-    return {
-      protocolState: states.failure({ reason: states.FailureReason.ProposalDoesNotMatch }),
-      sharedData,
-    };
-  }
-
-  if (helpers.ourTurn(sharedData, channelId)) {
-    try {
-      sharedData = sendAcceptConsensus(processId, channelId, sharedData);
-    } catch (error) {
-      return {
-        protocolState: states.failure({ reason: states.FailureReason.Error, error: error.message }),
-        sharedData,
-      };
-    }
-  }
-
-  latestCommitment = helpers.getLatestCommitment(channelId, sharedData);
-  // If we are the last player we would be the one reaching consensus so we check again
-  if (consensusReached(latestCommitment, proposedAllocation, proposedDestination)) {
-    return { protocolState: states.success({}), sharedData };
-  }
-  return { protocolState: states.commitmentSent({ ...protocolState }), sharedData };
+  return sendIfSafe(protocolState, sharedData);
 };
 
+function sendIfSafe(
+  protocolState: states.NonTerminalConsensusUpdateState,
+  sharedData: SharedData,
+): ProtocolStateWithSharedData<states.ConsensusUpdateState> {
+  const { channelId, processId, proposedAllocation, proposedDestination } = protocolState;
+  if (
+    consensusReached(
+      getExistingChannel(sharedData, channelId),
+      proposedAllocation,
+      proposedDestination,
+    )
+  ) {
+    return { protocolState: states.success({}), sharedData };
+  }
+
+  if (!helpers.ourTurn(sharedData, channelId)) {
+    return { protocolState, sharedData };
+  }
+
+  switch (protocolState.type) {
+    case 'ConsensusUpdate.CommitmentSent':
+      return {
+        protocolState: states.failure({ reason: states.FailureReason.ConsensusNotReached }),
+        sharedData,
+      };
+    case 'ConsensusUpdate.NotSafeToSend':
+      const { clearedToSend } = protocolState;
+      if (!clearedToSend) {
+        return { protocolState, sharedData };
+      }
+      try {
+        if (
+          proposalCommitmentHasExpectedValues(
+            helpers.getLatestCommitment(channelId, sharedData),
+            proposedAllocation,
+            proposedDestination,
+          )
+        ) {
+          sharedData = sendAcceptConsensus(processId, channelId, sharedData);
+        } else {
+          sharedData = sendProposal(
+            processId,
+            channelId,
+            proposedAllocation,
+            proposedDestination,
+            sharedData,
+          );
+        }
+      } catch (error) {
+        return {
+          protocolState: states.failure({
+            reason: states.FailureReason.Error,
+            error: error.message,
+          }),
+          sharedData,
+        };
+      }
+
+      // If we are the last player we would be the one reaching consensus so we check again
+      if (
+        consensusReached(
+          getExistingChannel(sharedData, channelId),
+          proposedAllocation,
+          proposedDestination,
+        )
+      ) {
+        return { protocolState: states.success({}), sharedData };
+      } else {
+        return {
+          protocolState: states.commitmentSent(protocolState),
+          sharedData,
+        };
+      }
+    default:
+      return unreachable(protocolState);
+  }
+}
+
 function consensusReached(
-  commitment: Commitment,
+  channel: ChannelState,
   expectedAllocation: string[],
   expectedDestination: string[],
 ): boolean {
-  return (
-    consensusHasBeenReached(commitment) &&
-    eqHexArray(commitment.allocation, expectedAllocation) &&
-    eqHexArray(commitment.destination, expectedDestination)
-  );
+  const { commitments } = channel;
+  return !!commitments.find(signedCommitment => {
+    const { commitment } = signedCommitment;
+    return (
+      consensusHasBeenReached(commitment) &&
+      eqHexArray(commitment.allocation, expectedAllocation) &&
+      eqHexArray(commitment.destination, expectedDestination)
+    );
+  });
 }
 
 function proposalCommitmentHasExpectedValues(
