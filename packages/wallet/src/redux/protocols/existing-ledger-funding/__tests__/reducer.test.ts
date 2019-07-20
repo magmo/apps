@@ -2,8 +2,8 @@ import * as scenarios from './scenarios';
 import { initialize, existingLedgerFundingReducer } from '../reducer';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { getLastMessage } from '../../../state';
-import { SignedCommitment } from '../../../../domain';
+// import { getLastMessage } from '../../../state';
+// import { SignedCommitment } from '../../../../domain';
 import { describeScenarioStep } from '../../../__tests__/helpers';
 
 describe('player A happy path', () => {
@@ -30,7 +30,6 @@ describe('player A happy path', () => {
       sharedData,
     );
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerUpdate');
-    itSendsMessage(result, scenario.initialize.reply);
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
@@ -67,10 +66,9 @@ describe('player B happy path', () => {
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
-    const { state, action, sharedData, reply } = scenario.waitForLedgerUpdate;
+    const { state, action, sharedData } = scenario.waitForLedgerUpdate;
     const updatedState = existingLedgerFundingReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'ExistingLedgerFunding.Success');
-    itSendsMessage(updatedState, reply);
   });
 });
 
@@ -151,19 +149,19 @@ function itTransitionsTo(state: ReturnVal, type: states.ExistingLedgerFundingSta
   });
 }
 
-function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
-  it('sends a message', () => {
-    const lastMessage = getLastMessage(state.sharedData);
-    if (lastMessage && 'messagePayload' in lastMessage) {
-      const dataPayload = lastMessage.messagePayload;
-      // This is yuk. The data in a message is currently of 'any' type..
-      if (!('signedCommitment' in dataPayload)) {
-        fail('No signedCommitment in the last message.');
-      }
-      const { commitment, signature } = dataPayload.signedCommitment;
-      expect({ commitment, signature }).toEqual(message);
-    } else {
-      fail('No messages in the outbox.');
-    }
-  });
-}
+// function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
+//   it('sends a message', () => {
+//     const lastMessage = getLastMessage(state.sharedData);
+//     if (lastMessage && 'messagePayload' in lastMessage) {
+//       const dataPayload = lastMessage.messagePayload;
+//       // This is yuk. The data in a message is currently of 'any' type..
+//       if (!('signedCommitment' in dataPayload)) {
+//         fail('No signedCommitment in the last message.');
+//       }
+//       const { commitment, signature } = dataPayload.signedCommitment;
+//       expect({ commitment, signature }).toEqual(message);
+//     } else {
+//       fail('No messages in the outbox.');
+//     }
+//   });
+// }
