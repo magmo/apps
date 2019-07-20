@@ -146,20 +146,3 @@ function itTransitionsTo(state: ReturnVal, type: states.ExistingLedgerFundingSta
     expect(state.protocolState.type).toEqual(type);
   });
 }
-
-// function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
-//   it('sends a message', () => {
-//     const lastMessage = getLastMessage(state.sharedData);
-//     if (lastMessage && 'messagePayload' in lastMessage) {
-//       const dataPayload = lastMessage.messagePayload;
-//       // This is yuk. The data in a message is currently of 'any' type..
-//       if (!('signedCommitment' in dataPayload)) {
-//         fail('No signedCommitment in the last message.');
-//       }
-//       const { commitment, signature } = dataPayload.signedCommitment;
-//       expect({ commitment, signature }).toEqual(message);
-//     } else {
-//       fail('No messages in the outbox.');
-//     }
-//   });
-// }
