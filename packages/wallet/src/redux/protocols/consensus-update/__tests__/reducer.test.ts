@@ -39,7 +39,7 @@ describe('Two Players', () => {
       const result = consensusUpdateReducer(state, sharedData, action);
 
       itTransitionsTo(result, 'ConsensusUpdate.Success');
-      itSendsTheseCommitments(result, reply);
+      itSendsTheseCommitments(result, reply); // fails
     });
   });
 
@@ -62,8 +62,8 @@ describe('Two Players', () => {
     describeScenarioStep(scenario.commitmentSent, () => {
       const { sharedData, action, state, reply } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Success');
-      itSendsTheseCommitments(result, reply);
+      itTransitionsTo(result, 'ConsensusUpdate.Success'); // fails
+      itSendsTheseCommitments(result, reply); // fails
     });
   });
 
@@ -74,7 +74,7 @@ describe('Two Players', () => {
       const { sharedData, action, state } = scenario.wrongTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
 
-      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.UnableToValidate);
+      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
       itSendsNoMessage(result);
     });
 
@@ -94,7 +94,7 @@ describe('Two Players', () => {
       const { sharedData, action, state } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
 
-      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.UnableToValidate);
+      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
       itSendsNoMessage(result);
     });
   });
@@ -152,6 +152,7 @@ describe('Three Players', () => {
 
   describe('Player B Happy Path', () => {
     const scenario = scenarios.threePlayerBHappyPath;
+
     describe('when initializing', () => {
       const result = initialize(scenario.initialize);
 
@@ -177,6 +178,7 @@ describe('Three Players', () => {
 
   describe('Player B waiting for Cleared To send', () => {
     const scenario = scenarios.threePlayerBNotClearedToSend;
+
     describe('when initializing', () => {
       const result = initialize(scenario.initialize);
 
@@ -209,13 +211,13 @@ describe('Three Players', () => {
     describe('when initializing', () => {
       const result = initialize(scenario.initialize);
 
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
     });
 
     describe("when receiving Player A's update", () => {
       const { sharedData, action, state } = scenario.waitForPlayerAUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSendsNoMessage(result);
     });
 
@@ -232,7 +234,7 @@ describe('Three Players', () => {
     describe('when initializing', () => {
       const result = initialize(scenario.initialize);
 
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSetsClearedToSend(result, false);
       itSendsNoMessage(result);
     });
@@ -240,7 +242,7 @@ describe('Three Players', () => {
     describe("when receiving Player A's update", () => {
       const { sharedData, action, state } = scenario.waitForPlayerAUpdate;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
       itSetsClearedToSend(result, false);
       itSendsNoMessage(result);
     });
@@ -250,8 +252,9 @@ describe('Three Players', () => {
       const result = consensusUpdateReducer(state, sharedData, action);
       itSendsNoMessage(result);
       itSetsClearedToSend(result, false);
-      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
     });
+
     describe('when receiving cleared to send', () => {
       const { sharedData, action, state, reply } = scenario.waitForClearedToSend;
       const result = consensusUpdateReducer(state, sharedData, action);
