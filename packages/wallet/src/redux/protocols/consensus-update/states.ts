@@ -26,7 +26,7 @@ export enum FailureReason {
   Error = 'Error',
   UnableToValidate = 'Unable to validate',
   InvalidTurnNumReceive = 'Invalid turn number received',
-  ConsensusExpected = 'Consensus expected',
+  ConsensusNotReached = 'Consensus not reached when in CommitmentSent',
   ProposalDoesNotMatch = 'Proposal does not match expected values.',
 }
 export interface Failure {

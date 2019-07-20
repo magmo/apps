@@ -78,12 +78,12 @@ describe('Two Players', () => {
       itSendsNoMessage(result);
     });
 
-    describeScenarioStep(scenario.notConsensus, () => {
-      const { sharedData, action, state } = scenario.notConsensus;
+    describeScenarioStep(scenario.notConsensusWhenCommitmentNotSent, () => {
+      const { sharedData, action, state, reply } = scenario.notConsensusWhenCommitmentNotSent;
       const result = consensusUpdateReducer(state, sharedData, action);
 
-      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.ConsensusExpected);
-      itSendsNoMessage(result);
+      itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');
+      itSendsTheseCommitments(result, reply);
     });
   });
 

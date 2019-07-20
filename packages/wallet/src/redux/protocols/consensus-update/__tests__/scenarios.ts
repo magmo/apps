@@ -43,6 +43,7 @@ const oneOneFour = [
 // Commitments that have reached consensus
 const balances = twoThree;
 const proposedBalances = twoThreeOneTwo;
+const wrongProposedBalances = twoThree;
 const ledger4 = ledgerCommitment({ turnNum: 4, balances });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances: proposedBalances });
@@ -53,7 +54,12 @@ const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
 // Commitments that propose a new consensus
 const ledger5Propose = ledgerCommitment({ turnNum: 5, balances, proposedBalances });
 const ledger6Propose = ledgerCommitment({ turnNum: 6, balances, proposedBalances });
-const ledger7Propose = ledgerCommitment({ turnNum: 7, balances, proposedBalances });
+const ledger7Propose = ledgerCommitment({
+  turnNum: 7,
+  balances,
+  proposedBalances: wrongProposedBalances,
+});
+const ledger8Propose = ledgerCommitment({ turnNum: 8, balances, proposedBalances });
 const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
 
 type AcceptConsensusTurnNum = 5 | 6 | 7 | 8 | 20;
@@ -74,11 +80,12 @@ function acceptConsensusLedgers(turnNum: AcceptConsensusTurnNum) {
   }
 }
 
-type ProposeTurnNum = 5 | 6 | 7;
+type ProposeTurnNum = 5 | 6 | 7 | 8;
 const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
   5: [ledger4, ledger5Propose],
   6: [ledger5, ledger6Propose],
   7: [ledger6, ledger7Propose],
+  8: [ledger7Propose, ledger8Propose],
 };
 
 const threePlayerLedger6 = threeWayLedgerCommitment({ turnNum: 6, balances: twoThreeOne });
@@ -319,7 +326,13 @@ export const twoPlayerACommitmentRejected = {
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerAcceptConsensusCommitmentsReceived(20),
   },
-  notConsensus: {
+  notConsensusWhenCommitmentNotSent: {
+    state: twoPlayerNotSafeToSend(true),
+    sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
+    action: twoPlayerNewProposalCommitmentsReceived(7),
+    reply: proposeLedgers[8],
+  },
+  notConsensusWhenCommitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerNewProposalCommitmentsReceived(7),
