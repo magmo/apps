@@ -62,11 +62,21 @@ const ledger7Propose = ledgerCommitment({
 const ledger8Propose = ledgerCommitment({ turnNum: 8, balances, proposedBalances });
 const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
 
-type AcceptConsensusTurnNum = 5 | 6 | 7 | 8 | 20;
-function acceptConsensusLedgers(turnNum: AcceptConsensusTurnNum) {
+type AcceptConsensusOnBalancesTurnNum = 5;
+function acceptConsensusOnBalancesLedgers(turnNum: AcceptConsensusOnBalancesTurnNum) {
   switch (turnNum) {
     case 5:
       return [ledger4, ledger5];
+    default:
+      return unreachable(turnNum);
+  }
+}
+
+type AcceptConsensusOnProposedBalancesTurnNum = 6 | 7 | 8 | 20;
+function acceptConsensusOnProposedBalancesLedgers(
+  turnNum: AcceptConsensusOnProposedBalancesTurnNum,
+) {
+  switch (turnNum) {
     case 6:
       return [ledger5Propose, ledger6];
     case 7:
@@ -139,13 +149,25 @@ const threePlayerSecondUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
   ]);
 };
 
-const twoPlayerConsensusAcceptedSharedData = (
-  turnNum: AcceptConsensusTurnNum,
+const twoPlayerConsensusAcceptedOnBalancesSharedData = (
+  turnNum: AcceptConsensusOnBalancesTurnNum,
   ourIndex: TwoPartyPlayerIndex,
 ) =>
   setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(
-      acceptConsensusLedgers(turnNum),
+      acceptConsensusOnBalancesLedgers(turnNum),
+      addressAndPrivateKeyLookup[ourIndex].address,
+      addressAndPrivateKeyLookup[ourIndex].privateKey,
+    ),
+  ]);
+
+const twoPlayerConsensusAcceptedOnProposedBalancesSharedData = (
+  turnNum: AcceptConsensusOnProposedBalancesTurnNum,
+  ourIndex: TwoPartyPlayerIndex,
+) =>
+  setChannels(EMPTY_SHARED_DATA, [
+    channelFromCommitments(
+      acceptConsensusOnProposedBalancesLedgers(turnNum),
       addressAndPrivateKeyLookup[ourIndex].address,
       addressAndPrivateKeyLookup[ourIndex].privateKey,
     ),
@@ -217,10 +239,21 @@ function twoPlayerNewProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
     protocolLocator,
   });
 }
-function twoPlayerAcceptConsensusCommitmentsReceived(turnNum: AcceptConsensusTurnNum) {
+// function twoPlayerAcceptConsensusOnBalancesCommitmentsReceived(
+//   turnNum: AcceptConsensusOnBalancesTurnNum,
+// ) {
+//   return commitmentsReceived({
+//     processId,
+//     signedCommitments: acceptConsensusOnBalancesLedgers(turnNum),
+//     protocolLocator,
+//   });
+// }
+function twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(
+  turnNum: AcceptConsensusOnProposedBalancesTurnNum,
+) {
   return commitmentsReceived({
     processId,
-    signedCommitments: acceptConsensusLedgers(turnNum),
+    signedCommitments: acceptConsensusOnProposedBalancesLedgers(turnNum),
     protocolLocator,
   });
 }
@@ -252,14 +285,14 @@ export const twoPlayerAHappyPath = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.A),
     reply: [ledger5, ledger6Propose],
     clearedToSend: true,
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerAcceptConsensusCommitmentsReceived(7),
+    action: twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(7),
   },
 };
 
@@ -269,14 +302,14 @@ export const twoPlayerANotOurTurn = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.A),
     clearedToSend: true,
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
-    sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerNewProposalCommitmentsReceived(7),
-    reply: acceptConsensusLedgers(8),
+    reply: acceptConsensusOnProposedBalancesLedgers(8),
   },
 };
 
@@ -287,19 +320,19 @@ export const twoPlayerBHappyPath = {
     proposedAllocation,
     proposedDestination,
     clearedToSend: true,
-    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.B),
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
-    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerNewProposalCommitmentsReceived(6),
-    reply: acceptConsensusLedgers(7),
+    reply: acceptConsensusOnProposedBalancesLedgers(7),
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
-    sharedData: twoPlayerConsensusAcceptedSharedData(5, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerNewProposalCommitmentsReceived(6),
-    reply: acceptConsensusLedgers(7),
+    reply: acceptConsensusOnProposedBalancesLedgers(7),
   },
 };
 
@@ -309,14 +342,14 @@ export const twoPlayerBOurTurn = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerConsensusAcceptedSharedData(6, TwoPartyPlayerIndex.B),
+    sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.B),
     reply: [ledger5, ledger6Propose],
     clearedToSend: true,
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.B),
-    action: twoPlayerAcceptConsensusCommitmentsReceived(7),
+    action: twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(7),
   },
 };
 
@@ -324,7 +357,7 @@ export const twoPlayerACommitmentRejected = {
   wrongTurn: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerAcceptConsensusCommitmentsReceived(20),
+    action: twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(20),
   },
   notConsensusWhenCommitmentNotSent: {
     state: twoPlayerNotSafeToSend(true),
@@ -343,7 +376,7 @@ export const twoPlayerBCommitmentRejected = {
   commitmentSent: {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerNewProposalSharedData(5, TwoPartyPlayerIndex.B),
-    action: twoPlayerAcceptConsensusCommitmentsReceived(20),
+    action: twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(20),
   },
 };
 
