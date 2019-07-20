@@ -21,7 +21,11 @@ import {
   CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
   consensusUpdateReducer,
 } from '../consensus-update/reducer';
-import { clearedToSend, routesToConsensusUpdate } from '../consensus-update/actions';
+import {
+  clearedToSend,
+  routesToConsensusUpdate,
+  isConsensusUpdateAction,
+} from '../consensus-update/actions';
 import {
   TerminalConsensusUpdateState,
   isTerminal,
@@ -197,7 +201,7 @@ const waitForLedgerUpdateReducer = (
   sharedData: SharedData,
   action: ExistingLedgerFundingAction,
 ) => {
-  if (!routesToConsensusUpdate(action, protocolState.protocolLocator)) {
+  if (!isConsensusUpdateAction(action)) {
     console.warn(`Expected Consensus Update action received ${action.type} instead`);
     return { protocolState, sharedData };
   }
