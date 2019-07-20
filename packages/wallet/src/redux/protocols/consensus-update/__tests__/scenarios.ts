@@ -46,7 +46,8 @@ const proposedBalances = twoThreeOneTwo;
 const wrongProposedBalances = twoThree;
 const ledger4 = ledgerCommitment({ turnNum: 4, balances });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances });
-const ledger6 = ledgerCommitment({ turnNum: 6, balances: proposedBalances });
+const ledger6 = ledgerCommitment({ turnNum: 6, balances });
+const ledger6ConsensusOnProposed = ledgerCommitment({ turnNum: 6, balances: proposedBalances });
 const ledger7 = ledgerCommitment({ turnNum: 7, balances: proposedBalances });
 const ledger8 = ledgerCommitment({ turnNum: 8, balances: proposedBalances });
 const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
@@ -62,11 +63,13 @@ const ledger7Propose = ledgerCommitment({
 const ledger8Propose = ledgerCommitment({ turnNum: 8, balances, proposedBalances });
 const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
 
-type AcceptConsensusOnBalancesTurnNum = 5;
+type AcceptConsensusOnBalancesTurnNum = 5 | 6;
 function acceptConsensusOnBalancesLedgers(turnNum: AcceptConsensusOnBalancesTurnNum) {
   switch (turnNum) {
     case 5:
       return [ledger4, ledger5];
+    case 6:
+      return [ledger5, ledger6];
     default:
       return unreachable(turnNum);
   }
@@ -78,7 +81,7 @@ function acceptConsensusOnProposedBalancesLedgers(
 ) {
   switch (turnNum) {
     case 6:
-      return [ledger5Propose, ledger6];
+      return [ledger5Propose, ledger6ConsensusOnProposed];
     case 7:
       return [ledger6Propose, ledger7];
     case 8:
@@ -307,7 +310,7 @@ export const twoPlayerANotOurTurn = {
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
-    sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerNewProposalCommitmentsReceived(7),
     reply: acceptConsensusOnProposedBalancesLedgers(8),
   },
