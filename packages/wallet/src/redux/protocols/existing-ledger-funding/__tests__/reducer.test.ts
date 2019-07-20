@@ -2,8 +2,6 @@ import * as scenarios from './scenarios';
 import { initialize, existingLedgerFundingReducer } from '../reducer';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-// import { getLastMessage } from '../../../state';
-// import { SignedCommitment } from '../../../../domain';
 import { describeScenarioStep } from '../../../__tests__/helpers';
 
 describe('player A happy path', () => {
