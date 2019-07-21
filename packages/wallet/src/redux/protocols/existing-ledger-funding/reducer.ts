@@ -130,17 +130,18 @@ const waitForLedgerTopUpReducer = (
   action: ExistingLedgerFundingAction,
 ): ProtocolStateWithSharedData<states.ExistingLedgerFundingState> => {
   if (routesToConsensusUpdate(action, protocolState.protocolLocator)) {
-    const consensusUpdateResult = consensusUpdateReducer(
+    let consensusUpdateState: ConsensusUpdateState;
+    ({ protocolState: consensusUpdateState, sharedData } = consensusUpdateReducer(
       protocolState.consensusUpdateState,
       sharedData,
       action,
-    );
+    ));
     return {
       protocolState: {
         ...protocolState,
-        consensusUpdateState: consensusUpdateResult.protocolState,
+        consensusUpdateState,
       },
-      sharedData: consensusUpdateResult.sharedData,
+      sharedData,
     };
   } else if (routesToLedgerTopUp(action, protocolState.protocolLocator)) {
     const { protocolState: ledgerTopUpState, sharedData: newSharedData } = ledgerTopUpReducer(
@@ -157,27 +158,28 @@ const waitForLedgerTopUpReducer = (
       };
     } else if (ledgerTopUpState.type === 'LedgerTopUp.Success') {
       const { protocolLocator, processId } = protocolState;
-      const consensusUpdateResult = consensusUpdateReducer(
+      let consensusUpdateState: ConsensusUpdateState;
+      ({ protocolState: consensusUpdateState, sharedData } = consensusUpdateReducer(
         protocolState.consensusUpdateState,
         sharedData,
         clearedToSend({
           protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
           processId,
         }),
-      );
-      sharedData = consensusUpdateResult.sharedData;
-      if (isTerminal(consensusUpdateResult.protocolState)) {
+      ));
+
+      if (isTerminal(consensusUpdateState)) {
         return handleTerminalConsensusUpdate(
           protocolState.channelId,
           protocolState.ledgerId,
-          consensusUpdateResult.protocolState,
+          consensusUpdateState,
           sharedData,
         );
       } else {
         return {
           protocolState: states.waitForLedgerUpdate({
             ...protocolState,
-            consensusUpdateState: consensusUpdateResult.protocolState,
+            consensusUpdateState,
           }),
           sharedData,
         };
@@ -205,24 +207,25 @@ const waitForLedgerUpdateReducer = (
     console.warn(`Expected Consensus Update action received ${action.type} instead`);
     return { protocolState, sharedData };
   }
-  const consensusUpdateResult = consensusUpdateReducer(
+  let consensusUpdateState: ConsensusUpdateState;
+  ({ sharedData, protocolState: consensusUpdateState } = consensusUpdateReducer(
     protocolState.consensusUpdateState,
     sharedData,
     action,
-  );
-  sharedData = consensusUpdateResult.sharedData;
-  if (isTerminal(consensusUpdateResult.protocolState)) {
+  ));
+
+  if (isTerminal(consensusUpdateState)) {
     return handleTerminalConsensusUpdate(
       protocolState.channelId,
       protocolState.ledgerId,
-      consensusUpdateResult.protocolState,
+      consensusUpdateState,
       sharedData,
     );
   } else {
     return {
       protocolState: {
         ...protocolState,
-        consensusUpdateState: consensusUpdateResult.protocolState,
+        consensusUpdateState,
       },
       sharedData,
     };
