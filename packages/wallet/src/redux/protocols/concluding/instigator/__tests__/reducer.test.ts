@@ -9,7 +9,6 @@ import {
   itSendsThisMessage,
   itSendsThisDisplayEventType,
   describeScenarioStep,
-  itStoresThisCommitment,
 } from '../../../../__tests__/helpers';
 import { HIDE_WALLET, CONCLUDE_SUCCESS, CONCLUDE_FAILURE } from 'magmo-wallet-client';
 
@@ -101,7 +100,6 @@ describe('[ Consensus Commitment Received Early ]', () => {
     const result = instigatorConcludingReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'ConcludingInstigator.AcknowledgeConcludeReceived');
-    itStoresThisCommitment(sharedData, action.signedCommitment);
   });
 });
 

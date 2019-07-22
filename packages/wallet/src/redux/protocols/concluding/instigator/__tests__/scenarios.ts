@@ -12,7 +12,7 @@ import {
 } from '../../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import { commitmentReceived } from '../../../../actions';
-import { twoPlayerPreSuccessA } from '../../../consensus-update/__tests__';
+import { twoPlayerPreSuccessA, twoPlayerPreSuccessB } from '../../../consensus-update/__tests__';
 
 // -----------------
 // Channel Scenarios
@@ -158,7 +158,7 @@ export const consensusUpdateReceivedEarly = {
   acknowledgeConcludeReceived: {
     state: acknowledgeConcludeReceived,
     sharedData: indirectFundedSecondConcludeReceived,
-    action: commitmentReceivedAction,
+    action: twoPlayerPreSuccessB.action,
   },
 };
 
