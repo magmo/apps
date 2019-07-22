@@ -312,7 +312,7 @@ export const twoPlayerANotOurTurn = {
     proposedAllocation,
     proposedDestination,
     processId,
-    sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.A),
+    sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(6, TwoPartyPlayerIndex.A),
     clearedToSend: true,
     protocolLocator,
   },
