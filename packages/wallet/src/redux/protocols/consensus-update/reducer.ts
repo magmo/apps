@@ -36,57 +36,19 @@ export const initialize = ({
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
-  const safeToSend = helpers.isSafeToSend({ sharedData, channelId, ourIndex, clearedToSend });
   const numParticipants = getExistingChannel(sharedData, channelId).participants.length;
-  switch (safeToSend) {
-    case true:
-      try {
-        sharedData = sendProposal(
-          processId,
-          channelId,
-          proposedAllocation,
-          proposedDestination,
-          protocolLocator,
-          sharedData,
-        );
-      } catch (error) {
-        return {
-          protocolState: states.failure({
-            reason: states.FailureReason.Error,
-            error: error.message,
-          }),
-          sharedData,
-        };
-      }
-
-      return {
-        protocolState: states.commitmentSent({
-          processId,
-          channelId,
-          proposedAllocation,
-          proposedDestination,
-          furtherVotesRequired: numParticipants - 2,
-          protocolLocator,
-        }),
-        sharedData,
-      };
-    case false:
-      return {
-        protocolState: states.notSafeToSend({
-          processId,
-          channelId,
-          proposedAllocation,
-          proposedDestination,
-          clearedToSend,
-          furtherVotesRequired: numParticipants - 1,
-          protocolLocator,
-        }),
-        sharedData,
-      };
-    default:
-      return unreachable(safeToSend);
-  }
+  return sendIfSafe(
+    states.notSafeToSend({
+      processId,
+      channelId,
+      proposedAllocation,
+      proposedDestination,
+      clearedToSend,
+      furtherVotesRequired: numParticipants - 1,
+      protocolLocator,
+    }),
+    sharedData,
+  );
 };
 
 export const consensusUpdateReducer = (
