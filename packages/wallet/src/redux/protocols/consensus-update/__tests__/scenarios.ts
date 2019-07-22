@@ -430,7 +430,7 @@ export const threePlayerBHappyPath = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerCommitmentSent,
+    state: threePlayerNotSafeToSend(true),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
     action: threePlayerUpdate0Received,
     reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
@@ -452,13 +452,13 @@ export const threePlayerHubHappyPath = {
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {
-    state: threePlayerCommitmentSent,
+    state: threePlayerNotSafeToSend(true),
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate0Received,
   },
   waitForPlayerBUpdate: {
-    state: threePlayerCommitmentSent,
-    sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.Hub),
+    state: threePlayerNotSafeToSend(true),
+    sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
     action: threePlayerUpdate1Received,
     reply: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
   },
@@ -503,7 +503,7 @@ export const threePlayerBNotClearedToSend = {
   notClearedToSendAndOurTurn: {
     state: threePlayerNotSafeToSend(false),
     sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.B),
-    action: clearedToSendAction,
+    action: threePlayerUpdate0Received,
     reply: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
   },
 };
