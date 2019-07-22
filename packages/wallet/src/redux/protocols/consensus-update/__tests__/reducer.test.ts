@@ -78,8 +78,8 @@ describe('Two Players', () => {
       itSendsNoMessage(result);
     });
 
-    describeScenarioStep(scenario.notConsensusWhenCommitmentNotSent, () => {
-      const { sharedData, action, state, reply } = scenario.notConsensusWhenCommitmentNotSent;
+    describeScenarioStep(scenario.wrongProposalWhenCommitmentNotSent, () => {
+      const { sharedData, action, state, reply } = scenario.wrongProposalWhenCommitmentNotSent;
       const result = consensusUpdateReducer(state, sharedData, action);
 
       itTransitionsTo(result, 'ConsensusUpdate.CommitmentSent');

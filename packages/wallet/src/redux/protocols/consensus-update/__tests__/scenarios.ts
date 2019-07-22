@@ -43,7 +43,6 @@ const oneOneFour = [
 // Commitments that have reached consensus
 const balances = twoThree;
 const proposedBalances = twoThreeOneTwo;
-const wrongProposedBalances = twoThree;
 const ledger4 = ledgerCommitment({ turnNum: 4, balances });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances });
 const ledger6 = ledgerCommitment({ turnNum: 6, balances });
@@ -55,10 +54,15 @@ const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
 // Commitments that propose a new consensus
 const ledger5Propose = ledgerCommitment({ turnNum: 5, balances, proposedBalances });
 const ledger6Propose = ledgerCommitment({ turnNum: 6, balances, proposedBalances });
+const ledger7ProposeWrongProposedBalances = ledgerCommitment({
+  turnNum: 7,
+  balances,
+  proposedBalances: balances,
+});
 const ledger7Propose = ledgerCommitment({
   turnNum: 7,
   balances,
-  proposedBalances: wrongProposedBalances,
+  proposedBalances,
 });
 const ledger8Propose = ledgerCommitment({ turnNum: 8, balances, proposedBalances });
 const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
@@ -98,7 +102,12 @@ const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
   5: [ledger4, ledger5Propose],
   6: [ledger5, ledger6Propose],
   7: [ledger6, ledger7Propose],
-  8: [ledger7Propose, ledger8Propose],
+  8: [ledger7ProposeWrongProposedBalances, ledger8Propose],
+};
+
+type ProposeOldTurnNum = 7;
+const proposeOldLedgers: { [turnNum in ProposeOldTurnNum]: SignedCommitment[] } = {
+  7: [ledger6, ledger7ProposeWrongProposedBalances],
 };
 
 const threePlayerLedger6 = threeWayLedgerCommitment({ turnNum: 6, balances: twoThreeOne });
@@ -242,6 +251,13 @@ function twoPlayerNewProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
     protocolLocator,
   });
 }
+function twoPlayerWrongProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
+  return commitmentsReceived({
+    processId,
+    signedCommitments: proposeOldLedgers[turnNum],
+    protocolLocator,
+  });
+}
 // function twoPlayerAcceptConsensusOnBalancesCommitmentsReceived(
 //   turnNum: AcceptConsensusOnBalancesTurnNum,
 // ) {
@@ -362,10 +378,10 @@ export const twoPlayerACommitmentRejected = {
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
     action: twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(20),
   },
-  notConsensusWhenCommitmentNotSent: {
+  wrongProposalWhenCommitmentNotSent: {
     state: twoPlayerNotSafeToSend(true),
     sharedData: twoPlayerNewProposalSharedData(6, TwoPartyPlayerIndex.A),
-    action: twoPlayerNewProposalCommitmentsReceived(7),
+    action: twoPlayerWrongProposalCommitmentsReceived(7),
     reply: proposeLedgers[8],
   },
   notConsensusWhenCommitmentSent: {
