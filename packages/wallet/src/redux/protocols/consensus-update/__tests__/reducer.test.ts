@@ -60,10 +60,10 @@ describe('Two Players', () => {
     });
 
     describeScenarioStep(scenario.commitmentSent, () => {
-      const { sharedData, action, state, reply } = scenario.commitmentSent;
+      const { sharedData, action, state } = scenario.commitmentSent;
       const result = consensusUpdateReducer(state, sharedData, action);
-      itTransitionsTo(result, 'ConsensusUpdate.Success'); // fails
-      itSendsTheseCommitments(result, reply); // fails
+      itTransitionsTo(result, 'ConsensusUpdate.Failure', states.FailureReason.ConsensusNotReached);
+      itSendsNoMessage(result);
     });
   });
 

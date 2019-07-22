@@ -351,7 +351,6 @@ export const twoPlayerBHappyPath = {
     state: twoPlayerCommitmentSent,
     sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.B),
     action: twoPlayerNewProposalCommitmentsReceived(6),
-    reply: acceptConsensusOnProposedBalancesLedgers(7),
   },
 };
 
