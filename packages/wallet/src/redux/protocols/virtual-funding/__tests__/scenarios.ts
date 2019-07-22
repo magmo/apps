@@ -151,7 +151,7 @@ export const happyPath = {
   },
   fundApp: {
     state: scenarioStates.waitForApplicationFunding,
-    action: prependToLocator(consensusUpdatePreSuccess.action, EmbeddedProtocol.VirtualFunding),
+    action: consensusUpdatePreSuccess.action,
     sharedData: consensusUpdatePreSuccess.sharedData,
   },
 };
