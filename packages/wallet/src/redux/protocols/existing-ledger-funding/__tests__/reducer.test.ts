@@ -2,7 +2,7 @@ import * as scenarios from './scenarios';
 import { initialize, existingLedgerFundingReducer } from '../reducer';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { describeScenarioStep } from '../../../__tests__/helpers';
+import { describeScenarioStep, itSendsTheseCommitments } from '../../../__tests__/helpers';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAFullyFundedHappyPath;
@@ -16,6 +16,7 @@ describe('player A happy path', () => {
       targetDestination,
       protocolLocator,
       sharedData,
+      reply,
     } = scenario.initialize;
 
     const result = initialize(
@@ -28,6 +29,7 @@ describe('player A happy path', () => {
       sharedData,
     );
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerUpdate');
+    itSendsTheseCommitments(result, reply);
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
@@ -64,8 +66,9 @@ describe('player B happy path', () => {
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
-    const { state, action, sharedData } = scenario.waitForLedgerUpdate;
+    const { state, action, sharedData, reply } = scenario.waitForLedgerUpdate;
     const updatedState = existingLedgerFundingReducer(state, sharedData, action);
+    itSendsTheseCommitments(updatedState, reply);
     itTransitionsTo(updatedState, 'ExistingLedgerFunding.Success');
   });
 });
