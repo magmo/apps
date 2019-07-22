@@ -78,7 +78,7 @@ const handleClearedToSend = (
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   if (protocolState.type !== 'ConsensusUpdate.NotSafeToSend') {
-    console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
+    console.warn(`Expected NotSafeToSend state received ${protocolState.type} instead`);
     return { protocolState, sharedData };
   }
 

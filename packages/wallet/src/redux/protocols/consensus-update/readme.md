@@ -2,8 +2,8 @@
 
 The purpose of the protocol is to handle updating the allocation and destination of channels running the consensus app to reach an outcome specified on initialization.
 
-The protocol stores every new commitment it receives that represents a valid transition from the mostt recent commitment.
-Commitments received in `COMMITMENTS_RECEIVED` are processed in order, and are ignored
+The protocol stores every new commitment it receives that represents a valid transition from the most recent commitment.
+Commitments received in `COMMITMENTS_RECEIVED` are processed in order, and are ignored when they are an invalid transition.
 
 When it is the participant's turn, and the protocol has been cleared to send,
 
