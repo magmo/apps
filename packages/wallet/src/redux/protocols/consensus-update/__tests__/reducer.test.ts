@@ -197,7 +197,7 @@ describe('Three Players', () => {
     });
 
     describe("when receiving player A's update", () => {
-      const { sharedData, action, state } = scenario.notClearedToSendAndNotOurTurn;
+      const { sharedData, action, state } = scenario.notClearedToSendAndOurTurn;
       const result = consensusUpdateReducer(state, sharedData, action);
 
       itTransitionsTo(result, 'ConsensusUpdate.NotSafeToSend');
