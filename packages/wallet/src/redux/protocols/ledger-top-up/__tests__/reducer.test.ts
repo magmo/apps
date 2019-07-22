@@ -36,6 +36,7 @@ describe('player A happy path', () => {
     });
     itTransitionsTo(initialState, 'LedgerTopUp.SwitchOrderAndAddATopUpUpdate');
   });
+
   describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
     const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
@@ -45,20 +46,24 @@ describe('player A happy path', () => {
       expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
+
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
   });
+
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
       expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x09');
     });
   });
+
   describeScenarioStep(scenario.waitForDirectFundingForB, () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForB;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
@@ -97,32 +102,41 @@ describe('player B happy path', () => {
       expect(consensusUpdate.proposedDestination).toEqual([bsAddress, asAddress]);
     });
   });
+
   describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
     const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
+    debugger;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
       expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
+
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
   });
+
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForB');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x02');
       expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x09');
     });
   });
+
   describeScenarioStep(scenario.waitForDirectFundingForB, () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForB;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
 });
@@ -158,23 +172,29 @@ describe('player A one user needs top up', () => {
       expect(consensusUpdate.proposedDestination).toEqual([bsAddress, asAddress]);
     });
   });
+
   describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
     const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x02');
       expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
+
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
   });
+
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
 });
@@ -210,23 +230,29 @@ describe('player B one user needs top up', () => {
       expect(consensusUpdate.proposedDestination).toEqual([bsAddress, asAddress]);
     });
   });
+
   describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
     const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
     it('requests the correct deposit amount', () => {
       expect(getRequiredDeposit(updatedState.protocolState)).toEqual('0x0');
       expect(getTotalFundingRequired(updatedState.protocolState)).toEqual('0x07');
     });
   });
+
   describeScenarioStep(scenario.waitForDirectFundingForA, () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
   });
+
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
+
     itTransitionsTo(updatedState, 'LedgerTopUp.Success');
   });
 });
