@@ -1,2 +1,7 @@
 import * as scenarios from './scenarios';
-export const preSuccess = scenarios.happyPath.fundApp;
+import { prependToScenarioLocator } from '../../__tests__';
+import { EmbeddedProtocol } from '../../../../communication';
+export const preSuccess = prependToScenarioLocator(
+  scenarios.happyPath.fundApp,
+  EmbeddedProtocol.VirtualFunding,
+);
