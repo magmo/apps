@@ -211,7 +211,6 @@ const twoProps = {
   processId,
   proposedAllocation,
   proposedDestination,
-  furtherVotesRequired: 1,
   protocolLocator,
 };
 
@@ -220,7 +219,6 @@ const threeProps = {
   processId,
   proposedAllocation: threePlayerProposedAllocation,
   proposedDestination: threePlayerProposedDestination,
-  furtherVotesRequired: 2,
   protocolLocator,
 };
 
@@ -228,7 +226,6 @@ const twoPlayerNotSafeToSend = (cleared: boolean) => {
   return states.notSafeToSend({
     ...twoProps,
     clearedToSend: cleared,
-    furtherVotesRequired: 1,
   });
 };
 
@@ -238,7 +235,6 @@ const threePlayerNotSafeToSend = (cleared: boolean) => {
   return states.notSafeToSend({
     ...threeProps,
     clearedToSend: cleared,
-    furtherVotesRequired: 2,
   });
 };
 

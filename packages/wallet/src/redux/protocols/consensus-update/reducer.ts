@@ -36,7 +36,6 @@ export const initialize = ({
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  const numParticipants = getExistingChannel(sharedData, channelId).participants.length;
   return sendIfSafe(
     states.notSafeToSend({
       processId,
@@ -44,7 +43,6 @@ export const initialize = ({
       proposedAllocation,
       proposedDestination,
       clearedToSend,
-      furtherVotesRequired: numParticipants - 1,
       protocolLocator,
     }),
     sharedData,

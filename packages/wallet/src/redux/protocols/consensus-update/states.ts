@@ -12,7 +12,6 @@ interface Base {
   proposedDestination: string[];
   channelId: string;
   processId: string;
-  furtherVotesRequired: number;
   protocolLocator: ProtocolLocator;
 }
 
