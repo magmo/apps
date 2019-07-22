@@ -5,12 +5,27 @@ import {
   threePlayerBHappyPath,
   threePlayerHubHappyPath,
 } from './scenarios';
+import { prependToActionLocator } from '../../__tests__';
+import { EmbeddedProtocol } from '../../../../communication';
 
-export const twoPlayerPreSuccessA = twoPlayerAHappyPath.commitmentSent;
-export const twoPlayerPreSuccessB = twoPlayerBHappyPath.notSafeToSend;
-export const twoPlayerReplyA = twoPlayerAHappyPath.initialize.reply;
-export const twoPlayerReplyB = twoPlayerBHappyPath.notSafeToSend.reply;
+export const twoPlayerPreSuccessA = prependToActionLocator(
+  twoPlayerAHappyPath.commitmentSent,
+  EmbeddedProtocol.ConsensusUpdate,
+);
+export const twoPlayerPreSuccessB = prependToActionLocator(
+  twoPlayerBHappyPath.notSafeToSend,
+  EmbeddedProtocol.ConsensusUpdate,
+);
 
-export const threePlayerPreSuccessA = threePlayerAHappyPath.waitForHubUpdate;
-export const threePlayerPreSuccessB = threePlayerBHappyPath.waitForHubUpdate;
-export const threePlayerPreSuccessHub = threePlayerHubHappyPath.waitForPlayerBUpdate;
+export const threePlayerPreSuccessA = prependToActionLocator(
+  threePlayerAHappyPath.waitForHubUpdate,
+  EmbeddedProtocol.ConsensusUpdate,
+);
+export const threePlayerPreSuccessB = prependToActionLocator(
+  threePlayerBHappyPath.waitForHubUpdate,
+  EmbeddedProtocol.ConsensusUpdate,
+);
+export const threePlayerPreSuccessHub = prependToActionLocator(
+  threePlayerHubHappyPath.waitForPlayerBUpdate,
+  EmbeddedProtocol.ConsensusUpdate,
+);
