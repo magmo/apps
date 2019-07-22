@@ -35,7 +35,6 @@ describe('indirect strategy chosen', () => {
 
   describeScenarioStep(scenario.waitForIndirectFunding, () => {
     const { state, sharedData, action } = scenario.waitForIndirectFunding;
-
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Funding.PlayerA.WaitForPostFundSetup');
@@ -63,7 +62,6 @@ describe('virtual strategy chosen', () => {
 
   describeScenarioStep(scenario.waitForStrategyChoice, () => {
     const { state, sharedData, action } = scenario.waitForStrategyChoice;
-
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Funding.PlayerA.WaitForStrategyResponse');
@@ -76,7 +74,6 @@ describe('virtual strategy chosen', () => {
 
   describeScenarioStep(scenario.waitForStrategyResponse, () => {
     const { state, sharedData, action } = scenario.waitForStrategyResponse;
-
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Funding.PlayerA.WaitForVirtualFunding');
@@ -84,7 +81,6 @@ describe('virtual strategy chosen', () => {
 
   describeScenarioStep(scenario.waitForVirtualFunding, () => {
     const { state, sharedData, action } = scenario.waitForVirtualFunding;
-
     const result = reducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Funding.PlayerA.WaitForPostFundSetup');

@@ -100,10 +100,6 @@ const indirectFundingSuccess = prependToLocator(
   indirectFundingPreSuccess.action,
   EmbeddedProtocol.IndirectFunding,
 );
-const virtualFundingSuccess = prependToLocator(
-  virtualFundingPreSuccess.action,
-  EmbeddedProtocol.VirtualFunding,
-);
 const strategyRejected = actions.strategyRejected({ processId });
 const cancelledByA = actions.cancelled({ processId, by: TwoPartyPlayerIndex.A });
 const cancelledByB = actions.cancelled({ processId, by: TwoPartyPlayerIndex.B });
@@ -159,7 +155,7 @@ export const virtualStrategyChosen = {
     sharedData: setChannels(virtualFundingPreSuccess.sharedData, [
       channelFromCommitments([app2, app3], asAddress, asPrivateKey),
     ]),
-    action: virtualFundingSuccess,
+    action: virtualFundingPreSuccess.action,
   },
 };
 
