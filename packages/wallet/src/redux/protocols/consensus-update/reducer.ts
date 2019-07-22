@@ -1,7 +1,7 @@
 import { SharedData, signAndStore, getExistingChannel } from '../../state';
 import * as states from './states';
 import { ProtocolStateWithSharedData } from '..';
-import { isConsensusUpdateAction } from './actions';
+import { ConsensusUpdateAction } from './actions';
 import * as helpers from '../reducer-helpers';
 import {
   proposeNewConsensus,
@@ -13,7 +13,6 @@ import { Commitment } from '../../../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { eqHexArray } from '../../../utils/hex-utils';
 import { CommitmentsReceived, ProtocolLocator } from '../../../communication';
-import { WalletAction } from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { ChannelState } from '../../channel-store';
 
@@ -52,12 +51,8 @@ export const initialize = ({
 export const consensusUpdateReducer = (
   protocolState: states.ConsensusUpdateState,
   sharedData: SharedData,
-  action: WalletAction,
+  action: ConsensusUpdateAction,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
-  if (!isConsensusUpdateAction(action)) {
-    console.warn(`Consensus Update received non Consensus Update action ${action}`);
-    return { protocolState, sharedData };
-  }
   if (states.isTerminal(protocolState)) {
     console.warn(`Consensus update reducer was called with terminal state ${protocolState.type}`);
     return { protocolState, sharedData };
