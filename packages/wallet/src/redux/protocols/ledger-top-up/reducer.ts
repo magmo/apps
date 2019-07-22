@@ -208,27 +208,28 @@ const waitForDirectFundingForAReducer: ProtocolReducer<states.LedgerTopUpState> 
     ));
 
     const { protocolLocator, processId } = protocolState;
-    if (directFundingState.type === 'DirectFunding.FundingFailure') {
-      return { protocolState: states.failure({ reason: 'DirectFundingFailure' }), sharedData };
-    } else if (directFundingState.type === 'DirectFunding.FundingSuccess') {
-      let consensusUpdateState: ConsensusUpdateState;
-      ({ protocolState: consensusUpdateState, sharedData } = consensusUpdateReducer(
-        protocolState.consensusUpdateState,
-        sharedData,
-        clearedToSend({
-          protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
-          processId,
-        }),
-      ));
-      return {
-        protocolState: states.restoreOrderAndAddBTopUpUpdate({
-          ...protocolState,
-          consensusUpdateState,
-        }),
-        sharedData,
-      };
-    } else {
-      return { protocolState: { ...protocolState, directFundingState }, sharedData };
+    switch (directFundingState.type) {
+      case 'DirectFunding.FundingFailure':
+        return { protocolState: states.failure({ reason: 'DirectFundingFailure' }), sharedData };
+      case 'DirectFunding.FundingSuccess':
+        let consensusUpdateState: ConsensusUpdateState;
+        ({ protocolState: consensusUpdateState, sharedData } = consensusUpdateReducer(
+          protocolState.consensusUpdateState,
+          sharedData,
+          clearedToSend({
+            protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
+            processId,
+          }),
+        ));
+        return {
+          protocolState: states.restoreOrderAndAddBTopUpUpdate({
+            ...protocolState,
+            consensusUpdateState,
+          }),
+          sharedData,
+        };
+      default:
+        return { protocolState: { ...protocolState, directFundingState }, sharedData };
     }
   } else if (isConsensusUpdateAction(action)) {
     let consensusUpdateState: ConsensusUpdateState;

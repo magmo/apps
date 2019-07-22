@@ -18,6 +18,7 @@ import { playerAHappyPath } from '../../ledger-top-up/__tests__/scenarios';
 import {
   twoPlayerPreSuccessA as consensusUpdatePreSuccessA,
   twoPlayerPreSuccessB as consensusUpdatePreSuccessB,
+  twoPlayerReplyB,
 } from '../../consensus-update/__tests__/';
 import { makeLocator, prependToLocator } from '../..';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../../consensus-update/reducer';
@@ -132,6 +133,7 @@ export const playerAFullyFundedHappyPath = {
   initialize: {
     sharedData: initialPlayerALedgerSharedData,
     ...props,
+    reply: [ledger5, ledger6],
   },
   waitForLedgerUpdate: {
     state: waitForLedgerUpdateForA,
@@ -155,6 +157,7 @@ export const playerBFullyFundedHappyPath = {
       consensusUpdatePreSuccessB.action,
       EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR,
     ),
+    reply: twoPlayerReplyB,
   },
 };
 

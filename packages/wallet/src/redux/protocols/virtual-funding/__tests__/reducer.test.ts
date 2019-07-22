@@ -132,9 +132,6 @@ describe('happyPath', () => {
       'indirectApplicationFunding',
       'ConsensusUpdate.CommitmentSent',
     );
-    // TODO: Now that existing ledger funding is using consensus update
-    // We can't test directly for the commitments since we get back
-    // consensus update pre-success
   });
 
   describe(scenarioStepDescription(scenario.fundApp), () => {
