@@ -18,6 +18,8 @@ import { clearedToSend } from '../actions';
 import { SignedCommitment } from '../../../../domain';
 import { unreachable } from '../../../../utils/reducer-utils';
 
+const protocolLocator = CONSENSUS_UPDATE_PROTOCOL_LOCATOR;
+
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
@@ -210,6 +212,7 @@ const twoProps = {
   proposedAllocation,
   proposedDestination,
   furtherVotesRequired: 1,
+  protocolLocator,
 };
 
 const threeProps = {
@@ -218,6 +221,7 @@ const threeProps = {
   proposedAllocation: threePlayerProposedAllocation,
   proposedDestination: threePlayerProposedDestination,
   furtherVotesRequired: 2,
+  protocolLocator,
 };
 
 const twoPlayerNotSafeToSend = (cleared: boolean) => {
@@ -243,7 +247,6 @@ const threePlayerCommitmentSent = states.commitmentSent(threeProps);
 // ------
 // Actions
 // ------
-const protocolLocator = CONSENSUS_UPDATE_PROTOCOL_LOCATOR;
 function twoPlayerNewProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
   return commitmentsReceived({
     processId,
@@ -258,15 +261,6 @@ function twoPlayerWrongProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
     protocolLocator,
   });
 }
-// function twoPlayerAcceptConsensusOnBalancesCommitmentsReceived(
-//   turnNum: AcceptConsensusOnBalancesTurnNum,
-// ) {
-//   return commitmentsReceived({
-//     processId,
-//     signedCommitments: acceptConsensusOnBalancesLedgers(turnNum),
-//     protocolLocator,
-//   });
-// }
 function twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(
   turnNum: AcceptConsensusOnProposedBalancesTurnNum,
 ) {
@@ -307,6 +301,7 @@ export const twoPlayerAHappyPath = {
     sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.A),
     reply: [ledger5, ledger6Propose],
     clearedToSend: true,
+    protocolLocator,
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
@@ -323,6 +318,7 @@ export const twoPlayerANotOurTurn = {
     processId,
     sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.A),
     clearedToSend: true,
+    protocolLocator,
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
@@ -340,6 +336,7 @@ export const twoPlayerBHappyPath = {
     proposedDestination,
     clearedToSend: true,
     sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.B),
+    protocolLocator,
   },
   notSafeToSend: {
     state: twoPlayerNotSafeToSend(true),
@@ -363,6 +360,7 @@ export const twoPlayerBOurTurn = {
     sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.B),
     reply: [ledger5, ledger6Propose],
     clearedToSend: true,
+    protocolLocator,
   },
   commitmentSent: {
     state: twoPlayerCommitmentSent,
@@ -405,6 +403,7 @@ export const threePlayerAHappyPath = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     clearedToSend: true,
+    protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
     reply: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
   },
@@ -427,6 +426,7 @@ export const threePlayerBHappyPath = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     clearedToSend: true,
+    protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
   waitForPlayerAUpdate: {
@@ -449,6 +449,7 @@ export const threePlayerHubHappyPath = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     clearedToSend: true,
+    protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {
@@ -471,6 +472,7 @@ export const threePlayerANotClearedToSend = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     clearedToSend: false,
+    protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
   },
   notSafeToSendAndOurTurn: {
@@ -493,6 +495,7 @@ export const threePlayerBNotClearedToSend = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     clearedToSend: false,
+    protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
   },
   notClearedToSendAndNotOurTurn: {
@@ -515,6 +518,7 @@ export const threePlayerHubNotClearedToSend = {
     proposedAllocation: threePlayerProposedAllocation,
     proposedDestination: threePlayerProposedDestination,
     clearedToSend: false,
+    protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
   },
   waitForPlayerAUpdate: {

@@ -14,11 +14,10 @@ import * as states from '../states';
 import { preSuccess as existingLedgerPreSuccess } from '../../existing-ledger-funding/__tests__';
 import {
   preSuccessState as newLedgerPreSuccess,
-  successTrigger as newLedgerFundingSuccessTrigger,
-} from '../../new-ledger-funding/__tests__';
+  successTrigger as NewLedgerChannelSuccessTrigger,
+  successState as newLedgerSuccess,
+} from '../../new-ledger-channel/__tests__';
 import { INDIRECT_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
-import { prependToLocator } from '../..';
-import { EmbeddedProtocol } from '../../../../communication';
 
 const processId = 'processId';
 
@@ -38,36 +37,36 @@ const ledger4 = ledgerCommitment({ turnNum: 4, balances: oneThree });
 const ledger5 = ledgerCommitment({ turnNum: 5, balances: oneThree });
 const app0 = appCommitment({ turnNum: 0, balances: oneThree });
 const app1 = appCommitment({ turnNum: 1, balances: oneThree });
-const existingLedgerFundingSharedData = setChannels(existingLedgerPreSuccess.sharedData, [
+const existingLedgerFundingSharedData = setChannels(newLedgerSuccess.store, [
   channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
   channelFromCommitments([app0, app1], asAddress, asPrivateKey),
 ]);
-const newLedgerFundingSharedData = setChannels(EMPTY_SHARED_DATA, [
+const NewLedgerChannelSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([app0, app1], asAddress, asPrivateKey),
 ]);
 const waitForExistingLedgerFunding = states.waitForExistingLedgerFunding({
   ...props,
   existingLedgerFundingState: existingLedgerPreSuccess.state,
 });
-const waitForNewLedgerFunding = states.waitForNewLedgerFunding({
+const waitForNewLedgerChannel = states.waitForNewLedgerChannel({
   ...props,
-  newLedgerFundingState: newLedgerPreSuccess.state,
+  newLedgerChannel: newLedgerPreSuccess.state,
 });
 
 export const existingLedgerFundingHappyPath = {
   initialize: { ...props, sharedData: existingLedgerFundingSharedData },
+};
+
+export const newLedgerChannelHappyPath = {
+  initialize: { ...props, sharedData: NewLedgerChannelSharedData },
+  waitForNewLedgerChannel: {
+    state: waitForNewLedgerChannel,
+    action: NewLedgerChannelSuccessTrigger,
+    sharedData: newLedgerPreSuccess.sharedData,
+  },
   waitForExistingLedgerFunding: {
     state: waitForExistingLedgerFunding,
     action: existingLedgerPreSuccess.action,
     sharedData: existingLedgerPreSuccess.sharedData,
-  },
-};
-
-export const newLedgerFundingHappyPath = {
-  initialize: { ...props, sharedData: newLedgerFundingSharedData },
-  waitForNewLedgerFunding: {
-    state: waitForNewLedgerFunding,
-    action: prependToLocator(newLedgerFundingSuccessTrigger, EmbeddedProtocol.NewLedgerFunding),
-    sharedData: newLedgerPreSuccess.sharedData,
   },
 };

@@ -12,7 +12,7 @@ import {
 import { Commitment } from '../../../domain';
 import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 import { eqHexArray } from '../../../utils/hex-utils';
-import { CommitmentsReceived, EmbeddedProtocol } from '../../../communication';
+import { CommitmentsReceived, EmbeddedProtocol, ProtocolLocator } from '../../../communication';
 import { WalletAction } from '../../actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { ChannelState } from '../../channel-store';
@@ -25,6 +25,7 @@ export const initialize = ({
   clearedToSend,
   proposedAllocation,
   proposedDestination,
+  protocolLocator,
   sharedData,
 }: {
   processId: string;
@@ -32,6 +33,7 @@ export const initialize = ({
   clearedToSend: boolean;
   proposedAllocation: string[];
   proposedDestination: string[];
+  protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.ConsensusUpdateState> => {
   const ourIndex = helpers.getTwoPlayerIndex(channelId, sharedData);
@@ -45,6 +47,7 @@ export const initialize = ({
           channelId,
           proposedAllocation,
           proposedDestination,
+          protocolLocator,
           sharedData,
         );
       } catch (error) {
@@ -64,6 +67,7 @@ export const initialize = ({
           proposedAllocation,
           proposedDestination,
           furtherVotesRequired: numParticipants - 2,
+          protocolLocator,
         }),
         sharedData,
       };
@@ -76,6 +80,7 @@ export const initialize = ({
           proposedDestination,
           clearedToSend,
           furtherVotesRequired: numParticipants - 1,
+          protocolLocator,
         }),
         sharedData,
       };
@@ -142,7 +147,13 @@ function sendIfSafe(
   protocolState: states.NonTerminalConsensusUpdateState,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.ConsensusUpdateState> {
-  const { channelId, processId, proposedAllocation, proposedDestination } = protocolState;
+  const {
+    channelId,
+    processId,
+    proposedAllocation,
+    proposedDestination,
+    protocolLocator,
+  } = protocolState;
   if (
     consensusReached(
       getExistingChannel(sharedData, channelId),
@@ -176,13 +187,14 @@ function sendIfSafe(
             proposedDestination,
           )
         ) {
-          sharedData = sendAcceptConsensus(processId, channelId, sharedData);
+          sharedData = sendAcceptConsensus(processId, channelId, protocolLocator, sharedData);
         } else {
           sharedData = sendProposal(
             processId,
             channelId,
             proposedAllocation,
             proposedDestination,
+            protocolLocator,
             sharedData,
           );
         }
@@ -248,6 +260,7 @@ function proposalCommitmentHasExpectedValues(
 function sendAcceptConsensus(
   processId: string,
   channelId: string,
+  protocolLocator: ProtocolLocator,
   sharedData: SharedData,
 ): SharedData {
   const lastCommitment = helpers.getLatestCommitment(channelId, sharedData);
@@ -260,12 +273,7 @@ function sendAcceptConsensus(
     throw new Error('Signature Failure');
   }
   sharedData = signResult.store;
-  sharedData = helpers.sendCommitments(
-    sharedData,
-    processId,
-    channelId,
-    CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
-  );
+  sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
   return sharedData;
 }
 
@@ -274,6 +282,7 @@ function sendProposal(
   channelId: string,
   proposedAllocation: string[],
   proposedDestination: string[],
+  protocolLocator: ProtocolLocator,
   sharedData: SharedData,
 ): SharedData {
   const lastCommitment = helpers.getLatestCommitment(channelId, sharedData);
@@ -288,11 +297,6 @@ function sendProposal(
   }
   sharedData = signResult.store;
 
-  sharedData = helpers.sendCommitments(
-    sharedData,
-    processId,
-    channelId,
-    CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
-  );
+  sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
   return sharedData;
 }

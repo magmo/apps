@@ -1,8 +1,10 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
+import { ProtocolLocator } from '../../../communication';
 
 export type NonTerminalConsensusUpdateState = NotSafeToSend | CommitmentSent;
 export type ConsensusUpdateState = NonTerminalConsensusUpdateState | Failure | Success;
+export type TerminalConsensusUpdateState = Failure | Success;
 export type ConsensusUpdateStateType = ConsensusUpdateState['type'];
 
 interface Base {
@@ -11,6 +13,7 @@ interface Base {
   channelId: string;
   processId: string;
   furtherVotesRequired: number;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface NotSafeToSend extends Base {

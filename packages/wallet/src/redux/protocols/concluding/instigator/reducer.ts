@@ -28,7 +28,7 @@ import { ProtocolAction } from '../../../../redux/actions';
 import { theirAddress } from '../../../channel-store';
 import { sendConcludeInstigated, CommitmentReceived } from '../../../../communication';
 import { failure, success } from '../states';
-import { ProtocolStateWithSharedData } from '../..';
+import { ProtocolStateWithSharedData, makeLocator } from '../..';
 import { isConcludingInstigatorAction } from './actions';
 import {
   initialize as consensusUpdateInitialize,
@@ -43,7 +43,6 @@ import {
 } from '../../consensus-update/actions';
 export type ReturnVal = ProtocolStateWithSharedData<states.InstigatorConcludingState>;
 export type Storage = SharedData;
-
 export function instigatorConcludingReducer(
   protocolState: NonTerminalCState,
   sharedData: SharedData,
@@ -96,7 +95,11 @@ export function initialize(channelId: string, processId: string, sharedData: Sto
     };
   } else {
     return {
-      protocolState: instigatorAcknowledgeFailure({ channelId, processId, reason: 'NotYourTurn' }),
+      protocolState: instigatorAcknowledgeFailure({
+        channelId,
+        processId,
+        reason: 'NotYourTurn',
+      }),
       sharedData,
     };
   }
@@ -203,6 +206,7 @@ function concludeReceived(
       proposedAllocation: latestCommitment.allocation,
       proposedDestination: latestCommitment.destination,
       sharedData,
+      protocolLocator: makeLocator(CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
     });
     sharedData = consensusUpdateResult.sharedData;
     return {
@@ -231,7 +235,7 @@ function keepOpenChosen(protocolState: NonTerminalCState, sharedData: Storage): 
     protocolState.consensusUpdateState,
     sharedData,
     clearedToSend({
-      protocolLocator: CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+      protocolLocator: makeLocator(CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
       processId: protocolState.processId,
     }),
   );

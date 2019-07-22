@@ -2,8 +2,6 @@ import * as scenarios from './scenarios';
 import { initialize, existingLedgerFundingReducer } from '../reducer';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { getLastMessage } from '../../../state';
-import { SignedCommitment } from '../../../../domain';
 import { describeScenarioStep } from '../../../__tests__/helpers';
 
 describe('player A happy path', () => {
@@ -16,6 +14,7 @@ describe('player A happy path', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     } = scenario.initialize;
 
@@ -25,10 +24,10 @@ describe('player A happy path', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     );
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerUpdate');
-    itSendsMessage(result, scenario.initialize.reply);
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
@@ -48,6 +47,7 @@ describe('player B happy path', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     } = scenario.initialize;
 
@@ -57,16 +57,16 @@ describe('player B happy path', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     );
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerUpdate');
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
-    const { state, action, sharedData, reply } = scenario.waitForLedgerUpdate;
+    const { state, action, sharedData } = scenario.waitForLedgerUpdate;
     const updatedState = existingLedgerFundingReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'ExistingLedgerFunding.Success');
-    itSendsMessage(updatedState, reply);
   });
 });
 
@@ -88,6 +88,7 @@ describe('player A top up needed', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     } = scenario.initialize;
 
@@ -97,6 +98,7 @@ describe('player A top up needed', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     );
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerTopUp');
@@ -121,6 +123,7 @@ describe('player B top up needed', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     } = scenario.initialize;
 
@@ -130,6 +133,7 @@ describe('player B top up needed', () => {
       ledgerId,
       targetAllocation,
       targetDestination,
+      protocolLocator,
       sharedData,
     );
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerTopUp');
@@ -140,22 +144,5 @@ type ReturnVal = ProtocolStateWithSharedData<states.ExistingLedgerFundingState>;
 function itTransitionsTo(state: ReturnVal, type: states.ExistingLedgerFundingState['type']) {
   it(`transitions protocol state to ${type}`, () => {
     expect(state.protocolState.type).toEqual(type);
-  });
-}
-
-function itSendsMessage(state: ReturnVal, message: SignedCommitment) {
-  it('sends a message', () => {
-    const lastMessage = getLastMessage(state.sharedData);
-    if (lastMessage && 'messagePayload' in lastMessage) {
-      const dataPayload = lastMessage.messagePayload;
-      // This is yuk. The data in a message is currently of 'any' type..
-      if (!('signedCommitment' in dataPayload)) {
-        fail('No signedCommitment in the last message.');
-      }
-      const { commitment, signature } = dataPayload.signedCommitment;
-      expect({ commitment, signature }).toEqual(message);
-    } else {
-      fail('No messages in the outbox.');
-    }
   });
 }

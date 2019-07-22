@@ -20,6 +20,7 @@ import { EmbeddedProtocol } from '../../../communication';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
 import { getLatestCommitment } from '../reducer-helpers';
+import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
 type ReturnVal = ProtocolStateWithSharedData<states.VirtualFundingState>;
 
@@ -232,13 +233,21 @@ function waitForGuarantorChannelReducer(
             result.sharedData,
             makeLocator(protocolState.protocolLocator, EmbeddedProtocol.IndirectFunding),
           );
-          return {
-            protocolState: states.waitForGuarantorFunding({
-              ...protocolState,
-              indirectGuarantorFunding: indirectFundingResult.protocolState,
-            }),
-            sharedData: indirectFundingResult.sharedData,
-          };
+          switch (indirectFundingResult.protocolState.type) {
+            case 'IndirectFunding.Failure':
+              return {
+                protocolState: states.failure({}),
+                sharedData: indirectFundingResult.sharedData,
+              };
+            default:
+              return {
+                protocolState: states.waitForGuarantorFunding({
+                  ...protocolState,
+                  indirectGuarantorFunding: indirectFundingResult.protocolState,
+                }),
+                sharedData: indirectFundingResult.sharedData,
+              };
+          }
 
         default:
           return {
@@ -292,6 +301,10 @@ function waitForGuarantorFundingReducer(
             clearedToSend: true,
             proposedAllocation,
             proposedDestination,
+            protocolLocator: makeLocator(
+              protocolState.protocolLocator,
+              CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
+            ),
             sharedData: result.sharedData,
           });
           return {

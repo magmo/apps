@@ -17,6 +17,7 @@ describe('player A happy path', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
     } = scenario.initialize;
     const initialState = initialize(
       processId,
@@ -25,6 +26,7 @@ describe('player A happy path', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
       sharedData,
     );
     it('requests the correct allocation/destination updates', () => {
@@ -47,11 +49,6 @@ describe('player A happy path', () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
-    it('requests the correct allocation/destination updates', () => {
-      const consensusUpdate = getProposedConsensus(updatedState.protocolState);
-      expect(consensusUpdate.proposedAllocation).toEqual(['0x04', '0x05']);
-      expect(consensusUpdate.proposedDestination).toEqual([asAddress, bsAddress]);
-    });
   });
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
@@ -80,6 +77,7 @@ describe('player B happy path', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
     } = scenario.initialize;
     const initialState = initialize(
       processId,
@@ -88,6 +86,7 @@ describe('player B happy path', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
       sharedData,
     );
 
@@ -111,11 +110,6 @@ describe('player B happy path', () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
-    it('requests the correct allocation/destination updates', () => {
-      const consensusUpdate = getProposedConsensus(updatedState.protocolState);
-      expect(consensusUpdate.proposedAllocation).toEqual(['0x04', '0x05']);
-      expect(consensusUpdate.proposedDestination).toEqual([asAddress, bsAddress]);
-    });
   });
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
@@ -144,6 +138,7 @@ describe('player A one user needs top up', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
     } = scenario.initialize;
     const initialState = initialize(
       processId,
@@ -152,6 +147,7 @@ describe('player A one user needs top up', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
       sharedData,
     );
 
@@ -175,11 +171,6 @@ describe('player A one user needs top up', () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
-    it('requests the correct allocation/destination updates', () => {
-      const consensusUpdate = getProposedConsensus(updatedState.protocolState);
-      expect(consensusUpdate.proposedAllocation).toEqual(['0x04', '0x03']);
-      expect(consensusUpdate.proposedDestination).toEqual([asAddress, bsAddress]);
-    });
   });
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;
@@ -199,6 +190,7 @@ describe('player B one user needs top up', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
     } = scenario.initialize;
     const initialState = initialize(
       processId,
@@ -207,6 +199,7 @@ describe('player B one user needs top up', () => {
       proposedAllocation,
       proposedDestination,
       originalAllocation,
+      protocolLocator,
       sharedData,
     );
 
@@ -230,11 +223,6 @@ describe('player B one user needs top up', () => {
     const { action, sharedData, state } = scenario.waitForDirectFundingForA;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'LedgerTopUp.RestoreOrderAndAddBTopUpUpdate');
-    it('requests the correct allocation/destination updates', () => {
-      const consensusUpdate = getProposedConsensus(updatedState.protocolState);
-      expect(consensusUpdate.proposedAllocation).toEqual(['0x04', '0x03']);
-      expect(consensusUpdate.proposedDestination).toEqual([asAddress, bsAddress]);
-    });
   });
   describeScenarioStep(scenario.restoreOrderAndAddBTopUpUpdate, () => {
     const { action, sharedData, state } = scenario.restoreOrderAndAddBTopUpUpdate;

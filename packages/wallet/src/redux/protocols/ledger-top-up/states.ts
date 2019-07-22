@@ -1,6 +1,7 @@
 import { DirectFundingState } from '../direct-funding/states';
 import { StateConstructor } from '../../utils';
 import { ConsensusUpdateState } from '../consensus-update';
+import { ProtocolLocator } from '../../../communication';
 
 export interface WaitForDirectFundingForA {
   type: 'LedgerTopUp.WaitForDirectFundingForA';
@@ -10,7 +11,9 @@ export interface WaitForDirectFundingForA {
   proposedAllocation: string[];
   proposedDestination: string[];
   originalAllocation: string[];
+  protocolLocator: ProtocolLocator;
   directFundingState: DirectFundingState;
+  consensusUpdateState: ConsensusUpdateState;
 }
 
 export interface WaitForDirectFundingForB {
@@ -21,6 +24,7 @@ export interface WaitForDirectFundingForB {
   proposedAllocation: string[];
   proposedDestination: string[];
   originalAllocation: string[];
+  protocolLocator: ProtocolLocator;
   directFundingState: DirectFundingState;
 }
 export interface SwitchOrderAndAddATopUpUpdate {
@@ -31,6 +35,7 @@ export interface SwitchOrderAndAddATopUpUpdate {
   proposedAllocation: string[];
   proposedDestination: string[];
   originalAllocation: string[];
+  protocolLocator: ProtocolLocator;
   consensusUpdateState: ConsensusUpdateState;
 }
 export interface RestoreOrderAndAddBTopUpUpdate {
@@ -42,6 +47,7 @@ export interface RestoreOrderAndAddBTopUpUpdate {
   proposedDestination: string[];
   originalAllocation: string[];
   consensusUpdateState: ConsensusUpdateState;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface Failure {
