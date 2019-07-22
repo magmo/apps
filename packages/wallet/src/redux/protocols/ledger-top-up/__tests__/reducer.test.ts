@@ -4,6 +4,7 @@ import { LedgerTopUpState, LedgerTopUpStateType } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
 import { describeScenarioStep } from '../../../__tests__/helpers';
 import { bsAddress, asAddress } from '../../../../domain/commitments/__tests__';
+import { isTerminal } from '../../consensus-update';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAHappyPath;
@@ -105,7 +106,6 @@ describe('player B happy path', () => {
 
   describeScenarioStep(scenario.switchOrderAndAddATopUpUpdate, () => {
     const { action, sharedData, state } = scenario.switchOrderAndAddATopUpUpdate;
-    debugger;
     const updatedState = ledgerTopUpReducer(state, sharedData, action);
 
     itTransitionsTo(updatedState, 'LedgerTopUp.WaitForDirectFundingForA');
@@ -282,10 +282,7 @@ function getTotalFundingRequired(protocolState: LedgerTopUpState): string {
 function getProposedConsensus(
   protocolState: LedgerTopUpState,
 ): { proposedAllocation: string[]; proposedDestination: string[] } {
-  if (
-    'consensusUpdateState' in protocolState &&
-    protocolState.consensusUpdateState.type === 'ConsensusUpdate.CommitmentSent'
-  ) {
+  if ('consensusUpdateState' in protocolState && !isTerminal(protocolState.consensusUpdateState)) {
     const { proposedAllocation, proposedDestination } = protocolState.consensusUpdateState;
     return { proposedDestination, proposedAllocation };
   }
