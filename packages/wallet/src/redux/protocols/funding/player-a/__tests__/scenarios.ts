@@ -52,8 +52,11 @@ const oneThree = [
   { address: asAddress, wei: bigNumberify(1).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
 ];
+const app0 = appCommitment({ turnNum: 0, balances: oneThree });
+const app1 = appCommitment({ turnNum: 1, balances: oneThree });
 const app2 = appCommitment({ turnNum: 2, balances: oneThree });
 const app3 = appCommitment({ turnNum: 3, balances: oneThree });
+const appChannelWaitingForFunding = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
 const successSharedData = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments([app2, app3], asAddress, asPrivateKey),
 ]);
@@ -117,7 +120,7 @@ export const indirectStrategyChosen = {
   },
   waitForStrategyResponse: {
     state: waitForIndirectStrategyResponse,
-    sharedData: indirectFundingPreSuccess.sharedData,
+    sharedData: setChannels(indirectFundingPreSuccess.sharedData, [appChannelWaitingForFunding]),
     action: approveIndirectStrategy,
   },
   waitForIndirectFunding: {
