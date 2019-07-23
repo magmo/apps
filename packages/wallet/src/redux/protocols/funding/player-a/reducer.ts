@@ -228,14 +228,14 @@ function strategyApproved(
   switch (action.strategy) {
     case 'IndirectFundingStrategy': {
       const latestCommitment = getLatestCommitment(state.targetChannelId, sharedData);
-      const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
-        state.processId,
-        state.targetChannelId,
-        latestCommitment.allocation,
-        latestCommitment.destination,
+      const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding({
+        processId: state.processId,
+        channelId: state.targetChannelId,
+        targetAllocation: latestCommitment.allocation,
+        targetDestination: latestCommitment.destination,
         sharedData,
-        makeLocator(EmbeddedProtocol.IndirectFunding),
-      );
+        protocolLocator: makeLocator(EmbeddedProtocol.IndirectFunding),
+      });
       if (fundingState.type === 'IndirectFunding.Failure') {
         return {
           protocolState: states.failure(fundingState),

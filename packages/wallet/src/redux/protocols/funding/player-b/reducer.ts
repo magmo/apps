@@ -168,14 +168,14 @@ function strategyApproved(
   const message = sendStrategyApproved(opponentAddress, processId, strategy);
   const latestCommitment = getLatestCommitment(targetChannelId, sharedData);
 
-  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
+  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding({
     processId,
-    targetChannelId,
-    latestCommitment.allocation,
-    latestCommitment.destination,
+    channelId: targetChannelId,
+    targetAllocation: latestCommitment.allocation,
+    targetDestination: latestCommitment.destination,
     sharedData,
-    makeLocator(EmbeddedProtocol.IndirectFunding),
-  );
+    protocolLocator: makeLocator(EmbeddedProtocol.IndirectFunding),
+  });
 
   const advanceChannelResult = initializeAdvanceChannel(
     processId,

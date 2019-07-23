@@ -221,14 +221,17 @@ function waitForGuarantorChannelReducer(
 
         case CommitmentType.PostFundSetup:
           const latestCommitment = getLatestCommitment(guarantorChannelId, sharedData);
-          const indirectFundingResult = indirectFunding.initializeIndirectFunding(
+          const indirectFundingResult = indirectFunding.initializeIndirectFunding({
             processId,
-            result.protocolState.channelId,
-            latestCommitment.allocation,
-            latestCommitment.destination,
-            result.sharedData,
-            makeLocator(protocolState.protocolLocator, EmbeddedProtocol.IndirectFunding),
-          );
+            channelId: result.protocolState.channelId,
+            targetAllocation: latestCommitment.allocation,
+            targetDestination: latestCommitment.destination,
+            sharedData: result.sharedData,
+            protocolLocator: makeLocator(
+              protocolState.protocolLocator,
+              EmbeddedProtocol.IndirectFunding,
+            ),
+          });
           switch (indirectFundingResult.protocolState.type) {
             case 'IndirectFunding.Failure':
               return {
