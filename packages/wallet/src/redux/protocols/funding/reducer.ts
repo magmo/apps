@@ -4,7 +4,7 @@ import * as helpers from '../reducer-helpers';
 import { SharedData, queueMessage } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
 import { unreachable } from '../../../utils/reducer-utils';
-import { TwoPartyPlayerIndex } from '../../types';
+
 import {
   showWallet,
   hideWallet,
@@ -175,7 +175,7 @@ function handleFundingStrategyNegotiationComplete({
     let advanceChannelState: advanceChannelStates.AdvanceChannelState;
     ({ protocolState: advanceChannelState, sharedData } = initializeAdvanceChannel(sharedData, {
       channelId: targetChannelId,
-      ourIndex: TwoPartyPlayerIndex.A,
+      ourIndex: helpers.getTwoPlayerIndex(targetChannelId, sharedData),
       processId,
       commitmentType: CommitmentType.PostFundSetup,
       clearedToSend: false,
