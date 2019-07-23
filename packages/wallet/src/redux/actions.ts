@@ -20,6 +20,7 @@ import { AdvanceChannelAction } from './protocols/advance-channel/actions';
 import { FundingStrategyNegotiationAction } from './protocols/funding-strategy-negotiation/actions';
 import { IndirectFundingAction } from './protocols/indirect-funding';
 
+import { LOAD as LOAD_FROM_STORAGE } from 'redux-storage';
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
 
@@ -113,6 +114,12 @@ export interface ChallengeExpiredEvent {
   timestamp: number;
 }
 
+export interface ChannelUpdate {
+  type: 'WALLET.ADJUDICATOR.CHANNEL_UPDATE';
+  channelId: string;
+  isFinalized: boolean;
+  balance: string;
+}
 // -------
 // Constructors
 // -------
@@ -178,6 +185,10 @@ export const challengeExpiredEvent: ActionConstructor<ChallengeExpiredEvent> = p
   ...p,
   type: 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED',
 });
+export const channelUpdate: ActionConstructor<ChannelUpdate> = p => ({
+  ...p,
+  type: 'WALLET.ADJUDICATOR.CHANNEL_UPDATE',
+});
 
 // -------
 // Unions and Guards
@@ -190,7 +201,8 @@ export type AdjudicatorEventAction =
   | FundingReceivedEvent
   | ChallengeExpiredEvent
   | ChallengeCreatedEvent
-  | ChallengeExpirySetEvent;
+  | ChallengeExpirySetEvent
+  | ChannelUpdate;
 
 export type ProtocolAction =
   // only list top level protocol actions
@@ -246,6 +258,17 @@ export function isAdjudicatorEventAction(action: WalletAction): action is Adjudi
     action.type === 'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED' ||
     action.type === 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT' ||
-    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET'
+    action.type === 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET' ||
+    action.type === 'WALLET.ADJUDICATOR.CHANNEL_UPDATE'
   );
+}
+
+// These are actions related to storage
+export interface LoadAction {
+  type: typeof LOAD_FROM_STORAGE;
+  payload: any;
+}
+
+export function isLoadAction(action: any): action is LoadAction {
+  return action.type && action.type === LOAD_FROM_STORAGE;
 }
