@@ -17,6 +17,8 @@ import { ActionConstructor } from './utils';
 import { Commitment } from '../domain';
 import { isDefundingAction, DefundingAction } from './protocols/defunding/actions';
 import { AdvanceChannelAction } from './protocols/advance-channel/actions';
+import { FundingStrategyNegotiationAction } from './protocols/funding-strategy-negotiation/actions';
+import { IndirectFundingAction } from './protocols/indirect-funding';
 
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
@@ -215,7 +217,10 @@ export type WalletAction =
   | ProtocolAction
   | protocol.NewProcessAction
   | channel.ChannelAction
-  | RelayableAction;
+  | RelayableAction
+  | FundingStrategyNegotiationAction
+  | FundingAction
+  | IndirectFundingAction;
 
 export {
   channel,
