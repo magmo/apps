@@ -209,6 +209,22 @@ function strategyApproved(
     return { protocolState: state, sharedData };
   }
 
+  const { processId, targetChannelId, ourAddress } = state;
+  let advanceChannelState: advanceChannelStates.AdvanceChannelState;
+  ({ protocolState: advanceChannelState, sharedData } = initializeAdvanceChannel(
+    processId,
+    sharedData,
+    CommitmentType.PostFundSetup,
+    {
+      channelId: targetChannelId,
+      ourIndex: TwoPartyPlayerIndex.A,
+      processId,
+      commitmentType: CommitmentType.PostFundSetup,
+      clearedToSend: false,
+      protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+    },
+  ));
+
   switch (action.strategy) {
     case 'IndirectFundingStrategy': {
       const latestCommitment = getLatestCommitment(state.targetChannelId, sharedData);
@@ -226,32 +242,16 @@ function strategyApproved(
           sharedData: newSharedData,
         };
       }
-      const { processId, targetChannelId } = state;
-      const advanceChannelResult = initializeAdvanceChannel(
-        processId,
-        newSharedData,
-        CommitmentType.PostFundSetup,
-        {
-          channelId: targetChannelId,
-          ourIndex: TwoPartyPlayerIndex.A,
-          processId,
-          commitmentType: CommitmentType.PostFundSetup,
-          clearedToSend: false,
-          protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-        },
-      );
       return {
         protocolState: states.waitForIndirectFunding({
           ...state,
           fundingState,
-          postFundSetupState: advanceChannelResult.protocolState,
+          postFundSetupState: advanceChannelState,
         }),
-        sharedData: advanceChannelResult.sharedData,
+        sharedData,
       };
     }
     case 'VirtualFundingStrategy': {
-      const { processId, targetChannelId, ourAddress } = state;
-
       const {
         allocation: startingAllocation,
         destination: startingDestination,
@@ -260,40 +260,28 @@ function strategyApproved(
 
       const ourIndex = channel.participants.indexOf(ourAddress);
 
-      const {
-        protocolState: fundingState,
-        sharedData: newSharedData,
-      } = virtualFunding.initializeVirtualFunding(sharedData, {
-        processId,
-        targetChannelId,
-        ourIndex,
-        // TODO: This should be an env variable
-        hubAddress: '0x100063c326b27f78b2cBb7cd036B8ddE4d4FCa7C',
-        startingAllocation,
-        startingDestination,
-        protocolLocator: makeLocator(EmbeddedProtocol.VirtualFunding),
-      });
-
-      const advanceChannelResult = initializeAdvanceChannel(
-        processId,
-        newSharedData,
-        CommitmentType.PostFundSetup,
+      let fundingState: virtualFunding.VirtualFundingState;
+      ({ protocolState: fundingState, sharedData } = virtualFunding.initializeVirtualFunding(
+        sharedData,
         {
-          channelId: targetChannelId,
-          ourIndex: TwoPartyPlayerIndex.A,
           processId,
-          commitmentType: CommitmentType.PostFundSetup,
-          clearedToSend: false,
-          protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+          targetChannelId,
+          ourIndex,
+          // TODO: This should be an env variable
+          hubAddress: '0x100063c326b27f78b2cBb7cd036B8ddE4d4FCa7C',
+          startingAllocation,
+          startingDestination,
+          protocolLocator: makeLocator(EmbeddedProtocol.VirtualFunding),
         },
-      );
+      ));
+
       return {
         protocolState: states.waitForVirtualFunding({
           ...state,
           fundingState,
-          postFundSetupState: advanceChannelResult.protocolState,
+          postFundSetupState: advanceChannelState,
         }),
-        sharedData: advanceChannelResult.sharedData,
+        sharedData,
       };
     }
     default:
@@ -354,20 +342,21 @@ function handleFundingComplete(
     case 'IndirectFunding.Success':
     case 'VirtualFunding.Success': {
       // When funding is complete we alert the advance channel protocol that we are now cleared to exchange post fund setups
-      const result = advanceChannelReducer(
+      let postFundSetupState: advanceChannelStates.AdvanceChannelState;
+      ({ protocolState: postFundSetupState, sharedData } = advanceChannelReducer(
         protocolState.postFundSetupState,
         sharedData,
         clearedToSend({
           processId: protocolState.processId,
           protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
         }),
-      );
+      ));
       return {
         protocolState: states.waitForPostFundSetup({
           ...protocolState,
-          postFundSetupState: result.protocolState,
+          postFundSetupState,
         }),
-        sharedData: result.sharedData,
+        sharedData,
       };
     }
     default:

@@ -19,19 +19,6 @@ import { channelFromCommitments } from '../../../../channel-store/channel-state/
 import { prependToLocator } from '../../..';
 import { EmbeddedProtocol } from '../../../../../communication';
 
-// To test all paths through the state machine we will use 4 different scenarios:
-//
-// 1. Happy path: WaitForStrategyChoice
-//             -> WaitForStrategyResponse
-//             -> WaitForIndirectFunding
-//             -> WaitForSuccessConfirmation
-//             -> Success
-//
-// 2. WaitForStrategyResponse --> |StrategyRejected| WaitForStrategyChoice
-//
-// 3. WaitForStrategyChoice   --> |Cancelled| Failure
-// 4. WaitForStrategyResponse --> |Cancelled| Failure
-
 // ---------
 // Test data
 // ---------
