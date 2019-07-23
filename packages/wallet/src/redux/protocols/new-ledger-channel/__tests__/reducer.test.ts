@@ -16,10 +16,13 @@ Object.defineProperty(selectors, 'getNextNonce', {
 describe('happy-path scenario', () => {
   const scenario = scenarios.happyPath;
   describe('when initializing', () => {
-    const { channelId, store, processId } = scenario.initialParams;
-    const initialState = initialize(processId, channelId, store, [
-      EmbeddedProtocol.NewLedgerChannel,
-    ]);
+    const { channelId, store: sharedData, processId } = scenario.initialParams;
+    const initialState = initialize({
+      processId,
+      channelId,
+      sharedData,
+      protocolLocator: [EmbeddedProtocol.NewLedgerChannel],
+    });
 
     itTransitionsTo(initialState, 'NewLedgerChannel.WaitForPreFundSetup');
     itSendsAMessage(initialState);
