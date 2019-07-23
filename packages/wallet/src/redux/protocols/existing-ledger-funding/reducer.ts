@@ -34,15 +34,23 @@ import {
 import { LedgerTopUpState } from '../ledger-top-up/states';
 export { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../../communication/protocol-locator';
 
-export const initialize = (
-  processId: string,
-  channelId: string,
-  ledgerId: string,
-  targetAllocation: string[],
-  targetDestination: string[],
-  protocolLocator: ProtocolLocator,
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<states.NonTerminalExistingLedgerFundingState | states.Failure> => {
+export const initialize = ({
+  processId,
+  channelId,
+  ledgerId,
+  targetAllocation,
+  targetDestination,
+  protocolLocator,
+  sharedData,
+}: {
+  processId: string;
+  channelId: string;
+  ledgerId: string;
+  targetAllocation: string[];
+  targetDestination: string[];
+  protocolLocator: ProtocolLocator;
+  sharedData: SharedData;
+}): ProtocolStateWithSharedData<states.NonTerminalExistingLedgerFundingState | states.Failure> => {
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 

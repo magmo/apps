@@ -189,15 +189,15 @@ function fundWithExistingLedgerChannel({
   const {
     protocolState: existingLedgerFundingState,
     sharedData: newSharedData,
-  } = initializeExistingLedgerFunding(
+  } = initializeExistingLedgerFunding({
     processId,
     channelId,
     ledgerId,
     targetAllocation,
     targetDestination,
-    makeLocator(protocolLocator, EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR),
+    protocolLocator: makeLocator(protocolLocator, EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR),
     sharedData,
-  );
+  });
 
   switch (existingLedgerFundingState.type) {
     case 'ExistingLedgerFunding.Failure':
