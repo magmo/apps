@@ -205,7 +205,6 @@ const waitForLoginReducer = (
       let privateKey = state.privateKey;
       if (!address || !privateKey) {
         ({ privateKey, address } = ethers.Wallet.createRandom());
-        privateKey = newPrivateKey;
       }
       return states.initialized({
         ...state,
