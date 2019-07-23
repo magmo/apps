@@ -14,8 +14,8 @@ linkStyle default interpolate basis
   S((start)) --> WFSC(WaitForStrategyChoice)
 
   WFSC --> |WALLET.FUNDING_STRATEGY.PLAYER_A.STRATEGY_CHOSEN| WFSR("WaitForStrategyResponse(Strategy)")
-  WFSR --> |"WALLET.FUNDING.STRATEGY_APPROVED(IndirectFunding)"|SS((success))
-  WFSR --> |"WALLET.FUNDING.STRATEGY_APPROVED(VirtualFunding)"|SS((success))
+  WFSR --> |"WALLET.FUNDING_STRATEGY_NEGOTIATION.STRATEGY_APPROVED(IndirectFunding)"|SS((success))
+  WFSR --> |"WALLET.FUNDING_STRATEGY_NEGOTIATION.STRATEGY_APPROVED(VirtualFunding)"|SS((success))
 
   WFSR --> |WALLET.FUNDING.PLAYER_A.STRATEGY_REJECTED| WFSC
 
