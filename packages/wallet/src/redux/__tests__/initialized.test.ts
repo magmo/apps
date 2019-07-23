@@ -31,7 +31,7 @@ describe('when a NewProcessAction arrives', () => {
 
   const updatedState = walletReducer(initializedState, action);
   it('calls initialize', () => {
-    expect(initialize).toHaveBeenCalledWith(states.EMPTY_SHARED_DATA, action.channelId, processId);
+    expect(initialize).toHaveBeenCalledWith(states.EMPTY_SHARED_DATA, processId, action.channelId);
   });
 
   it('stores the process in the process store', () => {

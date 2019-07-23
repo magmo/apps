@@ -152,7 +152,7 @@ function initializeNewProtocol(
   switch (action.type) {
     case 'WALLET.NEW_PROCESS.FUNDING_REQUESTED': {
       const { channelId } = action;
-      return fundProtocol.initializeFunding(incomingSharedData, channelId, processId);
+      return fundProtocol.initializeFunding(incomingSharedData, processId, channelId);
     }
     case 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED': {
       const { channelId } = action;
