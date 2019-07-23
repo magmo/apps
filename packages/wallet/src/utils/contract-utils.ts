@@ -79,7 +79,8 @@ export async function validateTransition(
     if (error.message === 'Internal JSON-RPC error.') {
       // Require statements cause a generic JSON-RPC error, so we just catch anything and return false
       return Promise.resolve(false);
+    } else {
+      throw error;
     }
   }
-  return Promise.resolve(true);
 }
