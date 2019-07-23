@@ -51,7 +51,6 @@ export function initialize({
     proposedDestination,
     originalAllocation,
     protocolLocator,
-    true,
     sharedData,
   );
   const newProtocolState = states.switchOrderAndAddATopUpUpdate({
@@ -163,7 +162,6 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
       proposedDestination,
       lastCommitment.allocation,
       protocolState.protocolLocator,
-      playerAFunded,
       sharedData,
     ));
     if (playerAFunded) {
@@ -356,7 +354,6 @@ function initializeConsensusState(
   proposedDestination: string[],
   currentAllocation: string[],
   protocolLocator: ProtocolLocator,
-  canSend: boolean,
   sharedData: SharedData,
 ) {
   let newAllocation;
