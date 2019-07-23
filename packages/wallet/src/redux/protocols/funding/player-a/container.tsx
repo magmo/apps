@@ -12,6 +12,7 @@ import AcknowledgeX from '../../shared-components/acknowledge-x';
 import { ActionDispatcher } from '../../../utils';
 import { IndirectFunding } from '../../indirect-funding/container';
 import ApproveX from '../../shared-components/approve-x';
+import { VirtualFunding } from '../../virtual-funding/container';
 
 interface Props {
   state: states.OngoingFundingState;
@@ -66,7 +67,7 @@ class FundingContainer extends PureComponent<Props> {
       case 'Funding.PlayerA.WaitForIndirectFunding':
         return <IndirectFunding state={state.fundingState} />;
       case 'Funding.PlayerA.WaitForVirtualFunding':
-        throw new Error('Unimplemented');
+        return <VirtualFunding state={state.fundingState} />;
       case 'Funding.PlayerA.WaitForSuccessConfirmation':
         return (
           <AcknowledgeX
