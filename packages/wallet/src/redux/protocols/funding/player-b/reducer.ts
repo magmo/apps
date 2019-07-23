@@ -64,7 +64,7 @@ export function fundingReducer(
     case 'WALLET.FUNDING.STRATEGY_PROPOSED':
       return strategyProposed(state, sharedData, action);
     case 'WALLET.FUNDING.PLAYER_B.STRATEGY_APPROVED':
-      return strategyApproved(state, sharedData);
+      return strategyApproved(state, sharedData, action);
     case 'WALLET.FUNDING.PLAYER_B.STRATEGY_REJECTED':
       return strategyRejected(state, sharedData);
     case 'WALLET.FUNDING.PLAYER_B.FUNDING_SUCCESS_ACKNOWLEDGED':
@@ -153,36 +153,38 @@ function strategyProposed(
   return { protocolState: states.waitForStrategyApproval({ ...state, strategy }), sharedData };
 }
 
-function strategyApproved(state: states.FundingState, sharedData: SharedData) {
+function strategyApproved(
+  state: states.FundingState,
+  sharedData: SharedData,
+  action: actions.StrategyApproved,
+) {
   if (state.type !== 'Funding.PlayerB.WaitForStrategyApproval') {
     return { protocolState: state, sharedData };
   }
 
-  const { processId, opponentAddress, targetChannelId } = state;
-  const message = sendStrategyApproved(opponentAddress, processId);
-  const latestCommitment = getLatestCommitment(targetChannelId, sharedData);
-  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding(
-    processId,
-    targetChannelId,
-    latestCommitment.allocation,
-    latestCommitment.destination,
-    sharedData,
-    makeLocator(EmbeddedProtocol.IndirectFunding),
-  );
+  const { strategy } = action;
 
-  const advanceChannelResult = initializeAdvanceChannel(
+  const { processId, opponentAddress, targetChannelId } = state;
+  const message = sendStrategyApproved(opponentAddress, processId, strategy);
+  const latestCommitment = getLatestCommitment(targetChannelId, sharedData);
+
+  const { protocolState: fundingState, sharedData: newSharedData } = initializeIndirectFunding({
     processId,
-    newSharedData,
-    CommitmentType.PostFundSetup,
-    {
-      channelId: targetChannelId,
-      ourIndex: TwoPartyPlayerIndex.B,
-      processId,
-      commitmentType: CommitmentType.PostFundSetup,
-      clearedToSend: false,
-      protocolLocator: makeLocator(ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
-    },
-  );
+    channelId: targetChannelId,
+    targetAllocation: latestCommitment.allocation,
+    targetDestination: latestCommitment.destination,
+    sharedData,
+    protocolLocator: makeLocator(EmbeddedProtocol.IndirectFunding),
+  });
+
+  const advanceChannelResult = initializeAdvanceChannel(newSharedData, {
+    channelId: targetChannelId,
+    ourIndex: TwoPartyPlayerIndex.B,
+    processId,
+    commitmentType: CommitmentType.PostFundSetup,
+    clearedToSend: false,
+    protocolLocator: makeLocator(ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
+  });
   switch (fundingState.type) {
     case 'IndirectFunding.Failure':
       return {

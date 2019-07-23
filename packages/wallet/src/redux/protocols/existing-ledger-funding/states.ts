@@ -1,6 +1,8 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 import { ProtocolLocator } from '../../../communication';
+import { ConsensusUpdateState } from '../consensus-update';
+import { LedgerTopUpState } from '../ledger-top-up/states';
 
 export type FailureReason =
   | 'ReceivedInvalidCommitment'
@@ -11,12 +13,13 @@ export type FailureReason =
 export interface WaitForLedgerTopUp {
   type: 'ExistingLedgerFunding.WaitForLedgerTopUp';
   processId: string;
-  ledgerTopUpState: any;
+  ledgerTopUpState: LedgerTopUpState;
   channelId: string;
   ledgerId: string;
   targetAllocation: string[];
   targetDestination: string[];
   protocolLocator: ProtocolLocator;
+  consensusUpdateState: ConsensusUpdateState;
 }
 
 export interface WaitForLedgerUpdate {
@@ -27,6 +30,7 @@ export interface WaitForLedgerUpdate {
   targetAllocation: string[];
   targetDestination: string[];
   protocolLocator: ProtocolLocator;
+  consensusUpdateState: ConsensusUpdateState;
 }
 
 export interface Failure {

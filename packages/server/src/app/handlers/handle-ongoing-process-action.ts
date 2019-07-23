@@ -39,14 +39,14 @@ export async function handleOngoingProcessAction(ctx) {
 }
 
 async function handleStrategyProposed(ctx, action: StrategyProposed) {
-  const { processId } = action;
+  const { processId, strategy } = action;
   const process = await getProcess(processId);
   if (!process) {
     throw errors.processMissing(processId);
   }
 
   const { theirAddress } = process;
-  ctx.body = communication.sendStrategyApproved(theirAddress, processId);
+  ctx.body = communication.sendStrategyApproved(theirAddress, processId, strategy);
   ctx.status = 200;
 
   return ctx;
@@ -104,7 +104,9 @@ async function handleCommitmentsReceived({ ctx, action }: { ctx; action: Commitm
     if (!walletProcess) {
       throw errors.processMissing(processId);
     }
-    const commitmentRound: SignedCommitment[] = action.signedCommitments.map(
+
+    const incomingCommitments = action.signedCommitments;
+    const commitmentRound: SignedCommitment[] = incomingCommitments.map(
       clientCommitmentToServerCommitment,
     );
 
@@ -144,14 +146,10 @@ async function handleCommitmentsReceived({ ctx, action }: { ctx; action: Commitm
     );
     ctx.status = 201;
 
-    // todo: properly compose a round of commitments
     ctx.body = communication.sendCommitmentsReceived(
       nextParticipant,
       processId,
-      [
-        { commitment: lastCommitment, signature: lastCommitmentSignature.signature },
-        { commitment, signature: (signature as unknown) as string },
-      ],
+      [...incomingCommitments, { commitment, signature: (signature as unknown) as string }],
       action.protocolLocator,
     );
 

@@ -4,11 +4,12 @@ import * as selectors from '../../selectors';
 import * as helpers from '../reducer-helpers';
 import { getLastCommitment, ChannelState } from '../../channel-store/channel-state';
 import { CommitmentType } from 'fmg-core';
+import { isExistingLedgerFundingAction } from '../existing-ledger-funding';
+// TODO: Why does importing the reducer from the index result in test failures in grand parent protocols?
 import {
-  initializeExistingLedgerFunding,
-  isExistingLedgerFundingAction,
+  initialize as initializeExistingLedgerFunding,
   existingLedgerFundingReducer,
-} from '../existing-ledger-funding';
+} from '../existing-ledger-funding/reducer';
 import * as states from './states';
 import { isNewLedgerChannelAction, NewLedgerChannelReducer } from '../new-ledger-channel';
 import { unreachable } from '../../../utils/reducer-utils';
@@ -19,14 +20,21 @@ import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../existing-ledger-fun
 
 export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.IndirectFunding);
 
-export function initialize(
-  processId: string,
-  channelId: string,
-  targetAllocation: string[],
-  targetDestination: string[],
-  sharedData: SharedData,
-  protocolLocator: ProtocolLocator,
-): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
+export function initialize({
+  processId,
+  channelId,
+  targetAllocation,
+  targetDestination,
+  sharedData,
+  protocolLocator,
+}: {
+  processId: string;
+  channelId: string;
+  targetAllocation: string[];
+  targetDestination: string[];
+  sharedData: SharedData;
+  protocolLocator: ProtocolLocator;
+}): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
   const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
     sharedData,
     helpers.getOurAddress(channelId, sharedData),
@@ -188,37 +196,39 @@ function fundWithExistingLedgerChannel({
   const {
     protocolState: existingLedgerFundingState,
     sharedData: newSharedData,
-  } = initializeExistingLedgerFunding(
+  } = initializeExistingLedgerFunding({
     processId,
     channelId,
     ledgerId,
     targetAllocation,
     targetDestination,
-    makeLocator(protocolLocator, EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR),
+    protocolLocator: makeLocator(protocolLocator, EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR),
     sharedData,
-  );
+  });
 
-  if (existingLedgerFundingState.type === 'ExistingLedgerFunding.Failure') {
-    return {
-      protocolState: states.failure({
-        reason: 'ExistingLedgerFunding Failure',
-      }),
-      sharedData: newSharedData,
-    };
+  switch (existingLedgerFundingState.type) {
+    case 'ExistingLedgerFunding.Failure':
+      return {
+        protocolState: states.failure(existingLedgerFundingState),
+        sharedData: newSharedData,
+      };
+    case 'ExistingLedgerFunding.WaitForLedgerTopUp':
+    case 'ExistingLedgerFunding.WaitForLedgerUpdate':
+      return {
+        protocolState: states.waitForExistingLedgerFunding({
+          processId,
+          channelId,
+          ledgerId,
+          existingLedgerFundingState,
+          targetAllocation,
+          targetDestination,
+          protocolLocator,
+        }),
+        sharedData: newSharedData,
+      };
+    default:
+      return unreachable(existingLedgerFundingState);
   }
-
-  return {
-    protocolState: states.waitForExistingLedgerFunding({
-      processId,
-      channelId,
-      ledgerId,
-      existingLedgerFundingState,
-      targetAllocation,
-      targetDestination,
-      protocolLocator,
-    }),
-    sharedData: newSharedData,
-  };
 }
 
 function ledgerChannelIsReady(

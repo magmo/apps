@@ -138,10 +138,10 @@ function handleLedgerUpdateAction(
     };
   } else {
     return {
-      protocolState: states.instigatorWaitForLedgerUpdate({
+      protocolState: {
         ...protocolState,
         consensusUpdateState: updatedConsensusUpdateState,
-      }),
+      },
       sharedData: newSharedData,
     };
   }
@@ -199,15 +199,15 @@ function concludeReceived(
     const latestCommitment = helpers.getLatestCommitment(protocolState.channelId, sharedData);
     const ledgerId = helpers.getFundingChannelId(protocolState.channelId, sharedData);
 
-    const consensusUpdateResult = consensusUpdateInitialize(
-      protocolState.processId,
-      ledgerId,
-      false,
-      latestCommitment.allocation,
-      latestCommitment.destination,
-      makeLocator(CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
+    const consensusUpdateResult = consensusUpdateInitialize({
+      processId: protocolState.processId,
+      channelId: ledgerId,
+      clearedToSend: false,
+      proposedAllocation: latestCommitment.allocation,
+      proposedDestination: latestCommitment.destination,
       sharedData,
-    );
+      protocolLocator: makeLocator(CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
+    });
     sharedData = consensusUpdateResult.sharedData;
     return {
       protocolState: states.instigatorAcknowledgeConcludeReceived({
