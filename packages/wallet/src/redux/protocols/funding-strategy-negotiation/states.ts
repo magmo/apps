@@ -30,14 +30,9 @@ export function isFundingStrategyNegotiationState(
 }
 
 export function isTerminal(
-  state: ProtocolState,
-): state is
-  | playerA.TerminalFundingStrategyNegotiationState
-  | playerB.TerminalFundingStrategyNegotiationState {
-  return (
-    (playerA.isFundingStrategyNegotiationState(state) && playerA.isTerminal(state)) ||
-    (playerB.isFundingStrategyNegotiationState(state) && playerB.isTerminal(state))
-  );
+  state: FundingStrategyNegotiationState,
+): state is TerminalFundingStrategyNegotiationState {
+  return isSuccess(state) || isFailure(state);
 }
 
 export function isSuccess(
@@ -58,9 +53,7 @@ export function isFailure(
 }
 
 export function isNonTerminalFundingState(
-  state: ProtocolState,
-): state is
-  | playerA.OngoingFundingStrategyNegotiationState
-  | playerB.OngoingFundingStrategyNegotiationState {
+  state: FundingStrategyNegotiationState,
+): state is OngoingFundingStrategyNegotiationState {
   return isFundingStrategyNegotiationState(state) && !isTerminal(state);
 }
