@@ -211,19 +211,14 @@ function strategyApproved(
 
   const { processId, targetChannelId, ourAddress } = state;
   let advanceChannelState: advanceChannelStates.AdvanceChannelState;
-  ({ protocolState: advanceChannelState, sharedData } = initializeAdvanceChannel(
+  ({ protocolState: advanceChannelState, sharedData } = initializeAdvanceChannel(sharedData, {
+    channelId: targetChannelId,
+    ourIndex: TwoPartyPlayerIndex.A,
     processId,
-    sharedData,
-    CommitmentType.PostFundSetup,
-    {
-      channelId: targetChannelId,
-      ourIndex: TwoPartyPlayerIndex.A,
-      processId,
-      commitmentType: CommitmentType.PostFundSetup,
-      clearedToSend: false,
-      protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
-    },
-  ));
+    commitmentType: CommitmentType.PostFundSetup,
+    clearedToSend: false,
+    protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+  }));
 
   switch (action.strategy) {
     case 'IndirectFundingStrategy': {
