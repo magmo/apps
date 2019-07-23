@@ -25,7 +25,7 @@ class VirtualFundingContainer extends PureComponent<Props> {
       case 'VirtualFunding.WaitForJointChannel':
         return <AdvanceChannel state={state.jointChannel} />;
       default:
-        unreachable(state);
+        return unreachable(state);
     }
   }
 }
