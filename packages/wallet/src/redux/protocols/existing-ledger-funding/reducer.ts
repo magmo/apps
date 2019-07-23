@@ -68,16 +68,16 @@ export const initialize = ({
 
   if (ledgerChannelNeedsTopUp(theirCommitment, targetAllocation, targetDestination)) {
     let ledgerTopUpState: LedgerTopUpState;
-    ({ protocolState: ledgerTopUpState, sharedData } = initializeLedgerTopUp(
+    ({ protocolState: ledgerTopUpState, sharedData } = initializeLedgerTopUp({
       processId,
       channelId,
       ledgerId,
-      targetAllocation,
-      targetDestination,
-      theirCommitment.allocation,
-      makeLocator(protocolLocator, LEDGER_TOP_UP_PROTOCOL_LOCATOR),
+      proposedAllocation: targetAllocation,
+      proposedDestination: targetDestination,
+      originalAllocation: theirCommitment.allocation,
+      protocolLocator: makeLocator(protocolLocator, LEDGER_TOP_UP_PROTOCOL_LOCATOR),
       sharedData,
-    ));
+    }));
 
     return {
       protocolState: states.waitForLedgerTopUp({

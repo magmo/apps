@@ -23,16 +23,25 @@ import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 import { DirectFundingState } from '../direct-funding/states';
 import { clearedToSend } from '../consensus-update/actions';
 export { LEDGER_TOP_UP_PROTOCOL_LOCATOR } from '../../../communication/protocol-locator';
-export function initialize(
-  processId: string,
-  channelId: string,
-  ledgerId: string,
-  proposedAllocation: string[],
-  proposedDestination: string[],
-  originalAllocation: string[],
-  protocolLocator: ProtocolLocator,
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<states.LedgerTopUpState> {
+export function initialize({
+  processId,
+  channelId,
+  ledgerId,
+  proposedAllocation,
+  proposedDestination,
+  originalAllocation,
+  protocolLocator,
+  sharedData,
+}: {
+  processId: string;
+  channelId: string;
+  ledgerId: string;
+  proposedAllocation: string[];
+  proposedDestination: string[];
+  originalAllocation: string[];
+  protocolLocator: ProtocolLocator;
+  sharedData: SharedData;
+}): ProtocolStateWithSharedData<states.LedgerTopUpState> {
   sharedData = registerChannelToMonitor(sharedData, processId, ledgerId);
   const { consensusUpdateState, sharedData: newSharedData } = initializeConsensusState(
     TwoPartyPlayerIndex.A,
