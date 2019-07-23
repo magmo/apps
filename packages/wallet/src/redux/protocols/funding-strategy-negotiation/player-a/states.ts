@@ -75,7 +75,7 @@ export type FundingStrategyNegotiationState =
 export function isFundingStrategyNegotiationState(
   state: ProtocolState,
 ): state is FundingStrategyNegotiationState {
-  return state.type.indexOf('FundingStrategyNegotiation') > -1;
+  return state.type.indexOf('FundingStrategyNegotiation.PlayerA') === 0;
 }
 
 export function isTerminal(

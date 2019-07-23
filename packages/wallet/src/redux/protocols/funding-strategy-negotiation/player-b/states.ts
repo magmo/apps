@@ -80,5 +80,5 @@ export function isTerminal(state: FundingStrategyNegotiationState): state is Fai
 export function isFundingStrategyNegotiationState(
   state: ProtocolState,
 ): state is FundingStrategyNegotiationState {
-  return state.type.indexOf('FundingStrategyNegotiation') > -1;
+  return state.type.indexOf('FundingStrategyNegotiation.PlayerB') === 0;
 }
