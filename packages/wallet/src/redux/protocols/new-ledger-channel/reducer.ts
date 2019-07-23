@@ -34,39 +34,40 @@ type ReturnVal = ProtocolStateWithSharedData<NewLedgerChannelState>;
 type IDFAction = NewLedgerChannelAction;
 export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.NewLedgerChannel);
 
+interface InitializeArgs {
+  processId: string;
+  channelId: string;
+  sharedData: SharedData;
+  protocolLocator: ProtocolLocator;
+}
 export function initialize(
-  processId: string,
-  channelId: string,
-  sharedData: SharedData,
-  protocolLocator: ProtocolLocator,
+  args: InitializeArgs,
 ): ProtocolStateWithSharedData<states.NonTerminalNewLedgerChannelState | states.Failure> {
-  const privateKey = getPrivatekey(sharedData, channelId);
-  const ourIndex = getTwoPlayerIndex(channelId, sharedData);
-  const { allocation, destination, channel } = getLatestCommitment(channelId, sharedData);
+  const privateKey = getPrivatekey(args.sharedData, args.channelId);
+  const ourIndex = getTwoPlayerIndex(args.channelId, args.sharedData);
+  const { allocation, destination, channel } = getLatestCommitment(args.channelId, args.sharedData);
   const initializationArgs = {
+    ...args,
     privateKey,
     channelType: CONSENSUS_LIBRARY_ADDRESS,
     ourIndex,
     commitmentType: CommitmentType.PreFundSetup,
     clearedToSend: true,
-    processId,
-    protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
+    protocolLocator: makeLocator(args.protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
     participants: channel.participants,
   };
 
-  const advanceChannelResult = initializeAdvanceChannel(sharedData, {
+  const advanceChannelResult = initializeAdvanceChannel(args.sharedData, {
     ...initializationArgs,
     ...channelSpecificArgs(allocation, destination),
   });
-  sharedData = advanceChannelResult.sharedData;
+  args.sharedData = advanceChannelResult.sharedData;
 
   const protocolState = states.waitForPreFundSetup({
-    channelId,
-    processId,
+    ...args,
     preFundSetupState: advanceChannelResult.protocolState,
-    protocolLocator,
   });
-  return { protocolState, sharedData };
+  return { ...args, protocolState };
 }
 
 export function NewLedgerChannelReducer(

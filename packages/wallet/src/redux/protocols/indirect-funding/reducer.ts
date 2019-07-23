@@ -20,47 +20,36 @@ import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../existing-ledger-fun
 
 export const INDIRECT_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.IndirectFunding);
 
-export function initialize({
-  processId,
-  channelId,
-  targetAllocation,
-  targetDestination,
-  sharedData,
-  protocolLocator,
-}: {
+interface InitializeArgs {
   processId: string;
   channelId: string;
   targetAllocation: string[];
   targetDestination: string[];
   sharedData: SharedData;
   protocolLocator: ProtocolLocator;
-}): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
+}
+export function initialize(
+  args: InitializeArgs,
+): ProtocolStateWithSharedData<states.NonTerminalIndirectFundingState | states.Failure> {
   const existingLedgerChannel = selectors.getFundedLedgerChannelForParticipants(
-    sharedData,
-    helpers.getOurAddress(channelId, sharedData),
-    helpers.getOpponentAddress(channelId, sharedData),
+    args.sharedData,
+    helpers.getOurAddress(args.channelId, args.sharedData),
+    helpers.getOpponentAddress(args.channelId, args.sharedData),
   );
 
   if (ledgerChannelIsReady(existingLedgerChannel)) {
     return fundWithExistingLedgerChannel({
-      processId,
-      channelId,
-      targetAllocation,
-      targetDestination,
-      protocolLocator,
-      sharedData,
+      ...args,
       existingLedgerChannel,
     });
   } else {
     const {
       protocolState: newLedgerChannelState,
       sharedData: newSharedData,
-    } = newLedgerChannel.initializeNewLedgerChannel(
-      processId,
-      channelId,
-      sharedData,
-      makeLocator(protocolLocator, EmbeddedProtocol.NewLedgerChannel),
-    );
+    } = newLedgerChannel.initializeNewLedgerChannel({
+      ...args,
+      protocolLocator: makeLocator(args.protocolLocator, EmbeddedProtocol.NewLedgerChannel),
+    });
 
     if (newLedgerChannelState.type === 'NewLedgerChannel.Failure') {
       return {
@@ -71,12 +60,8 @@ export function initialize({
 
     return {
       protocolState: states.waitForNewLedgerChannel({
-        processId,
-        channelId,
+        ...args,
         newLedgerChannel: newLedgerChannelState,
-        targetAllocation,
-        targetDestination,
-        protocolLocator,
       }),
       sharedData: newSharedData,
     };
