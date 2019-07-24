@@ -42,6 +42,7 @@ router.post(`${BASE_URL}`, koaBody(), async ctx => {
   } else {
     const action = ctx.request.body;
 
+    debugger;
     if (await isNewProcessAction(action)) {
       const response = await handleNewProcessAction(ctx);
       sendViaFirebaseToWallet(response);

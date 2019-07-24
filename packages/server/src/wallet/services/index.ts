@@ -25,7 +25,6 @@ export interface SignedLedgerCommitment {
 
 export const updateLedgerChannel: (
   ledgerCommitmentRound: SignedLedgerCommitment[],
-  currentC?: LedgerCommitment,
 ) => Promise<SignedCommitment> = LedgerChannelManager.updateLedgerChannel;
 
 export const fund: (id: Address, expectedHeld: Uint256, amount: Uint256) => Promise<Uint256> =
