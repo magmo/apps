@@ -78,7 +78,7 @@ function routeToProtocolReducer(
   } else {
     switch (processState.protocol) {
       case ProcessProtocol.Funding:
-        const { protocolState, sharedData } = fundProtocol.reducer(
+        const { protocolState, sharedData } = fundProtocol.fundingReducer(
           processState.protocolState,
           states.sharedData(state),
           action,
@@ -152,7 +152,7 @@ function initializeNewProtocol(
   switch (action.type) {
     case 'WALLET.NEW_PROCESS.FUNDING_REQUESTED': {
       const { channelId } = action;
-      return fundProtocol.initialize(incomingSharedData, channelId, processId, action.playerIndex);
+      return fundProtocol.initializeFunding(incomingSharedData, processId, channelId);
     }
     case 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED': {
       const { channelId } = action;
@@ -201,7 +201,10 @@ const waitForLoginReducer = (
 ): states.WalletState => {
   switch (action.type) {
     case 'WALLET.LOGGED_IN':
-      const { privateKey, address } = ethers.Wallet.createRandom();
+      let { address, privateKey } = state;
+      if (!address || !privateKey) {
+        ({ privateKey, address } = ethers.Wallet.createRandom());
+      }
       return states.initialized({
         ...state,
         uid: action.uid,
