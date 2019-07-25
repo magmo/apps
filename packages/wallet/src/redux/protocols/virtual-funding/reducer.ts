@@ -99,7 +99,7 @@ function waitForJointChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId, hubAddress, ourIndex } = protocolState;
+  const { processId, hubAddress, ourIndex, protocolLocator } = protocolState;
   if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const result = advanceChannelReducer(protocolState.jointChannel, sharedData, action);
 
@@ -111,7 +111,7 @@ function waitForJointChannelReducer(
             clearedToSend: true,
             commitmentType: CommitmentType.PostFundSetup,
             processId,
-            protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+            protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
             channelId: jointChannelId,
             ourIndex,
           });
@@ -135,7 +135,7 @@ function waitForJointChannelReducer(
               clearedToSend: true,
               commitmentType: CommitmentType.PreFundSetup,
               processId,
-              protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+              protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
               ourIndex,
               privateKey,
               channelType,
@@ -178,7 +178,7 @@ function waitForGuarantorChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId, ourIndex } = protocolState;
+  const { processId, ourIndex, protocolLocator } = protocolState;
   if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
     if (advanceChannel.isSuccess(result.protocolState)) {
@@ -192,7 +192,7 @@ function waitForGuarantorChannelReducer(
               clearedToSend: true,
               commitmentType: CommitmentType.PostFundSetup,
               processId,
-              protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
+              protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
               channelId: guarantorChannelId,
               ourIndex,
             },
