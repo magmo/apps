@@ -175,7 +175,7 @@ function initializeWithExistingChannel(
 ) {
   const { channelId, ourIndex, clearedToSend, protocolLocator } = initializeChannelArgs;
   const channel = getChannel(sharedData.channelStore, channelId);
-  if (helpers.isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
+  if (helpers.isSafeToSend({ sharedData, ourIndex, clearedToSend, channelId })) {
     const lastCommitment = getLastCommitment(channel);
     const ourCommitment = nextSetupCommitment(lastCommitment);
     if (ourCommitment === 'NotASetupCommitment') {
