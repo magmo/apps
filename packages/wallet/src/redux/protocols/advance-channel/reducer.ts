@@ -117,6 +117,7 @@ function initializeWithNewChannel(
     clearedToSend,
     protocolLocator,
     participants,
+    guaranteedChannel,
   } = initializeChannelArgs;
 
   if (helpers.isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
@@ -126,6 +127,7 @@ function initializeWithNewChannel(
       nonce,
       participants,
       channelType,
+      guaranteedChannel,
     };
     const ourCommitment: Commitment = {
       turnNum: 0,
