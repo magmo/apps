@@ -19,7 +19,6 @@ import { routesToConsensusUpdate } from '../consensus-update/actions';
 import { EmbeddedProtocol } from '../../../communication';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
-import { getLatestCommitment } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
 export function initialize(
@@ -208,12 +207,13 @@ function waitForGuarantorChannelReducer(
           };
 
         case CommitmentType.PostFundSetup:
-          const latestCommitment = getLatestCommitment(guarantorChannelId, sharedData);
+          const targetAllocation = [protocolState.startingAllocation.reduce(addHex)];
+          const targetDestination = [guarantorChannelId];
           const indirectFundingResult = indirectFunding.initializeIndirectFunding({
             processId,
             channelId: result.protocolState.channelId,
-            targetAllocation: latestCommitment.allocation,
-            targetDestination: latestCommitment.destination,
+            targetAllocation,
+            targetDestination,
             sharedData: result.sharedData,
             protocolLocator: makeLocator(
               protocolState.protocolLocator,
