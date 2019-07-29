@@ -140,6 +140,7 @@ function waitForJointChannelReducer(
               privateKey,
               channelType,
               participants: [ourAddress, hubAddress],
+              guaranteedChannel: jointChannelId,
               ...channelSpecificArgs([], destination),
             },
           );
