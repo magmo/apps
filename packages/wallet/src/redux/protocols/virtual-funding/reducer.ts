@@ -196,12 +196,13 @@ function waitForGuarantorChannelReducer(
               protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
               channelId: guarantorChannelId,
               ourIndex,
+              guaranteedChannel: protocolState.jointChannelId,
             },
           );
           return {
             protocolState: {
               ...protocolState,
-              jointChannel: guarantorChannelResult.protocolState,
+              guarantorChannel: guarantorChannelResult.protocolState,
             },
             sharedData: guarantorChannelResult.sharedData,
           };
