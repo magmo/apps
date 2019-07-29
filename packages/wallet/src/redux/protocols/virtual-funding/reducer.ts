@@ -19,7 +19,6 @@ import { routesToConsensusUpdate } from '../consensus-update/actions';
 import { EmbeddedProtocol } from '../../../communication';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
-import { getLatestCommitment } from '../reducer-helpers';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 
 export function initialize(
@@ -140,6 +139,7 @@ function waitForJointChannelReducer(
               privateKey,
               channelType,
               participants: [ourAddress, hubAddress],
+              guaranteedChannel: jointChannelId,
               ...channelSpecificArgs([], destination),
             },
           );
@@ -195,23 +195,32 @@ function waitForGuarantorChannelReducer(
               protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
               channelId: guarantorChannelId,
               ourIndex,
+              guaranteedChannel: protocolState.jointChannelId,
             },
           );
           return {
             protocolState: {
               ...protocolState,
-              jointChannel: guarantorChannelResult.protocolState,
+              guarantorChannel: guarantorChannelResult.protocolState,
             },
             sharedData: guarantorChannelResult.sharedData,
           };
 
         case CommitmentType.PostFundSetup:
-          const latestCommitment = getLatestCommitment(guarantorChannelId, sharedData);
+          const startingAllocation = [
+            protocolState.startingAllocation[ourIndex],
+            protocolState.startingAllocation[ourIndex],
+          ];
+          const startingDestination = [
+            protocolState.startingDestination[ourIndex],
+            protocolState.hubAddress,
+          ];
           const indirectFundingResult = indirectFunding.initializeIndirectFunding({
             processId,
             channelId: result.protocolState.channelId,
-            targetAllocation: latestCommitment.allocation,
-            targetDestination: latestCommitment.destination,
+            startingAllocation,
+            startingDestination,
+            participants: startingDestination,
             sharedData: result.sharedData,
             protocolLocator: makeLocator(
               protocolState.protocolLocator,
