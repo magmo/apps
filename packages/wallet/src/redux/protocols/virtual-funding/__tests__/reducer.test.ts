@@ -9,6 +9,8 @@ import {
 import { preFund, postFund } from '../../advance-channel/__tests__';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { bigNumberify } from 'ethers/utils';
+import { asAddress } from '../../../../domain/commitments/__tests__';
+import { bsAddress } from '../../../../communication/__tests__/commitments';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -103,17 +105,13 @@ describe('happyPath', () => {
       'indirectGuarantorFunding',
       'IndirectFunding.WaitForNewLedgerChannel',
     );
-    // While this channel should have two participants, the test scenarios currently
-    // create a guarantor channel that has three participants.
-    // Since we ask the indirect-funding protocol to fund that channel, the resulting
-    // ledger channel has three participants as well.
-    // TODO: Fix this by constructing appropriate test data
+
     itSendsTheseCommitments(result, [
       {
         commitment: {
           turnNum: 0,
           channel: {
-            participants: [expect.any(String), expect.any(String), expect.any(String)],
+            participants: [asAddress, bsAddress],
             nonce: expect.any(Number),
             channelType: CONSENSUS_LIBRARY_ADDRESS,
           },
