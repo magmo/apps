@@ -10,7 +10,6 @@ import { preFund, postFund } from '../../advance-channel/__tests__';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
 import { bigNumberify } from 'ethers/utils';
 import { asAddress } from '../../../../domain/commitments/__tests__';
-import { bsAddress } from '../../../../communication/__tests__/commitments';
 
 const itTransitionsTo = (
   result: states.VirtualFundingState,
@@ -111,7 +110,7 @@ describe('happyPath', () => {
         commitment: {
           turnNum: 0,
           channel: {
-            participants: [asAddress, bsAddress],
+            participants: [asAddress, hubAddress],
             nonce: expect.any(Number),
             channelType: CONSENSUS_LIBRARY_ADDRESS,
           },

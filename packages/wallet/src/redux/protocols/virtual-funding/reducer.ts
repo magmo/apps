@@ -207,7 +207,14 @@ function waitForGuarantorChannelReducer(
           };
 
         case CommitmentType.PostFundSetup:
-          const { startingAllocation, startingDestination } = protocolState;
+          const startingAllocation = [
+            protocolState.startingAllocation[ourIndex],
+            protocolState.startingAllocation[ourIndex],
+          ];
+          const startingDestination = [
+            protocolState.startingDestination[ourIndex],
+            protocolState.hubAddress,
+          ];
           const indirectFundingResult = indirectFunding.initializeIndirectFunding({
             processId,
             channelId: result.protocolState.channelId,
