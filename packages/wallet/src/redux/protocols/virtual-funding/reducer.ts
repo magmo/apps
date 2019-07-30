@@ -277,6 +277,7 @@ function waitForGuarantorFundingReducer(
     startingAllocation,
     targetChannelId,
     protocolLocator,
+    hubAddress,
   } = protocolState;
   if (routesToIndirectFunding(action, protocolLocator)) {
     const result = indirectFunding.indirectFundingReducer(
@@ -287,8 +288,11 @@ function waitForGuarantorFundingReducer(
     if (indirectFunding.isTerminal(result.protocolState)) {
       switch (result.protocolState.type) {
         case 'IndirectFunding.Success':
-          const proposedAllocation = [startingAllocation.reduce(addHex)];
-          const proposedDestination = [targetChannelId];
+          const proposedAllocation = [
+            startingAllocation.reduce(addHex),
+            startingAllocation.reduce(addHex),
+          ];
+          const proposedDestination = [targetChannelId, hubAddress];
 
           const applicationFundingResult = consensusUpdate.initializeConsensusUpdate({
             processId,
