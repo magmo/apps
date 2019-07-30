@@ -20,6 +20,7 @@ import { EmbeddedProtocol } from '../../../communication';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
+import { TwoPartyPlayerIndex } from '../../types';
 
 export function initialize(
   sharedData: SharedData,
@@ -135,7 +136,7 @@ function waitForJointChannelReducer(
               commitmentType: CommitmentType.PreFundSetup,
               processId,
               protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
-              ourIndex,
+              ourIndex: TwoPartyPlayerIndex.A, // When creating the guarantor channel with the hub we are always the first player
               privateKey,
               channelType,
               participants: [ourAddress, hubAddress],
@@ -194,7 +195,7 @@ function waitForGuarantorChannelReducer(
               processId,
               protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
               channelId: guarantorChannelId,
-              ourIndex,
+              ourIndex: TwoPartyPlayerIndex.A, // When creating the guarantor channel with the hub we are always the first player
               guaranteedChannel: protocolState.jointChannelId,
             },
           );
