@@ -372,8 +372,8 @@ function channelSpecificArgs(
     allocation,
     destination,
     appAttributes: bytesFromAppAttributes({
-      proposedAllocation: allocation,
-      proposedDestination: destination,
+      proposedAllocation: [],
+      proposedDestination: [],
       furtherVotesRequired: 0,
     }),
   };
