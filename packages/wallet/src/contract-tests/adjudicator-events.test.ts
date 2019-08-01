@@ -21,9 +21,7 @@ const createWatcherState = (
 ): walletStates.Initialized => {
   const channelSubscriptions: walletStates.ChannelSubscriptions = {};
   for (const channelId of channelIds) {
-    if (!channelSubscriptions[channelId]) {
-      channelSubscriptions[channelId] = [];
-    }
+    channelSubscriptions[channelId] = channelSubscriptions[channelId] || [];
     channelSubscriptions[channelId].push({ processId, protocolLocator: [] });
   }
 
