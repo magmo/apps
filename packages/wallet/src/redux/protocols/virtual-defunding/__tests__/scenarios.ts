@@ -36,7 +36,7 @@ const guarantorChannelId = '0x01';
 const startingAllocation = app0.commitment.allocation;
 const startingDestination = app0.commitment.destination;
 const props = {
-  appChannelId,
+  targetChannelId: appChannelId,
   processId,
   startingAllocation,
   startingDestination,

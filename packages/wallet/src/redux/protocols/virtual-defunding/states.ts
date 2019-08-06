@@ -9,7 +9,7 @@ interface Base {
   hubAddress: string;
   protocolLocator: ProtocolLocator;
   jointChannelId: string;
-  appChannelId: string;
+  targetChannelId: string;
 }
 
 export interface WaitForJointChannelUpdate extends Base {

@@ -15,25 +15,25 @@ import { routesToConsensusUpdate } from '../consensus-update/actions';
 
 export function initialize({
   processId,
-  appChannelId,
+  targetChannelId,
   ourIndex,
   hubAddress,
   protocolLocator,
   sharedData,
 }: {
   processId: string;
-  appChannelId: string;
+  targetChannelId: string;
   ourIndex: number;
   hubAddress: string;
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.NonTerminalVirtualDefundingState> {
-  const fundingState = getChannelFundingState(sharedData, appChannelId);
+  const fundingState = getChannelFundingState(sharedData, targetChannelId);
   if (!fundingState || !fundingState.fundingChannel) {
-    throw new Error(`Attempting to virtually defund a directly funded channel ${appChannelId}`);
+    throw new Error(`Attempting to virtually defund a directly funded channel ${targetChannelId}`);
   }
   const jointChannelId = fundingState.fundingChannel;
-  const latestAppCommitment = getLatestCommitment(appChannelId, sharedData);
+  const latestAppCommitment = getLatestCommitment(targetChannelId, sharedData);
 
   const proposedDestination = [...latestAppCommitment.destination, hubAddress];
   const proposedAllocation = [
@@ -58,7 +58,7 @@ export function initialize({
       hubAddress,
       jointChannel,
       jointChannelId,
-      appChannelId: appChannelId,
+      targetChannelId: targetChannelId,
       protocolLocator,
     }),
     sharedData,
@@ -96,7 +96,13 @@ function waitForJointChannelUpdateReducer(
       case 'ConsensusUpdate.Failure':
         return { protocolState: states.failure({}), sharedData };
       case 'ConsensusUpdate.Success':
-        const { hubAddress, jointChannelId, appChannelId, ourIndex, processId } = protocolState;
+        const {
+          hubAddress,
+          jointChannelId,
+          targetChannelId: appChannelId,
+          ourIndex,
+          processId,
+        } = protocolState;
         // TODO: We probably need to start this earlier to deal with commitments coming in early
         const ledgerChannelId = getLedgerChannelId(jointChannelId, sharedData);
         const latestAppCommitment = getLatestCommitment(appChannelId, sharedData);
