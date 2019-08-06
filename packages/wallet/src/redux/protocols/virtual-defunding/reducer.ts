@@ -15,25 +15,25 @@ import { routesToConsensusUpdate } from '../consensus-update/actions';
 
 export function initialize({
   processId,
-  channelId,
+  appChannelId,
   ourIndex,
   hubAddress,
   protocolLocator,
   sharedData,
 }: {
   processId: string;
-  channelId: string;
+  appChannelId: string;
   ourIndex: number;
   hubAddress: string;
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.NonTerminalVirtualDefundingState> {
-  const fundingState = getChannelFundingState(sharedData, channelId);
+  const fundingState = getChannelFundingState(sharedData, appChannelId);
   if (!fundingState || !fundingState.fundingChannel) {
-    throw new Error(`Attempting to virtually defund a directly funded channel ${channelId}`);
+    throw new Error(`Attempting to virtually defund a directly funded channel ${appChannelId}`);
   }
   const jointChannelId = fundingState.fundingChannel;
-  const latestAppCommitment = getLatestCommitment(channelId, sharedData);
+  const latestAppCommitment = getLatestCommitment(appChannelId, sharedData);
 
   const proposedDestination = [...latestAppCommitment.destination, hubAddress];
   const proposedAllocation = [
@@ -58,7 +58,7 @@ export function initialize({
       hubAddress,
       jointChannel,
       jointChannelId,
-      appChannelId: channelId,
+      appChannelId: appChannelId,
       protocolLocator,
     }),
     sharedData,
