@@ -8,23 +8,22 @@ import {
   consensusUpdateReducer,
 } from '../consensus-update/reducer';
 import { getChannelFundingState } from '../../selectors';
-import { getLatestCommitment } from '../reducer-helpers';
+import { getLatestCommitment, getTwoPlayerIndex } from '../reducer-helpers';
 import { addHex } from '../../../utils/hex-utils';
 import { VirtualDefundingAction } from './actions';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
+import { HUB_ADDRESS } from '../../../constants';
 
 export function initialize({
   processId,
   targetChannelId,
-  ourIndex,
-  hubAddress,
+
   protocolLocator,
   sharedData,
 }: {
   processId: string;
   targetChannelId: string;
-  ourIndex: number;
-  hubAddress: string;
+
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.NonTerminalVirtualDefundingState> {
@@ -34,7 +33,8 @@ export function initialize({
   }
   const jointChannelId = fundingState.fundingChannel;
   const latestAppCommitment = getLatestCommitment(targetChannelId, sharedData);
-
+  const ourIndex = getTwoPlayerIndex(targetChannelId, sharedData);
+  const hubAddress = HUB_ADDRESS;
   const proposedDestination = [...latestAppCommitment.destination, hubAddress];
   const proposedAllocation = [
     ...latestAppCommitment.allocation,
@@ -50,7 +50,7 @@ export function initialize({
     proposedDestination,
     sharedData,
   }));
-
+  const ledgerChannelId = getLedgerChannelId(jointChannelId, sharedData);
   return {
     protocolState: states.waitForJointChannelUpdate({
       processId,
@@ -59,6 +59,7 @@ export function initialize({
       jointChannel,
       jointChannelId,
       targetChannelId,
+      ledgerChannelId,
       protocolLocator,
     }),
     sharedData,
@@ -98,13 +99,13 @@ function waitForJointChannelUpdateReducer(
       case 'ConsensusUpdate.Success':
         const {
           hubAddress,
-          jointChannelId,
+          ledgerChannelId,
           targetChannelId: appChannelId,
           ourIndex,
           processId,
         } = protocolState;
         // TODO: We probably need to start this earlier to deal with commitments coming in early
-        const ledgerChannelId = getLedgerChannelId(jointChannelId, sharedData);
+
         const latestAppCommitment = getLatestCommitment(appChannelId, sharedData);
 
         const proposedAllocation = [

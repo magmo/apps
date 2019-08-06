@@ -10,6 +10,7 @@ interface Base {
   protocolLocator: ProtocolLocator;
   jointChannelId: string;
   targetChannelId: string;
+  ledgerChannelId: string;
 }
 
 export interface WaitForJointChannelUpdate extends Base {

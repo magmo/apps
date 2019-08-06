@@ -100,6 +100,7 @@ const props = {
   protocolLocator: [],
   ourAddress: asAddress,
   jointChannelId,
+  ledgerChannelId: ledgerId,
 };
 
 // ----
