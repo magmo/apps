@@ -58,7 +58,7 @@ export function initialize({
       hubAddress,
       jointChannel,
       jointChannelId,
-      targetChannelId: targetChannelId,
+      targetChannelId,
       protocolLocator,
     }),
     sharedData,
