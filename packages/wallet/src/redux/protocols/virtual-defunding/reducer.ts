@@ -37,7 +37,7 @@ export function initialize({
 
   const proposedDestination = [...latestAppCommitment.destination, hubAddress];
   const proposedAllocation = [
-    latestAppCommitment.allocation.reduce(addHex),
+    ...latestAppCommitment.allocation,
     latestAppCommitment.allocation.reduce(addHex),
   ];
   let jointChannel: ConsensusUpdateState;
@@ -109,7 +109,7 @@ function waitForJointChannelUpdateReducer(
 
         const proposedAllocation = [
           latestAppCommitment.allocation[ourIndex],
-          latestAppCommitment.allocation.reduce(addHex),
+          latestAppCommitment.allocation[1 - ourIndex],
         ];
         const proposedDestination = [latestAppCommitment.destination[ourIndex], hubAddress];
         let ledgerChannel: ConsensusUpdateState;

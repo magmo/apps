@@ -1,13 +1,15 @@
-import { appCommitment, twoThree } from '../../../../domain/commitments/__tests__';
+import { appCommitment } from '../../../../domain/commitments/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import * as scenarios from '../../../../domain/commitments/__tests__';
-import { preSuccess as indirectFundingPreSuccess } from '../../indirect-funding/__tests__';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import * as states from '../states';
-import { threePlayerPreSuccessA as consensusUpdatePreSuccess } from '../../consensus-update/__tests__';
 import { setChannel, EMPTY_SHARED_DATA, setFundingState } from '../../../state';
 import _ from 'lodash';
 import { bigNumberify } from 'ethers/utils/bignumber';
+import { bsAddress } from '../../../../communication/__tests__/commitments';
+import { commitmentsReceived, EmbeddedProtocol } from '../../../../communication';
+import { makeLocator } from '../..';
+import * as consensusStates from '../../consensus-update/states';
 
 // ---------
 // Test data
@@ -20,21 +22,74 @@ const twoTwo = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: hubAddress, wei: bigNumberify(2).toHexString() },
 ];
+const oneThree = [
+  { address: asAddress, wei: bigNumberify(1).toHexString() },
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+];
+const oneThreeHub = [
+  { address: asAddress, wei: bigNumberify(1).toHexString() },
+  { address: hubAddress, wei: bigNumberify(3).toHexString() },
+];
+const oneThreeFour = [...oneThree, { address: hubAddress, wei: bigNumberify(4).toHexString() }];
 
-const app0 = appCommitment({ turnNum: 10, balances: twoThree, isFinal: true });
-const app1 = appCommitment({ turnNum: 11, balances: twoThree, isFinal: true });
-const ledger5 = scenarios.ledgerCommitment({ turnNum: 5, balances: twoTwo });
-const ledger6 = scenarios.ledgerCommitment({ turnNum: 6, balances: twoTwo });
-const ledgerChannel = channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey);
-const ledgerId = ledgerChannel.channelId;
-const appChannel = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
+const app10 = appCommitment({ turnNum: 10, balances: oneThree, isFinal: true });
+const app11 = appCommitment({ turnNum: 11, balances: oneThree, isFinal: true });
+const appChannel = channelFromCommitments([app10, app11], asAddress, asPrivateKey);
 const appChannelId = appChannel.channelId;
 
-const jointChannelId = indirectFundingPreSuccess.state.existingLedgerFundingState.ledgerId;
+const ledger6 = scenarios.ledgerCommitment({ turnNum: 6, balances: twoTwo });
+const ledger7 = scenarios.ledgerCommitment({ turnNum: 7, balances: twoTwo });
+const ledger8 = scenarios.ledgerCommitment({
+  turnNum: 8,
+  balances: twoTwo,
+  proposedBalances: oneThreeHub,
+});
+const ledger9 = scenarios.ledgerCommitment({
+  turnNum: 9,
+  balances: oneThreeHub,
+});
+
+const ledgerChannelBeforeUpdate = channelFromCommitments(
+  [ledger6, ledger7],
+  asAddress,
+  asPrivateKey,
+);
+
+const ledgerChannelBeforeConsensus = channelFromCommitments(
+  [ledger7, ledger8],
+  asAddress,
+  asPrivateKey,
+);
+
+const ledgerId = ledgerChannelBeforeUpdate.channelId;
+const fundingApp = [{ address: appChannelId, wei: bigNumberify(6).toHexString() }];
+
+const joint4 = scenarios.threeWayLedgerCommitment({ turnNum: 4, balances: fundingApp });
+const joint5 = scenarios.threeWayLedgerCommitment({ turnNum: 5, balances: fundingApp });
+const joint6 = scenarios.threeWayLedgerCommitment({
+  turnNum: 6,
+  balances: fundingApp,
+  proposedBalances: oneThreeFour,
+  isVote: true,
+});
+const joint7 = scenarios.threeWayLedgerCommitment({
+  turnNum: 7,
+  balances: fundingApp,
+  proposedBalances: oneThreeFour,
+});
+const joint8 = scenarios.threeWayLedgerCommitment({ turnNum: 8, balances: oneThreeFour });
+const jointChannelFundingApp = channelFromCommitments([joint4, joint5], asAddress, asPrivateKey);
+const jointChannelBeforeConsensus = channelFromCommitments(
+  [joint6, joint7],
+  asAddress,
+  asPrivateKey,
+);
+const jointChannelId = jointChannelFundingApp.channelId;
+
 const guarantorChannelId = '0x01';
 
-const startingAllocation = app0.commitment.allocation;
-const startingDestination = app0.commitment.destination;
+const startingAllocation = app10.commitment.allocation;
+const startingDestination = app10.commitment.destination;
 const props = {
   targetChannelId: appChannelId,
   processId,
@@ -52,36 +107,81 @@ const props = {
 // ------
 const waitForJointChannelUpdate = states.waitForJointChannelUpdate({
   ...props,
-  jointChannel: consensusUpdatePreSuccess.state,
+  jointChannel: consensusStates.commitmentSent({
+    processId,
+    protocolLocator: makeLocator(EmbeddedProtocol.ConsensusUpdate),
+    proposedAllocation: oneThreeFour.map(i => i.wei),
+    proposedDestination: oneThreeFour.map(i => i.address),
+    channelId: jointChannelId,
+  }),
 });
 const waitForLedgerChannelUpdate = states.waitForLedgerChannelUpdate({
   ...props,
-  ledgerChannel: consensusUpdatePreSuccess.state,
+  ledgerChannel: consensusStates.commitmentSent({
+    processId,
+    protocolLocator: makeLocator(EmbeddedProtocol.ConsensusUpdate),
+    proposedAllocation: oneThreeHub.map(i => i.wei),
+    proposedDestination: oneThreeHub.map(i => i.address),
+    channelId: ledgerId,
+  }),
 });
 
 // ----
 // Shared Data
 // ------
-const initialSharedData = _.merge(
-  setFundingState(setChannel(EMPTY_SHARED_DATA, appChannel), appChannelId, {
-    fundingChannel: jointChannelId,
-    directlyFunded: false,
-  }),
-  indirectFundingPreSuccess.sharedData,
+
+const createFundingState = sharedData => {
+  return setFundingState(
+    setFundingState(
+      setFundingState(sharedData, appChannelId, {
+        fundingChannel: jointChannelId,
+        directlyFunded: false,
+      }),
+      jointChannelId,
+      {
+        guarantorChannel: guarantorChannelId,
+        directlyFunded: false,
+      },
+    ),
+    guarantorChannelId,
+    {
+      fundingChannel: ledgerId,
+      directlyFunded: false,
+    },
+  );
+};
+
+const initialSharedData = createFundingState(
+  setChannel(setChannel(EMPTY_SHARED_DATA, jointChannelFundingApp), appChannel),
 );
 
-const inProgressSharedData = _.merge(
-  setFundingState(consensusUpdatePreSuccess.sharedData, jointChannelId, {
-    guarantorChannel: guarantorChannelId,
-    directlyFunded: false,
-  }),
-  setFundingState(EMPTY_SHARED_DATA, guarantorChannelId, {
-    fundingChannel: ledgerId,
-    directlyFunded: false,
-  }),
-  setChannel(EMPTY_SHARED_DATA, appChannel),
-  setChannel(EMPTY_SHARED_DATA, ledgerChannel),
+const waitForJointSharedData = createFundingState(
+  setChannel(
+    setChannel(
+      setChannel(EMPTY_SHARED_DATA, jointChannelBeforeConsensus),
+      ledgerChannelBeforeUpdate,
+    ),
+    appChannel,
+  ),
 );
+
+const waitForLedgerSharedData = createFundingState(
+  setChannel(setChannel(EMPTY_SHARED_DATA, ledgerChannelBeforeConsensus), appChannel),
+);
+// ----
+// Actions
+// ------
+const jointCommitmentReceived = commitmentsReceived({
+  processId,
+  protocolLocator: makeLocator(EmbeddedProtocol.ConsensusUpdate),
+  signedCommitments: [joint8],
+});
+
+const ledgerCommitmentReceived = commitmentsReceived({
+  processId,
+  protocolLocator: makeLocator(EmbeddedProtocol.ConsensusUpdate),
+  signedCommitments: [ledger9],
+});
 
 export const happyPath = {
   ...props,
@@ -91,12 +191,12 @@ export const happyPath = {
   },
   waitForJointChannel: {
     state: waitForJointChannelUpdate,
-    action: consensusUpdatePreSuccess.action,
-    sharedData: inProgressSharedData,
+    action: jointCommitmentReceived,
+    sharedData: waitForJointSharedData,
   },
   waitForLedgerChannel: {
     state: waitForLedgerChannelUpdate,
-    action: consensusUpdatePreSuccess.action,
-    sharedData: inProgressSharedData,
+    action: ledgerCommitmentReceived,
+    sharedData: waitForLedgerSharedData,
   },
 };
