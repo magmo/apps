@@ -3,8 +3,8 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import * as scenarios from '../../../../domain/commitments/__tests__';
 import { preSuccess as indirectFundingPreSuccess } from '../../indirect-funding/__tests__';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
-import * as states from '../states';
-import { threePlayerPreSuccessA as consensusUpdatePreSuccess } from '../../consensus-update/__tests__';
+// import * as states from '../states';
+// import { threePlayerPreSuccessA as consensusUpdatePreSuccess } from '../../consensus-update/__tests__';
 
 // ---------
 // Test data
@@ -37,10 +37,10 @@ const props = {
 // States
 // ------
 
-const waitForJointChannelUpdate = states.waitForJointChannelUpdate({
-  ...props,
-  jointChannel: consensusUpdatePreSuccess.state,
-});
+// const waitForJointChannelUpdate = states.waitForJointChannelUpdate({
+//   ...props,
+//   jointChannel: consensusUpdatePreSuccess.state,
+// });
 
 export const happyPath = {
   ...props,
