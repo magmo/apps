@@ -10,14 +10,15 @@ import { bsAddress } from '../../../../communication/__tests__/commitments';
 import { commitmentsReceived, EmbeddedProtocol } from '../../../../communication';
 import { makeLocator } from '../..';
 import * as consensusStates from '../../consensus-update/states';
+import { HUB_ADDRESS } from '../../../../constants';
 
 // ---------
 // Test data
 // ---------
 const processId = 'Process.123';
 
-const { asAddress, asPrivateKey, threeParticipants: destination } = scenarios;
-const hubAddress = destination[2];
+const { asAddress, asPrivateKey } = scenarios;
+const hubAddress = HUB_ADDRESS;
 const twoTwo = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: hubAddress, wei: bigNumberify(2).toHexString() },

@@ -4,7 +4,8 @@ import * as states from '../states';
 import { scenarioStepDescription, itSendsTheseCommitments } from '../../../__tests__/helpers';
 import { bigNumberify } from 'ethers/utils';
 import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { asAddress, bsAddress, hubAddress } from '../../../../domain/commitments/__tests__';
+import { asAddress, bsAddress } from '../../../../domain/commitments/__tests__';
+import { HUB_ADDRESS } from '../../../../constants';
 const itTransitionsTo = (
   result: states.VirtualDefundingState,
   type: states.VirtualDefundingStateType,
@@ -28,7 +29,7 @@ describe('happyPath', () => {
         bigNumberify(3).toHexString(),
         bigNumberify(4).toHexString(),
       ],
-      proposedDestination: [asAddress, bsAddress, hubAddress],
+      proposedDestination: [asAddress, bsAddress, HUB_ADDRESS],
       furtherVotesRequired: 2,
     });
 
@@ -59,7 +60,7 @@ describe('happyPath', () => {
 
     const appAttributes = bytesFromAppAttributes({
       proposedAllocation: [bigNumberify(1).toHexString(), bigNumberify(3).toHexString()],
-      proposedDestination: [asAddress, hubAddress],
+      proposedDestination: [asAddress, HUB_ADDRESS],
       furtherVotesRequired: 1,
     });
 
