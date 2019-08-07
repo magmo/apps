@@ -2,7 +2,10 @@ import { WithdrawalState } from '../withdrawing/states';
 import { StateConstructor } from '../../utils';
 import { IndirectDefundingState } from '../indirect-defunding/states';
 import { ProtocolState } from '..';
-import { VirtualDefundingState } from '../virtual-defunding/states';
+import {
+  VirtualDefundingState,
+  NonTerminalVirtualDefundingState,
+} from '../virtual-defunding/states';
 
 // -------
 // States
@@ -30,7 +33,7 @@ export interface WaitForIndirectDefunding {
 export interface WaitForVirtualDefunding {
   type: 'Defunding.WaitForVirtualDefunding';
   processId: string;
-  virtualDefunding: VirtualDefundingState;
+  virtualDefunding: NonTerminalVirtualDefundingState;
   channelId: string;
 }
 
