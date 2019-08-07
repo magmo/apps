@@ -18,7 +18,7 @@ import { getLastCommitment } from '../../channel-store';
 import { ProtocolAction } from '../../../redux/actions';
 import { VirtualDefundingState } from '../virtual-defunding/states';
 import { initializeVirtualDefunding, virtualDefundingReducer } from '../virtual-defunding';
-import { routesToConsensusUpdate } from '../consensus-update/actions';
+import { routesToVirtualDefunding } from '../virtual-defunding/actions';
 
 export const initialize = (
   processId: string,
@@ -80,7 +80,7 @@ const waitForVirtualDefundingReducer = (
   sharedData: SharedData,
   action: actions.DefundingAction,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
-  if (!routesToConsensusUpdate(action, [])) {
+  if (!routesToVirtualDefunding(action, [])) {
     console.warn(`Expected virtual defunding action but received ${action.type}`);
     return { protocolState, sharedData };
   }
