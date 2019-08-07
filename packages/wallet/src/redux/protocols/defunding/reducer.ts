@@ -104,7 +104,7 @@ const waitForVirtualDefundingReducer = (
   sharedData: SharedData,
   action: actions.DefundingAction,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
-  if (!routesToConsensusUpdate(action, makeLocator(EmbeddedProtocol.ConsensusUpdate))) {
+  if (!routesToConsensusUpdate(action, [])) {
     console.warn(`Expected virtual defunding action but received ${action.type}`);
     return { protocolState, sharedData };
   }
