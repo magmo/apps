@@ -188,12 +188,24 @@ export const channelFinalizedOnChain = (channelId: string, sharedData: SharedDat
   return channelState && channelState.finalized;
 };
 
-export const isChannelDirectlyFunded = (channelId: string, sharedData: SharedData): boolean => {
+export enum FundingType {
+  Virtual,
+  Ledger,
+  Direct,
+}
+export const getChannelFundingType = (channelId: string, sharedData: SharedData): FundingType => {
   const channelFundingState = selectors.getChannelFundingState(sharedData, channelId);
   if (!channelFundingState) {
     throw new Error(`No funding state for ${channelId}. Cannot determine funding type.`);
   }
-  return channelFundingState.directlyFunded;
+  if (channelFundingState.directlyFunded) {
+    return FundingType.Direct;
+  }
+  if (!channelFundingState.fundingChannel) {
+    throw new Error(`Channel ${channelId} is not directly funded but has not fundingChannelId`);
+  }
+  const channelState = getExistingChannel(sharedData, channelFundingState.fundingChannel);
+  return channelState.participants.length === 3 ? FundingType.Virtual : FundingType.Ledger;
 };
 
 export const getFundingChannelId = (channelId: string, sharedData: SharedData): string => {
@@ -279,4 +291,28 @@ export function getNumberOfParticipants(commitment: Commitment): number {
 export function ourTurn(sharedData: SharedData, channelId: string) {
   const channel = getExistingChannel(sharedData, channelId);
   return ourTurnOnChannel(channel);
+}
+// TODO: This should handle all funding types and return whatever channel is directly funded
+export function getDirectlyFundedChannel(appChannelId: string, sharedData: SharedData): string {
+  const appChannelFundingState = selectors.getChannelFundingState(sharedData, appChannelId);
+  if (!appChannelFundingState || !appChannelFundingState.fundingChannel) {
+    throw new Error(`No joint channel for channel ${appChannelId}`);
+  }
+  const jointChannelId = appChannelFundingState.fundingChannel;
+  const guarantorFundingState = selectors.getChannelFundingState(sharedData, jointChannelId);
+  if (!guarantorFundingState || !guarantorFundingState.guarantorChannel) {
+    throw new Error(`No guarantor for joint channel ${jointChannelId}`);
+  }
+  const ledgerFundingState = selectors.getChannelFundingState(
+    sharedData,
+    guarantorFundingState.guarantorChannel,
+  );
+  if (!ledgerFundingState || !ledgerFundingState.fundingChannel) {
+    throw new Error(
+      `No ledger funding channel found for guarantor channel ${
+        guarantorFundingState.guarantorChannel
+      }`,
+    );
+  }
+  return ledgerFundingState.fundingChannel;
 }

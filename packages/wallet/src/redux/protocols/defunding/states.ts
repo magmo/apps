@@ -2,6 +2,7 @@ import { WithdrawalState } from '../withdrawing/states';
 import { StateConstructor } from '../../utils';
 import { IndirectDefundingState } from '../indirect-defunding/states';
 import { ProtocolState } from '..';
+import { VirtualDefundingState } from '../virtual-defunding/states';
 
 // -------
 // States
@@ -26,6 +27,13 @@ export interface WaitForIndirectDefunding {
   channelId;
 }
 
+export interface WaitForVirtualDefunding {
+  type: 'Defunding.WaitForVirtualDefunding';
+  processId: string;
+  virtualDefunding: VirtualDefundingState;
+  channelId: string;
+}
+
 export interface Failure {
   type: 'Defunding.Failure';
   reason: string;
@@ -47,6 +55,9 @@ export const waitForLedgerDefunding: StateConstructor<WaitForIndirectDefunding> 
   return { ...p, type: 'Defunding.WaitForIndirectDefunding' };
 };
 
+export const waitForVirtualDefunding: StateConstructor<WaitForVirtualDefunding> = p => {
+  return { ...p, type: 'Defunding.WaitForVirtualDefunding' };
+};
 export const success: StateConstructor<Success> = p => {
   return { ...p, type: 'Defunding.Success' };
 };
@@ -59,8 +70,11 @@ export const failure: StateConstructor<Failure> = p => {
 // Unions and Guards
 // -------
 
-export type NonTerminalDefundingState = WaitForWithdrawal | WaitForIndirectDefunding;
-export type DefundingState = WaitForWithdrawal | WaitForIndirectDefunding | Failure | Success;
+export type NonTerminalDefundingState =
+  | WaitForWithdrawal
+  | WaitForIndirectDefunding
+  | WaitForVirtualDefunding;
+export type DefundingState = NonTerminalDefundingState | Failure | Success;
 export type DefundingStateType = DefundingState['type'];
 
 export function isTerminal(state: DefundingState): state is Failure | Success {
