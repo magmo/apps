@@ -2,10 +2,7 @@ import { WithdrawalState } from '../withdrawing/states';
 import { StateConstructor } from '../../utils';
 import { IndirectDefundingState } from '../indirect-defunding/states';
 import { ProtocolState } from '..';
-import {
-  VirtualDefundingState,
-  NonTerminalVirtualDefundingState,
-} from '../virtual-defunding/states';
+import { NonTerminalVirtualDefundingState } from '../virtual-defunding/states';
 
 // -------
 // States
