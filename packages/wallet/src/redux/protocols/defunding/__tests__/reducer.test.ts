@@ -94,3 +94,26 @@ describe('indirectly funded failure', () => {
     itTransitionsToFailure(result, states.failure({ reason: 'Ledger De-funding Failure' }));
   });
 });
+
+describe('virtually funded happy path', () => {
+  const scenario = scenarios.virtualFundingChannelHappyPath;
+
+  describe('when initializing', () => {
+    const { processId, channelId, sharedData } = scenario.initialize;
+    const result = initialize(processId, channelId, sharedData);
+    itTransitionsTo(result, 'Defunding.WaitForVirtualDefunding');
+  });
+  describeScenarioStep(scenario.waitForVirtualDefunding, () => {
+    const { state, action, sharedData } = scenario.waitForVirtualDefunding;
+    const result = defundingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'Defunding.WaitForWithdrawal');
+  });
+  describeScenarioStep(scenario.waitForWithdrawal, () => {
+    const { state, action, sharedData } = scenario.waitForWithdrawal;
+    const result = defundingReducer(state, sharedData, action);
+
+    itTransitionsTo(result, 'Defunding.Success');
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});

@@ -4,6 +4,7 @@ import * as testScenarios from '../../../../domain/commitments/__tests__';
 import { ChannelState, ChannelStore } from '../../../channel-store';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
 import * as indirectDefunding from '../../indirect-defunding/__tests__';
+import * as virtualDefunding from '../../virtual-defunding/__tests__';
 const processId = 'process-id.123';
 
 const {
@@ -75,6 +76,12 @@ const waitForLedgerDefunding = states.waitForLedgerDefunding({
   indirectDefundingState: indirectDefunding.preSuccessState.state,
 });
 
+const waitForVirtualDefunding = states.waitForVirtualDefunding({
+  processId,
+  channelId,
+  virtualDefunding: virtualDefunding.preSuccess.state,
+});
+
 const waitForLedgerFailure = states.waitForLedgerDefunding({
   processId,
   channelId,
@@ -114,6 +121,29 @@ export const indirectlyFundingChannelHappyPath = {
     state: waitForLedgerDefunding,
     action: indirectDefunding.successTrigger,
     sharedData: indirectDefunding.preSuccessState.store,
+  },
+  waitForWithdrawal: {
+    state: waitForWithdrawal,
+    action: withdrawalScenarios.happyPath.waitForAcknowledgement.action,
+    sharedData: {
+      ...EMPTY_SHARED_DATA,
+      fundingState: directlyFundedFundingState,
+      channelStore,
+    },
+  },
+};
+
+export const virtualFundingChannelHappyPath = {
+  initialize: {
+    processId,
+    channelId: virtualDefunding.initial.targetChannelId,
+    sharedData: virtualDefunding.initial.sharedData,
+  },
+  // States
+  waitForVirtualDefunding: {
+    state: waitForVirtualDefunding,
+    action: virtualDefunding.preSuccess.action,
+    sharedData: virtualDefunding.preSuccess.sharedData,
   },
   waitForWithdrawal: {
     state: waitForWithdrawal,
