@@ -360,6 +360,10 @@ function waitForApplicationFundingReducer(
     if (consensusUpdate.isTerminal(result.protocolState)) {
       switch (result.protocolState.type) {
         case 'ConsensusUpdate.Success':
+          result.sharedData = setFundingState(result.sharedData, protocolState.targetChannelId, {
+            directlyFunded: false,
+            fundingChannel: protocolState.jointChannelId,
+          });
           return {
             protocolState: states.success(protocolState),
             sharedData: result.sharedData,
