@@ -5,6 +5,7 @@ import { ChannelState, ChannelStore } from '../../../channel-store';
 import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
 import * as indirectDefunding from '../../indirect-defunding/__tests__';
 import * as virtualDefunding from '../../virtual-defunding/__tests__';
+import _ from 'lodash';
 const processId = 'process-id.123';
 
 const {
@@ -23,7 +24,7 @@ const concludeCommitment2 = testScenarios.appCommitment({ turnNum: 52, isFinal: 
 const channelStatus: ChannelState = {
   address,
   privateKey,
-  channelId,
+  channelId: virtualDefunding.initial.targetChannelId,
   libraryAddress,
   ourIndex: 0,
   participants,
@@ -143,7 +144,15 @@ export const virtualFundingChannelHappyPath = {
   waitForVirtualDefunding: {
     state: waitForVirtualDefunding,
     action: virtualDefunding.preSuccess.action,
-    sharedData: virtualDefunding.preSuccess.sharedData,
+    sharedData: _.merge(
+      virtualDefunding.preSuccess.sharedData,
+      indirectDefunding.preSuccessState.store,
+    ),
+  },
+  waitForLedgerDefunding: {
+    state: waitForLedgerDefunding,
+    action: indirectDefunding.successTrigger,
+    sharedData: indirectDefunding.preSuccessState.store,
   },
   waitForWithdrawal: {
     state: waitForWithdrawal,

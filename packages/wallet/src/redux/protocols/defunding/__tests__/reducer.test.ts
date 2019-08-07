@@ -107,6 +107,12 @@ describe('virtually funded happy path', () => {
     const { state, action, sharedData } = scenario.waitForVirtualDefunding;
     const result = defundingReducer(state, sharedData, action);
 
+    itTransitionsTo(result, 'Defunding.WaitForIndirectDefunding');
+  });
+  describeScenarioStep(scenario.waitForLedgerDefunding, () => {
+    const { state, action, sharedData } = scenario.waitForLedgerDefunding;
+    const result = defundingReducer(state, sharedData, action);
+
     itTransitionsTo(result, 'Defunding.WaitForWithdrawal');
   });
   describeScenarioStep(scenario.waitForWithdrawal, () => {

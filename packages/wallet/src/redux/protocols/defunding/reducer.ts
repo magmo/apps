@@ -34,31 +34,7 @@ export const initialize = (
     case helpers.FundingType.Direct:
       return createWaitForWithdrawal(sharedData, processId, channelId);
     case helpers.FundingType.Ledger:
-      const ledgerId = helpers.getFundingChannelId(channelId, sharedData);
-      const channel = getChannel(sharedData, channelId);
-      if (!channel) {
-        throw new Error(`Channel does not exist with id ${channelId}`);
-      }
-      const proposedAllocation = getLastCommitment(channel).allocation;
-      const proposedDestination = getLastCommitment(channel).destination;
-      const indirectDefundingState = indirectDefundingInitialize({
-        processId,
-        channelId,
-        ledgerId,
-        proposedAllocation,
-        proposedDestination,
-        sharedData,
-        action,
-      });
-
-      const protocolState = states.waitForLedgerDefunding({
-        processId,
-        channelId,
-        indirectDefundingState: indirectDefundingState.protocolState,
-      });
-
-      return { protocolState, sharedData: indirectDefundingState.sharedData };
-
+      return createWaitForIndirectDefunding(processId, channelId, sharedData, action);
     case helpers.FundingType.Virtual:
       let virtualDefunding: VirtualDefundingState;
       ({ protocolState: virtualDefunding, sharedData } = initializeVirtualDefunding({
@@ -122,11 +98,11 @@ const waitForVirtualDefundingReducer = (
         sharedData,
       };
     case 'VirtualDefunding.Success':
-      const fundingChannelId = helpers.getDirectlyFundedChannel(
+      return createWaitForIndirectDefunding(
+        protocolState.processId,
         protocolState.channelId,
         sharedData,
       );
-      return createWaitForWithdrawal(sharedData, protocolState.processId, fundingChannelId);
     default:
       return {
         protocolState: states.waitForVirtualDefunding({ ...protocolState, virtualDefunding }),
@@ -203,6 +179,38 @@ const waitForWithdrawalReducer = (
       sharedData: newSharedData,
     };
   }
+};
+
+const createWaitForIndirectDefunding = (
+  processId: string,
+  channelId: string,
+  sharedData: SharedData,
+  action?: CommitmentReceived,
+) => {
+  const ledgerId = helpers.getFundingChannelId(channelId, sharedData);
+  const channel = getChannel(sharedData, channelId);
+  if (!channel) {
+    throw new Error(`Channel does not exist with id ${channelId}`);
+  }
+  const proposedAllocation = getLastCommitment(channel).allocation;
+  const proposedDestination = getLastCommitment(channel).destination;
+  const indirectDefundingState = indirectDefundingInitialize({
+    processId,
+    channelId,
+    ledgerId,
+    proposedAllocation,
+    proposedDestination,
+    sharedData,
+    action,
+  });
+
+  const protocolState = states.waitForLedgerDefunding({
+    processId,
+    channelId,
+    indirectDefundingState: indirectDefundingState.protocolState,
+  });
+
+  return { protocolState, sharedData: indirectDefundingState.sharedData };
 };
 
 const createWaitForWithdrawal = (sharedData: SharedData, processId: string, channelId: string) => {

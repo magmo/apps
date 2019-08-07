@@ -20,7 +20,7 @@ linkStyle default interpolate basis
   ID -->|Ledger Funding|LDP(Wait for Indirect De-funding)
   ID -->|Virtual Funding|VD(Wait for Virtual De-funding)
   VD -->|Virtual Defunding Action|VD
-  VD -->|Virtual Defunding Success|WP(Wait for Withdrawal)
+  VD -->|Virtual Defunding Success|LDP
   LDP-->|Indirect de-funding protocol success|WP(Wait for Withdrawal)
   WP-->|Withdrawal protocol success|Su((Success))
   WP-->|Withdrawal protocol failure|F((Failure))
