@@ -85,6 +85,7 @@ export function isDefundingState(state: ProtocolState): state is DefundingState 
   return (
     state.type === 'Defunding.WaitForWithdrawal' ||
     state.type === 'Defunding.WaitForIndirectDefunding' ||
+    state.type === 'Defunding.WaitForVirtualDefunding' ||
     state.type === 'Defunding.Failure' ||
     state.type === 'Defunding.Success'
   );
