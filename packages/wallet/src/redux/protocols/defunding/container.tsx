@@ -28,7 +28,7 @@ class DefundingContainer extends PureComponent<Props> {
       case 'Defunding.WaitForVirtualDefunding':
         return <VirtualDefunding state={state.virtualDefunding} />;
       default:
-        unreachable(state);
+        return unreachable(state);
     }
   }
 }
