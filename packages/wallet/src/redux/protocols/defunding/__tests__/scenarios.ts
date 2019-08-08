@@ -165,14 +165,3 @@ export const directlyFundingFailure = {
     },
   },
 };
-
-// export const indirectlyFundingFailure = {
-//   processId,
-//   channelId,
-//   // States
-//   waitForLedgerDefunding: {
-//     state: waitForLedgerFailure,
-//     action: indirectDefunding.failureTrigger,
-//     sharedData: indirectDefunding.preFailureState.store,
-//   },
-// };
