@@ -50,6 +50,7 @@ export interface Success {
 
 export interface Failure {
   type: 'VirtualFunding.Failure';
+  reason?: string;
 }
 
 // ------------
