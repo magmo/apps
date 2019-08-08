@@ -41,10 +41,12 @@ export const initialize = (
         true,
         sharedData,
       ));
+
       return {
         protocolState: states.waitForLedgerDefunding({
           processId,
           channelId,
+          ledgerId: helpers.getChannelWithFunds(channelId, sharedData),
           indirectDefundingState,
         }),
         sharedData,
@@ -70,6 +72,7 @@ export const initialize = (
         protocolState: states.waitForVirtualDefunding({
           processId,
           channelId,
+          ledgerId: helpers.getChannelWithFunds(channelId, sharedData),
           virtualDefunding,
           indirectDefundingState,
         }),
@@ -137,7 +140,7 @@ const waitForVirtualDefundingReducer = (
     case 'VirtualDefunding.Success':
       const { processId } = protocolState;
       return handleIndirectDefundingAction(
-        protocolState,
+        states.waitForLedgerDefunding(protocolState),
         sharedData,
         indirectDefundingActions.clearedToSend({
           processId,
@@ -216,7 +219,7 @@ const handleIndirectDefundingAction = (
         sharedData,
       };
     case 'IndirectDefunding.Success':
-      return createWaitForWithdrawal(sharedData, protocolState.processId, protocolState.channelId);
+      return createWaitForWithdrawal(sharedData, protocolState.processId, protocolState.ledgerId);
     default:
       return { protocolState: { ...protocolState, indirectDefundingState }, sharedData };
   }

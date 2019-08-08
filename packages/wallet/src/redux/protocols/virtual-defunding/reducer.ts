@@ -11,7 +11,7 @@ import { getChannelFundingState } from '../../selectors';
 import {
   getLatestCommitment,
   getTwoPlayerIndex,
-  getDirectlyFundedChannel,
+  getChannelWithFunds,
 } from '../reducer-helpers';
 import { addHex } from '../../../utils/hex-utils';
 import { VirtualDefundingAction } from './actions';
@@ -54,7 +54,7 @@ export function initialize({
     proposedDestination,
     sharedData,
   }));
-  const ledgerChannelId = getDirectlyFundedChannel(targetChannelId, sharedData);
+  const ledgerChannelId = getChannelWithFunds(targetChannelId, sharedData);
   return {
     protocolState: states.waitForJointChannelUpdate({
       processId,

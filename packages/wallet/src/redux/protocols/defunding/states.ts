@@ -25,6 +25,7 @@ export interface WaitForIndirectDefunding {
   processId: string;
   indirectDefundingState: IndirectDefundingState;
   channelId;
+  ledgerId: string;
 }
 
 export interface WaitForVirtualDefunding {
@@ -33,6 +34,7 @@ export interface WaitForVirtualDefunding {
   virtualDefunding: NonTerminalVirtualDefundingState;
   indirectDefundingState: IndirectDefundingState;
   channelId: string;
+  ledgerId: string;
 }
 
 export interface Failure {

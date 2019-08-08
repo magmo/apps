@@ -292,27 +292,24 @@ export function ourTurn(sharedData: SharedData, channelId: string) {
   const channel = getExistingChannel(sharedData, channelId);
   return ourTurnOnChannel(channel);
 }
-// TODO: This should handle all funding types and return whatever channel is directly funded
-export function getDirectlyFundedChannel(appChannelId: string, sharedData: SharedData): string {
-  const appChannelFundingState = selectors.getChannelFundingState(sharedData, appChannelId);
-  if (!appChannelFundingState || !appChannelFundingState.fundingChannel) {
-    throw new Error(`No joint channel for channel ${appChannelId}`);
+
+export function getChannelWithFunds(channelId: string, sharedData: SharedData): string {
+  const fundingState = selectors.getChannelFundingState(sharedData, channelId);
+  if (!fundingState) {
+    throw new Error(`No funding state found for ${channelId}`);
   }
-  const jointChannelId = appChannelFundingState.fundingChannel;
-  const guarantorFundingState = selectors.getChannelFundingState(sharedData, jointChannelId);
-  if (!guarantorFundingState || !guarantorFundingState.guarantorChannel) {
-    throw new Error(`No guarantor for joint channel ${jointChannelId}`);
+  if (fundingState.directlyFunded) {
+    return channelId;
+  } else {
+    const channelIdToCheck = fundingState.fundingChannel
+      ? fundingState.fundingChannel
+      : fundingState.guarantorChannel;
+    if (!channelIdToCheck) {
+      throw new Error(
+        `Funding state for ${channelId} is not directly funded so it must have aq funding or guarantor channel`,
+      );
+    }
+
+    return getChannelWithFunds(channelIdToCheck, sharedData);
   }
-  const ledgerFundingState = selectors.getChannelFundingState(
-    sharedData,
-    guarantorFundingState.guarantorChannel,
-  );
-  if (!ledgerFundingState || !ledgerFundingState.fundingChannel) {
-    throw new Error(
-      `No ledger funding channel found for guarantor channel ${
-        guarantorFundingState.guarantorChannel
-      }`,
-    );
-  }
-  return ledgerFundingState.fundingChannel;
 }
