@@ -201,7 +201,8 @@ const createWaitForIndirectDefunding = (
     proposedAllocation,
     proposedDestination,
     sharedData,
-    action,
+    clearedToSend: true,
+    protocolLocator: makeLocator([], EmbeddedProtocol.IndirectDefunding),
   });
 
   const protocolState = states.waitForLedgerDefunding({

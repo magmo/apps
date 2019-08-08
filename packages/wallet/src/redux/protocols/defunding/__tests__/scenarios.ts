@@ -2,40 +2,35 @@ import * as states from '../states';
 import * as withdrawalScenarios from '../../withdrawing/__tests__/scenarios';
 import * as testScenarios from '../../../../domain/commitments/__tests__';
 import { ChannelState, ChannelStore } from '../../../channel-store';
-import { EMPTY_SHARED_DATA, FundingState } from '../../../state';
+import { EMPTY_SHARED_DATA, FundingState, setFundingState, setChannels } from '../../../state';
 import * as indirectDefunding from '../../indirect-defunding/__tests__';
+import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { bigNumberify } from 'ethers/utils';
 import * as virtualDefunding from '../../virtual-defunding/__tests__';
 import _ from 'lodash';
 const processId = 'process-id.123';
 
-const {
-  asAddress: address,
-  asPrivateKey: privateKey,
-  channelId,
-  libraryAddress,
-  participants,
-  channelNonce,
-} = testScenarios;
+const { asAddress, bsAddress, asPrivateKey, channelId } = testScenarios;
+
+const twoThree = [
+  { address: asAddress, wei: bigNumberify(2).toHexString() },
+  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+];
+
 const gameCommitment1 = testScenarios.appCommitment({ turnNum: 19 }).commitment;
 const gameCommitment2 = testScenarios.appCommitment({ turnNum: 20 }).commitment;
-const concludeCommitment1 = testScenarios.appCommitment({ turnNum: 51, isFinal: true }).commitment;
-const concludeCommitment2 = testScenarios.appCommitment({ turnNum: 52, isFinal: true }).commitment;
+const concludeCommitment1 = testScenarios.appCommitment({ turnNum: 51, isFinal: true });
+const concludeCommitment2 = testScenarios.appCommitment({ turnNum: 52, isFinal: true });
+const ledger4 = testScenarios.ledgerCommitment({ turnNum: 4, balances: twoThree });
+const ledger5 = testScenarios.ledgerCommitment({ turnNum: 5, balances: twoThree });
 
-const channelStatus: ChannelState = {
-  address,
-  privateKey,
-  channelId: virtualDefunding.initial.targetChannelId,
-  libraryAddress,
-  ourIndex: 0,
-  participants,
-  channelNonce,
-  turnNum: concludeCommitment2.turnNum,
-  funded: true,
-  commitments: [
-    { commitment: concludeCommitment1, signature: '0x0' },
-    { commitment: concludeCommitment2, signature: '0x0' },
-  ],
-};
+const channelStatus = channelFromCommitments(
+  [concludeCommitment1, concludeCommitment2],
+  asAddress,
+  asPrivateKey,
+);
+
+const ledgerChannelStatus = channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey);
 
 const channelStore: ChannelStore = {
   [channelId]: channelStatus,
@@ -83,11 +78,11 @@ const waitForVirtualDefunding = states.waitForVirtualDefunding({
   virtualDefunding: virtualDefunding.preSuccess.state,
 });
 
-const waitForLedgerFailure = states.waitForLedgerDefunding({
-  processId,
-  channelId,
-  indirectDefundingState: indirectDefunding.preFailureState.state,
-});
+// const waitForLedgerFailure = states.waitForLedgerDefunding({
+//   processId,
+//   channelId,
+//   indirectDefundingState: indirectDefunding.preFailureState.state,
+// });
 
 const channelNotClosedFailure = states.failure({ reason: 'Channel Not Closed' });
 
@@ -116,12 +111,28 @@ export const directlyFundingChannelHappyPath = {
 };
 
 export const indirectlyFundingChannelHappyPath = {
-  initialize: { processId, channelId, sharedData: indirectDefunding.initialStore },
+  initialize: {
+    processId,
+    channelId,
+    sharedData: setChannels(
+      setFundingState(indirectDefunding.initialStore, channelId, {
+        directlyFunded: false,
+        fundingChannel: testScenarios.ledgerId,
+      }),
+      [channelStatus],
+    ),
+  },
   // States
   waitForLedgerDefunding: {
     state: waitForLedgerDefunding,
     action: indirectDefunding.successTrigger,
-    sharedData: indirectDefunding.preSuccessState.store,
+    sharedData: setChannels(
+      setFundingState(indirectDefunding.preSuccessState.sharedData, channelId, {
+        directlyFunded: false,
+        fundingChannel: testScenarios.ledgerId,
+      }),
+      [channelStatus, ledgerChannelStatus],
+    ),
   },
   waitForWithdrawal: {
     state: waitForWithdrawal,
@@ -146,13 +157,13 @@ export const virtualFundingChannelHappyPath = {
     action: virtualDefunding.preSuccess.action,
     sharedData: _.merge(
       virtualDefunding.preSuccess.sharedData,
-      indirectDefunding.preSuccessState.store,
+      indirectDefunding.preSuccessState.sharedData,
     ),
   },
   waitForLedgerDefunding: {
     state: waitForLedgerDefunding,
     action: indirectDefunding.successTrigger,
-    sharedData: indirectDefunding.preSuccessState.store,
+    sharedData: indirectDefunding.preSuccessState.sharedData,
   },
   waitForWithdrawal: {
     state: waitForWithdrawal,
@@ -194,13 +205,13 @@ export const directlyFundingFailure = {
   },
 };
 
-export const indirectlyFundingFailure = {
-  processId,
-  channelId,
-  // States
-  waitForLedgerDefunding: {
-    state: waitForLedgerFailure,
-    action: indirectDefunding.failureTrigger,
-    sharedData: indirectDefunding.preFailureState.store,
-  },
-};
+// export const indirectlyFundingFailure = {
+//   processId,
+//   channelId,
+//   // States
+//   waitForLedgerDefunding: {
+//     state: waitForLedgerFailure,
+//     action: indirectDefunding.failureTrigger,
+//     sharedData: indirectDefunding.preFailureState.store,
+//   },
+// };
