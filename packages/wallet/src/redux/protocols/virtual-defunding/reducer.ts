@@ -8,11 +8,7 @@ import {
   consensusUpdateReducer,
 } from '../consensus-update/reducer';
 import { getChannelFundingState } from '../../selectors';
-import {
-  getLatestCommitment,
-  getTwoPlayerIndex,
-  getChannelWithFunds,
-} from '../reducer-helpers';
+import { getLatestCommitment, getTwoPlayerIndex, getChannelWithFunds } from '../reducer-helpers';
 import { addHex } from '../../../utils/hex-utils';
 import { VirtualDefundingAction } from './actions';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
