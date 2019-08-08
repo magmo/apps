@@ -5,7 +5,6 @@ import * as scenarios from '../../../../domain/commitments/__tests__';
 import * as transactionSubmissionScenarios from '../../transaction-submission/__tests__';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 import * as states from '../states';
-import { directFundingRequested } from '../actions';
 import { SharedData } from '../../../state';
 
 const { threeWayLedgerId: channelId, twoThree } = scenarios;
@@ -26,6 +25,7 @@ const defaultsForA: states.DirectFundingState = {
   ourIndex: 0,
   safeToDepositLevel: '0x',
   type: 'DirectFunding.NotSafeToDeposit',
+  protocolLocator: [],
 };
 
 const defaultsForB: states.DirectFundingState = {
@@ -36,19 +36,7 @@ const defaultsForB: states.DirectFundingState = {
 };
 
 // actions
-const aInitializeAction = directFundingRequested({ ...defaultsForA });
-const aInitializeWithNoDeposit = directFundingRequested({
-  ...defaultsForA,
 
-  requiredDeposit: '0x0',
-});
-
-const aInitializeWithRequiredDeposit = directFundingRequested({
-  ...defaultsForA,
-
-  requiredDeposit: '0x5',
-});
-const bInitializeAction = directFundingRequested({ ...defaultsForB });
 const aFundingReceivedEvent = globalActions.fundingReceivedEvent({
   processId,
   channelId,
@@ -71,7 +59,7 @@ const adjudicatorStateSharedData: SharedData = {
   adjudicatorState: { [channelId]: { channelId, balance: '0x5', finalized: false } },
 };
 export const aHappyPath = {
-  initialize: { sharedData: sharedData(), action: aInitializeAction },
+  initialize: { sharedData: sharedData(), ...defaultsForA },
   waitForDepositTransaction: {
     state: states.waitForDepositTransaction({
       ...defaultsForA,
@@ -89,7 +77,7 @@ export const aHappyPath = {
 };
 
 export const bHappyPath = {
-  initialize: { sharedData: sharedData(), action: bInitializeAction },
+  initialize: { ...defaultsForB, sharedData: sharedData() },
   notSafeToDeposit: {
     state: states.notSafeToDeposit(defaultsForB),
     action: aFundingReceivedEvent,
@@ -111,10 +99,14 @@ export const bHappyPath = {
 };
 
 export const depositNotRequired = {
-  initialize: { action: aInitializeWithNoDeposit, sharedData: sharedData() },
+  initialize: { ...defaultsForA, requiredDeposit: '0x0', sharedData: sharedData() },
 };
 export const existingOnChainDeposit = {
-  initialize: { action: aInitializeWithRequiredDeposit, sharedData: adjudicatorStateSharedData },
+  initialize: {
+    ...defaultsForA,
+    requiredDeposit: '0x05',
+    sharedData: adjudicatorStateSharedData,
+  },
 };
 
 export const transactionFails = {
@@ -126,5 +118,31 @@ export const transactionFails = {
     sharedData: sharedData(),
 
     action: transactionSubmissionScenarios.failureTrigger,
+  },
+};
+
+export const fundsReceivedArrivesEarly = {
+  initialize: { sharedData: sharedData(), ...defaultsForA },
+  waitForDepositTransactionWithFundingEvent: {
+    state: states.waitForDepositTransaction({
+      ...defaultsForA,
+      transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
+    }),
+    sharedData: sharedData(),
+    action: aFundingReceivedEvent,
+  },
+  waitForDepositTransaction: {
+    state: states.waitForDepositTransaction({
+      ...defaultsForB,
+      transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
+    }),
+    sharedData: sharedData(),
+    action: transactionSubmissionScenarios.successTrigger,
+  },
+
+  waitForFunding: {
+    state: states.waitForFunding(defaultsForA),
+    sharedData: sharedData(),
+    action: bFundingReceivedEvent,
   },
 };

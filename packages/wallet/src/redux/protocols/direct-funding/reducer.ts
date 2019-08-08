@@ -3,7 +3,7 @@ import { unreachable } from '../../../utils/reducer-utils';
 import { createDepositTransaction } from '../../../utils/transaction-generator';
 import * as actions from '../../actions';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
-import { SharedData } from '../../state';
+import { SharedData, registerChannelToMonitor } from '../../state';
 import { isTransactionAction } from '../transaction-submission/actions';
 import {
   initialize as initTransactionState,
@@ -11,24 +11,32 @@ import {
 } from '../transaction-submission/reducer';
 import { isTerminal, isSuccess } from '../transaction-submission/states';
 import * as states from './states';
-import { DirectFundingRequested } from './actions';
 import * as selectors from '../../selectors';
+import { TwoPartyPlayerIndex } from '../../types';
+import { ProtocolLocator } from '../../../communication';
 
 type DFReducer = ProtocolReducer<states.DirectFundingState>;
 
-export function initialize(
-  action: DirectFundingRequested,
-  sharedData: SharedData,
-): ProtocolStateWithSharedData<states.DirectFundingState> {
-  const {
-    safeToDepositLevel,
-    totalFundingRequired,
-    requiredDeposit,
-    channelId,
-    ourIndex,
-    processId,
-  } = action;
-
+export function initialize({
+  safeToDepositLevel,
+  totalFundingRequired,
+  requiredDeposit,
+  channelId,
+  ourIndex,
+  processId,
+  protocolLocator,
+  sharedData,
+}: {
+  sharedData: SharedData;
+  safeToDepositLevel: string;
+  totalFundingRequired: string;
+  requiredDeposit: string;
+  channelId: string;
+  ourIndex: TwoPartyPlayerIndex;
+  processId: string;
+  protocolLocator: ProtocolLocator;
+}): ProtocolStateWithSharedData<states.DirectFundingState> {
+  sharedData = registerChannelToMonitor(sharedData, channelId, processId, protocolLocator);
   const existingChannelFunding = selectors.getAdjudicatorChannelBalance(sharedData, channelId);
   const alreadySafeToDeposit = bigNumberify(existingChannelFunding).gte(safeToDepositLevel);
   const alreadyFunded = bigNumberify(totalFundingRequired).eq('0x');
@@ -43,6 +51,7 @@ export function initialize(
         channelId,
         ourIndex,
         safeToDepositLevel,
+        protocolLocator,
       }),
       sharedData,
     };
@@ -56,6 +65,7 @@ export function initialize(
         channelId,
         ourIndex,
         safeToDepositLevel,
+        protocolLocator,
       }),
       sharedData,
     };
@@ -63,26 +73,27 @@ export function initialize(
 
   if (alreadySafeToDeposit) {
     const depositTransaction = createDepositTransaction(
-      action.channelId,
-      action.requiredDeposit,
+      channelId,
+      requiredDeposit,
       existingChannelFunding,
     );
     const { storage: newStorage, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
-      action.processId,
-      action.channelId,
+      processId,
+      channelId,
       sharedData,
     );
 
     return {
       protocolState: states.waitForDepositTransaction({
-        processId: action.processId,
+        processId,
         totalFundingRequired,
         requiredDeposit,
         channelId,
         ourIndex,
         safeToDepositLevel,
         transactionSubmissionState,
+        protocolLocator,
       }),
       sharedData: newStorage,
     };
@@ -90,12 +101,13 @@ export function initialize(
 
   return {
     protocolState: states.notSafeToDeposit({
-      processId: action.processId,
+      processId,
       totalFundingRequired,
       requiredDeposit,
       channelId,
       ourIndex,
       safeToDepositLevel,
+      protocolLocator,
     }),
     sharedData,
   };
