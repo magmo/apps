@@ -47,7 +47,7 @@ export const initialize = ({
     proposedDestination,
     channelId: ledgerId,
     clearedToSend,
-    protocolLocator,
+    protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.ConsensusUpdate),
     sharedData,
   }));
 

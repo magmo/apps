@@ -31,6 +31,7 @@ export interface WaitForVirtualDefunding {
   type: 'Defunding.WaitForVirtualDefunding';
   processId: string;
   virtualDefunding: NonTerminalVirtualDefundingState;
+  indirectDefundingState: IndirectDefundingState;
   channelId: string;
 }
 

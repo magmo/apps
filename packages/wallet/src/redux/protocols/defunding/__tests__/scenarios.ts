@@ -76,6 +76,7 @@ const waitForVirtualDefunding = states.waitForVirtualDefunding({
   processId,
   channelId,
   virtualDefunding: virtualDefunding.preSuccess.state,
+  indirectDefundingState: indirectDefunding.preSuccessState.state,
 });
 
 // const waitForLedgerFailure = states.waitForLedgerDefunding({
