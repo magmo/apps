@@ -94,6 +94,7 @@ export function initialize({
         safeToDepositLevel,
         transactionSubmissionState,
         protocolLocator,
+        funded: false,
       }),
       sharedData: newStorage,
     };
@@ -184,7 +185,11 @@ const notSafeToDepositReducer: DFReducer = (
           state: transactionSubmissionState,
         } = initTransactionState(depositTransaction, state.processId, state.channelId, sharedData);
         return {
-          protocolState: states.waitForDepositTransaction({ ...state, transactionSubmissionState }),
+          protocolState: states.waitForDepositTransaction({
+            ...state,
+            transactionSubmissionState,
+            funded: false,
+          }),
           sharedData: sharedDataWithTransactionState,
         };
       } else {
@@ -200,7 +205,11 @@ const waitForDepositTransactionReducer: DFReducer = (
   sharedData: SharedData,
   action: actions.WalletAction,
 ): ProtocolStateWithSharedData<states.DirectFundingState> => {
+  if (action.type === 'WALLET.ADJUDICATOR.FUNDING_RECEIVED_EVENT') {
+    return { protocolState: { ...protocolState, funded: true }, sharedData };
+  }
   if (!isTransactionAction(action)) {
+    console.warn(`Expected Transaction action or funding received, received ${action.type}`);
     return { protocolState, sharedData };
   }
   const {
@@ -214,6 +223,9 @@ const waitForDepositTransactionReducer: DFReducer = (
     };
   } else {
     if (isSuccess(newTransactionState)) {
+      if (protocolState.funded) {
+        return { protocolState: states.fundingSuccess({ ...protocolState }), sharedData };
+      }
       return {
         protocolState: states.waitForFunding(protocolState),
         sharedData,

@@ -37,6 +37,7 @@ export interface NotSafeToDeposit extends BaseDirectFundingState {
 export interface WaitForDepositTransaction extends BaseDirectFundingState {
   type: 'DirectFunding.WaitForDepositTransaction';
   transactionSubmissionState: NonTerminalTransactionSubmissionState;
+  funded: boolean;
 }
 export interface WaitForFunding extends BaseDirectFundingState {
   type: 'DirectFunding.WaitForFunding';
@@ -67,11 +68,10 @@ export const notSafeToDeposit: StateConstructor<NotSafeToDeposit> = params => {
 export function waitForDepositTransaction(
   params: Properties<WaitForDepositTransaction>,
 ): WaitForDepositTransaction {
-  const { transactionSubmissionState } = params;
   return {
     ...baseDirectFundingState(params),
+    ...params,
     type: 'DirectFunding.WaitForDepositTransaction',
-    transactionSubmissionState,
   };
 }
 export const waitForFunding: StateConstructor<WaitForFunding> = params => {

@@ -17,7 +17,7 @@ const processId = `processId.${channelId}`;
 // shared data
 
 // Direct funding state machine states
-const defaultsForA: states.DirectFundingState = {
+const defaultsForA = {
   processId,
   totalFundingRequired: TOTAL_REQUIRED,
   requiredDeposit: YOUR_DEPOSIT_A,
@@ -26,9 +26,10 @@ const defaultsForA: states.DirectFundingState = {
   safeToDepositLevel: '0x',
   type: 'DirectFunding.NotSafeToDeposit',
   protocolLocator: [],
+  funded: false,
 };
 
-const defaultsForB: states.DirectFundingState = {
+const defaultsForB = {
   ...defaultsForA,
   requiredDeposit: YOUR_DEPOSIT_B,
   ourIndex: 1,
@@ -123,7 +124,7 @@ export const transactionFails = {
 
 export const fundsReceivedArrivesEarly = {
   initialize: { sharedData: sharedData(), ...defaultsForA },
-  waitForDepositTransactionWithFundingEvent: {
+  waitForDepositTransaction: {
     state: states.waitForDepositTransaction({
       ...defaultsForA,
       transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
@@ -131,9 +132,10 @@ export const fundsReceivedArrivesEarly = {
     sharedData: sharedData(),
     action: aFundingReceivedEvent,
   },
-  waitForDepositTransaction: {
+  waitForDepositTransactionFunded: {
     state: states.waitForDepositTransaction({
       ...defaultsForB,
+      funded: true,
       transactionSubmissionState: transactionSubmissionScenarios.preSuccessState,
     }),
     sharedData: sharedData(),

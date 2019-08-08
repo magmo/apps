@@ -29,14 +29,14 @@ describe('Player A Happy path', () => {
 describe('Player A Funding Event Received Early', () => {
   const scenario = scenarios.fundsReceivedArrivesEarly;
 
-  describeScenarioStep(scenario.waitForDepositTransactionWithFundingEvent, () => {
-    const { action, state, sharedData } = scenario.waitForDepositTransactionWithFundingEvent;
+  describeScenarioStep(scenario.waitForDepositTransaction, () => {
+    const { action, state, sharedData } = scenario.waitForDepositTransaction;
     const updatedState = directFundingStateReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'DirectFunding.WaitForDepositTransaction');
   });
 
-  describeScenarioStep(scenario.waitForDepositTransaction, () => {
-    const { action, state, sharedData } = scenario.waitForDepositTransaction;
+  describeScenarioStep(scenario.waitForDepositTransactionFunded, () => {
+    const { action, state, sharedData } = scenario.waitForDepositTransactionFunded;
     const updatedState = directFundingStateReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'DirectFunding.FundingSuccess');
   });
