@@ -1,5 +1,5 @@
 import { SharedData, getChannel } from '../../state';
-import { ProtocolStateWithSharedData, makeLocator } from '..';
+import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
 import * as states from './states';
 import * as helpers from '../reducer-helpers';
 import { withdrawalReducer, initialize as withdrawalInitialize } from './../withdrawing/reducer';
@@ -107,10 +107,20 @@ const waitForVirtualDefundingReducer = (
   sharedData: SharedData,
   action: actions.DefundingAction,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
-  if (!routesToVirtualDefunding(action, protocolState.virtualDefunding.protocolLocator)) {
-    console.warn(`Expected virtual defunding action but received ${action.type}`);
+  if (
+    !routesToVirtualDefunding(action, EMPTY_LOCATOR) &&
+    !indirectDefundingActions.routesToIndirectDefunding(action, EMPTY_LOCATOR)
+  ) {
+    console.warn(
+      `Expected virtual defunding action or indirect defunding action but received ${action.type}`,
+    );
     return { protocolState, sharedData };
   }
+  // Handle the early indirect defunding action
+  if (indirectDefundingActions.routesToIndirectDefunding(action, EMPTY_LOCATOR)) {
+    return handleIndirectDefundingAction(protocolState, sharedData, action);
+  }
+
   let virtualDefunding: VirtualDefundingState;
   ({ protocolState: virtualDefunding, sharedData } = virtualDefundingReducer(
     protocolState.virtualDefunding,
