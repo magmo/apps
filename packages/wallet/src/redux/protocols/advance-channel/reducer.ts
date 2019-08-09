@@ -330,13 +330,17 @@ function nextCommitment(channel: ChannelState, commitmentType: CommitmentType): 
   }
 }
 
-// This only works for 2 or 3 players
 function nextConcludeCommitment(
   lastCommitment: Commitment,
   penultimateCommitment: Commitment,
 ): Commitment {
   const turnNum = lastCommitment.turnNum + 1;
-
+  if (
+    lastCommitment.channel.participants.length < 2 ||
+    lastCommitment.channel.participants.length > 3
+  ) {
+    throw new Error('nextConcludeCommitment only handles 2 or 3 players');
+  }
   let commitmentCount = 0;
   // If the last 2 commitments are conclude we are the sending the third commitment
   if (penultimateCommitment.commitmentType === CommitmentType.Conclude) {
