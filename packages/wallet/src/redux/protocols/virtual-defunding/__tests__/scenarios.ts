@@ -133,24 +133,19 @@ const waitForLedgerChannelUpdate = states.waitForLedgerChannelUpdate({
 // ------
 
 const createFundingState = sharedData => {
-  return setFundingState(
-    setFundingState(
-      setFundingState(sharedData, appChannelId, {
-        fundingChannel: jointChannelId,
-        directlyFunded: false,
-      }),
-      jointChannelId,
-      {
-        guarantorChannel: guarantorChannelId,
-        directlyFunded: false,
-      },
-    ),
-    guarantorChannelId,
-    {
-      fundingChannel: ledgerId,
-      directlyFunded: false,
-    },
-  );
+  sharedData = setFundingState(sharedData, appChannelId, {
+    fundingChannel: jointChannelId,
+    directlyFunded: false,
+  });
+  sharedData = setFundingState(sharedData, jointChannelId, {
+    guarantorChannel: guarantorChannelId,
+    directlyFunded: false,
+  });
+  sharedData = setFundingState(sharedData, guarantorChannelId, {
+    fundingChannel: ledgerId,
+    directlyFunded: false,
+  });
+  return sharedData;
 };
 
 const initialSharedData = createFundingState(
