@@ -67,7 +67,7 @@ export const initialize = ({
       processId,
       ledgerId,
       channelId,
-      ClearedToProceed: clearedToProceed,
+      clearedToProceed,
       ledgerUpdate,
       concluding,
       protocolLocator,

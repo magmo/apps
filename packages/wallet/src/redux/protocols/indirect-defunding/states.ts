@@ -21,7 +21,7 @@ export interface WaitForLedgerUpdate {
   processId: string;
   ledgerId: string;
   channelId: string;
-  ClearedToProceed: boolean;
+  clearedToProceed: boolean;
   ledgerUpdate: ConsensusUpdateState;
   concluding: AdvanceChannelState;
   protocolLocator: ProtocolLocator;

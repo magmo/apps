@@ -35,14 +35,14 @@ export const clearedToSendHappyPath = {
       advanceChannelScenarios.postFund.preSuccess.sharedData,
     ),
     ...props,
-    clearedToSend: true,
+    clearedToProceed: true,
   },
   waitForLedgerUpdate: {
     state: waitForLedgerUpdate({
       ...props,
       ledgerUpdate,
       concluding,
-      ClearedToProceed: true,
+      clearedToProceed: true,
     }),
     action: ledgerUpdateScenarios.twoPlayerPreSuccessA.action,
     sharedData: ledgerUpdateScenarios.twoPlayerPreSuccessA.sharedData,
