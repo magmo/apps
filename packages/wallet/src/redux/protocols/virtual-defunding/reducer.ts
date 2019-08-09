@@ -17,7 +17,6 @@ import { HUB_ADDRESS } from '../../../constants';
 export function initialize({
   processId,
   targetChannelId,
-
   protocolLocator,
   sharedData,
 }: {
