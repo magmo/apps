@@ -70,12 +70,6 @@ const waitForLedgerDefunding = states.waitForLedgerDefunding({
   indirectDefundingState: indirectDefunding.preSuccessState.state,
 });
 
-// const waitForLedgerFailure = states.waitForLedgerDefunding({
-//   processId,
-//   channelId,
-//   indirectDefundingState: indirectDefunding.preFailureState.state,
-// });
-
 const channelNotClosedFailure = states.failure({ reason: 'Channel Not Closed' });
 
 export const directlyFundingChannelHappyPath = {
