@@ -231,7 +231,7 @@ const createIndirectDefundingState = (
   clearedToSend: boolean,
   sharedData: SharedData,
 ) => {
-  const ledgerId = helpers.getFundingChannelId(channelId, sharedData);
+  const ledgerId = helpers.getChannelWithFunds(channelId, sharedData);
   const channel = getChannel(sharedData, channelId);
   if (!channel) {
     throw new Error(`Channel does not exist with id ${channelId}`);
@@ -245,7 +245,7 @@ const createIndirectDefundingState = (
     proposedAllocation,
     proposedDestination,
     sharedData,
-    clearedToSend: true,
+    clearedToSend,
     protocolLocator: makeLocator([], EmbeddedProtocol.IndirectDefunding),
   });
 
