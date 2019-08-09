@@ -42,7 +42,7 @@ export const clearedToSendHappyPath = {
       ...props,
       ledgerUpdate,
       concluding,
-      clearedToSend: true,
+      ClearedToProceed: true,
     }),
     action: ledgerUpdateScenarios.twoPlayerPreSuccessA.action,
     sharedData: ledgerUpdateScenarios.twoPlayerPreSuccessA.sharedData,

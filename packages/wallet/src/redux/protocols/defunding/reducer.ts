@@ -43,7 +43,7 @@ export const initialize = (
       proposedAllocation,
       proposedDestination,
       sharedData,
-      clearedToSend: true,
+      clearedToProceed: true,
       protocolLocator: makeLocator(EmbeddedProtocol.IndirectDefunding),
     });
 
