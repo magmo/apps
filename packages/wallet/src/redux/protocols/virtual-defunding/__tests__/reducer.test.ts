@@ -34,22 +34,9 @@ describe('happyPath', () => {
     });
 
     itSendsTheseCommitments(result.sharedData, [
-      {
-        commitment: {
-          turnNum: 4,
-        },
-      },
-      {
-        commitment: {
-          turnNum: 5,
-        },
-      },
-      {
-        commitment: {
-          turnNum: 6,
-          appAttributes,
-        },
-      },
+      { commitment: { turnNum: 4 } },
+      { commitment: { turnNum: 5 } },
+      { commitment: { turnNum: 6, appAttributes } },
     ]);
   });
 
