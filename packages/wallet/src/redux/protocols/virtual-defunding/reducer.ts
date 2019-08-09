@@ -17,13 +17,11 @@ import { HUB_ADDRESS } from '../../../constants';
 export function initialize({
   processId,
   targetChannelId,
-
   protocolLocator,
   sharedData,
 }: {
   processId: string;
   targetChannelId: string;
-
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.NonTerminalVirtualDefundingState> {
