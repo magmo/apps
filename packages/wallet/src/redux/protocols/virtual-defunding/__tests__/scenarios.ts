@@ -11,6 +11,7 @@ import { commitmentsReceived, EmbeddedProtocol } from '../../../../communication
 import { makeLocator } from '../..';
 import * as consensusStates from '../../consensus-update/states';
 import { HUB_ADDRESS } from '../../../../constants';
+import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
 
 // ---------
 // Test data
@@ -184,12 +185,26 @@ export const happyPath = {
   ...props,
   initialize: {
     ...props,
+     appAttributes : bytesFromAppAttributes({
+      proposedAllocation: [
+        bigNumberify(1).toHexString(),
+        bigNumberify(3).toHexString(),
+        bigNumberify(4).toHexString(),
+      ],
+      proposedDestination: [asAddress, bsAddress, HUB_ADDRESS],
+      furtherVotesRequired: 2,
+    }),
     sharedData: initialSharedData,
   },
   waitForJointChannel: {
     state: waitForJointChannelUpdate,
     action: jointCommitmentReceived,
     sharedData: waitForJointSharedData,
+    appAttributes: bytesFromAppAttributes({
+      proposedAllocation: [bigNumberify(1).toHexString(), bigNumberify(3).toHexString()],
+      proposedDestination: [asAddress, HUB_ADDRESS],
+      furtherVotesRequired: 1,
+    });
   },
   waitForLedgerChannel: {
     state: waitForLedgerChannelUpdate,
