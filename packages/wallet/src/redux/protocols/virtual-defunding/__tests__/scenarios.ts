@@ -185,7 +185,7 @@ export const happyPath = {
   ...props,
   initialize: {
     ...props,
-     appAttributes : bytesFromAppAttributes({
+    appAttributes: bytesFromAppAttributes({
       proposedAllocation: [
         bigNumberify(1).toHexString(),
         bigNumberify(3).toHexString(),
@@ -204,7 +204,7 @@ export const happyPath = {
       proposedAllocation: [bigNumberify(1).toHexString(), bigNumberify(3).toHexString()],
       proposedDestination: [asAddress, HUB_ADDRESS],
       furtherVotesRequired: 1,
-    });
+    }),
   },
   waitForLedgerChannel: {
     state: waitForLedgerChannelUpdate,
