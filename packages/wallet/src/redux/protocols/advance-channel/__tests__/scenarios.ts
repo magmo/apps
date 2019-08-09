@@ -352,7 +352,6 @@ export const existingChannelAsA = {
   },
 };
 
-// TODO: Add tests for concluding as B and hub
 export const concludingA = {
   ...propsA,
   commitmentType: CommitmentType.Conclude,
