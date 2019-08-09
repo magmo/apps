@@ -22,7 +22,6 @@ export function initialize({
 }: {
   processId: string;
   targetChannelId: string;
-
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.NonTerminalVirtualDefundingState> {
