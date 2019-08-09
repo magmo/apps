@@ -10,6 +10,7 @@ import * as virtualDefunding from '../../virtual-defunding/__tests__';
 import _ from 'lodash';
 import { prependToLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
+import { mergeSharedData } from '../../../__tests__/helpers';
 const processId = 'process-id.123';
 
 const { asAddress, bsAddress, asPrivateKey, channelId } = testScenarios;
@@ -171,13 +172,16 @@ export const virtualFundingChannelHappyPath = {
   initialize: {
     processId,
     channelId: virtualDefunding.initial.targetChannelId,
-    sharedData: virtualDefunding.initial.sharedData,
+    sharedData: mergeSharedData(
+      virtualDefunding.preSuccess.sharedData,
+      indirectDefunding.preSuccessState.sharedData,
+    ),
   },
   // States
   waitForVirtualDefunding: {
     state: waitForVirtualDefunding,
     action: prependToLocator(virtualDefunding.preSuccess.action, EmbeddedProtocol.VirtualDefunding),
-    sharedData: _.merge(
+    sharedData: mergeSharedData(
       virtualDefunding.preSuccess.sharedData,
       indirectDefunding.preSuccessState.sharedData,
     ),
@@ -185,7 +189,7 @@ export const virtualFundingChannelHappyPath = {
   waitForLedgerDefunding: {
     state: waitForLedgerDefunding,
     action: prependToLocator(indirectDefunding.successTrigger, EmbeddedProtocol.IndirectDefunding),
-    sharedData: _.merge(
+    sharedData: mergeSharedData(
       indirectDefunding.preSuccessState.sharedData,
       virtualDefunding.preSuccess.sharedData,
     ),
