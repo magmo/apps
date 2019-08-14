@@ -23,7 +23,6 @@ const props = {
 };
 
 const ledgerUpdate = ledgerUpdateScenarios.twoPlayerPreSuccessA.state;
-// TODO: We should probably add a conclude scenario to advance channel
 const concluding = advanceChannelScenarios.postFund.preSuccess.state;
 
 // -----------

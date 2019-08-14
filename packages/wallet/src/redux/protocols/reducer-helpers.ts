@@ -290,7 +290,7 @@ export function getFundingChannelId(channelId: string, sharedData: SharedData): 
   if (fundingState.directlyFunded) {
     return channelId;
   } else {
-    const channelIdToCheck = fundingState.fundingChannel
+    const channelIdToCheck = !!fundingState.fundingChannel
       ? fundingState.fundingChannel
       : fundingState.guarantorChannel;
     if (!channelIdToCheck) {
