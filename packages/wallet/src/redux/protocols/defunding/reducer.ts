@@ -46,7 +46,7 @@ export const initialize = (
         protocolState: states.waitForLedgerDefunding({
           processId,
           channelId,
-          ledgerId: helpers.getChannelWithFunds(channelId, sharedData),
+          ledgerId: helpers.getFundingChannelId(channelId, sharedData),
           indirectDefundingState,
         }),
         sharedData,
@@ -72,7 +72,7 @@ export const initialize = (
         protocolState: states.waitForVirtualDefunding({
           processId,
           channelId,
-          ledgerId: helpers.getChannelWithFunds(channelId, sharedData),
+          ledgerId: helpers.getFundingChannelId(channelId, sharedData),
           virtualDefunding,
           indirectDefundingState,
         }),
@@ -231,7 +231,7 @@ const createIndirectDefundingState = (
   clearedToSend: boolean,
   sharedData: SharedData,
 ) => {
-  const ledgerId = helpers.getChannelWithFunds(channelId, sharedData);
+  const ledgerId = helpers.getFundingChannelId(channelId, sharedData);
   const channel = getChannel(sharedData, channelId);
   if (!channel) {
     throw new Error(`Channel does not exist with id ${channelId}`);

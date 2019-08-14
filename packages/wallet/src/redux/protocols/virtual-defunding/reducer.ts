@@ -8,7 +8,7 @@ import {
   consensusUpdateReducer,
 } from '../consensus-update/reducer';
 import { getChannelFundingState } from '../../selectors';
-import { getLatestCommitment, getTwoPlayerIndex, getChannelWithFunds } from '../reducer-helpers';
+import { getLatestCommitment, getTwoPlayerIndex, getFundingChannelId } from '../reducer-helpers';
 import { addHex } from '../../../utils/hex-utils';
 import { VirtualDefundingAction } from './actions';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
@@ -48,7 +48,7 @@ export function initialize({
     proposedDestination,
     sharedData,
   }));
-  const ledgerChannelId = getChannelWithFunds(targetChannelId, sharedData);
+  const ledgerChannelId = getFundingChannelId(targetChannelId, sharedData);
   return {
     protocolState: states.waitForJointChannelUpdate({
       processId,

@@ -208,17 +208,6 @@ export const getChannelFundingType = (channelId: string, sharedData: SharedData)
   return channelState.participants.length === 3 ? FundingType.Virtual : FundingType.Ledger;
 };
 
-export const getFundingChannelId = (channelId: string, sharedData: SharedData): string => {
-  const channelFundingState = selectors.getChannelFundingState(sharedData, channelId);
-  if (!channelFundingState) {
-    throw new Error(`No funding state for ${channelId}. Cannot determine funding type.`);
-  }
-
-  if (!channelFundingState.fundingChannel) {
-    throw new Error('No funding channel id defined.');
-  }
-  return channelFundingState.fundingChannel;
-};
 export const getTwoPlayerIndex = (
   channelId: string,
   sharedData: SharedData,
@@ -293,7 +282,7 @@ export function ourTurn(sharedData: SharedData, channelId: string) {
   return ourTurnOnChannel(channel);
 }
 
-export function getChannelWithFunds(channelId: string, sharedData: SharedData): string {
+export function getFundingChannelId(channelId: string, sharedData: SharedData): string {
   const fundingState = selectors.getChannelFundingState(sharedData, channelId);
   if (!fundingState) {
     throw new Error(`No funding state found for ${channelId}`);
@@ -310,6 +299,6 @@ export function getChannelWithFunds(channelId: string, sharedData: SharedData): 
       );
     }
 
-    return getChannelWithFunds(channelIdToCheck, sharedData);
+    return getFundingChannelId(channelIdToCheck, sharedData);
   }
 }
