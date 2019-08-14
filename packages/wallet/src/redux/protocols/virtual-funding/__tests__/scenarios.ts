@@ -59,6 +59,7 @@ const initializeArgs = {
 const props = {
   targetChannelId,
   processId,
+  jointChannelId,
   startingAllocation,
   startingDestination,
   hubAddress,

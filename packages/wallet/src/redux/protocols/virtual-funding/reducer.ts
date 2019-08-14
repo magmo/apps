@@ -301,15 +301,7 @@ function waitForGuarantorFundingReducer(
   action: WalletAction,
 ) {
   const { processId, protocolLocator } = protocolState;
-  if (
-    !routesToIndirectFunding(action, protocolLocator) &&
-    !routesToConsensusUpdate(action, protocolLocator)
-  ) {
-    console.warn(
-      `Expected indirectFunding or consensusUpdate action, received ${action.type} instead`,
-    );
-    return { protocolState, sharedData };
-  }
+
   if (routesToConsensusUpdate(action, protocolLocator)) {
     let indirectApplicationFunding: consensusUpdate.ConsensusUpdateState;
     ({
@@ -334,13 +326,13 @@ function waitForGuarantorFundingReducer(
       default:
         return { protocolState: { ...protocolState, indirectApplicationFunding }, sharedData };
     }
-  }
-  const result = indirectFunding.indirectFundingReducer(
-    protocolState.indirectGuarantorFunding,
-    sharedData,
-    action,
-  );
-  if (indirectFunding.isTerminal(result.protocolState)) {
+  } else if (routesToIndirectFunding(action, protocolLocator)) {
+    const result = indirectFunding.indirectFundingReducer(
+      protocolState.indirectGuarantorFunding,
+      sharedData,
+      action,
+    );
+
     switch (result.protocolState.type) {
       case 'IndirectFunding.Success':
         // Once funding is complete we allow consensusUpdate to send commitments
@@ -363,17 +355,20 @@ function waitForGuarantorFundingReducer(
         throw new Error(`Indirect funding failed: ${result.protocolState.reason}`);
 
       default:
-        return unreachable(result.protocolState);
+        return {
+          protocolState: states.waitForGuarantorFunding({
+            ...protocolState,
+
+            indirectGuarantorFunding: result.protocolState,
+          }),
+          sharedData: result.sharedData,
+        };
     }
   } else {
-    return {
-      protocolState: states.waitForGuarantorFunding({
-        ...protocolState,
-
-        indirectGuarantorFunding: result.protocolState,
-      }),
-      sharedData: result.sharedData,
-    };
+    console.warn(
+      `Expected indirectFunding or consensusUpdate action, received ${action.type} instead`,
+    );
+    return { protocolState, sharedData };
   }
 }
 
@@ -391,6 +386,10 @@ function waitForApplicationFundingReducer(
     if (consensusUpdate.isTerminal(result.protocolState)) {
       switch (result.protocolState.type) {
         case 'ConsensusUpdate.Success':
+          result.sharedData = setFundingState(result.sharedData, protocolState.targetChannelId, {
+            directlyFunded: false,
+            fundingChannel: protocolState.jointChannelId,
+          });
           return {
             protocolState: states.success(protocolState),
             sharedData: result.sharedData,
