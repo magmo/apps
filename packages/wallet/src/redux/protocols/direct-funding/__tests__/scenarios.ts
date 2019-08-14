@@ -60,7 +60,7 @@ const adjudicatorStateSharedData: SharedData = {
   adjudicatorState: { [channelId]: { channelId, balance: '0x5', finalized: false } },
 };
 export const aHappyPath = {
-  initialize: { sharedData: sharedData(), ...defaultsForA },
+  initialize: { ...defaultsForA, sharedData: sharedData() },
   waitForDepositTransaction: {
     state: states.waitForDepositTransaction({
       ...defaultsForA,
@@ -123,7 +123,7 @@ export const transactionFails = {
 };
 
 export const fundsReceivedArrivesEarly = {
-  initialize: { sharedData: sharedData(), ...defaultsForA },
+  initialize: { ...defaultsForA, sharedData: sharedData() },
   waitForDepositTransaction: {
     state: states.waitForDepositTransaction({
       ...defaultsForA,
