@@ -335,45 +335,43 @@ function waitForGuarantorFundingReducer(
         return { protocolState: { ...protocolState, indirectApplicationFunding }, sharedData };
     }
   }
+
   const result = indirectFunding.indirectFundingReducer(
     protocolState.indirectGuarantorFunding,
     sharedData,
     action,
   );
-  if (indirectFunding.isTerminal(result.protocolState)) {
-    switch (result.protocolState.type) {
-      case 'IndirectFunding.Success':
-        // Once funding is complete we allow consensusUpdate to send commitments
-        const applicationFundingResult = consensusUpdate.consensusUpdateReducer(
-          protocolState.indirectApplicationFunding,
-          result.sharedData,
-          clearedToSend({
-            processId,
-            protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
-          }),
-        );
-        return {
-          protocolState: states.waitForApplicationFunding({
-            ...protocolState,
-            indirectApplicationFunding: applicationFundingResult.protocolState,
-          }),
-          sharedData: applicationFundingResult.sharedData,
-        };
-      case 'IndirectFunding.Failure':
-        throw new Error(`Indirect funding failed: ${result.protocolState.reason}`);
 
-      default:
-        return unreachable(result.protocolState);
-    }
-  } else {
-    return {
-      protocolState: states.waitForGuarantorFunding({
-        ...protocolState,
+  switch (result.protocolState.type) {
+    case 'IndirectFunding.Success':
+      // Once funding is complete we allow consensusUpdate to send commitments
+      const applicationFundingResult = consensusUpdate.consensusUpdateReducer(
+        protocolState.indirectApplicationFunding,
+        result.sharedData,
+        clearedToSend({
+          processId,
+          protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
+        }),
+      );
+      return {
+        protocolState: states.waitForApplicationFunding({
+          ...protocolState,
+          indirectApplicationFunding: applicationFundingResult.protocolState,
+        }),
+        sharedData: applicationFundingResult.sharedData,
+      };
+    case 'IndirectFunding.Failure':
+      throw new Error(`Indirect funding failed: ${result.protocolState.reason}`);
 
-        indirectGuarantorFunding: result.protocolState,
-      }),
-      sharedData: result.sharedData,
-    };
+    default:
+      return {
+        protocolState: states.waitForGuarantorFunding({
+          ...protocolState,
+
+          indirectGuarantorFunding: result.protocolState,
+        }),
+        sharedData: result.sharedData,
+      };
   }
 }
 

@@ -28,7 +28,7 @@ export const initialize = ({
   proposedAllocation,
   proposedDestination,
   sharedData,
-  clearedToSend,
+  clearedToProceed,
   protocolLocator,
 }: {
   processId: string;
@@ -37,7 +37,7 @@ export const initialize = ({
   proposedAllocation: string[];
   proposedDestination: string[];
   sharedData: SharedData;
-  clearedToSend: boolean;
+  clearedToProceed: boolean;
   protocolLocator: ProtocolLocator;
 }): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
   let ledgerUpdate: ConsensusUpdateState;
@@ -46,8 +46,8 @@ export const initialize = ({
     proposedAllocation,
     proposedDestination,
     channelId: ledgerId,
-    clearedToSend,
-    protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.ConsensusUpdate),
+    clearedToSend: clearedToProceed,
+    protocolLocator,
     sharedData,
   }));
 
@@ -67,7 +67,7 @@ export const initialize = ({
       processId,
       ledgerId,
       channelId,
-      clearedToSend,
+      clearedToProceed,
       ledgerUpdate,
       concluding,
       protocolLocator,

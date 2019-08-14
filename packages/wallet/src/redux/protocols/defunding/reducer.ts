@@ -228,7 +228,7 @@ const handleIndirectDefundingAction = (
 const createIndirectDefundingState = (
   processId: string,
   channelId: string,
-  clearedToSend: boolean,
+  clearedToProceed: boolean,
   sharedData: SharedData,
 ) => {
   const ledgerId = helpers.getFundingChannelId(channelId, sharedData);
@@ -245,7 +245,7 @@ const createIndirectDefundingState = (
     proposedAllocation,
     proposedDestination,
     sharedData,
-    clearedToSend,
+    clearedToProceed,
     protocolLocator: makeLocator([], EmbeddedProtocol.IndirectDefunding),
   });
 

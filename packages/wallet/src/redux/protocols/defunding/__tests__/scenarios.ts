@@ -93,12 +93,6 @@ const waitForVirtualDefunding = states.waitForVirtualDefunding({
   ),
 });
 
-// const waitForLedgerFailure = states.waitForLedgerDefunding({
-//   processId,
-//   channelId,
-//   indirectDefundingState: indirectDefunding.preFailureState.state,
-// });
-
 const channelNotClosedFailure = states.failure({ reason: 'Channel Not Closed' });
 
 export const directlyFundingChannelHappyPath = {
@@ -233,14 +227,3 @@ export const directlyFundingFailure = {
     },
   },
 };
-
-// export const indirectlyFundingFailure = {
-//   processId,
-//   channelId,
-//   // States
-//   waitForLedgerDefunding: {
-//     state: waitForLedgerFailure,
-//     action: indirectDefunding.failureTrigger,
-//     sharedData: indirectDefunding.preFailureState.store,
-//   },
-// };
