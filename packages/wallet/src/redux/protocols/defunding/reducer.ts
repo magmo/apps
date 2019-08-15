@@ -10,7 +10,7 @@ import {
 } from '../ledger-defunding/reducer';
 import { isLedgerDefundingAction } from '../ledger-defunding/actions';
 import * as ledgerDefundingStates from '../ledger-defunding/states';
-import { EmbeddedProtocol } from '../../../communication';
+import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
 import { getLastCommitment } from '../../channel-store';
 import { ProtocolAction } from '../../../redux/actions';
 import { VirtualDefundingState } from '../virtual-defunding/states';
@@ -20,6 +20,7 @@ import * as ledgerDefundingActions from '../ledger-defunding/actions';
 
 export const initialize = (
   processId: string,
+  protocolLocator: ProtocolLocator,
   channelId: string,
   sharedData: SharedData,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
@@ -37,6 +38,7 @@ export const initialize = (
     case helpers.FundingType.Ledger:
       ({ ledgerDefundingState, sharedData } = createLedgerDefundingState(
         processId,
+        protocolLocator,
         channelId,
         true,
         sharedData,
@@ -47,7 +49,8 @@ export const initialize = (
           processId,
           channelId,
           ledgerId: helpers.getFundingChannelId(channelId, sharedData),
-          ledgerDefundingState: ledgerDefundingState,
+          ledgerDefundingState,
+          protocolLocator,
         }),
         sharedData,
       };
@@ -57,7 +60,7 @@ export const initialize = (
         processId,
         targetChannelId: channelId,
 
-        protocolLocator: makeLocator(EmbeddedProtocol.VirtualDefunding),
+        protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.VirtualDefunding),
         sharedData,
       }));
 
@@ -67,6 +70,7 @@ export const initialize = (
           channelId,
           ledgerId: helpers.getFundingChannelId(channelId, sharedData),
           virtualDefunding,
+          protocolLocator,
         }),
         sharedData,
       };
@@ -166,6 +170,7 @@ const handleLedgerDefundingAction = (
 
 const createLedgerDefundingState = (
   processId: string,
+  protocolLocator: ProtocolLocator,
   channelId: string,
   clearedToProceed: boolean,
   sharedData: SharedData,
@@ -185,7 +190,7 @@ const createLedgerDefundingState = (
     proposedDestination,
     sharedData,
     clearedToProceed,
-    protocolLocator: makeLocator([], EmbeddedProtocol.ledgerDefunding),
+    protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.ledgerDefunding),
   });
 
   return { ledgerDefundingState: ledgerDefundingState.protocolState, sharedData };

@@ -6,7 +6,7 @@ import { channelFromCommitments } from '../../../channel-store/channel-state/__t
 import { bigNumberify } from 'ethers/utils';
 import * as virtualDefunding from '../../virtual-defunding/__tests__';
 import _ from 'lodash';
-import { prependToLocator } from '../..';
+import { prependToLocator, makeLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
 import { mergeSharedData } from '../../../__tests__/helpers';
 const processId = 'process-id.123';
@@ -36,6 +36,7 @@ const waitForLedgerDefunding = states.waitForLedgerDefunding({
   processId,
   channelId,
   ledgerId,
+  protocolLocator: makeLocator(EmbeddedProtocol.Defunding),
   ledgerDefundingState: prependToLocator(
     ledgerDefunding.preSuccessState.state,
     EmbeddedProtocol.ledgerDefunding,
@@ -46,9 +47,10 @@ const waitForVirtualDefunding = states.waitForVirtualDefunding({
   processId,
   channelId,
   ledgerId,
+  protocolLocator: makeLocator(EmbeddedProtocol.Defunding),
   virtualDefunding: prependToLocator(
     virtualDefunding.preSuccess.state,
-    EmbeddedProtocol.VirtualDefunding,
+    makeLocator(EmbeddedProtocol.Defunding, EmbeddedProtocol.VirtualDefunding),
   ),
 });
 
@@ -56,6 +58,7 @@ export const indirectlyFundingChannelHappyPath = {
   initialize: {
     processId,
     channelId,
+    protocolLocator: makeLocator(EmbeddedProtocol.Defunding),
     sharedData: setChannels(
       setFundingState(
         setFundingState(ledgerDefunding.initialStore, channelId, {
@@ -89,6 +92,7 @@ export const indirectlyFundingChannelHappyPath = {
 export const virtualFundingChannelHappyPath = {
   initialize: {
     processId,
+    protocolLocator: makeLocator(EmbeddedProtocol.Defunding),
     channelId: virtualDefunding.initial.targetChannelId,
     sharedData: mergeSharedData(
       virtualDefunding.preSuccess.sharedData,

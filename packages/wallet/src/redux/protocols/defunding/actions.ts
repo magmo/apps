@@ -2,6 +2,7 @@ import { WalletAction } from '../../actions';
 import { WithdrawalAction, isWithdrawalAction } from '../withdrawing/actions';
 import { LedgerDefundingAction, isLedgerDefundingAction } from '../ledger-defunding/actions';
 import { VirtualDefundingAction, isVirtualDefundingAction } from '../virtual-defunding';
+import { routerFactory, EmbeddedProtocol } from '../../../communication';
 
 // -------
 // Actions
@@ -25,3 +26,5 @@ export const isDefundingAction = (action: WalletAction): action is DefundingActi
     isVirtualDefundingAction(action)
   );
 };
+
+export const routesToDefunding = routerFactory(isDefundingAction, EmbeddedProtocol.Defunding);

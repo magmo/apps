@@ -2,6 +2,7 @@ import { StateConstructor } from '../../utils';
 import { LedgerDefundingState } from '../ledger-defunding/states';
 import { ProtocolState } from '..';
 import { NonTerminalVirtualDefundingState } from '../virtual-defunding/states';
+import { ProtocolLocator } from '../../../communication';
 
 // -------
 // States
@@ -15,6 +16,7 @@ export interface WaitForLedgerDefunding {
   ledgerDefundingState: LedgerDefundingState;
   channelId;
   ledgerId: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface WaitForVirtualDefunding {
@@ -23,6 +25,7 @@ export interface WaitForVirtualDefunding {
   virtualDefunding: NonTerminalVirtualDefundingState;
   channelId: string;
   ledgerId: string;
+  protocolLocator: ProtocolLocator;
 }
 
 export interface Failure {

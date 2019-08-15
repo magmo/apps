@@ -17,8 +17,8 @@ describe('indirectly funded happy path', () => {
   const scenario = scenarios.indirectlyFundingChannelHappyPath;
 
   describe('when initializing', () => {
-    const { processId, channelId, sharedData } = scenario.initialize;
-    const result = initialize(processId, channelId, sharedData);
+    const { processId, protocolLocator, channelId, sharedData } = scenario.initialize;
+    const result = initialize(processId, protocolLocator, channelId, sharedData);
     itTransitionsTo(result, 'Defunding.WaitForLedgerDefunding');
   });
   describeScenarioStep(scenario.waitForLedgerDefunding, () => {
@@ -34,8 +34,8 @@ describe('virtually funded happy path', () => {
   const scenario = scenarios.virtualFundingChannelHappyPath;
 
   describe('when initializing', () => {
-    const { processId, channelId, sharedData } = scenario.initialize;
-    const result = initialize(processId, channelId, sharedData);
+    const { processId, protocolLocator, channelId, sharedData } = scenario.initialize;
+    const result = initialize(processId, protocolLocator, channelId, sharedData);
     itTransitionsTo(result, 'Defunding.WaitForVirtualDefunding');
   });
   describeScenarioStep(scenario.waitForVirtualDefunding, () => {
