@@ -2,10 +2,7 @@ import { SharedData, getChannel } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
 import * as states from './states';
 import * as helpers from '../reducer-helpers';
-import { withdrawalReducer, initialize as withdrawalInitialize } from './../withdrawing/reducer';
-import * as selectors from '../../selectors';
 import * as actions from './actions';
-import { isWithdrawalAction } from '../withdrawing/actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import {
   indirectDefundingReducer,
@@ -33,7 +30,10 @@ export const initialize = (
   let indirectDefundingState: indirectDefundingStates.IndirectDefundingState;
   switch (fundingType) {
     case helpers.FundingType.Direct:
-      return createWaitForWithdrawal(sharedData, processId, channelId);
+      return {
+        protocolState: states.failure({ reason: 'Cannot defund directly funded channel' }),
+        sharedData,
+      };
     case helpers.FundingType.Ledger:
       ({ indirectDefundingState, sharedData } = createIndirectDefundingState(
         processId,
@@ -61,20 +61,12 @@ export const initialize = (
         sharedData,
       }));
 
-      ({ indirectDefundingState, sharedData } = createIndirectDefundingState(
-        processId,
-        channelId,
-        false,
-        sharedData,
-      ));
-
       return {
         protocolState: states.waitForVirtualDefunding({
           processId,
           channelId,
           ledgerId: helpers.getFundingChannelId(channelId, sharedData),
           virtualDefunding,
-          indirectDefundingState,
         }),
         sharedData,
       };
@@ -91,8 +83,6 @@ export const defundingReducer = (
     return { protocolState, sharedData };
   }
   switch (protocolState.type) {
-    case 'Defunding.WaitForWithdrawal':
-      return waitForWithdrawalReducer(protocolState, sharedData, action);
     case 'Defunding.WaitForIndirectDefunding':
       return waitForIndirectDefundingReducer(protocolState, sharedData, action);
     case 'Defunding.WaitForVirtualDefunding':
@@ -110,18 +100,9 @@ const waitForVirtualDefundingReducer = (
   sharedData: SharedData,
   action: actions.DefundingAction,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
-  if (
-    !routesToVirtualDefunding(action, EMPTY_LOCATOR) &&
-    !indirectDefundingActions.routesToIndirectDefunding(action, EMPTY_LOCATOR)
-  ) {
-    console.warn(
-      `Expected virtual defunding action or indirect defunding action but received ${action.type}`,
-    );
+  if (!routesToVirtualDefunding(action, EMPTY_LOCATOR)) {
+    console.warn(`Expected virtual defunding action but received ${action.type}`);
     return { protocolState, sharedData };
-  }
-  // Handle the early indirect defunding action
-  if (indirectDefundingActions.routesToIndirectDefunding(action, EMPTY_LOCATOR)) {
-    return handleIndirectDefundingAction(protocolState, sharedData, action);
   }
 
   let virtualDefunding: VirtualDefundingState;
@@ -138,15 +119,7 @@ const waitForVirtualDefundingReducer = (
         sharedData,
       };
     case 'VirtualDefunding.Success':
-      const { processId } = protocolState;
-      return handleIndirectDefundingAction(
-        states.waitForLedgerDefunding(protocolState),
-        sharedData,
-        indirectDefundingActions.clearedToSend({
-          processId,
-          protocolLocator: makeLocator(EmbeddedProtocol.IndirectDefunding),
-        }),
-      );
+      return { protocolState: states.success({}), sharedData: helpers.hideWallet(sharedData) };
 
     default:
       return {
@@ -167,42 +140,8 @@ const waitForIndirectDefundingReducer = (
   return handleIndirectDefundingAction(protocolState, sharedData, action);
 };
 
-const waitForWithdrawalReducer = (
-  protocolState: states.WaitForWithdrawal,
-  sharedData: SharedData,
-  action: actions.DefundingAction,
-) => {
-  if (!isWithdrawalAction(action)) {
-    return { protocolState, sharedData };
-  }
-  const { protocolState: newWithdrawalState, sharedData: newSharedData } = withdrawalReducer(
-    protocolState.withdrawalState,
-    sharedData,
-    action,
-  );
-  if (newWithdrawalState.type === 'Withdrawing.Success') {
-    return {
-      protocolState: states.success({}),
-      sharedData: helpers.hideWallet(newSharedData),
-    };
-  } else if (newWithdrawalState.type === 'Withdrawing.Failure') {
-    return {
-      protocolState: states.failure({ reason: 'Withdrawal Failure' }),
-      sharedData: newSharedData,
-    };
-  } else {
-    return {
-      protocolState: states.waitForWithdrawal({
-        ...protocolState,
-        withdrawalState: newWithdrawalState,
-      }),
-      sharedData: newSharedData,
-    };
-  }
-};
-
 const handleIndirectDefundingAction = (
-  protocolState: states.WaitForIndirectDefunding | states.WaitForVirtualDefunding,
+  protocolState: states.WaitForIndirectDefunding,
   sharedData: SharedData,
   action: indirectDefundingActions.IndirectDefundingAction,
 ) => {
@@ -219,7 +158,7 @@ const handleIndirectDefundingAction = (
         sharedData,
       };
     case 'IndirectDefunding.Success':
-      return createWaitForWithdrawal(sharedData, protocolState.processId, protocolState.ledgerId);
+      return { protocolState: states.success({}), sharedData: helpers.hideWallet(sharedData) };
     default:
       return { protocolState: { ...protocolState, indirectDefundingState }, sharedData };
   }
@@ -250,27 +189,4 @@ const createIndirectDefundingState = (
   });
 
   return { indirectDefundingState: indirectDefundingState.protocolState, sharedData };
-};
-
-const createWaitForWithdrawal = (sharedData: SharedData, processId: string, channelId: string) => {
-  const withdrawalAmount = getWithdrawalAmount(sharedData, channelId);
-
-  const { protocolState: withdrawalState, sharedData: newSharedData } = withdrawalInitialize(
-    withdrawalAmount,
-    channelId,
-    processId,
-    sharedData,
-  );
-
-  const protocolState = states.waitForWithdrawal({
-    processId,
-    withdrawalState,
-    channelId,
-  });
-
-  return { protocolState, sharedData: newSharedData };
-};
-const getWithdrawalAmount = (sharedData: SharedData, channelId: string) => {
-  const channelState = selectors.getChannelState(sharedData, channelId);
-  return getLastCommitment(channelState).allocation[channelState.ourIndex];
 };

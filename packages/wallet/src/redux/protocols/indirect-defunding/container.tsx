@@ -22,8 +22,6 @@ class IndirectDefundingContainer extends PureComponent<Props> {
             channelId={state.ledgerId}
           />
         );
-      case 'IndirectDefunding.WaitForConclude':
-        return <WaitForOtherPlayer actionDescriptor={'conclude'} channelId={state.ledgerId} />;
       case 'IndirectDefunding.Failure':
         return <Failure name="indirect-de-funding" reason={state.reason} />;
       case 'IndirectDefunding.Success':

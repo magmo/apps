@@ -14,11 +14,6 @@ describe('Cleared To Send happy path', () => {
   describe('when in WaitForLedgerUpdate', () => {
     const { state, action, sharedData } = scenario.waitForLedgerUpdate;
     const updatedState = indirectDefundingReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'IndirectDefunding.WaitForConclude');
-  });
-  describe('when in WaitForConclude', () => {
-    const { state, action, sharedData } = scenario.waitForConclude;
-    const updatedState = indirectDefundingReducer(state, sharedData, action);
     itTransitionsTo(updatedState, 'IndirectDefunding.Success');
   });
 });

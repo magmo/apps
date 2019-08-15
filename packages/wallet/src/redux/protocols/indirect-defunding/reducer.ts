@@ -2,7 +2,6 @@ import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { SharedData } from '../../state';
 import * as states from './states';
 import { IndirectDefundingAction } from './actions';
-import * as helpers from '../reducer-helpers';
 import { unreachable } from '../../../utils/reducer-utils';
 import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
 import {
@@ -10,16 +9,8 @@ import {
   initializeConsensusUpdate,
   consensusUpdateReducer,
 } from '../consensus-update';
-import { routesToAdvanceChannel } from '../advance-channel/actions';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
 import * as consensusUpdateActions from '../consensus-update/actions';
-import * as advanceChannelActions from '../advance-channel/actions';
-import {
-  AdvanceChannelState,
-  initializeAdvanceChannel,
-  advanceChannelReducer,
-} from '../advance-channel';
-import { CommitmentType } from '../../../domain';
 
 export const initialize = ({
   processId,
@@ -51,17 +42,6 @@ export const initialize = ({
     sharedData,
   }));
 
-  let concluding: AdvanceChannelState;
-  const ourIndex = helpers.getTwoPlayerIndex(ledgerId, sharedData);
-  ({ protocolState: concluding, sharedData } = initializeAdvanceChannel(sharedData, {
-    ourIndex,
-    commitmentType: CommitmentType.Conclude,
-    channelId: ledgerId,
-    processId,
-    clearedToSend: false, // We only want to clear this to send after the ledger updating is done
-    protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.AdvanceChannel),
-  }));
-
   return {
     protocolState: states.waitForLedgerUpdate({
       processId,
@@ -69,7 +49,7 @@ export const initialize = ({
       channelId,
       clearedToProceed,
       ledgerUpdate,
-      concluding,
+
       protocolLocator,
     }),
     sharedData,
@@ -87,8 +67,7 @@ export const indirectDefundingReducer = (
   switch (protocolState.type) {
     case 'IndirectDefunding.WaitForLedgerUpdate':
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
-    case 'IndirectDefunding.WaitForConclude':
-      return waitForConcludeReducer(protocolState, sharedData, action);
+
     case 'IndirectDefunding.Success':
     case 'IndirectDefunding.Failure':
       return { protocolState, sharedData };
@@ -121,37 +100,6 @@ const handleClearedToSend = (
   );
 };
 
-const waitForConcludeReducer = (
-  protocolState: states.WaitForConclude,
-  sharedData: SharedData,
-  action: IndirectDefundingAction,
-): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
-  if (!routesToAdvanceChannel(action, protocolState.protocolLocator)) {
-    console.warn(`Received non-AdvanceChannel action in state ${protocolState.type}`);
-    return { protocolState, sharedData };
-  }
-  let concluding: AdvanceChannelState;
-  ({ protocolState: concluding, sharedData } = advanceChannelReducer(
-    protocolState.concluding,
-    sharedData,
-    action,
-  ));
-  switch (concluding.type) {
-    case 'AdvanceChannel.Failure':
-      return { protocolState: states.failure({ reason: 'AdvanceChannel Failure' }), sharedData };
-    case 'AdvanceChannel.Success':
-      return {
-        protocolState: states.success({}),
-        sharedData,
-      };
-    default:
-      return {
-        protocolState: states.waitForConclude({ ...protocolState, concluding }),
-        sharedData,
-      };
-  }
-};
-
 const waitForLedgerUpdateReducer = (
   protocolState: states.WaitForLedgerUpdate,
   sharedData: SharedData,
@@ -169,7 +117,6 @@ function handleConsensusUpdateAction(
   sharedData: SharedData,
   action: consensusUpdateActions.ConsensusUpdateAction,
 ) {
-  const { processId, protocolLocator } = protocolState;
   let ledgerUpdate: ConsensusUpdateState;
   ({ protocolState: ledgerUpdate, sharedData } = consensusUpdateReducer(
     protocolState.ledgerUpdate,
@@ -183,19 +130,7 @@ function handleConsensusUpdateAction(
         sharedData,
       };
     case 'ConsensusUpdate.Success':
-      let concluding: AdvanceChannelState;
-      ({ protocolState: concluding, sharedData } = advanceChannelReducer(
-        protocolState.concluding,
-        sharedData,
-        advanceChannelActions.clearedToSend({
-          processId,
-          protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.AdvanceChannel),
-        }),
-      ));
-      return {
-        protocolState: states.waitForConclude({ ...protocolState, concluding }),
-        sharedData,
-      };
+      return { protocolState: states.success({}), sharedData };
     default:
       return {
         protocolState: { ...protocolState, ledgerUpdate },
