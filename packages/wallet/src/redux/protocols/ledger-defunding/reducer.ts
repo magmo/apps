@@ -1,7 +1,7 @@
 import { ProtocolStateWithSharedData, makeLocator } from '..';
 import { SharedData } from '../../state';
 import * as states from './states';
-import { IndirectDefundingAction } from './actions';
+import { LedgerDefundingAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
 import {
@@ -30,7 +30,7 @@ export const initialize = ({
   sharedData: SharedData;
   clearedToProceed: boolean;
   protocolLocator: ProtocolLocator;
-}): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
+}): ProtocolStateWithSharedData<states.LedgerDefundingState> => {
   let ledgerUpdate: ConsensusUpdateState;
   ({ protocolState: ledgerUpdate, sharedData } = initializeConsensusUpdate({
     processId,
@@ -56,20 +56,20 @@ export const initialize = ({
   };
 };
 
-export const indirectDefundingReducer = (
-  protocolState: states.IndirectDefundingState,
+export const ledgerDefundingReducer = (
+  protocolState: states.LedgerDefundingState,
   sharedData: SharedData,
-  action: IndirectDefundingAction,
-): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
-  if (action.type === 'WALLET.INDIRECT_DEFUNDING.CLEARED_TO_SEND') {
+  action: LedgerDefundingAction,
+): ProtocolStateWithSharedData<states.LedgerDefundingState> => {
+  if (action.type === 'WALLET.LEDGER_DEFUNDING.CLEARED_TO_SEND') {
     return handleClearedToSend(protocolState, sharedData);
   }
   switch (protocolState.type) {
-    case 'IndirectDefunding.WaitForLedgerUpdate':
+    case 'LedgerDefunding.WaitForLedgerUpdate':
       return waitForLedgerUpdateReducer(protocolState, sharedData, action);
 
-    case 'IndirectDefunding.Success':
-    case 'IndirectDefunding.Failure':
+    case 'LedgerDefunding.Success':
+    case 'LedgerDefunding.Failure':
       return { protocolState, sharedData };
     default:
       return unreachable(protocolState);
@@ -77,12 +77,12 @@ export const indirectDefundingReducer = (
 };
 
 const handleClearedToSend = (
-  protocolState: states.IndirectDefundingState,
+  protocolState: states.LedgerDefundingState,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
+): ProtocolStateWithSharedData<states.LedgerDefundingState> => {
   // We only need to send clear to send to the consensus update reducer
   // as the advance channel only gets cleared to send after this state
-  if (protocolState.type !== 'IndirectDefunding.WaitForLedgerUpdate') {
+  if (protocolState.type !== 'LedgerDefunding.WaitForLedgerUpdate') {
     console.warn(`Received ClearedToSend in state ${protocolState.type}`);
     return {
       protocolState,
@@ -103,8 +103,8 @@ const handleClearedToSend = (
 const waitForLedgerUpdateReducer = (
   protocolState: states.WaitForLedgerUpdate,
   sharedData: SharedData,
-  action: IndirectDefundingAction,
-): ProtocolStateWithSharedData<states.IndirectDefundingState> => {
+  action: LedgerDefundingAction,
+): ProtocolStateWithSharedData<states.LedgerDefundingState> => {
   if (!routesToConsensusUpdate(action, protocolState.protocolLocator)) {
     console.warn(`Received non-ConsensusUpdate action in state ${protocolState.type}`);
     return { protocolState, sharedData };

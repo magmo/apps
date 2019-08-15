@@ -1,25 +1,25 @@
 import * as scenarios from './scenarios';
-import { IndirectDefundingState, IndirectDefundingStateType } from '../states';
+import { LedgerDefundingState, LedgerDefundingStateType } from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { initialize, indirectDefundingReducer } from '../reducer';
+import { initialize, ledgerDefundingReducer } from '../reducer';
 
 describe('Cleared To Send happy path', () => {
   const scenario = scenarios.clearedToSendHappyPath;
 
   describe('when initializing', () => {
     const result = initialize(scenario.initialParams);
-    itTransitionsTo(result, 'IndirectDefunding.WaitForLedgerUpdate');
+    itTransitionsTo(result, 'LedgerDefunding.WaitForLedgerUpdate');
   });
 
   describe('when in WaitForLedgerUpdate', () => {
     const { state, action, sharedData } = scenario.waitForLedgerUpdate;
-    const updatedState = indirectDefundingReducer(state, sharedData, action);
-    itTransitionsTo(updatedState, 'IndirectDefunding.Success');
+    const updatedState = ledgerDefundingReducer(state, sharedData, action);
+    itTransitionsTo(updatedState, 'LedgerDefunding.Success');
   });
 });
 
-type ReturnVal = ProtocolStateWithSharedData<IndirectDefundingState>;
-function itTransitionsTo(state: ReturnVal, type: IndirectDefundingStateType) {
+type ReturnVal = ProtocolStateWithSharedData<LedgerDefundingState>;
+function itTransitionsTo(state: ReturnVal, type: LedgerDefundingStateType) {
   it(`transitions protocol state to ${type}`, () => {
     expect(state.protocolState.type).toEqual(type);
   });

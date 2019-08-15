@@ -19,7 +19,7 @@ describe('indirectly funded happy path', () => {
   describe('when initializing', () => {
     const { processId, channelId, sharedData } = scenario.initialize;
     const result = initialize(processId, channelId, sharedData);
-    itTransitionsTo(result, 'Defunding.WaitForIndirectDefunding');
+    itTransitionsTo(result, 'Defunding.WaitForLedgerDefunding');
   });
   describeScenarioStep(scenario.waitForLedgerDefunding, () => {
     const { state, action, sharedData } = scenario.waitForLedgerDefunding;

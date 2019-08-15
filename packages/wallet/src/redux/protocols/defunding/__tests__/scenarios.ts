@@ -1,7 +1,7 @@
 import * as states from '../states';
 import * as testScenarios from '../../../../domain/commitments/__tests__';
 import { setFundingState, setChannels } from '../../../state';
-import * as indirectDefunding from '../../indirect-defunding/__tests__';
+import * as ledgerDefunding from '../../ledger-defunding/__tests__';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import * as virtualDefunding from '../../virtual-defunding/__tests__';
@@ -36,9 +36,9 @@ const waitForLedgerDefunding = states.waitForLedgerDefunding({
   processId,
   channelId,
   ledgerId,
-  indirectDefundingState: prependToLocator(
-    indirectDefunding.preSuccessState.state,
-    EmbeddedProtocol.IndirectDefunding,
+  ledgerDefundingState: prependToLocator(
+    ledgerDefunding.preSuccessState.state,
+    EmbeddedProtocol.ledgerDefunding,
   ),
 });
 
@@ -58,7 +58,7 @@ export const indirectlyFundingChannelHappyPath = {
     channelId,
     sharedData: setChannels(
       setFundingState(
-        setFundingState(indirectDefunding.initialStore, channelId, {
+        setFundingState(ledgerDefunding.initialStore, channelId, {
           directlyFunded: false,
           fundingChannel: testScenarios.ledgerId,
         }),
@@ -71,10 +71,10 @@ export const indirectlyFundingChannelHappyPath = {
   // States
   waitForLedgerDefunding: {
     state: waitForLedgerDefunding,
-    action: prependToLocator(indirectDefunding.successTrigger, EmbeddedProtocol.IndirectDefunding),
+    action: prependToLocator(ledgerDefunding.successTrigger, EmbeddedProtocol.ledgerDefunding),
     sharedData: setChannels(
       setFundingState(
-        setFundingState(indirectDefunding.preSuccessState.sharedData, channelId, {
+        setFundingState(ledgerDefunding.preSuccessState.sharedData, channelId, {
           directlyFunded: false,
           fundingChannel: testScenarios.ledgerId,
         }),
@@ -92,7 +92,7 @@ export const virtualFundingChannelHappyPath = {
     channelId: virtualDefunding.initial.targetChannelId,
     sharedData: mergeSharedData(
       virtualDefunding.preSuccess.sharedData,
-      indirectDefunding.preSuccessState.sharedData,
+      ledgerDefunding.preSuccessState.sharedData,
     ),
   },
   // States

@@ -5,18 +5,18 @@ import * as helpers from '../reducer-helpers';
 import * as actions from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import {
-  indirectDefundingReducer,
-  initialize as indirectDefundingInitialize,
-} from '../indirect-defunding/reducer';
-import { isIndirectDefundingAction } from '../indirect-defunding/actions';
-import * as indirectDefundingStates from '../indirect-defunding/states';
+  ledgerDefundingReducer,
+  initialize as ledgerDefundingInitialize,
+} from '../ledger-defunding/reducer';
+import { isLedgerDefundingAction } from '../ledger-defunding/actions';
+import * as ledgerDefundingStates from '../ledger-defunding/states';
 import { EmbeddedProtocol } from '../../../communication';
 import { getLastCommitment } from '../../channel-store';
 import { ProtocolAction } from '../../../redux/actions';
 import { VirtualDefundingState } from '../virtual-defunding/states';
 import { initializeVirtualDefunding, virtualDefundingReducer } from '../virtual-defunding';
 import { routesToVirtualDefunding } from '../virtual-defunding/actions';
-import * as indirectDefundingActions from '../indirect-defunding/actions';
+import * as ledgerDefundingActions from '../ledger-defunding/actions';
 
 export const initialize = (
   processId: string,
@@ -27,7 +27,7 @@ export const initialize = (
     return { protocolState: states.failure({ reason: 'Channel Not Closed' }), sharedData };
   }
   const fundingType = helpers.getChannelFundingType(channelId, sharedData);
-  let indirectDefundingState: indirectDefundingStates.IndirectDefundingState;
+  let ledgerDefundingState: ledgerDefundingStates.LedgerDefundingState;
   switch (fundingType) {
     case helpers.FundingType.Direct:
       return {
@@ -35,7 +35,7 @@ export const initialize = (
         sharedData,
       };
     case helpers.FundingType.Ledger:
-      ({ indirectDefundingState, sharedData } = createIndirectDefundingState(
+      ({ ledgerDefundingState, sharedData } = createLedgerDefundingState(
         processId,
         channelId,
         true,
@@ -47,7 +47,7 @@ export const initialize = (
           processId,
           channelId,
           ledgerId: helpers.getFundingChannelId(channelId, sharedData),
-          indirectDefundingState,
+          ledgerDefundingState: ledgerDefundingState,
         }),
         sharedData,
       };
@@ -83,8 +83,8 @@ export const defundingReducer = (
     return { protocolState, sharedData };
   }
   switch (protocolState.type) {
-    case 'Defunding.WaitForIndirectDefunding':
-      return waitForIndirectDefundingReducer(protocolState, sharedData, action);
+    case 'Defunding.WaitForLedgerDefunding':
+      return waitForLedgerDefundingReducer(protocolState, sharedData, action);
     case 'Defunding.WaitForVirtualDefunding':
       return waitForVirtualDefundingReducer(protocolState, sharedData, action);
     case 'Defunding.Failure':
@@ -129,42 +129,42 @@ const waitForVirtualDefundingReducer = (
   }
 };
 
-const waitForIndirectDefundingReducer = (
-  protocolState: states.WaitForIndirectDefunding,
+const waitForLedgerDefundingReducer = (
+  protocolState: states.WaitForLedgerDefunding,
   sharedData: SharedData,
   action: actions.DefundingAction,
 ) => {
-  if (!isIndirectDefundingAction(action)) {
+  if (!isLedgerDefundingAction(action)) {
     return { protocolState, sharedData };
   }
-  return handleIndirectDefundingAction(protocolState, sharedData, action);
+  return handleLedgerDefundingAction(protocolState, sharedData, action);
 };
 
-const handleIndirectDefundingAction = (
-  protocolState: states.WaitForIndirectDefunding,
+const handleLedgerDefundingAction = (
+  protocolState: states.WaitForLedgerDefunding,
   sharedData: SharedData,
-  action: indirectDefundingActions.IndirectDefundingAction,
+  action: ledgerDefundingActions.LedgerDefundingAction,
 ) => {
-  let indirectDefundingState: indirectDefundingStates.IndirectDefundingState;
-  ({ protocolState: indirectDefundingState, sharedData } = indirectDefundingReducer(
-    protocolState.indirectDefundingState,
+  let ledgerDefundingState: ledgerDefundingStates.LedgerDefundingState;
+  ({ protocolState: ledgerDefundingState, sharedData } = ledgerDefundingReducer(
+    protocolState.ledgerDefundingState,
     sharedData,
     action,
   ));
-  switch (indirectDefundingState.type) {
-    case 'IndirectDefunding.Failure':
+  switch (ledgerDefundingState.type) {
+    case 'LedgerDefunding.Failure':
       return {
-        protocolState: states.failure({ reason: 'Indirect Defunding Failure' }),
+        protocolState: states.failure({ reason: 'Ledger Defunding Failure' }),
         sharedData,
       };
-    case 'IndirectDefunding.Success':
+    case 'LedgerDefunding.Success':
       return { protocolState: states.success({}), sharedData: helpers.hideWallet(sharedData) };
     default:
-      return { protocolState: { ...protocolState, indirectDefundingState }, sharedData };
+      return { protocolState: { ...protocolState, ledgerDefundingState }, sharedData };
   }
 };
 
-const createIndirectDefundingState = (
+const createLedgerDefundingState = (
   processId: string,
   channelId: string,
   clearedToProceed: boolean,
@@ -177,7 +177,7 @@ const createIndirectDefundingState = (
   }
   const proposedAllocation = getLastCommitment(channel).allocation;
   const proposedDestination = getLastCommitment(channel).destination;
-  const indirectDefundingState = indirectDefundingInitialize({
+  const ledgerDefundingState = ledgerDefundingInitialize({
     processId,
     channelId,
     ledgerId,
@@ -185,8 +185,8 @@ const createIndirectDefundingState = (
     proposedDestination,
     sharedData,
     clearedToProceed,
-    protocolLocator: makeLocator([], EmbeddedProtocol.IndirectDefunding),
+    protocolLocator: makeLocator([], EmbeddedProtocol.ledgerDefunding),
   });
 
-  return { indirectDefundingState: indirectDefundingState.protocolState, sharedData };
+  return { ledgerDefundingState: ledgerDefundingState.protocolState, sharedData };
 };

@@ -7,7 +7,7 @@ import { NewLedgerChannelState } from './new-ledger-channel/states';
 import { ResponderState } from './dispute/responder/states';
 import { WithdrawalState } from './withdrawing/states';
 import { ApplicationState } from './application/states';
-import { IndirectDefundingState } from './indirect-defunding/states';
+import { LedgerDefundingState } from './ledger-defunding/states';
 import { DefundingState } from './defunding/states';
 import { ConcludingState } from './concluding/states';
 import { TransactionSubmissionState } from './transaction-submission';
@@ -34,7 +34,7 @@ export type ProtocolState =
   | DefundingState
   | ChallengerState
   | ConcludingState
-  | IndirectDefundingState
+  | LedgerDefundingState
   | TransactionSubmissionState
   | ExistingLedgerFundingState
   | LedgerTopUpState
