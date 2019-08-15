@@ -12,6 +12,7 @@ import { getLastCommitment, nextParticipant, Commitments } from '../channel-stor
 import { Commitment } from '../../domain';
 import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
 import { ourTurn as ourTurnOnChannel } from '../channel-store';
+import _ from 'lodash';
 export const updateChannelState = (
   sharedData: SharedData,
   channelAction: actions.channel.ChannelAction,
@@ -171,6 +172,13 @@ export const channelIsClosed = (channelId: string, sharedData: SharedData): bool
   return (
     channelHasConclusionProof(channelId, sharedData) ||
     channelFinalizedOnChain(channelId, sharedData)
+  );
+};
+
+export const channelFundsAnotherChannel = (channelId: string, sharedData: SharedData): boolean => {
+  const latestCommitment = getLatestCommitment(channelId, sharedData);
+  return (
+    _.intersection(selectors.getChannelIds(sharedData), latestCommitment.destination).length > 0
   );
 };
 
