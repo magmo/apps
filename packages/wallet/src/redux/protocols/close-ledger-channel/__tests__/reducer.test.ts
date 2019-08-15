@@ -1,12 +1,12 @@
 import * as scenarios from './scenarios';
 import { describeScenarioStep, itSendsThisDisplayEventType } from '../../../__tests__/helpers';
-import { closeChannelReducer, initialize } from '../reducer';
+import { closeLedgerChannelReducer, initialize } from '../reducer';
 import { HIDE_WALLET } from 'magmo-wallet-client';
 import * as states from '../states';
 
 const itTransitionsTo = (
-  result: { protocolState: states.CloseChannelState },
-  type: states.CloseChannelStateType,
+  result: { protocolState: states.CloseLedgerChannelState },
+  type: states.CloseLedgerChannelStateType,
 ) => {
   it(`transitions to ${type}`, () => {
     expect(result.protocolState.type).toEqual(type);
@@ -19,20 +19,20 @@ describe('happy path', () => {
   describe('when initializing', () => {
     const { processId, channelId, sharedData } = scenario.initialize;
     const result = initialize(processId, channelId, sharedData);
-    itTransitionsTo(result, 'CloseChannel.WaitForConclude');
+    itTransitionsTo(result, 'CloseLedgerChannel.WaitForConclude');
   });
   describeScenarioStep(scenario.waitForConclude, () => {
     const { state, action, sharedData } = scenario.waitForConclude;
-    const result = closeChannelReducer(state, sharedData, action);
+    const result = closeLedgerChannelReducer(state, sharedData, action);
 
-    itTransitionsTo(result, 'CloseChannel.WaitForWithdrawal');
+    itTransitionsTo(result, 'CloseLedgerChannel.WaitForWithdrawal');
   });
 
   describeScenarioStep(scenario.waitForWithdrawal, () => {
     const { state, action, sharedData } = scenario.waitForWithdrawal;
-    const result = closeChannelReducer(state, sharedData, action);
+    const result = closeLedgerChannelReducer(state, sharedData, action);
 
-    itTransitionsTo(result, 'CloseChannel.Success');
+    itTransitionsTo(result, 'CloseLedgerChannel.Success');
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
@@ -43,13 +43,13 @@ describe('channel already concluded', () => {
   describe('when initializing', () => {
     const { processId, channelId, sharedData } = scenario.initialize;
     const result = initialize(processId, channelId, sharedData);
-    itTransitionsTo(result, 'CloseChannel.WaitForWithdrawal');
+    itTransitionsTo(result, 'CloseLedgerChannel.WaitForWithdrawal');
   });
   describeScenarioStep(scenario.waitForWithdrawal, () => {
     const { state, action, sharedData } = scenario.waitForWithdrawal;
-    const result = closeChannelReducer(state, sharedData, action);
+    const result = closeLedgerChannelReducer(state, sharedData, action);
 
-    itTransitionsTo(result, 'CloseChannel.Success');
+    itTransitionsTo(result, 'CloseLedgerChannel.Success');
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
@@ -60,6 +60,6 @@ describe('channel in use failure', () => {
   describe('when initializing', () => {
     const { processId, channelId, sharedData } = scenario.initialize;
     const result = initialize(processId, channelId, sharedData);
-    itTransitionsTo(result, 'CloseChannel.Failure');
+    itTransitionsTo(result, 'CloseLedgerChannel.Failure');
   });
 });

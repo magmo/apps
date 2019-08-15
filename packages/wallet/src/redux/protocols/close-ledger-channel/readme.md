@@ -1,6 +1,4 @@
-#Close Channel Protocol
-
-TODO: Better name?
+#Close Ledger Channel Protocol
 
 The purpose of the protocol is conclude the given channel and withdraw funds from the channel.
 

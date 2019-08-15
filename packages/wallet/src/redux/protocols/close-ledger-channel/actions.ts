@@ -14,8 +14,10 @@ import { AdvanceChannelAction, isAdvanceChannelAction } from '../advance-channel
 // Unions and Guards
 // -------
 
-export type CloseChannelAction = WithdrawalAction | AdvanceChannelAction;
+export type CloseLedgerChannelAction = WithdrawalAction | AdvanceChannelAction;
 
-export const isCloseChannelAction = (action: WalletAction): action is CloseChannelAction => {
+export const isCloseLedgerChannelAction = (
+  action: WalletAction,
+): action is CloseLedgerChannelAction => {
   return isWithdrawalAction(action) || isAdvanceChannelAction(action);
 };

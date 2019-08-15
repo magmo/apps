@@ -4,25 +4,25 @@ import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 
 export interface WaitForWithdrawal {
-  type: 'CloseChannel.WaitForWithdrawal';
+  type: 'CloseLedgerChannel.WaitForWithdrawal';
   processId: string;
   withdrawal: WithdrawalState;
   channelId;
 }
 export interface WaitForConclude {
-  type: 'CloseChannel.WaitForConclude';
+  type: 'CloseLedgerChannel.WaitForConclude';
   processId: string;
   concluding: AdvanceChannelState;
   channelId;
 }
 
 export interface Failure {
-  type: 'CloseChannel.Failure';
+  type: 'CloseLedgerChannel.Failure';
   reason: string;
 }
 
 export interface Success {
-  type: 'CloseChannel.Success';
+  type: 'CloseLedgerChannel.Success';
 }
 
 // -------
@@ -30,40 +30,42 @@ export interface Success {
 // -------
 
 export const waitForWithdrawal: StateConstructor<WaitForWithdrawal> = p => {
-  return { ...p, type: 'CloseChannel.WaitForWithdrawal' };
+  return { ...p, type: 'CloseLedgerChannel.WaitForWithdrawal' };
 };
 
 export const waitForConclude: StateConstructor<WaitForConclude> = p => {
-  return { ...p, type: 'CloseChannel.WaitForConclude' };
+  return { ...p, type: 'CloseLedgerChannel.WaitForConclude' };
 };
 
 export const success: StateConstructor<Success> = p => {
-  return { ...p, type: 'CloseChannel.Success' };
+  return { ...p, type: 'CloseLedgerChannel.Success' };
 };
 
 export const failure: StateConstructor<Failure> = p => {
-  return { ...p, type: 'CloseChannel.Failure' };
+  return { ...p, type: 'CloseLedgerChannel.Failure' };
 };
 
 // -------
 // Unions and Guards
 // -------
-export type TerminalCloseChannelState = Failure | Success;
-export type NonTerminalCloseChannelState = WaitForConclude | WaitForWithdrawal;
-export type CloseChannelState = TerminalCloseChannelState | NonTerminalCloseChannelState;
-export type CloseChannelStateType = CloseChannelState['type'];
+export type TerminalCloseLedgerChannelState = Failure | Success;
+export type NonTerminalCloseLedgerChannelState = WaitForConclude | WaitForWithdrawal;
+export type CloseLedgerChannelState =
+  | TerminalCloseLedgerChannelState
+  | NonTerminalCloseLedgerChannelState;
+export type CloseLedgerChannelStateType = CloseLedgerChannelState['type'];
 
-export function isCloseChannelState(state: ProtocolState): state is CloseChannelState {
-  return state.type.indexOf('CloseChannel') === 0;
+export function isCloseLedgerChannelState(state: ProtocolState): state is CloseLedgerChannelState {
+  return state.type.indexOf('CloseLedgerChannel') === 0;
 }
 
-export function isTerminalCloseChannelState(
+export function isTerminalCloseLedgerChannelState(
   state: ProtocolState,
-): state is TerminalCloseChannelState {
-  return state.type === 'CloseChannel.Failure' || state.type === 'CloseChannel.Success';
+): state is TerminalCloseLedgerChannelState {
+  return state.type === 'CloseLedgerChannel.Failure' || state.type === 'CloseLedgerChannel.Success';
 }
-export function isNonTerminalCloseChannelState(
+export function isNonTerminalCloseLedgerChannelState(
   state: ProtocolState,
-): state is NonTerminalCloseChannelState {
-  return !isTerminalCloseChannelState(state);
+): state is NonTerminalCloseLedgerChannelState {
+  return !isTerminalCloseLedgerChannelState(state);
 }

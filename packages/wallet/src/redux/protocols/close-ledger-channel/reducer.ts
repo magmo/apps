@@ -23,7 +23,7 @@ export const initialize = (
   processId: string,
   channelId: string,
   sharedData: SharedData,
-): ProtocolStateWithSharedData<states.CloseChannelState> => {
+): ProtocolStateWithSharedData<states.CloseLedgerChannelState> => {
   if (helpers.channelFundsAnotherChannel(channelId, sharedData)) {
     return {
       protocolState: states.failure({ reason: 'Channel in use' }),
@@ -48,19 +48,19 @@ export const initialize = (
   };
 };
 
-export const closeChannelReducer = (
-  protocolState: states.NonTerminalCloseChannelState,
+export const closeLedgerChannelReducer = (
+  protocolState: states.NonTerminalCloseLedgerChannelState,
   sharedData: SharedData,
   action: ProtocolAction,
-): ProtocolStateWithSharedData<states.CloseChannelState> => {
-  if (!actions.isCloseChannelAction(action)) {
-    console.warn(`Close Channel reducer received non-close-channel action ${action.type}.`);
+): ProtocolStateWithSharedData<states.CloseLedgerChannelState> => {
+  if (!actions.isCloseLedgerChannelAction(action)) {
+    console.warn(`Close Ledger Channel reducer received non-close-channel action ${action.type}.`);
     return { protocolState, sharedData };
   }
   switch (protocolState.type) {
-    case 'CloseChannel.WaitForWithdrawal':
+    case 'CloseLedgerChannel.WaitForWithdrawal':
       return waitForWithdrawalReducer(protocolState, sharedData, action);
-    case 'CloseChannel.WaitForConclude':
+    case 'CloseLedgerChannel.WaitForConclude':
       return waitForConcludeReducer(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);
@@ -70,7 +70,7 @@ export const closeChannelReducer = (
 const waitForConcludeReducer = (
   protocolState: states.WaitForConclude,
   sharedData: SharedData,
-  action: actions.CloseChannelAction,
+  action: actions.CloseLedgerChannelAction,
 ) => {
   if (!routesToAdvanceChannel(action, EMPTY_LOCATOR)) {
     console.warn(`Expected advance channel action but received ${action.type}`);
@@ -98,7 +98,7 @@ const waitForConcludeReducer = (
 const waitForWithdrawalReducer = (
   protocolState: states.WaitForWithdrawal,
   sharedData: SharedData,
-  action: actions.CloseChannelAction,
+  action: actions.CloseLedgerChannelAction,
 ) => {
   if (!isWithdrawalAction(action)) {
     return { protocolState, sharedData };
