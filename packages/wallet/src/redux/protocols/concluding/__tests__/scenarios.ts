@@ -21,6 +21,8 @@ const twoThree = [
 
 const app50 = appCommitment({ turnNum: 50, balances: twoThree, isFinal: false });
 const app51 = appCommitment({ turnNum: 51, balances: twoThree, isFinal: false });
+const ledger5 = testScenarios.ledgerCommitment({ turnNum: 5, balances: twoThree });
+const ledger6 = testScenarios.ledgerCommitment({ turnNum: 6, balances: twoThree });
 
 const waitForLedgerClosing = states.waitForLedgerClose({
   processId,
@@ -59,6 +61,7 @@ const initialSharedData = setFundingState(
   setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
       channelFromCommitments([app50, app51], asAddress, asPrivateKey),
+      channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
     ]),
     channelId,
     { directlyFunded: false, fundingChannel: testScenarios.ledgerId },
