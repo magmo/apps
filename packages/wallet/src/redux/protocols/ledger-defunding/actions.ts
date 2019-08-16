@@ -41,5 +41,5 @@ export function isLedgerDefundingAction(action: WalletAction): action is LedgerD
 }
 export const routesToLedgerDefunding = routerFactory(
   isLedgerDefundingAction,
-  EmbeddedProtocol.ledgerDefunding,
+  EmbeddedProtocol.LedgerDefunding,
 );

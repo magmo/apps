@@ -1,5 +1,5 @@
 import { SharedData, getChannel } from '../../state';
-import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
+import { ProtocolStateWithSharedData, makeLocator } from '..';
 import * as states from './states';
 import * as helpers from '../reducer-helpers';
 import * as actions from './actions';
@@ -104,7 +104,7 @@ const waitForVirtualDefundingReducer = (
   sharedData: SharedData,
   action: actions.DefundingAction,
 ): ProtocolStateWithSharedData<states.DefundingState> => {
-  if (!routesToVirtualDefunding(action, EMPTY_LOCATOR)) {
+  if (!routesToVirtualDefunding(action, protocolState.protocolLocator)) {
     console.warn(`Expected virtual defunding action but received ${action.type}`);
     return { protocolState, sharedData };
   }
@@ -190,7 +190,7 @@ const createLedgerDefundingState = (
     proposedDestination,
     sharedData,
     clearedToProceed,
-    protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.ledgerDefunding),
+    protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.LedgerDefunding),
   });
 
   return { ledgerDefundingState: ledgerDefundingState.protocolState, sharedData };

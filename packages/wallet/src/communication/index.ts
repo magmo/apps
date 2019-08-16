@@ -24,14 +24,14 @@ export const enum EmbeddedProtocol {
   ConsensusUpdate = 'ConsensusUpdate',
   DirectFunding = 'DirectFunding', // TODO: Post-fund-setup exchange will be removed from direct funding, so this should be removed
   ExistingLedgerFunding = 'ExistingLedgerFunding',
-  ledgerDefunding = 'ledgerDefunding',
+  LedgerDefunding = 'LedgerDefunding',
   LedgerFunding = 'LedgerFunding',
   LedgerTopUp = 'LedgerTopUp',
   NewLedgerChannel = 'NewLedgerChannel',
   VirtualFunding = 'VirtualFunding',
   FundingStrategyNegotiation = 'FundingStrategyNegotiation',
   VirtualDefunding = 'VirtualDefunding',
-  Defunding = 'Defunding,',
+  Defunding = 'Defunding',
 }
 
 export type ProtocolLocator = EmbeddedProtocol[];
