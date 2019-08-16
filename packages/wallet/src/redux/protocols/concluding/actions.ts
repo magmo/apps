@@ -6,29 +6,42 @@ import { WalletAction } from '../../actions';
 // -------
 // Actions
 // -------
-export interface CloseChannelSelected {
-  type: 'WALLET.CONCLUDING.CLOSE_CHANNEL_SELECTED';
+export interface CloseSelected {
+  type: 'WALLET.CONCLUDING.CLOSE_SELECTED';
+  processId: string;
+}
+
+export interface KeepOpenSelected {
+  type: 'WALLET.CONCLUDING.KEEP_OPEN_SELECTED';
   processId: string;
 }
 
 // -------
 // Constructors
 // -------
-
-export const closeChannelSelected: ActionConstructor<CloseChannelSelected> = p => ({
+export const keepOpenSelected: ActionConstructor<KeepOpenSelected> = p => ({
   ...p,
-  type: 'WALLET.CONCLUDING.CLOSE_CHANNEL_SELECTED',
+  type: 'WALLET.CONCLUDING.KEEP_OPEN_SELECTED',
+});
+export const closeSelected: ActionConstructor<CloseSelected> = p => ({
+  ...p,
+  type: 'WALLET.CONCLUDING.CLOSE_SELECTED',
 });
 
 // -------
 // Unions and Guards
 // -------
 
-export type ConcludingAction = CloseChannelSelected | AdvanceChannelAction | DefundingAction;
+export type ConcludingAction =
+  | KeepOpenSelected
+  | CloseSelected
+  | AdvanceChannelAction
+  | DefundingAction;
 
 export const isConcludingAction = (action: WalletAction): action is ConcludingAction => {
   return (
-    action.type === 'WALLET.CONCLUDING.CLOSE_CHANNEL_SELECTED' ||
+    action.type === 'WALLET.CONCLUDING.CLOSE_SELECTED' ||
+    action.type === 'WALLET.CONCLUDING.KEEP_OPEN_SELECTED' ||
     isAdvanceChannelAction(action) ||
     isDefundingAction(action)
   );

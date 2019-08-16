@@ -28,7 +28,14 @@ describe('Opponent Concluded Happy Path', () => {
   describeScenarioStep(scenario.waitForDefund, () => {
     const { action, state, sharedData } = scenario.waitForDefund;
     const result = concludingReducer(state, sharedData, action);
+    itTransitionsTo(result, 'Concluding.DecideClosing');
+  });
+
+  describeScenarioStep(scenario.decideClosing, () => {
+    const { action, state, sharedData } = scenario.decideClosing;
+    const result = concludingReducer(state, sharedData, action);
     itTransitionsTo(result, 'Concluding.Success');
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 });
 
@@ -53,6 +60,53 @@ describe('Player Concluded Happy Path', () => {
 
   describeScenarioStep(scenario.waitForDefund, () => {
     const { action, state, sharedData } = scenario.waitForDefund;
+    const result = concludingReducer(state, sharedData, action);
+    itTransitionsTo(result, 'Concluding.DecideClosing');
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+
+  describeScenarioStep(scenario.decideClosing, () => {
+    const { action, state, sharedData } = scenario.decideClosing;
+    const result = concludingReducer(state, sharedData, action);
+    itTransitionsTo(result, 'Concluding.Success');
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+});
+
+describe('Player Closes Channel Happy Path', () => {
+  const scenario = scenarios.channelClosingHappyPath;
+
+  describe('when initializing', () => {
+    const result = initialize(scenario.initialize);
+    itTransitionsTo(result, 'Concluding.WaitForConclude');
+    itRelaysThisAction(
+      result.sharedData,
+      concludeInstigated({ channelId: scenario.initialize.channelId }),
+    );
+    itSendsThisDisplayEventType(result.sharedData, SHOW_WALLET);
+  });
+
+  describeScenarioStep(scenario.waitForConclude, () => {
+    const { action, state, sharedData } = scenario.waitForConclude;
+    const result = concludingReducer(state, sharedData, action);
+    itTransitionsTo(result, 'Concluding.WaitForDefund');
+  });
+
+  describeScenarioStep(scenario.waitForDefund, () => {
+    const { action, state, sharedData } = scenario.waitForDefund;
+    const result = concludingReducer(state, sharedData, action);
+    itTransitionsTo(result, 'Concluding.DecideClosing');
+    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
+  });
+
+  describeScenarioStep(scenario.decideClosing, () => {
+    const { action, state, sharedData } = scenario.decideClosing;
+    const result = concludingReducer(state, sharedData, action);
+    itTransitionsTo(result, 'Concluding.WaitForLedgerClose');
+  });
+
+  describeScenarioStep(scenario.waitForLedgerClosing, () => {
+    const { action, state, sharedData } = scenario.waitForLedgerClosing;
     const result = concludingReducer(state, sharedData, action);
     itTransitionsTo(result, 'Concluding.Success');
     itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);

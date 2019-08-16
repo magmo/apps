@@ -4,8 +4,9 @@ The concluding protocols coordinate the process of concluding a channel.
 
 ## Currently Out of Scope
 
+- Concluding a ledger channel that is between two players. (We could probably generalize the negotiate-funding-strategy protocol for re-use here)
 - Getting user approval. This should be revisited when we think about approval system wide.
-- Concluding out of turn. Currently we only allow a user to initate a conclude on their turn.
+- Concluding out of turn. Currently we only allow a user to initiate a conclude on their turn.
 
 ## State Machine
 
@@ -16,9 +17,9 @@ linkStyle default interpolate basis
   WFC-->|AdvanceChannelAction|WFC
   WFC-->|AdvanceChannelSuccess|WFD(WaitForDefund)
   WFD-->|DefundAction|WFD
-  WFD-->|DefundSuccess|D{Close?}
-  D-->|No|S((success))
-  D-->|Yes|WFLC(WaitForLedgerChannelClose)
+  WFD-->|DefundSuccess|DC(DecideClosing)
+  DC-->|KeepOpen|S((success))
+  DC-->|Close|WFLC(WaitForLedgerChannelClose)
   WFLC-->|CloseAction|WFLC
   WFLC-->|CloseSuccess|S
 

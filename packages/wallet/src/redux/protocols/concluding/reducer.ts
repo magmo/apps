@@ -8,6 +8,7 @@ import {
   showWallet,
   sendConcludeSuccess,
   sendConcludeFailure,
+  hideWallet,
 } from '../reducer-helpers';
 import {
   initializeAdvanceChannel,
@@ -21,6 +22,12 @@ import { routesToAdvanceChannel } from '../advance-channel/actions';
 import { DefundingState, initializeDefunding, defundingReducer } from '../defunding';
 import { routesToDefunding } from '../defunding/actions';
 import { unreachable } from '../../../utils/reducer-utils';
+import { CloseLedgerChannelState } from '../close-ledger-channel/states';
+import {
+  initializeCloseLedgerChannel,
+  isCloseLedgerChannelAction,
+  closeLedgerChannelReducer,
+} from '../close-ledger-channel';
 
 export function concludingReducer(
   protocolState: states.NonTerminalConcludingState,
@@ -32,8 +39,90 @@ export function concludingReducer(
       return waitForConcludeReducer(protocolState, sharedData, action);
     case 'Concluding.WaitForDefund':
       return waitForDefundReducer(protocolState, sharedData, action);
+    case 'Concluding.DecideClosing':
+      return decideClosingReducer(protocolState, sharedData, action);
+    case 'Concluding.WaitForLedgerClose':
+      return waitForLedgerCloseReducer(protocolState, sharedData, action);
     default:
       return unreachable(protocolState);
+  }
+}
+
+function waitForLedgerCloseReducer(
+  protocolState: states.WaitForLedgerClose,
+  sharedData: SharedData,
+  action: ProtocolAction,
+): ProtocolStateWithSharedData<ConcludingState> {
+  if (!isCloseLedgerChannelAction(action)) {
+    console.warn(`Expected Close Ledger Channel Action, received ${action.type} instead`);
+    return { protocolState, sharedData };
+  }
+  let ledgerClosing: CloseLedgerChannelState;
+  ({ protocolState: ledgerClosing, sharedData } = closeLedgerChannelReducer(
+    protocolState.ledgerClosing,
+    sharedData,
+    action,
+  ));
+  switch (ledgerClosing.type) {
+    case 'CloseLedgerChannel.Failure':
+      return {
+        protocolState: states.failure({ reason: 'Close Ledger Channel Failure' }),
+        sharedData,
+      };
+    case 'CloseLedgerChannel.Success':
+      sharedData = sendConcludeSuccess(sharedData);
+      sharedData = hideWallet(sharedData);
+      return { protocolState: states.success({}), sharedData };
+    default:
+      return {
+        protocolState: states.waitForLedgerClose({ ...protocolState, ledgerClosing }),
+        sharedData,
+      };
+  }
+}
+function decideClosingReducer(
+  protocolState: states.DecideClosing,
+  sharedData: SharedData,
+  action: ProtocolAction,
+): ProtocolStateWithSharedData<ConcludingState> {
+  if (
+    action.type !== 'WALLET.CONCLUDING.KEEP_OPEN_SELECTED' &&
+    action.type !== 'WALLET.CONCLUDING.CLOSE_SELECTED'
+  ) {
+    console.warn(`Expected decision action received ${action.type} instead`);
+    return { protocolState, sharedData };
+  }
+
+  switch (action.type) {
+    case 'WALLET.CONCLUDING.KEEP_OPEN_SELECTED':
+      sharedData = sendConcludeSuccess(sharedData);
+      sharedData = hideWallet(sharedData);
+      return { protocolState: states.success({}), sharedData };
+    case 'WALLET.CONCLUDING.CLOSE_SELECTED':
+      let ledgerClosing: CloseLedgerChannelState;
+
+      ({ protocolState: ledgerClosing, sharedData } = initializeCloseLedgerChannel(
+        protocolState.processId,
+        protocolState.channelId,
+        sharedData,
+      ));
+      switch (ledgerClosing.type) {
+        case 'CloseLedgerChannel.Failure':
+          return {
+            protocolState: states.failure({ reason: 'Close Ledger Channel Failure' }),
+            sharedData,
+          };
+        case 'CloseLedgerChannel.Success':
+          sharedData = hideWallet(sharedData);
+          sharedData = sendConcludeSuccess(sharedData);
+          return { protocolState: states.success({}), sharedData };
+
+        default:
+          return {
+            protocolState: states.waitForLedgerClose({ ...protocolState, ledgerClosing }),
+            sharedData,
+          };
+      }
   }
 }
 
@@ -59,8 +148,7 @@ function waitForDefundReducer(
       sharedData = sendConcludeFailure(sharedData, 'Other');
       return { protocolState: states.failure({ reason: 'Defunding failure' }), sharedData };
     case 'Defunding.Success':
-      sharedData = sendConcludeSuccess(sharedData);
-      return { protocolState: states.success({}), sharedData };
+      return { protocolState: states.decideClosing(protocolState), sharedData };
 
     default:
       return {
