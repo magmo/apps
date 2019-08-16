@@ -16,7 +16,6 @@ describe('Opponent Concluded Happy Path', () => {
   describe('when initializing', () => {
     const result = initialize(scenario.initialize);
     itTransitionsTo(result, 'Concluding.WaitForConclude');
-    // TODO: Verify no conclude instigated sent
   });
 
   describeScenarioStep(scenario.waitForConclude, () => {

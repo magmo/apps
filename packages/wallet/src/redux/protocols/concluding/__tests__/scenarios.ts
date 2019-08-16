@@ -3,7 +3,7 @@ import * as defundingScenarios from '../../defunding/__tests__';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 
 import * as states from '../states';
-import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
+import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../state';
 import { bigNumberify } from 'ethers/utils';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { mergeSharedData } from '../../../__tests__/helpers';
@@ -55,9 +55,17 @@ const waitForConcluding = states.waitForConclude({
 const keepOpenSelectedAction = actions.keepOpenSelected({ processId });
 const closeSelectedAction = actions.closeSelected({ processId });
 
-const initialSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([app50, app51], asAddress, asPrivateKey),
-]);
+const initialSharedData = setFundingState(
+  setFundingState(
+    setChannels(EMPTY_SHARED_DATA, [
+      channelFromCommitments([app50, app51], asAddress, asPrivateKey),
+    ]),
+    channelId,
+    { directlyFunded: false, fundingChannel: testScenarios.ledgerId },
+  ),
+  testScenarios.ledgerId,
+  { directlyFunded: true },
+);
 
 export const opponentConcludedHappyPath = {
   initialize: {
@@ -116,7 +124,7 @@ export const playerConcludedHappyPath = {
   decideClosing: {
     state: decideClosing,
     action: keepOpenSelectedAction,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: initialSharedData,
   },
 };
 
@@ -146,11 +154,11 @@ export const channelClosingHappyPath = {
   decideClosing: {
     state: decideClosing,
     action: closeSelectedAction,
-    sharedData: ledgerCloseScenarios.preSuccess.sharedData,
+    sharedData: mergeSharedData(ledgerCloseScenarios.preSuccess.sharedData, initialSharedData),
   },
   waitForLedgerClosing: {
     state: waitForLedgerClosing,
     action: ledgerCloseScenarios.preSuccess.action,
-    sharedData: ledgerCloseScenarios.preSuccess.sharedData,
+    sharedData: mergeSharedData(ledgerCloseScenarios.preSuccess.sharedData, initialSharedData),
   },
 };

@@ -10,6 +10,7 @@ import {
   sendConcludeFailure,
   hideWallet,
   getFundingChannelId,
+  sendOpponentConcluded,
 } from '../reducer-helpers';
 import {
   initializeAdvanceChannel,
@@ -214,6 +215,8 @@ export function initialize({
   // so they can start their process
   if (!opponentInstigatedConclude) {
     sharedData = sendConcludeInstigated(sharedData, channelId);
+  } else {
+    sharedData = sendOpponentConcluded(sharedData);
   }
   sharedData = showWallet(sharedData);
 
