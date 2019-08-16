@@ -123,7 +123,7 @@ const waitForVirtualDefundingReducer = (
         sharedData,
       };
     case 'VirtualDefunding.Success':
-      return { protocolState: states.success({}), sharedData: helpers.hideWallet(sharedData) };
+      return { protocolState: states.success({}), sharedData };
 
     default:
       return {
@@ -162,7 +162,7 @@ const handleLedgerDefundingAction = (
         sharedData,
       };
     case 'LedgerDefunding.Success':
-      return { protocolState: states.success({}), sharedData: helpers.hideWallet(sharedData) };
+      return { protocolState: states.success({}), sharedData };
     default:
       return { protocolState: { ...protocolState, ledgerDefundingState }, sharedData };
   }

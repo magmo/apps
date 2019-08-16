@@ -62,7 +62,6 @@ describe('Player Concluded Happy Path', () => {
     const { action, state, sharedData } = scenario.waitForDefund;
     const result = concludingReducer(state, sharedData, action);
     itTransitionsTo(result, 'Concluding.DecideClosing');
-    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 
   describeScenarioStep(scenario.decideClosing, () => {
@@ -96,7 +95,6 @@ describe('Player Closes Channel Happy Path', () => {
     const { action, state, sharedData } = scenario.waitForDefund;
     const result = concludingReducer(state, sharedData, action);
     itTransitionsTo(result, 'Concluding.DecideClosing');
-    itSendsThisDisplayEventType(result.sharedData, HIDE_WALLET);
   });
 
   describeScenarioStep(scenario.decideClosing, () => {
