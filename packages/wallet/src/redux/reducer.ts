@@ -88,7 +88,11 @@ function routeToProtocolReducer(
         const {
           protocolState: defundingProtocolState,
           sharedData: defundingSharedData,
-        } = defundingProtocol.reducer(processState.protocolState, states.sharedData(state), action);
+        } = defundingProtocol.defundingReducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
         return updatedState(state, defundingSharedData, processState, defundingProtocolState);
       case ProcessProtocol.Application:
         const {
@@ -104,7 +108,7 @@ function routeToProtocolReducer(
         const {
           protocolState: concludingProtocolState,
           sharedData: concludingSharedData,
-        } = concludingProtocol.reducer(
+        } = concludingProtocol.concludingReducer(
           processState.protocolState,
           states.sharedData(state),
           action,
@@ -156,20 +160,22 @@ function initializeNewProtocol(
     }
     case 'WALLET.NEW_PROCESS.CONCLUDE_REQUESTED': {
       const { channelId } = action;
-      const { protocolState, sharedData } = concludingProtocol.initializeInstigatorState(
+      const { protocolState, sharedData } = concludingProtocol.initialize({
         channelId,
         processId,
-        incomingSharedData,
-      );
+        opponentInstigatedConclude: false,
+        sharedData: incomingSharedData,
+      });
       return { protocolState, sharedData };
     }
     case 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED': {
-      const { signedCommitment } = action;
-      const { protocolState, sharedData } = concludingProtocol.initializeResponderState(
-        signedCommitment,
+      const { channelId } = action;
+      const { protocolState, sharedData } = concludingProtocol.initialize({
+        channelId,
         processId,
-        incomingSharedData,
-      );
+        opponentInstigatedConclude: true,
+        sharedData: incomingSharedData,
+      });
       return { protocolState, sharedData };
     }
     case 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL':
@@ -179,10 +185,10 @@ function initializeNewProtocol(
         state.address,
         state.privateKey,
       );
-    case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
-      return defundingProtocol.initialize(processId, action.channelId, incomingSharedData);
+    // TODO: Handle close requested
     default:
-      return unreachable(action);
+      throw Error('TODO: Switch DEFUND_REQUESTED to CLOSE_REQUESTED and handle');
+    // return unreachable(action);
   }
 }
 

@@ -66,6 +66,12 @@ export function prependToLocator<
   State extends { protocolLocator: ProtocolLocator },
   T extends (WalletAction | State) & { protocolLocator: ProtocolLocator }
 >(actionOrState: T, protocol: ProtocolLocator | EmbeddedProtocol): T {
+  // First we update any sub-protocol protocolLocators
+  for (const prop of Object.keys(actionOrState)) {
+    if (typeof actionOrState[prop] === 'object' && 'protocolLocator' in actionOrState[prop]) {
+      actionOrState[prop] = prependToLocator(actionOrState[prop], protocol);
+    }
+  }
   return {
     ...actionOrState,
     protocolLocator: makeLocator(protocol, actionOrState.protocolLocator),

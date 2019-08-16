@@ -2,7 +2,7 @@ import { WalletAction } from '../../actions';
 import { WithdrawalAction, isWithdrawalAction } from '../withdrawing/actions';
 import { LedgerDefundingAction, isLedgerDefundingAction } from '../ledger-defunding/actions';
 import { VirtualDefundingAction, isVirtualDefundingAction } from '../virtual-defunding';
-import { routerFactory, EmbeddedProtocol } from '../../../communication';
+import { EmbeddedProtocol, routerFactory } from '../../../communication';
 
 // -------
 // Actions

@@ -11,6 +11,7 @@ import * as magmoWalletClient from 'magmo-wallet-client';
 import { getLastCommitment, nextParticipant, Commitments } from '../channel-store';
 import { Commitment } from '../../domain';
 import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
+import * as comms from '../../communication';
 import { ourTurn as ourTurnOnChannel } from '../channel-store';
 import _ from 'lodash';
 export const updateChannelState = (
@@ -79,6 +80,16 @@ export function sendConcludeSuccess(sharedData: SharedData): SharedData {
     // TODO could rename this helper function, as it covers both ways of finalizing a channel
   });
   return newSharedData;
+}
+
+export function sendConcludeInstigated(sharedData: SharedData, channelId: string): SharedData {
+  const channel = getExistingChannel(sharedData, channelId);
+  const { participants, ourIndex } = channel;
+  const messageRelay = comms.sendConcludeInstigated(
+    nextParticipant(participants, ourIndex),
+    channelId,
+  );
+  return queueMessage(sharedData, messageRelay);
 }
 
 export function sendOpponentConcluded(sharedData: SharedData): SharedData {

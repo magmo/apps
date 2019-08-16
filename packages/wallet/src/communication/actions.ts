@@ -38,7 +38,6 @@ export interface StrategyApproved extends BaseProcessAction {
 }
 export interface ConcludeInstigated {
   type: 'WALLET.NEW_PROCESS.CONCLUDE_INSTIGATED';
-  signedCommitment: SignedCommitment;
   protocol: ProcessProtocol.Concluding;
   channelId: string;
 }
