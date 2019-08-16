@@ -109,7 +109,8 @@ export type RelayableAction =
   | CommitmentReceived
   | CommitmentsReceived
   | DefundRequested
-  | MultipleRelayableActions;
+  | MultipleRelayableActions
+  | ConcludeInstigated;
 
 export function isRelayableAction(action: WalletAction): action is RelayableAction {
   return (
