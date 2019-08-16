@@ -2,7 +2,13 @@ import { ConcludingState } from '../concluding/states';
 import { SharedData } from '../../state';
 import { ProtocolAction } from '../../actions';
 import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
-import { sendConcludeInstigated, getTwoPlayerIndex, showWallet } from '../reducer-helpers';
+import {
+  sendConcludeInstigated,
+  getTwoPlayerIndex,
+  showWallet,
+  sendConcludeSuccess,
+  sendConcludeFailure,
+} from '../reducer-helpers';
 import {
   initializeAdvanceChannel,
   AdvanceChannelState,
@@ -50,8 +56,10 @@ function waitForDefundReducer(
 
   switch (defunding.type) {
     case 'Defunding.Failure':
+      sharedData = sendConcludeFailure(sharedData, 'Other');
       return { protocolState: states.failure({ reason: 'Defunding failure' }), sharedData };
     case 'Defunding.Success':
+      sharedData = sendConcludeSuccess(sharedData);
       return { protocolState: states.success({}), sharedData };
 
     default:
@@ -79,6 +87,7 @@ function waitForConcludeReducer(
   ));
   switch (concluding.type) {
     case 'AdvanceChannel.Failure':
+      sharedData = sendConcludeFailure(sharedData, 'Other');
       return { protocolState: states.failure({ reason: 'AdvanceChannelAction' }), sharedData };
     case 'AdvanceChannel.Success':
       let defunding: DefundingState;
