@@ -2,7 +2,7 @@ import { ConcludingState } from '../concluding/states';
 import { SharedData } from '../../state';
 import { ProtocolAction } from '../../actions';
 import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
-import { sendConcludeInstigated, getTwoPlayerIndex } from '../reducer-helpers';
+import { sendConcludeInstigated, getTwoPlayerIndex, showWallet } from '../reducer-helpers';
 import {
   initializeAdvanceChannel,
   AdvanceChannelState,
@@ -85,7 +85,7 @@ function waitForConcludeReducer(
       const { processId, channelId } = protocolState;
       ({ protocolState: defunding, sharedData } = initializeDefunding(
         processId,
-        makeLocator(EmbeddedProtocol.AdvanceChannel),
+        makeLocator(EmbeddedProtocol.Defunding),
         channelId,
         sharedData,
       ));
@@ -117,6 +117,7 @@ export function initialize({
   if (!opponentInstigatedConclude) {
     sharedData = sendConcludeInstigated(sharedData, channelId);
   }
+  sharedData = showWallet(sharedData);
 
   let concluding: AdvanceChannelState;
   ({ protocolState: concluding, sharedData } = initializeAdvanceChannel(sharedData, {
