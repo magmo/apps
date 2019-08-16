@@ -9,6 +9,7 @@ import {
   sendConcludeSuccess,
   sendConcludeFailure,
   hideWallet,
+  getFundingChannelId,
 } from '../reducer-helpers';
 import {
   initializeAdvanceChannel,
@@ -103,7 +104,7 @@ function decideClosingReducer(
 
       ({ protocolState: ledgerClosing, sharedData } = initializeCloseLedgerChannel(
         protocolState.processId,
-        protocolState.channelId,
+        protocolState.ledgerId,
         sharedData,
       ));
       switch (ledgerClosing.type) {
@@ -187,7 +188,7 @@ function waitForConcludeReducer(
         sharedData,
       ));
       return {
-        protocolState: states.waitForDefund({ defunding, processId, channelId }),
+        protocolState: states.waitForDefund({ ...protocolState, defunding }),
         sharedData,
       };
     default:
@@ -216,6 +217,8 @@ export function initialize({
   }
   sharedData = showWallet(sharedData);
 
+  const ledgerId = getFundingChannelId(channelId, sharedData);
+
   let concluding: AdvanceChannelState;
   ({ protocolState: concluding, sharedData } = initializeAdvanceChannel(sharedData, {
     channelId,
@@ -226,7 +229,7 @@ export function initialize({
     commitmentType: CommitmentType.Conclude,
   }));
   return {
-    protocolState: states.waitForConclude({ channelId, processId, concluding }),
+    protocolState: states.waitForConclude({ channelId, processId, ledgerId, concluding }),
     sharedData,
   };
 }

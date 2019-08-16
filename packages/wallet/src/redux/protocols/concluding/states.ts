@@ -22,6 +22,7 @@ export interface WaitForConclude {
   channelId: string;
   concluding: AdvanceChannelState;
   processId: string;
+  ledgerId: string;
 }
 
 export interface WaitForDefund {
@@ -29,15 +30,18 @@ export interface WaitForDefund {
   channelId: string;
   defunding: DefundingState;
   processId: string;
+  ledgerId: string;
 }
 export interface DecideClosing {
   type: 'Concluding.DecideClosing';
   channelId: string;
   processId: string;
+  ledgerId: string;
 }
 export interface WaitForLedgerClose {
   type: 'Concluding.WaitForLedgerClose';
   channelId: string;
+  ledgerId: string;
   processId: string;
   ledgerClosing: NonTerminalCloseLedgerChannelState;
 }

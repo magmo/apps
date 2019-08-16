@@ -13,7 +13,7 @@ import * as actions from '../actions';
 import * as ledgerCloseScenarios from '../../close-ledger-channel/__tests__';
 
 const processId = 'processId';
-const { channelId, asAddress, bsAddress, asPrivateKey, appCommitment } = testScenarios;
+const { channelId, asAddress, bsAddress, asPrivateKey, appCommitment, ledgerId } = testScenarios;
 const twoThree = [
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
@@ -25,23 +25,27 @@ const app51 = appCommitment({ turnNum: 51, balances: twoThree, isFinal: false })
 const waitForLedgerClosing = states.waitForLedgerClose({
   processId,
   channelId,
+  ledgerId,
   ledgerClosing: ledgerCloseScenarios.preSuccess.state,
 });
 
 const decideClosing = states.decideClosing({
   processId,
   channelId,
+  ledgerId,
 });
 
 const waitForDefund = states.waitForDefund({
   processId,
   channelId,
+  ledgerId,
   defunding: prependToLocator(defundingScenarios.preSuccess.state, EmbeddedProtocol.Defunding),
 });
 
 const waitForConcluding = states.waitForConclude({
   processId,
   channelId,
+  ledgerId,
   concluding: prependToLocator(
     advanceChannelScenarios.conclude.preSuccess.state,
     EmbeddedProtocol.AdvanceChannel,
