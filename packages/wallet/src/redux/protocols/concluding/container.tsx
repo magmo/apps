@@ -14,9 +14,9 @@ class ConcludingContainer extends PureComponent<Props> {
     const { state } = this.props;
     switch (state.type) {
       case 'Concluding.WaitForConclude':
-        return <WaitForOtherPlayer actionDescriptor={'conclude'} />;
+        return <WaitForOtherPlayer actionDescriptor={'conclude'} channelId={state.channelId} />;
       case 'Concluding.WaitForDefund':
-        return <WaitForOtherPlayer actionDescriptor={'defund'} />;
+        return <WaitForOtherPlayer actionDescriptor={'defund'} channelId={state.channelId} />;
       default:
         return unreachable(state);
     }
