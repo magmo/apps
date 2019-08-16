@@ -6,6 +6,7 @@ import WaitForOtherPlayer from '../shared-components/wait-for-other-player';
 import { unreachable } from '../../../utils/reducer-utils';
 import ApproveX from '../shared-components/approve-x';
 import * as actions from './actions';
+import { CloseLedgerChannel } from '../close-ledger-channel/container';
 interface Props {
   state: NonTerminalConcludingState;
   keepOpenSelected: typeof actions.keepOpenSelected;
@@ -21,7 +22,7 @@ class ConcludingContainer extends PureComponent<Props> {
       case 'Concluding.WaitForDefund':
         return <WaitForOtherPlayer actionDescriptor={'defund'} channelId={state.channelId} />;
       case 'Concluding.WaitForLedgerClose':
-        return <WaitForOtherPlayer actionDescriptor={'close'} channelId={state.channelId} />;
+        return <CloseLedgerChannel state={state.ledgerClosing} />;
       case 'Concluding.DecideClosing':
         const { processId } = state;
         return (
