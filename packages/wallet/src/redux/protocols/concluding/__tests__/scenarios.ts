@@ -94,7 +94,7 @@ export const opponentConcludedHappyPath = {
   decideClosing: {
     state: decideClosing,
     action: keepOpenSelectedAction,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: initialSharedData,
   },
 };
 
