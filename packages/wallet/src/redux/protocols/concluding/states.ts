@@ -66,5 +66,5 @@ export function isTerminalConcludingState(state: ProtocolState): state is Termin
 export function isNonTerminalConcludingState(
   state: ProtocolState,
 ): state is NonTerminalConcludingState {
-  return !isTerminalConcludingState(state);
+  return isConcludingState(state) && !isTerminalConcludingState(state);
 }
