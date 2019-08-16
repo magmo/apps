@@ -15,8 +15,8 @@ export * from './actions';
 export const enum ProcessProtocol {
   Application = 'Application',
   Funding = 'Funding',
-  Defunding = 'DefundingOld',
   Concluding = 'Concluding',
+  CloseLedgerChannel = 'CloseLedgerChannel',
 }
 
 export const enum EmbeddedProtocol {

@@ -6,7 +6,6 @@ import { clearOutbox } from './outbox/reducer';
 import { ProtocolState } from './protocols';
 import { isNewProcessAction, NewProcessAction } from './protocols/actions';
 import * as applicationProtocol from './protocols/application';
-import * as defundingProtocol from './protocols/defunding';
 import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
 import * as states from './state';
@@ -15,7 +14,7 @@ import { adjudicatorStateReducer } from './adjudicator-state/reducer';
 import { isStartProcessAction, ProcessProtocol } from '../communication';
 import * as communication from '../communication';
 import { ethers } from 'ethers';
-
+import * as closeLedgerChannelProtocol from './protocols/close-ledger-channel';
 const initialState = states.waitForLogin();
 
 export const walletReducer = (
@@ -84,16 +83,6 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, sharedData, processState, protocolState);
-      case ProcessProtocol.Defunding:
-        const {
-          protocolState: defundingProtocolState,
-          sharedData: defundingSharedData,
-        } = defundingProtocol.defundingReducer(
-          processState.protocolState,
-          states.sharedData(state),
-          action,
-        );
-        return updatedState(state, defundingSharedData, processState, defundingProtocolState);
       case ProcessProtocol.Application:
         const {
           protocolState: appProtocolState,
@@ -114,6 +103,22 @@ function routeToProtocolReducer(
           action,
         );
         return updatedState(state, concludingSharedData, processState, concludingProtocolState);
+
+      case ProcessProtocol.CloseLedgerChannel:
+        const {
+          protocolState: closeLedgerChannelState,
+          sharedData: closeLedgerChannelSharedData,
+        } = closeLedgerChannelProtocol.closeLedgerChannelReducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+        return updatedState(
+          state,
+          closeLedgerChannelSharedData,
+          processState,
+          closeLedgerChannelState,
+        );
       default:
         return unreachable(processState.protocol);
     }
@@ -185,10 +190,14 @@ function initializeNewProtocol(
         state.address,
         state.privateKey,
       );
-    // TODO: Handle close requested
+    case 'WALLET.NEW_PROCESS.CLOSE_LEDGER_CHANNEL':
+      return closeLedgerChannelProtocol.initializeCloseLedgerChannel(
+        processId,
+        action.channelId,
+        incomingSharedData,
+      );
     default:
-      throw Error('TODO: Switch DEFUND_REQUESTED to CLOSE_REQUESTED and handle');
-    // return unreachable(action);
+      return unreachable(action);
   }
 }
 
