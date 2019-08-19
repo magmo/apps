@@ -15,6 +15,7 @@ import { isStartProcessAction, ProcessProtocol } from '../communication';
 import * as communication from '../communication';
 import { ethers } from 'ethers';
 import * as closeLedgerChannelProtocol from './protocols/close-ledger-channel';
+import _ from 'lodash';
 const initialState = states.waitForLogin();
 
 export const walletReducer = (
@@ -82,7 +83,7 @@ function routeToProtocolReducer(
           states.sharedData(state),
           action,
         );
-        return updatedState(state, sharedData, processState, protocolState);
+        return updatedState(state, sharedData, processState, protocolState, action.processId);
       case ProcessProtocol.Application:
         const {
           protocolState: appProtocolState,
@@ -92,7 +93,7 @@ function routeToProtocolReducer(
           states.sharedData(state),
           action,
         );
-        return updatedState(state, appSharedData, processState, appProtocolState);
+        return updatedState(state, appSharedData, processState, appProtocolState, action.processId);
       case ProcessProtocol.Concluding:
         const {
           protocolState: concludingProtocolState,
@@ -102,7 +103,13 @@ function routeToProtocolReducer(
           states.sharedData(state),
           action,
         );
-        return updatedState(state, concludingSharedData, processState, concludingProtocolState);
+        return updatedState(
+          state,
+          concludingSharedData,
+          processState,
+          concludingProtocolState,
+          action.processId,
+        );
 
       case ProcessProtocol.CloseLedgerChannel:
         const {
@@ -118,6 +125,7 @@ function routeToProtocolReducer(
           closeLedgerChannelSharedData,
           processState,
           closeLedgerChannelState,
+          action.processId,
         );
       default:
         return unreachable(processState.protocol);
@@ -130,14 +138,19 @@ function updatedState(
   sharedData: states.SharedData,
   processState: states.ProcessState,
   protocolState: ProtocolState,
+  processId: string,
 ) {
-  const newState = { ...state, ...sharedData };
-  const newProcessState = { ...processState, protocolState };
-  newState.processStore = {
-    ...newState.processStore,
-    [processState.processId]: newProcessState,
-  };
-  return newState;
+  if (states.isTerminalProtocolState(protocolState)) {
+    return endProcess(state, sharedData, processId);
+  } else {
+    const newState = { ...state, ...sharedData };
+    const newProcessState = { ...processState, protocolState };
+    newState.processStore = {
+      ...newState.processStore,
+      [processState.processId]: newProcessState,
+    };
+    return newState;
+  }
 }
 
 export function getProcessId(action: NewProcessAction): string {
@@ -234,7 +247,16 @@ const waitForLoginReducer = (
       return state;
   }
 };
-
+function endProcess(
+  state: states.Initialized,
+  sharedData: states.SharedData,
+  processId: string,
+): states.Initialized {
+  const newState = _.cloneDeep({ ...state, ...sharedData });
+  delete newState.processStore[processId];
+  newState.currentProcessId = undefined;
+  return newState;
+}
 function startProcess(
   state: states.Initialized,
   sharedData: states.SharedData,

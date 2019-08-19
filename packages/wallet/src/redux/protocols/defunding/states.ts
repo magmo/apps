@@ -61,10 +61,12 @@ export const failure: StateConstructor<Failure> = p => {
 // -------
 
 export type NonTerminalDefundingState = WaitForLedgerDefunding | WaitForVirtualDefunding;
-export type DefundingState = NonTerminalDefundingState | Failure | Success;
+export type TerminalDefundingState = Failure | Success;
+export type DefundingState = NonTerminalDefundingState | TerminalDefundingState;
+
 export type DefundingStateType = DefundingState['type'];
 
-export function isTerminal(state: DefundingState): state is Failure | Success {
+export function isTerminalDefundingState(state: DefundingState): state is Failure | Success {
   return state.type === 'Defunding.Failure' || state.type === 'Defunding.Success';
 }
 
