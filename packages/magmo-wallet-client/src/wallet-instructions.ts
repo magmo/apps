@@ -107,6 +107,12 @@ export const receiveMessage = (messagePayload: any) => ({
 });
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 
+export const SHOW_CHANNEL_MANAGEMENT = 'WALLET.CHANNEL_MANAGEMENT.SHOW';
+export const showChannelManagement = () => ({
+  type: SHOW_CHANNEL_MANAGEMENT,
+});
+export type showChannelManagement = ReturnType<typeof showChannelManagement>;
+
 // Requests
 // ========
 export type RequestAction =
@@ -115,4 +121,5 @@ export type RequestAction =
   | SignCommitmentRequest
   | ValidateCommitmentRequest
   | WithdrawalRequest
-  | CreateChallengeRequest;
+  | CreateChallengeRequest
+  | showChannelManagement;

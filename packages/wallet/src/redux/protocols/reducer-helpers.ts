@@ -12,6 +12,8 @@ import { getLastCommitment, nextParticipant, Commitments } from '../channel-stor
 import { Commitment } from '../../domain';
 import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
 import { ourTurn as ourTurnOnChannel } from '../channel-store';
+import { CONSENSUS_LIBRARY_ADDRESS } from '../../constants';
+
 export const updateChannelState = (
   sharedData: SharedData,
   channelAction: actions.channel.ChannelAction,
@@ -254,11 +256,65 @@ export function isSafeToSend({
   const numParticipants = channel.participants.length;
   return (channel.turnNum + 1) % numParticipants === ourIndex;
 }
+export function getOpenLedgerChannels(sharedData: SharedData): string[] {
+  const channelIds = selectors.getChannelIds(sharedData);
+  return channelIds.filter(channelId => {
+    const channel = selectors.getChannelState(sharedData, channelId);
+    const ourAddress = getOurAddress(channelId, sharedData);
+
+    return (
+      channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
+      channel.participants.indexOf(ourAddress) > -1 &&
+      isChannelOpen(channelId, sharedData)
+    );
+  });
+}
+
+export function isLedgerChannelBeingUsedForFunding(
+  ledgerChannelId: string,
+  sharedData: SharedData,
+) {
+  const ledgerChannel = selectors.getChannelState(sharedData, ledgerChannelId);
+  if (ledgerChannel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
+    throw new Error(`The channel ${ledgerChannelId} is not a ledger channel.`);
+  }
+  const fundingState = selectors.getFundingState(sharedData);
+  return Object.keys(fundingState).some(channelId => {
+    const channelFundingState = fundingState[channelId];
+    return channelFundingState.fundingChannel === ledgerChannelId;
+  });
+}
+
+export function isChannelOpen(channelId: string, sharedData: SharedData): boolean {
+  const { participants } = selectors.getChannelState(sharedData, channelId);
+  const latestCommitment = getLatestCommitment(channelId, sharedData);
+  return (
+    latestCommitment.commitmentType === CommitmentType.Conclude &&
+    latestCommitment.commitmentCount === participants.length
+  );
+}
+
+export function getOurAllocation(channelId: string, sharedData: SharedData): string {
+  const ourAddress = getOurAddress(channelId, sharedData);
+  const { allocation, destination } = getLatestCommitment(channelId, sharedData);
+  const ourIndex = destination.indexOf(ourAddress);
+  return allocation[ourIndex];
+}
+
+export function getOpponentAllocation(channelId: string, sharedData: SharedData): string {
+  const opponentAddress = getOpponentAddress(channelId, sharedData);
+  const { allocation, destination } = getLatestCommitment(channelId, sharedData);
+  const opponentIndex = destination.indexOf(opponentAddress);
+  return allocation[opponentIndex];
+}
 
 export function getOpponentAddress(channelId: string, sharedData: SharedData) {
   const channel = getExistingChannel(sharedData, channelId);
 
   const { participants } = channel;
+  if (participants.length > 2) {
+    throw new Error('getOpponentAddress only supports two player channels');
+  }
   const opponentAddress = participants[(channel.ourIndex + 1) % participants.length];
   return opponentAddress;
 }

@@ -26,6 +26,7 @@ import { FundingStrategyNegotiationAction } from './protocols/funding-strategy-n
 import { LedgerFundingAction } from './protocols/ledger-funding';
 
 import { LOAD as LOAD_FROM_STORAGE } from 'redux-storage';
+import { ChannelManagementAction } from './protocols/channel-management/actions';
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
 
@@ -242,7 +243,8 @@ export type WalletAction =
   | RelayableAction
   | FundingStrategyNegotiationAction
   | FundingAction
-  | LedgerFundingAction;
+  | LedgerFundingAction
+  | ChannelManagementAction;
 
 export {
   channel,

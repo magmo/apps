@@ -17,6 +17,7 @@ import {
   receiveMessage,
   createChallenge,
   respondToChallenge,
+  showChannelManagement as showChannelManagementInstruction,
 } from './wallet-instructions';
 import { Commitment } from 'fmg-core';
 
@@ -223,5 +224,11 @@ export function startChallenge(iFrameId: string, channelId: string) {
 export function respondToOngoingChallenge(iFrameId: string, responseCommitment: Commitment) {
   const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
   const message = respondToChallenge(responseCommitment);
+  iFrame.contentWindow.postMessage(message, '*');
+}
+
+export function showChannelManagement(iFrameId: string) {
+  const iFrame = document.getElementById(iFrameId) as HTMLIFrameElement;
+  const message = showChannelManagementInstruction();
   iFrame.contentWindow.postMessage(message, '*');
 }
