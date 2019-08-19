@@ -43,6 +43,11 @@ import {
   isTerminalDefundingState,
   TerminalDefundingState,
 } from './protocols/defunding/states';
+import {
+  TerminalConcludingState,
+  isConcludingState,
+  isTerminalConcludingState,
+} from './protocols/concluding/states';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -336,12 +341,17 @@ export function getCommitments(store: SharedData, channelId: string): Commitment
 
 export { NewLedgerChannel };
 
-export function isTerminalProcessProtocolState(
+export function isTerminalProtocolState(
   protocolState: ProtocolState,
-): protocolState is TerminalApplicationState | TerminalFundingState | TerminalDefundingState {
+): protocolState is
+  | TerminalApplicationState
+  | TerminalFundingState
+  | TerminalDefundingState
+  | TerminalConcludingState {
   return (
     (isApplicationState(protocolState) && isTerminalApplicationState(protocolState)) ||
     (isFundingState(protocolState) && isTerminalFundingState(protocolState)) ||
-    (isDefundingState(protocolState) && isTerminalDefundingState(protocolState))
+    (isDefundingState(protocolState) && isTerminalDefundingState(protocolState)) ||
+    (isConcludingState(protocolState) && isTerminalConcludingState(protocolState))
   );
 }

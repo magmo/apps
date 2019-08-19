@@ -135,7 +135,7 @@ function updatedState(
   protocolState: ProtocolState,
   processId: string,
 ) {
-  if (states.isTerminalProcessProtocolState(protocolState)) {
+  if (states.isTerminalProtocolState(protocolState)) {
     return endProcess(state, sharedData, processId);
   } else {
     const newState = { ...state, ...sharedData };
