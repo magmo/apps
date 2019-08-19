@@ -5,6 +5,7 @@ import MAGMO_LOGO from '../images/magmo_logo.svg';
 interface Props {
   createBlockchainChallenge: () => void;
   resign: () => void;
+  showChannelManagement: () => void;
   isNotOurTurn: boolean;
   canChallenge: boolean;
   challengeOngoing: boolean;
@@ -18,6 +19,7 @@ export default class GameFooter extends React.PureComponent<Props> {
       isNotOurTurn,
       canChallenge,
       challengeOngoing,
+      showChannelManagement,
     } = this.props;
 
     return (
@@ -33,6 +35,9 @@ export default class GameFooter extends React.PureComponent<Props> {
               disabled={isNotOurTurn}
             >
               {isNotOurTurn ? "Can't Resign" : 'Resign'}
+            </Button>
+            <Button className="footer-resign" outline={true} onClick={showChannelManagement}>
+              Show Channel Management
             </Button>
             <Button
               className="footer-challenge"

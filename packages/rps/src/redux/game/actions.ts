@@ -11,6 +11,7 @@ export const DECLINE_GAME = 'GAME.DECLINE_GAME';
 export const CHOOSE_WEAPON = 'GAME.CHOOSE_WEAPON';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
+export const SHOW_CHANNEL_MANAGEMENT = 'GAME.SHOW_CHANNEL_MANAGEMENT';
 export const COMMITMENT_RECEIVED = 'GAME.COMMITMENT_RECEIVED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const FUNDING_FAILURE = 'GAME.FUNDING_FAILURE';
@@ -20,6 +21,10 @@ export const CREATE_CHALLENGE = 'GAME.CREATE_CHALLENGE';
 export const RESPOND_TO_CHALLENGE = 'GAME.RESPOND_TO_CHALLENGE';
 export const CHALLENGE_RESPONSE_REQUESTED = 'GAME.CHALLENGE_RESPONSE_REQUESTED';
 export const CHALLENGE_COMPLETED = 'GAME.CHALLENGE_COMPLETED';
+
+export const showChannelManagement = () => ({
+  type: SHOW_CHANNEL_MANAGEMENT as typeof SHOW_CHANNEL_MANAGEMENT,
+});
 
 export const updateProfile = (name: string, twitterHandle: string) => ({
   type: UPDATE_PROFILE as typeof UPDATE_PROFILE,
@@ -133,6 +138,7 @@ export type MessageSent = ReturnType<typeof messageSent>;
 export type CreateChallenge = ReturnType<typeof createChallenge>;
 export type ChallengeResponseRequested = ReturnType<typeof challengeResponseRequested>;
 export type ChallengeCompleted = ReturnType<typeof challengeCompleted>;
+export type ShowChannelManagement = ReturnType<typeof showChannelManagement>;
 
 export type GameAction =
   | UpdateProfile
@@ -153,4 +159,5 @@ export type GameAction =
   | MessageSent
   | CreateChallenge
   | ChallengeResponseRequested
-  | ChallengeCompleted;
+  | ChallengeCompleted
+  | ShowChannelManagement;

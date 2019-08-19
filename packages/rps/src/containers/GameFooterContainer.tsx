@@ -25,6 +25,7 @@ function mapStateToProps(state: SiteState) {
 const mapDispatchToProps = {
   resign: gameActions.resign,
   createBlockchainChallenge: gameActions.createChallenge,
+  showChannelManagement: gameActions.showChannelManagement,
 };
 
 export default connect(

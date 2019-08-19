@@ -12,7 +12,8 @@ export interface WalletRequest {
     | 'RESPOND_TO_CHALLENGE'
     | 'WITHDRAWAL_REQUESTED'
     | 'CONCLUDE_REQUESTED'
-    | 'CHALLENGE_REQUESTED';
+    | 'CHALLENGE_REQUESTED'
+    | 'SHOW_CHANNEL_MANAGEMENT';
   data?: any;
 }
 export interface MessageState {
