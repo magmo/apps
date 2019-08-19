@@ -1,5 +1,5 @@
 import * as states from '../states';
-import { ThreePartyPlayerIndex as PlayerIndex, ThreePartyPlayerIndex } from '../../../types';
+import { ThreePartyPlayerIndex as PlayerIndex } from '../../../types';
 
 import { EMPTY_SHARED_DATA, setChannels, SharedData } from '../../../state';
 import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
@@ -188,27 +188,27 @@ const bSentPostFundSetupCommitment = setChannels(EMPTY_SHARED_DATA, [
   channelFromCommitments(commitments4, bsAddress, bsPrivateKey),
 ]);
 
-const allPostFundSetupsReceived = (playerIndex: ThreePartyPlayerIndex): SharedData => {
+const allPostFundSetupsReceived = (playerIndex: PlayerIndex): SharedData => {
   const { address, privateKey } = scenarios.addressAndPrivateKeyLookup[playerIndex];
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(commitments5, address, privateKey),
   ]);
 };
 
-const aSentConclude = (playerIndex: ThreePartyPlayerIndex): SharedData => {
+const aSentConclude = (playerIndex: PlayerIndex): SharedData => {
   const { address, privateKey } = scenarios.addressAndPrivateKeyLookup[playerIndex];
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(commitments6, address, privateKey),
   ]);
 };
-const bSentConclude = (playerIndex: ThreePartyPlayerIndex): SharedData => {
+const bSentConclude = (playerIndex: PlayerIndex): SharedData => {
   const { address, privateKey } = scenarios.addressAndPrivateKeyLookup[playerIndex];
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(commitments7, address, privateKey),
   ]);
 };
 
-const allConcludesReceived = (playerIndex: ThreePartyPlayerIndex): SharedData => {
+const allConcludesReceived = (playerIndex: PlayerIndex): SharedData => {
   const { address, privateKey } = scenarios.addressAndPrivateKeyLookup[playerIndex];
   return setChannels(EMPTY_SHARED_DATA, [
     channelFromCommitments(commitments8, address, privateKey),
@@ -346,7 +346,7 @@ export const postFund = {
 export const conclude = {
   preSuccess: {
     state: concludeCommitmentSentA,
-    sharedData: bSentConclude(ThreePartyPlayerIndex.A),
+    sharedData: bSentConclude(PlayerIndex.A),
     trigger: receiveConcludeFromHub,
   },
   success: {
@@ -406,18 +406,18 @@ export const concludingAsA = {
   commitmentType: CommitmentType.Conclude,
   initialize: {
     args: { ...existingArgsA, commitmentType: CommitmentType.Conclude },
-    sharedData: allPostFundSetupsReceived(ThreePartyPlayerIndex.A),
+    sharedData: allPostFundSetupsReceived(PlayerIndex.A),
     commitments: commitments6,
   },
   receiveFromB: {
     state: concludeCommitmentSentA,
-    sharedData: aSentConclude(ThreePartyPlayerIndex.A),
+    sharedData: aSentConclude(PlayerIndex.A),
     action: receiveConcludeFromB,
     commitments: commitments7,
   },
   receiveFromHub: {
     state: concludeCommitmentSentA,
-    sharedData: bSentConclude(ThreePartyPlayerIndex.A),
+    sharedData: bSentConclude(PlayerIndex.A),
     action: receiveConcludeFromHub,
     commitments: commitments8,
   },
@@ -469,18 +469,18 @@ export const concludingAsB = {
   commitmentType: CommitmentType.Conclude,
   initialize: {
     args: { ...existingArgsB, commitmentType: CommitmentType.Conclude },
-    sharedData: allPostFundSetupsReceived(ThreePartyPlayerIndex.B),
+    sharedData: allPostFundSetupsReceived(PlayerIndex.B),
     commitments: commitments5,
   },
   receiveFromA: {
     state: waitingForConcludeB,
-    sharedData: allPostFundSetupsReceived(ThreePartyPlayerIndex.B),
+    sharedData: allPostFundSetupsReceived(PlayerIndex.B),
     action: receiveConcludeFromA,
     commitments: commitments7,
   },
   receiveFromHub: {
     state: concludeCommitmentSentB,
-    sharedData: bSentConclude(ThreePartyPlayerIndex.B),
+    sharedData: bSentConclude(PlayerIndex.B),
     action: receiveConcludeFromHub,
     commitments: commitments8,
   },
@@ -526,18 +526,18 @@ export const concludingAsHub = {
   commitmentType: CommitmentType.Conclude,
   initialize: {
     args: { ...existingArgsB, commitmentType: CommitmentType.Conclude },
-    sharedData: allPostFundSetupsReceived(ThreePartyPlayerIndex.Hub),
+    sharedData: allPostFundSetupsReceived(PlayerIndex.Hub),
     commitments: commitments5,
   },
   receiveFromA: {
     state: waitForConcludeHub,
-    sharedData: allPostFundSetupsReceived(ThreePartyPlayerIndex.Hub),
+    sharedData: allPostFundSetupsReceived(PlayerIndex.Hub),
     action: receiveConcludeFromA,
     commitments: commitments6,
   },
   receiveFromB: {
     state: waitForConcludeHub,
-    sharedData: aSentConclude(ThreePartyPlayerIndex.Hub),
+    sharedData: aSentConclude(PlayerIndex.Hub),
     action: receiveConcludeFromB,
     commitments: commitments8,
   },
