@@ -26,7 +26,10 @@ import { FundingStrategyNegotiationAction } from './protocols/funding-strategy-n
 import { LedgerFundingAction } from './protocols/ledger-funding';
 
 import { LOAD as LOAD_FROM_STORAGE } from 'redux-storage';
-import { ChannelManagementAction } from './protocols/channel-management/actions';
+import {
+  ChannelManagementAction,
+  isChannelManagementAction,
+} from './protocols/channel-management/actions';
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
 
@@ -217,14 +220,15 @@ export type AdjudicatorEventAction =
 
 export type ProtocolAction =
   // only list top level protocol actions
-  FundingAction | DefundingAction | ApplicationAction | ConcludingAction;
+  FundingAction | DefundingAction | ApplicationAction | ConcludingAction | ChannelManagementAction;
 
 export function isProtocolAction(action: WalletAction): action is ProtocolAction {
   return (
     isFundingAction(action) ||
     application.isApplicationAction(action) ||
     isConcludingAction(action) ||
-    isDefundingAction(action)
+    isDefundingAction(action) ||
+    isChannelManagementAction(action)
   );
 }
 
