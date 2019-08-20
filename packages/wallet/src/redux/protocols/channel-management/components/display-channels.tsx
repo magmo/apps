@@ -8,11 +8,12 @@ export interface Props {
   ledgerChannels: DisplayChannel[];
   applicationChannels: DisplayChannel[];
   closeAction: () => void;
+  closeChannelAction: (channelId: string) => void;
 }
 
 export default class DisplayChannels extends React.Component<Props> {
   render() {
-    const { ledgerChannels, applicationChannels, closeAction } = this.props;
+    const { ledgerChannels, applicationChannels, closeAction, closeChannelAction } = this.props;
     const hubColumns = [
       {
         name: 'Channel Id',
@@ -37,7 +38,21 @@ export default class DisplayChannels extends React.Component<Props> {
       },
       {
         selector: 'fundingChannel',
-        cell: row => <div>{!row.fundingChannel ? <Button>TODO CLOSE</Button> : ''}</div>,
+        cell: row => (
+          <div>
+            {!row.fundingChannel ? (
+              <Button
+                onClick={() => {
+                  closeChannelAction(row.channelId);
+                }}
+              >
+                Close
+              </Button>
+            ) : (
+              ''
+            )}
+          </div>
+        ),
       },
     ];
     const appColumns = [
