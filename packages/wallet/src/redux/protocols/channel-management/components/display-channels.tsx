@@ -22,20 +22,22 @@ export default class DisplayChannels extends React.Component<Props> {
         name: 'Your Deposit',
         selector: 'ourAmount',
         cell: row => <div>{formatEther(bigNumberify(row.ourAmount || '0x0'))}</div>,
-        width: '50px',
       },
 
       {
         name: 'Channel Total',
         selector: 'channelAmount',
         cell: row => <div>{formatEther(bigNumberify(row.channelAmount || '0x0'))}</div>,
-        width: '50px',
       },
 
       {
         name: 'Status',
         selector: 'fundingChannel',
         cell: row => <div>{row.fundingChannel ? `Funding ${row.channelId}` : 'Open'}</div>,
+      },
+      {
+        selector: 'fundingChannel',
+        cell: row => <div>{!row.fundingChannel ? <Button>TODO CLOSE</Button> : ''}</div>,
       },
     ];
     const appColumns = [
@@ -51,14 +53,12 @@ export default class DisplayChannels extends React.Component<Props> {
         name: 'Your Funds',
         selector: 'ourAmount',
         cell: row => <div>{formatEther(bigNumberify(row.ourAmount || '0x0'))}</div>,
-        width: '50px',
       },
 
       {
         name: "Opponent's Funds",
         selector: 'opponentAmount',
-        cell: row => <div>{formatEther(bigNumberify(row.channelAmount || '0x0'))}</div>,
-        width: '50px',
+        cell: row => <div>{formatEther(bigNumberify(row.opponentAmount || '0x0'))}</div>,
       },
       {
         name: 'Status',
@@ -77,7 +77,11 @@ export default class DisplayChannels extends React.Component<Props> {
       <Fragment>
         {ledgerTable}
         {appTable}
-        <Button onClick={closeAction}>Close</Button>
+        <div style={{ textAlign: 'center' }}>
+          <Button style={{ margin: '10px 0' }} onClick={closeAction}>
+            Close
+          </Button>
+        </div>
       </Fragment>
     );
   }
