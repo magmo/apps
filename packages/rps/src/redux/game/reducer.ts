@@ -46,6 +46,16 @@ export const gameReducer: Reducer<JointState> = (
   ) {
     return state;
   }
+  if (action.type === actions.SHOW_CHANNEL_MANAGEMENT) {
+    const { gameState, messageState } = state;
+    return {
+      gameState,
+      messageState: {
+        ...messageState,
+        walletOutbox: { type: 'SHOW_CHANNEL_MANAGEMENT' },
+      },
+    };
+  }
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress = 'myAddress' in state.gameState ? state.gameState.myAddress : '';
     const myName = 'myName' in state.gameState ? state.gameState.myName : '';

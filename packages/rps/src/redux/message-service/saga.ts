@@ -83,6 +83,7 @@ export function* sendMessagesSaga() {
     gameActions.JOIN_OPEN_GAME,
     gameActions.RESIGN,
     gameActions.CREATE_CHALLENGE,
+    gameActions.SHOW_CHANNEL_MANAGEMENT,
   ]);
   while (true) {
     // We take any action that might trigger the outbox to be updated
@@ -283,6 +284,7 @@ function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.Pl
       break;
 
     case 'SHOW_CHANNEL_MANAGEMENT':
+      console.log('t');
       Wallet.showChannelManagement(WALLET_IFRAME_ID);
       yield put(gameActions.messageSent());
       break;
