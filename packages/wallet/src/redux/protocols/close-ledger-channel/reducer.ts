@@ -109,36 +109,37 @@ const waitForWithdrawalReducer = (
     sharedData,
     action,
   ));
-  if (withdrawal.type === 'Withdrawing.Success') {
-    return {
-      protocolState: states.success({}),
-      sharedData: helpers.hideWallet(sharedData),
-    };
-  } else if (withdrawal.type === 'Withdrawing.Failure') {
-    return {
-      protocolState: states.failure({ reason: 'Withdrawal Failure' }),
-      sharedData,
-    };
-  } else {
-    return {
-      protocolState: states.waitForWithdrawal({
-        ...protocolState,
-        withdrawal,
-      }),
-      sharedData,
-    };
+  switch (withdrawal.type) {
+    case 'Withdrawing.Success':
+      return {
+        protocolState: states.success({}),
+        sharedData: helpers.hideWallet(sharedData),
+      };
+    case 'Withdrawing.Failure':
+      return {
+        protocolState: states.failure({ reason: 'Withdrawal Failure' }),
+        sharedData,
+      };
+    default:
+      return {
+        protocolState: states.waitForWithdrawal({
+          ...protocolState,
+          withdrawal,
+        }),
+        sharedData,
+      };
   }
 };
 
 const createWaitForWithdrawal = (sharedData: SharedData, processId: string, channelId: string) => {
   const withdrawalAmount = getWithdrawalAmount(sharedData, channelId);
-
-  const { protocolState: withdrawal, sharedData: newSharedData } = withdrawalInitialize(
+  let withdrawal: WithdrawalState;
+  ({ protocolState: withdrawal, sharedData } = withdrawalInitialize(
     withdrawalAmount,
     channelId,
     processId,
     sharedData,
-  );
+  ));
 
   const protocolState = states.waitForWithdrawal({
     processId,
@@ -146,7 +147,7 @@ const createWaitForWithdrawal = (sharedData: SharedData, processId: string, chan
     channelId,
   });
 
-  return { protocolState, sharedData: newSharedData };
+  return { protocolState, sharedData };
 };
 const getWithdrawalAmount = (sharedData: SharedData, channelId: string) => {
   const channelState = selectors.getChannelState(sharedData, channelId);
