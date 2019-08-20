@@ -12,7 +12,9 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { isDefundingState } from './defunding/states';
 import { Defunding } from './defunding';
 import { Application } from './application/container';
-
+import { isChannelManagementState } from './channel-management';
+import { isNonTerminalChannelManagementState } from './channel-management/states';
+import { ChannelManagement } from './channel-management/container';
 interface Props {
   protocolState: ProtocolState;
 }
@@ -34,6 +36,11 @@ class ProtocolContainer extends PureComponent<Props> {
       return <Concluding state={protocolState} />;
     } else if (isDefundingState(protocolState)) {
       return <Defunding state={protocolState} />;
+    } else if (
+      isChannelManagementState(protocolState) &&
+      isNonTerminalChannelManagementState(protocolState)
+    ) {
+      return <ChannelManagement state={protocolState} />;
     } else {
       return (
         <div>

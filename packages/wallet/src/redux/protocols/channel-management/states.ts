@@ -32,8 +32,16 @@ export type ChannelManagementState =
   | TerminalChannelManagementState
   | NonTerminalChannelManagementState;
 
-export function isTerminalChannelManagementState(state: ChannelManagementState): state is Success {
+export function isTerminalChannelManagementState(
+  state: ChannelManagementState,
+): state is TerminalChannelManagementState {
   return state.type === 'ChannelManagement.Success';
+}
+
+export function isNonTerminalChannelManagementState(
+  state: ChannelManagementState,
+): state is NonTerminalChannelManagementState {
+  return state.type === 'ChannelManagement.DisplayChannels';
 }
 
 export function isChannelManagementState(state: ProtocolState): state is ChannelManagementState {

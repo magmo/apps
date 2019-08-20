@@ -14,7 +14,7 @@ interface Props {
   closeChannelManagement: ActionDispatcher<actions.CloseChannelManagement>;
 }
 
-class FundingContainer extends PureComponent<Props> {
+class ChannelManagementContainer extends PureComponent<Props> {
   render() {
     const { state, closeChannelManagement } = this.props;
     const { processId } = state;
@@ -38,7 +38,7 @@ const mapDispatchToProps = {
   closeChannelManagement: actions.closeChannelManagement,
 };
 
-export const Funding = connect(
+export const ChannelManagement = connect(
   () => ({}),
   mapDispatchToProps,
-)(FundingContainer);
+)(ChannelManagementContainer);
