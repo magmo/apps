@@ -188,9 +188,7 @@ export const channelIsClosed = (channelId: string, sharedData: SharedData): bool
 
 export const channelFundsAnotherChannel = (channelId: string, sharedData: SharedData): boolean => {
   const latestCommitment = getLatestCommitment(channelId, sharedData);
-  return (
-    !!_.intersection(selectors.getChannelIds(sharedData), latestCommitment.destination)
-  );
+  return !!_.intersection(selectors.getChannelIds(sharedData), latestCommitment.destination);
 };
 
 export const channelHasConclusionProof = (channelId: string, sharedData: SharedData): boolean => {
