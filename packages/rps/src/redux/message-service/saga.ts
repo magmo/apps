@@ -284,7 +284,6 @@ function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.Pl
       break;
 
     case 'SHOW_CHANNEL_MANAGEMENT':
-      console.log('t');
       Wallet.showChannelManagement(WALLET_IFRAME_ID);
       yield put(gameActions.messageSent());
       break;
