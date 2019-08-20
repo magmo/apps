@@ -15,9 +15,9 @@ export * from './actions';
 export const enum ProcessProtocol {
   Application = 'Application',
   Funding = 'Funding',
-  Defunding = 'Defunding',
   Concluding = 'Concluding',
   ChannelManagement = 'ChannelManagement',
+  CloseLedgerChannel = 'CloseLedgerChannel',
 }
 
 export const enum EmbeddedProtocol {
@@ -25,13 +25,14 @@ export const enum EmbeddedProtocol {
   ConsensusUpdate = 'ConsensusUpdate',
   DirectFunding = 'DirectFunding', // TODO: Post-fund-setup exchange will be removed from direct funding, so this should be removed
   ExistingLedgerFunding = 'ExistingLedgerFunding',
-  IndirectDefunding = 'IndirectDefunding',
+  LedgerDefunding = 'LedgerDefunding',
   LedgerFunding = 'LedgerFunding',
   LedgerTopUp = 'LedgerTopUp',
   NewLedgerChannel = 'NewLedgerChannel',
   VirtualFunding = 'VirtualFunding',
   FundingStrategyNegotiation = 'FundingStrategyNegotiation',
   VirtualDefunding = 'VirtualDefunding',
+  Defunding = 'Defunding',
 }
 
 export type ProtocolLocator = EmbeddedProtocol[];
@@ -49,8 +50,8 @@ export function sendStrategyApproved(to: string, processId: string, strategy: Fu
   return sendMessage(to, strategyApproved({ processId, strategy }));
 }
 
-export function sendConcludeInstigated(to: string, channelId, signedCommitment: SignedCommitment) {
-  return sendMessage(to, concludeInstigated({ signedCommitment, channelId }));
+export function sendConcludeInstigated(to: string, channelId) {
+  return sendMessage(to, concludeInstigated({ channelId }));
 }
 
 export const sendCommitmentReceived = (
