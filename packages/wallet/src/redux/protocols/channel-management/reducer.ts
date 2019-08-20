@@ -12,6 +12,7 @@ import {
   isLedgerChannelBeingUsedForFunding,
   showWallet,
   hideWallet,
+  isTwoPlayerChannel,
 } from '../reducer-helpers';
 import { WalletAction } from '../../actions';
 
@@ -23,7 +24,11 @@ export const initialize = ({
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.ChannelManagementState> => {
   const openLedgerChannels = getOpenLedgerChannels(sharedData);
-  const displayChannels: states.DisplayChannel[] = openLedgerChannels.map(channelId => {
+  const twoPlayerChannels = openLedgerChannels.filter(channelId =>
+    isTwoPlayerChannel(channelId, sharedData),
+  );
+
+  const displayChannels: states.DisplayChannel[] = twoPlayerChannels.map(channelId => {
     return {
       channelId,
       ourAddress: getOurAddress(channelId, sharedData),

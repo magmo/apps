@@ -256,6 +256,12 @@ export function isSafeToSend({
   const numParticipants = channel.participants.length;
   return (channel.turnNum + 1) % numParticipants === ourIndex;
 }
+
+export function isTwoPlayerChannel(channelId: string, sharedData: SharedData): boolean {
+  const { participants } = selectors.getChannelState(sharedData, channelId);
+  return participants.length === 2;
+}
+
 export function getOpenLedgerChannels(sharedData: SharedData): string[] {
   const channelIds = selectors.getChannelIds(sharedData);
   return channelIds.filter(channelId => {
