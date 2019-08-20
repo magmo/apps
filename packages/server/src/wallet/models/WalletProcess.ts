@@ -1,3 +1,4 @@
+import { ProcessProtocol } from 'magmo-wallet/lib/src/communication';
 import { Model, snakeCaseMappers } from 'objection';
 
 export default class WalletProcess extends Model {
@@ -13,6 +14,10 @@ export default class WalletProcess extends Model {
   }
 
   get appChannelId() {
-    return this.processId.split('-')[1];
+    const process = this.processId.split('-')[0];
+    if (process !== ProcessProtocol.CloseLedgerChannel) {
+      return this.processId.split('-')[1];
+    }
+    return '';
   }
 }
