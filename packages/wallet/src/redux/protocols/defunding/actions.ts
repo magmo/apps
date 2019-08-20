@@ -16,7 +16,6 @@ import { EmbeddedProtocol, routerFactory } from '../../../communication';
 // Unions and Guards
 // -------
 
-// TODO: Replace once ledger defunding actions are defined
 export type DefundingAction = WithdrawalAction | LedgerDefundingAction | VirtualDefundingAction;
 
 export const isDefundingAction = (action: WalletAction): action is DefundingAction => {
