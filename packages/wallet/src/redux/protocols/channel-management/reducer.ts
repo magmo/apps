@@ -9,13 +9,30 @@ import {
   getOurAllocation,
   getOpponentAllocation,
   getOpenLedgerChannels,
-  isLedgerChannelBeingUsedForFunding,
   showWallet,
   hideWallet,
   isTwoPlayerChannel,
+  getTotalAllocation as getAllocationTotal,
+  getOpenApplicationChannels,
+  getTargetOfLedgerFunding,
+  getFundingChannelId,
 } from '../reducer-helpers';
 import { WalletAction } from '../../actions';
 
+const mapToDisplayChannel = (channelId: string, sharedData: SharedData): states.DisplayChannel => {
+  const fundedBy = getFundingChannelId(channelId, sharedData);
+  const fundingChannel = getTargetOfLedgerFunding(channelId, sharedData);
+  return {
+    channelId,
+    ourAddress: getOurAddress(channelId, sharedData),
+    opponentAddress: getOpponentAddress(channelId, sharedData),
+    ourAmount: getOurAllocation(channelId, sharedData),
+    opponentAmount: getOpponentAllocation(channelId, sharedData),
+    channelAmount: getAllocationTotal(channelId, sharedData),
+    fundingChannel: fundingChannel === channelId ? '' : fundingChannel,
+    fundedBy,
+  };
+};
 export const initialize = ({
   processId,
   sharedData,
@@ -28,19 +45,15 @@ export const initialize = ({
     isTwoPlayerChannel(channelId, sharedData),
   );
 
-  const displayChannels: states.DisplayChannel[] = twoPlayerChannels.map(channelId => {
-    return {
-      channelId,
-      ourAddress: getOurAddress(channelId, sharedData),
-      opponentAddress: getOpponentAddress(channelId, sharedData),
-      ourAmount: getOurAllocation(channelId, sharedData),
-      opponentAmount: getOpponentAllocation(channelId, sharedData),
-      inUse: isLedgerChannelBeingUsedForFunding(channelId, sharedData),
-    };
-  });
-
+  const ledgerChannels: states.DisplayChannel[] = twoPlayerChannels.map(channelId =>
+    mapToDisplayChannel(channelId, sharedData),
+  );
+  const openApplicationChannels = getOpenApplicationChannels(sharedData);
+  const applicationChannels = openApplicationChannels.map(channelId =>
+    mapToDisplayChannel(channelId, sharedData),
+  );
   return {
-    protocolState: states.displayChannels({ processId, displayChannels }),
+    protocolState: states.displayChannels({ processId, ledgerChannels, applicationChannels }),
     sharedData: showWallet(sharedData),
   };
 };

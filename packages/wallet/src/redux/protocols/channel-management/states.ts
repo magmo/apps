@@ -2,17 +2,21 @@ import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 export interface DisplayChannel {
   channelId: string;
-  opponentAmount: string;
-  ourAmount: string;
+  opponentAmount?: string;
+  ourAmount?: string;
   opponentAddress: string;
   ourAddress: string;
   opponentName?: string;
-  inUse: boolean;
+  channelAmount: string;
+  fundingChannel?: string;
+  fundedBy?: string;
 }
+
 export interface DisplayChannels {
   type: 'ChannelManagement.DisplayChannels';
   processId: string;
-  displayChannels: DisplayChannel[];
+  ledgerChannels: DisplayChannel[];
+  applicationChannels: DisplayChannel[];
 }
 export interface Success {
   type: 'ChannelManagement.Success';

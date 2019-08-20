@@ -24,7 +24,8 @@ class ChannelManagementContainer extends PureComponent<Props> {
         return (
           <DisplayChannels
             closeAction={() => closeChannelManagement({ processId })}
-            channels={state.displayChannels}
+            ledgerChannels={state.ledgerChannels}
+            applicationChannels={state.applicationChannels}
           />
         );
 

@@ -13,6 +13,7 @@ import { Commitment } from '../../domain';
 import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
 import { ourTurn as ourTurnOnChannel } from '../channel-store';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../constants';
+import { addHex } from '../../utils/hex-utils';
 
 export const updateChannelState = (
   sharedData: SharedData,
@@ -262,6 +263,23 @@ export function isTwoPlayerChannel(channelId: string, sharedData: SharedData): b
   return participants.length === 2;
 }
 
+export function getOpenApplicationChannels(sharedData: SharedData): string[] {
+  const channelIds = selectors.getChannelIds(sharedData);
+  return channelIds.filter(channelId => {
+    const channel = selectors.getChannelState(sharedData, channelId);
+    const ourAddress = getOurAddress(channelId, sharedData);
+
+    return (
+      channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS &&
+      channel.participants.indexOf(ourAddress) > -1 &&
+      !isChannelConcluded(channelId, sharedData) &&
+      // TODO: Due to redeployments of the consensus library we're picking up old ledger channels
+      // so we do some filtering out here
+      channel.participants.length === 2 &&
+      !isGuarantorChannel(channelId, sharedData)
+    );
+  });
+}
 export function getOpenLedgerChannels(sharedData: SharedData): string[] {
   const channelIds = selectors.getChannelIds(sharedData);
   return channelIds.filter(channelId => {
@@ -271,24 +289,15 @@ export function getOpenLedgerChannels(sharedData: SharedData): string[] {
     return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
       channel.participants.indexOf(ourAddress) > -1 &&
-      !isChannelConcluded(channelId, sharedData)
+      !isChannelConcluded(channelId, sharedData) &&
+      !isGuarantorChannel(channelId, sharedData)
     );
   });
 }
 
-export function isLedgerChannelBeingUsedForFunding(
-  ledgerChannelId: string,
-  sharedData: SharedData,
-) {
-  const ledgerChannel = selectors.getChannelState(sharedData, ledgerChannelId);
-  if (ledgerChannel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS) {
-    throw new Error(`The channel ${ledgerChannelId} is not a ledger channel.`);
-  }
-  const fundingState = selectors.getFundingState(sharedData);
-  return Object.keys(fundingState).some(channelId => {
-    const channelFundingState = fundingState[channelId];
-    return channelFundingState.fundingChannel === ledgerChannelId;
-  });
+export function isGuarantorChannel(channelId: string, sharedData: SharedData): boolean {
+  const latestCommitment = getLatestCommitment(channelId, sharedData);
+  return !!latestCommitment.channel.guaranteedChannel;
 }
 
 export function isChannelConcluded(channelId: string, sharedData: SharedData): boolean {
@@ -298,6 +307,11 @@ export function isChannelConcluded(channelId: string, sharedData: SharedData): b
     latestCommitment.commitmentType === CommitmentType.Conclude &&
     latestCommitment.commitmentCount === participants.length - 1
   );
+}
+
+export function getTotalAllocation(channelId: string, sharedData: SharedData): string {
+  const { allocation } = getLatestCommitment(channelId, sharedData);
+  return allocation.reduce(addHex, '0x0');
 }
 
 export function getOurAllocation(channelId: string, sharedData: SharedData): string {
@@ -344,6 +358,23 @@ export function ourTurn(sharedData: SharedData, channelId: string) {
   return ourTurnOnChannel(channel);
 }
 
+export function getTargetOfLedgerFunding(
+  ledgerChannelId: string,
+  sharedData: SharedData,
+): string | undefined {
+  const latestCommitment = getLatestCommitment(ledgerChannelId, sharedData);
+  if (latestCommitment.destination.length > 1) {
+    return undefined;
+  }
+  const targetChannel = latestCommitment.destination[0];
+  const targetFundingState = selectors.getChannelFundingState(sharedData, targetChannel);
+  // Ensure that the funding state reflects what we have in the commitment destination
+  if (!targetFundingState || targetFundingState.fundingChannel !== ledgerChannelId) {
+    return undefined;
+  }
+  return targetChannel;
+}
+
 export function getFundingChannelId(channelId: string, sharedData: SharedData): string {
   const fundingState = selectors.getChannelFundingState(sharedData, channelId);
   if (!fundingState) {
@@ -357,7 +388,7 @@ export function getFundingChannelId(channelId: string, sharedData: SharedData): 
       : fundingState.guarantorChannel;
     if (!channelIdToCheck) {
       throw new Error(
-        `Funding state for ${channelId} is not directly funded so it must have aq funding or guarantor channel`,
+        `Funding state for ${channelId} is not directly funded so it must have a funding or guarantor channel`,
       );
     }
 

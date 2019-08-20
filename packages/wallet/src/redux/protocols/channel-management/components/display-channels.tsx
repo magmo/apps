@@ -1,39 +1,55 @@
 import React, { Fragment } from 'react';
 import { DisplayChannel } from '../states';
-import ReactTable from 'react-table';
+import DataTable from 'react-data-table-component';
 import Button from 'reactstrap/lib/Button';
+import { formatEther, bigNumberify } from 'ethers/utils';
 
 export interface Props {
-  channels: DisplayChannel[];
+  ledgerChannels: DisplayChannel[];
+  applicationChannels: DisplayChannel[];
   closeAction: () => void;
 }
 
 export default class DisplayChannels extends React.Component<Props> {
   render() {
-    const { channels, closeAction } = this.props;
+    const { ledgerChannels, applicationChannels, closeAction } = this.props;
     const columns = [
       {
-        Header: 'Channel Id',
-        accessor: 'channelId',
+        name: 'Channel Id',
+        selector: 'channelId',
       },
-      { Header: 'OpponentAddress', access: 'opponentAddress' },
+      { name: 'OpponentAddress', selector: 'opponentAddress' },
       {
-        Header: 'Your Amount',
-        accessor: 'ourAmount',
-      },
-      {
-        Header: 'Opponent Amount',
-        accessor: 'opponentAmount',
+        name: 'Your Amount',
+        selector: 'ourAmount',
+        cell: row => <div>{formatEther(bigNumberify(row.ourAmount || '0x0'))}</div>,
       },
       {
-        Header: 'In use?',
-        accessor: 'inUse',
+        name: 'Opponent Amount',
+        selector: 'opponentAmount',
+        cell: row => <div>{formatEther(bigNumberify(row.opponentAmount || '0x0'))}</div>,
+      },
+      {
+        name: 'Channel Total',
+        selector: 'channelAmount',
+        cell: row => <div>{formatEther(bigNumberify(row.channelAmount || '0x0'))}</div>,
+      },
+      {
+        name: 'Funding Channel',
+        selector: 'fundingChannel',
+      },
+      {
+        name: 'Funded By',
+        selector: 'fundedBy',
       },
     ];
-    const table = <ReactTable data={channels} columns={columns} />;
+    const ledgerTable = <DataTable columns={columns} data={ledgerChannels} />;
+    const appTable = <DataTable columns={columns} data={applicationChannels} />;
+
     return (
       <Fragment>
-        <div>{table}</div>
+        {ledgerTable}
+        {appTable}
         <Button onClick={closeAction}>Close</Button>
       </Fragment>
     );
