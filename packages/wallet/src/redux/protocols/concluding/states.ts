@@ -8,6 +8,12 @@ import { NonTerminalCloseLedgerChannelState } from '../close-ledger-channel/stat
 // States
 // -------
 
+export interface BaseState {
+  channelId: string;
+  processId: string;
+  ledgerId: string;
+}
+
 export interface Failure {
   type: 'Concluding.Failure';
   reason: 'Close Ledger Channel Failure' | 'Defunding Failure' | 'Advance Channel Failure';
@@ -17,32 +23,20 @@ export interface Success {
   type: 'Concluding.Success';
 }
 
-export interface WaitForConclude {
+export interface WaitForConclude extends BaseState {
   type: 'Concluding.WaitForConclude';
-  channelId: string;
   concluding: AdvanceChannelState;
-  processId: string;
-  ledgerId: string;
 }
 
-export interface WaitForDefund {
+export interface WaitForDefund extends BaseState {
   type: 'Concluding.WaitForDefund';
-  channelId: string;
   defunding: DefundingState;
-  processId: string;
-  ledgerId: string;
 }
-export interface DecideClosing {
+export interface DecideClosing extends BaseState {
   type: 'Concluding.DecideClosing';
-  channelId: string;
-  processId: string;
-  ledgerId: string;
 }
-export interface WaitForLedgerClose {
+export interface WaitForLedgerClose extends BaseState {
   type: 'Concluding.WaitForLedgerClose';
-  channelId: string;
-  ledgerId: string;
-  processId: string;
   ledgerClosing: NonTerminalCloseLedgerChannelState;
 }
 
