@@ -48,6 +48,11 @@ import {
   isConcludingState,
   isTerminalConcludingState,
 } from './protocols/concluding/states';
+import {
+  TerminalCloseLedgerChannelState,
+  isTerminalCloseLedgerChannelState,
+  isCloseLedgerChannelState,
+} from './protocols/close-ledger-channel/states';
 
 export type WalletState = WaitForLogin | MetaMaskError | Initialized;
 
@@ -347,11 +352,13 @@ export function isTerminalProtocolState(
   | TerminalApplicationState
   | TerminalFundingState
   | TerminalDefundingState
-  | TerminalConcludingState {
+  | TerminalConcludingState
+  | TerminalCloseLedgerChannelState {
   return (
     (isApplicationState(protocolState) && isTerminalApplicationState(protocolState)) ||
     (isFundingState(protocolState) && isTerminalFundingState(protocolState)) ||
     (isDefundingState(protocolState) && isTerminalDefundingState(protocolState)) ||
-    (isConcludingState(protocolState) && isTerminalConcludingState(protocolState))
+    (isConcludingState(protocolState) && isTerminalConcludingState(protocolState)) ||
+    (isCloseLedgerChannelState(protocolState) && isTerminalCloseLedgerChannelState(protocolState))
   );
 }
