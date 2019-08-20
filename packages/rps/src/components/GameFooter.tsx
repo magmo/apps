@@ -36,8 +36,12 @@ export default class GameFooter extends React.PureComponent<Props> {
             >
               {isNotOurTurn ? "Can't Resign" : 'Resign'}
             </Button>
-            <Button className="footer-resign" outline={true} onClick={showChannelManagement}>
-              Show Channel Management
+            <Button
+              className="footer-channel-management"
+              outline={true}
+              onClick={showChannelManagement}
+            >
+              Channel Management
             </Button>
             <Button
               className="footer-challenge"
