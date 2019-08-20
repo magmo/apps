@@ -15,7 +15,6 @@ import { Application } from './application/container';
 import { isChannelManagementState } from './channel-management';
 import { isNonTerminalChannelManagementState } from './channel-management/states';
 import { ChannelManagement } from './channel-management/container';
-import { isCloseLedgerChannelState } from './close-ledger-channel';
 import { isNonTerminalCloseLedgerChannelState } from './close-ledger-channel/states';
 import { CloseLedgerChannel } from './close-ledger-channel/container';
 interface Props {
