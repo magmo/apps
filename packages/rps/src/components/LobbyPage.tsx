@@ -17,6 +17,7 @@ interface Props {
     roundBuyIn: string,
   ) => void;
   newOpenGame: () => void;
+  showChannelManagement: () => void;
 }
 
 const initialState = { showChallenges: true };
@@ -26,13 +27,20 @@ export default class LobbyPage extends React.PureComponent<Props, State> {
   readonly state: State = initialState;
 
   render() {
-    const { newOpenGame, joinOpenGame } = this.props;
+    const { newOpenGame, joinOpenGame, showChannelManagement } = this.props;
     const openGames = this.props.openGames || [];
 
     return (
       <ApplicationLayout>
         <div className="w-100">
           <div className="lobby-header">
+            <Button
+              className="lobby-channel-management"
+              outline={true}
+              onClick={showChannelManagement}
+            >
+              Channel Management
+            </Button>
             <a className="lobby-header-title">Games</a>
             <Button className="lobby-new-game" outline={true} onClick={newOpenGame}>
               Create a game

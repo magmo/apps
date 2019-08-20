@@ -106,14 +106,7 @@ export function* sendMessagesSaga() {
       yield put(gameActions.messageSent());
     }
     if (messageState.walletOutbox) {
-      if (
-        gameState.name !== gameStates.StateName.Lobby &&
-        gameState.name !== gameStates.StateName.WaitingRoom &&
-        gameState.name !== gameStates.StateName.CreatingOpenGame &&
-        gameState.name !== gameStates.StateName.NoName
-      ) {
-        yield handleWalletMessage(messageState.walletOutbox, gameState);
-      }
+      yield handleWalletMessage(messageState.walletOutbox, gameState);
     }
   }
 }
@@ -198,95 +191,106 @@ function createWalletEventChannel(walletEventTypes: Wallet.WalletEventType[]) {
   }, buffers.fixed(10));
 }
 
-function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.PlayingState) {
-  const { channel, player, allocation: balances, destination: participants } = state;
-  const channelId = channelID(channel);
+function* handleWalletMessage(walletMessage: WalletRequest, state: gameStates.GameState) {
+  // Check if it is a playing state
+  if (
+    state.name !== gameStates.StateName.WaitingRoom &&
+    state.name !== gameStates.StateName.CreatingOpenGame &&
+    state.name !== gameStates.StateName.NoName &&
+    state.name !== gameStates.StateName.Lobby
+  ) {
+    const { channel, player, allocation: balances, destination: participants } = state;
+    const channelId = channelID(channel);
+    switch (walletMessage.type) {
+      case 'RESPOND_TO_CHALLENGE':
+        if (
+          state.name === gameStates.StateName.WaitForOpponentToPickWeaponA ||
+          state.name === gameStates.StateName.WaitForRevealB ||
+          state.name === gameStates.StateName.PickWeapon
+        ) {
+          Wallet.respondToOngoingChallenge(WALLET_IFRAME_ID, asCoreCommitment(walletMessage.data));
+          yield put(gameActions.messageSent());
+          const challengeCompleteChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
+          yield take(challengeCompleteChannel);
+          yield put(gameActions.challengeCompleted());
+        }
+        break;
+      case 'FUNDING_REQUESTED':
+        const myIndex = player === Player.PlayerA ? 0 : 1;
 
-  switch (walletMessage.type) {
-    case 'RESPOND_TO_CHALLENGE':
-      if (
-        state.name === gameStates.StateName.WaitForOpponentToPickWeaponA ||
-        state.name === gameStates.StateName.WaitForRevealB ||
-        state.name === gameStates.StateName.PickWeapon
-      ) {
-        Wallet.respondToOngoingChallenge(WALLET_IFRAME_ID, asCoreCommitment(walletMessage.data));
-        yield put(gameActions.messageSent());
-        const challengeCompleteChannel = createWalletEventChannel([Wallet.CHALLENGE_COMPLETE]);
-        yield take(challengeCompleteChannel);
-        yield put(gameActions.challengeCompleted());
-      }
-      break;
-    case 'FUNDING_REQUESTED':
-      const myIndex = player === Player.PlayerA ? 0 : 1;
+        const opponentAddress = participants[1 - myIndex];
+        const myAddress = participants[myIndex];
+        const fundingChannel = createWalletEventChannel([
+          Wallet.FUNDING_SUCCESS,
+          Wallet.FUNDING_FAILURE,
+        ]);
 
-      const opponentAddress = participants[1 - myIndex];
-      const myAddress = participants[myIndex];
-      const fundingChannel = createWalletEventChannel([
-        Wallet.FUNDING_SUCCESS,
-        Wallet.FUNDING_FAILURE,
-      ]);
-
-      Wallet.startFunding(
-        WALLET_IFRAME_ID,
-        channelId,
-        myAddress,
-        opponentAddress,
-        balances[myIndex],
-        balances[1 - myIndex],
-        myIndex,
-      );
-      const fundingResponse: Wallet.FundingResponse = yield take(fundingChannel);
-      if (fundingResponse.type === Wallet.FUNDING_FAILURE) {
-        if (fundingResponse.reason === 'FundingDeclined') {
+        Wallet.startFunding(
+          WALLET_IFRAME_ID,
+          channelId,
+          myAddress,
+          opponentAddress,
+          balances[myIndex],
+          balances[1 - myIndex],
+          myIndex,
+        );
+        const fundingResponse: Wallet.FundingResponse = yield take(fundingChannel);
+        if (fundingResponse.type === Wallet.FUNDING_FAILURE) {
+          if (fundingResponse.reason === 'FundingDeclined') {
+            yield put(gameActions.exitToLobby());
+          } else {
+            throw new Error(fundingResponse.error);
+          }
+        } else {
+          yield put(gameActions.messageSent());
+          const commitment = fromCoreCommitment(fundingResponse.commitment);
+          yield put(gameActions.fundingSuccess(commitment));
+        }
+        break;
+      case 'CONCLUDE_REQUESTED':
+        const conclusionChannel = createWalletEventChannel([
+          Wallet.CONCLUDE_SUCCESS,
+          Wallet.CONCLUDE_FAILURE,
+        ]);
+        Wallet.startConcludingGame(WALLET_IFRAME_ID, channelId);
+        const concludeResponse = yield take(conclusionChannel);
+        if (concludeResponse.type === Wallet.CONCLUDE_SUCCESS) {
+          yield put(gameActions.messageSent());
           yield put(gameActions.exitToLobby());
         } else {
-          throw new Error(fundingResponse.error);
+          yield put(gameActions.messageSent());
+          if (concludeResponse.reason !== 'UserDeclined') {
+            throw new Error(concludeResponse.error);
+          }
         }
-      } else {
+        break;
+      case 'CHALLENGE_REQUESTED':
+        const challengeChannel = createWalletEventChannel([
+          Wallet.CHALLENGE_COMPLETE,
+          Wallet.CONCLUDE_SUCCESS,
+        ]);
+        Wallet.startChallenge(WALLET_IFRAME_ID, channelId);
         yield put(gameActions.messageSent());
-        const commitment = fromCoreCommitment(fundingResponse.commitment);
-        yield put(gameActions.fundingSuccess(commitment));
-      }
-      break;
-    case 'CONCLUDE_REQUESTED':
-      const conclusionChannel = createWalletEventChannel([
-        Wallet.CONCLUDE_SUCCESS,
-        Wallet.CONCLUDE_FAILURE,
-      ]);
-      Wallet.startConcludingGame(WALLET_IFRAME_ID, channelId);
-      const concludeResponse = yield take(conclusionChannel);
-      if (concludeResponse.type === Wallet.CONCLUDE_SUCCESS) {
-        yield put(gameActions.messageSent());
-        yield put(gameActions.exitToLobby());
-      } else {
-        yield put(gameActions.messageSent());
-        if (concludeResponse.reason !== 'UserDeclined') {
-          throw new Error(concludeResponse.error);
+        const challengeResponse = yield take(challengeChannel);
+        if (challengeResponse.type === Wallet.CHALLENGE_COMPLETE) {
+          yield put(gameActions.challengeCompleted());
         }
-      }
-      break;
-    case 'CHALLENGE_REQUESTED':
-      const challengeChannel = createWalletEventChannel([
-        Wallet.CHALLENGE_COMPLETE,
-        Wallet.CONCLUDE_SUCCESS,
-      ]);
-      Wallet.startChallenge(WALLET_IFRAME_ID, channelId);
-      yield put(gameActions.messageSent());
-      const challengeResponse = yield take(challengeChannel);
-      if (challengeResponse.type === Wallet.CHALLENGE_COMPLETE) {
-        yield put(gameActions.challengeCompleted());
-      }
-      if (challengeResponse.type === Wallet.CONCLUDE_SUCCESS) {
+        if (challengeResponse.type === Wallet.CONCLUDE_SUCCESS) {
+          yield put(gameActions.messageSent());
+          yield put(gameActions.exitToLobby());
+        }
+
+        break;
+      case 'SHOW_CHANNEL_MANAGEMENT':
+        Wallet.showChannelManagement(WALLET_IFRAME_ID);
         yield put(gameActions.messageSent());
-        yield put(gameActions.exitToLobby());
-      }
-
-      break;
-
-    case 'SHOW_CHANNEL_MANAGEMENT':
+        break;
+    }
+  } else {
+    if (walletMessage.type === 'SHOW_CHANNEL_MANAGEMENT') {
       Wallet.showChannelManagement(WALLET_IFRAME_ID);
       yield put(gameActions.messageSent());
-      break;
+    }
   }
 }
 
@@ -311,7 +315,7 @@ function* receiveDisplayEventFromWalletSaga() {
         yield put(appActions.hideWallet());
         break;
       default:
-        throw new Error('recieveDisplayFromWalletSaga: unexpected event');
+        throw new Error('receiveDisplayFromWalletSaga: unexpected event');
     }
   }
 }

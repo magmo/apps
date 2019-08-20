@@ -13,6 +13,7 @@ const mapStateToProps = (state: SiteState) => ({
 const mapDispatchToProps = {
   joinOpenGame: actions.joinOpenGame,
   newOpenGame: actions.newOpenGame,
+  showChannelManagement: actions.showChannelManagement,
 };
 
 export default connect(
