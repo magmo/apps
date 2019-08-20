@@ -28,7 +28,9 @@ export function* messageListener() {
     const action = messageEvent.data;
     switch (messageEvent.data.type) {
       // Events that need a new process
-
+      case incoming.SHOW_CHANNEL_MANAGEMENT:
+        yield put(actions.protocol.showChannelManagement({}));
+        break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.protocol.concludeRequested({ channelId: action.channelId }));
         break;

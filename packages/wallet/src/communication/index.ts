@@ -17,6 +17,7 @@ export const enum ProcessProtocol {
   Funding = 'Funding',
   Defunding = 'Defunding',
   Concluding = 'Concluding',
+  ChannelManagement = 'ChannelManagement',
 }
 
 export const enum EmbeddedProtocol {

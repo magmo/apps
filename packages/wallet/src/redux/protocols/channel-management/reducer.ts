@@ -1,7 +1,7 @@
 import { SharedData } from '../../state';
 import { ProtocolStateWithSharedData } from '..';
 import * as states from './states';
-import { ChannelManagementAction } from './actions';
+import { isChannelManagementAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import {
   getOurAddress,
@@ -13,6 +13,7 @@ import {
   showWallet,
   hideWallet,
 } from '../reducer-helpers';
+import { WalletAction } from '../../actions';
 
 export const initialize = ({
   processId,
@@ -42,8 +43,12 @@ export const initialize = ({
 export const channelManagementReducer = (
   protocolState: states.NonTerminalChannelManagementState,
   sharedData: SharedData,
-  action: ChannelManagementAction,
+  action: WalletAction,
 ): ProtocolStateWithSharedData<states.ChannelManagementState> => {
+  if (!isChannelManagementAction(action)) {
+    console.warn(`Expected channel management action, received ${action.type} instead`);
+    return { protocolState, sharedData };
+  }
   switch (protocolState.type) {
     case 'ChannelManagement.DisplayChannels':
       switch (action.type) {

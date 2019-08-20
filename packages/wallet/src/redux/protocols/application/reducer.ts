@@ -24,6 +24,7 @@ import { disputeReducer } from '../dispute/reducer';
 // since we're not too concerned with handling multiple running app channels.
 // This might need to change in the future.
 export const APPLICATION_PROCESS_ID = 'Application';
+export const CHANNEL_MANAGEMENT_PROCESS_ID = 'ChannelManagement';
 
 export function initialize(
   sharedData: SharedData,

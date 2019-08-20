@@ -10,12 +10,16 @@ import * as defundingProtocol from './protocols/defunding';
 import * as concludingProtocol from './protocols/concluding';
 import * as fundProtocol from './protocols/funding';
 import * as states from './state';
-import { APPLICATION_PROCESS_ID } from './protocols/application/reducer';
+import {
+  APPLICATION_PROCESS_ID,
+  CHANNEL_MANAGEMENT_PROCESS_ID,
+} from './protocols/application/reducer';
 import { adjudicatorStateReducer } from './adjudicator-state/reducer';
 import { isStartProcessAction, ProcessProtocol } from '../communication';
 import * as communication from '../communication';
 import { ethers } from 'ethers';
 import _ from 'lodash';
+import * as channelManagementProtocol from './protocols/channel-management';
 const initialState = states.waitForLogin();
 
 export const walletReducer = (
@@ -122,6 +126,22 @@ function routeToProtocolReducer(
           concludingProtocolState,
           action.processId,
         );
+      case ProcessProtocol.ChannelManagement:
+        const {
+          protocolState: channelManagementProtocolState,
+          sharedData: channelManagementSharedData,
+        } = channelManagementProtocol.channelManagementReducer(
+          processState.protocolState,
+          states.sharedData(state),
+          action,
+        );
+        return updatedState(
+          state,
+          channelManagementSharedData,
+          processState,
+          channelManagementProtocolState,
+          action.processId,
+        );
       default:
         return unreachable(processState.protocol);
     }
@@ -153,6 +173,8 @@ export function getProcessId(action: NewProcessAction): string {
     return communication.getProcessId(action);
   } else if (action.type === 'WALLET.NEW_PROCESS.INITIALIZE_CHANNEL') {
     return APPLICATION_PROCESS_ID;
+  } else if (action.type === 'WALLET.NEW_PROCESS.SHOW_CHANNEL_MANAGEMENT') {
+    return CHANNEL_MANAGEMENT_PROCESS_ID;
   } else if ('channelId' in action) {
     return `${action.protocol}-${action.channelId}`;
   }
@@ -198,6 +220,11 @@ function initializeNewProtocol(
       );
     case 'WALLET.NEW_PROCESS.DEFUND_REQUESTED':
       return defundingProtocol.initialize(processId, action.channelId, incomingSharedData);
+    case 'WALLET.NEW_PROCESS.SHOW_CHANNEL_MANAGEMENT':
+      return channelManagementProtocol.initializeChannelManagement({
+        processId,
+        sharedData: incomingSharedData,
+      });
     default:
       return unreachable(action);
   }
