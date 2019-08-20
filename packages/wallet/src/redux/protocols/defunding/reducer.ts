@@ -32,7 +32,7 @@ export const initialize = (
   switch (fundingType) {
     case helpers.FundingType.Direct:
       return {
-        protocolState: states.failure({ reason: 'Cannot defund directly funded channel' }),
+        protocolState: states.failure({ reason: 'Cannot Defund Directly Funded Channel' }),
         sharedData,
       };
     case helpers.FundingType.Ledger:
@@ -119,7 +119,7 @@ const waitForVirtualDefundingReducer = (
   switch (virtualDefunding.type) {
     case 'VirtualDefunding.Failure':
       return {
-        protocolState: states.failure({ reason: 'Virtual De-Funding Failure' }),
+        protocolState: states.failure({ reason: 'Virtual Defunding Failure' }),
         sharedData,
       };
     case 'VirtualDefunding.Success':

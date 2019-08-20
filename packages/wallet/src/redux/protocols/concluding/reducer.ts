@@ -148,7 +148,7 @@ function waitForDefundReducer(
   switch (defunding.type) {
     case 'Defunding.Failure':
       sharedData = sendConcludeFailure(sharedData, 'Other');
-      return { protocolState: states.failure({ reason: 'Defunding failure' }), sharedData };
+      return { protocolState: states.failure({ reason: 'Defunding Failure' }), sharedData };
     case 'Defunding.Success':
       return { protocolState: states.decideClosing(protocolState), sharedData };
 
@@ -178,7 +178,7 @@ function waitForConcludeReducer(
   switch (concluding.type) {
     case 'AdvanceChannel.Failure':
       sharedData = sendConcludeFailure(sharedData, 'Other');
-      return { protocolState: states.failure({ reason: 'AdvanceChannelAction' }), sharedData };
+      return { protocolState: states.failure({ reason: 'Advance Channel Failure' }), sharedData };
     case 'AdvanceChannel.Success':
       let defunding: DefundingState;
       const { processId, channelId } = protocolState;

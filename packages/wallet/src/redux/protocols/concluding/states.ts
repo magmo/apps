@@ -10,7 +10,7 @@ import { NonTerminalCloseLedgerChannelState } from '../close-ledger-channel/stat
 
 export interface Failure {
   type: 'Concluding.Failure';
-  reason: string;
+  reason: 'Close Ledger Channel Failure' | 'Defunding Failure' | 'Advance Channel Failure';
 }
 
 export interface Success {

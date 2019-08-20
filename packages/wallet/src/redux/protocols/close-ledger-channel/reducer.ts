@@ -26,7 +26,7 @@ export const initialize = (
 ): ProtocolStateWithSharedData<states.CloseLedgerChannelState> => {
   if (helpers.channelFundsAnotherChannel(channelId, sharedData)) {
     return {
-      protocolState: states.failure({ reason: 'Channel in use' }),
+      protocolState: states.failure({ reason: 'Channel In Use' }),
       sharedData,
     };
   } else if (helpers.channelIsClosed(channelId, sharedData)) {

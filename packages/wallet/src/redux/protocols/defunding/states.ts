@@ -8,8 +8,6 @@ import { ProtocolLocator } from '../../../communication';
 // States
 // -------
 
-export type FailureReason = 'Ledger De-funding Failure' | 'Channel Not Closed';
-
 export interface WaitForLedgerDefunding {
   type: 'Defunding.WaitForLedgerDefunding';
   processId: string;
@@ -30,7 +28,11 @@ export interface WaitForVirtualDefunding {
 
 export interface Failure {
   type: 'Defunding.Failure';
-  reason: string;
+  reason:
+    | 'Virtual Defunding Failure'
+    | 'Ledger Defunding Failure'
+    | 'Channel Not Closed'
+    | 'Cannot Defund Directly Funded Channel';
 }
 
 export interface Success {

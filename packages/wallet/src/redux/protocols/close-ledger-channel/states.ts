@@ -18,7 +18,7 @@ export interface WaitForConclude {
 
 export interface Failure {
   type: 'CloseLedgerChannel.Failure';
-  reason: string;
+  reason: 'Channel In Use' | 'Withdrawal Failure' | 'Advance Channel Failure';
 }
 
 export interface Success {
