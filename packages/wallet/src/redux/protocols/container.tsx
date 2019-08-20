@@ -15,6 +15,9 @@ import { Application } from './application/container';
 import { isChannelManagementState } from './channel-management';
 import { isNonTerminalChannelManagementState } from './channel-management/states';
 import { ChannelManagement } from './channel-management/container';
+import { isCloseLedgerChannelState } from './close-ledger-channel';
+import { isNonTerminalCloseLedgerChannelState } from './close-ledger-channel/states';
+import { CloseLedgerChannel } from './close-ledger-channel/container';
 interface Props {
   protocolState: ProtocolState;
 }
@@ -41,6 +44,8 @@ class ProtocolContainer extends PureComponent<Props> {
       isNonTerminalChannelManagementState(protocolState)
     ) {
       return <ChannelManagement state={protocolState} />;
+    } else if (isNonTerminalCloseLedgerChannelState(protocolState)) {
+      return <CloseLedgerChannel state={protocolState} />;
     } else {
       return (
         <div>
