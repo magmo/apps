@@ -265,7 +265,7 @@ export function getOpenLedgerChannels(sharedData: SharedData): string[] {
     return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
       channel.participants.indexOf(ourAddress) > -1 &&
-      isChannelOpen(channelId, sharedData)
+      !isChannelConcluded(channelId, sharedData)
     );
   });
 }
@@ -285,12 +285,12 @@ export function isLedgerChannelBeingUsedForFunding(
   });
 }
 
-export function isChannelOpen(channelId: string, sharedData: SharedData): boolean {
+export function isChannelConcluded(channelId: string, sharedData: SharedData): boolean {
   const { participants } = selectors.getChannelState(sharedData, channelId);
   const latestCommitment = getLatestCommitment(channelId, sharedData);
   return (
     latestCommitment.commitmentType === CommitmentType.Conclude &&
-    latestCommitment.commitmentCount === participants.length
+    latestCommitment.commitmentCount === participants.length - 1
   );
 }
 
