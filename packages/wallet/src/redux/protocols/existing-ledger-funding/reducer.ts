@@ -14,7 +14,7 @@ import {
   LEDGER_TOP_UP_PROTOCOL_LOCATOR,
 } from '../ledger-top-up/reducer';
 import { routesToLedgerTopUp } from '../ledger-top-up/actions';
-import { addHex } from '../../../utils/hex-utils';
+import { addHex, subHex } from '../../../utils/hex-utils';
 import { initializeConsensusUpdate } from '../consensus-update';
 import {
   CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
@@ -31,6 +31,7 @@ import {
   ConsensusUpdateState,
 } from '../consensus-update/states';
 import { LedgerTopUpState } from '../ledger-top-up/states';
+import { getLatestCommitment, removeZeroFundsFromBalance } from '../reducer-helpers';
 export { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../../../communication/protocol-locator';
 
 export const initialize = ({
@@ -53,7 +54,7 @@ export const initialize = ({
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 
-  const appFunding = craftAppFunding(channelId, startingAllocation);
+  const appFunding = craftAppFunding(channelId, ledgerId, startingAllocation, sharedData);
   let consensusUpdateState: ConsensusUpdateState;
   ({ sharedData, protocolState: consensusUpdateState } = initializeConsensusUpdate({
     processId,
@@ -265,12 +266,42 @@ function ledgerChannelNeedsTopUp(
 
 function craftAppFunding(
   appChannelId: string,
-  allocation: string[],
+  ledgerChannelId: string,
+  startingAllocation: string[],
+  sharedData: SharedData,
 ): { proposedAllocation: string[]; proposedDestination: string[] } {
-  const total = allocation.reduce(addHex);
+  const { allocation: ledgerAllocation, destination: ledgerDestination } = getLatestCommitment(
+    ledgerChannelId,
+    sharedData,
+  );
+
+  const appTotal = startingAllocation.reduce(addHex);
+
+  // If the ledger allocation is greater than the startingAllocation requested
+  // we subtract the startingAllocation from the ledger allocation
+  const updatedLedgerAllocation = ledgerAllocation.map(a => {
+    const index = ledgerAllocation.indexOf(a);
+    const updatedEntry = subHex(a, startingAllocation[index]);
+
+    if (bigNumberify(updatedEntry).lt(0)) {
+      throw new Error(
+        `Player at index ${0} does not have enough funds to allocate to the channel.`,
+      );
+    }
+    return updatedEntry;
+  });
+
+  const {
+    allocation: proposedAllocation,
+    destination: proposedDestination,
+  } = removeZeroFundsFromBalance(
+    [appTotal, ...updatedLedgerAllocation],
+    [appChannelId, ...ledgerDestination],
+  );
+
   return {
-    proposedAllocation: [total],
-    proposedDestination: [appChannelId],
+    proposedAllocation,
+    proposedDestination,
   };
 }
 

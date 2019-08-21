@@ -12,6 +12,9 @@ import { getLastCommitment, nextParticipant, Commitments } from '../channel-stor
 import { Commitment } from '../../domain';
 import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
 import { ourTurn as ourTurnOnChannel } from '../channel-store';
+import _ from 'lodash';
+import { bigNumberify } from 'ethers/utils';
+
 export const updateChannelState = (
   sharedData: SharedData,
   channelAction: actions.channel.ChannelAction,
@@ -301,4 +304,19 @@ export function getFundingChannelId(channelId: string, sharedData: SharedData): 
 
     return getFundingChannelId(channelIdToCheck, sharedData);
   }
+}
+
+export function removeZeroFundsFromBalance(
+  incomingAllocation: string[],
+  incomingDestination: string[],
+): { allocation: string[]; destination: string[] } {
+  const allocation: string[] = [];
+  const destination: string[] = [];
+  for (let i = 0; i < incomingAllocation.length; i++) {
+    if (bigNumberify(incomingAllocation[i]).gt(0)) {
+      allocation.push(incomingAllocation[i]);
+      destination.push(incomingDestination[i]);
+    }
+  }
+  return { allocation, destination };
 }
