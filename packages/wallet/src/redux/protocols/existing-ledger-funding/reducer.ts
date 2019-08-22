@@ -14,7 +14,7 @@ import {
   LEDGER_TOP_UP_PROTOCOL_LOCATOR,
 } from '../ledger-top-up/reducer';
 import { routesToLedgerTopUp } from '../ledger-top-up/actions';
-import { addHex, subHex } from '../../../utils/hex-utils';
+import { addHex } from '../../../utils/hex-utils';
 import { initializeConsensusUpdate } from '../consensus-update';
 import {
   CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
@@ -54,7 +54,13 @@ export const initialize = ({
   const ledgerChannel = selectors.getChannelState(sharedData, ledgerId);
   const theirCommitment = getLastCommitment(ledgerChannel);
 
-  const appFunding = craftAppFunding(channelId, ledgerId, startingAllocation, sharedData);
+  const appFunding = craftAppFunding(
+    channelId,
+    ledgerId,
+    startingAllocation,
+    startingDestination,
+    sharedData,
+  );
   let consensusUpdateState: ConsensusUpdateState;
   ({ sharedData, protocolState: consensusUpdateState } = initializeConsensusUpdate({
     processId,
@@ -268,6 +274,7 @@ function craftAppFunding(
   appChannelId: string,
   ledgerChannelId: string,
   startingAllocation: string[],
+  startingDestination: string[],
   sharedData: SharedData,
 ): { proposedAllocation: string[]; proposedDestination: string[] } {
   const { allocation: ledgerAllocation, destination: ledgerDestination } = getLatestCommitment(
@@ -279,16 +286,11 @@ function craftAppFunding(
 
   // If the ledger allocation is greater than the startingAllocation requested
   // we subtract the startingAllocation from the ledger allocation
-  const updatedLedgerAllocation = ledgerAllocation.map(a => {
-    const index = ledgerAllocation.indexOf(a);
-    const updatedEntry = subHex(a, startingAllocation[index]);
-
-    if (bigNumberify(updatedEntry).lt(0)) {
-      throw new Error(
-        `Player at index ${0} does not have enough funds to allocate to the channel.`,
-      );
-    }
-    return updatedEntry;
+  const updatedLedgerAllocation = ledgerAllocation.map((a, i) => {
+    const address = ledgerDestination[i];
+    const startingIndex = startingDestination.indexOf(address);
+    const difference = bigNumberify(a).sub(startingAllocation[startingIndex]);
+    return difference.gt(0) ? difference.toHexString() : bigNumberify(0).toHexString();
   });
 
   const {
