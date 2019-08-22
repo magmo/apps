@@ -330,11 +330,11 @@ export function removeZeroFundsFromBalance(
 ): { allocation: string[]; destination: string[] } {
   const allocation: string[] = [];
   const destination: string[] = [];
-  for (let i = 0; i < incomingAllocation.length; i++) {
-    if (bigNumberify(incomingAllocation[i]).gt(0)) {
+  incomingAllocation.map((a, i) => {
+    if (bigNumberify(a).gt(0)) {
       allocation.push(incomingAllocation[i]);
       destination.push(incomingDestination[i]);
     }
-  }
+  });
   return { allocation, destination };
 }
