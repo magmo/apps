@@ -385,16 +385,12 @@ export function getTargetOfLedgerFunding(
   sharedData: SharedData,
 ): string | undefined {
   const latestCommitment = getLatestCommitment(ledgerChannelId, sharedData);
-  if (latestCommitment.destination.length > 1) {
-    return undefined;
-  }
-  const targetChannel = latestCommitment.destination[0];
-  const targetFundingState = selectors.getChannelFundingState(sharedData, targetChannel);
-  // Ensure that the funding state reflects what we have in the commitment destination
-  if (!targetFundingState || targetFundingState.fundingChannel !== ledgerChannelId) {
-    return undefined;
-  }
-  return targetChannel;
+  // We assume there is only one channel listed in the destination
+  return latestCommitment.destination.find(d => {
+    const targetFundingState = selectors.getChannelFundingState(sharedData, d);
+    // Ensure that the funding state reflects what we have in the commitment destination
+    return !targetFundingState || targetFundingState.fundingChannel !== ledgerChannelId;
+  });
 }
 
 export function getFundingChannelId(channelId: string, sharedData: SharedData): string {
