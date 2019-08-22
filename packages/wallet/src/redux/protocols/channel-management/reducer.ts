@@ -8,12 +8,11 @@ import {
   getOpponentAddress,
   getOurAllocation,
   getOpponentAllocation,
-  getOpenLedgerChannels,
+  getOurOpenHubChannels,
   showWallet,
   hideWallet,
-  isTwoPlayerChannel,
-  getTotalAllocation as getAllocationTotal,
-  getOpenApplicationChannels,
+  getAllocationTotal,
+  getOurOpenApplicationChannels,
   getTargetOfLedgerFunding,
   getFundingChannelId,
 } from '../reducer-helpers';
@@ -40,17 +39,12 @@ export const initialize = ({
   processId: string;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.ChannelManagementState> => {
-  const openLedgerChannels = getOpenLedgerChannels(sharedData);
-  const twoPlayerChannels = openLedgerChannels.filter(channelId =>
-    isTwoPlayerChannel(channelId, sharedData),
+  const ledgerChannels = getOurOpenHubChannels(sharedData).map(c =>
+    mapToDisplayChannel(c, sharedData),
   );
 
-  const ledgerChannels: states.DisplayChannel[] = twoPlayerChannels.map(channelId =>
-    mapToDisplayChannel(channelId, sharedData),
-  );
-  const openApplicationChannels = getOpenApplicationChannels(sharedData);
-  const applicationChannels = openApplicationChannels.map(channelId =>
-    mapToDisplayChannel(channelId, sharedData),
+  const applicationChannels = getOurOpenApplicationChannels(sharedData).map(c =>
+    mapToDisplayChannel(c, sharedData),
   );
   return {
     protocolState: states.displayChannels({ processId, ledgerChannels, applicationChannels }),

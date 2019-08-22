@@ -13,7 +13,7 @@ import { Commitment } from '../../domain';
 import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
 import * as comms from '../../communication';
 import { ourTurn as ourTurnOnChannel } from '../channel-store';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../constants';
+import { CONSENSUS_LIBRARY_ADDRESS, HUB_ADDRESS } from '../../constants';
 import { addHex } from '../../utils/hex-utils';
 import _ from 'lodash';
 import { bigNumberify } from 'ethers/utils';
@@ -283,7 +283,7 @@ export function isTwoPlayerChannel(channelId: string, sharedData: SharedData): b
   return participants.length === 2;
 }
 
-export function getOpenApplicationChannels(sharedData: SharedData): string[] {
+export function getOurOpenApplicationChannels(sharedData: SharedData): string[] {
   const channelIds = selectors.getChannelIds(sharedData);
   return channelIds.filter(channelId => {
     const channel = selectors.getChannelState(sharedData, channelId);
@@ -300,7 +300,7 @@ export function getOpenApplicationChannels(sharedData: SharedData): string[] {
     );
   });
 }
-export function getOpenLedgerChannels(sharedData: SharedData): string[] {
+export function getOurOpenHubChannels(sharedData: SharedData): string[] {
   const channelIds = selectors.getChannelIds(sharedData);
   return channelIds.filter(channelId => {
     const channel = selectors.getChannelState(sharedData, channelId);
@@ -308,7 +308,9 @@ export function getOpenLedgerChannels(sharedData: SharedData): string[] {
 
     return (
       channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
+      channel.participants.length === 2 &&
       channel.participants.indexOf(ourAddress) > -1 &&
+      channel.participants.indexOf(HUB_ADDRESS) > -1 &&
       !isChannelConcluded(channelId, sharedData) &&
       !isGuarantorChannel(channelId, sharedData)
     );
@@ -329,7 +331,7 @@ export function isChannelConcluded(channelId: string, sharedData: SharedData): b
   );
 }
 
-export function getTotalAllocation(channelId: string, sharedData: SharedData): string {
+export function getAllocationTotal(channelId: string, sharedData: SharedData): string {
   const { allocation } = getLatestCommitment(channelId, sharedData);
   return allocation.reduce(addHex, '0x0');
 }
