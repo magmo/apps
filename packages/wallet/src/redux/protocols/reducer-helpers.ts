@@ -293,8 +293,6 @@ export function getOurOpenApplicationChannels(sharedData: SharedData): string[] 
       channel.libraryAddress !== CONSENSUS_LIBRARY_ADDRESS &&
       channel.participants.indexOf(ourAddress) > -1 &&
       !isChannelConcluded(channelId, sharedData) &&
-      // TODO: Due to redeployments of the consensus library we're picking up old ledger channels
-      // so we do some filtering out here
       channel.participants.length === 2 &&
       !isGuarantorChannel(channelId, sharedData)
     );
