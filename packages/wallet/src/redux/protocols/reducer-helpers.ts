@@ -16,6 +16,7 @@ import { ourTurn as ourTurnOnChannel } from '../channel-store';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../constants';
 import { addHex } from '../../utils/hex-utils';
 import _ from 'lodash';
+import { bigNumberify } from 'ethers/utils';
 
 export const updateChannelState = (
   sharedData: SharedData,
@@ -413,4 +414,19 @@ export function getFundingChannelId(channelId: string, sharedData: SharedData): 
 
     return getFundingChannelId(channelIdToCheck, sharedData);
   }
+}
+
+export function removeZeroFundsFromBalance(
+  incomingAllocation: string[],
+  incomingDestination: string[],
+): { allocation: string[]; destination: string[] } {
+  const allocation: string[] = [];
+  const destination: string[] = [];
+  incomingAllocation.map((a, i) => {
+    if (bigNumberify(a).gt(0)) {
+      allocation.push(incomingAllocation[i]);
+      destination.push(incomingDestination[i]);
+    }
+  });
+  return { allocation, destination };
 }
