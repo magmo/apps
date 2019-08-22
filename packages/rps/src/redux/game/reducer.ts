@@ -408,15 +408,6 @@ function waitForFundingReducer(
     });
     return { gameState: lobbyGameState, messageState: {} };
   }
-  if (action.type === actions.SHOW_CHANNEL_MANAGEMENT) {
-    return {
-      gameState,
-      messageState: {
-        ...messageState,
-        walletOutbox: { type: 'SHOW_CHANNEL_MANAGEMENT' },
-      },
-    };
-  }
 
   if (action.type === actions.RESIGN) {
     return resignationReducer(gameState, messageState);
