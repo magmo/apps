@@ -20,7 +20,7 @@ export default class DisplayChannels extends React.Component<Props> {
         selector: 'channelId',
       },
       {
-        name: 'Your Deposit',
+        name: 'Your Amount',
         selector: 'ourAmount',
         cell: row => <div>{formatEther(bigNumberify(row.ourAmount || '0x0'))}</div>,
       },
