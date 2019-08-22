@@ -46,7 +46,7 @@ export default class DisplayChannels extends React.Component<Props> {
                   closeChannelAction(row.channelId);
                 }}
               >
-                Close
+                Close Channel
               </Button>
             ) : (
               ''
@@ -81,17 +81,11 @@ export default class DisplayChannels extends React.Component<Props> {
         cell: row => <div>{row.fundedBy ? `Funded by ${row.fundedBy}` : 'Directly Funded'}</div>,
       },
     ];
-    const ledgerTable = (
-      <DataTable title="Hub Channels" columns={hubColumns} data={ledgerChannels} />
-    );
-    const appTable = (
-      <DataTable title="Application Channels" columns={appColumns} data={applicationChannels} />
-    );
 
     return (
       <Fragment>
-        {ledgerTable}
-        {appTable}
+        <DataTable title="Hub Channels" columns={hubColumns} data={ledgerChannels} />
+        <DataTable title="Application Channels" columns={appColumns} data={applicationChannels} />
         <div style={{ textAlign: 'center' }}>
           <Button style={{ margin: '10px 0' }} onClick={closeAction}>
             Close
