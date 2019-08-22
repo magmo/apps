@@ -289,7 +289,8 @@ function craftAppFunding(
   const updatedLedgerAllocation = ledgerAllocation.map((a, i) => {
     const address = ledgerDestination[i];
     const startingIndex = startingDestination.indexOf(address);
-    const difference = bigNumberify(a).sub(startingAllocation[startingIndex]);
+    const difference =
+      startingIndex < 0 ? bigNumberify(0) : bigNumberify(a).sub(startingAllocation[startingIndex]);
     return difference.gt(0) ? difference.toHexString() : bigNumberify(0).toHexString();
   });
 
