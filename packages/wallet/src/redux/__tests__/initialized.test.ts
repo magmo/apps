@@ -40,7 +40,7 @@ describe('when a NewProcessAction arrives', () => {
     });
   });
   it('stores the process in the priority queue', () => {
-    expect(updatedState.processQueue).toContain(expect.objectContaining({ processId }));
+    expect(updatedState.processQueue).toContainEqual(expect.objectContaining({ processId }));
   });
 });
 
@@ -119,7 +119,7 @@ describe('when a process state is terminal', () => {
 
   const result = walletReducer(state, action);
   it('removes the current process id', () => {
-    expect(result.processQueue).not.toContain(expect.objectContaining({ processId }));
+    expect(result.processQueue).not.toContainEqual(expect.objectContaining({ processId }));
   });
   it('removes the process state', () => {
     expect(Object.keys((result as states.Initialized).processStore)).not.toContain(processId);
