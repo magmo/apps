@@ -1,9 +1,7 @@
-import { Commitment } from 'fmg-core';
-
+import { SignedState } from 'nitro-protocol';
 // TODO: We should limit WalletEvent/WalletEventTypes to the bare minimum of events we expect the app to handle. Some of these can be pruned.
 // Events that we handle for the user (HideWallet,ShowWallet, ValidateSuccess, etc..) should be removed from WalletEvent/WalletEventTypes
 // We should also switch from ReturnType to declaring a fixed type/interface that the action creators implement.
-
 // FUNDING
 // =======
 /**
@@ -19,10 +17,10 @@ export const FUNDING_FAILURE = 'WALLET.FUNDING.FAILURE';
 /**
  * @ignore
  */
-export const fundingSuccess = (channelId, commitment: Commitment) => ({
+export const fundingSuccess = (channelId, signedState: SignedState) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
   channelId,
-  commitment,
+  signedState,
 });
 
 /**
@@ -54,83 +52,45 @@ export type FundingFailure = ReturnType<typeof fundingFailure>;
  */
 export type FundingResponse = FundingSuccess | FundingFailure;
 
-// VALIDATION
-// ==========
-/**
- * @ignore
- */
-export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
-/**
- * @ignore
- */
-export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
-/**
- * @ignore
- */
-export const validationSuccess = () => ({
-  type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
+// SIGNING
+export interface SignatureSuccess {
+  type: 'WALLET.SIGNATURE.SUCCESS';
+  signedState: SignedState;
+}
+export const signatureSuccess = (signedState: SignedState): SignatureSuccess => ({
+  type: 'WALLET.SIGNATURE.SUCCESS',
+  signedState,
 });
-/**
- * @ignore
- */
-export const validationFailure = (
-  reason: 'WalletBusy' | 'InvalidSignature' | 'Other',
-  error?: string,
-) => ({
-  type: VALIDATION_FAILURE as typeof VALIDATION_FAILURE,
-  reason,
-  error,
-});
-/**
- * @ignore
- */
-export type ValidationSuccess = ReturnType<typeof validationSuccess>;
-/**
- * @ignore
- */
-export type ValidationFailure = ReturnType<typeof validationFailure>;
-/**
- * @ignore
- */
-export type ValidationResponse = ValidationSuccess | ValidationFailure;
 
-// SIGNATURE
-// =========
-/**
- * @ignore
- */
-export const SIGNATURE_SUCCESS = 'WALLET.SIGNATURE.SUCCESS';
-/**
- * @ignore
- */
-export const SIGNATURE_FAILURE = 'WALLET.SIGNATURE.FAILURE';
-/**
- * @ignore
- */
-export const signatureSuccess = (signature: string) => ({
-  type: SIGNATURE_SUCCESS as typeof SIGNATURE_SUCCESS,
-  signature,
-});
-/**
- * @ignore
- */
-export const signatureFailure = (reason: 'WalletBusy' | 'Other', error?: string) => ({
-  type: SIGNATURE_FAILURE as typeof SIGNATURE_FAILURE,
-  reason,
+export interface SignatureFailure {
+  type: 'WALLET.SIGNATURE.FAILURE';
+  error: any; // TODO: This should be typed when we settle on the errors we return
+}
+export const signatureFailure = (error): SignatureFailure => ({
+  type: 'WALLET.SIGNATURE.FAILURE',
   error,
 });
-/**
- * @ignore
- */
-export type SignatureSuccess = ReturnType<typeof signatureSuccess>;
-/**
- * @ignore
- */
-export type SignatureFailure = ReturnType<typeof signatureFailure>;
-/**
- * @ignore
- */
-export type SignatureResponse = SignatureSuccess | SignatureFailure;
+
+export type SignatureResponse = SignatureFailure | SignatureSuccess;
+
+// VALIDATION/STORAGE
+export interface ValidateAndSaveSuccess {
+  type: 'WALLET.STORE.SUCCESS';
+}
+export const validateAndSaveSuccess = (): ValidateAndSaveSuccess => ({
+  type: 'WALLET.STORE.SUCCESS',
+});
+
+export interface ValidateAndSaveFailure {
+  type: 'WALLET.STORE.FAILURE';
+  error: any; // TODO:
+}
+export const validateAndSaveFailure = (error): ValidateAndSaveFailure => ({
+  type: 'WALLET.STORE.FAILURE',
+  error, // TODO: This should be typed when we settle on the errors we return
+});
+
+export type ValidateAndSaveResponse = ValidateAndSaveSuccess | ValidateAndSaveFailure;
 
 // INITIALIZATION
 // ==============
@@ -267,18 +227,18 @@ export type MessageRelayRequested = ReturnType<typeof messageRelayRequested>;
 /**
  * The type for events where a challenge position is received from the wallet.
  */
-export const CHALLENGE_COMMITMENT_RECEIVED = 'WALLET.MESSAGING.CHALLENGE_COMMITMENT_RECEIVED';
+export const CHALLENGE_STATE_RECEIVED = 'WALLET.MESSAGING.CHALLENGE_STATE_RECEIVED';
 /**
  * @ignore
  */
-export const challengeCommitmentReceived = (commitment: Commitment) => ({
-  type: CHALLENGE_COMMITMENT_RECEIVED as typeof CHALLENGE_COMMITMENT_RECEIVED,
-  commitment,
+export const challengeStateReceived = (signedState: SignedState) => ({
+  type: CHALLENGE_STATE_RECEIVED as typeof CHALLENGE_STATE_RECEIVED,
+  signedState,
 });
 /**
  * The event emitted when the wallet has received a challenge position.
  */
-export type ChallengeCommitmentReceived = ReturnType<typeof challengeCommitmentReceived>;
+export type ChallengeStateReceived = ReturnType<typeof challengeStateReceived>;
 
 /**
  * The event type when a user rejects a challenge.
@@ -326,34 +286,13 @@ export const challengeComplete = () => ({
 export type ChallengeComplete = ReturnType<typeof challengeComplete>;
 
 /**
- * The various types of wallet events that can occur.
- */
-export type WalletEventType =
-  | typeof CHALLENGE_COMMITMENT_RECEIVED
-  | typeof CHALLENGE_COMPLETE
-  | typeof CHALLENGE_REJECTED
-  | typeof CHALLENGE_RESPONSE_REQUESTED
-  | typeof OPPONENT_CONCLUDED
-  | typeof CONCLUDE_FAILURE
-  | typeof CONCLUDE_SUCCESS
-  | typeof FUNDING_FAILURE
-  | typeof FUNDING_SUCCESS
-  | typeof HIDE_WALLET
-  | typeof MESSAGE_RELAY_REQUESTED
-  | typeof SHOW_WALLET
-  | typeof SIGNATURE_FAILURE
-  | typeof SIGNATURE_SUCCESS
-  | typeof VALIDATION_FAILURE
-  | typeof VALIDATION_SUCCESS;
-
-/**
  * @ignore
  */
 export type DisplayAction = ShowWallet | HideWallet;
 
 // TODO: This could live exclusively in the wallet
 export type WalletEvent =
-  | ChallengeCommitmentReceived
+  | ChallengeStateReceived
   | ChallengeComplete
   | ChallengeRejected
   | ChallengeResponseRequested
@@ -364,7 +303,7 @@ export type WalletEvent =
   | FundingSuccess
   | InitializationSuccess
   | MessageRelayRequested
-  | SignatureFailure
-  | SignatureSuccess
-  | ValidationFailure
-  | ValidationSuccess;
+  | SignatureResponse
+  | ValidateAndSaveResponse;
+
+export type WalletEventType = WalletEvent['type'];
