@@ -1,31 +1,15 @@
 import {
   OutboxState,
   emptyDisplayOutboxState,
-  SideEffects,
   queueMessage as queueMessageOutbox,
   queueTransaction as queueTransactionOutbox,
-  getLastMessage as getLastMessageFromOutbox,
 } from './outbox/state';
-import {
-  ChannelStore,
-  ChannelState,
-  setChannel as setChannelInStore,
-  setChannels as setChannelsInStore,
-  checkAndStore as checkAndStoreChannelStore,
-  checkAndInitialize as checkAndInitializeChannelStore,
-  signAndStore as signAndStoreChannelStore,
-  signAndInitialize as signAndInitializeChannelStore,
-  emptyChannelStore,
-  SignFailureReason,
-  Commitments,
-} from './channel-store';
+import { ChannelStore } from './channel-store';
 import { Properties } from './utils';
 import * as NewLedgerChannel from './protocols/new-ledger-channel/states';
-import { accumulateSideEffects } from './outbox';
 import { WalletEvent } from 'magmo-wallet-client';
 import { TransactionRequest } from 'ethers/providers';
 import { AdjudicatorState } from './adjudicator-state/state';
-import { SignedCommitment, Commitment } from '../domain';
 import { ProcessProtocol, ProtocolLocator } from '../communication';
 import {
   TerminalApplicationState,
@@ -69,6 +53,8 @@ export interface SharedData {
   adjudicatorState: AdjudicatorState;
   fundingState: FundingState;
   currentProcessId?: string;
+  address: string;
+  privateKey: string;
 }
 
 export interface ChannelSubscriptions {
@@ -78,14 +64,16 @@ export interface ChannelSubscriber {
   protocolLocator: ProtocolLocator;
   processId: string;
 }
-export interface WaitForLogin extends SharedData {
+export interface WaitForLogin {
   type: typeof WAIT_FOR_LOGIN;
   address?: string;
   privateKey?: string;
+  outboxState: OutboxState;
 }
 
-export interface MetaMaskError extends SharedData {
+export interface MetaMaskError {
   type: typeof METAMASK_ERROR;
+  outboxState: OutboxState;
 }
 
 export interface Initialized extends SharedData {
@@ -160,26 +148,17 @@ export interface ChannelFundingState {
 // ------------
 export const EMPTY_SHARED_DATA: SharedData = {
   outboxState: emptyDisplayOutboxState(),
-  channelStore: emptyChannelStore(),
+  channelStore: {},
   channelSubscriptions: {},
   adjudicatorState: {},
   fundingState: {},
+  address: '0x0',
+  privateKey: '0x0',
 };
 
 export function sharedData(params: SharedData): SharedData {
-  const {
-    outboxState,
-    channelStore: channelState,
-    adjudicatorState,
-    fundingState,
-    channelSubscriptions,
-  } = params;
   return {
-    outboxState,
-    channelStore: channelState,
-    adjudicatorState,
-    fundingState,
-    channelSubscriptions,
+    ...params,
   };
 }
 
@@ -188,7 +167,7 @@ export function waitForLogin(): WaitForLogin {
 }
 
 export function metaMaskError(params: Properties<MetaMaskError>): MetaMaskError {
-  return { ...sharedData(params), type: METAMASK_ERROR };
+  return { ...params, type: METAMASK_ERROR };
 }
 export function initialized(params: Properties<Initialized>): Initialized {
   return {
@@ -201,40 +180,11 @@ export function initialized(params: Properties<Initialized>): Initialized {
 // -------------------
 // Getters and setters
 // -------------------
-
-export function getChannelStatus(state: WalletState, channelId: string): ChannelState {
-  return state.channelStore[channelId];
-}
-
-export function setSideEffects(state: Initialized, sideEffects: SideEffects): Initialized {
-  return { ...state, outboxState: accumulateSideEffects(state.outboxState, sideEffects) };
-}
-
-export function setChannel(state: SharedData, channel: ChannelState): SharedData {
-  return { ...state, channelStore: setChannelInStore(state.channelStore, channel) };
-}
-
-export function setChannels(state: SharedData, channels: ChannelState[]): SharedData {
-  return { ...state, channelStore: setChannelsInStore(state.channelStore, channels) };
-}
-
-export function getChannel(state: SharedData, channelId: string): ChannelState | undefined {
-  return state.channelStore[channelId];
-}
-
-export function getExistingChannel(state: SharedData, channelId: string) {
-  if (!state.channelStore[channelId]) {
-    throw new Error(`Channel ${channelId} not found`);
-  }
-  return state.channelStore[channelId];
-}
-
-export function queueMessage(state: SharedData, message: WalletEvent): SharedData {
-  return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
-}
-
 export function setChannelStore(state: SharedData, channelStore: ChannelStore): SharedData {
   return { ...state, channelStore };
+}
+export function queueMessage(state: SharedData, message: WalletEvent): SharedData {
+  return { ...state, outboxState: queueMessageOutbox(state.outboxState, message) };
 }
 
 export function setFundingState(
@@ -245,79 +195,8 @@ export function setFundingState(
   return { ...state, fundingState: { ...state.fundingState, [channelId]: fundingState } };
 }
 
-export function getLastMessage(state: SharedData): WalletEvent | undefined {
-  return getLastMessageFromOutbox(state.outboxState);
-}
-
-export function getPrivatekey(state: SharedData, channelId: string): string {
-  const channel = getChannel(state, channelId);
-  if (!channel) {
-    throw new Error(`Channel ${channelId} missing`);
-  } else {
-    return channel.privateKey;
-  }
-}
-
-export function signAndInitialize(
-  state: SharedData,
-  commitment: Commitment,
-  privateKey: string,
-): SignResult {
-  const result = signAndInitializeChannelStore(state.channelStore, commitment, privateKey);
-  if (result.isSuccess) {
-    return { ...result, store: setChannelStore(state, result.store) };
-  } else {
-    return result;
-  }
-}
-
-export function checkAndInitialize(
-  state: SharedData,
-  signedCommitment: SignedCommitment,
-  privateKey: string,
-): CheckResult {
-  const result = checkAndInitializeChannelStore(state.channelStore, signedCommitment, privateKey);
-  if (result.isSuccess) {
-    return { ...result, store: setChannelStore(state, result.store) };
-  } else {
-    return result;
-  }
-}
-
-export function checkAndStore(state: SharedData, signedCommitment: SignedCommitment): CheckResult {
-  const result = checkAndStoreChannelStore(state.channelStore, signedCommitment);
-  if (result.isSuccess) {
-    return { ...result, store: setChannelStore(state, result.store) };
-  } else {
-    return result;
-  }
-}
-type CheckResult = CheckSuccess | CheckFailure;
-interface CheckSuccess {
-  isSuccess: true;
-  store: SharedData;
-}
-interface CheckFailure {
-  isSuccess: false;
-}
-
-export function signAndStore(state: SharedData, commitment: Commitment): SignResult {
-  const result = signAndStoreChannelStore(state.channelStore, commitment);
-  if (result.isSuccess) {
-    return { ...result, store: setChannelStore(state, result.store) };
-  } else {
-    return result;
-  }
-}
-type SignResult = SignSuccess | SignFailure;
-interface SignSuccess {
-  isSuccess: true;
-  signedCommitment: SignedCommitment;
-  store: SharedData;
-}
-interface SignFailure {
-  isSuccess: false;
-  reason: SignFailureReason;
+export function getPrivateKey(state: SharedData): string {
+  return state.privateKey;
 }
 
 export function queueTransaction(
@@ -329,14 +208,6 @@ export function queueTransaction(
     ...state,
     outboxState: queueTransactionOutbox(state.outboxState, transaction, processId),
   };
-}
-
-export function getCommitments(store: SharedData, channelId: string): Commitments {
-  const channel = getChannel(store, channelId);
-  if (!channel) {
-    throw new Error('Channel missing');
-  }
-  return channel.commitments;
 }
 
 export { NewLedgerChannel };

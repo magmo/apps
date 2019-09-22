@@ -1,9 +1,14 @@
-import { CommitmentReceived, WalletAction } from '../../actions';
+import { WalletAction } from '../../actions';
 import { DirectFundingAction } from '../direct-funding';
 import { isDirectFundingAction } from '../direct-funding/actions';
-import { isCommonAction, EmbeddedProtocol, routerFactory } from '../../../communication';
+import {
+  isCommonAction,
+  EmbeddedProtocol,
+  routerFactory,
+  StatesReceived,
+} from '../../../communication';
 
-export type LedgerTopUpAction = CommitmentReceived | DirectFundingAction;
+export type LedgerTopUpAction = StatesReceived | DirectFundingAction;
 
 export function isLedgerTopUpAction(action: WalletAction): action is LedgerTopUpAction {
   return isCommonAction(action, EmbeddedProtocol.LedgerTopUp) || isDirectFundingAction(action);

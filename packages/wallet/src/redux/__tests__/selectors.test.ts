@@ -1,7 +1,8 @@
 import * as walletStates from '../state';
 import * as selectors from '../selectors';
 import { ChannelState } from '../channel-store';
-import { Commitment } from '../../domain';
+import { Signature } from 'ethers/utils';
+import { State } from 'nitro-protocol/lib/src/contract/state';
 
 describe('getAdjudicatorWatcherProcessesForChannel', () => {
   const createWatcherState = (
@@ -63,19 +64,13 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
 
 describe('getNextNonce', () => {
   const defaultChannelState: ChannelState = {
-    channelId: '0x0',
-    libraryAddress: '0x0',
-    ourIndex: 0,
-    participants: ['0x0', '0x0'],
-    channelNonce: 0,
-    funded: false,
-    address: 'address',
-    privateKey: 'privateKey',
-    commitments: [
-      { commitment: {} as Commitment, signature: 'signature' },
-      { commitment: {} as Commitment, signature: 'signature' },
+    channel: { participants: ['0x0', '0x0'], chainId: '0x1', channelNonce: '0x1' },
+    type: 'Channel.WaitForState',
+    signedStates: [
+      { state: {} as State, signature: {} as Signature },
+      { state: {} as State, signature: {} as Signature },
     ],
-    turnNum: 0,
+    turnNumRecord: 0,
   };
   const state = {
     ...walletStates.EMPTY_SHARED_DATA,

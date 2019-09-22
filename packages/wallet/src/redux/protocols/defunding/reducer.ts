@@ -1,4 +1,4 @@
-import { SharedData, getChannel } from '../../state';
+import { SharedData } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
 import * as states from './states';
 import * as helpers from '../reducer-helpers';
@@ -11,12 +11,12 @@ import {
 import { isLedgerDefundingAction } from '../ledger-defunding/actions';
 import * as ledgerDefundingStates from '../ledger-defunding/states';
 import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
-import { getLastCommitment } from '../../channel-store';
 import { ProtocolAction } from '../../../redux/actions';
 import { VirtualDefundingState } from '../virtual-defunding/states';
 import { initializeVirtualDefunding, virtualDefundingReducer } from '../virtual-defunding';
 import { routesToVirtualDefunding } from '../virtual-defunding/actions';
 import * as ledgerDefundingActions from '../ledger-defunding/actions';
+import { getLastStateForChannel } from '../../selectors';
 
 export const initialize = (
   processId: string,
@@ -176,18 +176,13 @@ const createLedgerDefundingState = (
   sharedData: SharedData,
 ) => {
   const ledgerId = helpers.getFundingChannelId(channelId, sharedData);
-  const channel = getChannel(sharedData, channelId);
-  if (!channel) {
-    throw new Error(`Channel does not exist with id ${channelId}`);
-  }
-  const proposedAllocation = getLastCommitment(channel).allocation;
-  const proposedDestination = getLastCommitment(channel).destination;
+
+  const { outcome: proposedOutcome } = getLastStateForChannel(sharedData, ledgerId).state;
   const ledgerDefundingState = ledgerDefundingInitialize({
     processId,
     channelId,
     ledgerId,
-    proposedAllocation,
-    proposedDestination,
+    proposedOutcome,
     sharedData,
     clearedToProceed,
     protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.LedgerDefunding),

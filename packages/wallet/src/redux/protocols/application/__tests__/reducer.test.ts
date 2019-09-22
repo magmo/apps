@@ -3,12 +3,6 @@ import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
 import { itSendsThisMessage, describeScenarioStep } from '../../../__tests__/helpers';
 import { initialize, applicationReducer } from '../reducer';
-import {
-  VALIDATION_SUCCESS,
-  SIGNATURE_SUCCESS,
-  VALIDATION_FAILURE,
-  SIGNATURE_FAILURE,
-} from 'magmo-wallet-client';
 
 function whenIn(state) {
   return `when in ${state}`;
@@ -22,7 +16,7 @@ describe('when initializing', () => {
     scenario.address,
     scenario.privateKey,
   );
-  itTransitionsTo(result, 'Application.WaitForFirstCommitment');
+  itTransitionsTo(result, 'Application.WaitForFirstState');
 });
 
 describe('starting the application', () => {
@@ -34,24 +28,24 @@ describe('starting the application', () => {
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
-    itSendsThisMessage(result, SIGNATURE_SUCCESS);
+    itSendsThisMessage(result, 'WALLET.SIGNATURE.SUCCESS');
   });
 });
 
 describe('signing a commitment', () => {
-  const scenario = scenarios.receivingOurCommitment;
+  const scenario = scenarios.receivingOurState;
 
   describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
-    itSendsThisMessage(result, SIGNATURE_SUCCESS);
+    itSendsThisMessage(result, 'WALLET.SIGNATURE.SUCCESS');
   });
 });
 
 describe('signing an invalid commitment', () => {
-  const scenario = scenarios.receivingOurInvalidCommitment;
+  const scenario = scenarios.receivingOurInvalidState;
 
   describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
@@ -59,12 +53,12 @@ describe('signing an invalid commitment', () => {
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
-    itSendsThisMessage(result, SIGNATURE_FAILURE);
+    itSendsThisMessage(result, '');
   });
 });
 
 describe('validating a commitment', () => {
-  const scenario = scenarios.receivingTheirCommitment;
+  const scenario = scenarios.receivingTheirState;
 
   describe(whenIn('Application.Ongoing'), () => {
     const { state, sharedData, action } = scenario.ongoing;
@@ -72,12 +66,12 @@ describe('validating a commitment', () => {
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
-    itSendsThisMessage(result, VALIDATION_SUCCESS);
+    itSendsThisMessage(result, 'WALLET.STORE.SUCCESS');
   });
 });
 
 describe('validating an invalid commitment', () => {
-  const scenario = scenarios.receivingTheirInvalidCommitment;
+  const scenario = scenarios.receivingTheirInvalidState;
 
   describeScenarioStep(scenario.ongoing, () => {
     const { state, sharedData, action } = scenario.ongoing;
@@ -85,7 +79,7 @@ describe('validating an invalid commitment', () => {
     const result = applicationReducer(state, sharedData, action);
 
     itTransitionsTo(result, 'Application.Ongoing');
-    itSendsThisMessage(result, VALIDATION_FAILURE);
+    itSendsThisMessage(result, 'WALLET.STORE.FAILURE');
   });
 });
 

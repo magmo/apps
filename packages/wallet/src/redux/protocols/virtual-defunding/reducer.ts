@@ -7,12 +7,19 @@ import {
   CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
   consensusUpdateReducer,
 } from '../consensus-update/reducer';
-import { getChannelFundingState } from '../../selectors';
-import { getLatestCommitment, getTwoPlayerIndex, getFundingChannelId } from '../reducer-helpers';
-import { addHex } from '../../../utils/hex-utils';
+import { getChannelFundingState, getLastStateForChannel } from '../../selectors';
+import {
+  getTwoPlayerIndex,
+  getFundingChannelId,
+  addToEthAllocation,
+  getEthAllocation,
+} from '../reducer-helpers';
+
 import { VirtualDefundingAction } from './actions';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
 import { HUB_ADDRESS } from '../../../constants';
+import { convertAddressToBytes32 } from '../../../domain/commitments/__tests__';
+import { bigNumberify } from 'ethers/utils';
 
 export function initialize({
   processId,
@@ -30,22 +37,31 @@ export function initialize({
     throw new Error(`Attempting to virtually defund a directly funded channel ${targetChannelId}`);
   }
   const jointChannelId = fundingState.fundingChannel;
-  const latestAppCommitment = getLatestCommitment(targetChannelId, sharedData);
+  const latestAppState = getLastStateForChannel(sharedData, targetChannelId).state;
+  if (!latestAppState) {
+    throw new Error(`No state found for ${targetChannelId}`);
+  }
   const ourIndex = getTwoPlayerIndex(targetChannelId, sharedData);
   const hubAddress = HUB_ADDRESS;
-  const proposedDestination = [...latestAppCommitment.destination, hubAddress];
-  const proposedAllocation = [
-    ...latestAppCommitment.allocation,
-    latestAppCommitment.allocation.reduce(addHex),
-  ];
+  const allocation = getEthAllocation(latestAppState.outcome) || [];
+  const total = allocation
+    .map(a => a.amount)
+    .reduce((a1, a2) => {
+      return bigNumberify(a1)
+        .add(a2)
+        .toHexString();
+    });
+  const proposedOutcome = addToEthAllocation(
+    { destination: convertAddressToBytes32(hubAddress), amount: total },
+    latestAppState.outcome,
+  );
   let jointChannel: ConsensusUpdateState;
   ({ protocolState: jointChannel, sharedData } = initializeConsensusUpdate({
     processId,
     protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
     clearedToSend: true,
     channelId: jointChannelId,
-    proposedAllocation,
-    proposedDestination,
+    proposedOutcome,
     sharedData,
   }));
   const ledgerChannelId = getFundingChannelId(targetChannelId, sharedData);
@@ -96,21 +112,17 @@ function waitForJointChannelUpdateReducer(
         return { protocolState: states.failure({}), sharedData };
       case 'ConsensusUpdate.Success':
         const {
-          hubAddress,
           ledgerChannelId,
           targetChannelId: appChannelId,
-          ourIndex,
+
           processId,
         } = protocolState;
         // TODO: We probably need to start this earlier to deal with commitments coming in early
 
-        const latestAppCommitment = getLatestCommitment(appChannelId, sharedData);
+        const latestState = getLastStateForChannel(sharedData, appChannelId);
+        // TODO: Construct proposed outcome correctly
+        const proposedOutcome = latestState.state.outcome;
 
-        const proposedAllocation = [
-          latestAppCommitment.allocation[ourIndex],
-          latestAppCommitment.allocation[1 - ourIndex],
-        ];
-        const proposedDestination = [latestAppCommitment.destination[ourIndex], hubAddress];
         let ledgerChannel: ConsensusUpdateState;
         ({ protocolState: ledgerChannel, sharedData } = initializeConsensusUpdate({
           processId,
@@ -119,8 +131,7 @@ function waitForJointChannelUpdateReducer(
             CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
           ),
           channelId: ledgerChannelId,
-          proposedAllocation,
-          proposedDestination,
+          proposedOutcome,
           clearedToSend: true,
           sharedData,
         }));

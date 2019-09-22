@@ -1,8 +1,7 @@
 import * as states from '../states';
 import * as testScenarios from '../../../../domain/commitments/__tests__';
-import { setFundingState, setChannels } from '../../../state';
+import { setFundingState } from '../../../state';
 import * as ledgerDefunding from '../../ledger-defunding/__tests__';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { bigNumberify } from 'ethers/utils';
 import * as virtualDefunding from '../../virtual-defunding/__tests__';
 import _ from 'lodash';
@@ -11,26 +10,25 @@ import { EmbeddedProtocol } from '../../../../communication';
 import { mergeSharedData } from '../../../__tests__/helpers';
 const processId = 'process-id.123';
 
-const { asAddress, bsAddress, asPrivateKey, channelId } = testScenarios;
+const { asAddress, bsAddress, channelId } = testScenarios;
 
-const twoThree = [
+const twoThree = testScenarios.convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
-];
+]);
 
-const concludeCommitment1 = testScenarios.appCommitment({ turnNum: 51, isFinal: true });
-const concludeCommitment2 = testScenarios.appCommitment({ turnNum: 52, isFinal: true });
-const ledger4 = testScenarios.ledgerCommitment({ turnNum: 4, balances: twoThree });
-const ledger5 = testScenarios.ledgerCommitment({ turnNum: 5, balances: twoThree });
+const concludeCommitment1 = testScenarios.appState({ turnNum: 51, isFinal: true });
+const concludeCommitment2 = testScenarios.appState({ turnNum: 52, isFinal: true });
+const ledger4 = testScenarios.ledgerState({ turnNum: 4, outcome: twoThree });
+const ledger5 = testScenarios.ledgerState({ turnNum: 5, outcome: twoThree });
 
-const channelStatus = channelFromCommitments(
-  [concludeCommitment1, concludeCommitment2],
-  asAddress,
-  asPrivateKey,
-);
+const channelStatus = testScenarios.channelStateFromStates([
+  concludeCommitment1,
+  concludeCommitment2,
+]);
 
-const ledgerChannelStatus = channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey);
-const { ledgerId } = testScenarios;
+const ledgerChannelStatus = testScenarios.channelStateFromStates([ledger4, ledger5]);
+const { TWO_PARTICIPANT_LEDGER_CHANNEL_ID: ledgerId } = testScenarios;
 
 const waitForLedgerDefunding = states.waitForLedgerDefunding({
   processId,
@@ -59,13 +57,13 @@ export const indirectlyFundingChannelHappyPath = {
     processId,
     channelId,
     protocolLocator: EMPTY_LOCATOR,
-    sharedData: setChannels(
+    sharedData: testScenarios.setChannels(
       setFundingState(
         setFundingState(ledgerDefunding.initialStore, channelId, {
           directlyFunded: false,
-          fundingChannel: testScenarios.ledgerId,
+          fundingChannel: testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
         }),
-        testScenarios.ledgerId,
+        testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
         { directlyFunded: true },
       ),
       [channelStatus],
@@ -75,13 +73,13 @@ export const indirectlyFundingChannelHappyPath = {
   waitForLedgerDefunding: {
     state: waitForLedgerDefunding,
     action: prependToLocator(ledgerDefunding.successTrigger, EmbeddedProtocol.LedgerDefunding),
-    sharedData: setChannels(
+    sharedData: testScenarios.setChannels(
       setFundingState(
         setFundingState(ledgerDefunding.preSuccessState.sharedData, channelId, {
           directlyFunded: false,
-          fundingChannel: testScenarios.ledgerId,
+          fundingChannel: testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
         }),
-        testScenarios.ledgerId,
+        testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
         { directlyFunded: true },
       ),
       [channelStatus, ledgerChannelStatus],

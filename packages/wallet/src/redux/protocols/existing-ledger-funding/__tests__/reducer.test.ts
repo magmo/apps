@@ -2,7 +2,7 @@ import * as scenarios from './scenarios';
 import { initialize, existingLedgerFundingReducer } from '../reducer';
 import * as states from '../states';
 import { ProtocolStateWithSharedData } from '../..';
-import { describeScenarioStep, itSendsTheseCommitments } from '../../../__tests__/helpers';
+import { describeScenarioStep, itSendsTheseStates } from '../../../__tests__/helpers';
 
 describe('player A happy path', () => {
   const scenario = scenarios.playerAFullyFundedHappyPath;
@@ -10,7 +10,7 @@ describe('player A happy path', () => {
   describe('when initializing', () => {
     const result = initialize(scenario.initialize);
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerUpdate');
-    itSendsTheseCommitments(result, scenario.initialize.reply);
+    itSendsTheseStates(result, scenario.initialize.reply);
   });
 
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
@@ -31,7 +31,7 @@ describe('player B happy path', () => {
   describeScenarioStep(scenario.waitForLedgerUpdate, () => {
     const { state, action, sharedData, reply } = scenario.waitForLedgerUpdate;
     const updatedState = existingLedgerFundingReducer(state, sharedData, action);
-    itSendsTheseCommitments(updatedState, reply);
+    itSendsTheseStates(updatedState, reply);
     itTransitionsTo(updatedState, 'ExistingLedgerFunding.Success');
   });
 });
@@ -76,7 +76,7 @@ describe('only using partial amount of ledger funds', () => {
   describe('when initializing', () => {
     const result = initialize(scenario.initialize);
     itTransitionsTo(result, 'ExistingLedgerFunding.WaitForLedgerUpdate');
-    itSendsTheseCommitments(result, scenario.initialize.reply);
+    itSendsTheseStates(result, scenario.initialize.reply);
   });
 });
 

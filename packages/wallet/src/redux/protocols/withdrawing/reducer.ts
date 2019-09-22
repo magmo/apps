@@ -2,12 +2,6 @@ import { ProtocolStateWithSharedData } from '..';
 import * as states from './states';
 import { WithdrawalAction } from './actions';
 import * as selectors from '../../selectors';
-import { CommitmentType } from '../../../domain';
-import {
-  createConcludeAndWithdrawTransaction,
-  ConcludeAndWithdrawArgs,
-} from '../../../utils/transaction-generator';
-import { signVerificationData } from '../../../domain';
 import { TransactionRequest } from 'ethers/providers';
 import {
   initialize as initTransactionState,
@@ -152,11 +146,8 @@ const handleTransactionSubmissionComplete = (
 
 const channelIsClosed = (channelId: string, sharedData: SharedData): boolean => {
   const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const [lastCommitment, penultimateCommitment] = channelState.commitments;
-  return (
-    lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&
-    penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude
-  );
+  const [lastState, penultimateState] = channelState.signedStates;
+  return lastState.state.isFinal && penultimateState.state.isFinal;
   // TODO: Check if there is a finalized outcome on chain
 };
 
@@ -166,26 +157,6 @@ const createConcludeAndWithTransaction = (
   withdrawalAddress: string,
   sharedData: SharedData,
 ): TransactionRequest => {
-  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const { commitments: lastRound, participants, ourIndex, privateKey } = channelState;
-  const [penultimateCommitment, lastCommitment] = lastRound;
-  const participant = participants[ourIndex];
-  const verificationSignature = signVerificationData(
-    participant,
-    withdrawalAddress,
-    withdrawalAmount,
-    withdrawalAddress,
-    privateKey,
-  );
-  const args: ConcludeAndWithdrawArgs = {
-    fromCommitment: penultimateCommitment.commitment,
-    fromSignature: penultimateCommitment.signature,
-    toCommitment: lastCommitment.commitment,
-    toSignature: lastCommitment.signature,
-    participant,
-    amount: withdrawalAmount,
-    destination: withdrawalAddress,
-    verificationSignature,
-  };
-  return createConcludeAndWithdrawTransaction(args);
+  // TODO: Switch this to AssetHolders
+  return { data: '' };
 };

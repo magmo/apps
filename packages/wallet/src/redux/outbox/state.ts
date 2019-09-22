@@ -1,23 +1,31 @@
 import { TransactionRequest } from 'ethers/providers';
 import { WalletEvent, DisplayAction } from 'magmo-wallet-client';
 import { accumulateSideEffects } from '.';
+import { SignedState } from 'nitro-protocol';
 
 export function emptyDisplayOutboxState(): OutboxState {
-  return { displayOutbox: [], messageOutbox: [], transactionOutbox: [] };
+  return { displayOutbox: [], messageOutbox: [], transactionOutbox: [], validationOutbox: [] };
 }
 
 export interface QueuedTransaction {
   transactionRequest: TransactionRequest;
   processId: string;
 }
+
+export interface ValidationRequest {
+  statesToValidate: SignedState[];
+  previousState?: SignedState;
+}
 export type DisplayOutbox = DisplayAction[];
 export type MessageOutbox = WalletEvent[];
 export type TransactionOutbox = QueuedTransaction[];
+export type ValidationOutbox = ValidationRequest[];
 
 export interface OutboxState {
   displayOutbox: DisplayOutbox;
   messageOutbox: MessageOutbox;
   transactionOutbox: TransactionOutbox;
+  validationOutbox: ValidationOutbox;
 }
 
 export type SideEffects = {
@@ -32,6 +40,9 @@ export function queueMessage(state: OutboxState, message: WalletEvent): OutboxSt
   return accumulateSideEffects(state, { messageOutbox: [message] });
 }
 
+export function queueValidationRequest(state: OutboxState, validationRequest: ValidationRequest) {
+  return accumulateSideEffects(state, { validationOutbox: validationRequest });
+}
 export function queueTransaction(
   state: OutboxState,
   transaction: TransactionRequest,

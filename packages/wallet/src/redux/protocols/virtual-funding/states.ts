@@ -4,6 +4,7 @@ import { AdvanceChannelState } from '../advance-channel';
 import { ConsensusUpdateState } from '../consensus-update';
 import { NonTerminalLedgerFundingState } from '../ledger-funding';
 import { ProtocolLocator } from '../../../communication';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 
 // -------
 // States
@@ -12,9 +13,8 @@ import { ProtocolLocator } from '../../../communication';
 export interface InitializationArgs {
   processId: string;
   targetChannelId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
-  ourIndex: number;
+  startingOutcome: Outcome;
+  ourAddress: string;
   hubAddress: string;
   protocolLocator: ProtocolLocator;
 }

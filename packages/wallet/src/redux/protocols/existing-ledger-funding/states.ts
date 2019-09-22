@@ -3,6 +3,7 @@ import { ProtocolState } from '..';
 import { ProtocolLocator } from '../../../communication';
 import { ConsensusUpdateState } from '../consensus-update';
 import { LedgerTopUpState } from '../ledger-top-up/states';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 
 export type FailureReason =
   | 'ReceivedInvalidCommitment'
@@ -16,8 +17,7 @@ export interface WaitForLedgerTopUp {
   ledgerTopUpState: LedgerTopUpState;
   channelId: string;
   ledgerId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
+  startingOutcome: Outcome;
   protocolLocator: ProtocolLocator;
   consensusUpdateState: ConsensusUpdateState;
 }
@@ -27,8 +27,7 @@ export interface WaitForLedgerUpdate {
   processId: string;
   channelId: string;
   ledgerId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
+  startingOutcome: Outcome;
   protocolLocator: ProtocolLocator;
   consensusUpdateState: ConsensusUpdateState;
 }

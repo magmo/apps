@@ -3,21 +3,19 @@ import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
 import * as states from './states';
 import * as helpers from '../reducer-helpers';
 import { withdrawalReducer, initialize as withdrawalInitialize } from '../withdrawing/reducer';
-import * as selectors from '../../selectors';
 import * as actions from './actions';
 import { isWithdrawalAction } from '../withdrawing/actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { EmbeddedProtocol } from '../../../communication';
-import { getLastCommitment } from '../../channel-store';
 import { ProtocolAction } from '../../actions';
 import {
   AdvanceChannelState,
   initializeAdvanceChannel,
   advanceChannelReducer,
 } from '../advance-channel';
-import { CommitmentType } from '../../../domain';
 import { WithdrawalState } from '../withdrawing/states';
 import { routesToAdvanceChannel } from '../advance-channel/actions';
+import { StateType } from '../advance-channel/states';
 
 export const initialize = (
   processId: string,
@@ -38,9 +36,8 @@ export const initialize = (
     clearedToSend: true,
     processId,
     channelId,
-    commitmentType: CommitmentType.Conclude,
+    stateType: StateType.Concluding,
     protocolLocator: makeLocator(EMPTY_LOCATOR, EmbeddedProtocol.AdvanceChannel),
-    ourIndex: helpers.getTwoPlayerIndex(channelId, sharedData),
   }));
   return {
     protocolState: states.waitForConclude({ processId, channelId, concluding }),
@@ -150,6 +147,8 @@ const createWaitForWithdrawal = (sharedData: SharedData, processId: string, chan
   return { protocolState, sharedData };
 };
 const getWithdrawalAmount = (sharedData: SharedData, channelId: string) => {
-  const channelState = selectors.getChannelState(sharedData, channelId);
-  return getLastCommitment(channelState).allocation[channelState.ourIndex];
+  return '0x0';
+  //  TODO: Update to outcomes
+  // const channelState = selectors.getChannelState(sharedData, channelId);
+  // return getLastNitroState(channelState).allocation[channelState.ourIndex];
 };

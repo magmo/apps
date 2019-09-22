@@ -6,13 +6,14 @@ import { eventChannel, buffers } from 'redux-saga';
 import * as application from '../protocols/application/reducer';
 import { isRelayableAction } from '../../communication';
 import { responseProvided } from '../protocols/dispute/responder/actions';
-import { getChannelId, Commitment, SignedCommitment } from '../../domain';
-import * as selectors from '../selectors';
-import * as contractUtils from '../../utils/contract-utils';
 import { concluded, challengeRequested } from '../protocols/application/actions';
 
-import { appAttributesFromBytes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../constants';
+import { TwoPartyPlayerIndex } from '../types';
+import { signState } from 'nitro-protocol/lib/src/signatures';
+import { getPrivateKey } from '../state';
+import { signatureSuccess } from 'magmo-wallet-client';
+import { messageSender } from './message-sender';
+
 export function* messageListener() {
   const postMessageEventChannel = eventChannel(emitter => {
     window.addEventListener('message', (event: MessageEvent) => {
@@ -26,10 +27,9 @@ export function* messageListener() {
   }, buffers.fixed(100));
   while (true) {
     const messageEvent = yield take(postMessageEventChannel);
-    const action = messageEvent.data;
-    switch (messageEvent.data.type) {
+    const action: incoming.WalletInstruction = messageEvent.data;
+    switch (action.type) {
       // Events that need a new process
-
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.protocol.concludeRequested({ channelId: action.channelId }));
         break;
@@ -37,7 +37,6 @@ export function* messageListener() {
         yield put(
           challengeRequested({
             processId: application.APPLICATION_PROCESS_ID, // TODO allow for multiple application Ids
-            commitment: action.commitment,
             channelId: action.channelId,
           }),
         );
@@ -46,7 +45,7 @@ export function* messageListener() {
         yield put(
           actions.protocol.fundingRequested({
             channelId: action.channelId,
-            playerIndex: action.playerIndex,
+            playerIndex: action.playerIndex === 0 ? TwoPartyPlayerIndex.A : TwoPartyPlayerIndex.B,
           }),
         );
         break;
@@ -55,49 +54,30 @@ export function* messageListener() {
       case incoming.INITIALIZE_REQUEST:
         yield put(actions.loggedIn({ uid: action.userId }));
         break;
-      case incoming.SIGN_COMMITMENT_REQUEST:
-        if (action.commitment.turnNum === 0) {
-          yield put(
-            actions.protocol.initializeChannel({ channelId: getChannelId(action.commitment) }),
-          );
-        }
-        yield validateAgainstLatestCommitment(action.commitment);
-
-        yield put(
-          actions.application.ownCommitmentReceived({
-            processId: application.APPLICATION_PROCESS_ID,
-            commitment: action.commitment,
-          }),
-        );
+      case 'WALLET.SIGNATURE.REQUEST':
+        // TODO: This should probably be handling by some other module instead of being inlined
+        const privateKey = yield select(getPrivateKey);
+        const signedState = yield signState(action.state, privateKey);
+        const message = signatureSuccess(signedState);
+        yield messageSender(message);
         break;
-      case incoming.VALIDATE_COMMITMENT_REQUEST:
-        if (action.commitment.turnNum === 0) {
-          yield put(
-            actions.protocol.initializeChannel({ channelId: getChannelId(action.commitment) }),
-          );
-        }
-        yield validateAgainstLatestCommitment(action.commitment);
-
+      case 'WALLET.STORE.REQUEST':
         yield put(
-          actions.application.opponentCommitmentReceived({
+          actions.application.statesReceived({
             processId: application.APPLICATION_PROCESS_ID,
-            commitment: action.commitment,
-            signature: action.signature,
+            signedStates: [signedState],
           }),
         );
         break;
       case incoming.RESPOND_TO_CHALLENGE:
         // TODO: This probably should be in a function
         const processId = application.APPLICATION_PROCESS_ID;
-        yield put(responseProvided({ processId, commitment: action.commitment }));
+        yield put(responseProvided({ processId, signedState: action.signedState }));
         break;
       case incoming.RECEIVE_MESSAGE:
         const messageAction = handleIncomingMessage(action);
-        if (messageAction.type === 'WALLET.COMMON.COMMITMENT_RECEIVED') {
-          yield validateAgainstLatestCommitment(messageAction.signedCommitment.commitment);
-        }
-        if (messageAction.type === 'WALLET.COMMON.COMMITMENTS_RECEIVED') {
-          yield validateTransitionForCommitments(messageAction.signedCommitments);
+        if (messageAction.type === 'WALLET.COMMON.STATES_RECEIVED') {
+          yield put(messageAction);
         }
 
         yield put(messageAction);
@@ -107,73 +87,6 @@ export function* messageListener() {
         break;
       default:
     }
-  }
-}
-
-function* validateTransitionForCommitments(signedCommitments: SignedCommitment[]) {
-  const channelId = getChannelId(signedCommitments[0].commitment);
-
-  const storedCommitmentExists = yield select(selectors.doesACommitmentExistForChannel, channelId);
-  if (storedCommitmentExists) {
-    const latestStoredCommitment: Commitment = yield select(
-      selectors.getLastCommitmentForChannel,
-      channelId,
-    );
-    const newCommitments = signedCommitments.filter(
-      signedCommitment => signedCommitment.commitment.turnNum > latestStoredCommitment.turnNum,
-    );
-    if (newCommitments.length > 0) {
-      let fromCommitment = latestStoredCommitment;
-      let toCommitment = newCommitments[0].commitment;
-      yield validateTransition(fromCommitment, toCommitment);
-
-      for (let i = 1; i < signedCommitments.length; i++) {
-        fromCommitment = signedCommitments[i - 1].commitment;
-        toCommitment = signedCommitments[i].commitment;
-        yield validateTransition(fromCommitment, toCommitment);
-      }
-    }
-  }
-}
-function* validateAgainstLatestCommitment(incomingCommitment: Commitment) {
-  // If we're receiving the first commitment there's nothing stored to validate against
-  if (incomingCommitment.turnNum > 0) {
-    const channelId = getChannelId(incomingCommitment);
-    const fromCommitment: Commitment = yield select(
-      selectors.getLastCommitmentForChannel,
-      channelId,
-    );
-    yield validateTransition(fromCommitment, incomingCommitment);
-  }
-}
-
-function* validateTransition(fromCommitment: Commitment, toCommitment: Commitment) {
-  const validTransition = yield contractUtils.validateTransition(fromCommitment, toCommitment);
-  if (!validTransition) {
-    const isConsensusChannel = toCommitment.channel.channelType === CONSENSUS_LIBRARY_ADDRESS;
-    const fromAppAttributes = isConsensusChannel
-      ? appAttributesFromBytes(fromCommitment.appAttributes)
-      : fromCommitment.appAttributes;
-    const toAppAttributes = isConsensusChannel
-      ? appAttributesFromBytes(toCommitment.appAttributes)
-      : toCommitment.appAttributes;
-    throw new Error(
-      `Invalid transition. From Commitment: ${JSON.stringify(
-        {
-          ...fromCommitment,
-          appAttributes: fromAppAttributes,
-        },
-        null,
-        1,
-      )} To Commitment: ${JSON.stringify(
-        {
-          ...toCommitment,
-          appAttributes: toAppAttributes,
-        },
-        null,
-        1,
-      )}`,
-    );
   }
 }
 

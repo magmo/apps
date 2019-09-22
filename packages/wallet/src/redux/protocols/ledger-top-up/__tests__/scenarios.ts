@@ -3,66 +3,65 @@ import * as states from '../states';
 import { preSuccessA, preSuccessB } from '../../direct-funding/__tests__';
 import {
   channelId,
-  ledgerId,
+  TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
   asAddress,
   bsAddress,
-  ledgerCommitment,
-  addressAndPrivateKeyLookup,
+  ledgerState,
+  convertBalanceToOutcome,
+  setChannels,
+  channelStateFromStates,
 } from '../../../../domain/commitments/__tests__';
 import { TwoPartyPlayerIndex } from '../../../types';
 import { twoPlayerPreSuccessA, twoPlayerPreSuccessB } from '../../consensus-update/__tests__';
-import { setChannels } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import { SignedCommitment } from '../../../../domain';
+
 import { makeLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
+import { SignedState } from 'nitro-protocol';
 
 const protocolLocator = makeLocator(EmbeddedProtocol.LedgerTopUp);
 // ---------
 // Test data
 // ---------
 
-const fourFive = [
+const fourFive = convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(4).toHexString() },
   { address: bsAddress, wei: bigNumberify(5).toHexString() },
-];
+]);
 
-const twoThree = [
+const twoThree = convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
-];
-const threeFourFlipped = [
+]);
+const threeFourFlipped = convertBalanceToOutcome([
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
   { address: asAddress, wei: bigNumberify(4).toHexString() },
-];
-const fourTwo = [
+]);
+const fourTwo = convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(4).toHexString() },
   { address: bsAddress, wei: bigNumberify(2).toHexString() },
-];
+]);
 
 const processId = 'process-id.123';
 const defaultProps = {
   processId,
   channelId,
-  ledgerId,
-  proposedAllocation: fourFive.map(a => a.wei),
-  originalAllocation: twoThree.map(a => a.wei),
-  proposedDestination: fourFive.map(a => a.address),
+  ledgerId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+  proposedOutcome: fourFive,
+  originalOutcome: twoThree,
   protocolLocator,
 };
 
 const oneOverFundedOneUnderFundedProps = {
   processId,
   channelId,
-  ledgerId,
-  proposedAllocation: fourTwo.map(a => a.wei),
-  originalAllocation: twoThree.map(a => a.wei),
-  proposedDestination: fourTwo.map(a => a.address),
+  ledgerId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+  proposedOutcome: fourTwo,
+  originalOutcome: twoThree,
   protocolLocator,
 };
 
-const ledgerTwoThree = ledgerCommitment({ turnNum: 5, balances: twoThree });
-const ledgerThreeFourFlipped = ledgerCommitment({ turnNum: 5, balances: threeFourFlipped });
+const ledgerTwoThree = ledgerState({ turnNum: 5, outcome: twoThree });
+const ledgerThreeFourFlipped = ledgerState({ turnNum: 5, outcome: threeFourFlipped });
 
 // ------
 // States
@@ -110,16 +109,10 @@ const consensusSharedData = (ourIndex: TwoPartyPlayerIndex) => {
     ? twoPlayerPreSuccessA.sharedData
     : twoPlayerPreSuccessB.sharedData;
 };
-const fundingSharedData = (ourIndex: TwoPartyPlayerIndex, latestCommitment: SignedCommitment) => {
+const fundingSharedData = (ourIndex: TwoPartyPlayerIndex, latestState: SignedState) => {
   return setChannels(
     ourIndex === TwoPartyPlayerIndex.A ? preSuccessA.sharedData : preSuccessB.sharedData,
-    [
-      channelFromCommitments(
-        [latestCommitment],
-        addressAndPrivateKeyLookup[ourIndex].address,
-        addressAndPrivateKeyLookup[ourIndex].privateKey,
-      ),
-    ],
+    [channelStateFromStates([latestState])],
   );
 };
 

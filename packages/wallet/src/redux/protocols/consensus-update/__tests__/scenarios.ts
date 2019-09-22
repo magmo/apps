@@ -1,70 +1,95 @@
 import {
-  ledgerCommitment,
+  ledgerState,
   asAddress,
   bsAddress,
-  ledgerId,
-  threeWayLedgerCommitment,
-  threeWayLedgerId,
-  addressAndPrivateKeyLookup,
+  TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+  threeWayLedgerState,
+  setChannels,
+  channelStateFromStates,
+  THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
+  convertAddressToBytes32,
 } from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { setChannels, EMPTY_SHARED_DATA } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA } from '../../../state';
+
 import * as states from '../states';
-import { commitmentsReceived } from '../../../../communication';
+import { statesReceived } from '../../../../communication';
 import { ThreePartyPlayerIndex, TwoPartyPlayerIndex } from '../../../types';
 import { clearedToSend } from '../actions';
-import { SignedCommitment } from '../../../../domain';
 import { unreachable } from '../../../../utils/reducer-utils';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
+import { ETH_ASSET_HOLDER } from '../../../../constants';
+import { SignedState } from 'nitro-protocol';
 
 const protocolLocator = [];
 
-const twoThree = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+const twoThree: Outcome = [
+  {
+    assetHolderAddress: ETH_ASSET_HOLDER,
+    allocation: [
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(2).toHexString() },
+      { destination: convertAddressToBytes32(bsAddress), amount: bigNumberify(3).toHexString() },
+    ],
+  },
 ];
+
 const threeTwo = [
-  { address: asAddress, wei: bigNumberify(3).toHexString() },
-  { address: bsAddress, wei: bigNumberify(2).toHexString() },
+  {
+    assetHolderAddress: ETH_ASSET_HOLDER,
+    allocation: [
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(3).toHexString() },
+      { destination: convertAddressToBytes32(bsAddress), amount: bigNumberify(2).toHexString() },
+    ],
+  },
 ];
 
 const twoThreeOne = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
-  { address: asAddress, wei: bigNumberify(1).toHexString() },
+  {
+    assetHolderAddress: ETH_ASSET_HOLDER,
+    allocation: [
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(2).toHexString() },
+      { destination: convertAddressToBytes32(bsAddress), amount: bigNumberify(3).toHexString() },
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(1).toHexString() },
+    ],
+  },
 ];
 
 const oneOneFour = [
-  { address: asAddress, wei: bigNumberify(1).toHexString() },
-  { address: bsAddress, wei: bigNumberify(1).toHexString() },
-  { address: asAddress, wei: bigNumberify(4).toHexString() },
+  {
+    assetHolderAddress: ETH_ASSET_HOLDER,
+    allocation: [
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(1).toHexString() },
+      { destination: convertAddressToBytes32(bsAddress), amount: bigNumberify(1).toHexString() },
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(4).toHexString() },
+    ],
+  },
 ];
 // Commitments that have reached consensus
-const balances = twoThree;
-const proposedBalances = threeTwo;
-const ledger4 = ledgerCommitment({ turnNum: 4, balances });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances });
-const ledger6 = ledgerCommitment({ turnNum: 6, balances });
-const ledger6ConsensusOnProposed = ledgerCommitment({ turnNum: 6, balances: proposedBalances });
-const ledger7 = ledgerCommitment({ turnNum: 7, balances: proposedBalances });
-const ledger8 = ledgerCommitment({ turnNum: 8, balances: proposedBalances });
-const ledger20 = ledgerCommitment({ turnNum: 20, balances: proposedBalances });
+const outcome = twoThree;
+const proposedOutcome = threeTwo;
+const ledger4 = ledgerState({ turnNum: 4, outcome });
+const ledger5 = ledgerState({ turnNum: 5, outcome });
+const ledger6 = ledgerState({ turnNum: 6, outcome });
+const ledger6ConsensusOnProposed = ledgerState({ turnNum: 6, outcome: proposedOutcome });
+const ledger7 = ledgerState({ turnNum: 7, outcome: proposedOutcome });
+const ledger8 = ledgerState({ turnNum: 8, outcome: proposedOutcome });
+const ledger20 = ledgerState({ turnNum: 20, outcome: proposedOutcome });
 
 // Commitments that propose a new consensus
-const ledger5Propose = ledgerCommitment({ turnNum: 5, balances, proposedBalances });
-const ledger6Propose = ledgerCommitment({ turnNum: 6, balances, proposedBalances });
-const ledger7ProposeWrongProposedBalances = ledgerCommitment({
+const ledger5Propose = ledgerState({ turnNum: 5, outcome, proposedOutcome });
+const ledger6Propose = ledgerState({ turnNum: 6, outcome, proposedOutcome });
+const ledger7ProposeWrongProposedBalances = ledgerState({
   turnNum: 7,
-  balances,
-  proposedBalances: balances,
+  outcome,
+  proposedOutcome: oneOneFour,
 });
-const ledger7Propose = ledgerCommitment({
+const ledger7Propose = ledgerState({
   turnNum: 7,
-  balances,
-  proposedBalances,
+  outcome,
+  proposedOutcome,
 });
-const ledger8Propose = ledgerCommitment({ turnNum: 8, balances, proposedBalances });
-const ledger19Propose = ledgerCommitment({ turnNum: 19, balances, proposedBalances });
+const ledger8Propose = ledgerState({ turnNum: 8, outcome, proposedOutcome });
+const ledger19Propose = ledgerState({ turnNum: 19, outcome, proposedOutcome });
 
 type AcceptConsensusOnBalancesTurnNum = 5 | 6;
 function acceptConsensusOnBalancesLedgers(turnNum: AcceptConsensusOnBalancesTurnNum) {
@@ -97,7 +122,7 @@ function acceptConsensusOnProposedBalancesLedgers(
 }
 
 type ProposeTurnNum = 5 | 6 | 7 | 8;
-const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
+const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedState[] } = {
   5: [ledger4, ledger5Propose],
   6: [ledger5, ledger6Propose],
   7: [ledger6, ledger7Propose],
@@ -105,27 +130,28 @@ const proposeLedgers: { [turnNum in ProposeTurnNum]: SignedCommitment[] } = {
 };
 
 type ProposeOldTurnNum = 7;
-const proposeOldLedgers: { [turnNum in ProposeOldTurnNum]: SignedCommitment[] } = {
+const proposeOldLedgers: { [turnNum in ProposeOldTurnNum]: SignedState[] } = {
   7: [ledger6, ledger7ProposeWrongProposedBalances],
 };
 
-const threePlayerLedger6 = threeWayLedgerCommitment({ turnNum: 6, balances: twoThreeOne });
-const threePlayerLedger7 = threeWayLedgerCommitment({ turnNum: 7, balances: twoThreeOne });
-const threePlayerLedger8 = threeWayLedgerCommitment({ turnNum: 8, balances: twoThreeOne });
-const threePlayerLedger9 = threeWayLedgerCommitment({
+const threePlayerLedger6 = threeWayLedgerState({ turnNum: 6, outcome: twoThreeOne });
+const threePlayerLedger7 = threeWayLedgerState({ turnNum: 7, outcome: twoThreeOne });
+const threePlayerLedger8 = threeWayLedgerState({ turnNum: 8, outcome: twoThreeOne });
+const threePlayerLedger9 = threeWayLedgerState({
   turnNum: 9,
-  balances: twoThreeOne,
-  proposedBalances: oneOneFour,
+  outcome: twoThreeOne,
+  proposedOutcome: oneOneFour,
+  furtherVotesRequired: 2,
 });
-const threePlayerLedger10 = threeWayLedgerCommitment({
+const threePlayerLedger10 = threeWayLedgerState({
   turnNum: 10,
-  balances: twoThreeOne,
-  proposedBalances: oneOneFour,
-  isVote: true,
+  outcome: twoThreeOne,
+  proposedOutcome: oneOneFour,
+  furtherVotesRequired: 1,
 });
-const threePlayerLedger11 = threeWayLedgerCommitment({
+const threePlayerLedger11 = threeWayLedgerState({
   turnNum: 11,
-  balances: oneOneFour,
+  outcome: oneOneFour,
 });
 
 // ------
@@ -134,29 +160,17 @@ const threePlayerLedger11 = threeWayLedgerCommitment({
 
 const threePlayerInitialSharedData = (ourIndex: ThreePartyPlayerIndex) => {
   return setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(
-      [threePlayerLedger6, threePlayerLedger7, threePlayerLedger8],
-      addressAndPrivateKeyLookup[ourIndex].address,
-      addressAndPrivateKeyLookup[ourIndex].privateKey,
-    ),
+    channelStateFromStates([threePlayerLedger6, threePlayerLedger7, threePlayerLedger8]),
   ]);
 };
 const threePlayerFirstUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
   return setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(
-      [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
-      addressAndPrivateKeyLookup[ourIndex].address,
-      addressAndPrivateKeyLookup[ourIndex].privateKey,
-    ),
+    channelStateFromStates([threePlayerLedger7, threePlayerLedger8, threePlayerLedger9]),
   ]);
 };
 const threePlayerSecondUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
   return setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(
-      [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
-      addressAndPrivateKeyLookup[ourIndex].address,
-      addressAndPrivateKeyLookup[ourIndex].privateKey,
-    ),
+    channelStateFromStates([threePlayerLedger8, threePlayerLedger9, threePlayerLedger10]),
   ]);
 };
 
@@ -165,11 +179,7 @@ const twoPlayerConsensusAcceptedOnBalancesSharedData = (
   ourIndex: TwoPartyPlayerIndex,
 ) =>
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(
-      acceptConsensusOnBalancesLedgers(turnNum),
-      addressAndPrivateKeyLookup[ourIndex].address,
-      addressAndPrivateKeyLookup[ourIndex].privateKey,
-    ),
+    channelStateFromStates(acceptConsensusOnBalancesLedgers(turnNum)),
   ]);
 
 const twoPlayerConsensusAcceptedOnProposedBalancesSharedData = (
@@ -177,45 +187,29 @@ const twoPlayerConsensusAcceptedOnProposedBalancesSharedData = (
   ourIndex: TwoPartyPlayerIndex,
 ) =>
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(
-      acceptConsensusOnProposedBalancesLedgers(turnNum),
-      addressAndPrivateKeyLookup[ourIndex].address,
-      addressAndPrivateKeyLookup[ourIndex].privateKey,
-    ),
+    channelStateFromStates(acceptConsensusOnProposedBalancesLedgers(turnNum)),
   ]);
 
 const twoPlayerNewProposalSharedData = (turnNum: ProposeTurnNum, ourIndex: TwoPartyPlayerIndex) =>
-  setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments(
-      proposeLedgers[turnNum],
-      addressAndPrivateKeyLookup[ourIndex].address,
-      addressAndPrivateKeyLookup[ourIndex].privateKey,
-    ),
-  ]);
+  setChannels(EMPTY_SHARED_DATA, [channelStateFromStates(proposeLedgers[turnNum])]);
 
 // ------
 // States
 // ------
-const proposedAllocation = threeTwo.map(b => b.wei);
-const proposedDestination = threeTwo.map(b => b.address);
 
-const threePlayerProposedAllocation = oneOneFour.map(b => b.wei);
-const threePlayerProposedDestination = oneOneFour.map(b => b.address);
 const processId = 'process-id.123';
 
 const twoProps = {
-  channelId: ledgerId,
+  channelId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
   processId,
-  proposedAllocation,
-  proposedDestination,
+  proposedOutcome,
   protocolLocator,
 };
 
 const threeProps = {
-  channelId: threeWayLedgerId,
+  channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
   processId,
-  proposedAllocation: threePlayerProposedAllocation,
-  proposedDestination: threePlayerProposedDestination,
+  proposedOutcome: oneOneFour,
   protocolLocator,
 };
 
@@ -241,43 +235,43 @@ const threePlayerCommitmentSent = states.commitmentSent(threeProps);
 // Actions
 // ------
 function twoPlayerNewProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
-  return commitmentsReceived({
+  return statesReceived({
     processId,
-    signedCommitments: proposeLedgers[turnNum],
+    signedStates: proposeLedgers[turnNum],
     protocolLocator,
   });
 }
 function twoPlayerWrongProposalCommitmentsReceived(turnNum: ProposeTurnNum) {
-  return commitmentsReceived({
+  return statesReceived({
     processId,
-    signedCommitments: proposeOldLedgers[turnNum],
+    signedStates: proposeOldLedgers[turnNum],
     protocolLocator,
   });
 }
 function twoPlayerAcceptConsensusOnProposedBalancesCommitmentsReceived(
   turnNum: AcceptConsensusOnProposedBalancesTurnNum,
 ) {
-  return commitmentsReceived({
+  return statesReceived({
     processId,
-    signedCommitments: acceptConsensusOnProposedBalancesLedgers(turnNum),
+    signedStates: acceptConsensusOnProposedBalancesLedgers(turnNum),
     protocolLocator,
   });
 }
 
-const threePlayerUpdate0Received = commitmentsReceived({
+const threePlayerUpdate0Received = statesReceived({
   processId,
-  signedCommitments: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
+  signedStates: [threePlayerLedger7, threePlayerLedger8, threePlayerLedger9],
   protocolLocator,
 });
-const threePlayerUpdate1Received = commitmentsReceived({
+const threePlayerUpdate1Received = statesReceived({
   processId,
-  signedCommitments: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
+  signedStates: [threePlayerLedger8, threePlayerLedger9, threePlayerLedger10],
   protocolLocator,
 });
 
-const threePlayerUpdate2Received = commitmentsReceived({
+const threePlayerUpdate2Received = statesReceived({
   processId,
-  signedCommitments: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
+  signedStates: [threePlayerLedger9, threePlayerLedger10, threePlayerLedger11],
   protocolLocator,
 });
 const clearedToSendAction = clearedToSend({
@@ -287,9 +281,8 @@ const clearedToSendAction = clearedToSend({
 
 export const twoPlayerAHappyPath = {
   initialize: {
-    channelId: ledgerId,
-    proposedAllocation,
-    proposedDestination,
+    channelId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+    proposedOutcome,
     processId,
     sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.A),
     reply: [ledger5, ledger6Propose],
@@ -305,9 +298,8 @@ export const twoPlayerAHappyPath = {
 
 export const twoPlayerANotOurTurn = {
   initialize: {
-    channelId: ledgerId,
-    proposedAllocation,
-    proposedDestination,
+    channelId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+    proposedOutcome,
     processId,
     sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(6, TwoPartyPlayerIndex.A),
     clearedToSend: true,
@@ -324,9 +316,8 @@ export const twoPlayerANotOurTurn = {
 export const twoPlayerBHappyPath = {
   initialize: {
     processId,
-    channelId: ledgerId,
-    proposedAllocation,
-    proposedDestination,
+    channelId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+    proposedOutcome,
     clearedToSend: true,
     sharedData: twoPlayerConsensusAcceptedOnBalancesSharedData(5, TwoPartyPlayerIndex.B),
     protocolLocator,
@@ -346,9 +337,8 @@ export const twoPlayerBHappyPath = {
 
 export const twoPlayerBOurTurn = {
   initialize: {
-    channelId: ledgerId,
-    proposedAllocation,
-    proposedDestination,
+    channelId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+    proposedOutcome,
     processId,
     sharedData: twoPlayerConsensusAcceptedOnProposedBalancesSharedData(6, TwoPartyPlayerIndex.B),
     reply: [ledger5, ledger6Propose],
@@ -391,10 +381,9 @@ export const twoPlayerBCommitmentRejected = {
 
 export const threePlayerAHappyPath = {
   initialize: {
-    channelId: threeWayLedgerId,
+    channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
     processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+    proposedOutcome: oneOneFour,
     clearedToSend: true,
     protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
@@ -414,10 +403,9 @@ export const threePlayerAHappyPath = {
 
 export const threePlayerBHappyPath = {
   initialize: {
-    channelId: threeWayLedgerId,
+    channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
     processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+    proposedOutcome: oneOneFour,
     clearedToSend: true,
     protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
@@ -437,10 +425,9 @@ export const threePlayerBHappyPath = {
 
 export const threePlayerHubHappyPath = {
   initialize: {
-    channelId: threeWayLedgerId,
+    channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
     processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+    proposedOutcome: oneOneFour,
     clearedToSend: true,
     protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
@@ -460,10 +447,9 @@ export const threePlayerHubHappyPath = {
 
 export const threePlayerANotClearedToSend = {
   initialize: {
-    channelId: threeWayLedgerId,
+    channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
     processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+    proposedOutcome: oneOneFour,
     clearedToSend: false,
     protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.A),
@@ -483,10 +469,9 @@ export const threePlayerANotClearedToSend = {
 
 export const threePlayerBNotClearedToSend = {
   initialize: {
-    channelId: threeWayLedgerId,
+    channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
     processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+    proposedOutcome: oneOneFour,
     clearedToSend: false,
     protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.B),
@@ -506,10 +491,9 @@ export const threePlayerBNotClearedToSend = {
 
 export const threePlayerHubNotClearedToSend = {
   initialize: {
-    channelId: threeWayLedgerId,
+    channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
     processId,
-    proposedAllocation: threePlayerProposedAllocation,
-    proposedDestination: threePlayerProposedDestination,
+    proposedOutcome: oneOneFour,
     clearedToSend: false,
     protocolLocator,
     sharedData: threePlayerInitialSharedData(ThreePartyPlayerIndex.Hub),
@@ -535,10 +519,9 @@ export const threePlayerHubNotClearedToSend = {
 export const threePlayerNotOurTurn = {
   playerA: {
     initialize: {
-      channelId: threeWayLedgerId,
+      channelId: THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
       processId,
-      proposedAllocation: threePlayerProposedAllocation,
-      proposedDestination: threePlayerProposedDestination,
+      proposedOutcome: oneOneFour,
       clearedToSend: true,
       sharedData: threePlayerFirstUpdateSharedData(ThreePartyPlayerIndex.A),
     },

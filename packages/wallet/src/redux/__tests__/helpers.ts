@@ -1,11 +1,14 @@
 import { ChannelState, ChannelStore } from '../channel-store';
 import { StateWithSideEffects } from '../utils';
-import { Commitment, SignedCommitment, getChannelId } from '../../domain';
 import { QueuedTransaction, OutboxState, MessageOutbox } from '../outbox/state';
 import { SharedData } from '../state';
 import { ProtocolStateWithSharedData } from '../protocols';
 import { ProtocolLocator, RelayableAction } from 'src/communication';
 import _ from 'lodash';
+import { State } from 'nitro-protocol/lib/src/contract/state';
+import { SignedState } from 'nitro-protocol';
+import { getChannelId } from 'nitro-protocol/lib/src/contract/channel';
+import { Signature } from 'ethers/utils';
 
 type SideEffectState =
   | StateWithSideEffects<any>
@@ -88,28 +91,28 @@ export const expectThisMessage = (state: SideEffectState, messageType: string) =
   });
 };
 
-type PartialCommitments = Array<{ commitment: Partial<Commitment>; signature?: string }>;
+type PartialStates = Array<{ state: Partial<State>; signature?: Signature }>;
 
-function transformCommitmentToMatcher(sc: { commitment: Partial<Commitment>; signature?: string }) {
+function transformStateToMatcher(sc: { state: Partial<State>; signature?: Signature }) {
   if (sc.signature) {
     return expect.objectContaining({
-      commitment: expect.objectContaining(sc.commitment),
+      state: expect.objectContaining(sc.state),
       signature: sc.signature,
     });
   } else {
-    return expect.objectContaining({ commitment: expect.objectContaining(sc.commitment) });
+    return expect.objectContaining({ state: expect.objectContaining(sc.state) });
   }
 }
 
-export const itSendsThisCommitment = (
-  state: SideEffectState,
-  commitment: Partial<Commitment>,
-  type = 'WALLET.COMMON.COMMITMENT_RECEIVED',
+export const itSendsThisState = (
+  sideEffectState: SideEffectState,
+  state: Partial<State>,
+  type = 'WALLET.COMMON.STATES_RECEIVED',
   idx = 0,
 ) => {
-  const messageOutbox = getOutboxState(state, 'messageOutbox');
+  const messageOutbox = getOutboxState(sideEffectState, 'messageOutbox');
 
-  it('sends a commitment', () => {
+  it('sends a state', () => {
     try {
       // Passes when at least one message matches
       // In the case of multiple messages queued, this approach does not care about
@@ -120,7 +123,7 @@ export const itSendsThisCommitment = (
         expect.arrayContaining([
           expect.objectContaining({
             messagePayload: expect.objectContaining({
-              signedCommitment: transformCommitmentToMatcher({ commitment }),
+              signedStates: transformStateToMatcher({ state }),
             }),
           }),
         ]),
@@ -133,13 +136,13 @@ export const itSendsThisCommitment = (
         // multiple messages are queued.
 
         // To help with debugging, you can change the idx variable when running tests to 'search'
-        // for the correct commitment
+        // for the correct state
 
         console.warn(`Message not found: inspecting mismatched message in position ${idx}`);
         expect(messageOutbox[idx]).toMatchObject({
           messagePayload: {
             type,
-            signedCommitment: { commitment },
+            signedStates: { state },
           },
         });
       } else {
@@ -149,15 +152,15 @@ export const itSendsThisCommitment = (
   });
 };
 
-export const itSendsTheseCommitments = (
+export const itSendsTheseStates = (
   state: SideEffectState,
-  commitments: PartialCommitments,
-  type = 'WALLET.COMMON.COMMITMENTS_RECEIVED',
+  states: PartialStates,
+  type = 'WALLET.COMMON.STATES_RECEIVED',
   idx = 0,
 ) => {
   const messageOutbox = getOutboxState(state, 'messageOutbox');
 
-  it('sends commitments', () => {
+  it('sends states', () => {
     try {
       // Passes when at least one message matches
       // In the case of multiple messages queued, this approach does not care about
@@ -168,7 +171,7 @@ export const itSendsTheseCommitments = (
         expect.arrayContaining([
           expect.objectContaining({
             messagePayload: expect.objectContaining({
-              signedCommitments: commitments.map(transformCommitmentToMatcher),
+              signedStates: states.map(transformStateToMatcher),
             }),
           }),
         ]),
@@ -181,12 +184,12 @@ export const itSendsTheseCommitments = (
         // multiple messages are queued.
 
         // To help with debugging, you can change the idx variable when running tests to 'search'
-        // for the correct commitment
+        // for the correct state
         console.warn(`Message not found: inspecting mismatched message in position ${idx}`);
         expect(messageOutbox[idx]).toMatchObject({
           messagePayload: {
             type,
-            signedCommitments: commitments,
+            signedStates: states,
           },
         });
       } else {
@@ -258,23 +261,23 @@ export const itIncreasesTurnNumBy = (
   newState: StateWithSideEffects<ChannelState>,
 ) => {
   it(`increases the turnNum by ${increase}`, () => {
-    if (!('turnNum' in newState.state) || !('turnNum' in oldState)) {
-      fail('turnNum does not exist on one of the states');
+    if (!('turnNumRecord' in newState.state) || !('turnNumRecord' in oldState)) {
+      fail('turnNumRecord does not exist on one of the states');
     } else {
-      expect(newState.state.turnNum).toEqual(oldState.turnNum + increase);
+      expect(newState.state.turnNumRecord).toEqual(oldState.turnNumRecord + increase);
     }
   });
 };
 
-export const itStoresThisCommitment = (
+export const itStoresThisState = (
   state: { channelStore: ChannelStore },
-  signedCommitment: SignedCommitment,
+  signedState: SignedState,
 ) => {
-  it('stores the commitment in the channel state', () => {
-    const channelId = getChannelId(signedCommitment.commitment);
+  it('stores the state in the channel state', () => {
+    const channelId = getChannelId(signedState.state.channel);
     const channelState = state.channelStore[channelId];
-    const lastSignedCommitment = channelState.commitments.slice(-1)[0];
-    expect(lastSignedCommitment).toMatchObject(signedCommitment);
+    const lastSignedState = channelState.signedStates.slice(-1)[0];
+    expect(lastSignedState).toMatchObject(signedState);
   });
 };
 

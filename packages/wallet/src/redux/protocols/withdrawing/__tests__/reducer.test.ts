@@ -1,16 +1,11 @@
 import * as scenarios from './scenarios';
 import { withdrawalReducer as reducer, initialize } from '../reducer';
 import * as states from '../states';
-import * as TransactionGenerator from '../../../../utils/transaction-generator';
 import { SharedData } from '../../../state';
 import { describeScenarioStep } from '../../../__tests__/helpers';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };
-const createConcludeAndWithdrawMock = jest.fn().mockReturnValue(mockTransaction);
-Object.defineProperty(TransactionGenerator, 'createConcludeAndWithdrawTransaction', {
-  value: createConcludeAndWithdrawMock,
-});
 
 // Helpers
 const itTransitionsToFailure = (

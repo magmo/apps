@@ -8,39 +8,25 @@ import { Wallet } from 'ethers';
 import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 import * as web3Utils from 'web3-utils';
 import * as testScenarios from '../../../../domain/commitments/__tests__';
-
+import { splitSignature } from 'ethers/utils';
 // ---------
 // Test data
 // ---------
 
-const {
-  asAddress: address,
-  asPrivateKey: privateKey,
-  channelId,
-  libraryAddress,
-  participants,
-  channelNonce,
-} = testScenarios;
-
-const gameCommitment1 = testScenarios.appCommitment({ turnNum: 19 }).commitment;
-const gameCommitment2 = testScenarios.appCommitment({ turnNum: 20 }).commitment;
-const concludeCommitment1 = testScenarios.appCommitment({ turnNum: 51, isFinal: true }).commitment;
-const concludeCommitment2 = testScenarios.appCommitment({ turnNum: 52, isFinal: true }).commitment;
+const { channelId } = testScenarios;
+const signature = splitSignature(`0x5e9b7a7bd77ac21372939d386342ae58081a33bf53479152c87c1e787c27d06b
+       118d3eccff0ace49891e192049e16b5210047068384772ba1fdb33bbcba580391c`);
+const gameState1 = testScenarios.appState({ turnNum: 19 }).state;
+const gameState2 = testScenarios.appState({ turnNum: 20 }).state;
+const concludeState1 = testScenarios.appState({ turnNum: 51, isFinal: true }).state;
+const concludeState2 = testScenarios.appState({ turnNum: 52, isFinal: true }).state;
 
 const channelStatus: ChannelState = {
-  address,
-  privateKey,
-  channelId,
-  libraryAddress,
-  ourIndex: 0,
-  participants,
-  channelNonce,
-  turnNum: concludeCommitment2.turnNum,
-  funded: true,
-  commitments: [
-    { commitment: concludeCommitment1, signature: '0x0' },
-    { commitment: concludeCommitment2, signature: '0x0' },
-  ],
+  channel: concludeState2.channel,
+  type: 'Channel.WaitForState',
+  turnNumRecord: concludeState2.turnNum,
+
+  signedStates: [{ state: concludeState1, signature }, { state: concludeState2, signature }],
 };
 
 const channelStore: ChannelStore = {
@@ -49,11 +35,8 @@ const channelStore: ChannelStore = {
 
 const notClosedChannelStatus: ChannelState = {
   ...channelStatus,
-  commitments: [
-    { commitment: gameCommitment1, signature: '0x0' },
-    { commitment: gameCommitment2, signature: '0x0' },
-  ],
-  turnNum: gameCommitment2.turnNum,
+  signedStates: [{ state: gameState1, signature }, { state: gameState2, signature }],
+  turnNumRecord: gameState2.turnNum,
 };
 
 const notClosedChannelState = {

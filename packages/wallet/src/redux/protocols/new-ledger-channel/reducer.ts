@@ -2,17 +2,13 @@ import * as states from './states';
 import { NewLedgerChannelState, failure } from './states';
 import { SharedData, ChannelFundingState, setFundingState } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
-import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { CommitmentType } from '../../../domain';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
-import { getChannel } from '../../channel-store';
 import { DirectFundingAction } from '../direct-funding';
 import { isSuccess, isFailure, isTerminal } from '../direct-funding/states';
 import {
   directFundingStateReducer,
   initialize as initializeDirectFunding,
 } from '../direct-funding/reducer';
-import { addHex } from '../../../utils/hex-utils';
 import { unreachable } from '../../../utils/reducer-utils';
 import { NewLedgerChannelAction } from './actions';
 import { EmbeddedProtocol, ProtocolLocator } from '../../../communication';
@@ -26,9 +22,10 @@ import {
   isAdvanceChannelAction,
   advanceChannelReducer,
 } from '../advance-channel';
-import { getLatestCommitment, isFirstPlayer, getTwoPlayerIndex } from '../reducer-helpers';
+import { getTwoPlayerIndex } from '../reducer-helpers';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
-import { TwoPartyPlayerIndex } from '../../types';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
+import { encodeConsensusData } from 'nitro-protocol/lib/src/contract/consensus-data';
 
 type ReturnVal = ProtocolStateWithSharedData<NewLedgerChannelState>;
 type IDFAction = NewLedgerChannelAction;
@@ -36,37 +33,39 @@ export const NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.
 
 export function initialize({
   processId,
-  startingAllocation,
-  startingDestination,
-  ourIndex,
+  chainId,
+  startingOutcome,
   participants,
-  privateKey,
+  challengeDuration,
   sharedData,
   protocolLocator,
 }: {
+  chainId: string;
+  challengeDuration: string;
   processId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
-  ourIndex: TwoPartyPlayerIndex;
+  startingOutcome: Outcome;
   participants: string[];
-  privateKey: string;
   sharedData: SharedData;
   protocolLocator: ProtocolLocator;
 }): ProtocolStateWithSharedData<states.NonTerminalNewLedgerChannelState | states.Failure> {
   const initializationArgs = {
-    privateKey,
     channelType: CONSENSUS_LIBRARY_ADDRESS,
-    ourIndex,
-    commitmentType: CommitmentType.PreFundSetup,
+    stateType: advanceChannelState.StateType.PreFunding,
     clearedToSend: true,
     processId,
     protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
     participants,
+    privateKey: sharedData.privateKey,
+    challengeDuration,
+    chainId,
+    ourAddress: sharedData.address,
+    appDefinition: CONSENSUS_LIBRARY_ADDRESS,
   };
 
   const advanceChannelResult = initializeAdvanceChannel(sharedData, {
     ...initializationArgs,
-    ...channelSpecificArgs(startingAllocation, startingDestination),
+
+    ...channelSpecificArgs(startingOutcome),
   });
   sharedData = advanceChannelResult.sharedData;
 
@@ -158,16 +157,19 @@ function handleWaitForPreFundSetup(
       return { protocolState: states.failure({}), sharedData };
     } else {
       const ledgerId = preFundResult.protocolState.channelId;
-      const latestCommitment = getLatestCommitment(ledgerId, sharedData);
+      // const latestState = getLastStateForChannel( sharedData,ledgerId).state;
+      const safeToDepositLevel = '0x0';
+      const total = '0x0';
+      const requiredDeposit = '0x0;';
+      // TODO: Implement this with outcomes
+      // const total = latestState.allocation.reduce(addHex);
+      // const requiredDeposit = isFirstPlayer(ledgerId, sharedData)
+      //   ? latestState.allocation[0]
+      //   : latestState.allocation[1];
 
-      const total = latestCommitment.allocation.reduce(addHex);
-      const requiredDeposit = isFirstPlayer(ledgerId, sharedData)
-        ? latestCommitment.allocation[0]
-        : latestCommitment.allocation[1];
-
-      const safeToDepositLevel = isFirstPlayer(ledgerId, sharedData)
-        ? '0x0'
-        : latestCommitment.allocation[1];
+      // const safeToDepositLevel = isFirstPlayer(ledgerId, sharedData)
+      //   ? '0x0'
+      //   : latestState.allocation[1];
       const ourIndex = getTwoPlayerIndex(ledgerId, sharedData);
       // update the state
       const directFundingState = initializeDirectFunding({
@@ -184,9 +186,9 @@ function handleWaitForPreFundSetup(
 
       const advanceChannelResult = initializeAdvanceChannel(directFundingState.sharedData, {
         channelId: ledgerId,
-        ourIndex,
+
         processId: protocolState.processId,
-        commitmentType: CommitmentType.PostFundSetup,
+        stateType: advanceChannelState.StateType.PostFunding,
         clearedToSend: false,
         protocolLocator: makeLocator(
           protocolState.protocolLocator,
@@ -243,10 +245,6 @@ function handleWaitForDirectFunding(
     return { protocolState: states.failure({}), sharedData };
   }
   if (isSuccess(newDirectFundingState)) {
-    const channel = getChannel(sharedData.channelStore, newProtocolState.ledgerId);
-    if (!channel) {
-      throw new Error(`Could not find channel for id ${newProtocolState.ledgerId}`);
-    }
     const { processId } = protocolState;
     const advanceChannelResult = advanceChannelReducer(
       protocolState.postFundSetupState,
@@ -288,18 +286,11 @@ function handleWaitForDirectFunding(
 }
 
 // TODO: This should be an advance channel helper
-function channelSpecificArgs(
-  allocation: string[],
-  destination: string[],
-): { allocation: string[]; destination: string[]; appAttributes: string } {
+function channelSpecificArgs(outcome: Outcome): { outcome: Outcome; appData: string } {
   return {
-    allocation,
-    destination,
-    appAttributes: bytesFromAppAttributes({
-      proposedAllocation: [],
-      proposedDestination: [],
-      furtherVotesRequired: 0,
-    }),
+    outcome,
+
+    appData: encodeConsensusData({ proposedOutcome: [], furtherVotesRequired: 0 }),
   };
 }
 

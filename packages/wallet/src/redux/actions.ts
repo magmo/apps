@@ -5,12 +5,7 @@ import * as application from './protocols/application/actions';
 import * as protocol from './protocols/actions';
 import * as advanceChannel from './protocols/advance-channel';
 import { FundingAction, isFundingAction } from './protocols/funding/actions';
-import {
-  CommitmentReceived,
-  commitmentReceived,
-  RelayableAction,
-  ProtocolLocator,
-} from '../communication';
+import { RelayableAction, ProtocolLocator } from '../communication';
 import {
   TransactionAction as TA,
   isTransactionAction as isTA,
@@ -19,15 +14,14 @@ import {
 import { ConcludingAction, isConcludingAction } from './protocols/concluding';
 import { ApplicationAction } from './protocols/application/actions';
 import { ActionConstructor } from './utils';
-import { Commitment } from '../domain';
 import { isDefundingAction, DefundingAction } from './protocols/defunding/actions';
 import { AdvanceChannelAction } from './protocols/advance-channel/actions';
 import { FundingStrategyNegotiationAction } from './protocols/funding-strategy-negotiation/actions';
 import { LedgerFundingAction } from './protocols/ledger-funding';
 
 import { LOAD as LOAD_FROM_STORAGE } from 'redux-storage';
+import { SignedState } from 'nitro-protocol';
 export * from './protocols/transaction-submission/actions';
-export { CommitmentReceived, commitmentReceived };
 
 export type TransactionAction = TA;
 export const isTransactionAction = isTA;
@@ -81,7 +75,7 @@ export interface ChallengeExpirySetEvent {
 export interface ChallengeCreatedEvent {
   type: 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT';
   channelId: string;
-  commitment: Commitment;
+  signedState: SignedState;
   finalizedAt: number;
 }
 
@@ -95,15 +89,14 @@ export interface RefutedEvent {
   processId: string;
   protocolLocator: ProtocolLocator;
   channelId: string;
-  refuteCommitment: Commitment;
+  refuteState: SignedState;
 }
 
 export interface RespondWithMoveEvent {
   processId: string;
   protocolLocator: ProtocolLocator;
   channelId: string;
-  responseCommitment: Commitment;
-  responseSignature: string;
+  responseState: SignedState;
   type: 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT';
 }
 

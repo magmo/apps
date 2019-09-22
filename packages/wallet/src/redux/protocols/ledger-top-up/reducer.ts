@@ -9,47 +9,39 @@ import {
 } from '../direct-funding/reducer';
 import { LedgerTopUpAction } from './actions';
 import { isDirectFundingAction } from '../direct-funding/actions';
-import { addHex, subHex } from '../../../utils/hex-utils';
 import {
   initializeConsensusUpdate,
   isConsensusUpdateAction,
   consensusUpdateReducer,
   ConsensusUpdateState,
 } from '../consensus-update';
-import { bigNumberify } from 'ethers/utils';
-import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
 import { DirectFundingState } from '../direct-funding/states';
 import { clearedToSend } from '../consensus-update/actions';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 export { LEDGER_TOP_UP_PROTOCOL_LOCATOR } from '../../../communication/protocol-locator';
 export function initialize({
   processId,
   channelId,
   ledgerId,
-  proposedAllocation,
-  proposedDestination,
-  originalAllocation,
+  proposedOutcome,
+  originalOutcome,
   protocolLocator,
   sharedData,
 }: {
   processId: string;
   channelId: string;
   ledgerId: string;
-  proposedAllocation: string[];
-  proposedDestination: string[];
-  originalAllocation: string[];
+  proposedOutcome: Outcome;
+  originalOutcome: Outcome;
   protocolLocator: ProtocolLocator;
   sharedData: SharedData;
 }): ProtocolStateWithSharedData<states.LedgerTopUpState> {
   sharedData = registerChannelToMonitor(sharedData, processId, ledgerId, protocolLocator);
   const { consensusUpdateState, sharedData: newSharedData } = initializeConsensusState(
-    TwoPartyPlayerIndex.A,
     processId,
     ledgerId,
-    proposedAllocation,
-    proposedDestination,
-    originalAllocation,
     protocolLocator,
     sharedData,
   );
@@ -57,10 +49,9 @@ export function initialize({
     processId,
     ledgerId,
     channelId,
-    proposedAllocation,
-    proposedDestination,
+    proposedOutcome,
+    originalOutcome,
     consensusUpdateState,
-    originalAllocation,
     protocolLocator,
   });
   return { protocolState: newProtocolState, sharedData: newSharedData };
@@ -80,7 +71,7 @@ const restoreOrderAndAddBTopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpS
     sharedData: consensusUpdateSharedData,
   } = consensusUpdateReducer(protocolState.consensusUpdateState, sharedData, action);
   sharedData = consensusUpdateSharedData;
-  const { processId, proposedAllocation, ledgerId, originalAllocation } = protocolState;
+  const { processId, ledgerId } = protocolState;
 
   if (consensusUpdateState.type === 'ConsensusUpdate.Failure') {
     return {
@@ -88,19 +79,18 @@ const restoreOrderAndAddBTopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpS
       sharedData: consensusUpdateSharedData,
     };
   } else if (consensusUpdateState.type === 'ConsensusUpdate.Success') {
+    // TODO: Reimplement this with outcomes
     // If player B already has enough funds then skip to success
-    if (bigNumberify(originalAllocation[PlayerIndex.B]).gte(proposedAllocation[PlayerIndex.B])) {
+    // if (bigNumberify(originalAllocation[PlayerIndex.B]).gte(proposedAllocation[PlayerIndex.B])) {
+    if (false) {
       return { protocolState: states.success({}), sharedData: consensusUpdateSharedData };
     }
     const {
       directFundingState,
       sharedData: directFundingSharedData,
     } = initializeDirectFundingState(
-      TwoPartyPlayerIndex.B,
       processId,
       ledgerId,
-      proposedAllocation,
-      originalAllocation,
       makeLocator(protocolState.protocolLocator, EmbeddedProtocol.DirectFunding),
       sharedData,
     );
@@ -136,14 +126,7 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
     action,
   ));
 
-  const {
-    processId,
-    ledgerId,
-    originalAllocation,
-    proposedAllocation,
-    proposedDestination,
-  } = protocolState;
-  const lastCommitment = helpers.getLatestCommitment(protocolState.ledgerId, sharedData);
+  const { processId, ledgerId } = protocolState;
 
   if (consensusUpdateState.type === 'ConsensusUpdate.Failure') {
     return {
@@ -151,17 +134,15 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
       sharedData,
     };
   } else if (consensusUpdateState.type === 'ConsensusUpdate.Success') {
-    const playerAFunded = bigNumberify(originalAllocation[TwoPartyPlayerIndex.A]).gte(
-      proposedAllocation[TwoPartyPlayerIndex.A],
-    );
+    const playerAFunded = true;
+    // TODO: Redo this with outcomes
+    // const playerAFunded = bigNumberify(originalAllocation[TwoPartyPlayerIndex.A]).gte(
+    //   proposedAllocation[TwoPartyPlayerIndex.A],
+    // );
 
     ({ consensusUpdateState, sharedData } = initializeConsensusState(
-      TwoPartyPlayerIndex.B,
       processId,
       ledgerId,
-      proposedAllocation,
-      proposedDestination,
-      lastCommitment.allocation,
       protocolState.protocolLocator,
       sharedData,
     ));
@@ -176,11 +157,8 @@ const switchOrderAndAddATopUpUpdateReducer: ProtocolReducer<states.LedgerTopUpSt
     }
     let directFundingState: DirectFundingState;
     ({ directFundingState, sharedData } = initializeDirectFundingState(
-      TwoPartyPlayerIndex.A,
       processId,
       ledgerId,
-      proposedAllocation,
-      originalAllocation,
       protocolState.protocolLocator,
       sharedData,
     ));
@@ -299,46 +277,43 @@ export const ledgerTopUpReducer: ProtocolReducer<states.LedgerTopUpState> = (
 };
 
 function initializeDirectFundingState(
-  playerFor: TwoPartyPlayerIndex,
   processId: string,
   ledgerId: string,
-  proposedAllocation: string[],
-  originalAllocation: string[],
   protocolLocator: ProtocolLocator,
   sharedData: SharedData,
 ) {
   const isFirstPlayer = helpers.isFirstPlayer(ledgerId, sharedData);
 
-  let requiredDeposit = '0x0';
+  const requiredDeposit = '0x0';
+  // TODO: Reimplement this with outcomes
+  // if (playerFor === TwoPartyPlayerIndex.A && isFirstPlayer) {
+  //   requiredDeposit = subHex(
+  //     proposedAllocation[TwoPartyPlayerIndex.A],
+  //     originalAllocation[TwoPartyPlayerIndex.A],
+  //   );
+  // } else if (playerFor === TwoPartyPlayerIndex.B && !isFirstPlayer) {
+  //   requiredDeposit = subHex(
+  //     proposedAllocation[TwoPartyPlayerIndex.B],
+  //     originalAllocation[TwoPartyPlayerIndex.B],
+  //   );
+  // }
 
-  if (playerFor === TwoPartyPlayerIndex.A && isFirstPlayer) {
-    requiredDeposit = subHex(
-      proposedAllocation[TwoPartyPlayerIndex.A],
-      originalAllocation[TwoPartyPlayerIndex.A],
-    );
-  } else if (playerFor === TwoPartyPlayerIndex.B && !isFirstPlayer) {
-    requiredDeposit = subHex(
-      proposedAllocation[TwoPartyPlayerIndex.B],
-      originalAllocation[TwoPartyPlayerIndex.B],
-    );
-  }
-
-  let totalFundingRequired = '0x0';
-  if (playerFor === TwoPartyPlayerIndex.A) {
-    totalFundingRequired = addHex(
-      proposedAllocation[TwoPartyPlayerIndex.A],
-      originalAllocation[TwoPartyPlayerIndex.B],
-    );
-  } else if (playerFor === TwoPartyPlayerIndex.B) {
-    totalFundingRequired = proposedAllocation.reduce(addHex);
-  }
+  // let totalFundingRequired = '0x0';
+  // if (playerFor === TwoPartyPlayerIndex.A) {
+  //   totalFundingRequired = addHex(
+  //     proposedAllocation[TwoPartyPlayerIndex.A],
+  //     originalAllocation[TwoPartyPlayerIndex.B],
+  //   );
+  // } else if (playerFor === TwoPartyPlayerIndex.B) {
+  //   totalFundingRequired = proposedAllocation.reduce(addHex);
+  // }
 
   const { protocolState: directFundingState, sharedData: newSharedData } = initializeDirectFunding({
     processId,
     channelId: ledgerId,
     safeToDepositLevel: '0x0', // Since we only have one player depositing we can always deposit right away
     requiredDeposit,
-    totalFundingRequired,
+    totalFundingRequired: '0x0', // TODO: Update this once outcome changes are made
     ourIndex: isFirstPlayer ? TwoPartyPlayerIndex.A : TwoPartyPlayerIndex.B,
     sharedData,
     protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.DirectFunding),
@@ -347,44 +322,42 @@ function initializeDirectFundingState(
 }
 
 function initializeConsensusState(
-  playerFor: TwoPartyPlayerIndex,
   processId: string,
   ledgerId: string,
-  proposedAllocation: string[],
-  proposedDestination: string[],
-  currentAllocation: string[],
   protocolLocator: ProtocolLocator,
   sharedData: SharedData,
 ) {
-  let newAllocation;
-  let newDestination;
-  // For player A we want to move their top-upped deposit to the end and leave player B's as is
-  if (playerFor === TwoPartyPlayerIndex.A) {
-    const currentAllocationForA = currentAllocation[TwoPartyPlayerIndex.A];
-    const proposedAllocationForA = proposedAllocation[TwoPartyPlayerIndex.A];
+  // TODO: Redo with outcomes
+  // let newAllocation;
+  // let newDestination;
+  // // For player A we want to move their top-upped deposit to the end and leave player B's as is
+  // if (playerFor === TwoPartyPlayerIndex.A) {
+  //   const currentAllocationForA = currentAllocation[TwoPartyPlayerIndex.A];
+  //   const proposedAllocationForA = proposedAllocation[TwoPartyPlayerIndex.A];
 
-    const newAllocationForA = bigNumberify(currentAllocationForA).gte(proposedAllocationForA)
-      ? currentAllocationForA
-      : proposedAllocationForA;
+  //   const newAllocationForA = bigNumberify(currentAllocationForA).gte(proposedAllocationForA)
+  //     ? currentAllocationForA
+  //     : proposedAllocationForA;
 
-    newAllocation = [currentAllocation[TwoPartyPlayerIndex.B], newAllocationForA];
-    newDestination = [
-      proposedDestination[TwoPartyPlayerIndex.B],
-      proposedDestination[TwoPartyPlayerIndex.A],
-    ];
-  } else {
-    // When we're handling this for player B the allocation has already been flipped, so our current value is first in the allocation
-    const currentAllocationForB = currentAllocation[0];
-    const currentAllocationForA = currentAllocation[1];
-    const proposedAllocationForB = proposedAllocation[TwoPartyPlayerIndex.B];
+  //   newAllocation = [currentAllocation[TwoPartyPlayerIndex.B], newAllocationForA];
+  //   newDestination = [
+  //     proposedDestination[TwoPartyPlayerIndex.B],
+  //     proposedDestination[TwoPartyPlayerIndex.A],
+  //   ];
+  // } else {
+  //   // When we're handling this for player B the allocation has already been flipped, so our current value is first in the allocation
+  //   const currentAllocationForB = currentAllocation[0];
+  //   const currentAllocationForA = currentAllocation[1];
+  //   const proposedAllocationForB = proposedAllocation[TwoPartyPlayerIndex.B];
 
-    const newAllocationForB = bigNumberify(currentAllocationForB).gte(proposedAllocationForB)
-      ? currentAllocationForB
-      : proposedAllocationForB;
-    // For Player B we're restoring the original order of [A,B]
-    newAllocation = [currentAllocationForA, newAllocationForB];
-    newDestination = proposedDestination;
-  }
+  //   const newAllocationForB = bigNumberify(currentAllocationForB).gte(proposedAllocationForB)
+  //     ? currentAllocationForB
+  //     : proposedAllocationForB;
+  //   // For Player B we're restoring the original order of [A,B]
+  //   newAllocation = [currentAllocationForA, newAllocationForB];
+  //   newDestination = proposedDestination;
+  // }
+  const newOutcome: Outcome = [];
   const {
     protocolState: consensusUpdateState,
     sharedData: newSharedData,
@@ -392,8 +365,7 @@ function initializeConsensusState(
     processId,
     channelId: ledgerId,
     clearedToSend: true,
-    proposedAllocation: newAllocation,
-    proposedDestination: newDestination,
+    proposedOutcome: newOutcome,
     protocolLocator: makeLocator(protocolLocator, CONSENSUS_UPDATE_PROTOCOL_LOCATOR),
     sharedData,
   });

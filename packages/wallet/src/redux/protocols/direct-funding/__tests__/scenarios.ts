@@ -1,4 +1,3 @@
-import { addHex } from '../../../../utils/hex-utils';
 import * as globalActions from '../../../actions';
 
 import * as scenarios from '../../../../domain/commitments/__tests__';
@@ -7,11 +6,11 @@ import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 import * as states from '../states';
 import { SharedData } from '../../../state';
 
-const { threeWayLedgerId: channelId, twoThree } = scenarios;
+const { THREE_PARTICIPANT_LEDGER_CHANNEL_ID: channelId } = scenarios;
 
-export const YOUR_DEPOSIT_A = twoThree[0].wei;
-export const YOUR_DEPOSIT_B = twoThree[1].wei;
-export const TOTAL_REQUIRED = addHex(twoThree[0].wei, twoThree[1].wei);
+export const YOUR_DEPOSIT_A = '0x2';
+export const YOUR_DEPOSIT_B = '0x3';
+export const TOTAL_REQUIRED = '0x5';
 const processId = `processId.${channelId}`;
 
 // shared data

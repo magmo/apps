@@ -1,62 +1,34 @@
-import { SIGNATURE_SUCCESS, VALIDATION_SUCCESS, fundingSuccess } from 'magmo-wallet-client';
-import * as actions from '../actions';
-import { channelStoreReducer } from '../channel-store/reducer';
+import { fundingSuccess } from 'magmo-wallet-client';
 import { accumulateSideEffects } from '../outbox';
-import { SideEffects } from '../outbox/state';
-import { SharedData, queueMessage, getExistingChannel, checkAndStore } from '../state';
+import { SharedData, queueMessage } from '../state';
 import * as selectors from '../selectors';
-import { TwoPartyPlayerIndex, ThreePartyPlayerIndex } from '../types';
-import { CommitmentType } from 'fmg-core/lib/commitment';
+import { TwoPartyPlayerIndex } from '../types';
 import * as magmoWalletClient from 'magmo-wallet-client';
-import { getLastCommitment, nextParticipant, Commitments } from '../channel-store';
-import { Commitment } from '../../domain';
-import { sendCommitmentsReceived, ProtocolLocator } from '../../communication';
+
+import { ProtocolLocator } from '../../communication';
 import * as comms from '../../communication';
-import { ourTurn as ourTurnOnChannel } from '../channel-store';
+
 import _ from 'lodash';
 import { bigNumberify } from 'ethers/utils';
-
-export const updateChannelState = (
-  sharedData: SharedData,
-  channelAction: actions.channel.ChannelAction,
-): SharedData => {
-  const newSharedData = { ...sharedData };
-  const updatedChannelState = channelStoreReducer(newSharedData.channelStore, channelAction);
-  newSharedData.channelStore = updatedChannelState.state;
-  // TODO: Currently we need to filter out signature/validation messages that are meant to the app
-  // This might change based on whether protocol reducers or channel reducers craft commitments
-  const filteredSideEffects = filterOutSignatureMessages(updatedChannelState.sideEffects);
-  // App channel state may still generate side effects
-  newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, filteredSideEffects);
-  return newSharedData;
-};
-
-export const filterOutSignatureMessages = (sideEffects?: SideEffects): SideEffects | undefined => {
-  if (sideEffects && sideEffects.messageOutbox) {
-    let messageArray = Array.isArray(sideEffects.messageOutbox)
-      ? sideEffects.messageOutbox
-      : [sideEffects.messageOutbox];
-    messageArray = messageArray.filter(
-      walletEvent =>
-        walletEvent.type !== VALIDATION_SUCCESS && walletEvent.type !== SIGNATURE_SUCCESS,
-    );
-    return {
-      ...sideEffects,
-      messageOutbox: messageArray,
-    };
-  }
-  return sideEffects;
-};
+import { SignedState } from 'nitro-protocol';
+import { State } from 'nitro-protocol/lib/src/contract/state';
+import {
+  isAllocationOutcome,
+  Outcome,
+  Allocation,
+  AllocationItem,
+} from 'nitro-protocol/lib/src/contract/outcome';
+import { ETH_ASSET_HOLDER } from '../../constants';
 
 export function sendFundingComplete(sharedData: SharedData, appChannelId: string) {
   const channelState = selectors.getOpenedChannelState(sharedData, appChannelId);
-  const c = getLastCommitment(channelState);
-  if (c.commitmentType !== CommitmentType.PostFundSetup || c.turnNum !== 3) {
+  const s = selectors.getLastState(channelState);
+  if (s.state.turnNum !== 3) {
     throw new Error(
-      `Expected a post fund setup B commitment. Instead received ${JSON.stringify(c)}.`,
+      `Expected a post fund setup B commitment. Instead received ${JSON.stringify(s)}.`,
     );
   }
-  return queueMessage(sharedData, fundingSuccess(appChannelId, c));
+  return queueMessage(sharedData, fundingSuccess(appChannelId, s));
 }
 
 export function showWallet(sharedData: SharedData): SharedData {
@@ -85,12 +57,8 @@ export function sendConcludeSuccess(sharedData: SharedData): SharedData {
 }
 
 export function sendConcludeInstigated(sharedData: SharedData, channelId: string): SharedData {
-  const channel = getExistingChannel(sharedData, channelId);
-  const { participants, ourIndex } = channel;
-  const messageRelay = comms.sendConcludeInstigated(
-    nextParticipant(participants, ourIndex),
-    channelId,
-  );
+  const lastState = selectors.getLastStateForChannel(sharedData, channelId);
+  const messageRelay = comms.sendConcludeInstigated(nextParticipant(lastState.state), channelId);
   return queueMessage(sharedData, messageRelay);
 }
 
@@ -103,43 +71,20 @@ export function sendOpponentConcluded(sharedData: SharedData): SharedData {
   return newSharedData;
 }
 
-export function sendCommitments(
+export function sendStates(
   sharedData: SharedData,
   processId: string,
   channelId: string,
   protocolLocator: ProtocolLocator,
 ): SharedData {
-  const channel = getExistingChannel(sharedData, channelId);
-  const { participants, ourIndex } = channel;
-  const messageRelay = sendCommitmentsReceived(
-    nextParticipant(participants, ourIndex),
+  const lastState = selectors.getLastStateForChannel(sharedData, channelId);
+  const messageRelay = comms.sendStatesReceived(
+    nextParticipant(lastState.state),
     processId,
-    channel.commitments,
+    getLatestRoundOfStates(channelId, sharedData),
     protocolLocator,
   );
   return queueMessage(sharedData, messageRelay);
-}
-
-export function checkCommitments(
-  sharedData: SharedData,
-  turnNum: number,
-  commitments: Commitments,
-): SharedData {
-  // We don't bother checking "stale" commitments -- those whose turnNum does not
-  // exceed the current turnNum.
-
-  commitments
-    .filter(signedCommitment => signedCommitment.commitment.turnNum > turnNum)
-    .map(signedCommitment => {
-      const result = checkAndStore(sharedData, signedCommitment);
-      if (result.isSuccess) {
-        sharedData = result.store;
-      } else {
-        throw new Error('Unable to validate commitment');
-      }
-    });
-
-  return sharedData;
 }
 
 export function sendChallengeResponseRequested(
@@ -153,10 +98,10 @@ export function sendChallengeResponseRequested(
   return newSharedData;
 }
 
-export function sendChallengeCommitmentReceived(sharedData: SharedData, commitment: Commitment) {
+export function sendChallengeStateReceived(sharedData: SharedData, signedState: SignedState) {
   const newSharedData = { ...sharedData };
   newSharedData.outboxState = accumulateSideEffects(newSharedData.outboxState, {
-    messageOutbox: magmoWalletClient.challengeCommitmentReceived(commitment),
+    messageOutbox: magmoWalletClient.challengeStateReceived(signedState),
   });
   return newSharedData;
 }
@@ -189,19 +134,41 @@ export const channelIsClosed = (channelId: string, sharedData: SharedData): bool
 };
 
 export const channelFundsAnotherChannel = (channelId: string, sharedData: SharedData): boolean => {
-  const latestCommitment = getLatestCommitment(channelId, sharedData);
-  return (
-    _.intersection(selectors.getChannelIds(sharedData), latestCommitment.destination).length > 0
-  );
+  const latestState = selectors.getLastStateForChannel(sharedData, channelId).state;
+  const channelIds = selectors.getChannelIds(sharedData);
+
+  const allocationDestinations = latestState.outcome
+    .map(o => {
+      if (isAllocationOutcome(o)) {
+        return o.allocation.map(a => a.destination);
+      } else {
+        return [];
+      }
+    })
+    .reduce((d1, d2) => d1.concat(d2), []);
+
+  return _.intersection(allocationDestinations, channelIds).length > 0;
+};
+export const getLatestRoundOfStates = (
+  channelId: string,
+  sharedData: SharedData,
+): SignedState[] => {
+  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
+  if (channelState.signedStates.length === 0) {
+    return [];
+  }
+
+  const { signedStates } = channelState;
+  const { participants } = signedStates[0].state.channel;
+
+  const roundIndex =
+    signedStates.length < participants.length ? 0 : signedStates.length - participants.length;
+  return channelState.signedStates.slice(roundIndex);
 };
 
 export const channelHasConclusionProof = (channelId: string, sharedData: SharedData): boolean => {
-  const channelState = selectors.getOpenedChannelState(sharedData, channelId);
-  const [penultimateCommitment, lastCommitment] = channelState.commitments;
-  return (
-    lastCommitment.commitment.commitmentType === CommitmentType.Conclude &&
-    penultimateCommitment.commitment.commitmentType === CommitmentType.Conclude
-  );
+  const latestStateRound = getLatestRoundOfStates(channelId, sharedData);
+  return latestStateRound.every(s => s.state.isFinal);
 };
 
 export const channelFinalizedOnChain = (channelId: string, sharedData: SharedData): boolean => {
@@ -225,37 +192,46 @@ export const getChannelFundingType = (channelId: string, sharedData: SharedData)
   if (!channelFundingState.fundingChannel) {
     throw new Error(`Channel ${channelId} is not directly funded but has not fundingChannelId`);
   }
-  const channelState = getExistingChannel(sharedData, channelFundingState.fundingChannel);
-  return channelState.participants.length === 3 ? FundingType.Virtual : FundingType.Ledger;
+  const channelState = selectors.getChannelState(sharedData, channelFundingState.fundingChannel);
+  return channelState.channel.participants.length === 3 ? FundingType.Virtual : FundingType.Ledger;
 };
 
 export const getTwoPlayerIndex = (
   channelId: string,
   sharedData: SharedData,
 ): TwoPartyPlayerIndex => {
+  const { address } = sharedData;
   const channelState = selectors.getChannelState(sharedData, channelId);
-  return channelState.participants.indexOf(channelState.address);
+  return channelState.channel.participants.indexOf(address);
 };
 export const isFirstPlayer = (channelId: string, sharedData: SharedData) => {
+  const { address } = sharedData;
   const channelState = selectors.getChannelState(sharedData, channelId);
-  return channelState.ourIndex === TwoPartyPlayerIndex.A;
+  return channelState.channel.participants.indexOf(address) === 0;
 };
 
 export const isLastPlayer = (channelId: string, sharedData: SharedData) => {
+  const { address } = sharedData;
   const channelState = selectors.getChannelState(sharedData, channelId);
-  return channelState.ourIndex === channelState.participants.length - 1;
+  const { participants } = channelState.channel;
+  return participants.indexOf(address) === participants.length;
 };
 
+export const nextParticipant = (state: State): string => {
+  const { participants } = state.channel;
+  const nextIndex = (state.turnNum + 1) % participants.length;
+  return participants[nextIndex];
+};
 export function isSafeToSend({
   sharedData,
   channelId,
-  ourIndex,
   clearedToSend,
+  participants,
 }: {
   sharedData: SharedData;
-  ourIndex: TwoPartyPlayerIndex | ThreePartyPlayerIndex;
   channelId?: string;
   clearedToSend: boolean;
+  participants: string[];
 }): boolean {
   if (!clearedToSend) {
     return false;
@@ -266,41 +242,56 @@ export function isSafeToSend({
   // B. The channel is not in storage and our index is not 0.
   // C. The channel is in storage and it's our turn
   // D. The channel is in storage and it's not our turn
-
+  const { address: ourAddress } = sharedData;
+  const ourIndex = participants.indexOf(ourAddress);
   if (!channelId) {
     return ourIndex === 0;
   }
 
-  const channel = selectors.getChannelState(sharedData, channelId);
-  const numParticipants = channel.participants.length;
-  return (channel.turnNum + 1) % numParticipants === ourIndex;
+  const channelState = selectors.getChannelState(sharedData, channelId);
+  const { turnNumRecord } = channelState;
+  const numParticipants = participants.length;
+  return (turnNumRecord + 1) % numParticipants === ourIndex;
 }
 
 export function getOpponentAddress(channelId: string, sharedData: SharedData) {
-  const channel = getExistingChannel(sharedData, channelId);
+  const channelState = selectors.getChannelState(sharedData, channelId);
 
-  const { participants } = channel;
-  const opponentAddress = participants[(channel.ourIndex + 1) % participants.length];
+  const { participants } = channelState.channel;
+  const ourIndex = participants.indexOf(sharedData.address);
+  const opponentAddress = participants[1 - ourIndex];
   return opponentAddress;
 }
 
-export function getOurAddress(channelId: string, sharedData: SharedData) {
-  const channel = getExistingChannel(sharedData, channelId);
-  return channel.participants[channel.ourIndex];
+export function getNumberOfParticipants(signedState: SignedState): number {
+  return signedState.state.channel.participants.length;
 }
-
-export function getLatestCommitment(channelId: string, sharedData: SharedData) {
-  const channel = getExistingChannel(sharedData, channelId);
-  return getLastCommitment(channel);
+export function addToEthAllocation(allocationItem: AllocationItem, outcome: Outcome): Outcome {
+  const newOutcome = _.cloneDeep(outcome);
+  newOutcome.forEach(o => {
+    if (isAllocationOutcome(o) && o.assetHolderAddress === ETH_ASSET_HOLDER) {
+      o.allocation.push(allocationItem);
+    }
+  });
+  return newOutcome;
 }
-
-export function getNumberOfParticipants(commitment: Commitment): number {
-  return commitment.channel.participants.length;
+export function getEthAllocation(outcome: Outcome): Allocation | undefined {
+  let outcomeToReturn: Allocation | undefined;
+  outcome.forEach(o => {
+    if (isAllocationOutcome(o) && o.assetHolderAddress === ETH_ASSET_HOLDER) {
+      outcomeToReturn = o.allocation;
+    }
+  });
+  return outcomeToReturn;
 }
-
+export function isFullyOpen() {
+  return true;
+}
 export function ourTurn(sharedData: SharedData, channelId: string) {
-  const channel = getExistingChannel(sharedData, channelId);
-  return ourTurnOnChannel(channel);
+  const channelState = selectors.getChannelState(sharedData, channelId);
+  const { participants } = channelState.channel;
+  const turnIndex = channelState.turnNumRecord % participants.length;
+  return participants[turnIndex] === sharedData.address;
 }
 
 export function getFundingChannelId(channelId: string, sharedData: SharedData): string {
@@ -338,3 +329,13 @@ export function removeZeroFundsFromBalance(
   });
   return { allocation, destination };
 }
+
+export const convertAddressToBytes32 = (address: string) => {
+  const hexValue = bigNumberify(address).toHexString();
+  return hexValue.padEnd(66, '0');
+};
+
+export const convertBytes32ToAddress = (bytes: string) => {
+  const hexValue = bigNumberify(bytes).toHexString();
+  return hexValue.slice(0, 42);
+};

@@ -1,8 +1,7 @@
-import { SharedData, getPrivatekey } from '../../state';
+import { SharedData } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator } from '..';
 import * as selectors from '../../selectors';
-import { getLastCommitment, ChannelState } from '../../channel-store/channel-state';
-import { CommitmentType } from 'fmg-core';
+import { ChannelState } from '../../channel-store/channel-state';
 import { isExistingLedgerFundingAction } from '../existing-ledger-funding';
 // TODO: Why does importing the reducer from the index result in test failures in grand parent protocols?
 import {
@@ -16,23 +15,22 @@ import { WalletAction } from '../../actions';
 import { ProtocolLocator, EmbeddedProtocol } from '../../../communication';
 import * as newLedgerChannel from '../new-ledger-channel';
 import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../existing-ledger-funding/reducer';
-import { getTwoPlayerIndex } from '../reducer-helpers';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
+import { getChannelId } from 'nitro-protocol/lib/src/contract/channel';
 
 export const LEDGER_FUNDING_PROTOCOL_LOCATOR = makeLocator(EmbeddedProtocol.LedgerFunding);
 
 export function initialize({
   processId,
   channelId,
-  startingAllocation,
-  startingDestination,
+  startingOutcome,
   participants,
   sharedData,
   protocolLocator,
 }: {
   processId: string;
   channelId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
+  startingOutcome: Outcome;
   participants: string[];
   sharedData: SharedData;
   protocolLocator: ProtocolLocator;
@@ -48,25 +46,23 @@ export function initialize({
     return fundWithExistingLedgerChannel({
       processId,
       channelId,
-      startingAllocation,
-      startingDestination,
+      startingOutcome,
       protocolLocator,
       sharedData,
       existingLedgerChannel,
     });
   } else {
-    const ourIndex = getTwoPlayerIndex(channelId, sharedData);
-    const privateKey = getPrivatekey(sharedData, channelId);
+    const { chainId } = selectors.getChannelState(sharedData, channelId).channel;
+    const { challengeDuration } = selectors.getLastStateForChannel(sharedData, channelId).state;
     const {
       protocolState: newLedgerChannelState,
       sharedData: newSharedData,
     } = newLedgerChannel.initializeNewLedgerChannel({
       processId,
-      privateKey,
-      startingAllocation,
-      startingDestination,
+      chainId,
+      challengeDuration,
+      startingOutcome,
       participants,
-      ourIndex,
       sharedData,
       protocolLocator: makeLocator(protocolLocator, EmbeddedProtocol.NewLedgerChannel),
     });
@@ -83,8 +79,7 @@ export function initialize({
         processId,
         channelId,
         newLedgerChannel: newLedgerChannelState,
-        startingAllocation,
-        startingDestination,
+        startingOutcome,
         protocolLocator,
       }),
       sharedData: newSharedData,
@@ -187,21 +182,19 @@ function waitForExistingLedgerFundingReducer(
 function fundWithExistingLedgerChannel({
   processId,
   channelId,
-  startingAllocation,
-  startingDestination,
+  startingOutcome,
   sharedData,
   existingLedgerChannel,
   protocolLocator,
 }: {
   processId: string;
   channelId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
+  startingOutcome: Outcome;
   sharedData: SharedData;
   existingLedgerChannel: ChannelState;
   protocolLocator: ProtocolLocator;
 }): ProtocolStateWithSharedData<states.NonTerminalLedgerFundingState | states.Failure> {
-  const ledgerId = existingLedgerChannel.channelId;
+  const ledgerId = getChannelId(existingLedgerChannel.channel);
   const {
     protocolState: existingLedgerFundingState,
     sharedData: newSharedData,
@@ -209,8 +202,7 @@ function fundWithExistingLedgerChannel({
     processId,
     channelId,
     ledgerId,
-    startingAllocation,
-    startingDestination,
+    startingOutcome,
     protocolLocator: makeLocator(protocolLocator, EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR),
     sharedData,
   });
@@ -229,8 +221,7 @@ function fundWithExistingLedgerChannel({
           channelId,
           ledgerId,
           existingLedgerFundingState,
-          startingAllocation,
-          startingDestination,
+          startingOutcome,
           protocolLocator,
         }),
         sharedData: newSharedData,
@@ -243,9 +234,12 @@ function fundWithExistingLedgerChannel({
 function ledgerChannelIsReady(
   existingLedgerChannel: ChannelState | undefined,
 ): existingLedgerChannel is ChannelState {
-  return (
-    !!existingLedgerChannel &&
-    (getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.App ||
-      getLastCommitment(existingLedgerChannel).commitmentType === CommitmentType.PostFundSetup)
-  );
+  if (!existingLedgerChannel) {
+    return false;
+  } else {
+    const { participants } = existingLedgerChannel.channel;
+    const { turnNumRecord } = existingLedgerChannel;
+
+    return turnNumRecord >= participants.length * 2;
+  }
 }

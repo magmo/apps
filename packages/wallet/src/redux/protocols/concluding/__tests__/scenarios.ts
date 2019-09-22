@@ -3,9 +3,9 @@ import * as defundingScenarios from '../../defunding/__tests__';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 
 import * as states from '../states';
-import { EMPTY_SHARED_DATA, setChannels, setFundingState } from '../../../state';
+import { EMPTY_SHARED_DATA, setFundingState } from '../../../state';
 import { bigNumberify } from 'ethers/utils';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+
 import { mergeSharedData } from '../../../__tests__/helpers';
 import { prependToLocator } from '../../../protocols';
 import { EmbeddedProtocol } from '../../../../communication';
@@ -13,16 +13,22 @@ import * as actions from '../actions';
 import * as ledgerCloseScenarios from '../../close-ledger-channel/__tests__';
 
 const processId = 'processId';
-const { channelId, asAddress, bsAddress, asPrivateKey, appCommitment, ledgerId } = testScenarios;
-const twoThree = [
+const {
+  channelId,
+  asAddress,
+  bsAddress,
+  appState: appCommitment,
+  TWO_PARTICIPANT_LEDGER_CHANNEL_ID: ledgerId,
+} = testScenarios;
+const twoThree = testScenarios.convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
-];
+]);
 
-const app50 = appCommitment({ turnNum: 50, balances: twoThree, isFinal: false });
-const app51 = appCommitment({ turnNum: 51, balances: twoThree, isFinal: false });
-const ledger5 = testScenarios.ledgerCommitment({ turnNum: 5, balances: twoThree });
-const ledger6 = testScenarios.ledgerCommitment({ turnNum: 6, balances: twoThree });
+const app50 = appCommitment({ turnNum: 50, outcome: twoThree, isFinal: false });
+const app51 = appCommitment({ turnNum: 51, outcome: twoThree, isFinal: false });
+const ledger5 = testScenarios.ledgerState({ turnNum: 5, outcome: twoThree });
+const ledger6 = testScenarios.ledgerState({ turnNum: 6, outcome: twoThree });
 
 const waitForLedgerClosing = states.waitForLedgerClose({
   processId,
@@ -59,14 +65,14 @@ const closeSelectedAction = actions.closeSelected({ processId });
 
 const initialSharedData = setFundingState(
   setFundingState(
-    setChannels(EMPTY_SHARED_DATA, [
-      channelFromCommitments([app50, app51], asAddress, asPrivateKey),
-      channelFromCommitments([ledger5, ledger6], asAddress, asPrivateKey),
+    testScenarios.setChannels(EMPTY_SHARED_DATA, [
+      testScenarios.channelStateFromStates([app50, app51]),
+      testScenarios.channelStateFromStates([ledger5, ledger6]),
     ]),
     channelId,
-    { directlyFunded: false, fundingChannel: testScenarios.ledgerId },
+    { directlyFunded: false, fundingChannel: testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID },
   ),
-  testScenarios.ledgerId,
+  testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
   { directlyFunded: true },
 );
 
