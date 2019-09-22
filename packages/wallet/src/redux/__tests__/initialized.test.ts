@@ -114,7 +114,7 @@ describe('when a process state is terminal', () => {
     value: reducer,
   });
 
-  const result = walletReducer(state, action);
+  const result = walletReducer(state, action) as states.Initialized;
   it('removes the current process id', () => {
     expect(result.currentProcessId).toBeUndefined();
   });

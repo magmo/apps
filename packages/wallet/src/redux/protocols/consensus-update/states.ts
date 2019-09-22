@@ -1,6 +1,7 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
 import { ProtocolLocator } from '../../../communication';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 
 export type NonTerminalConsensusUpdateState = NotSafeToSend | CommitmentSent;
 export type ConsensusUpdateState = NonTerminalConsensusUpdateState | Failure | Success;
@@ -8,8 +9,7 @@ export type TerminalConsensusUpdateState = Failure | Success;
 export type ConsensusUpdateStateType = ConsensusUpdateState['type'];
 
 interface Base {
-  proposedAllocation: string[];
-  proposedDestination: string[];
+  proposedOutcome: Outcome;
   channelId: string;
   processId: string;
   protocolLocator: ProtocolLocator;

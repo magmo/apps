@@ -3,14 +3,14 @@ import * as testScenarios from '../../../domain/commitments/__tests__';
 const { channelId } = testScenarios;
 import { adjudicatorStateReducer } from '../reducer';
 // tslint:disable: no-shadowed-variable
-const gameCommitment1 = testScenarios.appCommitment({ turnNum: 19 }).commitment;
+const gameState1 = testScenarios.appState({ turnNum: 19 });
 const createChallengeState = (channelId: string, expiryTime) => {
   return {
     channelId,
     balance: '0x0',
     finalized: false,
     challenge: {
-      challengeCommitment: gameCommitment1,
+      challengeState: gameState1,
       expiresAt: expiryTime,
     },
   };
@@ -22,13 +22,13 @@ describe('adjudicator state reducer', () => {
     const expiryTime = 1234;
     const action = actions.challengeCreatedEvent({
       channelId,
-      commitment: gameCommitment1,
+      signedState: gameState1,
       finalizedAt: expiryTime,
     });
     const updatedState = adjudicatorStateReducer(state, action);
     it('sets a challenge', () => {
       expect(updatedState[channelId].challenge).toEqual({
-        challengeCommitment: gameCommitment1,
+        challengeCommitment: gameState1,
         expiresAt: expiryTime,
       });
     });
@@ -81,7 +81,7 @@ describe('adjudicator state reducer', () => {
       processId: '0x0',
       protocolLocator: [],
       channelId,
-      refuteCommitment: gameCommitment1,
+      refuteState: gameState1,
     });
     const updatedState = adjudicatorStateReducer(state, action);
 
@@ -98,8 +98,7 @@ describe('adjudicator state reducer', () => {
       processId: '0x0',
       protocolLocator: [],
       channelId,
-      responseCommitment: gameCommitment1,
-      responseSignature: '0xSignature',
+      responseState: gameState1,
     });
     const updatedState = adjudicatorStateReducer(state, action);
 

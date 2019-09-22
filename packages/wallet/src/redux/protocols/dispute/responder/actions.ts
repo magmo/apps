@@ -1,5 +1,4 @@
 import { BaseProcessAction } from '../../actions';
-import { Commitment } from '../../../../domain';
 import { TransactionAction } from '../../transaction-submission/actions';
 import {
   isTransactionAction,
@@ -8,6 +7,7 @@ import {
   WalletAction,
 } from '../../../actions';
 import { ActionConstructor } from '../../../utils';
+import { SignedState } from 'nitro-protocol';
 
 // -------
 // Actions
@@ -21,7 +21,7 @@ export interface RespondApproved extends BaseProcessAction {
 export interface ResponseProvided extends BaseProcessAction {
   type: 'WALLET.DISPUTE.RESPONDER.RESPONSE_PROVIDED';
   processId: string;
-  commitment: Commitment;
+  signedState: SignedState;
 }
 
 export interface ExitChallenge {

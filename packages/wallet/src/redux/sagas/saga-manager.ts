@@ -1,4 +1,4 @@
-import { select, take, fork, actionChannel, cancel } from 'redux-saga/effects';
+import { select, take, fork, actionChannel, cancel, call } from 'redux-saga/effects';
 
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
@@ -17,6 +17,7 @@ import { multipleActionDispatcher } from './multiple-action-dispatcher';
 
 import { adjudicatorStateUpdater } from './adjudicator-state-updater';
 import { isLoadAction } from '../actions';
+import { stateValidator } from './state-validator';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -87,6 +88,12 @@ export function* sagaManager(): IterableIterator<any> {
     if (outboxState.transactionOutbox.length) {
       const queuedTransaction = outboxState.transactionOutbox[0];
       yield transactionSender(queuedTransaction);
+    }
+    if (outboxState.validationOutbox.length) {
+      const validationRequest = outboxState.validationOutbox[0];
+      const provider = yield call(getProvider);
+
+      yield stateValidator(validationRequest, provider);
     }
   }
 }

@@ -11,13 +11,13 @@ import {
 } from '../consensus-update';
 import { routesToConsensusUpdate } from '../consensus-update/actions';
 import * as consensusUpdateActions from '../consensus-update/actions';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 
 export const initialize = ({
   processId,
   channelId,
   ledgerId,
-  proposedAllocation,
-  proposedDestination,
+  proposedOutcome,
   sharedData,
   clearedToProceed,
   protocolLocator,
@@ -25,8 +25,7 @@ export const initialize = ({
   processId: string;
   channelId: string;
   ledgerId: string;
-  proposedAllocation: string[];
-  proposedDestination: string[];
+  proposedOutcome: Outcome;
   sharedData: SharedData;
   clearedToProceed: boolean;
   protocolLocator: ProtocolLocator;
@@ -34,8 +33,7 @@ export const initialize = ({
   let ledgerUpdate: ConsensusUpdateState;
   ({ protocolState: ledgerUpdate, sharedData } = initializeConsensusUpdate({
     processId,
-    proposedAllocation,
-    proposedDestination,
+    proposedOutcome,
     channelId: ledgerId,
     clearedToSend: clearedToProceed,
     protocolLocator,

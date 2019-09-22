@@ -66,7 +66,7 @@ end
 
 subgraph CommonAction
 CommonAction --> WALLET.COMMON.COMMITMENT_RECEIVED
-CommonAction --> WALLET.COMMON.COMMITMENTS_RECEIVED
+CommonAction --> WALLET.COMMON.STATES_RECEIVED
 end
 
 subgraph FundingAction

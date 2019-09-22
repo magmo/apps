@@ -6,48 +6,45 @@ import { prependToLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
+import { EMPTY_SHARED_DATA } from '../../../state';
 import { mergeSharedData } from '../../../__tests__/helpers';
 const processId = 'process-id.123';
 
-const { ledgerId: channelId, channelId: appChannelId } = testScenarios;
-const twoThree = [
+const { TWO_PARTICIPANT_LEDGER_CHANNEL_ID: channelId, channelId: appChannelId } = testScenarios;
+const twoThree = testScenarios.convertBalanceToOutcome([
   { address: testScenarios.asAddress, wei: bigNumberify(2).toHexString() },
   { address: testScenarios.bsAddress, wei: bigNumberify(3).toHexString() },
-];
-const fundingAppChannel = [{ address: appChannelId, wei: bigNumberify(5).toHexString() }];
+]);
+const fundingAppChannel = testScenarios.convertBalanceToOutcome([
+  { address: appChannelId, wei: bigNumberify(5).toHexString() },
+]);
 
-const ledger4 = testScenarios.ledgerCommitment({ turnNum: 4, balances: twoThree });
-const ledger5 = testScenarios.ledgerCommitment({ turnNum: 5, balances: twoThree });
-const ledger6 = testScenarios.ledgerCommitment({ turnNum: 6, balances: twoThree, isFinal: true });
-const ledger7 = testScenarios.ledgerCommitment({ turnNum: 7, balances: twoThree, isFinal: true });
+const ledger4 = testScenarios.ledgerState({ turnNum: 4, outcome: twoThree });
+const ledger5 = testScenarios.ledgerState({ turnNum: 5, outcome: twoThree });
+const ledger6 = testScenarios.ledgerState({ turnNum: 6, outcome: twoThree, isFinal: true });
+const ledger7 = testScenarios.ledgerState({ turnNum: 7, outcome: twoThree, isFinal: true });
 
-const ledgerFundingChannel0 = testScenarios.ledgerCommitment({
+const ledgerFundingChannel0 = testScenarios.ledgerState({
   turnNum: 4,
-  balances: fundingAppChannel,
+  outcome: fundingAppChannel,
 });
-const ledgerFundingChannel1 = testScenarios.ledgerCommitment({
+const ledgerFundingChannel1 = testScenarios.ledgerState({
   turnNum: 5,
-  balances: fundingAppChannel,
+  outcome: fundingAppChannel,
 });
 
-const app5 = testScenarios.appCommitment({ turnNum: 5, balances: twoThree });
-const app6 = testScenarios.appCommitment({ turnNum: 6, balances: twoThree });
+const app5 = testScenarios.appState({ turnNum: 5, outcome: twoThree });
+const app6 = testScenarios.appState({ turnNum: 6, outcome: twoThree });
 
-const ledgerOpenSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger4, ledger5], testScenarios.asAddress, testScenarios.asPrivateKey),
+const ledgerOpenSharedData = testScenarios.setChannels(EMPTY_SHARED_DATA, [
+  testScenarios.channelStateFromStates([ledger4, ledger5]),
 ]);
-const ledgerConcludedSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([ledger6, ledger7], testScenarios.asAddress, testScenarios.asPrivateKey),
+const ledgerConcludedSharedData = testScenarios.setChannels(EMPTY_SHARED_DATA, [
+  testScenarios.channelStateFromStates([ledger6, ledger7]),
 ]);
-const ledgerFundingSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments(
-    [ledgerFundingChannel0, ledgerFundingChannel1],
-    testScenarios.asAddress,
-    testScenarios.asPrivateKey,
-  ),
-  channelFromCommitments([app5, app6], testScenarios.asAddress, testScenarios.asPrivateKey),
+const ledgerFundingSharedData = testScenarios.setChannels(EMPTY_SHARED_DATA, [
+  testScenarios.channelStateFromStates([ledgerFundingChannel0, ledgerFundingChannel1]),
+  testScenarios.channelStateFromStates([app5, app6]),
 ]);
 
 const waitForWithdrawal = states.waitForWithdrawal({
@@ -68,7 +65,7 @@ const waitForConclude = states.waitForConclude({
 export const happyPath = {
   initialize: {
     processId,
-    channelId: testScenarios.ledgerId,
+    channelId: testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
     sharedData: ledgerOpenSharedData,
   },
   // States
@@ -94,7 +91,7 @@ export const happyPath = {
 export const alreadyConcluded = {
   initialize: {
     processId,
-    channelId: testScenarios.ledgerId,
+    channelId: testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
     sharedData: ledgerConcludedSharedData,
   },
   // States
@@ -109,7 +106,7 @@ export const alreadyConcluded = {
 export const channelInUseFailure = {
   initialize: {
     processId,
-    channelId: testScenarios.ledgerId,
+    channelId: testScenarios.TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
     sharedData: ledgerFundingSharedData,
   },
 };

@@ -22,6 +22,7 @@ describe('when a side effect occured', () => {
     displayOutbox,
     transactionOutbox,
     messageOutbox,
+    validationOutbox: [],
   };
 
   it('clears the first element of the displayOutbox', () => {

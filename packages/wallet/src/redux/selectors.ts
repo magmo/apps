@@ -1,22 +1,27 @@
-import { OpenChannelState, ChannelState, isFullyOpen, getLastCommitment } from './channel-store';
+import { ChannelState } from './channel-store';
 import * as walletStates from './state';
 import { SharedData, FundingState } from './state';
 import { ProcessProtocol } from '../communication';
 import { CONSENSUS_LIBRARY_ADDRESS } from '../constants';
-import { Commitment } from '../domain';
+import { SignedState } from 'nitro-protocol';
+import { getChannelId } from 'nitro-protocol/lib/src/contract/channel';
+import { bigNumberify } from 'ethers/utils';
 
-export const getOpenedChannelState = (state: SharedData, channelId: string): OpenChannelState => {
+export const getOpenedChannelState = (state: SharedData, channelId: string): ChannelState => {
   const channelStatus = getChannelState(state, channelId);
   if (!isFullyOpen(channelStatus)) {
     throw new Error(`Channel ${channelId} is still in the process of being opened.`);
   }
   return channelStatus;
 };
+function isFullyOpen(channelState: ChannelState): boolean {
+  return channelState.turnNumRecord >= channelState.channel.participants.length;
+}
 
-export const doesACommitmentExistForChannel = (state: SharedData, channelId: string): boolean => {
+export const doesAStateExistForChannel = (state: SharedData, channelId: string): boolean => {
   return (
     state.channelStore[channelId] !== undefined &&
-    state.channelStore[channelId].commitments.length > 0
+    state.channelStore[channelId].signedStates.length > 0
   );
 };
 
@@ -28,9 +33,12 @@ export const getChannelState = (state: SharedData, channelId: string): ChannelSt
   return channelStatus;
 };
 
-export const getLastCommitmentForChannel = (state: SharedData, channelId: string): Commitment => {
+export const getLastState = (state: ChannelState) => {
+  return state.signedStates[state.signedStates.length - 1];
+};
+export const getLastStateForChannel = (state: SharedData, channelId: string): SignedState => {
   const channelState = getChannelState(state, channelId);
-  return getLastCommitment(channelState);
+  return getLastState(channelState);
 };
 
 export const getFundedLedgerChannelForParticipants = (
@@ -39,13 +47,16 @@ export const getFundedLedgerChannelForParticipants = (
   playerB: string,
 ): ChannelState | undefined => {
   // Finds a directly funded, two-party channel between players A and B
-  return Object.values(state.channelStore).find(channel => {
-    const fundingState = getChannelFundingState(state, channel.channelId);
+  return Object.values(state.channelStore).find(channelState => {
+    const channelId = getChannelId(channelState.channel);
+    const fundingState = getChannelFundingState(state, channelId);
     const directlyFunded: boolean = fundingState ? fundingState.directlyFunded : false;
+
+    const { appDefinition } = getLastState(channelState).state;
     return (
-      channel.libraryAddress === CONSENSUS_LIBRARY_ADDRESS &&
+      appDefinition === CONSENSUS_LIBRARY_ADDRESS &&
       // We call concat() on participants in order to not sort it in place
-      JSON.stringify(channel.participants.concat().sort()) ===
+      JSON.stringify(channelState.channel.participants.concat().sort()) ===
         JSON.stringify([playerA, playerB].sort()) &&
       directlyFunded
     );
@@ -105,19 +116,19 @@ export const getProtocolState = (state: walletStates.Initialized, processId: str
   return state.processStore[processId].protocolState;
 };
 
-export const getNextNonce = (
-  state: SharedData,
-
-  libraryAddress: string,
-): number => {
-  let highestNonce = -1;
+export const getNextNonce = (state: SharedData, libraryAddress: string): string => {
+  let highestNonce = '0x0';
   for (const channelId of Object.keys(state.channelStore)) {
-    const channel = state.channelStore[channelId];
-    if (channel.libraryAddress === libraryAddress && channel.channelNonce > highestNonce) {
+    const channelState = state.channelStore[channelId];
+    const { channel } = channelState;
+    const { appDefinition } = getLastState(channelState).state;
+    if (appDefinition === libraryAddress && bigNumberify(channel.channelNonce).gt(highestNonce)) {
       highestNonce = channel.channelNonce;
     }
   }
-  return highestNonce + 1;
+  return bigNumberify(highestNonce)
+    .add(1)
+    .toHexString();
 };
 
 export const getChannelIds = (state: SharedData): string[] => {

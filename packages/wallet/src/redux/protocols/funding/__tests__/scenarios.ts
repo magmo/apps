@@ -1,19 +1,20 @@
 import * as states from '../states';
 import * as actions from '../actions';
 
-import { EMPTY_SHARED_DATA, setChannels } from '../../../state';
+import { EMPTY_SHARED_DATA } from '../../../state';
 import {
   channelId,
   bsAddress,
   asAddress,
-  appCommitment,
-  asPrivateKey,
+  appState,
+  convertBalanceToOutcome,
+  channelStateFromStates,
+  setChannels,
 } from '../../../../domain/commitments/__tests__';
 import { preSuccess as ledgerFundingPreSuccess } from '../../ledger-funding/__tests__';
 import { preSuccess as virtualFundingPreSuccess } from '../../virtual-funding/__tests__';
 import { preSuccess as advanceChannelPreSuccess } from '../../advance-channel/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
 import { prependToLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
 import {
@@ -34,18 +35,17 @@ const props = {
   opponentAddress,
   ourAddress,
 };
-const oneThree = [
+const oneThree = convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(1).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
-];
-const app0 = appCommitment({ turnNum: 0, balances: oneThree });
-const app1 = appCommitment({ turnNum: 1, balances: oneThree });
-const app2 = appCommitment({ turnNum: 2, balances: oneThree });
-const app3 = appCommitment({ turnNum: 3, balances: oneThree });
-const appChannelWaitingForFunding = channelFromCommitments([app0, app1], asAddress, asPrivateKey);
-const successSharedData = setChannels(EMPTY_SHARED_DATA, [
-  channelFromCommitments([app2, app3], asAddress, asPrivateKey),
 ]);
+
+const app0 = appState({ turnNum: 0, outcome: oneThree });
+const app1 = appState({ turnNum: 1, outcome: oneThree });
+const app2 = appState({ turnNum: 2, outcome: oneThree });
+const app3 = appState({ turnNum: 3, outcome: oneThree });
+const appChannelWaitingForFunding = channelStateFromStates([app0, app1]);
+const successSharedData = setChannels(EMPTY_SHARED_DATA, [channelStateFromStates([app2, app3])]);
 // ----
 // States
 // ------
@@ -117,7 +117,7 @@ export const virtualFunding = {
   waitForStrategyNegotiation: {
     state: waitForVirtualStrategyNegotiation,
     sharedData: setChannels(virtualFundingPreSuccess.sharedData, [
-      channelFromCommitments([app2, app3], asAddress, asPrivateKey),
+      channelStateFromStates([app2, app3]),
     ]),
     action: virtualNegotiationPreSuccess.action,
   },
@@ -125,7 +125,7 @@ export const virtualFunding = {
   waitForVirtualFunding: {
     state: waitForVirtualFunding,
     sharedData: setChannels(virtualFundingPreSuccess.sharedData, [
-      channelFromCommitments([app2, app3], asAddress, asPrivateKey),
+      channelStateFromStates([app2, app3]),
     ]),
     action: virtualFundingPreSuccess.action,
   },

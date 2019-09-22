@@ -2,22 +2,22 @@ import * as scenarios from './scenarios';
 import { initialize, responderReducer } from '../reducer';
 
 import * as states from '../states';
-import { Commitment } from '../../../../../domain';
-import * as TransactionGenerator from '../../../../../utils/transaction-generator';
+
 import { SHOW_WALLET, HIDE_WALLET, CHALLENGE_COMPLETE } from 'magmo-wallet-client';
 import { itSendsThisDisplayEventType, itSendsThisMessage } from '../../../../__tests__/helpers';
 import { describeScenarioStep } from '../../../../__tests__/helpers';
+import { SignedState } from 'nitro-protocol';
 
 // Mocks
 const mockTransaction = { to: '0xabc' };
 const createRespondWithMoveMock = jest.fn().mockReturnValue(mockTransaction);
 const refuteMock = jest.fn().mockReturnValue(mockTransaction);
-Object.defineProperty(TransactionGenerator, 'createRespondWithMoveTransaction', {
-  value: createRespondWithMoveMock,
-});
-Object.defineProperty(TransactionGenerator, 'createRefuteTransaction', {
-  value: refuteMock,
-});
+// Object.defineProperty(TransactionGenerator, 'createRespondWithMoveTransaction', {
+//   value: createRespondWithMoveMock,
+// });
+// Object.defineProperty(TransactionGenerator, 'createRefuteTransaction', {
+//   value: refuteMock,
+// });
 
 // helpers
 
@@ -30,18 +30,15 @@ const itTransitionsToFailure = (
   });
 };
 
-const itCallsRespondWithMoveWith = (challengeCommitment: Commitment) => {
+const itCallsRespondWithMoveWith = (challengeState: SignedState) => {
   it('calls respond with move with the correct commitment', () => {
-    expect(createRespondWithMoveMock).toHaveBeenCalledWith(
-      challengeCommitment,
-      jasmine.any(String),
-    );
+    expect(createRespondWithMoveMock).toHaveBeenCalledWith(challengeState, jasmine.any(String));
   });
 };
 
-const itCallsRefuteWith = (refuteCommitment: Commitment) => {
+const itCallsRefuteWith = (refuteState: SignedState) => {
   it('calls refute with the correct commitment', () => {
-    expect(refuteMock).toHaveBeenCalledWith(refuteCommitment, jasmine.any(String));
+    expect(refuteMock).toHaveBeenCalledWith(refuteState, jasmine.any(String));
   });
 };
 
@@ -56,11 +53,11 @@ const itTransitionsTo = (
 
 const itSetsChallengeCommitment = (
   result: { protocolState: states.ResponderState },
-  commitment: Commitment,
+  signedState: SignedState,
 ) => {
   it('sets the correct challenge commitment', () => {
-    expect((result.protocolState as states.WaitForApproval).challengeCommitment).toMatchObject(
-      commitment,
+    expect((result.protocolState as states.WaitForApproval).challengeState).toMatchObject(
+      signedState,
     );
   });
 };

@@ -239,6 +239,10 @@ const waitForLoginReducer = (
         outboxState: accumulateSideEffects(state.outboxState, {
           messageOutbox: [initializationSuccess(address)],
         }),
+        adjudicatorState: {},
+        channelStore: {},
+        channelSubscriptions: {},
+        fundingState: {},
         processStore: {},
         privateKey,
         address,

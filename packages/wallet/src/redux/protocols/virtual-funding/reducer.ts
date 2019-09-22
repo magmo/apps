@@ -1,16 +1,14 @@
 import * as states from './states';
-import { SharedData, getPrivatekey, setFundingState } from '../../state';
+import { SharedData, getPrivateKey, setFundingState } from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer, makeLocator } from '..';
 import { WalletAction, advanceChannel } from '../../actions';
 import { VirtualFundingAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
-import { CommitmentType } from '../../../domain';
-import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
+
+import { CONSENSUS_LIBRARY_ADDRESS, ETH_ASSET_HOLDER } from '../../../constants';
 import { advanceChannelReducer } from '../advance-channel';
 import * as consensusUpdate from '../consensus-update';
 import * as ledgerFunding from '../ledger-funding';
-import { ethers } from 'ethers';
 import { addHex } from '../../../utils/hex-utils';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
 import { routesToAdvanceChannel } from '../advance-channel/actions';
@@ -20,40 +18,51 @@ import { EmbeddedProtocol } from '../../../communication';
 
 export const VIRTUAL_FUNDING_PROTOCOL_LOCATOR = 'VirtualFunding';
 import { CONSENSUS_UPDATE_PROTOCOL_LOCATOR } from '../consensus-update/reducer';
-import { TwoPartyPlayerIndex } from '../../types';
+import { StateType } from '../advance-channel/states';
+import { encodeConsensusData } from 'nitro-protocol/lib/src/contract/consensus-data';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
+import { getEthAllocation, addToEthAllocation } from '../reducer-helpers';
+import { getChannelState, getLastStateForChannel } from '../../selectors';
 
 export function initialize(
   sharedData: SharedData,
   args: states.InitializationArgs,
 ): ProtocolStateWithSharedData<states.NonTerminalVirtualFundingState> {
-  const {
-    ourIndex,
-    processId,
-    targetChannelId,
-    startingAllocation,
-    startingDestination,
-    hubAddress,
-    protocolLocator,
-  } = args;
-  const privateKey = getPrivatekey(sharedData, targetChannelId);
-  const channelType = CONSENSUS_LIBRARY_ADDRESS;
-
+  const { processId, targetChannelId, startingOutcome, hubAddress, protocolLocator } = args;
+  const privateKey = getPrivateKey(sharedData);
+  const ourAddress = sharedData.address;
+  const channel = getChannelState(sharedData, targetChannelId).channel;
+  const { chainId } = channel;
+  const appDefinition = CONSENSUS_LIBRARY_ADDRESS;
+  // TODO: Set challenge duration properly
+  const challengeDuration = '0x0';
+  // TODO: Add token support
+  const ethAllocation = getEthAllocation(startingOutcome);
+  if (!ethAllocation) {
+    throw new Error('No eth asset holder allocation');
+  }
   const initializationArgs = {
     privateKey,
-    channelType,
-    ourIndex,
-    commitmentType: CommitmentType.PreFundSetup,
+    appDefinition,
+    ourAddress,
+    stateType: StateType.PreFunding,
     clearedToSend: true,
     processId,
-    protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
-    participants: [...startingDestination, hubAddress],
-  };
 
-  const jointAllocation = [...startingAllocation, startingAllocation.reduce(addHex)];
-  const jointDestination = [...startingDestination, hubAddress];
+    protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
+    participants: [...ethAllocation.map(o => o.destination), hubAddress],
+  };
+  const total = ethAllocation.map(o => o.amount).reduce(addHex);
+  const jointOutcome = addToEthAllocation(
+    { amount: total, destination: hubAddress },
+    startingOutcome,
+  );
+
   const jointChannelInitialized = advanceChannel.initializeAdvanceChannel(sharedData, {
     ...initializationArgs,
-    ...channelSpecificArgs(jointAllocation, jointDestination),
+    ...channelSpecificArgs(jointOutcome),
+    chainId,
+    challengeDuration,
   });
 
   return {
@@ -61,9 +70,8 @@ export function initialize(
       processId,
       jointChannel: jointChannelInitialized.protocolState,
       targetChannelId,
-      startingAllocation,
-      startingDestination,
-      ourIndex,
+      ourAddress,
+      startingOutcome,
       hubAddress,
       protocolLocator,
     }),
@@ -99,21 +107,20 @@ function waitForJointChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId, hubAddress, ourIndex, protocolLocator } = protocolState;
+  const { processId, hubAddress, ourAddress, protocolLocator } = protocolState;
   if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const result = advanceChannelReducer(protocolState.jointChannel, sharedData, action);
 
     if (advanceChannel.isSuccess(result.protocolState)) {
       const { channelId: jointChannelId } = result.protocolState;
-      switch (result.protocolState.commitmentType) {
-        case CommitmentType.PreFundSetup:
+      switch (result.protocolState.stateType) {
+        case StateType.PreFunding:
           const jointChannelResult = advanceChannel.initializeAdvanceChannel(result.sharedData, {
             clearedToSend: true,
-            commitmentType: CommitmentType.PostFundSetup,
+            stateType: StateType.PostFunding,
             processId,
             protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
             channelId: jointChannelId,
-            ourIndex,
           });
 
           return {
@@ -123,25 +130,36 @@ function waitForJointChannelReducer(
             },
             sharedData: jointChannelResult.sharedData,
           };
-        case CommitmentType.PostFundSetup:
+        case StateType.PostFunding:
           const { targetChannelId } = protocolState;
-          const privateKey = getPrivatekey(sharedData, targetChannelId);
-          const ourAddress = new ethers.Wallet(privateKey).address;
-          const channelType = CONSENSUS_LIBRARY_ADDRESS;
-          const destination = [targetChannelId, ourAddress, hubAddress];
+          const privateKey = getPrivateKey(sharedData);
+
+          const { challengeDuration, channel } = getLastStateForChannel(
+            sharedData,
+            targetChannelId,
+          ).state;
+          const { chainId } = channel;
+          const destinations = [targetChannelId, ourAddress, hubAddress];
           const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
             result.sharedData,
             {
               clearedToSend: true,
-              commitmentType: CommitmentType.PreFundSetup,
+              stateType: StateType.PostFunding,
               processId,
               protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
-              ourIndex: TwoPartyPlayerIndex.A, // When creating the guarantor channel with the hub we are always the first player
               privateKey,
-              channelType,
+              ourAddress,
+              appDefinition: CONSENSUS_LIBRARY_ADDRESS,
+              challengeDuration,
               participants: [ourAddress, hubAddress],
-              guaranteedChannel: jointChannelId,
-              ...channelSpecificArgs([], destination),
+              chainId,
+
+              ...channelSpecificArgs([
+                {
+                  assetHolderAddress: ETH_ASSET_HOLDER,
+                  guarantee: { targetChannelId: jointChannelId, destinations },
+                },
+              ]),
             },
           );
           return {
@@ -179,7 +197,7 @@ function waitForGuarantorChannelReducer(
   sharedData: SharedData,
   action: WalletAction,
 ) {
-  const { processId, ourIndex, protocolLocator } = protocolState;
+  const { processId, ourAddress, protocolLocator } = protocolState;
   if (routesToAdvanceChannel(action, protocolState.protocolLocator)) {
     const result = advanceChannelReducer(protocolState.guarantorChannel, sharedData, action);
     if (advanceChannel.isSuccess(result.protocolState)) {
@@ -193,18 +211,17 @@ function waitForGuarantorChannelReducer(
         protocolState.jointChannelId,
         fundingState,
       );
-      switch (result.protocolState.commitmentType) {
-        case CommitmentType.PreFundSetup:
+      switch (result.protocolState.stateType) {
+        case StateType.PreFunding:
           const guarantorChannelResult = advanceChannel.initializeAdvanceChannel(
             result.sharedData,
             {
               clearedToSend: true,
-              commitmentType: CommitmentType.PostFundSetup,
+              stateType: StateType.PreFunding,
               processId,
               protocolLocator: makeLocator(protocolLocator, ADVANCE_CHANNEL_PROTOCOL_LOCATOR),
               channelId: guarantorChannelId,
-              ourIndex: TwoPartyPlayerIndex.A, // When creating the guarantor channel with the hub we are always the first player
-              guaranteedChannel: protocolState.jointChannelId,
+              ourAddress,
             },
           );
           return {
@@ -215,21 +232,14 @@ function waitForGuarantorChannelReducer(
             sharedData: guarantorChannelResult.sharedData,
           };
 
-        case CommitmentType.PostFundSetup:
-          const startingAllocation = [
-            protocolState.startingAllocation[ourIndex],
-            protocolState.startingAllocation[ourIndex],
-          ];
-          const startingDestination = [
-            protocolState.startingDestination[ourIndex],
-            protocolState.hubAddress,
-          ];
+        case StateType.PostFunding:
+          const startingOutcome: Outcome = [];
+
           const ledgerFundingResult = ledgerFunding.initializeLedgerFunding({
             processId,
             channelId: result.protocolState.channelId,
-            startingAllocation,
-            startingDestination,
-            participants: startingDestination,
+            startingOutcome,
+            participants: [sharedData.address, protocolState.hubAddress],
             sharedData: result.sharedData,
             protocolLocator: makeLocator(
               protocolState.protocolLocator,
@@ -243,20 +253,14 @@ function waitForGuarantorChannelReducer(
                 sharedData: ledgerFundingResult.sharedData,
               };
             default:
-              const { targetChannelId, hubAddress, jointChannelId } = protocolState;
+              const { jointChannelId } = protocolState;
               // We initialize our joint channel sub-protocol early in case we receive a commitment before we're done funding
-              const proposedAllocation = [
-                startingAllocation.reduce(addHex),
-                startingAllocation.reduce(addHex),
-              ];
-              const proposedDestination = [targetChannelId, hubAddress];
-
+              const proposedOutcome = [];
               const applicationFundingResult = consensusUpdate.initializeConsensusUpdate({
                 processId,
                 channelId: jointChannelId,
                 clearedToSend: false,
-                proposedAllocation,
-                proposedDestination,
+                proposedOutcome,
                 protocolLocator: makeLocator(
                   protocolState.protocolLocator,
                   CONSENSUS_UPDATE_PROTOCOL_LOCATOR,
@@ -365,9 +369,7 @@ function waitForGuarantorFundingReducer(
         };
     }
   } else {
-    console.warn(
-      `Expected ledgerFunding or consensusUpdate action, received ${action.type} instead`,
-    );
+    console.warn(`Expected ledgerFunding or consensusUpdate action`);
     return { protocolState, sharedData };
   }
 }
@@ -413,17 +415,9 @@ function waitForApplicationFundingReducer(
   return { protocolState, sharedData };
 }
 
-function channelSpecificArgs(
-  allocation: string[],
-  destination: string[],
-): { allocation: string[]; destination: string[]; appAttributes: string } {
+function channelSpecificArgs(outcome: Outcome): { outcome: Outcome; appData: string } {
   return {
-    allocation,
-    destination,
-    appAttributes: bytesFromAppAttributes({
-      proposedAllocation: [],
-      proposedDestination: [],
-      furtherVotesRequired: 0,
-    }),
+    outcome,
+    appData: encodeConsensusData({ proposedOutcome: [], furtherVotesRequired: 0 }),
   };
 }

@@ -1,5 +1,5 @@
 import {
-  CommitmentsReceived,
+  StatesReceived,
   BaseProcessAction,
   isCommonAction,
   ProtocolLocator,
@@ -14,7 +14,7 @@ export interface ClearedToSend extends BaseProcessAction {
   protocolLocator: ProtocolLocator;
 }
 
-export type AdvanceChannelAction = CommitmentsReceived | ClearedToSend;
+export type AdvanceChannelAction = StatesReceived | ClearedToSend;
 
 export const clearedToSend: ActionConstructor<ClearedToSend> = p => {
   const { processId, protocolLocator } = p;

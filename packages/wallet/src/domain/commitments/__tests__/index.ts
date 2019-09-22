@@ -1,11 +1,16 @@
-import { SignedCommitment, signCommitment2, CommitmentType } from '..';
 import { bigNumberify } from 'ethers/utils';
 import { channelID } from 'fmg-core/lib/channel';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../../constants';
-import { bytesFromAppAttributes } from 'fmg-nitro-adjudicator/lib/consensus-app';
+import { ETH_ASSET_HOLDER } from '../../../constants';
 import { ThreePartyPlayerIndex, TwoPartyPlayerIndex } from '../../../redux/types';
 import { unreachable } from '../../../utils/reducer-utils';
-
+import { encodeConsensusData } from 'nitro-protocol/lib/src/contract/consensus-data';
+import { Outcome, AllocationAssetOutcome } from 'nitro-protocol/lib/src/contract/outcome';
+import { State } from 'nitro-protocol/lib/src/contract/state';
+import { Channel, getChannelId } from 'nitro-protocol/lib/src/contract/channel';
+import { signState } from 'nitro-protocol/lib/src/signatures';
+import { SignedState } from 'nitro-protocol';
+import { ChannelState } from '../../../redux/channel-store';
+import { SharedData } from '../../../redux/state';
 export const asPrivateKey = '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d';
 export const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
 export const bsPrivateKey = '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72';
@@ -15,48 +20,44 @@ export const hubAddress = '0xAbcdE1140bA6aE8e702b78f63A4eA1D1553144a1';
 
 export const threeParticipants: [string, string, string] = [asAddress, bsAddress, hubAddress];
 export const participants: [string, string] = [asAddress, bsAddress];
-
+export const TEST_CONSENSUS_LIBRARY_ADDRESS = '0x' + '2'.repeat(40);
 export const libraryAddress = '0x' + '1'.repeat(40);
 export const channelNonce = 4;
 export const channel = { channelType: libraryAddress, nonce: channelNonce, participants };
 export const channelId = channelID(channel);
 
-function typeAndCount(
-  turnNum: number,
-  isFinal: boolean,
-  numParticipants = 2,
-): { commitmentCount: number; commitmentType: CommitmentType } {
-  let commitmentCount;
-  let commitmentType;
-  if (isFinal) {
-    commitmentCount = turnNum % numParticipants;
-    commitmentType = CommitmentType.Conclude;
-  } else if (turnNum < numParticipants) {
-    commitmentCount = turnNum;
-    commitmentType = CommitmentType.PreFundSetup;
-  } else if (turnNum < 2 * numParticipants) {
-    commitmentCount = turnNum - numParticipants;
-    commitmentType = CommitmentType.PostFundSetup;
-  } else {
-    commitmentType = CommitmentType.App;
-    commitmentCount = 0;
-  }
-  return { commitmentCount, commitmentType };
-}
+// TODO: Move this to the correct location
+export const convertAddressToBytes32 = (address: string) => {
+  const hexValue = bigNumberify(address).toHexString();
+  return hexValue.padEnd(66, '0');
+};
 
-interface Balance {
-  address: string;
-  wei: string;
-}
-
-export const twoThree = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
+export const convertBytes32ToAddress = (bytes: string) => {
+  const hexValue = bigNumberify(bytes).toHexString();
+  return hexValue.slice(0, 42);
+};
+export const twoThree: Outcome = [
+  {
+    assetHolderAddress: ETH_ASSET_HOLDER,
+    allocation: [
+      {
+        destination: convertAddressToBytes32(asAddress),
+        amount: bigNumberify(2).toHexString(),
+      },
+      { destination: convertAddressToBytes32(bsAddress), amount: bigNumberify(3).toHexString() },
+    ],
+  },
 ];
-const twoThreeTwo = [
-  { address: asAddress, wei: bigNumberify(2).toHexString() },
-  { address: bsAddress, wei: bigNumberify(3).toHexString() },
-  { address: hubAddress, wei: bigNumberify(2).toHexString() },
+
+const twoThreeTwo: Outcome = [
+  {
+    assetHolderAddress: ETH_ASSET_HOLDER,
+    allocation: [
+      { destination: convertAddressToBytes32(asAddress), amount: bigNumberify(2).toHexString() },
+      { destination: convertAddressToBytes32(bsAddress), amount: bigNumberify(3).toHexString() },
+      { destination: convertAddressToBytes32(hubAddress), amount: bigNumberify(2).toHexString() },
+    ],
+  },
 ];
 
 export const addressAndPrivateKeyLookup: {
@@ -69,148 +70,154 @@ export const addressAndPrivateKeyLookup: {
   [ThreePartyPlayerIndex.Hub]: { address: hubAddress, privateKey: hubPrivateKey },
 };
 
-const blankBalance: Balance[] = [];
+const blankOutcome: Outcome = [];
 
 interface AppCommitmentParams {
   turnNum: number;
   isFinal?: boolean;
-  balances?: Balance[];
-  appAttributes?: string;
+  outcome?: Outcome;
+  appData?: string;
 }
 
-const EMPTY_APP_ATTRIBUTES = bytesFromAppAttributes({
+const EMPTY_APP_DATA = encodeConsensusData({
   furtherVotesRequired: 0,
-  proposedAllocation: [],
-  proposedDestination: [],
+  proposedOutcome: [],
 });
-export function appCommitment(params: AppCommitmentParams): SignedCommitment {
-  const turnNum = params.turnNum;
-  const balances = params.balances || twoThree;
-  const isFinal = params.isFinal || false;
-  const appAttributes = params.appAttributes || EMPTY_APP_ATTRIBUTES;
-  const allocation = balances.map(b => b.wei);
-  const destination = balances.map(b => b.address);
-  const { commitmentCount, commitmentType } = typeAndCount(turnNum, isFinal);
+export const APP_CHANNEL: Channel = {
+  chainId: '0x1',
+  channelNonce: '0x5',
+  participants: [asAddress, bsAddress],
+};
 
-  const commitment = {
-    channel,
-    commitmentCount,
-    commitmentType,
+export function appState(params: AppCommitmentParams): SignedState {
+  const turnNum = params.turnNum;
+  const outcome = params.outcome || twoThree;
+  const isFinal = params.isFinal || false;
+  const appData = params.appData || EMPTY_APP_DATA;
+
+  const state: State = {
     turnNum,
-    appAttributes,
-    allocation,
-    destination,
+    outcome,
+    isFinal,
+    appData,
+    appDefinition: '0x0',
+    channel: APP_CHANNEL,
+    challengeDuration: '0x1',
   };
   const privateKey = turnNum % 2 === 0 ? asPrivateKey : bsPrivateKey;
 
-  return signCommitment2(commitment, privateKey);
+  return signState(state, privateKey);
 }
 
-function ledgerAppAttributes(furtherVotesRequired, proposedBalances: Balance[]) {
-  const proposedAllocation = proposedBalances.map(b => b.wei);
-  const proposedDestination = proposedBalances.map(b => b.address);
-  return bytesFromAppAttributes({
-    proposedAllocation,
-    proposedDestination,
-    furtherVotesRequired,
-  });
-}
-
-interface LedgerCommitmentParams {
+interface LedgerStateParams {
   turnNum: number;
   isFinal?: boolean;
-  balances?: Balance[];
-  proposedBalances?: Balance[];
+  outcome?: Outcome;
+  proposedOutcome?: Outcome;
 }
 
-interface ThreeWayLedgerCommitmentParams extends LedgerCommitmentParams {
-  isVote?: boolean;
-  commitmentCount?: number;
+interface ThreeWayLedgerStateParams extends LedgerStateParams {
+  furtherVotesRequired?: number;
 }
 
-const LEDGER_CHANNEL_NONCE = 0;
-export const ledgerChannel = {
-  nonce: LEDGER_CHANNEL_NONCE,
-  channelType: CONSENSUS_LIBRARY_ADDRESS,
+const LEDGER_CHANNEL_NONCE = 800;
+
+export const TWO_PARTICIPANT_LEDGER_CHANNEL: Channel = {
   participants,
+  chainId: '0x1',
+  channelNonce: bigNumberify(LEDGER_CHANNEL_NONCE).toHexString(),
 };
-export const ledgerId = channelID(ledgerChannel);
-
-export const threeWayLedgerChannel = {
-  nonce: LEDGER_CHANNEL_NONCE,
-  channelType: CONSENSUS_LIBRARY_ADDRESS,
+export const TWO_PARTICIPANT_LEDGER_CHANNEL_ID = getChannelId(TWO_PARTICIPANT_LEDGER_CHANNEL);
+export const THREE_PARTICIPANT_LEDGER_CHANNEL: Channel = {
   participants: threeParticipants,
+  chainId: '0x1',
+  channelNonce: bigNumberify(LEDGER_CHANNEL_NONCE).toHexString(),
 };
-export const threeWayLedgerId = channelID(threeWayLedgerChannel);
+export const THREE_PARTICIPANT_LEDGER_CHANNEL_ID = getChannelId(THREE_PARTICIPANT_LEDGER_CHANNEL);
 
-export function threeWayLedgerCommitment(params: ThreeWayLedgerCommitmentParams): SignedCommitment {
+export function threeWayLedgerState(params: ThreeWayLedgerStateParams): SignedState {
   const turnNum = params.turnNum;
   const isFinal = params.isFinal || false;
-  const balances = params.balances || twoThreeTwo;
-  let proposedBalances = params.proposedBalances || blankBalance;
-  let furtherVotesRequired = 0;
-  if (params.proposedBalances) {
-    furtherVotesRequired = params.isVote ? 1 : 2;
-    proposedBalances = params.proposedBalances;
-  }
-
-  const allocation = balances.map(b => b.wei);
-  const destination = balances.map(b => b.address);
-  // TODO: Find a better way of handling the conclude case
-  // For now we'll just accept an argument to override commitmentCount
-  const { commitmentCount, commitmentType } = typeAndCount(turnNum, isFinal, 3);
-
-  const appAttributes = ledgerAppAttributes(furtherVotesRequired, proposedBalances);
-  const commitment = {
-    channel: threeWayLedgerChannel,
-    commitmentCount: params.commitmentCount || commitmentCount,
-    commitmentType,
+  const outcome = params.outcome || twoThreeTwo;
+  const proposedOutcome = params.proposedOutcome || blankOutcome;
+  const furtherVotesRequired: number = params.furtherVotesRequired || 0;
+  const appData = encodeConsensusData({ proposedOutcome, furtherVotesRequired });
+  const state: State = {
     turnNum,
-    appAttributes,
-    allocation,
-    destination,
+    challengeDuration: '0x1',
+    isFinal,
+    outcome,
+    appDefinition: TEST_CONSENSUS_LIBRARY_ADDRESS,
+    appData,
+    channel: THREE_PARTICIPANT_LEDGER_CHANNEL,
   };
-
   const idx: ThreePartyPlayerIndex = turnNum % 3;
   switch (idx) {
     case ThreePartyPlayerIndex.A:
-      return signCommitment2(commitment, asPrivateKey);
+      return signState(state, asPrivateKey);
     case ThreePartyPlayerIndex.B:
-      return signCommitment2(commitment, bsPrivateKey);
+      return signState(state, bsPrivateKey);
     case ThreePartyPlayerIndex.Hub:
-      return signCommitment2(commitment, hubPrivateKey);
+      return signState(state, hubPrivateKey);
     default:
       return unreachable(idx);
   }
 }
 
-export function ledgerCommitment(params: LedgerCommitmentParams): SignedCommitment {
+export function ledgerState(params: LedgerStateParams): SignedState {
   const turnNum = params.turnNum;
   const isFinal = params.isFinal || false;
-  const balances = params.balances || twoThree;
-  let proposedBalances = params.proposedBalances || blankBalance;
+  const outcome = params.outcome || twoThree;
+  const proposedOutcome = params.proposedOutcome || blankOutcome;
   let furtherVotesRequired = 0;
-  if (params.proposedBalances) {
+  if (params.proposedOutcome) {
     furtherVotesRequired = 1;
-    proposedBalances = params.proposedBalances;
   }
-  const allocation = balances.map(b => b.wei);
-  const destination = balances.map(b => b.address);
-  const { commitmentCount, commitmentType } = typeAndCount(turnNum, isFinal);
-
-  const appAttributes = ledgerAppAttributes(furtherVotesRequired, proposedBalances);
-
-  const commitment = {
-    channel: ledgerChannel,
-    commitmentCount,
-    commitmentType,
+  const appData = encodeConsensusData({ proposedOutcome, furtherVotesRequired });
+  const state: State = {
     turnNum,
-    appAttributes,
-    allocation,
-    destination,
+    challengeDuration: '0x1',
+    isFinal,
+    outcome,
+    appDefinition: TEST_CONSENSUS_LIBRARY_ADDRESS,
+    appData,
+    channel: TWO_PARTICIPANT_LEDGER_CHANNEL,
   };
 
   const privateKey = turnNum % 2 === 0 ? asPrivateKey : bsPrivateKey;
 
-  return signCommitment2(commitment, privateKey);
+  return signState(state, privateKey);
+}
+
+export function channelStateFromStates(signedStates: SignedState[]): ChannelState {
+  const lastState = signedStates[signedStates.length - 1].state;
+  return {
+    type: 'Channel.WaitForState',
+    signedStates,
+    turnNumRecord: lastState.turnNum,
+    channel: lastState.channel,
+  };
+}
+
+export function setChannels(sharedData: SharedData, channelStates: ChannelState[]): SharedData {
+  const channelStore = {};
+  channelStates.forEach(s => {
+    const cId = getChannelId(s.channel);
+    channelStore[cId] = s;
+  });
+  return { ...sharedData, channelStore };
+}
+
+export function convertBalanceToOutcome(
+  balances: Array<{ wei: string; address: string }>,
+): AllocationAssetOutcome[] {
+  const allocation = balances.map(b => {
+    return { destination: convertAddressToBytes32(b.address), amount: b.wei };
+  });
+  return [
+    {
+      assetHolderAddress: ETH_ASSET_HOLDER,
+      allocation,
+    },
+  ];
 }

@@ -9,14 +9,14 @@ import {
 import {
   itSendsThisMessage,
   itSendsThisDisplayEventType,
-  itStoresThisCommitment,
   describeScenarioStep,
+  itStoresThisState,
 } from '../../../../__tests__/helpers';
 import {
   HIDE_WALLET,
   CHALLENGE_COMPLETE,
-  CHALLENGE_COMMITMENT_RECEIVED,
   SHOW_WALLET,
+  CHALLENGE_STATE_RECEIVED,
 } from 'magmo-wallet-client';
 
 describe('OPPONENT RESPONDS', () => {
@@ -62,11 +62,11 @@ describe('OPPONENT RESPONDS', () => {
     });
   });
   describeScenarioStep(scenario.waitForResponseOrTimeoutReceiveResponse, () => {
-    const { state, action, commitment } = scenario.waitForResponseOrTimeoutReceiveResponse;
+    const { state, action, signedState } = scenario.waitForResponseOrTimeoutReceiveResponse;
     const result = challengerReducer(state, sharedData, action);
 
-    itSendsThisMessage(result.sharedData, CHALLENGE_COMMITMENT_RECEIVED);
-    itStoresThisCommitment(result.sharedData, commitment);
+    itSendsThisMessage(result.sharedData, CHALLENGE_STATE_RECEIVED);
+    itStoresThisState(result.sharedData, signedState);
     itTransitionsTo(result, 'Challenging.AcknowledgeResponse');
   });
 

@@ -38,7 +38,7 @@ const challengeCreatedEventReducer = (
   state: AdjudicatorState,
   action: actions.ChallengeCreatedEvent,
 ) => {
-  const challenge = { expiresAt: action.finalizedAt, challengeCommitment: action.commitment };
+  const challenge = { expiresAt: action.finalizedAt, challengeState: action.signedState };
   return setChallenge(state, action.channelId, challenge);
 };
 

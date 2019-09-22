@@ -5,12 +5,7 @@ import { SharedData, queueMessage } from '../../state';
 import { ProtocolStateWithSharedData, makeLocator, EMPTY_LOCATOR } from '..';
 import { unreachable } from '../../../utils/reducer-utils';
 
-import {
-  showWallet,
-  hideWallet,
-  sendFundingComplete,
-  getLatestCommitment,
-} from '../reducer-helpers';
+import { showWallet, hideWallet, sendFundingComplete } from '../reducer-helpers';
 import { fundingFailure } from 'magmo-wallet-client';
 import { EmbeddedProtocol } from '../../../communication';
 
@@ -28,7 +23,6 @@ import {
 } from '../advance-channel';
 import * as advanceChannelStates from '../advance-channel/states';
 import { clearedToSend, routesToAdvanceChannel } from '../advance-channel/actions';
-import { CommitmentType } from '../../../domain';
 import { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../advance-channel/reducer';
 import { routesToLedgerFunding } from '../ledger-funding/actions';
 import { routesToVirtualFunding } from '../virtual-funding/actions';
@@ -47,6 +41,7 @@ import {
 } from '../funding-strategy-negotiation/actions';
 import * as fundingStrategyNegotiationStates from '../funding-strategy-negotiation/states';
 import { ProtocolAction } from '../../actions';
+import { getLastStateForChannel } from '../../selectors';
 
 export function initialize(
   sharedData: SharedData,
@@ -54,7 +49,7 @@ export function initialize(
   channelId: string,
 ): ProtocolStateWithSharedData<states.FundingState> {
   const opponentAddress = helpers.getOpponentAddress(channelId, sharedData);
-  const ourAddress = helpers.getOurAddress(channelId, sharedData);
+  const ourAddress = sharedData.address;
 
   let fundingStrategyNegotiationState: FundingStrategyNegotiationState;
   ({
@@ -175,23 +170,21 @@ function handleFundingStrategyNegotiationComplete({
     let advanceChannelState: advanceChannelStates.AdvanceChannelState;
     ({ protocolState: advanceChannelState, sharedData } = initializeAdvanceChannel(sharedData, {
       channelId: targetChannelId,
-      ourIndex: helpers.getTwoPlayerIndex(targetChannelId, sharedData),
       processId,
-      commitmentType: CommitmentType.PostFundSetup,
+      stateType: advanceChannelStates.StateType.PostFunding,
       clearedToSend: false,
       protocolLocator: ADVANCE_CHANNEL_PROTOCOL_LOCATOR,
     }));
 
     switch (fundingStrategyNegotiationState.selectedFundingStrategy) {
       case 'IndirectFundingStrategy': {
-        const latestCommitment = getLatestCommitment(targetChannelId, sharedData);
+        const latestState = getLastStateForChannel(sharedData, targetChannelId).state;
         let fundingState: ledgerFundingStates.LedgerFundingState;
         ({ protocolState: fundingState, sharedData } = initializeLedgerFunding({
           processId,
           channelId: targetChannelId,
-          startingAllocation: latestCommitment.allocation,
-          startingDestination: latestCommitment.destination,
-          participants: latestCommitment.channel.participants,
+          startingOutcome: latestState.outcome,
+          participants: latestState.channel.participants,
           sharedData,
           protocolLocator: makeLocator(EmbeddedProtocol.LedgerFunding),
         }));
@@ -214,13 +207,10 @@ function handleFundingStrategyNegotiationComplete({
         };
       }
       case 'VirtualFundingStrategy': {
-        const {
-          allocation: startingAllocation,
-          destination: startingDestination,
-          channel,
-        } = helpers.getLatestCommitment(targetChannelId, sharedData);
-
-        const ourIndex = channel.participants.indexOf(ourAddress);
+        const { outcome: startingOutcome } = getLastStateForChannel(
+          sharedData,
+          targetChannelId,
+        ).state;
 
         let fundingState: virtualFunding.VirtualFundingState;
         ({ protocolState: fundingState, sharedData } = virtualFunding.initializeVirtualFunding(
@@ -228,11 +218,10 @@ function handleFundingStrategyNegotiationComplete({
           {
             processId,
             targetChannelId,
-            ourIndex,
+            startingOutcome,
+            ourAddress: sharedData.address,
             // TODO: This should be an env variable
             hubAddress: '0x100063c326b27f78b2cBb7cd036B8ddE4d4FCa7C',
-            startingAllocation,
-            startingDestination,
             protocolLocator: makeLocator(EmbeddedProtocol.VirtualFunding),
           },
         ));

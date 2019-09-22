@@ -2,12 +2,12 @@ import { NonTerminalExistingLedgerFundingState } from '../existing-ledger-fundin
 import { StateConstructor } from '../../utils';
 import { NonTerminalNewLedgerChannelState } from '../new-ledger-channel/states';
 import { ProtocolLocator } from '../../../communication';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 
 interface Base {
   processId: string;
   channelId: string;
-  startingAllocation: string[];
-  startingDestination: string[];
+  startingOutcome: Outcome;
   protocolLocator: ProtocolLocator;
 }
 export interface WaitForNewLedgerChannel extends Base {

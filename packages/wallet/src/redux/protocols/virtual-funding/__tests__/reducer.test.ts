@@ -3,12 +3,10 @@ import { initialize, reducer } from '../reducer';
 import * as scenarios from './scenarios';
 import {
   scenarioStepDescription,
-  itSendsTheseCommitments,
+  itSendsTheseStates,
   itSendsNoMessage,
 } from '../../../__tests__/helpers';
 import { preFund, postFund } from '../../advance-channel/__tests__';
-import { CONSENSUS_LIBRARY_ADDRESS } from '../../../../constants';
-import { bigNumberify } from 'ethers/utils';
 import { asAddress } from '../../../../domain/commitments/__tests__';
 
 const itTransitionsTo = (
@@ -26,11 +24,6 @@ const itTransitionsSubstateTo = (result: any, substate: string, type: string) =>
   });
 };
 
-const allocation = [
-  bigNumberify(2).toHexString(),
-  bigNumberify(3).toHexString(),
-  bigNumberify(5).toHexString(),
-];
 describe('happyPath', () => {
   const scenario = scenarios.happyPath;
   const { hubAddress } = scenario;
@@ -40,7 +33,7 @@ describe('happyPath', () => {
     const { protocolState, sharedData: result } = initialize(sharedData, args);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForJointChannel');
-    itSendsTheseCommitments(result, [{ commitment: { turnNum: 0, allocation } }]);
+    itSendsTheseStates(result, [{ state: { turnNum: 0 } }]);
   });
 
   describe('openJ', () => {
@@ -53,26 +46,24 @@ describe('happyPath', () => {
     // since we're using the preSuccess scenarios from advance-channel, which sets up a joint
     // 3-party channel, three get sent out.
     // TODO: Fix this by constructing appropriate test data
-    itSendsTheseCommitments(result, [
-      { commitment: { turnNum: 1 } },
-      { commitment: { turnNum: 2 } },
-      { commitment: { turnNum: 3 } },
+    itSendsTheseStates(result, [
+      { state: { turnNum: 1 } },
+      { state: { turnNum: 2 } },
+      { state: { turnNum: 3 } },
     ]);
   });
 
   describe(scenarioStepDescription(scenario.prepareJ), () => {
-    const { targetChannelId, ourAddress } = scenario;
     const { state, sharedData, action } = scenario.prepareJ;
     const { protocolState, sharedData: result } = reducer(state, sharedData, action);
 
     itTransitionsTo(protocolState, 'VirtualFunding.WaitForGuarantorChannel');
     itTransitionsSubstateTo(protocolState, 'guarantorChannel', postFund.preSuccess.state.type);
-    itSendsTheseCommitments(result, [
+    itSendsTheseStates(result, [
       {
-        commitment: {
+        state: {
           turnNum: 0,
-          allocation: [],
-          destination: [targetChannelId, ourAddress, hubAddress],
+          outcome: [], // TODO: Check for guarantor outcome
         },
       },
     ]);
@@ -88,10 +79,10 @@ describe('happyPath', () => {
     // since we're using the preSuccess scenarios from advance-channel, which sets up a joint
     // 3-party channel, three get sent out.
     // TODO: Fix this by constructing appropriate test data
-    itSendsTheseCommitments(result, [
-      { commitment: { turnNum: 1 } },
-      { commitment: { turnNum: 2 } },
-      { commitment: { turnNum: 3 } },
+    itSendsTheseStates(result, [
+      { state: { turnNum: 1 } },
+      { state: { turnNum: 2 } },
+      { state: { turnNum: 3 } },
     ]);
   });
 
@@ -106,14 +97,14 @@ describe('happyPath', () => {
       'LedgerFunding.WaitForNewLedgerChannel',
     );
 
-    itSendsTheseCommitments(result, [
+    itSendsTheseStates(result, [
       {
-        commitment: {
+        state: {
           turnNum: 0,
           channel: {
             participants: [asAddress, hubAddress],
-            nonce: expect.any(Number),
-            channelType: CONSENSUS_LIBRARY_ADDRESS,
+            channelNonce: expect.any(Number),
+            chainId: '0x1',
           },
         },
       },

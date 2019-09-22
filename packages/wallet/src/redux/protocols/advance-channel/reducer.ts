@@ -1,28 +1,17 @@
 import * as states from './states';
-import {
-  SharedData,
-  registerChannelToMonitor,
-  signAndInitialize,
-  checkAndInitialize,
-  signAndStore,
-  getExistingChannel,
-} from '../../state';
+import { SharedData, registerChannelToMonitor } from '../../state';
 import { ProtocolStateWithSharedData, ProtocolReducer } from '..';
-import { CommitmentType, Commitment, getChannelId, nextSetupCommitment } from '../../../domain';
-import {
-  getChannel,
-  getLastCommitment,
-  ChannelState,
-  getPenultimateCommitment,
-} from '../../channel-store';
 import { WalletAction } from '../../actions';
 import * as selectors from '../../selectors';
-import { CommitmentsReceived } from '../../../communication';
-import { Channel } from 'fmg-core';
+import { StatesReceived } from '../../../communication';
 import { isAdvanceChannelAction } from './actions';
 import { unreachable } from '../../../utils/reducer-utils';
 import { Properties } from '../../utils';
 import * as helpers from '../reducer-helpers';
+import { Channel, getChannelId } from 'nitro-protocol/lib/src/contract/channel';
+import { State } from 'nitro-protocol/lib/src/contract/state';
+import { signState } from 'nitro-protocol/lib/src/signatures';
+import { storeState, storeStates } from '../../channel-store/reducer';
 
 export { ADVANCE_CHANNEL_PROTOCOL_LOCATOR } from '../../../communication/protocol-locator';
 
@@ -33,8 +22,8 @@ export function initialize(
   sharedData: Storage,
   args: OngoingChannelArgs | NewChannelArgs,
 ): ReturnVal {
-  const { commitmentType, processId } = args;
-  if (commitmentType === CommitmentType.PreFundSetup) {
+  const { stateType, processId } = args;
+  if (stateType === states.StateType.PreFunding) {
     if (!isNewChannelArgs(args)) {
       throw new Error('Must receive NewChannelArgs');
     }
@@ -54,14 +43,14 @@ export const reducer: ProtocolReducer<states.AdvanceChannelState> = (
   action: WalletAction,
 ) => {
   if (!isAdvanceChannelAction(action)) {
-    console.error('Invalid action: expected WALLET.COMMON.COMMITMENTS_RECEIVED');
+    console.error('Invalid action: expected WALLET.COMMON.STATES_RECEIVED');
     return { protocolState, sharedData };
   }
 
   switch (action.type) {
     case 'WALLET.ADVANCE_CHANNEL.CLEARED_TO_SEND':
       return clearedToSendReducer(protocolState, sharedData);
-    case 'WALLET.COMMON.COMMITMENTS_RECEIVED':
+    case 'WALLET.COMMON.STATES_RECEIVED':
       switch (protocolState.type) {
         case 'AdvanceChannel.ChannelUnknown': {
           return channelUnknownReducer(protocolState, sharedData, action);
@@ -114,49 +103,45 @@ function initializeWithNewChannel(
   initializeChannelArgs: NewChannelArgs,
 ) {
   const {
-    channelType,
-    destination,
-    appAttributes,
-    allocation,
-    ourIndex,
+    outcome,
+    appData,
     clearedToSend,
     protocolLocator,
+    chainId,
     participants,
-    guaranteedChannel,
+    appDefinition,
+    challengeDuration,
   } = initializeChannelArgs;
 
-  if (helpers.isSafeToSend({ sharedData, ourIndex, clearedToSend })) {
+  if (helpers.isSafeToSend({ sharedData, participants, clearedToSend })) {
     // Initialize the channel in the store
-    const nonce = selectors.getNextNonce(sharedData, channelType);
+    const channelNonce = selectors.getNextNonce(sharedData, chainId);
     const channel: Channel = {
-      nonce,
+      channelNonce,
       participants,
-      channelType,
-      guaranteedChannel,
+      chainId,
     };
-    const ourCommitment: Commitment = {
-      turnNum: 0,
-      commitmentCount: 0,
-      commitmentType: CommitmentType.PreFundSetup,
-      appAttributes,
-      allocation,
-      destination,
+    const ourState: State = {
       channel,
+      turnNum: 0,
+      isFinal: false,
+      appData,
+      appDefinition,
+      challengeDuration,
+      outcome,
     };
     const { privateKey } = initializeChannelArgs;
-    const signResult = signAndInitialize(sharedData, ourCommitment, privateKey);
-    if (!signResult.isSuccess) {
-      throw new Error('Could not store new ledger channel commitment.');
-    }
-    sharedData = signResult.store;
+    const signedState = signState(ourState, privateKey);
+
+    sharedData = storeState(signedState, sharedData);
 
     // Register channel to monitor
-    const channelId = getChannelId(ourCommitment);
+    const channelId = getChannelId(channel);
     sharedData = registerChannelToMonitor(sharedData, processId, channelId, protocolLocator);
 
     // Send commitments to next participant
-    sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
-    const protocolState = states.commitmentSent({
+    sharedData = helpers.sendStates(sharedData, processId, channelId, protocolLocator);
+    const protocolState = states.stateSent({
       ...initializeChannelArgs,
       processId,
       channelId,
@@ -180,20 +165,25 @@ function initializeWithExistingChannel(
   sharedData: Storage,
   initializeChannelArgs: OngoingChannelArgs,
 ) {
-  const { channelId, ourIndex, clearedToSend, protocolLocator } = initializeChannelArgs;
-  const channel = getChannel(sharedData.channelStore, channelId);
-  if (helpers.isSafeToSend({ sharedData, ourIndex, clearedToSend, channelId })) {
-    const ourCommitment = nextCommitment(channel, initializeChannelArgs.commitmentType);
+  const { channelId, clearedToSend, protocolLocator } = initializeChannelArgs;
+  const channelState = selectors.getChannelState(sharedData, channelId);
+  if (
+    helpers.isSafeToSend({
+      participants: channelState.channel.participants,
+      sharedData,
+      clearedToSend,
+      channelId,
+    })
+  ) {
+    const lastState = selectors.getLastStateForChannel(sharedData, channelId).state;
 
-    const signResult = signAndStore(sharedData, ourCommitment);
-    if (!signResult.isSuccess) {
-      throw new Error('Could not store new ledger channel commitment.');
-    }
-    sharedData = signResult.store;
+    const ourState = { ...lastState, turnNum: lastState.turnNum + 1 };
+    const ourSignedState = signState(ourState, sharedData.privateKey);
 
-    sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
+    sharedData = storeState(ourSignedState, sharedData);
+    sharedData = helpers.sendStates(sharedData, processId, channelId, protocolLocator);
 
-    const protocolState = states.commitmentSent({
+    const protocolState = states.stateSent({
       ...initializeChannelArgs,
       processId,
       channelId,
@@ -212,28 +202,23 @@ function attemptToAdvanceChannel(
   protocolState: states.ChannelUnknown | states.NotSafeToSend,
   channelId: string,
 ): { sharedData: SharedData; protocolState: states.AdvanceChannelState } {
-  const { ourIndex, commitmentType, clearedToSend, protocolLocator, processId } = protocolState;
+  const { clearedToSend, protocolLocator, processId } = protocolState;
 
-  let channel = getChannel(sharedData.channelStore, channelId);
-  if (helpers.isSafeToSend({ sharedData, ourIndex, channelId, clearedToSend })) {
+  const latestState = selectors.getLastStateForChannel(sharedData, channelId).state;
+  const { participants } = latestState.channel;
+  if (helpers.isSafeToSend({ sharedData, channelId, participants, clearedToSend })) {
     // First, update the store with our response
-    const ourCommitment = nextCommitment(channel, protocolState.commitmentType);
+    const ourState = { ...latestState, turnNum: latestState.turnNum + 1 };
 
-    const signResult = signAndStore(sharedData, ourCommitment);
-    if (!signResult.isSuccess) {
-      throw new Error(`Could not sign result: ${signResult.reason}`);
-    }
-    sharedData = signResult.store;
+    const ourSignedState = signState(ourState, sharedData.privateKey);
+    sharedData = storeState(ourSignedState, sharedData);
 
-    // Finally, send the commitments to the next participant
-    channel = getChannel(sharedData.channelStore, channelId);
+    sharedData = helpers.sendStates(sharedData, processId, channelId, protocolLocator);
 
-    sharedData = helpers.sendCommitments(sharedData, processId, channelId, protocolLocator);
-    channel = getExistingChannel(sharedData, channelId);
-    if (channelAdvanced(channel, commitmentType)) {
+    if (channelAdvanced(channelId, sharedData)) {
       return { protocolState: states.success({ ...protocolState, channelId }), sharedData };
     } else {
-      return { protocolState: states.commitmentSent({ ...protocolState, channelId }), sharedData };
+      return { protocolState: states.stateSent({ ...protocolState, channelId }), sharedData };
     }
   } else {
     return { protocolState, sharedData };
@@ -243,16 +228,11 @@ function attemptToAdvanceChannel(
 const channelUnknownReducer = (
   protocolState: states.ChannelUnknown,
   sharedData,
-  action: CommitmentsReceived,
+  action: StatesReceived,
 ) => {
-  const { privateKey } = protocolState;
-  const channelId = getChannelId(action.signedCommitments[0].commitment);
-  const checkResult = checkAndInitialize(sharedData, action.signedCommitments[0], privateKey);
-  if (!checkResult.isSuccess) {
-    throw new Error('Could not initialize channel');
-  }
-  sharedData = checkResult.store;
-  sharedData = helpers.checkCommitments(sharedData, 0, action.signedCommitments);
+  const channelId = getChannelId(action.signedStates[0].state.channel);
+
+  sharedData = storeStates(action.signedStates, sharedData);
 
   const result = attemptToAdvanceChannel(sharedData, protocolState, channelId);
   sharedData = result.sharedData;
@@ -275,12 +255,11 @@ const channelUnknownReducer = (
 const notSafeToSendReducer = (
   protocolState: states.NotSafeToSend,
   sharedData,
-  action: CommitmentsReceived,
+  action: StatesReceived,
 ) => {
   const { channelId } = protocolState;
 
-  const channel = getChannel(sharedData.channelStore, channelId);
-  sharedData = helpers.checkCommitments(sharedData, channel.turnNum, action.signedCommitments);
+  sharedData = storeStates(action.signedStates, sharedData);
 
   return attemptToAdvanceChannel(sharedData, protocolState, channelId);
 };
@@ -288,66 +267,21 @@ const notSafeToSendReducer = (
 const commitmentSentReducer = (
   protocolState: states.CommitmentSent,
   sharedData,
-  action: CommitmentsReceived,
+  action: StatesReceived,
 ) => {
-  const { channelId, commitmentType } = protocolState;
+  const { channelId } = protocolState;
 
-  let channel = getChannel(sharedData.channelStore, channelId);
-  sharedData = helpers.checkCommitments(sharedData, channel.turnNum, action.signedCommitments);
+  sharedData = storeStates(action.signedStates, sharedData);
 
-  channel = getChannel(sharedData.channelStore, channelId);
-  if (channelAdvanced(channel, commitmentType)) {
+  if (channelAdvanced(channelId, sharedData)) {
     return { protocolState: states.success(protocolState), sharedData };
   }
 
   return { protocolState, sharedData };
 };
 
-function channelAdvanced(channel: ChannelState, commitmentType: CommitmentType): boolean {
-  const lastCommitment = getLastCommitment(channel);
-  return (
-    (lastCommitment.commitmentType === commitmentType &&
-      lastCommitment.commitmentCount === channel.participants.length - 1) ||
-    lastCommitment.commitmentType > commitmentType
-  );
-}
-
-function nextCommitment(channel: ChannelState, commitmentType: CommitmentType): Commitment {
-  const lastCommitment = getLastCommitment(channel);
-  const penultimateCommitment =
-    lastCommitment.turnNum > 0 ? getPenultimateCommitment(channel) : undefined;
-  if (commitmentType === CommitmentType.Conclude) {
-    if (!penultimateCommitment) {
-      throw new Error('Attempted to conclude a channel that only contains a setup commitment');
-    }
-    return nextConcludeCommitment(lastCommitment, penultimateCommitment);
-  } else {
-    const next = nextSetupCommitment(lastCommitment);
-    if (next === 'NotASetupCommitment') {
-      throw new Error('lastCommitment was not a setup commitment');
-    }
-    return next;
-  }
-}
-
-function nextConcludeCommitment(
-  lastCommitment: Commitment,
-  penultimateCommitment: Commitment,
-): Commitment {
-  const turnNum = lastCommitment.turnNum + 1;
-  if (
-    lastCommitment.channel.participants.length < 2 ||
-    lastCommitment.channel.participants.length > 3
-  ) {
-    throw new Error('nextConcludeCommitment only handles 2 or 3 players');
-  }
-  let commitmentCount = 0;
-  // If the last 2 commitments are conclude we are the sending the third commitment
-  if (penultimateCommitment.commitmentType === CommitmentType.Conclude) {
-    commitmentCount = 2;
-    // Otherwise we have 1 conclude commitment so we are sending the 2nd
-  } else if (lastCommitment.commitmentType === CommitmentType.Conclude) {
-    commitmentCount = 1;
-  }
-  return { ...lastCommitment, turnNum, commitmentType: CommitmentType.Conclude, commitmentCount };
+function channelAdvanced(channelId: string, sharedData: SharedData): boolean {
+  const lastState = selectors.getLastStateForChannel(sharedData, channelId).state;
+  const { participants } = lastState.channel;
+  return lastState.turnNum > 0 && lastState.turnNum % participants.length === 0;
 }

@@ -13,7 +13,7 @@ import {
   successClosed,
 } from './states';
 import { unreachable } from '../../../../utils/reducer-utils';
-import { SharedData, registerChannelToMonitor, checkAndStore } from '../../../state';
+import { SharedData, registerChannelToMonitor } from '../../../state';
 import * as actions from './actions';
 import { TransactionAction } from '../../transaction-submission/actions';
 import { isTransactionAction, ProtocolAction } from '../../../actions';
@@ -22,17 +22,20 @@ import {
   initialize as initializeTransaction,
 } from '../../transaction-submission';
 import { isSuccess, isFailure } from '../../transaction-submission/states';
-import { getChannel } from '../../../state';
-import { createForceMoveTransaction } from '../../../../utils/transaction-generator';
-import { isFullyOpen, ourTurn } from '../../../channel-store';
+
 import {
   showWallet,
   hideWallet,
-  sendChallengeCommitmentReceived,
+  sendChallengeStateReceived,
   sendChallengeComplete,
   sendConcludeSuccess,
+  ourTurn,
+  isFullyOpen,
 } from '../../reducer-helpers';
-import { Commitment, SignedCommitment } from '../../../../domain';
+
+import { SignedState } from 'nitro-protocol';
+import { storeState } from '../../../channel-store/reducer';
+import { getChannelState } from '../../../selectors';
 
 const CHALLENGE_TIMEOUT = 5 * 60000;
 
@@ -64,12 +67,7 @@ export function challengerReducer(
     case 'WALLET.DISPUTE.CHALLENGER.CHALLENGE_DENIED':
       return challengeDenied(state, sharedData);
     case 'WALLET.ADJUDICATOR.RESPOND_WITH_MOVE_EVENT':
-      return challengeResponseReceived(
-        state,
-        sharedData,
-        action.responseCommitment,
-        action.responseSignature,
-      );
+      return challengeResponseReceived(state, sharedData, action.responseState);
     case 'WALLET.ADJUDICATOR.REFUTED_EVENT':
       return refuteReceived(state, sharedData);
     case 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRED':
@@ -102,7 +100,7 @@ export function initialize(
   processId: string,
   sharedData: SharedData,
 ): ReturnVal {
-  const channelState = getChannel(sharedData, channelId);
+  const channelState = getChannelState(sharedData, channelId);
   const props = { processId, channelId };
 
   if (!channelState) {
@@ -112,11 +110,11 @@ export function initialize(
     };
   }
 
-  if (!isFullyOpen(channelState)) {
+  if (!isFullyOpen()) {
     return { state: acknowledgeFailure(props, 'NotFullyOpen'), sharedData: showWallet(sharedData) };
   }
 
-  if (ourTurn(channelState)) {
+  if (ourTurn(sharedData, channelId)) {
     // if it's our turn we don't need to challenge
     return {
       state: acknowledgeFailure(props, 'AlreadyHaveLatest'),
@@ -179,33 +177,35 @@ function challengeApproved(state: NonTerminalCState, sharedData: SharedData): Re
   if (state.type !== 'Challenging.ApproveChallenge') {
     return { state, sharedData };
   }
-  const channelState = getChannel(sharedData, state.channelId);
+  const channelState = getChannelState(sharedData, state.channelId);
 
   // These shouldn't have changed but the type system doesn't know that. In any case, we
   // might as well be safe. And type-safe...
   if (!channelState) {
     return { state: acknowledgeFailure(state, 'ChannelDoesntExist'), sharedData };
   }
-  if (!isFullyOpen(channelState)) {
+  if (!isFullyOpen()) {
     return { state: acknowledgeFailure(state, 'NotFullyOpen'), sharedData };
   }
 
-  if (ourTurn(channelState)) {
+  if (ourTurn(sharedData, state.channelId)) {
     // if it's our turn now, a commitment must have arrived while we were approving
     return { state: acknowledgeFailure(state, 'LatestWhileApproving'), sharedData };
   }
 
   // else if we don't have the last two states
   // make challenge transaction
-  const [penultimateCommitment, lastCommitment] = channelState.commitments;
-  const { commitment: fromPosition, signature: fromSignature } = penultimateCommitment;
-  const { commitment: toPosition, signature: toSignature } = lastCommitment;
-  const transactionRequest = createForceMoveTransaction(
-    fromPosition,
-    toPosition,
-    fromSignature,
-    toSignature,
-  );
+  const transactionRequest = {};
+  // TODO: Implement this with latest nitro protocol
+  // const [penultimateCommitment, lastCommitment] = channelState.signedStates;
+  // const { commitment: fromPosition, signature: fromSignature } = penultimateCommitment;
+  // const { commitment: toPosition, signature: toSignature } = lastCommitment;
+  // const transactionRequest = createForceMoveTransaction(
+  //   fromPosition,
+  //   toPosition,
+  //   fromSignature,
+  //   toSignature,
+  // );
   // initialize transaction state machine
   const returnVal = initializeTransaction(
     transactionRequest,
@@ -241,25 +241,16 @@ function refuteReceived(state: NonTerminalCState, sharedData: SharedData): Retur
 function challengeResponseReceived(
   state: NonTerminalCState,
   sharedData: SharedData,
-  challengeCommitment: Commitment,
-  challengeSignature: string,
+  challengeState: SignedState,
 ): ReturnVal {
   if (state.type !== 'Challenging.WaitForResponseOrTimeout') {
     return { state, sharedData };
   }
 
   state = acknowledgeResponse(state);
-  sharedData = sendChallengeCommitmentReceived(sharedData, challengeCommitment);
+  sharedData = sendChallengeStateReceived(sharedData, challengeState);
 
-  const signedCommitment: SignedCommitment = {
-    commitment: challengeCommitment,
-    signature: challengeSignature,
-  };
-  const checkResult = checkAndStore(sharedData, signedCommitment);
-  if (checkResult.isSuccess) {
-    return { state, sharedData: checkResult.store };
-  }
-
+  sharedData = storeState(challengeState, sharedData);
   return { state, sharedData };
 }
 

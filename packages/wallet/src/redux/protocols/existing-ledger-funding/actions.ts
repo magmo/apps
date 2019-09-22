@@ -1,8 +1,13 @@
-import { CommitmentReceived, WalletAction } from '../../actions';
+import { WalletAction } from '../../actions';
 import { LedgerTopUpAction, isLedgerTopUpAction } from '../ledger-top-up/actions';
-import { isCommonAction, EmbeddedProtocol, routerFactory } from '../../../communication';
+import {
+  isCommonAction,
+  EmbeddedProtocol,
+  routerFactory,
+  StatesReceived,
+} from '../../../communication';
 
-export type ExistingLedgerFundingAction = CommitmentReceived | LedgerTopUpAction;
+export type ExistingLedgerFundingAction = StatesReceived | LedgerTopUpAction;
 
 export function isExistingLedgerFundingAction(
   action: WalletAction,

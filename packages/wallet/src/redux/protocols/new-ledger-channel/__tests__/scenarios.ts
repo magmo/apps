@@ -1,7 +1,6 @@
 import { bigNumberify } from 'ethers/utils';
 import * as states from '../states';
-import { channelFromCommitments } from '../../../channel-store/channel-state/__tests__';
-import { EMPTY_SHARED_DATA, setChannels, SharedData } from '../../../state';
+import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
 
 import {
   preFailure as DFPreFailure,
@@ -9,13 +8,17 @@ import {
 } from '../../direct-funding/__tests__';
 import { preSuccess as ACPreSuccess } from '../../advance-channel/__tests__/index';
 import {
-  appCommitment,
-  ledgerCommitment,
+  appState,
+  ledgerState,
   asAddress,
   bsAddress,
   asPrivateKey,
-  ledgerId,
+  TWO_PARTICIPANT_LEDGER_CHANNEL,
   channelId,
+  convertBalanceToOutcome,
+  TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+  setChannels,
+  channelStateFromStates,
 } from '../../../../domain/commitments/__tests__';
 import { success } from '../../ledger-defunding/states';
 import * as _ from 'lodash';
@@ -27,24 +30,26 @@ import { TwoPartyPlayerIndex } from '../../../types';
 // -----------
 const processId = 'processId';
 
-const twoThree = [
+const twoThree = convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
-];
+]);
 
-const fiveToApp = [{ address: channelId, wei: bigNumberify(5).toHexString() }];
+const fiveToApp = convertBalanceToOutcome([
+  { address: channelId, wei: bigNumberify(5).toHexString() },
+]);
 
-const app2 = appCommitment({ turnNum: 2, balances: twoThree });
-const app3 = appCommitment({ turnNum: 3, balances: twoThree });
+const app2 = appState({ turnNum: 2, outcome: twoThree });
+const app3 = appState({ turnNum: 3, outcome: twoThree });
 
-const ledger4 = ledgerCommitment({ turnNum: 4, balances: twoThree, proposedBalances: fiveToApp });
-const ledger5 = ledgerCommitment({ turnNum: 5, balances: fiveToApp });
+const ledger4 = ledgerState({ turnNum: 4, outcome: twoThree, proposedOutcome: fiveToApp });
+const ledger5 = ledgerState({ turnNum: 5, outcome: fiveToApp });
 
 const setFundingState = (sharedData: SharedData): SharedData => {
   return {
     ...sharedData,
     fundingState: {
-      [ledgerId]: { directlyFunded: true },
+      [TWO_PARTICIPANT_LEDGER_CHANNEL_ID]: { directlyFunded: true },
     },
   };
 };
@@ -52,7 +57,12 @@ const setFundingState = (sharedData: SharedData): SharedData => {
 // Channels
 
 const protocolLocator = NEW_LEDGER_FUNDING_PROTOCOL_LOCATOR;
-const props = { channelId, ledgerId, processId, protocolLocator };
+const props = {
+  channelId,
+  ledgerId: TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
+  processId,
+  protocolLocator,
+};
 
 // ------
 // States
@@ -75,8 +85,8 @@ const waitForPostFund1 = states.waitForPostFundSetup({
 const waitForPreFundSetupSharedData = _.merge(
   ACPreSuccess.sharedData,
   setChannels(EMPTY_SHARED_DATA, [
-    channelFromCommitments([app2, app3], asAddress, asPrivateKey),
-    channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
+    channelStateFromStates([app2, app3]),
+    channelStateFromStates([ledger4, ledger5]),
   ]),
 );
 const waitForPostFundSharedData = _.merge(ACPreSuccess.sharedData);
@@ -84,8 +94,8 @@ export const successState = {
   state: success({}),
   store: setFundingState(
     setChannels(EMPTY_SHARED_DATA, [
-      channelFromCommitments([app2, app3], asAddress, asPrivateKey),
-      channelFromCommitments([ledger4, ledger5], asAddress, asPrivateKey),
+      channelStateFromStates([app2, app3]),
+      channelStateFromStates([ledger4, ledger5]),
     ]),
   ),
 };
@@ -102,13 +112,14 @@ export const happyPath = {
   initialParams: {
     sharedData: ACPreSuccess.sharedData,
     processId: 'processId',
-    ledgerId,
-    startingAllocation: twoThree.map(t => t.wei),
-    startingDestination: twoThree.map(t => t.address),
+    ledgerId: TWO_PARTICIPANT_LEDGER_CHANNEL,
+    startingOutcome: twoThree,
     privateKey: asPrivateKey,
     ourIndex: TwoPartyPlayerIndex.A,
-    participants: twoThree.map(t => t.address),
+    participants: [asAddress, bsAddress],
     protocolLocator,
+    chainId: '0x1',
+    challengeDuration: '0x0',
   },
   waitForPreFundL1: {
     state: waitForPreFundL1,

@@ -1,32 +1,35 @@
 import { StateConstructor } from '../../utils';
 import { ProtocolState } from '..';
-import { CommitmentType } from '../../../domain';
 import { ProtocolLocator } from '../../../communication';
+import { Outcome } from 'nitro-protocol/lib/src/contract/outcome';
 
 // -------
 // States
 // -------
-
+export enum StateType {
+  PreFunding,
+  PostFunding,
+  Concluding,
+}
 export type AdvanceChannelType = AdvanceChannelState['type'];
 
 interface BaseState {
   processId: string;
-  ourIndex: number;
-  commitmentType: CommitmentType;
+  stateType: StateType;
   protocolLocator: ProtocolLocator;
 }
 
 export interface ChannelUnknown extends BaseState {
   type: 'AdvanceChannel.ChannelUnknown';
-  ourIndex: number;
-  allocation: string[];
-  destination: string[];
+  outcome: Outcome;
   participants: string[];
-  channelType: string;
-  appAttributes: string;
+  chainId: string;
+  appData: string;
   privateKey: string;
   clearedToSend: boolean;
-  guaranteedChannel?: string;
+  ourAddress: string;
+  appDefinition: string;
+  challengeDuration: string;
 }
 
 export interface NotSafeToSend extends BaseState {
@@ -42,7 +45,7 @@ export interface CommitmentSent extends BaseState {
 
 export interface Success {
   type: 'AdvanceChannel.Success';
-  commitmentType: CommitmentType;
+  stateType: StateType;
   channelId: string;
 }
 
@@ -55,11 +58,10 @@ export interface Failure {
 // ------------
 
 const base: StateConstructor<BaseState> = params => {
-  const { processId, ourIndex, commitmentType, protocolLocator } = params;
+  const { processId, protocolLocator, stateType } = params;
   return {
     processId,
-    ourIndex,
-    commitmentType,
+    stateType,
     protocolLocator,
   };
 };
@@ -67,23 +69,27 @@ const base: StateConstructor<BaseState> = params => {
 export const channelUnknown: StateConstructor<ChannelUnknown> = params => {
   const {
     privateKey,
-    allocation,
-    destination,
+    outcome,
     participants,
-    channelType,
-    appAttributes,
+    chainId,
+    appData,
     clearedToSend,
+    ourAddress,
+    appDefinition,
+    challengeDuration,
   } = params;
   return {
     ...base(params),
     type: 'AdvanceChannel.ChannelUnknown',
     privateKey,
-    allocation,
-    destination,
+    outcome,
     participants,
-    channelType,
-    appAttributes,
+    chainId,
+    appData,
     clearedToSend,
+    ourAddress,
+    appDefinition,
+    challengeDuration,
   };
 };
 
@@ -96,7 +102,7 @@ export const notSafeToSend: StateConstructor<NotSafeToSend> = params => {
   };
 };
 
-export const commitmentSent: StateConstructor<CommitmentSent> = params => {
+export const stateSent: StateConstructor<CommitmentSent> = params => {
   const { channelId } = params;
   return {
     ...base(params),
@@ -106,15 +112,15 @@ export const commitmentSent: StateConstructor<CommitmentSent> = params => {
 };
 
 export const success: StateConstructor<Success> = params => {
-  const { commitmentType, channelId } = params;
+  const { stateType, channelId } = params;
   return {
     type: 'AdvanceChannel.Success',
-    commitmentType,
+    stateType,
     channelId,
   };
 };
 
-export const failure: StateConstructor<Failure> = params => {
+export const failure: StateConstructor<Failure> = () => {
   return {
     type: 'AdvanceChannel.Failure',
   };

@@ -1,5 +1,10 @@
 import * as actions from '../../actions';
-import { isCommonAction, EmbeddedProtocol, routerFactory } from '../../../communication';
+import {
+  isCommonAction,
+  EmbeddedProtocol,
+  routerFactory,
+  StatesReceived,
+} from '../../../communication';
 
 // -------
 // Actions
@@ -14,10 +19,7 @@ import { isCommonAction, EmbeddedProtocol, routerFactory } from '../../../commun
 
 type EmbeddedAction = actions.advanceChannel.AdvanceChannelAction | actions.TransactionAction;
 
-export type DirectFundingAction =
-  | actions.CommitmentReceived
-  | actions.FundingReceivedEvent
-  | EmbeddedAction;
+export type DirectFundingAction = StatesReceived | actions.FundingReceivedEvent | EmbeddedAction;
 
 function isEmbeddedAction(action: actions.WalletAction): action is EmbeddedAction {
   return (

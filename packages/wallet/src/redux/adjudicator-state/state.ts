@@ -1,4 +1,4 @@
-import { Commitment } from '../../domain';
+import { SignedState } from 'nitro-protocol';
 
 export interface AdjudicatorState {
   [channelId: string]: AdjudicatorChannelState;
@@ -11,7 +11,7 @@ export interface AdjudicatorChannelState {
 }
 export interface Challenge {
   expiresAt: number;
-  challengeCommitment: Commitment;
+  challengeState: SignedState;
 }
 
 function getOrCreateAdjudicatorChannelState(

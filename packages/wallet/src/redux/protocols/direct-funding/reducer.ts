@@ -1,6 +1,6 @@
 import { bigNumberify } from 'ethers/utils';
 import { unreachable } from '../../../utils/reducer-utils';
-import { createDepositTransaction } from '../../../utils/transaction-generator';
+
 import * as actions from '../../actions';
 import { ProtocolReducer, ProtocolStateWithSharedData } from '../../protocols';
 import { SharedData, registerChannelToMonitor } from '../../state';
@@ -72,11 +72,13 @@ export function initialize({
   }
 
   if (alreadySafeToDeposit) {
-    const depositTransaction = createDepositTransaction(
-      channelId,
-      requiredDeposit,
-      existingChannelFunding,
-    );
+    const depositTransaction = {};
+    // TODO Reimplement with nitro protocol
+    // const depositTransaction = createDepositTransaction(
+    //   channelId,
+    //   requiredDeposit,
+    //   existingChannelFunding,
+    // );
     const { storage: newStorage, state: transactionSubmissionState } = initTransactionState(
       depositTransaction,
       processId,
@@ -170,15 +172,18 @@ const notSafeToDepositReducer: DFReducer = (
         action.channelId === state.channelId &&
         bigNumberify(action.totalForDestination).gte(state.safeToDepositLevel)
       ) {
-        const existingChannelFunding = selectors.getAdjudicatorChannelBalance(
-          sharedData,
-          state.channelId,
-        );
-        const depositTransaction = createDepositTransaction(
-          state.channelId,
-          state.requiredDeposit,
-          existingChannelFunding,
-        );
+        const depositTransaction = {};
+        // TODO: update to nitro protocol
+        // const existingChannelFunding = selectors.getAdjudicatorChannelBalance(
+        //   sharedData,
+        //   state.channelId,
+        // );
+
+        // const depositTransaction = createDepositTransaction(
+        //   state.channelId,
+        //   state.requiredDeposit,
+        //   existingChannelFunding,
+        // );
 
         const {
           storage: sharedDataWithTransactionState,

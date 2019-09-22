@@ -1,4 +1,9 @@
-import { asAddress, bsAddress, channelId } from '../../../../domain/commitments/__tests__';
+import {
+  asAddress,
+  bsAddress,
+  channelId,
+  convertBalanceToOutcome,
+} from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils/bignumber';
 import { waitForLedgerUpdate } from '../states';
 import * as ledgerUpdateScenarios from '../../consensus-update/__tests__';
@@ -7,10 +12,10 @@ import _ from 'lodash';
 const processId = 'processId';
 const protocolLocator = [];
 
-const twoThree = [
+const twoThree = convertBalanceToOutcome([
   { address: asAddress, wei: bigNumberify(2).toHexString() },
   { address: bsAddress, wei: bigNumberify(3).toHexString() },
-];
+]);
 
 const props = {
   processId,
@@ -18,8 +23,7 @@ const props = {
   channelId,
   ledgerId: ledgerUpdateScenarios.twoPlayerPreSuccessA.state.channelId,
 
-  proposedAllocation: twoThree.map(a => a.wei),
-  proposedDestination: twoThree.map(a => a.address),
+  proposedOutcome: twoThree,
 };
 
 const ledgerUpdate = ledgerUpdateScenarios.twoPlayerPreSuccessA.state;

@@ -3,10 +3,10 @@ import { call, take, put, select } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import * as actions from '../actions';
 import { ethers } from 'ethers';
-import { fromParameters } from 'fmg-core/lib/commitment';
 import { getAdjudicatorWatcherSubscribersForChannel } from '../selectors';
 import { ChannelSubscriber } from '../state';
 import { ProtocolLocator } from '../../communication';
+import { SignedState } from 'nitro-protocol';
 
 enum AdjudicatorEventType {
   ChallengeCreated,
@@ -20,6 +20,10 @@ interface AdjudicatorEvent {
   eventArgs: any;
   channelId: string;
   eventType: AdjudicatorEventType;
+}
+
+function decodeState(encodedState: string): SignedState {
+  throw new Error('Not implemented yet! Sorry!');
 }
 
 export function* adjudicatorWatcher(provider) {
@@ -40,15 +44,17 @@ export function* adjudicatorWatcher(provider) {
 }
 
 function* dispatchEventAction(event: AdjudicatorEvent) {
+  // TODO: SignedStates were thrown on here to get things compiling
+  // This still needs to be updated to the actual events the nitro protocol will generate
   switch (event.eventType) {
     case AdjudicatorEventType.ChallengeCreated:
       const { channelId } = event;
-      const { commitment, finalizedAt } = event.eventArgs;
+      const { signedState, finalizedAt } = event.eventArgs;
       const altFinalizedAt = finalizedAt * 1000;
       yield put(
         actions.challengeCreatedEvent({
           channelId,
-          commitment: fromParameters(commitment),
+          signedState: decodeState(signedState),
           finalizedAt: altFinalizedAt,
         }),
       );
@@ -83,25 +89,17 @@ function* dispatchProcessEventAction(
           processId,
           protocolLocator,
           channelId,
-          refuteCommitment: fromParameters(event.eventArgs.refutation),
+          refuteState: decodeState(event.eventArgs.refuteState),
         }),
       );
       break;
     case AdjudicatorEventType.RespondWithMove:
-      const { v, r, s } = event.eventArgs;
-      const signature = ethers.utils.joinSignature({
-        v,
-        r,
-        s,
-      });
-
       yield put(
         actions.respondWithMoveEvent({
           processId,
           protocolLocator,
           channelId,
-          responseCommitment: fromParameters(event.eventArgs.response),
-          responseSignature: signature,
+          responseState: decodeState(event.eventArgs.responseState),
         }),
       );
       break;

@@ -3,12 +3,12 @@ import React from 'react';
 interface Props {
   name: string;
   transactionID: string;
-  networkId: number;
+  networkId: string;
 }
 
 export default class WaitForXConfirmation extends React.PureComponent<Props> {
   buildEtherscanLink() {
-    switch (this.props.networkId) {
+    switch (parseInt(this.props.networkId, 16)) {
       case 1:
         return `https://etherscan.io/tx/${this.props.transactionID}`;
       case 4:
