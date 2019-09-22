@@ -2,7 +2,7 @@ import * as states from '../states';
 import * as actions from '../actions';
 
 import * as transactionScenarios from '../../../transaction-submission/__tests__';
-import { EMPTY_SHARED_DATA, SharedData } from '../../../../state';
+import { SharedData } from '../../../../state';
 
 import { ChannelState, ChannelStore } from '../../../../channel-store';
 import * as transactionActions from '../../../transaction-submission/actions';
@@ -38,7 +38,7 @@ const refuteChannelState = {
 };
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
+const sharedData: SharedData = { ...testScenarios.testEmptySharedData(), channelStore };
 const defaults = { processId, transactionSubmissionState, sharedData, channelId, expiryTime: 0 };
 
 // ------

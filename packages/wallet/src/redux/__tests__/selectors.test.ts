@@ -3,6 +3,7 @@ import * as selectors from '../selectors';
 import { ChannelState } from '../channel-store';
 import { Signature } from 'ethers/utils';
 import { State } from 'nitro-protocol/lib/src/contract/state';
+import { testEmptySharedData } from '../../domain/commitments/__tests__';
 
 describe('getAdjudicatorWatcherProcessesForChannel', () => {
   const createWatcherState = (
@@ -14,7 +15,7 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
     channelSubscriptions[channelId] = subscribers;
 
     return walletStates.initialized({
-      ...walletStates.EMPTY_SHARED_DATA,
+      ...testEmptySharedData(),
       uid: '',
       processStore: {},
       channelSubscriptions,
@@ -25,7 +26,7 @@ describe('getAdjudicatorWatcherProcessesForChannel', () => {
 
   it('should return an empty array when channelSubscriptions is empty', () => {
     const state = walletStates.initialized({
-      ...walletStates.EMPTY_SHARED_DATA,
+      ...testEmptySharedData(),
       uid: '',
       processStore: {},
       channelSubscriptions: {},
@@ -73,7 +74,7 @@ describe('getNextNonce', () => {
     turnNumRecord: 0,
   };
   const state = {
-    ...walletStates.EMPTY_SHARED_DATA,
+    ...testEmptySharedData(),
     channelStore: {
       ['0x1']: {
         ...defaultChannelState,

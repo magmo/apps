@@ -8,7 +8,6 @@ import * as actions from '../actions';
 // -----------------
 const { channelId, asAddress: address, asPrivateKey: privateKey } = testScenarios;
 import { ChannelState } from '../../../channel-store';
-import { EMPTY_SHARED_DATA } from '../../../state';
 import { APPLICATION_PROCESS_ID } from '../reducer';
 import {
   challengerPreSuccessOpenState,
@@ -30,7 +29,7 @@ const ourTurn = testScenarios.channelStateFromStates([signedState20, signedState
 // --------
 const processId = 'processId';
 const storage = (channelState: ChannelState) =>
-  testScenarios.setChannels(EMPTY_SHARED_DATA, [channelState]);
+  testScenarios.setChannels(testScenarios.testEmptySharedData(), [channelState]);
 
 const defaults = { processId, channelId, address, privateKey };
 
@@ -94,7 +93,7 @@ const disputeTerminated = { ...terminatingAction };
 // -------
 // SharedData
 // -------
-const emptySharedData = EMPTY_SHARED_DATA;
+const emptySharedData = testScenarios.testEmptySharedData();
 const ourTurnSharedData = storage(ourTurn);
 const theirTurnSharedData = storage(theirTurn);
 

@@ -3,7 +3,7 @@ import { appState } from '../../../../domain/commitments/__tests__';
 import * as scenarios from '../../../../domain/commitments/__tests__';
 import { PlayerIndex } from 'magmo-wallet-client/lib/wallet-instructions';
 import * as states from '../states';
-import { EMPTY_SHARED_DATA, setFundingState } from '../../../state';
+import { setFundingState } from '../../../state';
 import _ from 'lodash';
 import { bigNumberify } from 'ethers/utils/bignumber';
 
@@ -144,11 +144,11 @@ const createFundingState = sharedData => {
 };
 
 const initialSharedData = createFundingState(
-  scenarios.setChannels(EMPTY_SHARED_DATA, [jointChannelFundingApp, appChannel]),
+  scenarios.setChannels(scenarios.testEmptySharedData(), [jointChannelFundingApp, appChannel]),
 );
 
 const waitForJointSharedData = createFundingState(
-  scenarios.setChannels(EMPTY_SHARED_DATA, [
+  scenarios.setChannels(scenarios.testEmptySharedData(), [
     jointChannelBeforeConsensus,
     ledgerChannelBeforeUpdate,
     appChannel,
@@ -156,7 +156,10 @@ const waitForJointSharedData = createFundingState(
 );
 
 const waitForLedgerSharedData = createFundingState(
-  scenarios.setChannels(EMPTY_SHARED_DATA, [ledgerChannelBeforeConsensus, appChannel]),
+  scenarios.setChannels(scenarios.testEmptySharedData(), [
+    ledgerChannelBeforeConsensus,
+    appChannel,
+  ]),
 );
 // ----
 // Actions

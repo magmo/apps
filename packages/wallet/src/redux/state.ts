@@ -146,14 +146,16 @@ export interface ChannelFundingState {
 // ------------
 // Constructors
 // ------------
-export const EMPTY_SHARED_DATA: SharedData = {
-  outboxState: emptyDisplayOutboxState(),
-  channelStore: {},
-  channelSubscriptions: {},
-  adjudicatorState: {},
-  fundingState: {},
-  address: '0x0',
-  privateKey: '0x0',
+export const emptySharedData = (address: string, privateKey: string): SharedData => {
+  return {
+    address,
+    privateKey,
+    outboxState: emptyDisplayOutboxState(),
+    channelStore: {},
+    channelSubscriptions: {},
+    adjudicatorState: {},
+    fundingState: {},
+  };
 };
 
 export function sharedData(params: SharedData): SharedData {
@@ -163,7 +165,7 @@ export function sharedData(params: SharedData): SharedData {
 }
 
 export function waitForLogin(): WaitForLogin {
-  return { type: WAIT_FOR_LOGIN, ...EMPTY_SHARED_DATA };
+  return { outboxState: emptyDisplayOutboxState(), type: WAIT_FOR_LOGIN };
 }
 
 export function metaMaskError(params: Properties<MetaMaskError>): MetaMaskError {

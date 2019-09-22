@@ -5,7 +5,7 @@ import * as transactionScenarios from '../../transaction-submission/__tests__';
 import { ChannelState, ChannelStore } from '../../../channel-store';
 
 import { Wallet } from 'ethers';
-import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
+import { SharedData } from '../../../state';
 import * as web3Utils from 'web3-utils';
 import * as testScenarios from '../../../../domain/commitments/__tests__';
 import { splitSignature } from 'ethers/utils';
@@ -46,7 +46,7 @@ const notClosedChannelState = {
 const transaction = {};
 const withdrawalAddress = Wallet.createRandom().address;
 const processId = 'process-id.123';
-const sharedData: SharedData = { ...EMPTY_SHARED_DATA, channelStore };
+const sharedData: SharedData = { ...testScenarios.testEmptySharedData(), channelStore };
 const withdrawalAmount = web3Utils.toWei('5');
 const transactionSubmissionState = transactionScenarios.preSuccessState;
 const props = {
@@ -124,6 +124,6 @@ export const failedTransaction = {
 
 export const channelNotClosed = {
   ...props,
-  sharedData: { ...EMPTY_SHARED_DATA, channelStore: notClosedChannelState },
+  sharedData: { ...testScenarios.testEmptySharedData(), channelStore: notClosedChannelState },
   failure: channelNotClosedFailure,
 };

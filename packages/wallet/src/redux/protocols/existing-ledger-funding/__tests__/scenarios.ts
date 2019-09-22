@@ -8,9 +8,10 @@ import {
   convertBalanceToOutcome,
   setChannels,
   channelStateFromStates,
+  testEmptySharedData,
 } from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils/bignumber';
-import { SharedData, EMPTY_SHARED_DATA } from '../../../state';
+import { SharedData } from '../../../state';
 import * as states from '../states';
 
 import { EXISTING_LEDGER_FUNDING_PROTOCOL_LOCATOR } from '../reducer';
@@ -106,42 +107,42 @@ const app1 = appState({ turnNum: 1, outcome: oneThree });
 // -----------
 
 const initialPlayerALedgerSharedData = setFundingState(
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([ledger4, ledger5]),
     channelStateFromStates([app0, app1]),
   ]),
 );
 
 const initialPlayerAPartialSharedData = setFundingState(
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([ledger4Partial, ledger5Partial]),
     channelStateFromStates([app0, app1]),
   ]),
 );
 
 const initialPlayerATopUpNeededSharedData = setFundingState(
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([topUpLedger4, topUpLedger5]),
     channelStateFromStates([app0, app1]),
   ]),
 );
 
 const playerAFirstCommitmentReceived = setFundingState(
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([ledger5, ledger6]),
     channelStateFromStates([app0, app1]),
   ]),
 );
 
 const initialPlayerBLedgerSharedData = setFundingState(
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([ledger4, ledger5]),
     channelStateFromStates([app0, app1]),
   ]),
 );
 
 const initialPlayerBTopUpNeededSharedData = setFundingState(
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([topUpLedger4, topUpLedger5]),
     channelStateFromStates([app0, app1]),
   ]),

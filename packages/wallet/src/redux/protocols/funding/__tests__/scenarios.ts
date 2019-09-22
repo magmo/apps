@@ -1,7 +1,5 @@
 import * as states from '../states';
 import * as actions from '../actions';
-
-import { EMPTY_SHARED_DATA } from '../../../state';
 import {
   channelId,
   bsAddress,
@@ -10,6 +8,7 @@ import {
   convertBalanceToOutcome,
   channelStateFromStates,
   setChannels,
+  testEmptySharedData,
 } from '../../../../domain/commitments/__tests__';
 import { preSuccess as ledgerFundingPreSuccess } from '../../ledger-funding/__tests__';
 import { preSuccess as virtualFundingPreSuccess } from '../../virtual-funding/__tests__';
@@ -45,7 +44,9 @@ const app1 = appState({ turnNum: 1, outcome: oneThree });
 const app2 = appState({ turnNum: 2, outcome: oneThree });
 const app3 = appState({ turnNum: 3, outcome: oneThree });
 const appChannelWaitingForFunding = channelStateFromStates([app0, app1]);
-const successSharedData = setChannels(EMPTY_SHARED_DATA, [channelStateFromStates([app2, app3])]);
+const successSharedData = setChannels(testEmptySharedData(), [
+  channelStateFromStates([app2, app3]),
+]);
 // ----
 // States
 // ------

@@ -290,7 +290,7 @@ export function isFullyOpen() {
 export function ourTurn(sharedData: SharedData, channelId: string) {
   const channelState = selectors.getChannelState(sharedData, channelId);
   const { participants } = channelState.channel;
-  const turnIndex = channelState.turnNumRecord % participants.length;
+  const turnIndex = (channelState.turnNumRecord + 1) % participants.length;
   return participants[turnIndex] === sharedData.address;
 }
 

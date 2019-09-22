@@ -1,7 +1,7 @@
 import * as states from '../states';
 import { ThreePartyPlayerIndex as PlayerIndex } from '../../../types';
 
-import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
+import { SharedData } from '../../../state';
 
 import { statesReceived, EmbeddedProtocol } from '../../../../communication';
 import { clearedToSend } from '../actions';
@@ -147,54 +147,54 @@ const notSafeToSendHub = states.notSafeToSend({
 // Shared Data
 // -------
 
-const emptySharedData = { ...EMPTY_SHARED_DATA };
-// const channelCreated = { ...EMPTY_SHARED_DATA };
-const aSentPreFundCommitment = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const emptySharedData = { ...scenarios.testEmptySharedData() };
+// const channelCreated = { ...testEmptySharedData() };
+const aSentPreFundCommitment = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates0),
 ]);
 
-const bSentPreFundCommitment = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const bSentPreFundCommitment = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates1),
 ]);
 
-const bReceivedPreFundSetup = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const bReceivedPreFundSetup = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates2),
 ]);
 
-const hubSentPreFundCommitment = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const hubSentPreFundCommitment = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates2),
 ]);
 
-const aReceivedPrefundSetup = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const aReceivedPrefundSetup = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates2),
 ]);
-const aSentPostFundCommitment = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const aSentPostFundCommitment = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates3),
 ]);
 
-const bSentPostFundSetupCommitment = scenarios.setChannels(EMPTY_SHARED_DATA, [
+const bSentPostFundSetupCommitment = scenarios.setChannels(scenarios.testEmptySharedData(), [
   scenarios.channelStateFromStates(signedStates4),
 ]);
 
 const allPostFundSetupsReceived = (playerIndex: PlayerIndex): SharedData => {
-  return scenarios.setChannels(EMPTY_SHARED_DATA, [
+  return scenarios.setChannels(scenarios.testEmptySharedData(), [
     scenarios.channelStateFromStates(signedStates5),
   ]);
 };
 
 const aSentConclude = (playerIndex: PlayerIndex): SharedData => {
-  return scenarios.setChannels(EMPTY_SHARED_DATA, [
+  return scenarios.setChannels(scenarios.testEmptySharedData(), [
     scenarios.channelStateFromStates(signedStates6),
   ]);
 };
 const bSentConclude = (playerIndex: PlayerIndex): SharedData => {
-  return scenarios.setChannels(EMPTY_SHARED_DATA, [
+  return scenarios.setChannels(scenarios.testEmptySharedData(), [
     scenarios.channelStateFromStates(signedStates7),
   ]);
 };
 
 const allConcludesReceived = (playerIndex: PlayerIndex): SharedData => {
-  return scenarios.setChannels(EMPTY_SHARED_DATA, [
+  return scenarios.setChannels(scenarios.testEmptySharedData(), [
     scenarios.channelStateFromStates(signedStates8),
   ]);
 };

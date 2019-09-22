@@ -1,7 +1,6 @@
 import * as states from '../states';
 import * as actions from '../actions';
 import * as tsScenarios from '../../../transaction-submission/__tests__';
-import { EMPTY_SHARED_DATA } from '../../../../state';
 import { ChannelState } from '../../../../channel-store';
 import {
   challengeExpiredEvent,
@@ -32,7 +31,7 @@ const processId = 'processId';
 const tsPreSuccess = tsScenarios.preSuccessState;
 const tsPreFailure = tsScenarios.preFailureState;
 const sharedData = (channelState: ChannelState) =>
-  testScenarios.setChannels(EMPTY_SHARED_DATA, [channelState]);
+  testScenarios.setChannels(testScenarios.testEmptySharedData(), [channelState]);
 
 const defaults = { processId, channelId, sharedData: sharedData(theirTurn) };
 
@@ -132,7 +131,7 @@ export const challengeTimesOutAndIsNotDefunded = {
 
 export const channelDoesntExist = {
   ...defaults,
-  sharedData: EMPTY_SHARED_DATA,
+  sharedData: testScenarios.testEmptySharedData(),
   acknowledgeFailure: {
     state: acknowledgeFailure('ChannelDoesntExist'),
     action: acknowledged,

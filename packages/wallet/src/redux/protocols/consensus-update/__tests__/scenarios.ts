@@ -8,9 +8,9 @@ import {
   channelStateFromStates,
   THREE_PARTICIPANT_LEDGER_CHANNEL_ID,
   convertAddressToBytes32,
+  testEmptySharedData,
 } from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { EMPTY_SHARED_DATA } from '../../../state';
 
 import * as states from '../states';
 import { statesReceived } from '../../../../communication';
@@ -159,17 +159,17 @@ const threePlayerLedger11 = threeWayLedgerState({
 // ------
 
 const threePlayerInitialSharedData = (ourIndex: ThreePartyPlayerIndex) => {
-  return setChannels(EMPTY_SHARED_DATA, [
+  return setChannels(testEmptySharedData(), [
     channelStateFromStates([threePlayerLedger6, threePlayerLedger7, threePlayerLedger8]),
   ]);
 };
 const threePlayerFirstUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
-  return setChannels(EMPTY_SHARED_DATA, [
+  return setChannels(testEmptySharedData(), [
     channelStateFromStates([threePlayerLedger7, threePlayerLedger8, threePlayerLedger9]),
   ]);
 };
 const threePlayerSecondUpdateSharedData = (ourIndex: ThreePartyPlayerIndex) => {
-  return setChannels(EMPTY_SHARED_DATA, [
+  return setChannels(testEmptySharedData(), [
     channelStateFromStates([threePlayerLedger8, threePlayerLedger9, threePlayerLedger10]),
   ]);
 };
@@ -178,7 +178,7 @@ const twoPlayerConsensusAcceptedOnBalancesSharedData = (
   turnNum: AcceptConsensusOnBalancesTurnNum,
   ourIndex: TwoPartyPlayerIndex,
 ) =>
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates(acceptConsensusOnBalancesLedgers(turnNum)),
   ]);
 
@@ -186,12 +186,12 @@ const twoPlayerConsensusAcceptedOnProposedBalancesSharedData = (
   turnNum: AcceptConsensusOnProposedBalancesTurnNum,
   ourIndex: TwoPartyPlayerIndex,
 ) =>
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates(acceptConsensusOnProposedBalancesLedgers(turnNum)),
   ]);
 
 const twoPlayerNewProposalSharedData = (turnNum: ProposeTurnNum, ourIndex: TwoPartyPlayerIndex) =>
-  setChannels(EMPTY_SHARED_DATA, [channelStateFromStates(proposeLedgers[turnNum])]);
+  setChannels(testEmptySharedData(), [channelStateFromStates(proposeLedgers[turnNum])]);
 
 // ------
 // States

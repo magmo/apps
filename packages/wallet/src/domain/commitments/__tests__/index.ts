@@ -10,7 +10,8 @@ import { Channel, getChannelId } from 'nitro-protocol/lib/src/contract/channel';
 import { signState } from 'nitro-protocol/lib/src/signatures';
 import { SignedState } from 'nitro-protocol';
 import { ChannelState } from '../../../redux/channel-store';
-import { SharedData } from '../../../redux/state';
+import { SharedData, emptySharedData } from '../../../redux/state';
+import { ethers } from 'ethers';
 export const asPrivateKey = '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d';
 export const asAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631';
 export const bsPrivateKey = '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72';
@@ -100,7 +101,7 @@ export function appState(params: AppCommitmentParams): SignedState {
     outcome,
     isFinal,
     appData,
-    appDefinition: '0x0',
+    appDefinition: ethers.Wallet.createRandom().address,
     channel: APP_CHANNEL,
     challengeDuration: '0x1',
   };
@@ -221,3 +222,7 @@ export function convertBalanceToOutcome(
     },
   ];
 }
+
+export const testEmptySharedData = (address = asAddress, privateKey = asPrivateKey): SharedData => {
+  return emptySharedData(address, privateKey);
+};

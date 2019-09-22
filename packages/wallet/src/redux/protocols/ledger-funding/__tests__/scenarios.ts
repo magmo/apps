@@ -8,9 +8,9 @@ import {
   TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
   channelStateFromStates,
   setChannels,
+  testEmptySharedData,
 } from '../../../../domain/commitments/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { EMPTY_SHARED_DATA } from '../../../state';
 import * as states from '../states';
 import { preSuccess as existingLedgerPreSuccess } from '../../existing-ledger-funding/__tests__';
 import {
@@ -41,7 +41,7 @@ const existingLedgerFundingSharedData = setChannels(newLedgerSuccess.store, [
   channelStateFromStates([ledger4, ledger5]),
   channelStateFromStates([app0, app1]),
 ]);
-const NewLedgerChannelSharedData = setChannels(EMPTY_SHARED_DATA, [
+const NewLedgerChannelSharedData = setChannels(testEmptySharedData(), [
   channelStateFromStates([app0, app1]),
 ]);
 const waitForExistingLedgerFunding = states.waitForExistingLedgerFunding({

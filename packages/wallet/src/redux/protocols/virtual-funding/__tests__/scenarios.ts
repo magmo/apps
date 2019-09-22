@@ -1,6 +1,5 @@
 import * as states from '../states';
 
-import { EMPTY_SHARED_DATA } from '../../../state';
 import * as scenarios from '../../../../domain/commitments/__tests__';
 
 import { preFund, postFund } from '../../advance-channel/__tests__';
@@ -124,7 +123,7 @@ export const happyPath = {
   ...props,
   initialize: {
     args: initializeArgs,
-    sharedData: scenarios.setChannels(EMPTY_SHARED_DATA, [appChannel]),
+    sharedData: scenarios.setChannels(scenarios.testEmptySharedData(), [appChannel]),
   },
   openJ: {
     state: scenarioStates.waitForJointChannel1,

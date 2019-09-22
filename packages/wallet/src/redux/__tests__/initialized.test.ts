@@ -8,9 +8,9 @@ import * as fundProtocol from '../protocols/funding';
 import { fundingRequested } from '../protocols/actions';
 import * as adjudicatorState from '../adjudicator-state/reducer';
 import { ProcessProtocol, strategyApproved } from '../../communication';
-import { channelId } from '../../domain/commitments/__tests__';
+import { channelId, testEmptySharedData } from '../../domain/commitments/__tests__';
 const defaults = {
-  ...states.EMPTY_SHARED_DATA,
+  ...testEmptySharedData(),
   uid: 'uid',
   processStore: {},
   adjudicatorStore: {},
@@ -31,7 +31,7 @@ describe('when a NewProcessAction arrives', () => {
 
   const updatedState = walletReducer(initializedState, action);
   it('calls initialize', () => {
-    expect(initialize).toHaveBeenCalledWith(states.EMPTY_SHARED_DATA, processId, action.channelId);
+    expect(initialize).toHaveBeenCalledWith(testEmptySharedData(), processId, action.channelId);
   });
 
   it('stores the process in the process store', () => {
@@ -68,7 +68,7 @@ describe('when a ProcessAction arrives', () => {
   it('calls the correct reducer', () => {
     expect(NewLedgerChannelReducer).toHaveBeenCalledWith(
       protocolState,
-      states.EMPTY_SHARED_DATA,
+      testEmptySharedData(),
       action,
     );
   });

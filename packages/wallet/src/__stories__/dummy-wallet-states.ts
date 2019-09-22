@@ -36,7 +36,7 @@ export const dummyWaitForMetaMask: walletStates.WalletState = walletStates.metaM
 ////////////////////////////
 
 const defaults = {
-  ...states.EMPTY_SHARED_DATA,
+  ...scenarios.testEmptySharedData(),
   uid: 'uid',
   processStore: {},
   adjudicatorStore: {},

@@ -26,7 +26,7 @@ jest.setTimeout(60000);
 //   }
 
 //   return walletStates.initialized({
-//     ...walletStates.EMPTY_SHARED_DATA,
+//     ...walletStates.testEmptySharedData(),
 //     uid: '',
 //     processStore: {},
 //     channelSubscriptions,
@@ -57,7 +57,7 @@ describe('adjudicator listener', () => {
   // it('should not handle an event when no process has registered', async () => {
   //   const channelId = await getChannelId(provider, getNextNonce(), participantA, participantB);
   //   const initialState = walletStates.initialized({
-  //     ...walletStates.EMPTY_SHARED_DATA,
+  //     ...walletStates.testEmptySharedData(),
   //     uid: '',
   //     processStore: {},
   //     channelSubscriptions: {},

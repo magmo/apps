@@ -6,7 +6,6 @@ import { prependToLocator } from '../..';
 import { EmbeddedProtocol } from '../../../../communication';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 import { bigNumberify } from 'ethers/utils';
-import { EMPTY_SHARED_DATA } from '../../../state';
 import { mergeSharedData } from '../../../__tests__/helpers';
 const processId = 'process-id.123';
 
@@ -36,13 +35,13 @@ const ledgerFundingChannel1 = testScenarios.ledgerState({
 const app5 = testScenarios.appState({ turnNum: 5, outcome: twoThree });
 const app6 = testScenarios.appState({ turnNum: 6, outcome: twoThree });
 
-const ledgerOpenSharedData = testScenarios.setChannels(EMPTY_SHARED_DATA, [
+const ledgerOpenSharedData = testScenarios.setChannels(testScenarios.testEmptySharedData(), [
   testScenarios.channelStateFromStates([ledger4, ledger5]),
 ]);
-const ledgerConcludedSharedData = testScenarios.setChannels(EMPTY_SHARED_DATA, [
+const ledgerConcludedSharedData = testScenarios.setChannels(testScenarios.testEmptySharedData(), [
   testScenarios.channelStateFromStates([ledger6, ledger7]),
 ]);
-const ledgerFundingSharedData = testScenarios.setChannels(EMPTY_SHARED_DATA, [
+const ledgerFundingSharedData = testScenarios.setChannels(testScenarios.testEmptySharedData(), [
   testScenarios.channelStateFromStates([ledgerFundingChannel0, ledgerFundingChannel1]),
   testScenarios.channelStateFromStates([app5, app6]),
 ]);

@@ -3,7 +3,7 @@ import * as defundingScenarios from '../../defunding/__tests__';
 import * as advanceChannelScenarios from '../../advance-channel/__tests__';
 
 import * as states from '../states';
-import { EMPTY_SHARED_DATA, setFundingState } from '../../../state';
+import { setFundingState } from '../../../state';
 import { bigNumberify } from 'ethers/utils';
 
 import { mergeSharedData } from '../../../__tests__/helpers';
@@ -65,7 +65,7 @@ const closeSelectedAction = actions.closeSelected({ processId });
 
 const initialSharedData = setFundingState(
   setFundingState(
-    testScenarios.setChannels(EMPTY_SHARED_DATA, [
+    testScenarios.setChannels(testScenarios.testEmptySharedData(), [
       testScenarios.channelStateFromStates([app50, app51]),
       testScenarios.channelStateFromStates([ledger5, ledger6]),
     ]),

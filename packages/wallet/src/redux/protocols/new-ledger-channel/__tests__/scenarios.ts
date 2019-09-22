@@ -1,6 +1,6 @@
 import { bigNumberify } from 'ethers/utils';
 import * as states from '../states';
-import { EMPTY_SHARED_DATA, SharedData } from '../../../state';
+import { SharedData } from '../../../state';
 
 import {
   preFailure as DFPreFailure,
@@ -19,6 +19,7 @@ import {
   TWO_PARTICIPANT_LEDGER_CHANNEL_ID,
   setChannels,
   channelStateFromStates,
+  testEmptySharedData,
 } from '../../../../domain/commitments/__tests__';
 import { success } from '../../ledger-defunding/states';
 import * as _ from 'lodash';
@@ -84,7 +85,7 @@ const waitForPostFund1 = states.waitForPostFundSetup({
 });
 const waitForPreFundSetupSharedData = _.merge(
   ACPreSuccess.sharedData,
-  setChannels(EMPTY_SHARED_DATA, [
+  setChannels(testEmptySharedData(), [
     channelStateFromStates([app2, app3]),
     channelStateFromStates([ledger4, ledger5]),
   ]),
@@ -93,7 +94,7 @@ const waitForPostFundSharedData = _.merge(ACPreSuccess.sharedData);
 export const successState = {
   state: success({}),
   store: setFundingState(
-    setChannels(EMPTY_SHARED_DATA, [
+    setChannels(testEmptySharedData(), [
       channelStateFromStates([app2, app3]),
       channelStateFromStates([ledger4, ledger5]),
     ]),

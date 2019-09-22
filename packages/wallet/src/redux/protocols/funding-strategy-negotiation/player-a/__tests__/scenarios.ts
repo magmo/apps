@@ -2,8 +2,12 @@ import * as states from '../states';
 import * as actions from '../actions';
 import { TwoPartyPlayerIndex } from '../../../../types';
 
-import { EMPTY_SHARED_DATA } from '../../../../state';
-import { channelId, bsAddress, asAddress } from '../../../../../domain/commitments/__tests__';
+import {
+  channelId,
+  bsAddress,
+  asAddress,
+  testEmptySharedData,
+} from '../../../../../domain/commitments/__tests__';
 
 import { FundingStrategy } from '../../../../../communication';
 
@@ -62,12 +66,12 @@ export const indirectStrategyChosen = {
   ...props,
   waitForStrategyChoice: {
     state: waitForStrategyChoice,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: chooseIndirectStrategy,
   },
   waitForStrategyResponse: {
     state: waitForIndirectStrategyResponse,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: approveIndirectStrategy,
   },
 };
@@ -76,12 +80,12 @@ export const virtualStrategyChosen = {
   ...props,
   waitForStrategyChoice: {
     state: waitForStrategyChoice,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: chooseVirtualStrategy,
   },
   waitForStrategyResponse: {
     state: waitForVirtualStrategyResponse,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: approveVirtualStrategy,
   },
 };
@@ -91,7 +95,7 @@ export const rejectedStrategy = {
 
   waitForStrategyResponse: {
     state: waitForIndirectStrategyResponse,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: strategyRejected,
   },
 };
@@ -100,12 +104,12 @@ export const cancelledByUser = {
   ...props,
   waitForStrategyChoice: {
     state: waitForStrategyChoice,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: cancelledByA,
   },
   waitForStrategyResponse: {
     state: waitForIndirectStrategyResponse,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: cancelledByA,
   },
 };
@@ -114,12 +118,12 @@ export const cancelledByOpponent = {
   ...props,
   waitForStrategyChoice: {
     state: waitForStrategyChoice,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: cancelledByB,
   },
   waitForStrategyResponse: {
     state: waitForIndirectStrategyResponse,
-    sharedData: EMPTY_SHARED_DATA,
+    sharedData: testEmptySharedData(),
     action: cancelledByB,
   },
 };

@@ -1,6 +1,6 @@
 import * as states from '../states';
 import * as actions from '../actions';
-import { EMPTY_SHARED_DATA } from '../../../state';
+import { testEmptySharedData } from '../../../../domain/commitments/__tests__';
 
 // ---------
 // Test data
@@ -8,7 +8,7 @@ import { EMPTY_SHARED_DATA } from '../../../state';
 const transaction = {};
 const processId = 'process-id.123';
 const transactionHash = 'transaction-hash.123';
-const sharedData = EMPTY_SHARED_DATA;
+const sharedData = testEmptySharedData();
 
 const props = { transaction, processId, transactionHash, sharedData, channelId: '0xChannel' };
 

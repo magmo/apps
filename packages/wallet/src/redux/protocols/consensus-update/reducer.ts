@@ -166,8 +166,8 @@ function sendIfSafe(
 function consensusReached(channelState: ChannelState, expectedOutcome: Outcome): boolean {
   const latestState = getLastState(channelState);
   const consensusData = decodeConsensusData(latestState.state.appData);
-  const { furtherVotesRequired, proposedOutcome } = consensusData;
-  return furtherVotesRequired === 0 && _.isEqual(proposedOutcome, expectedOutcome);
+  const { furtherVotesRequired } = consensusData;
+  return furtherVotesRequired === 0 && _.isEqual(latestState.state.outcome, expectedOutcome);
 }
 
 function proposalStateHasExpectedValues(
