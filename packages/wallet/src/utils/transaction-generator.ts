@@ -1,21 +1,18 @@
 import { TransactionRequest } from 'ethers/providers';
 import { getAdjudicatorInterface } from './contract-utils';
 import { splitSignature } from 'ethers/utils';
-import { Commitment, SignedCommitment } from '../domain';
+import { Commitment, SignedCommitment, getChannelId, signCommitment2 } from '../domain';
 import { asEthersObject } from 'fmg-core';
 import { Transactions as nitroTrans } from 'nitro-protocol';
 import { getChannelStorage } from './nitro-converter';
-import { signChallengeMessage } from 'nitro-protocol/lib/src/signatures';
 
 export function createForceMoveTransaction(
   fromCommitment: SignedCommitment,
   toCommitment: SignedCommitment,
   privateKey: string,
 ): TransactionRequest {
-  const channelStorage = getChannelStorage(toCommitment.commitment);
   const signedStates = [fromCommitment.signedState, toCommitment.signedState];
-  const challengeSignature = signChallengeMessage(signedStates, privateKey);
-  return nitroTrans.createForceMoveTransaction(channelStorage, signedStates, challengeSignature);
+  return nitroTrans.createForceMoveTransaction(signedStates, privateKey);
 }
 
 export function createRespondWithMoveTransaction(
@@ -34,16 +31,11 @@ export function createRespondWithMoveTransaction(
 
 export function createRefuteTransaction(
   refuteState: Commitment,
-  signature: string,
+  privateKey: string,
 ): TransactionRequest {
-  const adjudicatorInterface = getAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.refute.encode([
-    asEthersObject(refuteState),
-    splitSignature(signature),
-  ]);
-  return {
-    data,
-  };
+  const channelStorage = getChannelStorage(refuteState);
+  const signedRefuteState = signCommitment2(refuteState, privateKey).signedState;
+  return nitroTrans.createRefuteTransaction(channelStorage, signedRefuteState);
 }
 
 export interface ConcludeAndWithdrawArgs {

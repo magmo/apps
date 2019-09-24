@@ -14183,9 +14183,9 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
-"nitro-protocol@https://github.com/statechannels/nitro-protocol.git#ag-include-contracts":
+"nitro-protocol@https://github.com/statechannels/nitro-protocol.git#expose_createRefuteTransaction":
   version "0.0.1"
-  resolved "https://github.com/statechannels/nitro-protocol.git#436f7bb68ad6f391bf53873fd5e7f42eec69b2b6"
+  resolved "https://github.com/statechannels/nitro-protocol.git#55c7022c5c49d05fdcb186e73a5af98871682771"
   dependencies:
     "@openzeppelin/contracts" "^2.3.0"
     ethers "^4.0.26"
@@ -21806,6 +21806,7 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
+    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"

@@ -1,4 +1,4 @@
-import { Commitment } from '../../../../domain';
+import { Commitment, getChannelId } from '../../../../domain';
 import { ProtocolStateWithSharedData } from '../..';
 import * as states from './states';
 import * as actions from './actions';
@@ -11,7 +11,7 @@ import {
   initialize as initTransactionState,
   transactionReducer,
 } from '../../transaction-submission/reducer';
-import { SharedData, signAndStore, registerChannelToMonitor } from '../../../state';
+import { SharedData, signAndStore, registerChannelToMonitor, getPrivatekey } from '../../../state';
 import { isTransactionAction } from '../../transaction-submission/actions';
 import {
   isTerminal,
@@ -255,21 +255,19 @@ const craftResponseTransactionWithExistingCommitment = (
   challengeCommitment: Commitment,
   sharedData: SharedData,
 ): TransactionRequest => {
-  const {
-    penultimateCommitment,
-    lastCommitment,
-    lastSignature,
-    penultimateSignature,
-  } = getStoredCommitments(challengeCommitment, sharedData);
+  const { penultimateCommitment, lastCommitment, lastSignature } = getStoredCommitments(
+    challengeCommitment,
+    sharedData,
+  );
 
   if (canRefute(challengeCommitment, sharedData)) {
+    const channelId = getChannelId(challengeCommitment);
+    const privateKey = getPrivatekey(sharedData, channelId);
+
     if (canRefuteWithCommitment(lastCommitment, challengeCommitment)) {
-      return TransactionGenerator.createRefuteTransaction(lastCommitment, lastSignature);
+      return TransactionGenerator.createRefuteTransaction(lastCommitment, privateKey);
     } else {
-      return TransactionGenerator.createRefuteTransaction(
-        penultimateCommitment,
-        penultimateSignature,
-      );
+      return TransactionGenerator.createRefuteTransaction(penultimateCommitment, privateKey);
     }
   } else if (canRespondWithExistingCommitment(challengeCommitment, sharedData)) {
     return TransactionGenerator.createRespondWithMoveTransaction(lastCommitment, lastSignature);

@@ -147,9 +147,7 @@ describe('transactions', () => {
       commitmentCount: 1,
     };
 
-    const toSig = signCommitment(toCommitment, participantA.privateKey);
-
-    const refuteTransaction = createRefuteTransaction(toCommitment, toSig);
+    const refuteTransaction = createRefuteTransaction(toCommitment, participantA.privateKey);
     await testTransactionSender(refuteTransaction);
   });
 
