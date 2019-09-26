@@ -1,4 +1,4 @@
-import { getAdjudicatorContract } from '../../utils/contract-utils';
+import { getNitroAdjudicatorContract } from '../../utils/contract-utils';
 import { call, take, put, select } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import * as actions from '../actions';
@@ -7,9 +7,11 @@ import { fromParameters } from 'fmg-core/lib/commitment';
 import { getAdjudicatorWatcherSubscribersForChannel } from '../selectors';
 import { ChannelSubscriber } from '../state';
 import { ProtocolLocator } from '../../communication';
+import { BigNumber } from 'ethers/utils';
+import { Address } from 'fmg-core';
 
 enum AdjudicatorEventType {
-  ChallengeCreated,
+  ChallengeRegistered,
   Concluded,
   Refuted,
   RespondWithMove,
@@ -20,6 +22,29 @@ interface AdjudicatorEvent {
   eventArgs: any;
   channelId: string;
   eventType: AdjudicatorEventType;
+}
+
+export interface FixedPart {
+  chainId: BigNumber;
+  participants: Address[];
+  channelNonce: BigNumber;
+  appDefinition: Address;
+  challengeDuration: BigNumber;
+}
+
+export interface VariablePart {
+  outcome: string;
+  appData: string;
+}
+
+interface ChallengeRegisteredArgs {
+  channelId: string;
+  largestTurnNum: number;
+  finalizesAt: BigNumber;
+  challenger: Address;
+  isFinalCount: boolean;
+  fixedPart: FixedPart;
+  variablePart: VariablePart;
 }
 
 export function* adjudicatorWatcher(provider) {
@@ -41,15 +66,18 @@ export function* adjudicatorWatcher(provider) {
 
 function* dispatchEventAction(event: AdjudicatorEvent) {
   switch (event.eventType) {
-    case AdjudicatorEventType.ChallengeCreated:
+    case AdjudicatorEventType.ChallengeRegistered:
       const { channelId } = event;
-      const { commitment, finalizedAt } = event.eventArgs;
-      const altFinalizedAt = finalizedAt * 1000;
+      const args: ChallengeRegisteredArgs = event.eventArgs;
+      const altFinalizedAt = args.finalizesAt.mul(1000);
       yield put(
-        actions.challengeCreatedEvent({
+        actions.challengeRegisteredEvent({
           channelId,
-          commitment: fromParameters(commitment),
-          finalizedAt: altFinalizedAt,
+          finalizesAt: altFinalizedAt,
+          challenger: args.challenger,
+          isFinalCount: args.isFinalCount,
+          fixedPart: args.fixedPart,
+          variableParts: args.variablePart,
         }),
       );
       break;
@@ -63,14 +91,14 @@ function* dispatchProcessEventAction(
 ) {
   const { channelId } = event;
   switch (event.eventType) {
-    case AdjudicatorEventType.ChallengeCreated:
+    case AdjudicatorEventType.ChallengeRegistered:
       const { finalizedAt } = event.eventArgs;
       yield put(
         actions.challengeExpirySetEvent({
           processId,
           protocolLocator,
           channelId,
-          expiryTime: finalizedAt * 1000,
+          expiryTime: finalizedAt.mul(1000),
         }),
       );
       break;
@@ -120,22 +148,40 @@ function* dispatchProcessEventAction(
 }
 
 function* createAdjudicatorEventChannel(provider) {
-  const adjudicator: ethers.Contract = yield call(getAdjudicatorContract, provider);
+  const adjudicator: ethers.Contract = yield call(getNitroAdjudicatorContract, provider);
 
   return eventChannel(emitter => {
-    const challengeCreatedFilter = adjudicator.filters.ChallengeCreated();
+    const challengeRegisteredFilter = adjudicator.filters.ChallengeRegistered();
     const gameConcludedFilter = adjudicator.filters.Concluded();
     const refutedFilter = adjudicator.filters.Refuted();
     const respondWithMoveFilter = adjudicator.filters.RespondedWithMove();
     const depositedFilter = adjudicator.filters.Deposited();
 
-    adjudicator.on(challengeCreatedFilter, (channelId, commitment, finalizedAt) => {
-      emitter({
-        eventType: AdjudicatorEventType.ChallengeCreated,
+    adjudicator.on(
+      challengeRegisteredFilter,
+      (
         channelId,
-        eventArgs: { commitment, finalizedAt },
-      });
-    });
+        largestTurnNum,
+        challengeDuration,
+        challenger,
+        isFinalCount,
+        fixedPart,
+        variablePart,
+      ) => {
+        emitter({
+          eventType: AdjudicatorEventType.ChallengeRegistered,
+          channelId,
+          eventArgs: {
+            largestTurnNum,
+            challengeDuration,
+            challenger,
+            isFinalCount,
+            fixedPart,
+            variablePart,
+          },
+        });
+      },
+    );
     adjudicator.on(gameConcludedFilter, channelId => {
       emitter({ eventType: AdjudicatorEventType.Concluded, channelId });
     });
@@ -158,7 +204,7 @@ function* createAdjudicatorEventChannel(provider) {
     });
     return () => {
       // This function is called when the channel gets closed
-      adjudicator.removeAllListeners(challengeCreatedFilter);
+      adjudicator.removeAllListeners(challengeRegisteredFilter);
       adjudicator.removeAllListeners(gameConcludedFilter);
       adjudicator.removeAllListeners(refutedFilter);
       adjudicator.removeAllListeners(respondWithMoveFilter);

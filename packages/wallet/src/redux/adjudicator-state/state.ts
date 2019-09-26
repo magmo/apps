@@ -1,4 +1,7 @@
+import { AddressZero } from 'ethers/constants';
+
 import { Commitment } from '../../domain';
+import { Address } from 'fmg-core';
 
 export interface AdjudicatorState {
   [channelId: string]: AdjudicatorChannelState;
@@ -8,6 +11,9 @@ export interface AdjudicatorChannelState {
   balance: string;
   finalized: boolean;
   challenge?: Challenge;
+  finalizedAt: string;
+  outcomeBytes: string;
+  challengerAddress: Address;
 }
 export interface Challenge {
   expiresAt: number;
@@ -20,7 +26,14 @@ function getOrCreateAdjudicatorChannelState(
 ): AdjudicatorChannelState {
   let channelState = getAdjudicatorChannelState(adjudicatorState, channelId);
   if (!channelState) {
-    channelState = { channelId, balance: '0x0', finalized: false };
+    channelState = {
+      channelId,
+      balance: '0x0',
+      finalized: false,
+      finalizedAt: '0',
+      outcomeBytes: '',
+      challengerAddress: AddressZero,
+    };
   }
   return channelState;
 }
