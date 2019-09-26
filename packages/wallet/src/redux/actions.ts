@@ -26,6 +26,9 @@ import { FundingStrategyNegotiationAction } from './protocols/funding-strategy-n
 import { LedgerFundingAction } from './protocols/ledger-funding';
 
 import { LOAD as LOAD_FROM_STORAGE } from 'redux-storage';
+import { Address } from 'fmg-core';
+import { FixedPart, VariablePart } from './sagas/adjudicator-watcher';
+import { BigNumber } from 'ethers/utils';
 export * from './protocols/transaction-submission/actions';
 export { CommitmentReceived, commitmentReceived };
 
@@ -78,11 +81,14 @@ export interface ChallengeExpirySetEvent {
   expiryTime;
 }
 
-export interface ChallengeCreatedEvent {
-  type: 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT';
+export interface ChallengeRegisteredEvent {
+  type: 'WALLET.ADJUDICATOR.CHALLENGE_REGISTERED_EVENT';
   channelId: string;
-  commitment: Commitment;
-  finalizedAt: number;
+  finalizesAt: BigNumber;
+  challenger: Address;
+  isFinalCount: boolean;
+  fixedPart: FixedPart;
+  variableParts: VariablePart;
 }
 
 export interface ConcludedEvent {
@@ -168,9 +174,9 @@ export const challengeExpirySetEvent: ActionConstructor<ChallengeExpirySetEvent>
   type: 'WALLET.ADJUDICATOR.CHALLENGE_EXPIRY_TIME_SET',
 });
 
-export const challengeCreatedEvent: ActionConstructor<ChallengeCreatedEvent> = p => ({
+export const challengeRegisteredEvent: ActionConstructor<ChallengeRegisteredEvent> = p => ({
   ...p,
-  type: 'WALLET.ADJUDICATOR.CHALLENGE_CREATED_EVENT',
+  type: 'WALLET.ADJUDICATOR.CHALLENGE_REGISTERED_EVENT',
 });
 
 export const concludedEvent: ActionConstructor<ConcludedEvent> = p => ({

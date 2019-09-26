@@ -9,7 +9,7 @@ export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
 }
 
-export async function getAdjudicatorContract(provider) {
+export async function getNitroAdjudicatorContract(provider) {
   await provider.ready;
   const networkId = (await provider.getNetwork()).chainId;
   const contractAddress = NitroAdjudicatorArtifact.networks[networkId].address;
@@ -56,13 +56,13 @@ export function isDevelopmentNetwork(): boolean {
 }
 
 export async function getAdjudicatorHoldings(provider, channelId) {
-  const contract = await getAdjudicatorContract(provider);
+  const contract = await getNitroAdjudicatorContract(provider);
   const holdingForChannel = await contract.holdings(channelId);
   return holdingForChannel;
 }
 
 export async function getAdjudicatorOutcome(provider, channelId) {
-  const contract = await getAdjudicatorContract(provider);
+  const contract = await getNitroAdjudicatorContract(provider);
   const outcomeForChannel = await contract.outcomes(channelId);
   return outcomeForChannel;
 }
@@ -72,7 +72,7 @@ export async function validateTransition(
   toCommitment: Commitment,
 ): Promise<boolean> {
   const provider = await getProvider();
-  const contract = await getAdjudicatorContract(provider);
+  const contract = await getNitroAdjudicatorContract(provider);
   try {
     return await contract.validTransition(
       asEthersObject(fromCommitment),
